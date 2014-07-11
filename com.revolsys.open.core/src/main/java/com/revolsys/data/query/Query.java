@@ -9,10 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.revolsys.data.query.functions.EnvelopeIntersects;
+import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.jts.geom.BoundingBox;
 
 public class Query extends AbstractObjectWithProperties implements Cloneable {
   private static void addFilter(final Query query,
@@ -71,6 +75,20 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     }
   }
 
+  public static Query intersects(final RecordDefinition recordDefinition,
+    final BoundingBox boundingBox) {
+    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
+    if (geometryAttribute == null) {
+      return null;
+    } else {
+      final EnvelopeIntersects intersects = F.envelopeIntersects(
+        geometryAttribute, boundingBox);
+      final Query query = new Query(recordDefinition, intersects);
+      return query;
+    }
+
+  }
+
   public static Query or(final RecordDefinition recordDefinition,
     final Map<String, ?> filter) {
     final Query query = new Query(recordDefinition);
@@ -104,6 +122,8 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   private Condition whereCondition;
 
+  private Statistics statistics;
+
   public Query() {
   }
 
@@ -112,7 +132,8 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     this.recordDefinition = recordDefinition;
   }
 
-  public Query(final RecordDefinition recordDefinition, final Condition whereCondition) {
+  public Query(final RecordDefinition recordDefinition,
+    final Condition whereCondition) {
     this(recordDefinition);
     setWhereCondition(whereCondition);
   }
@@ -127,12 +148,12 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   }
 
   public void addOrderBy(final String column, final boolean ascending) {
-    orderBy.put(column, ascending);
+    this.orderBy.put(column, ascending);
   }
 
   @Deprecated
   public void addParameter(final Object value) {
-    parameters.add(value);
+    this.parameters.add(value);
   }
 
   public void and(final Condition condition) {
@@ -152,10 +173,10 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     try {
       final Query clone = (Query)super.clone();
       clone.attributeNames = new ArrayList<String>(clone.attributeNames);
-      clone.parameters = new ArrayList<Object>(parameters);
-      clone.orderBy = new HashMap<String, Boolean>(orderBy);
-      if (whereCondition != null) {
-        clone.whereCondition = whereCondition.clone();
+      clone.parameters = new ArrayList<Object>(this.parameters);
+      clone.orderBy = new HashMap<String, Boolean>(this.orderBy);
+      if (this.whereCondition != null) {
+        clone.whereCondition = this.whereCondition.clone();
       }
       if (!clone.getAttributeNames().isEmpty() || clone.whereCondition != null) {
         clone.sql = null;
@@ -167,11 +188,11 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   }
 
   public List<String> getAttributeNames() {
-    return attributeNames;
+    return this.attributeNames;
   }
 
   public String getFromClause() {
-    return fromClause;
+    return this.fromClause;
   }
 
   public Attribute getGeometryAttribute() {
@@ -179,43 +200,47 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   }
 
   public int getLimit() {
-    return limit;
-  }
-
-  public RecordDefinition getRecordDefinition() {
-    return recordDefinition;
+    return this.limit;
   }
 
   public int getOffset() {
-    return offset;
+    return this.offset;
   }
 
   public Map<String, Boolean> getOrderBy() {
-    return orderBy;
+    return this.orderBy;
   }
 
   public List<Object> getParameters() {
-    return parameters;
+    return this.parameters;
+  }
+
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   public String getSql() {
-    return sql;
+    return this.sql;
+  }
+
+  public Statistics getStatistics() {
+    return this.statistics;
   }
 
   public String getTypeName() {
-    return typeName;
+    return this.typeName;
   }
 
   public String getTypeNameAlias() {
-    return typePathAlias;
+    return this.typePathAlias;
   }
 
   public Condition getWhereCondition() {
-    return whereCondition;
+    return this.whereCondition;
   }
 
   public boolean isLockResults() {
-    return lockResults;
+    return this.lockResults;
   }
 
   public void setAttributeNames(final List<String> attributeNames) {
@@ -236,13 +261,6 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   public void setLockResults(final boolean lockResults) {
     this.lockResults = lockResults;
-  }
-
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.recordDefinition = recordDefinition;
-    if (whereCondition != null) {
-      whereCondition.setRecordDefinition(recordDefinition);
-    }
   }
 
   public void setOffset(final int offset) {
@@ -269,8 +287,19 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     setOrderByColumns(Arrays.asList(orderBy));
   }
 
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
+    if (this.whereCondition != null) {
+      this.whereCondition.setRecordDefinition(recordDefinition);
+    }
+  }
+
   public void setSql(final String sql) {
     this.sql = sql;
+  }
+
+  public void setStatistics(final Statistics statistics) {
+    this.statistics = statistics;
   }
 
   public void setTypeName(final String typeName) {
@@ -297,14 +326,14 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   public String toString() {
     try {
       final StringBuffer string = new StringBuffer();
-      if (sql == null) {
+      if (this.sql == null) {
         string.append(JdbcUtils.getSelectSql(this));
       } else {
-        string.append(sql);
+        string.append(this.sql);
       }
-      if (!parameters.isEmpty()) {
+      if (!this.parameters.isEmpty()) {
         string.append(" ");
-        string.append(parameters);
+        string.append(this.parameters);
       }
       return string.toString();
     } catch (final Throwable t) {

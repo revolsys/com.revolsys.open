@@ -217,13 +217,19 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   protected void cleanCachedRecords() {
     synchronized (getSync()) {
       super.cleanCachedRecords();
-      final Set<Identifier> ids = new HashSet<>();
+      final Set<Identifier> identifiers = new HashSet<>();
       for (final Set<Identifier> recordIds : this.cacheIdToRecordIdMap.values()) {
         if (recordIds != null) {
-          ids.addAll(recordIds);
+          identifiers.addAll(recordIds);
         }
       }
-      this.recordIdToRecordMap.keySet().retainAll(ids);
+      for (final AbstractProxyLayerRecord record : getProxyRecords()) {
+        final Identifier identifier = record.getIdentifier();
+        if (identifier != null) {
+          identifiers.add(identifier);
+        }
+      }
+      this.recordIdToRecordMap.keySet().retainAll(identifiers);
     }
     // for (final Entry<Label, Set<Identifier>> entry :
     // this.cacheIdToRecordIdMap.entrySet()) {
@@ -657,9 +663,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   protected List<LayerRecord> getRecordsFromRecordStore(
     final BoundingBox boundingBox) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final Attribute geometryAttribute = getGeometryAttribute();
-    final Query query = new Query(recordDefinition, F.envelopeIntersects(
-      geometryAttribute, boundingBox));
+    final Query query = Query.intersects(recordDefinition, boundingBox);
     return query(query);
   }
 

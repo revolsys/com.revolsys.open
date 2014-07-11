@@ -3,7 +3,6 @@ package com.revolsys.swing.map.layer.record;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,6 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
@@ -36,13 +34,13 @@ public class ListRecordLayer extends AbstractRecordLayer {
   public ListRecordLayer() {
   }
 
+  public ListRecordLayer(final Map<String, ? extends Object> properties) {
+    super(properties);
+  }
+
   public ListRecordLayer(final RecordDefinition recordDefinition) {
     super(recordDefinition);
     setEditable(true);
-  }
-
-  public ListRecordLayer(final Map<String, ? extends Object> properties) {
-    super(properties);
   }
 
   public ListRecordLayer(final String name,
@@ -69,7 +67,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
     } finally {
       record.setState(RecordState.Persisted);
     }
-    synchronized (records) {
+    synchronized (this.records) {
       this.records.add(record);
     }
     addToIndex(record);
@@ -79,14 +77,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
   public Component createTablePanel() {
     final RecordLayerTable table = RecordListLayerTableModel.createTable(this);
     return new RecordLayerTablePanel(this, table);
-  }
-
-  @Override
-  protected void doDeleteRecord(final LayerRecord record) {
-    this.records.remove(record);
-    super.doDeleteRecord(record);
-    saveChanges(record);
-    fireEmpty();
   }
 
   @Override
@@ -101,42 +91,22 @@ public class ListRecordLayer extends AbstractRecordLayer {
     }
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
   @Override
-  public List<LayerRecord> doQuery(final BoundingBox boundingBox) {
-    final double width = boundingBox.getWidth();
-    final double height = boundingBox.getHeight();
-    if (boundingBox.isEmpty() || width == 0 || height == 0) {
-      return Collections.emptyList();
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
-      final List<LayerRecord> records = (List)getIndex().queryIntersects(
-        convertedBoundingBox);
-      return records;
-    }
-  }
-
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  @Override
-  public List<LayerRecord> doQuery(Geometry geometry, final double distance) {
-    geometry = getGeometryFactory().geometry(geometry);
-    return (List)getIndex().queryDistance(geometry, distance);
+  protected void doDeleteRecord(final LayerRecord record) {
+    this.records.remove(record);
+    super.doDeleteRecord(record);
+    saveChanges(record);
+    fireEmpty();
   }
 
   @Override
   protected List<LayerRecord> doQuery(final Query query) {
     final Condition whereCondition = query.getWhereCondition();
     if (whereCondition == null) {
-      return new ArrayList<LayerRecord>(records);
+      return new ArrayList<LayerRecord>(this.records);
     } else {
       final List<LayerRecord> records = new ArrayList<LayerRecord>();
-      for (final LayerRecord record : new ArrayList<LayerRecord>(
-        this.records)) {
+      for (final LayerRecord record : new ArrayList<LayerRecord>(this.records)) {
         if (whereCondition.accept(record)) {
           records.add(record);
         }
@@ -193,8 +163,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   @Override
   public List<LayerRecord> getRecords() {
     synchronized (this.records) {
-      final ArrayList<LayerRecord> records = new ArrayList<>(
-        this.records);
+      final ArrayList<LayerRecord> records = new ArrayList<>(this.records);
       records.addAll(getNewRecords());
       return records;
     }

@@ -87,8 +87,8 @@ RecordIterator {
 
   private Statistics statistics;
 
-  public JdbcQueryIterator(final JdbcRecordStore recordStore, final Query query,
-    final Map<String, Object> properties) {
+  public JdbcQueryIterator(final JdbcRecordStore recordStore,
+    final Query query, final Map<String, Object> properties) {
     super();
     this.connection = recordStore.getConnection();
     this.dataSource = recordStore.getDataSource();
@@ -111,7 +111,10 @@ RecordIterator {
     }
     this.recordStore = recordStore;
     this.query = query;
-    this.statistics = (Statistics)properties.get(Statistics.class.getName());
+    this.statistics = query.getStatistics();
+    if (this.statistics == null) {
+      this.statistics = (Statistics)properties.get(Statistics.class.getName());
+    }
   }
 
   @Override
@@ -135,10 +138,6 @@ RecordIterator {
   @Override
   protected void doInit() {
     this.resultSet = getResultSet();
-  }
-
-  public JdbcRecordStore getRecordStore() {
-    return this.recordStore;
   }
 
   protected String getErrorMessage() {
@@ -182,6 +181,10 @@ RecordIterator {
       hasNext();
     }
     return this.recordDefinition;
+  }
+
+  public JdbcRecordStore getRecordStore() {
+    return this.recordStore;
   }
 
   protected ResultSet getResultSet() {

@@ -8,12 +8,15 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
 
   public AbstractProxyLayerRecord(final AbstractRecordLayer layer) {
     super(layer);
+    layer.addProxyRecord(this);
   }
 
   @Override
-  public synchronized void cancelChanges() {
+  public void cancelChanges() {
     final LayerRecord record = getLayerRecord();
-    record.cancelChanges();
+    if (record != null) {
+      record.cancelChanges();
+    }
   }
 
   @Override
@@ -22,6 +25,12 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
     if (record != null) {
       record.clearChanges();
     }
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    final AbstractRecordLayer layer = getLayer();
+    layer.removeProxyRecord(this);
   }
 
   @Override

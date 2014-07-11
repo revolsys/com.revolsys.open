@@ -19,8 +19,8 @@ import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 
-public class RecordStoreQueryReader extends IteratorReader<Record>
-  implements RecordReader {
+public class RecordStoreQueryReader extends IteratorReader<Record> implements
+  RecordReader {
 
   private AbstractRecordStore recordStore;
 
@@ -42,33 +42,33 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
   }
 
   public void addQuery(final Query query) {
-    queries.add(query);
+    this.queries.add(query);
   }
 
   @Override
   @PreDestroy
   public void close() {
     super.close();
-    boundingBox = null;
-    recordStore = null;
-    queries = null;
-    typePaths = null;
-    whereClause = null;
+    this.boundingBox = null;
+    this.recordStore = null;
+    this.queries = null;
+    this.typePaths = null;
+    this.whereClause = null;
   }
 
   protected AbstractIterator<Record> createQueryIterator(final int i) {
-    if (i < queries.size()) {
-      final Query query = queries.get(i);
-      if (StringUtils.hasText(whereClause)) {
-        query.and(new SqlCondition(whereClause));
+    if (i < this.queries.size()) {
+      final Query query = this.queries.get(i);
+      if (StringUtils.hasText(this.whereClause)) {
+        query.and(new SqlCondition(this.whereClause));
       }
-      if (boundingBox != null) {
+      if (this.boundingBox != null) {
         final Attribute geometryAttribute = query.getRecordDefinition()
-          .getGeometryAttribute();
-        query.and(F.envelopeIntersects(geometryAttribute, boundingBox));
+            .getGeometryAttribute();
+        query.and(F.envelopeIntersects(geometryAttribute, this.boundingBox));
       }
 
-      final AbstractIterator<Record> iterator = recordStore.createIterator(
+      final AbstractIterator<Record> iterator = this.recordStore.createIterator(
         query, getProperties());
       return iterator;
     }
@@ -76,11 +76,11 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
   }
 
   public BoundingBox getBoundingBox() {
-    return boundingBox;
+    return this.boundingBox;
   }
 
-  public AbstractRecordStore getRecordStore() {
-    return recordStore;
+  public List<Query> getQueries() {
+    return this.queries;
   }
 
   @Override
@@ -88,29 +88,27 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
     return ((RecordIterator)iterator()).getRecordDefinition();
   }
 
-  public List<Query> getQueries() {
-    return queries;
+  public AbstractRecordStore getRecordStore() {
+    return this.recordStore;
   }
 
   public String getWhereClause() {
-    return whereClause;
+    return this.whereClause;
   }
 
   @Override
   @PostConstruct
   public void open() {
-    if (typePaths != null) {
-      for (final String tableName : typePaths) {
-        final RecordDefinition recordDefinition = recordStore.getRecordDefinition(tableName);
+    if (this.typePaths != null) {
+      for (final String tableName : this.typePaths) {
+        final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(tableName);
         if (recordDefinition != null) {
           Query query;
-          if (boundingBox == null) {
+          if (this.boundingBox == null) {
             query = new Query(recordDefinition);
-            query.setWhereCondition(new SqlCondition(whereClause));
+            query.setWhereCondition(new SqlCondition(this.whereClause));
           } else {
-            query = new Query(recordDefinition);
-            query.setWhereCondition(F.envelopeIntersects(
-              recordDefinition.getGeometryAttribute(), boundingBox));
+            query = Query.intersects(recordDefinition, this.boundingBox);
             ;
           }
           addQuery(query);
@@ -122,10 +120,6 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
 
   public void setBoundingBox(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
-  }
-
-  public void setRecordStore(final AbstractRecordStore recordStore) {
-    this.recordStore = recordStore;
   }
 
   /**
@@ -143,6 +137,10 @@ public class RecordStoreQueryReader extends IteratorReader<Record>
     for (final Query query : queries) {
       addQuery(query);
     }
+  }
+
+  public void setRecordStore(final AbstractRecordStore recordStore) {
+    this.recordStore = recordStore;
   }
 
   /**

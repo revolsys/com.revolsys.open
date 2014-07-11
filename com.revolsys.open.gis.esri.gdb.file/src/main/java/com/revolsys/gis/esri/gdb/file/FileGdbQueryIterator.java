@@ -15,6 +15,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbAttribute;
 import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
+import com.revolsys.gis.io.Statistics;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
@@ -43,6 +44,8 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
   private final int limit;
 
   private int count;
+
+  private Statistics statistics;
 
   FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore,
     final String typePath) {
@@ -82,31 +85,32 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   @Override
   protected void doClose() {
-    if (recordStore != null) {
+    if (this.recordStore != null) {
       try {
-        recordStore.closeEnumRows(rows);
+        this.recordStore.closeEnumRows(this.rows);
       } catch (final Throwable e) {
       } finally {
-        boundingBox = null;
-        recordStore = null;
-        fields = null;
-        recordDefinition = null;
-        rows = null;
-        sql = null;
-        table = null;
+        this.boundingBox = null;
+        this.recordStore = null;
+        this.fields = null;
+        this.recordDefinition = null;
+        this.rows = null;
+        this.sql = null;
+        this.table = null;
       }
     }
   }
 
   @Override
   protected void doInit() {
-    if (recordDefinition != null) {
-      synchronized (recordStore) {
-        if (boundingBox == null) {
-          if (sql.startsWith("SELECT")) {
-            rows = recordStore.query(sql, true);
+    if (this.recordDefinition != null) {
+      synchronized (this.recordStore) {
+        if (this.boundingBox == null) {
+          if (this.sql.startsWith("SELECT")) {
+            this.rows = this.recordStore.query(this.sql, true);
           } else {
-            rows = recordStore.search(table, fields, sql, true);
+            this.rows = this.recordStore.search(this.table, this.fields,
+              this.sql, true);
           }
         } else {
           BoundingBox boundingBox = this.boundingBox;
@@ -117,58 +121,67 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
             boundingBox = boundingBox.expand(0, 1);
           }
           final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter.toEsri(boundingBox);
-          rows = recordStore.search(table, fields, sql, envelope, true);
+          this.rows = this.recordStore.search(this.table, this.fields,
+            this.sql, envelope, true);
+        }
+      }
+    }
+  }
+
+  @Override
+  protected Record getNext() throws NoSuchElementException {
+    if (this.rows == null || this.recordDefinition == null) {
+      throw new NoSuchElementException();
+    } else {
+      Row row = null;
+      while (this.offset > 0 && this.count < this.offset) {
+        this.recordStore.nextRow(this.rows);
+        this.count++;
+      }
+      if (this.limit > -1 && this.count >= this.offset + this.limit) {
+        throw new NoSuchElementException();
+      }
+      row = this.recordStore.nextRow(this.rows);
+      this.count++;
+      if (row == null) {
+        throw new NoSuchElementException();
+      } else {
+        try {
+          final Record record = this.recordFactory.createRecord(this.recordDefinition);
+          if (this.statistics == null) {
+            this.recordStore.addStatistic("query", record);
+          } else {
+            this.statistics.add(record);
+          }
+          record.setState(RecordState.Initalizing);
+          for (final Attribute attribute : this.recordDefinition.getAttributes()) {
+            final String name = attribute.getName();
+            final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+            final Object value;
+            synchronized (this.recordStore) {
+              value = esriAttribute.getValue(row);
+            }
+            record.setValue(name, value);
+          }
+          record.setState(RecordState.Persisted);
+          return record;
+
+        } finally {
+          this.recordStore.closeRow(row);
         }
       }
     }
   }
 
   protected RecordDefinition getRecordDefinition() {
-    if (recordDefinition == null) {
+    if (this.recordDefinition == null) {
       hasNext();
     }
-    return recordDefinition;
+    return this.recordDefinition;
   }
 
-  @Override
-  protected Record getNext() throws NoSuchElementException {
-    if (rows == null || recordDefinition == null) {
-      throw new NoSuchElementException();
-    } else {
-      Row row = null;
-      while (offset > 0 && count < offset) {
-        recordStore.nextRow(rows);
-        count++;
-      }
-      if (limit > -1 && count >= offset + limit) {
-        throw new NoSuchElementException();
-      }
-      row = recordStore.nextRow(rows);
-      count++;
-      if (row == null) {
-        throw new NoSuchElementException();
-      } else {
-        try {
-          final Record object = recordFactory.createRecord(recordDefinition);
-          recordStore.addStatistic("query", object);
-          object.setState(RecordState.Initalizing);
-          for (final Attribute attribute : recordDefinition.getAttributes()) {
-            final String name = attribute.getName();
-            final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-            final Object value;
-            synchronized (recordStore) {
-              value = esriAttribute.getValue(row);
-            }
-            object.setValue(name, value);
-          }
-          object.setState(RecordState.Persisted);
-          return object;
-
-        } finally {
-          recordStore.closeRow(row);
-        }
-      }
-    }
+  public Statistics getStatistics() {
+    return this.statistics;
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
@@ -192,9 +205,13 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     this.sql = whereClause;
   }
 
+  public void setStatistics(final Statistics statistics) {
+    this.statistics = statistics;
+  }
+
   @Override
   public String toString() {
-    return typePath.toString();
+    return this.typePath.toString();
   }
 
 }

@@ -10,7 +10,7 @@ import com.revolsys.jts.geom.BoundingBox;
 
 public class FileGdbReader extends AbstractMultipleIteratorReader<Record> {
 
-  private List<String> typePaths = new ArrayList<String>();
+  private List<String> typePaths = new ArrayList<>();
 
   private final CapiFileGdbRecordStore recordStore;
 
@@ -23,19 +23,19 @@ public class FileGdbReader extends AbstractMultipleIteratorReader<Record> {
   }
 
   public BoundingBox getBoundingBox() {
-    return boundingBox;
+    return this.boundingBox;
   }
 
   @Override
   protected AbstractIterator<Record> getNextIterator() {
-    if (index < typePaths.size()) {
-      final String typePath = typePaths.get(index);
-      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(recordStore,
-        typePath);
-      if (boundingBox != null) {
-        iterator.setBoundingBox(boundingBox);
+    if (this.index < this.typePaths.size()) {
+      final String typePath = this.typePaths.get(this.index);
+      final FileGdbQueryIterator iterator = new FileGdbQueryIterator(
+        this.recordStore, typePath);
+      if (this.boundingBox != null) {
+        iterator.setBoundingBox(this.boundingBox);
       }
-      index++;
+      this.index++;
       return iterator;
     } else {
       return null;
@@ -43,7 +43,7 @@ public class FileGdbReader extends AbstractMultipleIteratorReader<Record> {
   }
 
   public List<String> getTypeNames() {
-    return typePaths;
+    return this.typePaths;
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
@@ -56,7 +56,7 @@ public class FileGdbReader extends AbstractMultipleIteratorReader<Record> {
 
   @Override
   public String toString() {
-    return "Reader " + recordStore.getLabel() + " " + typePaths + " "
-      + boundingBox;
+    return "Reader " + this.recordStore.getLabel() + " " + this.typePaths + " "
+        + this.boundingBox;
   }
 }

@@ -45,18 +45,24 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
    * Internal method to revert the records values to the original
    */
   @Override
-  public synchronized void cancelChanges() {
-    RecordState newState = getState();
-    if (newState != RecordState.New) {
-      newState = RecordState.Persisted;
-    }
-    setState(RecordState.Initalizing);
+  public void cancelChanges() {
+    synchronized (getSync()) {
+      RecordState newState = getState();
+      if (newState != RecordState.New) {
+        newState = RecordState.Persisted;
+      }
+      setState(RecordState.Initalizing);
 
-    if (this.originalValues != null) {
-      super.setValues(this.originalValues);
+      if (this.originalValues != null) {
+        super.setValues(this.originalValues);
+      }
+      this.originalValues = null;
+      setState(newState);
     }
-    this.originalValues = null;
-    setState(newState);
+  }
+
+  protected Object getSync() {
+    return getLayer().getSync();
   }
 
   @Override
@@ -79,13 +85,15 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
-  public synchronized Identifier getIdentifier() {
-    Identifier identifier = this.identifier.get();
-    if (identifier == null) {
-      identifier = super.getIdentifier();
-      this.identifier = new WeakReference<>(identifier);
+  public Identifier getIdentifier() {
+    synchronized (getSync()) {
+      Identifier identifier = this.identifier.get();
+      if (identifier == null) {
+        identifier = super.getIdentifier();
+        this.identifier = new WeakReference<>(identifier);
+      }
+      return identifier;
     }
-    return identifier;
   }
 
   @Override
@@ -190,7 +198,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
-            && !StringUtils.hasText((String)value)) {
+          && !StringUtils.hasText((String)value)) {
           return false;
         }
       }

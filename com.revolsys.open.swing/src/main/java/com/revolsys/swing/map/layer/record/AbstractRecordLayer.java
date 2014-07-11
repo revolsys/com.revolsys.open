@@ -22,6 +22,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JComponent;
@@ -30,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
+import org.apache.commons.collections4.set.MapBackedSet;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.expression.EvaluationContext;
@@ -274,6 +276,8 @@ RecordFactory, AddGeometryCompleteAction {
 
   private final Label cacheIdIndex = new Label("index");
 
+  private final Set<AbstractProxyLayerRecord> proxyRecords = MapBackedSet.mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
+
   public AbstractRecordLayer() {
     this("");
   }
@@ -359,6 +363,10 @@ RecordFactory, AddGeometryCompleteAction {
         }
       }
     }
+  }
+
+  protected void addProxyRecord(final AbstractProxyLayerRecord record) {
+    this.proxyRecords.add(record);
   }
 
   @SuppressWarnings("unchecked")
@@ -489,6 +497,7 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   protected void cleanCachedRecords() {
+    System.gc();
     // for (final Entry<Label, Set<LayerRecord>> entry :
     // this.cacheIdToRecordMap.entrySet()) {
     // final Label key = entry.getKey();
@@ -732,13 +741,31 @@ RecordFactory, AddGeometryCompleteAction {
     }
   }
 
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
   protected List<LayerRecord> doQuery(final BoundingBox boundingBox) {
-    return Collections.emptyList();
+    final double width = boundingBox.getWidth();
+    final double height = boundingBox.getHeight();
+    if (boundingBox.isEmpty() || width == 0 || height == 0) {
+      return Collections.emptyList();
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
+      final List<LayerRecord> records = (List)getIndex().queryIntersects(
+        convertedBoundingBox);
+      return records;
+    }
   }
 
-  protected List<LayerRecord> doQuery(final Geometry geometry,
-    final double maxDistance) {
-    return Collections.emptyList();
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public List<LayerRecord> doQuery(Geometry geometry, final double distance) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    geometry = geometry.convert(geometryFactory);
+    final RecordQuadTree index = getIndex();
+    return (List)index.queryDistance(geometry, distance);
   }
 
   protected abstract List<LayerRecord> doQuery(final Query query);
@@ -1180,6 +1207,10 @@ RecordFactory, AddGeometryCompleteAction {
     }
   }
 
+  public List<AbstractProxyLayerRecord> getProxyRecords() {
+    return new ArrayList<>(this.proxyRecords);
+  }
+
   public Query getQuery() {
     if (this.query == null) {
       return null;
@@ -1259,7 +1290,7 @@ RecordFactory, AddGeometryCompleteAction {
     return getProperty("snapLayers", Collections.<String> emptyList());
   }
 
-  protected Object getSync() {
+  public Object getSync() {
     return this.sync;
   }
 
@@ -1815,6 +1846,10 @@ RecordFactory, AddGeometryCompleteAction {
 
   protected void removeHighlightedRecord(final LayerRecord record) {
     removeRecordFromCache(this.cacheIdHighlighted, record);
+  }
+
+  public void removeProxyRecord(final AbstractProxyLayerRecord proxyRecord) {
+    this.proxyRecords.remove(proxyRecord);
   }
 
   public boolean removeRecordFromCache(final Label cacheId,

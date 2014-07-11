@@ -14,7 +14,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayerRecord extends AbstractRecord implements
-LayerRecord {
+  LayerRecord {
 
   private final AbstractRecordLayer layer;
 
@@ -26,7 +26,7 @@ LayerRecord {
    * Internal method to revert the records values to the original
    */
   @Override
-  public synchronized void cancelChanges() {
+  public void cancelChanges() {
   }
 
   @Override
@@ -143,7 +143,7 @@ LayerRecord {
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
-            && !StringUtils.hasText((String)value)) {
+          && !StringUtils.hasText((String)value)) {
           return false;
         }
       }

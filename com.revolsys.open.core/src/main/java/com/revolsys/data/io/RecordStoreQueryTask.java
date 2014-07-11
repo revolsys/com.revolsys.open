@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.data.query.Query;
-import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.BoundingBox;
@@ -30,7 +28,7 @@ public class RecordStoreQueryTask extends AbstractProcess {
   }
 
   public void cancel() {
-    objects = null;
+    this.objects = null;
   }
 
   @Override
@@ -40,16 +38,14 @@ public class RecordStoreQueryTask extends AbstractProcess {
 
   @Override
   public void run() {
-    objects = new ArrayList<Record>();
-    final RecordDefinition recordDefinition = recordStore.getRecordDefinition(path);
-    final Query query = new Query(recordDefinition);
-    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-    query.setWhereCondition(F.envelopeIntersects(geometryAttribute, boundingBox));
+    this.objects = new ArrayList<Record>();
+    final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(this.path);
+    final Query query = Query.intersects(recordDefinition, this.boundingBox);
     try (
-      final Reader<Record> reader = recordStore.query(query)) {
+        final Reader<Record> reader = this.recordStore.query(query)) {
       for (final Record object : reader) {
         try {
-          objects.add(object);
+          this.objects.add(object);
         } catch (final NullPointerException e) {
           return;
         }
