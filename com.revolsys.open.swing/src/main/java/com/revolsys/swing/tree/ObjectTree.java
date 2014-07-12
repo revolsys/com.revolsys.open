@@ -16,6 +16,7 @@ import javax.swing.DropMode;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import com.revolsys.swing.dnd.transferhandler.ObjectTreeTransferHandler;
 import com.revolsys.swing.menu.MenuFactory;
@@ -69,6 +70,8 @@ public class ObjectTree extends BaseTree implements PropertyChangeListener {
     setTransferHandler(new ObjectTreeTransferHandler(model));
     setDragEnabled(true);
     setDropMode(DropMode.ON_OR_INSERT);
+    getSelectionModel().setSelectionMode(
+      TreeSelectionModel.CONTIGUOUS_TREE_SELECTION);
   }
 
   @Override

@@ -23,6 +23,18 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 
 public class ObjectTreeTransferHandler extends TransferHandler {
+  public static boolean isDropSupported(final TreePath treePath,
+    final Set<Class<?>> supportedClasses) {
+    final Object value = treePath.getLastPathComponent();
+    final Class<?> valueClass = value.getClass();
+    for (final Class<?> supportedClass : supportedClasses) {
+      if (supportedClass.isAssignableFrom(valueClass)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private static final long serialVersionUID = 1L;
 
   private final ObjectTreeModel model;
@@ -33,39 +45,18 @@ public class ObjectTreeTransferHandler extends TransferHandler {
 
   @Override
   public boolean canImport(final TransferSupport support) {
-    if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
-      final Component c = support.getComponent();
-      if (c instanceof JTree) {
-        final JTree.DropLocation loc = (JTree.DropLocation)support.getDropLocation();
-        final TreePath path = loc.getPath();
-        if (path != null) {
-          final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(path);
-          if (nodeModel != null) {
-            final Set<Class<?>> supportedClasses = nodeModel.getSupportedChildClasses();
-            try {
-              final Transferable transferable = support.getTransferable();
-              final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);
-              if (data instanceof TreePathListTransferable) {
-                final TreePathListTransferable pathTransferable = (TreePathListTransferable)data;
-                final List<TreePath> pathList = pathTransferable.getPaths();
-                for (final TreePath treePath : pathList) {
-                  if (!isDropSupported(treePath, supportedClasses)) {
-                    return false;
-                  }
-                }
-              }
-              support.setShowDropLocation(true);
-              return true;
-
-            } catch (final Exception e) {
-              return false;
-            }
+    final Component c = support.getComponent();
+    if (c instanceof JTree) {
+      final JTree.DropLocation loc = (JTree.DropLocation)support.getDropLocation();
+      final TreePath path = loc.getPath();
+      if (path != null) {
+        final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(path);
+        if (nodeModel != null) {
+          if (nodeModel.canImport(path, support)) {
+            return true;
           }
         }
-
       }
-    } else if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-      return true;
     }
     return false;
   }
@@ -96,7 +87,7 @@ public class ObjectTreeTransferHandler extends TransferHandler {
             final TreePath parentPath = treePath.getParentPath();
             final Object parent = parentPath.getLastPathComponent();
             if (pathTransferable.isSameParent(treePath)) {
-              model.fireTreeNodesChanged(treePath);
+              this.model.fireTreeNodesChanged(treePath);
             } else {
               final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(parentPath);
               if (nodeModel != null) {
@@ -115,7 +106,7 @@ public class ObjectTreeTransferHandler extends TransferHandler {
   @Override
   public int getSourceActions(final JComponent c) {
     if (c instanceof JTree) {
-      return MOVE;
+      return COPY_OR_MOVE;
     } else {
       return NONE;
     }
@@ -125,6 +116,8 @@ public class ObjectTreeTransferHandler extends TransferHandler {
   @Override
   public boolean importData(final TransferSupport support) {
     final Component component = support.getComponent();
+    System.out.println(support.getDropAction());
+    System.out.println(support.getUserDropAction());
     if (component instanceof ObjectTree) {
       final JTree.DropLocation loc = (JTree.DropLocation)support.getDropLocation();
       final TreePath path = loc.getPath();
@@ -180,18 +173,6 @@ public class ObjectTreeTransferHandler extends TransferHandler {
             return false;
           }
         }
-      }
-    }
-    return false;
-  }
-
-  private boolean isDropSupported(final TreePath treePath,
-    final Set<Class<?>> supportedClasses) {
-    final Object value = treePath.getLastPathComponent();
-    final Class<?> valueClass = value.getClass();
-    for (final Class<?> supportedClass : supportedClasses) {
-      if (supportedClass.isAssignableFrom(valueClass)) {
-        return true;
       }
     }
     return false;

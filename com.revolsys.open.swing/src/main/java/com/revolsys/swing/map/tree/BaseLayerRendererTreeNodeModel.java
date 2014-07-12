@@ -4,8 +4,6 @@ import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Collections;
-import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -23,11 +21,8 @@ public class BaseLayerRendererTreeNodeModel extends
   AbstractObjectTreeNodeModel<AbstractLayerRenderer<? extends Layer>, Void>
   implements MouseListener {
 
-  private final Set<Class<?>> SUPPORTED_CHILD_CLASSES = Collections.<Class<?>> singleton(AbstractLayerRenderer.class);
-
   public BaseLayerRendererTreeNodeModel() {
     setSupportedClasses(AbstractLayerRenderer.class);
-    setSupportedChildClasses(this.SUPPORTED_CHILD_CLASSES);
     setMouseListener(this);
   }
 

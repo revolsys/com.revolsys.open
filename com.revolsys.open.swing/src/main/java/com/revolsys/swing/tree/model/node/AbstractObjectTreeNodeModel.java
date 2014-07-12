@@ -1,6 +1,7 @@
 package com.revolsys.swing.tree.model.node;
 
 import java.awt.Component;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,12 +12,16 @@ import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
+import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
 
 import org.springframework.util.CollectionUtils;
 
 import com.revolsys.beans.ClassUtil;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.dnd.transferable.TreePathListTransferable;
+import com.revolsys.swing.dnd.transferhandler.ObjectTreeTransferHandler;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
@@ -69,6 +74,32 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
         nodeModel.setObjectTreeModel(this.objectTreeModel);
       }
     }
+  }
+
+  @Override
+  public boolean canImport(final TreePath path, final TransferSupport support) {
+    if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
+      final Set<Class<?>> supportedClasses = getSupportedChildClasses();
+      try {
+        final Transferable transferable = support.getTransferable();
+        final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);
+        if (data instanceof TreePathListTransferable) {
+          final TreePathListTransferable pathTransferable = (TreePathListTransferable)data;
+          final List<TreePath> pathList = pathTransferable.getPaths();
+          for (final TreePath treePath : pathList) {
+            if (!ObjectTreeTransferHandler.isDropSupported(treePath,
+              supportedClasses)) {
+              return false;
+            }
+          }
+        }
+        support.setShowDropLocation(true);
+        return true;
+      } catch (final Exception e) {
+        return false;
+      }
+    }
+    return false;
   }
 
   @Override

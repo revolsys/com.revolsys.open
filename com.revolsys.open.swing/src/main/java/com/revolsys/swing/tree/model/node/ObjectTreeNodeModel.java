@@ -6,50 +6,54 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.JTree;
+import javax.swing.TransferHandler.TransferSupport;
+import javax.swing.tree.TreePath;
 
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 
 public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> {
-  int addChild(final NODE node, final CHILD child);
+  int addChild(NODE node, CHILD child);
 
   int addChild(NODE node, int index, CHILD child);
+
+  boolean canImport(TreePath path, TransferSupport support);
 
   String convertValueToText(NODE node, boolean selected, boolean expanded,
     boolean leaf, int row, boolean hasFocus);
 
-  CHILD getChild(final NODE node, final int index);
+  CHILD getChild(NODE node, int index);
 
-  int getChildCount(final NODE node);
+  int getChildCount(NODE node);
 
-  int getIndexOfChild(final NODE node, final CHILD child);
+  int getIndexOfChild(NODE node, CHILD child);
 
-  Object getLabel(final NODE node);
+  Object getLabel(NODE node);
 
-  MenuFactory getMenu(final NODE node);
+  MenuFactory getMenu(NODE node);
 
-  MouseListener getMouseListener(final NODE node);
+  MouseListener getMouseListener(NODE node);
 
   ObjectTreeNodeModel<?, ?> getObjectTreeNodeModel(Class<?> clazz);
 
   List<ObjectTreeNodeModel<?, ?>> getObjectTreeNodeModels();
 
-  <T> T getParent(final NODE node);
+  <T> T getParent(NODE node);
 
-  Component getRenderer(final NODE node, JTree tree, boolean selected,
+  Component getRenderer(NODE node, JTree tree, boolean selected,
     boolean expanded, boolean leaf, int row, boolean hasFocus);
 
   Set<Class<?>> getSupportedChildClasses();
 
   Set<Class<?>> getSupportedClasses();
 
-  void initialize(final NODE node);
+  void initialize(NODE node);
 
   boolean isLazyLoad();
 
-  boolean isLeaf(final NODE node);
+  boolean isLeaf(NODE node);
 
-  boolean removeChild(final NODE node, final CHILD child);
+  boolean removeChild(NODE node, CHILD child);
 
   void setObjectTreeModel(ObjectTreeModel objectTreeModel);
 }

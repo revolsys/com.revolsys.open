@@ -1,6 +1,11 @@
 package com.revolsys.swing.map.tree;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
 import java.util.List;
+
+import javax.swing.TransferHandler.TransferSupport;
+import javax.swing.tree.TreePath;
 
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
@@ -29,6 +34,17 @@ public class LayerGroupTreeNodeModel extends
   public int addChild(final LayerGroup parent, final Layer layer) {
     parent.add(layer);
     return getChildCount(parent);
+  }
+
+  @Override
+  public boolean canImport(final TreePath path, final TransferSupport support) {
+    if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+      support.setDropAction(DnDConstants.ACTION_COPY);
+      support.setShowDropLocation(true);
+      return true;
+    } else {
+      return super.canImport(path, support);
+    }
   }
 
   @Override
