@@ -1,13 +1,16 @@
 package com.revolsys.swing.map.tree;
 
 import java.awt.Rectangle;
+import java.awt.dnd.DnDConstants;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
@@ -19,8 +22,8 @@ import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class BaseLayerTreeNodeModel extends
-  AbstractObjectTreeNodeModel<AbstractLayer, LayerRenderer<Layer>> implements
-  MouseListener {
+AbstractObjectTreeNodeModel<AbstractLayer, LayerRenderer<Layer>> implements
+MouseListener {
 
   public static BaseLayerTreeNodeModel create(final String name,
     final Class<? extends AbstractLayer> layerClass) {
@@ -50,6 +53,23 @@ public class BaseLayerTreeNodeModel extends
   }
 
   @Override
+  public int addChild(final AbstractLayer layer, final int index,
+    final LayerRenderer<Layer> child) {
+    return layer.addRenderer(child, index);
+  }
+
+  @Override
+  public int addChild(final AbstractLayer layer,
+    final LayerRenderer<Layer> child) {
+    return layer.addRenderer(child);
+  }
+
+  @Override
+  public Collection<Class<?>> getChildClasses(final AbstractLayer layer) {
+    return layer.getChildClasses();
+  }
+
+  @Override
   protected List<LayerRenderer<Layer>> getChildren(final AbstractLayer node) {
     final LayerRenderer<Layer> renderer = node.getRenderer();
     if (renderer == null) {
@@ -67,6 +87,17 @@ public class BaseLayerTreeNodeModel extends
     } else {
       return (T)node.getLayerGroup();
     }
+  }
+
+  @Override
+  public boolean isDndDropSupported(final TransferSupport support,
+    final AbstractLayer node, final TreePath treePath) {
+    final boolean dropSupported = super.isDndDropSupported(support, node,
+      treePath);
+    if (dropSupported) {
+      support.setDropAction(DnDConstants.ACTION_COPY);
+    }
+    return dropSupported;
   }
 
   @Override

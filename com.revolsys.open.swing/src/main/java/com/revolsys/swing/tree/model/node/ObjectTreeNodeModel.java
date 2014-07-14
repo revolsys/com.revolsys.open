@@ -1,7 +1,9 @@
 package com.revolsys.swing.tree.model.node;
 
 import java.awt.Component;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -17,10 +19,11 @@ public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> 
 
   int addChild(NODE node, int index, CHILD child);
 
-  boolean canImport(TreePath path, TransferSupport support);
-
   String convertValueToText(NODE node, boolean selected, boolean expanded,
     boolean leaf, int row, boolean hasFocus);
+
+  boolean dndImportData(TransferSupport support, final NODE node, int index)
+      throws IOException, UnsupportedFlavorException;
 
   CHILD getChild(NODE node, int index);
 
@@ -48,6 +51,8 @@ public interface ObjectTreeNodeModel<NODE extends Object, CHILD extends Object> 
   Set<Class<?>> getSupportedClasses();
 
   void initialize(NODE node);
+
+  boolean isDndCanImport(TreePath path, TransferSupport support);
 
   boolean isLazyLoad();
 

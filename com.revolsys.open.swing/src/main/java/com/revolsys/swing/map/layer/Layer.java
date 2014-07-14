@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -13,8 +14,8 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.component.TabbedValuePanel;
 
 public interface Layer extends PropertyChangeSupportProxy,
-  ObjectWithProperties, PropertyChangeListener, Comparable<Layer>,
-  MapSerializer, Child<LayerGroup> {
+ObjectWithProperties, PropertyChangeListener, Comparable<Layer>,
+MapSerializer, Child<LayerGroup> {
 
   TabbedValuePanel createPropertiesPanel();
 
@@ -23,6 +24,8 @@ public interface Layer extends PropertyChangeSupportProxy,
   BoundingBox getBoundingBox();
 
   BoundingBox getBoundingBox(boolean visibleLayersOnly);
+
+  Collection<Class<?>> getChildClasses();
 
   GeometryFactory getGeometryFactory();
 

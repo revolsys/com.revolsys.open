@@ -1,7 +1,11 @@
 package com.revolsys.swing.map.tree;
 
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.TransferHandler.TransferSupport;
@@ -37,13 +41,28 @@ public class LayerGroupTreeNodeModel extends
   }
 
   @Override
-  public boolean canImport(final TreePath path, final TransferSupport support) {
+  public boolean isDndCanImport(final TreePath path, final TransferSupport support) {
     if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
       support.setDropAction(DnDConstants.ACTION_COPY);
       support.setShowDropLocation(true);
       return true;
     } else {
-      return super.canImport(path, support);
+      return super.isDndCanImport(path, support);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean dndImportData(final TransferSupport support,
+    final LayerGroup group, final int index) throws IOException,
+    UnsupportedFlavorException {
+    if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+      final Transferable transferable = support.getTransferable();
+      final List<File> files = (List<File>)transferable.getTransferData(DataFlavor.javaFileListFlavor);
+      group.openFiles(files);
+      return true;
+    } else {
+      return super.dndImportData(support, group, index);
     }
   }
 

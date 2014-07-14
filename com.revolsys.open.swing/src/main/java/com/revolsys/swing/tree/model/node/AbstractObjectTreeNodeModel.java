@@ -2,9 +2,12 @@ package com.revolsys.swing.tree.model.node;
 
 import java.awt.Component;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -24,9 +27,10 @@ import com.revolsys.swing.dnd.transferable.TreePathListTransferable;
 import com.revolsys.swing.dnd.transferhandler.ObjectTreeTransferHandler;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.util.JavaBeanUtil;
 
 public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD extends Object>
-  implements ObjectTreeNodeModel<NODE, CHILD> {
+implements ObjectTreeNodeModel<NODE, CHILD> {
 
   public static final ImageIcon ICON_FOLDER = SilkIconLoader.getIcon("folder");
 
@@ -77,32 +81,6 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
   }
 
   @Override
-  public boolean canImport(final TreePath path, final TransferSupport support) {
-    if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
-      final Set<Class<?>> supportedClasses = getSupportedChildClasses();
-      try {
-        final Transferable transferable = support.getTransferable();
-        final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);
-        if (data instanceof TreePathListTransferable) {
-          final TreePathListTransferable pathTransferable = (TreePathListTransferable)data;
-          final List<TreePath> pathList = pathTransferable.getPaths();
-          for (final TreePath treePath : pathList) {
-            if (!ObjectTreeTransferHandler.isDropSupported(treePath,
-              supportedClasses)) {
-              return false;
-            }
-          }
-        }
-        support.setShowDropLocation(true);
-        return true;
-      } catch (final Exception e) {
-        return false;
-      }
-    }
-    return false;
-  }
-
-  @Override
   public String convertValueToText(final NODE node, final boolean selected,
     final boolean expanded, final boolean leaf, final int row,
     final boolean hasFocus) {
@@ -111,6 +89,48 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
     } else {
       return node.toString();
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public boolean dndImportData(final TransferSupport support, final NODE node,
+    int index) throws IOException, UnsupportedFlavorException {
+    final int dropAction = support.getDropAction();
+    if (!ObjectTreeTransferHandler.isDndNoneAction(dropAction)) {
+      final Transferable transferable = support.getTransferable();
+      if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
+        final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);
+        if (data instanceof TreePathListTransferable) {
+          final TreePathListTransferable pathTransferable = (TreePathListTransferable)data;
+          final List<TreePath> pathList = pathTransferable.getPaths();
+          for (final TreePath treePath : pathList) {
+            CHILD child = (CHILD)treePath.getLastPathComponent();
+            if (ObjectTreeTransferHandler.isDndCopyAction(dropAction)) {
+              child = JavaBeanUtil.clone(child);
+            } else {
+              final int childIndex = getIndexOfChild(node, child);
+              if (childIndex > -1) {
+                removeChild(node, child);
+                pathTransferable.setSameParent(treePath);
+                if (index != -1) {
+                  if (childIndex > -1 && childIndex < index) {
+                    index--;
+                  }
+                }
+              }
+            }
+            if (index != -1) {
+              addChild(node, index, child);
+              index++;
+            } else {
+              addChild(node, child);
+            }
+          }
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -125,6 +145,10 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
 
   protected Set<Class<?>> getChildClasses() {
     return this.supportedChildClasses;
+  }
+
+  public Collection<Class<?>> getChildClasses(final NODE node) {
+    return getSupportedChildClasses();
   }
 
   @Override
@@ -215,6 +239,57 @@ public abstract class AbstractObjectTreeNodeModel<NODE extends Object, CHILD ext
 
   @Override
   public void initialize(final NODE node) {
+  }
+
+  public boolean isAncestor(final NODE node, final TreePath treePath) {
+    for (int i = 0; i < treePath.getPathCount(); i++) {
+      final Object pathComponent = treePath.getPathComponent(i);
+      if (node == pathComponent) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean isDndCanImport(final TreePath path,
+    final TransferSupport support) {
+    if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
+      try {
+        final NODE node = (NODE)path.getLastPathComponent();
+        final Transferable transferable = support.getTransferable();
+        final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);
+        if (data instanceof TreePathListTransferable) {
+          final TreePathListTransferable pathTransferable = (TreePathListTransferable)data;
+          final List<TreePath> pathList = pathTransferable.getPaths();
+          for (final TreePath treePath : pathList) {
+            if (!isDndDropSupported(support, node, treePath)) {
+              return false;
+            }
+          }
+        }
+        support.setShowDropLocation(true);
+        return true;
+      } catch (final Exception e) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  public boolean isDndDropSupported(final TransferSupport support,
+    final NODE node, final TreePath treePath) {
+    if (!isAncestor(node, treePath)) {
+      final Object value = treePath.getLastPathComponent();
+      final Class<?> valueClass = value.getClass();
+      for (final Class<?> supportedClass : getChildClasses(node)) {
+        if (supportedClass.isAssignableFrom(valueClass)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override

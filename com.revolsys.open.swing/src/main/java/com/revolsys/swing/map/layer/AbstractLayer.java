@@ -11,6 +11,8 @@ import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +68,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
-  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
+implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   static {
@@ -75,7 +77,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final EnableCheck exists = new TreeItemPropertyEnableCheck("exists");
 
     final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
-      "hasGeometry");
+        "hasGeometry");
     menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Layer",
       "magnifier", new AndEnableCheck(exists, hasGeometry), "zoomToLayer"));
 
@@ -176,18 +178,18 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       } else {
         extentPanel.add(new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
-            + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-            + boundingBox.getMaximum(1)
-            + "</td><td>&nbsp;</td></tr><tr>"
-            + "<td><b>Left</b>: "
-            + boundingBox.getMinimum(0)
-            + "</td><td>&nbsp;</td><td>&nbsp;</td>"
-            + "<td><b>Right</b>: "
-            + boundingBox.getMaximum(0)
-            + "</td></tr>"
-            + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-            + boundingBox.getMinimum(1) + "</td><td>&nbsp;</td></tr><tr>"
-            + "</tr></table></html>"));
+              + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+              + boundingBox.getMaximum(1)
+              + "</td><td>&nbsp;</td></tr><tr>"
+              + "<td><b>Left</b>: "
+              + boundingBox.getMinimum(0)
+              + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+              + "<td><b>Right</b>: "
+              + boundingBox.getMaximum(0)
+              + "</td></tr>"
+              + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+              + boundingBox.getMinimum(1) + "</td><td>&nbsp;</td></tr><tr>"
+              + "</tr></table></html>"));
 
       }
       GroupLayoutUtil.makeColumns(extentPanel, 1, true);
@@ -278,6 +280,15 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
     parent.add(panel);
     return panel;
+  }
+
+  public int addRenderer(final LayerRenderer<?> child) {
+    return addRenderer(child, 1);
+  }
+
+  public int addRenderer(final LayerRenderer<?> child, final int index) {
+    setRenderer(child);
+    return 0;
   }
 
   public boolean canSaveSettings(final File directory) {
@@ -403,6 +414,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     }
   }
 
+  @Override
+  public Collection<Class<?>> getChildClasses() {
+    return Collections.emptySet();
+  }
+
   public File getDirectory() {
     final LayerGroup layerGroup = getLayerGroup();
     if (layerGroup == null) {
@@ -525,7 +541,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         setExists(exists);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to initialize layer: "
-          + getPath(), e);
+            + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -544,7 +560,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   public boolean isEventsEnabled() {
-    if (eventsEnabled.get() != Boolean.FALSE) {
+    if (this.eventsEnabled.get() != Boolean.FALSE) {
       final LayerGroup layerGroup = getLayerGroup();
       if (layerGroup == null || layerGroup == this) {
         return true;
@@ -558,7 +574,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isExists() {
-    return isInitialized() && exists;
+    return isInitialized() && this.exists;
   }
 
   @Override
@@ -573,7 +589,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isInitialized() {
-    return initialized;
+    return this.initialized;
   }
 
   @Override
@@ -594,7 +610,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public boolean isSelectable() {
     return isExists() && isVisible()
-      && (isSelectSupported() && this.selectable || isEditable());
+        && (isSelectSupported() && this.selectable || isEditable());
   }
 
   @Override
@@ -625,7 +641,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (propertyChangeSupport != null && isEventsEnabled()) {
+    if (this.propertyChangeSupport != null && isEventsEnabled()) {
       this.propertyChangeSupport.firePropertyChange(event);
     }
   }
@@ -754,7 +770,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
         final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(
           this, "property", oldValue, value, name);
-        if (propertyChangeSupport != null) {
+        if (this.propertyChangeSupport != null) {
           this.propertyChangeSupport.firePropertyChange(event);
         }
         try {
@@ -831,7 +847,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void showProperties(final String tabName) {
     final MapPanel map = MapPanel.get(this);
     if (map != null) {
-      if (exists) {
+      if (this.exists) {
         if (checkShowProperties()) {
           try {
             final Window window = SwingUtilities.getWindowAncestor(map);
@@ -851,7 +867,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public void showRendererProperties(final LayerRenderer<?> renderer) {
     final MapPanel map = MapPanel.get(this);
     if (map != null) {
-      if (exists) {
+      if (this.exists) {
         if (checkShowProperties()) {
           try {
             final Window window = SwingUtilities.getWindowAncestor(map);
@@ -921,8 +937,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
     final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-      .expandPercent(0.1)
-      .clipToCoordinateSystem();
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
 
     project.setViewBoundingBox(boundingBox);
   }
