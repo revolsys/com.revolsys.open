@@ -18,12 +18,12 @@ import com.revolsys.io.xml.StaxUtils;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.Property;
 
-public abstract class OsmElement extends AbstractRecord implements OsmConstants {
+public class OsmElement extends AbstractRecord implements OsmConstants {
   public static final RecordDefinition META_DATA;
 
   static {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-      "/osm/record");
+        "/osm/record");
     recordDefinition.addAttribute("id", DataTypes.LONG);
     recordDefinition.addAttribute("visible", DataTypes.BOOLEAN);
     recordDefinition.addAttribute("version", DataTypes.INT);
@@ -72,6 +72,10 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
     this.tags = tags;
   }
 
+  public OsmElement(final OsmElement element) {
+    setInfo(element);
+  }
+
   public OsmElement(final XMLStreamReader in) {
     this.id = StaxUtils.getLongAttribute(in, null, "id");
     this.visible = StaxUtils.getBooleanAttribute(in, null, "visible");
@@ -103,7 +107,7 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
       }
     } else {
       throw new IllegalArgumentException(
-        "Key cannot be null or the emptry string");
+          "Key cannot be null or the emptry string");
     }
   }
 
@@ -173,31 +177,31 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
     switch (index) {
       case 0:
         value = this.id;
-      break;
+        break;
       case 1:
         value = this.visible;
-      break;
+        break;
       case 2:
         value = this.version;
-      break;
+        break;
       case 3:
         value = this.changeset;
-      break;
+        break;
       case 4:
         value = this.timestamp;
-      break;
+        break;
       case 5:
         value = this.user;
-      break;
+        break;
       case 6:
         value = this.uid;
-      break;
+        break;
       case 7:
         value = this.tags;
-      break;
+        break;
       case 8:
         value = this.geometry;
-      break;
+        break;
     }
     return (V)value;
   }
@@ -256,6 +260,16 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
     this.id = id;
   }
 
+  public void setInfo(final OsmElement element) {
+    setId(element.getId());
+    setChangeset(element.getChangeset());
+    setTimestamp(element.getTimestamp());
+    setUid(element.getUid());
+    setUser(element.getUser());
+    setVersion(element.getVersion());
+    setTags(element.getTags());
+  }
+
   @Override
   public void setState(final RecordState state) {
   }
@@ -267,6 +281,10 @@ public abstract class OsmElement extends AbstractRecord implements OsmConstants 
 
   public void setTimestamp(final Date timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public void setTimestamp(final long timestamp) {
+    setTimestamp(new Date(timestamp));
   }
 
   public void setUid(final int uid) {

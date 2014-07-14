@@ -22,6 +22,10 @@ public class OsmNode extends OsmElement {
     setGeometryValue(OsmConstants.WGS84_2D.point(x, y));
   }
 
+  public OsmNode(final OsmElement element) {
+    super(element);
+  }
+
   public OsmNode(final XMLStreamReader in) {
     super(in);
     final double lon = StaxUtils.getDoubleAttribute(in, null, "lon");

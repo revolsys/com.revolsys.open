@@ -33,6 +33,7 @@ package com.revolsys.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.google.protobuf.ByteString;
@@ -85,8 +86,6 @@ public final class ProtocolBufferInputStream {
     return newInstance(buf, 0, buf.length);
   }
 
-  // -----------------------------------------------------------------
-
   /**
    * Create a new CodedInputStream wrapping the given byte array slice.
    */
@@ -120,6 +119,8 @@ public final class ProtocolBufferInputStream {
   public static ProtocolBufferInputStream newInstance(final InputStream input) {
     return new ProtocolBufferInputStream(input);
   }
+
+  // -----------------------------------------------------------------
 
   /**
    * Reads a varint from the input one byte at a time, so that it does not
@@ -172,11 +173,11 @@ public final class ProtocolBufferInputStream {
     throw InvalidProtocolBufferException.malformedVarint();
   }
 
-  // -----------------------------------------------------------------
-
   private byte[] buffer;
 
   private int bufferSize;
+
+  // -----------------------------------------------------------------
 
   private int bufferSizeAfterLimit;
 
@@ -200,6 +201,11 @@ public final class ProtocolBufferInputStream {
 
   /** See setRecursionLimit() */
   private int recursionDepth;
+
+  private int recursionLimit = DEFAULT_RECURSION_LIMIT;
+
+  /** See setSizeLimit() */
+  private int sizeLimit = DEFAULT_SIZE_LIMIT;
 
   // /**
   // * Reads a {@code group} field value from the stream and merges it into the
@@ -255,11 +261,6 @@ public final class ProtocolBufferInputStream {
   // return result;
   // }
 
-  private int recursionLimit = DEFAULT_RECURSION_LIMIT;
-
-  /** See setSizeLimit() */
-  private int sizeLimit = DEFAULT_SIZE_LIMIT;
-
   private static final int DEFAULT_RECURSION_LIMIT = 64;
 
   private static final int DEFAULT_SIZE_LIMIT = 64 << 20; // 64MB
@@ -296,6 +297,13 @@ public final class ProtocolBufferInputStream {
     if (this.lastTag != value) {
       throw InvalidProtocolBufferException.invalidEndTag();
     }
+  }
+
+  public void endLengthDelimited(final int limit)
+    throws InvalidProtocolBufferException {
+    checkLastTagWas(0);
+    --this.recursionDepth;
+    popLimit(limit);
   }
 
   /**
@@ -335,8 +343,8 @@ public final class ProtocolBufferInputStream {
    *
    * @param oldLimit The old limit, as returned by {@code pushLimit}.
    */
-  public void popLimit(final int oldLimit) {
-    this.currentLimit = oldLimit;
+  public void popLimit(final int limit) {
+    this.currentLimit = limit;
     recomputeBufferSizeAfterLimit();
   }
 
@@ -364,7 +372,6 @@ public final class ProtocolBufferInputStream {
       throw InvalidProtocolBufferException.truncatedMessage();
     }
     this.currentLimit = byteLimit;
-
     recomputeBufferSizeAfterLimit();
 
     return oldLimit;
@@ -373,6 +380,21 @@ public final class ProtocolBufferInputStream {
   /** Read a {@code bool} field value from the stream. */
   public boolean readBool() throws IOException {
     return readRawVarint32() != 0;
+  }
+
+  public void readBool(final Collection<Boolean> booleans) throws IOException {
+    final boolean bool = readBool();
+    booleans.add(bool);
+  }
+
+  public void readBools(final Collection<Boolean> booleans) throws IOException {
+    final int length = readRawVarint32();
+    final int oldLength = pushLimit(length);
+    while (getBytesUntilLimit() > 0) {
+      final boolean bool = readBool();
+      booleans.add(bool);
+    }
+    popLimit(oldLength);
   }
 
   /** Read a {@code bytes} field value from the stream. */
@@ -413,12 +435,17 @@ public final class ProtocolBufferInputStream {
     return readRawLittleEndian64();
   }
 
+  // -----------------------------------------------------------------
+
   /** Read a {@code float} field value from the stream. */
   public float readFloat() throws IOException {
     return Float.intBitsToFloat(readRawLittleEndian32());
   }
 
-  // -----------------------------------------------------------------
+  public void readInt(final Collection<Integer> ints) throws IOException {
+    final int number = readSInt32();
+    ints.add(number);
+  }
 
   /** Read an {@code int32} field value from the stream. */
   public int readInt32() throws IOException {
@@ -428,6 +455,31 @@ public final class ProtocolBufferInputStream {
   /** Read an {@code int64} field value from the stream. */
   public long readInt64() throws IOException {
     return readRawVarint64();
+  }
+
+  public void readInts(final Collection<Integer> ints) throws IOException {
+    final int length = readRawVarint32();
+    final int oldLength = pushLimit(length);
+    while (getBytesUntilLimit() > 0) {
+      final int number = readSInt32();
+      ints.add(number);
+    }
+    popLimit(oldLength);
+  }
+
+  public void readLong(final Collection<Long> longs) throws IOException {
+    final long number = readSInt64();
+    longs.add(number);
+  }
+
+  public void readLongs(final Collection<Long> longs) throws IOException {
+    final int length = readRawVarint32();
+    final int oldLength = pushLimit(length);
+    while (getBytesUntilLimit() > 0) {
+      final long number = readSInt64();
+      longs.add(number);
+    }
+    popLimit(oldLength);
   }
 
   /**
@@ -703,6 +755,18 @@ public final class ProtocolBufferInputStream {
     return readRawVarint64();
   }
 
+  private void recomputeBufferSizeAfterLimit() {
+    this.bufferSize += this.bufferSizeAfterLimit;
+    final int bufferEnd = this.totalBytesRetired + this.bufferSize;
+    if (bufferEnd > this.currentLimit) {
+      // Limit is in current buffer.
+      this.bufferSizeAfterLimit = bufferEnd - this.currentLimit;
+      this.bufferSize -= this.bufferSizeAfterLimit;
+    } else {
+      this.bufferSizeAfterLimit = 0;
+    }
+  }
+
   //
   // /** Read a {@code group} field value from the stream. */
   // public void readGroup(final int fieldNumber,
@@ -735,18 +799,6 @@ public final class ProtocolBufferInputStream {
   // --recursionDepth;
   // return result;
   // }
-
-  private void recomputeBufferSizeAfterLimit() {
-    this.bufferSize += this.bufferSizeAfterLimit;
-    final int bufferEnd = this.totalBytesRetired + this.bufferSize;
-    if (bufferEnd > this.currentLimit) {
-      // Limit is in current buffer.
-      this.bufferSizeAfterLimit = bufferEnd - this.currentLimit;
-      this.bufferSize -= this.bufferSizeAfterLimit;
-    } else {
-      this.bufferSizeAfterLimit = 0;
-    }
-  }
 
   /**
    * Called with {@code this.buffer} is empty to read more bytes from the
@@ -950,5 +1002,15 @@ public final class ProtocolBufferInputStream {
 
       this.bufferPos = size - pos;
     }
+  }
+
+  public int startLengthDelimited() throws IOException {
+    final int length = readRawVarint32();
+    if (this.recursionDepth >= this.recursionLimit) {
+      throw InvalidProtocolBufferException.recursionLimitExceeded();
+    }
+    final int oldLimit = pushLimit(length);
+    ++this.recursionDepth;
+    return oldLimit;
   }
 }

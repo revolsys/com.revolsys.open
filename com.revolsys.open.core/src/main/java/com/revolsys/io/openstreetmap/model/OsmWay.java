@@ -43,6 +43,10 @@ public class OsmWay extends OsmElement {
     setGeometry(points);
   }
 
+  public OsmWay(final OsmElement element) {
+    super(element);
+  }
+
   public OsmWay(final XMLStreamReader in) {
     super(in);
     // TODO Auto-generated constructor stub
