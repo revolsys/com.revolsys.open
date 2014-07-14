@@ -278,15 +278,25 @@ implements ObjectTreeNodeModel<NODE, CHILD> {
     return false;
   }
 
+  protected boolean isDndDropSupported(final TransferSupport support,
+    final NODE node, final Object value) {
+    final Class<?> valueClass = value.getClass();
+    for (final Class<?> supportedClass : getChildClasses(node)) {
+      if (supportedClass.isAssignableFrom(valueClass)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public boolean isDndDropSupported(final TransferSupport support,
     final NODE node, final TreePath treePath) {
-    if (!isAncestor(node, treePath)) {
+    final boolean ancestor = isAncestor(node, treePath);
+    final boolean copyAction = ObjectTreeTransferHandler.isDndCopyAction(support);
+    if (!ancestor || copyAction) {
       final Object value = treePath.getLastPathComponent();
-      final Class<?> valueClass = value.getClass();
-      for (final Class<?> supportedClass : getChildClasses(node)) {
-        if (supportedClass.isAssignableFrom(valueClass)) {
-          return true;
-        }
+      if (isDndDropSupported(support, node, value)) {
+        return true;
       }
     }
     return false;

@@ -81,7 +81,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
    * Each cache has a separate cacheId. The cache id is recommended to be a private variable to prevent modification
    * of that cache.
    */
-  private final Map<Label, Set<Identifier>> cacheIdToRecordIdMap = new WeakHashMap<>();
+  private Map<Label, Set<Identifier>> cacheIdToRecordIdMap = new WeakHashMap<>();
 
   private RecordStore recordStore;
 
@@ -92,7 +92,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   private SwingWorker<List<LayerRecord>, Void> loadingWorker;
 
   /** Cache of records from {@link Record#getIdentifier()} to {@link Record}. */
-  private final Map<Identifier, LayerRecord> recordIdToRecordMap = new WeakHashMap<>();
+  private Map<Identifier, LayerRecord> recordIdToRecordMap = new WeakHashMap<>();
 
   private String typePath;
 
@@ -260,6 +260,16 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       }
 
     }
+  }
+
+  @Override
+  public RecordStoreLayer clone() {
+    final RecordStoreLayer clone = (RecordStoreLayer)super.clone();
+    clone.cacheIdToRecordIdMap = new WeakHashMap<>();
+    clone.loadingBoundingBox = null;
+    clone.loadingWorker = null;
+    clone.recordIdToRecordMap = new WeakHashMap<>();
+    return clone;
   }
 
   protected LoadingWorker createLoadingWorker(final BoundingBox boundingBox) {

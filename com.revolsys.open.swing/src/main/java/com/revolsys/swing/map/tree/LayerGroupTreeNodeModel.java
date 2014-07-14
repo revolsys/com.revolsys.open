@@ -11,6 +11,7 @@ import java.util.List;
 import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.swing.dnd.transferhandler.ObjectTreeTransferHandler;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -38,17 +39,6 @@ public class LayerGroupTreeNodeModel extends
   public int addChild(final LayerGroup parent, final Layer layer) {
     parent.add(layer);
     return getChildCount(parent);
-  }
-
-  @Override
-  public boolean isDndCanImport(final TreePath path, final TransferSupport support) {
-    if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-      support.setDropAction(DnDConstants.ACTION_COPY);
-      support.setShowDropLocation(true);
-      return true;
-    } else {
-      return super.isDndCanImport(path, support);
-    }
   }
 
   @SuppressWarnings("unchecked")
@@ -79,6 +69,34 @@ public class LayerGroupTreeNodeModel extends
     } else {
       return (T)node.getLayerGroup();
     }
+  }
+
+  @Override
+  public boolean isDndCanImport(final TreePath path,
+    final TransferSupport support) {
+    if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+      support.setDropAction(DnDConstants.ACTION_COPY);
+      support.setShowDropLocation(true);
+      return true;
+    } else {
+      return super.isDndCanImport(path, support);
+    }
+  }
+
+  @Override
+  protected boolean isDndDropSupported(final TransferSupport support,
+    final LayerGroup node, final Object value) {
+    if (value instanceof AbstractLayer) {
+      final AbstractLayer layer = (AbstractLayer)value;
+      if (ObjectTreeTransferHandler.isDndCopyAction(support)) {
+        if (layer.isClonable()) {
+          support.setDropAction(DnDConstants.ACTION_COPY);
+          return true;
+        }
+        support.setDropAction(DnDConstants.ACTION_MOVE);
+      }
+    }
+    return super.isDndDropSupported(support, node, value);
   }
 
   @Override

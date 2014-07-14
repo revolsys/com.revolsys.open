@@ -41,11 +41,18 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
 
   private static final double TILE_HEIGHT = 1.0 / TILE_SCALE_Y;
 
-  private final Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
+  private Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
 
   public OsmOverpassLayer(final Map<String, Object> properties) {
     super(properties);
     setType("openStreetMapVectorApi");
+  }
+
+  @Override
+  public OsmOverpassLayer clone() {
+    final OsmOverpassLayer clone = (OsmOverpassLayer)super.clone();
+    clone.boundingBoxTileMap = new HashMap<>();
+    return clone;
   }
 
   @Override

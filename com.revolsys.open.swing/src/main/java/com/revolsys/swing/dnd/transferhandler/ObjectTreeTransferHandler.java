@@ -23,12 +23,27 @@ public class ObjectTreeTransferHandler extends TransferHandler {
     return (dropAction & DnDConstants.ACTION_COPY) == DnDConstants.ACTION_COPY;
   }
 
+  public static boolean isDndCopyAction(final TransferSupport support) {
+    final int dropAction = support.getDropAction();
+    return isDndCopyAction(dropAction);
+  }
+
   public static boolean isDndMoveAction(final int dropAction) {
     return (dropAction & DnDConstants.ACTION_MOVE) == DnDConstants.ACTION_MOVE;
   }
 
+  public static boolean isDndMoveAction(final TransferSupport support) {
+    final int dropAction = support.getDropAction();
+    return isDndMoveAction(dropAction);
+  }
+
   public static boolean isDndNoneAction(final int dropAction) {
     return dropAction == DnDConstants.ACTION_NONE;
+  }
+
+  public static boolean isDndNoneAction(final TransferSupport support) {
+    final int dropAction = support.getDropAction();
+    return isDndNoneAction(dropAction);
   }
 
   private static final long serialVersionUID = 1L;

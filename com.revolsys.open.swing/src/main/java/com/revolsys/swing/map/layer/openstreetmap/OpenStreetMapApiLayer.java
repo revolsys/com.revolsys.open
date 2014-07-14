@@ -41,11 +41,18 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
 
   private static final double TILE_HEIGHT = 1.0 / TILE_SCALE_Y;
 
-  private final Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
+  private Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
 
   public OpenStreetMapApiLayer(final Map<String, Object> properties) {
     super(properties);
     setType("openStreetMapVectorApi");
+  }
+
+  @Override
+  public OpenStreetMapApiLayer clone() {
+    final OpenStreetMapApiLayer clone = (OpenStreetMapApiLayer)super.clone();
+    clone.boundingBoxTileMap = new HashMap<>();
+    return clone;
   }
 
   @Override

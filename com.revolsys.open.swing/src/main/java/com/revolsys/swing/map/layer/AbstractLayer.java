@@ -94,47 +94,47 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
       "information", exists, "showProperties"));
   }
 
-  private boolean exists = true;
-
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(
     this);
 
   private boolean editable = false;
 
+  private ThreadLocal<Boolean> eventsEnabled = new ThreadLocal<Boolean>();
+
+  private boolean exists = true;
+
+  private GeometryFactory geometryFactory;
+
+  private long id = ID_GEN.incrementAndGet();
+
+  private boolean initialized;
+
   private Reference<LayerGroup> layerGroup;
+
+  private long maximumScale = 0;
+
+  private long minimumScale = Long.MAX_VALUE;
 
   private String name;
 
   private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
-  private GeometryFactory geometryFactory;
+  private boolean queryable = true;
+
+  private boolean querySupported = true;
 
   private boolean readOnly = false;
+
+  private LayerRenderer<AbstractLayer> renderer;
 
   private boolean selectable = true;
 
   private boolean selectSupported = true;
 
-  private long maximumScale = 0;
-
-  private long minimumScale = Long.MAX_VALUE;
-
-  private boolean visible = true;
-
-  private boolean queryable = true;
-
-  private final ThreadLocal<Boolean> eventsEnabled = new ThreadLocal<Boolean>();
-
-  private boolean querySupported = true;
-
-  private final long id = ID_GEN.incrementAndGet();
-
-  private LayerRenderer<AbstractLayer> renderer;
-
   private String type;
 
-  private boolean initialized;
+  private boolean visible = true;
 
   public AbstractLayer() {
   }
@@ -320,6 +320,23 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
       }
     }
     return show;
+  }
+
+  @Override
+  public AbstractLayer clone() {
+    try {
+      final AbstractLayer clone = (AbstractLayer)super.clone();
+      clone.beanPropertyListener = new BeanPropertyListener(clone);
+      clone.eventsEnabled = new ThreadLocal<>();
+      clone.id = this.id = ID_GEN.incrementAndGet();
+      clone.initialized = false;
+      clone.layerGroup = null;
+      clone.propertyChangeSupport = new PropertyChangeSupport(clone);
+      clone.renderer = this.renderer.clone();
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
   }
 
   @Override
@@ -547,6 +564,10 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
         setInitialized(true);
       }
     }
+  }
+
+  public boolean isClonable() {
+    return false;
   }
 
   @Override

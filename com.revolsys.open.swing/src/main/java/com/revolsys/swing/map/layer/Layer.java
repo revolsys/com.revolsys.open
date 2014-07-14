@@ -14,8 +14,8 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.component.TabbedValuePanel;
 
 public interface Layer extends PropertyChangeSupportProxy,
-ObjectWithProperties, PropertyChangeListener, Comparable<Layer>,
-MapSerializer, Child<LayerGroup> {
+  ObjectWithProperties, PropertyChangeListener, Comparable<Layer>,
+  MapSerializer, Child<LayerGroup>, Cloneable {
 
   TabbedValuePanel createPropertiesPanel();
 

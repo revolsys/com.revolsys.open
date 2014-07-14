@@ -21,8 +21,6 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
 
   private boolean loading = false;
 
-  private final Object sync = new Object();
-
   private BoundingBox boundingBox;
 
   private final Class<?> workerClass;
@@ -36,6 +34,14 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
     this.workerClass = workerClass;
   }
 
+  @Override
+  public BoundingBoxRecordLayer clone() {
+    final BoundingBoxRecordLayer clone = (BoundingBoxRecordLayer)super.clone();
+    clone.boundingBox = null;
+    clone.worker = null;
+    return clone;
+  }
+
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
@@ -44,7 +50,7 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
     if (boundingBox.isEmpty()) {
       return Collections.emptyList();
     } else {
-      synchronized (this.sync) {
+      synchronized (getSync()) {
         if (this.loading) {
           if (!boundingBox.equals(this.boundingBox)) {
             this.boundingBox = null;
@@ -94,7 +100,7 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
 
   public void setIndexRecords(final BoundingBox boundingBox,
     final List<LayerRecord> records) {
-    synchronized (this.sync) {
+    synchronized (getSync()) {
       if (EqualsRegistry.equal(this.boundingBox, boundingBox)) {
         setIndexRecords(records);
         this.worker = null;

@@ -29,7 +29,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
     return recordDefinition;
   }
 
-  private final List<LayerRecord> records = new ArrayList<LayerRecord>();
+  private List<LayerRecord> records = new ArrayList<>();
 
   public ListRecordLayer() {
   }
@@ -49,6 +49,13 @@ public class ListRecordLayer extends AbstractRecordLayer {
     final RecordDefinitionImpl recordDefinition = createMetaData(name,
       geometryFactory, geometryType);
     setRecordDefinition(recordDefinition);
+  }
+
+  @Override
+  public ListRecordLayer clone() {
+    final ListRecordLayer clone = (ListRecordLayer)super.clone();
+    clone.records = new ArrayList<LayerRecord>();
+    return clone;
   }
 
   @Override
