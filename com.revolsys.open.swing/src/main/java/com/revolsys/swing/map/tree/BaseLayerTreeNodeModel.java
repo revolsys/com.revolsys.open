@@ -22,8 +22,8 @@ import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class BaseLayerTreeNodeModel extends
-AbstractObjectTreeNodeModel<AbstractLayer, LayerRenderer<Layer>> implements
-MouseListener {
+  AbstractObjectTreeNodeModel<AbstractLayer, LayerRenderer<Layer>> implements
+  MouseListener {
 
   public static BaseLayerTreeNodeModel create(final String name,
     final Class<? extends AbstractLayer> layerClass) {
@@ -91,9 +91,9 @@ MouseListener {
 
   @Override
   public boolean isDndDropSupported(final TransferSupport support,
-    final AbstractLayer node, final TreePath treePath) {
-    final boolean dropSupported = super.isDndDropSupported(support, node,
-      treePath);
+    final TreePath dropPath, final AbstractLayer node, final TreePath treePath) {
+    final boolean dropSupported = super.isDndDropSupported(support, dropPath,
+      node, treePath);
     if (dropSupported) {
       support.setDropAction(DnDConstants.ACTION_COPY);
     }

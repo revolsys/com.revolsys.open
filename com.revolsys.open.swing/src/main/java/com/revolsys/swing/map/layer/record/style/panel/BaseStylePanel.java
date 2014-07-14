@@ -58,7 +58,7 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
 public class BaseStylePanel extends ValueField implements
-PropertyChangeListener {
+  PropertyChangeListener {
   public static List<Action> getLineActions(final String type,
     final String... alignmentTypes) {
     final List<Action> actions = new ArrayList<Action>();
@@ -209,7 +209,7 @@ PropertyChangeListener {
     addPanel(stylePanels, "Marker Position", markerStyle,
       "markerHorizontalAlignment", "markerVerticalAlignment", "markerDx",
       "markerDy", "markerOrientationType", "markerOrientation",
-        "markerPlacement");
+      "markerPlacement");
 
   }
 
@@ -270,7 +270,7 @@ PropertyChangeListener {
     } else if (Color.class.equals(fieldClass)) {
       field = new ColorChooserField(fieldName, (Color)value);
     } else if (Boolean.TYPE.equals(fieldClass)
-        || Boolean.class.equals(fieldClass)) {
+      || Boolean.class.equals(fieldClass)) {
       field = new CheckBox(fieldName, value);
     } else if (Measure.class.equals(fieldClass)) {
       field = new LengthMeasureTextField(fieldName, (Measure<Length>)value,
@@ -284,7 +284,7 @@ PropertyChangeListener {
   protected TogglePanel createHorizontalAlignmentField(final String fieldName,
     String aligment) {
     if (!"left".equalsIgnoreCase(aligment)
-        && !"right".equalsIgnoreCase(aligment)) {
+      && !"right".equalsIgnoreCase(aligment)) {
       aligment = "center";
     }
     return new TogglePanel(fieldName, aligment, new Dimension(28, 28),
@@ -320,8 +320,8 @@ PropertyChangeListener {
   protected TogglePanel createVerticalAlignmentField(final String fieldName,
     String aligment) {
     if (!"top".equalsIgnoreCase(aligment)
-        && !"bottom".equalsIgnoreCase(aligment)) {
-      aligment = "middle";
+      && !"middle".equalsIgnoreCase(aligment)) {
+      aligment = "bottom";
     }
     return new TogglePanel(fieldName, aligment, new Dimension(28, 28),
       VERTICAL_ALIGNMENT_ACTIONS);

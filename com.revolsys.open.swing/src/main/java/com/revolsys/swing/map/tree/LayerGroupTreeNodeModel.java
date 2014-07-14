@@ -19,7 +19,7 @@ import com.revolsys.swing.map.tree.renderer.LayerGroupTreeCellRenderer;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class LayerGroupTreeNodeModel extends
-  AbstractObjectTreeNodeModel<LayerGroup, Layer> {
+AbstractObjectTreeNodeModel<LayerGroup, Layer> {
 
   public LayerGroupTreeNodeModel() {
     setSupportedClasses(LayerGroup.class);
@@ -85,7 +85,8 @@ public class LayerGroupTreeNodeModel extends
 
   @Override
   protected boolean isDndDropSupported(final TransferSupport support,
-    final LayerGroup node, final Object value) {
+    final TreePath dropPath, final LayerGroup node, final TreePath childPath,
+    final Object value) {
     if (value instanceof AbstractLayer) {
       final AbstractLayer layer = (AbstractLayer)value;
       if (ObjectTreeTransferHandler.isDndCopyAction(support)) {
@@ -96,7 +97,7 @@ public class LayerGroupTreeNodeModel extends
         support.setDropAction(DnDConstants.ACTION_MOVE);
       }
     }
-    return super.isDndDropSupported(support, node, value);
+    return super.isDndDropSupported(support, dropPath, node, childPath, value);
   }
 
   @Override

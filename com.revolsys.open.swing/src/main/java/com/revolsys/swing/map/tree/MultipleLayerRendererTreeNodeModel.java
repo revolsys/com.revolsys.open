@@ -16,14 +16,14 @@ import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
+import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class MultipleLayerRendererTreeNodeModel
-  extends
-  AbstractObjectTreeNodeModel<AbstractMultipleRenderer, AbstractRecordLayerRenderer>
-  implements MouseListener {
+extends
+AbstractObjectTreeNodeModel<AbstractMultipleRenderer, AbstractRecordLayerRenderer>
+implements MouseListener {
 
   private final Set<Class<?>> SUPPORTED_CHILD_CLASSES = Collections.<Class<?>> singleton(AbstractRecordLayerRenderer.class);
 
@@ -38,13 +38,13 @@ public class MultipleLayerRendererTreeNodeModel
   @Override
   public int addChild(final AbstractMultipleRenderer node,
     final AbstractRecordLayerRenderer renderer) {
-    return node.addRenderer(renderer.clone());
+    return node.addRenderer(renderer);
   }
 
   @Override
   public int addChild(final AbstractMultipleRenderer node, final int index,
     final AbstractRecordLayerRenderer renderer) {
-    return node.addRenderer(index, renderer.clone());
+    return node.addRenderer(index, renderer);
   }
 
   @Override

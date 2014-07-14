@@ -29,8 +29,8 @@ import com.revolsys.swing.tree.model.node.ListObjectTreeNodeModel;
 import com.revolsys.swing.tree.model.node.ObjectTreeNodeModel;
 import com.revolsys.util.Property;
 
-public class RecordLayerStylePanel extends ValueField implements
-MouseListener, PropertyChangeListener {
+public class RecordLayerStylePanel extends ValueField implements MouseListener,
+  PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -40,26 +40,26 @@ MouseListener, PropertyChangeListener {
 
   private final AbstractRecordLayer layer;
 
-  private final LayerRenderer<? extends Layer> renderer;
-
   private final List<LayerRenderer<? extends Layer>> renderers = new PropertyChangeArrayList<LayerRenderer<? extends Layer>>();
+
+  private final LayerRenderer<? extends Layer> rootRenderer;
 
   public RecordLayerStylePanel(final AbstractRecordLayer layer) {
     this.layer = layer;
     setLayout(new BorderLayout());
     final JLabel instructions = new JLabel(
-      "<html><p style=\"padding: 2px 3px 2px\">Click on the style from the left to show the edit panel on the right for that style.</p></html>");
+        "<html><p style=\"padding: 2px 3px 2px\">Click on the style from the left to show the edit panel on the right for that style.</p></html>");
     add(instructions, BorderLayout.NORTH);
 
     final ListObjectTreeNodeModel listModel = new ListObjectTreeNodeModel(
       new MultipleLayerRendererTreeNodeModel(),
       new BaseLayerRendererTreeNodeModel());
 
-    this.renderer = layer.getRenderer().clone();
-    Property.removeAllListeners(this.renderer);
-    this.renderer.setEditing(true);
-    this.renderers.add(this.renderer);
-    Property.addListener(this.renderer, this);
+    this.rootRenderer = layer.getRenderer().clone();
+    Property.removeAllListeners(this.rootRenderer);
+    this.rootRenderer.setEditing(true);
+    this.renderers.add(this.rootRenderer);
+    Property.addListener(this.rootRenderer, this);
 
     final ObjectTreePanel styleTree = new ObjectTreePanel(this.renderers,
       listModel);
@@ -67,11 +67,11 @@ MouseListener, PropertyChangeListener {
     this.tree.setRootVisible(false);
     this.tree.setExpandsSelectedPaths(true);
     final TreePath rendererPath = ObjectTree.createTreePath(this.renderers,
-      this.renderer);
+      this.rootRenderer);
     this.tree.setSelectionPath(rendererPath);
     this.tree.expandPath(rendererPath);
     this.tree.addMouseListener(this);
-    setEditStylePanel(this.renderer);
+    setEditStylePanel(this.rootRenderer);
     final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
       styleTree, this.editStyleContainer);
 
@@ -88,7 +88,7 @@ MouseListener, PropertyChangeListener {
       final TreePath path = this.tree.getPathForLocation(x, y);
       if (path != null) {
         final ObjectTreeNodeModel<Object, Object> nodeModel = this.tree.getModel()
-            .getNodeModel(path);
+          .getNodeModel(path);
         if (nodeModel != null) {
           final Object node = path.getLastPathComponent();
           if (node instanceof LayerRenderer<?>) {
@@ -122,22 +122,27 @@ MouseListener, PropertyChangeListener {
     if ("replaceRenderer".equals(event.getPropertyName())) {
       saveStylePanel();
       final LayerRenderer<? extends Layer> oldRenderer = (LayerRenderer<? extends Layer>)event.getOldValue();
-      Property.removeListener(oldRenderer, this);
-
       final LayerRenderer<? extends Layer> newRenderer = (LayerRenderer<? extends Layer>)event.getNewValue();
-      Property.addListener(newRenderer, this);
-      this.renderers.remove(0);
-      this.renderers.add(newRenderer);
-      this.tree.setVisible(newRenderer, true);
+      if (oldRenderer == this.rootRenderer && newRenderer != null
+          && newRenderer != oldRenderer) {
+        Property.removeListener(oldRenderer, this);
+        this.renderers.remove(0);
 
-      setSelectedRenderer(newRenderer);
+        Property.addListener(newRenderer, this);
+        this.renderers.add(newRenderer);
+
+        this.tree.setVisible(newRenderer, true);
+
+        setSelectedRenderer(newRenderer);
+      }
     }
   }
 
   @Override
   public void save() {
     super.save();
-    this.layer.setRenderer(this.renderer);
+    final LayerRenderer<? extends Layer> renderer = this.rootRenderer;
+    this.layer.setRenderer(renderer);
   }
 
   protected void saveStylePanel() {
@@ -170,7 +175,7 @@ MouseListener, PropertyChangeListener {
   })
   public void setSelectedRenderer(final LayerRenderer<?> renderer) {
     final List<String> pathNames = renderer.getPathNames();
-    final LayerRenderer<?> selectedRenderer = this.renderer.getRenderer(pathNames);
+    final LayerRenderer<?> selectedRenderer = this.rootRenderer.getRenderer(pathNames);
     if (selectedRenderer != null) {
       final List path = selectedRenderer.getPathRenderers();
       if (!path.isEmpty()) {

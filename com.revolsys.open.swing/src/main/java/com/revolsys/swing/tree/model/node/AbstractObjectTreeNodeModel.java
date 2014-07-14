@@ -241,30 +241,20 @@ implements ObjectTreeNodeModel<NODE, CHILD> {
   public void initialize(final NODE node) {
   }
 
-  public boolean isAncestor(final NODE node, final TreePath treePath) {
-    for (int i = 0; i < treePath.getPathCount(); i++) {
-      final Object pathComponent = treePath.getPathComponent(i);
-      if (node == pathComponent) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
-  public boolean isDndCanImport(final TreePath path,
+  public boolean isDndCanImport(final TreePath dropPath,
     final TransferSupport support) {
     if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
       try {
-        final NODE node = (NODE)path.getLastPathComponent();
+        final NODE node = (NODE)dropPath.getLastPathComponent();
         final Transferable transferable = support.getTransferable();
         final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);
         if (data instanceof TreePathListTransferable) {
           final TreePathListTransferable pathTransferable = (TreePathListTransferable)data;
           final List<TreePath> pathList = pathTransferable.getPaths();
           for (final TreePath treePath : pathList) {
-            if (!isDndDropSupported(support, node, treePath)) {
+            if (!isDndDropSupported(support, dropPath, node, treePath)) {
               return false;
             }
           }
@@ -278,24 +268,24 @@ implements ObjectTreeNodeModel<NODE, CHILD> {
     return false;
   }
 
-  protected boolean isDndDropSupported(final TransferSupport support,
-    final NODE node, final Object value) {
-    final Class<?> valueClass = value.getClass();
-    for (final Class<?> supportedClass : getChildClasses(node)) {
-      if (supportedClass.isAssignableFrom(valueClass)) {
+  public boolean isDndDropSupported(final TransferSupport support,
+    final TreePath dropPath, final NODE node, final TreePath childPath) {
+    final boolean descendant = childPath.isDescendant(dropPath);
+    if (!descendant) {
+      final Object value = childPath.getLastPathComponent();
+      if (isDndDropSupported(support, dropPath, node, childPath, value)) {
         return true;
       }
     }
     return false;
   }
 
-  public boolean isDndDropSupported(final TransferSupport support,
-    final NODE node, final TreePath treePath) {
-    final boolean ancestor = isAncestor(node, treePath);
-    final boolean copyAction = ObjectTreeTransferHandler.isDndCopyAction(support);
-    if (!ancestor || copyAction) {
-      final Object value = treePath.getLastPathComponent();
-      if (isDndDropSupported(support, node, value)) {
+  protected boolean isDndDropSupported(final TransferSupport support,
+    final TreePath dropPath, final NODE node, final TreePath childPath,
+    final Object value) {
+    final Class<?> valueClass = value.getClass();
+    for (final Class<?> supportedClass : getChildClasses(node)) {
+      if (supportedClass.isAssignableFrom(valueClass)) {
         return true;
       }
     }
