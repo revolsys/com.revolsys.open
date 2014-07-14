@@ -3,11 +3,15 @@ package com.revolsys.swing.map.layer.record.table.model;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import com.revolsys.data.record.Record;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.predicate.MergedNullValuePredicate;
-import com.revolsys.swing.map.layer.record.table.predicate.MergedObjectPredicate;
+import com.revolsys.swing.map.layer.record.table.predicate.MergedRecordPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.MergedValuePredicate;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.TablePanel;
@@ -15,9 +19,7 @@ import com.revolsys.swing.table.record.model.RecordListTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 
 public class MergedRecordsTableModel extends RecordListTableModel implements
-  SortableTableModel {
-  private static final long serialVersionUID = 1L;
-
+SortableTableModel, ListSelectionListener {
   public static TablePanel createPanel(final AbstractRecordLayer layer,
     final Record mergedObject, final Collection<LayerRecord> objects) {
     final MergedRecordsTableModel model = new MergedRecordsTableModel(layer,
@@ -25,24 +27,29 @@ public class MergedRecordsTableModel extends RecordListTableModel implements
     final RecordRowTable table = new RecordRowTable(model);
     table.setVisibleRowCount(objects.size() + 2);
     MergedValuePredicate.add(table);
-    MergedObjectPredicate.add(table);
+    MergedRecordPredicate.add(table);
     MergedNullValuePredicate.add(table);
     table.setSortable(false);
-
+    table.getSelectionModel().addListSelectionListener(model);
     return new TablePanel(table);
   }
 
-  private final Record mergedObject;
+  private static final long serialVersionUID = 1L;
+
+  private final Record mergedRecord;
+
+  private final AbstractRecordLayer layer;
 
   public MergedRecordsTableModel(final AbstractRecordLayer layer) {
     this(layer, null, null);
   }
 
   public MergedRecordsTableModel(final AbstractRecordLayer layer,
-    final Record mergedObject, final Collection<LayerRecord> objects) {
-    super(layer.getRecordDefinition(), objects, layer.getColumnNames());
+    final Record mergedRecord, final Collection<LayerRecord> records) {
+    super(layer.getRecordDefinition(), records, layer.getColumnNames());
+    this.layer = layer;
     setAttributesOffset(1);
-    this.mergedObject = mergedObject;
+    this.mergedRecord = mergedRecord;
     setEditable(true);
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
   }
@@ -56,15 +63,15 @@ public class MergedRecordsTableModel extends RecordListTableModel implements
     }
   }
 
-  public Record getMergedObject() {
-    return mergedObject;
+  public Record getMergedRecord() {
+    return this.mergedRecord;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Record> V getRecord(final int index) {
     if (index == super.getRowCount()) {
-      return (V)mergedObject;
+      return (V)this.mergedRecord;
     } else {
       return (V)super.getRecord(index);
     }
@@ -102,11 +109,31 @@ public class MergedRecordsTableModel extends RecordListTableModel implements
   @Override
   public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
-    final Map<String, Object> object = getRecord(rowIndex);
-    if (object != null) {
+    final Map<String, Object> record = getRecord(rowIndex);
+    if (record != null) {
       final String name = getColumnName(columnIndex);
-      object.put(name, value);
+      record.put(name, value);
     }
+  }
+
+  @Override
+  public void valueChanged(final ListSelectionEvent event) {
+
+    final RecordRowTable table = getTable();
+    final ListSelectionModel selectionModel = table.getSelectionModel();
+    final int rowCount = super.getRowCount();
+    final boolean mergedSelected = selectionModel.isSelectedIndex(rowCount);
+    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+      final Record record = getRecord(rowIndex);
+      if (record != null) {
+        if (mergedSelected || selectionModel.isSelectedIndex(rowIndex)) {
+          this.layer.addHighlightedRecords((LayerRecord)record);
+        } else {
+          this.layer.unHighlightRecords((LayerRecord)record);
+        }
+      }
+    }
+    this.layer.zoomToHighlighted();
   }
 
 }

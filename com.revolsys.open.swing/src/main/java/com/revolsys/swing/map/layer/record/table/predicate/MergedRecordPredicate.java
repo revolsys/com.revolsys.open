@@ -16,11 +16,11 @@ import com.revolsys.data.record.Record;
 import com.revolsys.swing.map.layer.record.table.model.MergedRecordsTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 
-public class MergedObjectPredicate implements HighlightPredicate {
+public class MergedRecordPredicate implements HighlightPredicate {
 
   public static void add(final RecordRowTable table) {
     final MergedRecordsTableModel model = table.getTableModel();
-    final MergedObjectPredicate predicate = new MergedObjectPredicate(model);
+    final MergedRecordPredicate predicate = new MergedRecordPredicate(model);
     final Highlighter colors = new ColorHighlighter(predicate,
       ColorUtil.setAlpha(WebColors.Green, 64), WebColors.Black,
       WebColors.Green, WebColors.White);
@@ -31,7 +31,7 @@ public class MergedObjectPredicate implements HighlightPredicate {
 
   private final MergedRecordsTableModel model;
 
-  public MergedObjectPredicate(final MergedRecordsTableModel model) {
+  public MergedRecordPredicate(final MergedRecordsTableModel model) {
     this.model = model;
   }
 
@@ -41,7 +41,7 @@ public class MergedObjectPredicate implements HighlightPredicate {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
       final Record object = this.model.getRecord(rowIndex);
-      if (object == model.getMergedObject()) {
+      if (object == this.model.getMergedRecord()) {
         return true;
       } else {
         return false;

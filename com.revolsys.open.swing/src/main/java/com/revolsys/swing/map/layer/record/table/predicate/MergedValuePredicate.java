@@ -34,8 +34,8 @@ public class MergedValuePredicate implements HighlightPredicate {
     try {
       final int rowIndex = adapter.convertRowIndexToView(adapter.row);
       final int columnIndex = adapter.convertColumnIndexToView(adapter.column);
-      final Record record = model.getRecord(rowIndex);
-      final Record mergedRecord = model.getMergedObject();
+      final Record record = this.model.getRecord(rowIndex);
+      final Record mergedRecord = this.model.getMergedRecord();
 
       if (record == mergedRecord) {
         return false;
