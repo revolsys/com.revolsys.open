@@ -2,6 +2,7 @@ package com.revolsys.swing.map.tree;
 
 import java.awt.Component;
 import java.awt.Rectangle;
+import java.awt.dnd.DnDConstants;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collections;
@@ -12,9 +13,11 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
@@ -81,6 +84,29 @@ implements MouseListener {
     }
     renderer.setEnabled(node.isVisible());
     return renderer;
+  }
+
+  @Override
+  protected boolean isDndDropSupported(final TransferSupport support,
+    final TreePath dropPath, final AbstractMultipleRenderer node,
+    final TreePath childPath, final Object child) {
+    if (super.isDndDropSupported(support, dropPath, node, childPath, child)) {
+
+      if (child instanceof AbstractRecordLayerRenderer) {
+        final AbstractRecordLayerRenderer childRenderer = (AbstractRecordLayerRenderer)child;
+        final Layer nodeLayer = node.getLayer();
+        final Layer childLayer = childRenderer.getLayer();
+        if (childLayer != nodeLayer) {
+          if (isCopySupported(childRenderer)) {
+            support.setDropAction(DnDConstants.ACTION_COPY);
+          } else {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

@@ -6,8 +6,10 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.tree.TreePath;
 
@@ -31,6 +33,10 @@ public class TreePathListTransferable implements Transferable {
 
   private final List<TreePath> paths;
 
+  private final Set<TreePath> copiedPaths = new HashSet<>();
+
+  private final Set<TreePath> movedPaths = new HashSet<>();
+
   private final Map<TreePath, Boolean> sameParent = new HashMap<TreePath, Boolean>();
 
   public TreePathListTransferable(final List<TreePath> paths) {
@@ -39,6 +45,22 @@ public class TreePathListTransferable implements Transferable {
 
   public TreePathListTransferable(final TreePath... paths) {
     this(Arrays.asList(paths));
+  }
+
+  public void addCopiedPath(final TreePath path) {
+    this.copiedPaths.add(path);
+  }
+
+  public void addMovedPath(final TreePath path) {
+    this.movedPaths.add(path);
+  }
+
+  public Set<TreePath> getCopiedPaths() {
+    return this.copiedPaths;
+  }
+
+  public Set<TreePath> getMovedPaths() {
+    return this.movedPaths;
   }
 
   public List<TreePath> getPaths() {
@@ -60,14 +82,27 @@ public class TreePathListTransferable implements Transferable {
     return FLAVORS;
   }
 
+  public boolean isCopied(final TreePath path) {
+    return this.copiedPaths.contains(path);
+  }
+
   @Override
   public boolean isDataFlavorSupported(final DataFlavor flavor) {
     final boolean supported = FLAVOR.equals(flavor);
     return supported;
   }
 
+  public boolean isMoved(final TreePath path) {
+    return this.movedPaths.contains(path);
+  }
+
   public boolean isSameParent(final TreePath path) {
     return this.sameParent.containsKey(path);
+  }
+
+  public void reset() {
+    this.copiedPaths.clear();
+    this.movedPaths.clear();
   }
 
   public void setSameParent(final TreePath path) {

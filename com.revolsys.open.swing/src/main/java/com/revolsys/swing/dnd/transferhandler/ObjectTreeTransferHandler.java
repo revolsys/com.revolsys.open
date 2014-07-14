@@ -3,7 +3,7 @@ package com.revolsys.swing.dnd.transferhandler;
 import java.awt.Component;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
-import java.util.List;
+import java.util.Collection;
 
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -93,20 +93,23 @@ public class ObjectTreeTransferHandler extends TransferHandler {
         final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);
         if (data instanceof TreePathListTransferable) {
           final TreePathListTransferable pathTransferable = (TreePathListTransferable)data;
-          final List<TreePath> pathList = pathTransferable.getPaths();
-          for (final TreePath treePath : pathList) {
-            final TreePath parentPath = treePath.getParentPath();
+          final Collection<TreePath> paths = pathTransferable.getPaths();
+          for (final TreePath path : paths) {
+            final TreePath parentPath = path.getParentPath();
             final Object parent = parentPath.getLastPathComponent();
+
             final ObjectTreeNodeModel<Object, Object> nodeModel = this.model.getNodeModel(parentPath);
-            if (nodeModel != null) {
-              if (pathTransferable.isSameParent(treePath)) {
-                this.model.fireTreeNodesChanged(treePath);
-              } else {
-                final Object child = treePath.getLastPathComponent();
-                nodeModel.removeChild(parent, child);
-              }
+            boolean removed = false;
+            if (nodeModel != null && pathTransferable.isMoved(path)) {
+              final Object child = path.getLastPathComponent();
+              removed = nodeModel.removeChild(parent, child);
+            }
+            if (!removed) {
+              this.model.fireTreeNodesChanged(parentPath);
+              this.model.fireTreeNodesChanged(path);
             }
           }
+          pathTransferable.reset();
         }
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Cannot export data", e);
@@ -135,13 +138,12 @@ public class ObjectTreeTransferHandler extends TransferHandler {
         if (nodeModel != null) {
           try {
             final Object node = path.getLastPathComponent();
-            nodeModel.dndImportData(support, node, index);
+            return nodeModel.dndImportData(support, node, index);
           } catch (final Exception e) {
             LoggerFactory.getLogger(getClass()).error("Cannot import data", e);
             return false;
           }
         }
-        component.repaint();
       }
     }
     return false;

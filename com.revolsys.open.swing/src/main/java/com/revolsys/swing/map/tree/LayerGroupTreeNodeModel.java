@@ -11,7 +11,6 @@ import java.util.List;
 import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.tree.TreePath;
 
-import com.revolsys.swing.dnd.transferhandler.ObjectTreeTransferHandler;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -72,6 +71,11 @@ AbstractObjectTreeNodeModel<LayerGroup, Layer> {
   }
 
   @Override
+  public boolean isCopySupported(final Layer layer) {
+    return layer.isClonable();
+  }
+
+  @Override
   public boolean isDndCanImport(final TreePath path,
     final TransferSupport support) {
     if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
@@ -84,30 +88,12 @@ AbstractObjectTreeNodeModel<LayerGroup, Layer> {
   }
 
   @Override
-  protected boolean isDndDropSupported(final TransferSupport support,
-    final TreePath dropPath, final LayerGroup node, final TreePath childPath,
-    final Object value) {
-    if (value instanceof AbstractLayer) {
-      final AbstractLayer layer = (AbstractLayer)value;
-      if (ObjectTreeTransferHandler.isDndCopyAction(support)) {
-        if (layer.isClonable()) {
-          support.setDropAction(DnDConstants.ACTION_COPY);
-          return true;
-        }
-        support.setDropAction(DnDConstants.ACTION_MOVE);
-      }
-    }
-    return super.isDndDropSupported(support, dropPath, node, childPath, value);
-  }
-
-  @Override
   public boolean isLeaf(final LayerGroup node) {
     return false;
   }
 
   @Override
   public boolean removeChild(final LayerGroup parent, final Layer layer) {
-    parent.remove(layer);
-    return true;
+    return parent.remove(layer);
   }
 }

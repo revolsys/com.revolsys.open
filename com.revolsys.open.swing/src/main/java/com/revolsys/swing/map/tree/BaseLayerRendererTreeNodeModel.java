@@ -18,8 +18,8 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class BaseLayerRendererTreeNodeModel extends
-  AbstractObjectTreeNodeModel<AbstractLayerRenderer<? extends Layer>, Void>
-  implements MouseListener {
+AbstractObjectTreeNodeModel<AbstractLayerRenderer<? extends Layer>, Void>
+implements MouseListener {
 
   public BaseLayerRendererTreeNodeModel() {
     setSupportedClasses(AbstractLayerRenderer.class);

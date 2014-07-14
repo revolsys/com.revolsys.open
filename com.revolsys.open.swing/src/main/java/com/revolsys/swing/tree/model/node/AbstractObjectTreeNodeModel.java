@@ -92,39 +92,18 @@ implements ObjectTreeNodeModel<NODE, CHILD> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public boolean dndImportData(final TransferSupport support, final NODE node,
     int index) throws IOException, UnsupportedFlavorException {
-    final int dropAction = support.getDropAction();
-    if (!ObjectTreeTransferHandler.isDndNoneAction(dropAction)) {
+    if (!ObjectTreeTransferHandler.isDndNoneAction(support)) {
       final Transferable transferable = support.getTransferable();
       if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
         final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);
         if (data instanceof TreePathListTransferable) {
           final TreePathListTransferable pathTransferable = (TreePathListTransferable)data;
           final List<TreePath> pathList = pathTransferable.getPaths();
-          for (final TreePath treePath : pathList) {
-            CHILD child = (CHILD)treePath.getLastPathComponent();
-            if (ObjectTreeTransferHandler.isDndCopyAction(dropAction)) {
-              child = JavaBeanUtil.clone(child);
-            } else {
-              final int childIndex = getIndexOfChild(node, child);
-              if (childIndex > -1) {
-                removeChild(node, child);
-                pathTransferable.setSameParent(treePath);
-                if (index != -1) {
-                  if (childIndex > -1 && childIndex < index) {
-                    index--;
-                  }
-                }
-              }
-            }
-            if (index != -1) {
-              addChild(node, index, child);
-              index++;
-            } else {
-              addChild(node, child);
-            }
+          for (final TreePath sourcePath : pathList) {
+            index = importData(support, pathTransferable, node, index,
+              sourcePath);
           }
         }
         return true;
@@ -237,8 +216,47 @@ implements ObjectTreeNodeModel<NODE, CHILD> {
     return this.supportedClasses;
   }
 
+  @SuppressWarnings("unchecked")
+  protected int importData(final TransferSupport support,
+    final TreePathListTransferable pathTransferable, final NODE node,
+    int index, final TreePath sourcePath) {
+    CHILD child = (CHILD)sourcePath.getLastPathComponent();
+    if (ObjectTreeTransferHandler.isDndCopyAction(support)) {
+      if (isCopySupported(child)) {
+        child = JavaBeanUtil.clone(child);
+        pathTransferable.addCopiedPath(sourcePath);
+      } else {
+        return index;
+      }
+    } else {
+      final int childIndex = getIndexOfChild(node, child);
+      if (childIndex > -1) {
+        removeChild(node, child);
+        pathTransferable.setSameParent(sourcePath);
+        if (index != -1) {
+          if (childIndex > -1 && childIndex < index) {
+            index--;
+          }
+        }
+      } else {
+        pathTransferable.addMovedPath(sourcePath);
+      }
+    }
+    if (index != -1) {
+      addChild(node, index, child);
+      index++;
+    } else {
+      addChild(node, child);
+    }
+    return index;
+  }
+
   @Override
   public void initialize(final NODE node) {
+  }
+
+  public boolean isCopySupported(final CHILD child) {
+    return child instanceof Cloneable;
   }
 
   @SuppressWarnings("unchecked")
@@ -269,23 +287,31 @@ implements ObjectTreeNodeModel<NODE, CHILD> {
   }
 
   public boolean isDndDropSupported(final TransferSupport support,
-    final TreePath dropPath, final NODE node, final TreePath childPath) {
-    final boolean descendant = childPath.isDescendant(dropPath);
+    final TreePath dropPath, final NODE node, final TreePath sourcePath) {
+    final boolean descendant = sourcePath.isDescendant(dropPath);
     if (!descendant) {
-      final Object value = childPath.getLastPathComponent();
-      if (isDndDropSupported(support, dropPath, node, childPath, value)) {
+      final Object value = sourcePath.getLastPathComponent();
+      if (isDndDropSupported(support, dropPath, node, sourcePath, value)) {
         return true;
       }
     }
     return false;
   }
 
+  @SuppressWarnings("unchecked")
   protected boolean isDndDropSupported(final TransferSupport support,
     final TreePath dropPath, final NODE node, final TreePath childPath,
-    final Object value) {
-    final Class<?> valueClass = value.getClass();
+    final Object child) {
+    final Class<?> valueClass = child.getClass();
     for (final Class<?> supportedClass : getChildClasses(node)) {
       if (supportedClass.isAssignableFrom(valueClass)) {
+        final int dropAction = support.getDropAction();
+        if (ObjectTreeTransferHandler.isDndCopyAction(dropAction)) {
+          if (!isCopySupported((CHILD)child)) {
+            return false;
+          }
+        }
+
         return true;
       }
     }
