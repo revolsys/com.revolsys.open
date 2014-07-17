@@ -71,7 +71,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     if (geometry instanceof Point) {
       boolean add = true;
       if (cleanDuplicatePoints) {
-        final List<Record> objects = otherPointMap.getObjects(object);
+        final List<Record> objects = otherPointMap.getRecords(object);
         if (!objects.isEmpty()) {
           final Filter<Record> filter = equalFilterFactory.create(object);
           add = !FilterUtil.matches(objects, filter);
@@ -93,7 +93,7 @@ public class CompareProcessor extends AbstractMergeProcess {
     if (geometry instanceof Point) {
       boolean add = true;
       if (cleanDuplicatePoints) {
-        final List<Record> objects = sourcePointMap.getObjects(object);
+        final List<Record> objects = sourcePointMap.getRecords(object);
         if (!objects.isEmpty()) {
           final Filter<Record> filter = equalFilterFactory.create(object);
           add = !FilterUtil.matches(objects, filter);

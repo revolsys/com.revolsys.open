@@ -13,10 +13,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -244,7 +244,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   private final Label cacheIdSelected = new Label("selected");
 
-  private Map<Label, Set<LayerRecord>> cacheIdToRecordMap = new HashMap<>();
+  private Map<Label, Collection<LayerRecord>> cacheIdToRecordMap = new HashMap<>();
 
   private boolean canAddRecords = true;
 
@@ -258,9 +258,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   private Object editSync;
 
-  private Map<Record, Component> forms = new HashMap<>();
+  private List<Record> formRecords = new LinkedList<>();
 
-  private Map<Record, Window> formWindows = new HashMap<>();
+  private List<Component> formComponents = new LinkedList<>();
+
+  private List<Window> formWindows = new LinkedList<>();
 
   private RecordQuadTree index = new RecordQuadTree();
 
@@ -392,9 +394,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
         return record;
       } else {
         synchronized (getSync()) {
-          Set<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+          Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
           if (cachedRecords == null) {
-            cachedRecords = new HashSet<>();
+            cachedRecords = new ArrayList<>();
             this.cacheIdToRecordMap.put(cacheId, cachedRecords);
           }
           if (!cachedRecords.contains(record)) {
@@ -553,8 +555,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     clone.cacheIdToRecordMap = new HashMap<>();
     clone.columnNameOrder = new ArrayList<>(this.columnNameOrder);
     clone.columnNames = new ArrayList<>(this.columnNames);
-    clone.forms = new HashMap<>();
-    clone.formWindows = new HashMap<>();
+    clone.formRecords = new LinkedList<>();
+    clone.formComponents = new LinkedList<>();
+    clone.formWindows = new LinkedList<>();
     clone.index = new RecordQuadTree();
     clone.selectedRecordsIndex = null;
     clone.proxyRecords = MapBackedSet.mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
@@ -711,23 +714,22 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   @Override
   public void delete() {
     super.delete();
-    if (this.forms != null) {
-      for (final Window window : this.formWindows.values()) {
-        if (window != null) {
-          Invoke.later(window, "dispose");
-        }
+    for (final Window window : this.formWindows) {
+      if (window != null) {
+        Invoke.later(window, "dispose");
       }
-      for (final Component form : this.forms.values()) {
-        if (form != null) {
-          if (form instanceof LayerRecordForm) {
-            final LayerRecordForm recordForm = (LayerRecordForm)form;
-            Invoke.later(recordForm, "destroy");
-          }
+    }
+    for (final Component form : this.formComponents) {
+      if (form != null) {
+        if (form instanceof LayerRecordForm) {
+          final LayerRecordForm recordForm = (LayerRecordForm)form;
+          Invoke.later(recordForm, "destroy");
         }
       }
     }
     this.columnNameOrder.clear();
-    this.forms.clear();
+    this.formRecords.clear();
+    this.formComponents.clear();
     this.formWindows.clear();
     this.index.clear();
     this.cacheIdToRecordMap.clear();
@@ -926,7 +928,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public int getCachedRecordCount(final Label cacheId) {
-    final Set<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+    final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
     if (cachedRecords == null) {
       return 0;
     } else {
@@ -936,8 +938,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   public List<LayerRecord> getCachedRecords(final Label cacheId) {
     synchronized (getSync()) {
-      final ArrayList<LayerRecord> records = new ArrayList<>();
-      final Set<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+      final List<LayerRecord> records = new ArrayList<>();
+      final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
       if (cachedRecords != null) {
         records.addAll(cachedRecords);
       }
@@ -1596,7 +1598,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public boolean isRecordCached(final Label cacheId, final LayerRecord record) {
     if (isLayerRecord(record)) {
       synchronized (getSync()) {
-        final Set<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
+        final Collection<LayerRecord> cachedRecords = this.cacheIdToRecordMap.get(cacheId);
         if (cachedRecords != null) {
           return cachedRecords.contains(record);
         }
@@ -1844,17 +1846,22 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   protected void removeForm(final LayerRecord record) {
     if (record != null) {
       if (SwingUtilities.isEventDispatchThread()) {
-        final Component form = this.forms.remove(record);
-        if (form != null) {
-          if (form instanceof LayerRecordForm) {
-            final LayerRecordForm recordForm = (LayerRecordForm)form;
-            recordForm.destroy();
+        final int index = this.formRecords.indexOf(record);
+        if (index != -1) {
+          this.formRecords.remove(index);
+          final Component form = this.formComponents.remove(index);
+          if (form != null) {
+            if (form instanceof LayerRecordForm) {
+              final LayerRecordForm recordForm = (LayerRecordForm)form;
+              recordForm.destroy();
+            }
+          }
+          final Window window = this.formWindows.remove(index);
+          if (window != null) {
+            window.dispose();
           }
         }
-        final Window window = this.formWindows.remove(record);
-        if (window != null) {
-          window.dispose();
-        }
+
         cleanCachedRecords();
       } else {
         Invoke.later(this, "removeForm", record);
@@ -1918,8 +1925,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     final LayerRecord record) {
     if (isLayerRecord(record)) {
       synchronized (getSync()) {
-        return CollectionUtil.removeFromSet(this.cacheIdToRecordMap, cacheId,
-          record);
+        return CollectionUtil.removeFromCollection(this.cacheIdToRecordMap,
+          cacheId, record);
       }
     }
     return false;
@@ -2295,7 +2302,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       return null;
     } else {
       if (SwingUtilities.isEventDispatchThread()) {
-        Window window = this.formWindows.get(record);
+        final int index = this.formRecords.indexOf(record);
+        Window window;
+        if (index == -1) {
+          window = null;
+        } else {
+          window = this.formWindows.get(index);
+        }
         if (window == null) {
           final Component form = createForm(record);
           final Identifier id = record.getIdentifier();
@@ -2325,8 +2338,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
             SwingUtil.autoAdjustPosition(window);
             final int offset = Math.abs(formCount.incrementAndGet() % 10);
             window.setLocation(50 + offset * 20, 100 + offset * 20);
-            this.forms.put(record, form);
-            this.formWindows.put(record, window);
+            this.formRecords.add(record);
+            this.formComponents.add(form);
+            this.formWindows.add(window);
             window.addWindowListener(new WindowAdapter() {
 
               @Override

@@ -19,7 +19,7 @@ import com.revolsys.spring.SpringUtil;
 public class PdfImage extends JaiGeoReferencedImage {
 
   public PdfImage(final Resource imageResource) {
-    super(imageResource);
+    setImageResource(imageResource);
     setRenderedImage(createBufferedImage());
   }
 
@@ -59,7 +59,7 @@ public class PdfImage extends JaiGeoReferencedImage {
             final Graphics2D graphics = (Graphics2D)viewportImage.getGraphics();
             graphics.translate(-bbox.getX() * scaleFactor,
               -(mediaBox.getHeight() - (bbox.getHeight() + bbox.getY()))
-                * scaleFactor);
+              * scaleFactor);
             graphics.scale(1, 1);
             graphics.drawImage(image, 0, 0, null);
             graphics.dispose();

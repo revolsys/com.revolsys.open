@@ -1,7 +1,9 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -47,11 +49,6 @@ import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.layer.record.style.panel.TextStylePanel;
 
 public class TextStyleRenderer extends AbstractRecordLayerRenderer {
-
-  public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(
-    0, 0);
-
-  private static final Icon ICON = SilkIconLoader.getIcon("style_text");
 
   public static String getLabel(final Record object, final TextStyle style) {
     if (object == null) {
@@ -157,8 +154,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           point = geometry.getCentroid().copy(geometryFactory);
           if (!viewport.getBoundingBox().covers(point)) {
             final Geometry clippedGeometry = viewport.getBoundingBox()
-              .toPolygon()
-              .intersection(geometry);
+                .toPolygon()
+                .intersection(geometry);
             if (!clippedGeometry.isEmpty()) {
               double maxArea = 0;
               double maxLength = 0;
@@ -201,8 +198,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   public static final void renderText(final Viewport2D viewport,
-    final Graphics2D graphics, final Record object,
-    final Geometry geometry, final TextStyle style) {
+    final Graphics2D graphics, final Record object, final Geometry geometry,
+    final TextStyle style) {
     final String label = getLabel(object, style);
     if (StringUtils.hasText(label) && geometry != null || viewport == null) {
       final PointWithOrientation point = getTextLocation(viewport, geometry,
@@ -211,6 +208,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
         final double orientation = point.getOrientation();
 
         final Paint paint = graphics.getPaint();
+        final Composite composite = graphics.getComposite();
         try {
           graphics.setBackground(Color.BLACK);
           style.setTextStyle(viewport, graphics);
@@ -250,7 +248,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           final int ascent = fontMetrics.getAscent();
           final int leading = fontMetrics.getLeading();
           final double maxHeight = lines.length * (ascent + descent)
-            + (lines.length - 1) * leading;
+              + (lines.length - 1) * leading;
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
           } else if ("middle".equals(verticalAlignment)) {
@@ -290,7 +288,6 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
             graphics.rotate(-Math.toRadians(orientation), 0, 0);
           }
           graphics.translate(dx, dy);
-
           for (int i = 0; i < lines.length; i++) {
             final String line = lines[i];
             graphics.translate(0, ascent);
@@ -311,14 +308,34 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
             if (Math.abs(orientation) > 90) {
               graphics.rotate(Math.PI, maxWidth / 2, -height / 4);
             }
+
+            final int textBoxOpacity = style.getTextBoxOpacity();
+            final Color textBoxColor = style.getTextBoxColor();
+            if (textBoxOpacity > 0 && textBoxColor != null) {
+              graphics.setPaint(textBoxColor);
+              final double cornerSize = Math.max(height / 2, 5);
+              final RoundRectangle2D.Double box = new RoundRectangle2D.Double(
+                bounds.getX() - 3, bounds.getY() - 1, width + 6, height + 2,
+                cornerSize, cornerSize);
+              graphics.fill(box);
+            }
+
+            if (textBoxOpacity > 0 && textBoxOpacity < 255) {
+              graphics.setComposite(AlphaComposite.SrcOut);
+            } else {
+              graphics.setComposite(AlphaComposite.SrcOver);
+            }
+
             final double textHaloRadius = Viewport2D.toDisplayValue(viewport,
               style.getTextHaloRadius());
             if (textHaloRadius > 0) {
+              graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
               graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
               final Stroke savedStroke = graphics.getStroke();
               final Stroke outlineStroke = new BasicStroke(
-                (float)textHaloRadius, BasicStroke.CAP_BUTT,
+                (float)(textHaloRadius + 1), BasicStroke.CAP_BUTT,
                 BasicStroke.JOIN_BEVEL);
               graphics.setColor(style.getTextHaloFill());
               graphics.setStroke(outlineStroke);
@@ -331,15 +348,6 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
               graphics.setStroke(savedStroke);
             }
 
-            final Color textBoxColor = style.getTextBoxColor();
-            if (textBoxColor != null) {
-              graphics.setPaint(textBoxColor);
-              final double cornerSize = Math.max(height / 2, 5);
-              final RoundRectangle2D.Double box = new RoundRectangle2D.Double(
-                bounds.getX() - 3, bounds.getY() - 1, width + 6, height + 2,
-                cornerSize, cornerSize);
-              graphics.fill(box);
-            }
             graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
               RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -347,16 +355,22 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
             graphics.setColor(style.getTextFill());
             graphics.drawString(line, (float)0, (float)0);
             graphics.setTransform(lineTransform);
-            graphics.translate(0, (leading + descent));
+            graphics.translate(0, leading + descent);
           }
           graphics.setTransform(savedTransform);
 
         } finally {
           graphics.setPaint(paint);
+          graphics.setComposite(composite);
         }
       }
     }
   }
+
+  public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(
+    0, 0);
+
+  private static final Icon ICON = SilkIconLoader.getIcon("style_text");
 
   private TextStyle style;
 
@@ -375,7 +389,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   @Override
   public TextStyleRenderer clone() {
     final TextStyleRenderer clone = (TextStyleRenderer)super.clone();
-    clone.style = style.clone();
+    clone.style = this.style.clone();
     return clone;
   }
 

@@ -42,8 +42,8 @@ import com.revolsys.swing.parallel.Invoke;
 public class SelectRecordsOverlay extends AbstractOverlay {
   protected static final BasicStroke BOX_STROKE = new BasicStroke(2,
     BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 2, new float[] {
-      6, 6
-    }, 0f);
+    6, 6
+  }, 0f);
 
   private static final Color COLOR_BOX = WebColors.Green;
 
@@ -86,12 +86,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private long redrawId = -1;
 
   private static final Set<String> REDRAW_PROPERTY_NAMES = new HashSet<>(
-    Arrays.asList("refresh", "viewBoundingBox", "unitsPerPixel", "scale"));
+      Arrays.asList("refresh", "viewBoundingBox", "unitsPerPixel", "scale"));
 
   private static final Set<String> REDRAW_REPAINT_PROPERTY_NAMES = new HashSet<>(
-    Arrays.asList("layers", "selectable", "visible", "editable",
-      "recordsChanged", "updateRecord", "hasSelectedRecords",
-      "hasHighlightedRecords"));
+      Arrays.asList("layers", "selectable", "visible", "editable",
+        "recordsChanged", "updateRecord", "hasSelectedRecords",
+          "hasHighlightedRecords"));
 
   public SelectRecordsOverlay(final MapPanel map) {
     super(map);
@@ -189,7 +189,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   @Override
   public void mouseClicked(final MouseEvent event) {
-    if (event.getClickCount() == 1 && selectCursor != null) {
+    if (event.getClickCount() == 1 && this.selectCursor != null) {
       final int x = event.getX();
       final int y = event.getY();
       final double[] location = getViewport().toModelCoordinates(x, y);
@@ -216,7 +216,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   @Override
   public void mouseExited(final MouseEvent event) {
-    selectCursor = null;
+    this.selectCursor = null;
   }
 
   @Override
@@ -244,7 +244,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   @Override
   public void paintComponent(final Graphics2D graphics) {
     final LayerGroup layerGroup = getProject();
-    final long redrawId = redrawCount.longValue();
+    final long redrawId = this.redrawCount.longValue();
     if (redrawId != this.redrawId) {
       final Viewport2D viewport = getViewport();
       final int width = viewport.getViewWidthPixels();
@@ -256,10 +256,10 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           setMapCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
           try (
-            final ImageViewport imageViewport = new ImageViewport(viewport)) {
+              final ImageViewport imageViewport = new ImageViewport(viewport)) {
             paintSelected(imageViewport, layerGroup);
             paintHighlighted(imageViewport, layerGroup);
-            selectImage = imageViewport.getImage();
+            this.selectImage = imageViewport.getImage();
           }
 
           this.redrawId = redrawId;
@@ -268,27 +268,27 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         }
       }
     }
-    if (selectImage != null) {
-      graphics.drawImage(selectImage, 0, 0, null);
+    if (this.selectImage != null) {
+      graphics.drawImage(this.selectImage, 0, 0, null);
     }
     paintSelectBox(graphics);
   }
 
-  protected void paintHighlighted(final ImageViewport vieport,
+  protected void paintHighlighted(final ImageViewport viewport,
     final LayerGroup layerGroup) {
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
     for (final Layer layer : layerGroup.getLayers()) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        paintHighlighted(vieport, childGroup);
+        paintHighlighted(viewport, childGroup);
       } else if (layer instanceof AbstractRecordLayer) {
         final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
         for (final LayerRecord record : recordLayer.getHighlightedRecords()) {
           if (record != null && recordLayer.isVisible(record)) {
             final Geometry geometry = record.getGeometryValue();
             final AbstractRecordLayerRenderer layerRenderer = layer.getRenderer();
-            layerRenderer.renderSelectedRecord(vieport, recordLayer, record);
-            HIGHLIGHT_RENDERER.paintSelected(vieport, viewportGeometryFactory,
+            layerRenderer.renderSelectedRecord(viewport, recordLayer, record);
+            HIGHLIGHT_RENDERER.paintSelected(viewport, viewportGeometryFactory,
               geometry);
           }
         }
@@ -297,12 +297,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   protected void paintSelectBox(final Graphics2D graphics2d) {
-    if (selectBox != null) {
+    if (this.selectBox != null) {
       graphics2d.setColor(COLOR_BOX);
       graphics2d.setStroke(BOX_STROKE);
-      graphics2d.draw(selectBox);
+      graphics2d.draw(this.selectBox);
       graphics2d.setPaint(COLOR_BOX_TRANSPARENT);
-      graphics2d.fill(selectBox);
+      graphics2d.fill(this.selectBox);
     }
   }
 
@@ -349,39 +349,41 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   public void redraw() {
-    redrawCount.incrementAndGet();
+    this.redrawCount.incrementAndGet();
   }
 
   public void redrawAndRepaint() {
-    redrawCount.incrementAndGet();
+    this.redrawCount.incrementAndGet();
     repaint();
   }
 
   private void selectBoxClear(final InputEvent event) {
     clearOverlayAction(ACTION_SELECT_RECORDS);
-    selectBox = null;
-    selectBoxCursor = null;
-    selectBoxFirstPoint = null;
+    this.selectBox = null;
+    this.selectBoxCursor = null;
+    this.selectBoxFirstPoint = null;
     setSelectCursor(event);
   }
 
   public boolean selectBoxDrag(final MouseEvent event) {
     if (isOverlayAction(ACTION_SELECT_RECORDS)) {
-      final double width = Math.abs(event.getX() - selectBoxFirstPoint.getX());
-      final double height = Math.abs(event.getY() - selectBoxFirstPoint.getY());
+      final double width = Math.abs(event.getX()
+        - this.selectBoxFirstPoint.getX());
+      final double height = Math.abs(event.getY()
+        - this.selectBoxFirstPoint.getY());
       final java.awt.Point topLeft = new java.awt.Point(); // java.awt.Point
-      if (selectBoxFirstPoint.getX() < event.getX()) {
-        topLeft.setLocation(selectBoxFirstPoint.getX(), 0);
+      if (this.selectBoxFirstPoint.getX() < event.getX()) {
+        topLeft.setLocation(this.selectBoxFirstPoint.getX(), 0);
       } else {
         topLeft.setLocation(event.getX(), 0);
       }
 
-      if (selectBoxFirstPoint.getY() < event.getY()) {
-        topLeft.setLocation(topLeft.getX(), selectBoxFirstPoint.getY());
+      if (this.selectBoxFirstPoint.getY() < event.getY()) {
+        topLeft.setLocation(topLeft.getX(), this.selectBoxFirstPoint.getY());
       } else {
         topLeft.setLocation(topLeft.getX(), event.getY());
       }
-      selectBox.setRect(topLeft.getX(), topLeft.getY(), width, height);
+      this.selectBox.setRect(topLeft.getX(), topLeft.getY(), width, height);
       event.consume();
       setSelectCursor(event);
       repaint();
@@ -391,16 +393,16 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   public boolean selectBoxFinish(final MouseEvent event) {
-    if (event.getButton() == selectBoxButton) {
+    if (event.getButton() == this.selectBoxButton) {
       if (clearOverlayAction(ACTION_SELECT_RECORDS)) {
         // Convert first point to envelope top left in map coords.
-        final int minX = (int)selectBox.getMinX();
-        final int minY = (int)selectBox.getMinY();
+        final int minX = (int)this.selectBox.getMinX();
+        final int minY = (int)this.selectBox.getMinY();
         final Point topLeft = getViewport().toModelPoint(minX, minY);
 
         // Convert second point to envelope bottom right in map coords.
-        final int maxX = (int)selectBox.getMaxX();
-        final int maxY = (int)selectBox.getMaxY();
+        final int maxX = (int)this.selectBox.getMaxX();
+        final int maxY = (int)this.selectBox.getMaxY();
         final Point bottomRight = getViewport().toModelPoint(maxX, maxY);
 
         final GeometryFactory geometryFactory = getMap().getGeometryFactory();
@@ -421,15 +423,15 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   public boolean selectBoxStart(final MouseEvent event) {
-    if (selectCursor != null || SwingUtil.isControlOrMetaDown(event)) {
+    if (this.selectCursor != null || SwingUtil.isControlOrMetaDown(event)) {
       if (setOverlayAction(ACTION_SELECT_RECORDS)) {
-        if (selectBoxCursor == null) {
-          selectCursor = CURSOR_SELECT_BOX;
+        if (this.selectBoxCursor == null) {
+          this.selectCursor = CURSOR_SELECT_BOX;
         }
-        selectBoxCursor = selectCursor;
-        selectBoxButton = event.getButton();
-        selectBoxFirstPoint = event.getPoint();
-        selectBox = new Rectangle2D.Double();
+        this.selectBoxCursor = this.selectCursor;
+        this.selectBoxButton = event.getButton();
+        this.selectBoxFirstPoint = event.getPoint();
+        this.selectBox = new Rectangle2D.Double();
         event.consume();
         return true;
       }
@@ -467,17 +469,17 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private void setSelectCursor(final Cursor cursor) {
     if (cursor == null) {
-      clearMapCursor(selectCursor);
+      clearMapCursor(this.selectCursor);
     } else {
       setMapCursor(cursor);
     }
-    selectCursor = cursor;
+    this.selectCursor = cursor;
   }
 
   protected void setSelectCursor(final InputEvent event) {
     Cursor cursor = null;
     if (SwingUtil.isControlOrMetaDown(event)
-      || isOverlayAction(ACTION_SELECT_RECORDS)) {
+        || isOverlayAction(ACTION_SELECT_RECORDS)) {
       if (SwingUtil.isShiftDown(event)) {
         cursor = CURSOR_SELECT_BOX_ADD;
       } else if (SwingUtil.isAltDown(event)) {

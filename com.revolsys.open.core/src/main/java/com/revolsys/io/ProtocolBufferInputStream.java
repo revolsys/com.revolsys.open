@@ -300,7 +300,7 @@ public final class ProtocolBufferInputStream {
   }
 
   public void endLengthDelimited(final int limit)
-    throws InvalidProtocolBufferException {
+      throws InvalidProtocolBufferException {
     checkLastTagWas(0);
     --this.recursionDepth;
     popLimit(limit);
@@ -425,6 +425,23 @@ public final class ProtocolBufferInputStream {
     return readRawVarint32();
   }
 
+  public void readEnum(final Collection<Integer> enums) throws IOException {
+    final int number = readEnum();
+    enums.add(number);
+  }
+
+  public void readEnums(final Collection<Integer> enums) throws IOException {
+    final int length = readRawVarint32();
+    final int oldLength = pushLimit(length);
+    while (getBytesUntilLimit() > 0) {
+      final int number = readEnum();
+      enums.add(number);
+    }
+    popLimit(oldLength);
+  }
+
+  // -----------------------------------------------------------------
+
   /** Read a {@code fixed32} field value from the stream. */
   public int readFixed32() throws IOException {
     return readRawLittleEndian32();
@@ -434,8 +451,6 @@ public final class ProtocolBufferInputStream {
   public long readFixed64() throws IOException {
     return readRawLittleEndian64();
   }
-
-  // -----------------------------------------------------------------
 
   /** Read a {@code float} field value from the stream. */
   public float readFloat() throws IOException {

@@ -7,15 +7,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.revolsys.collection.AbstractIterator;
@@ -30,18 +29,15 @@ import com.revolsys.io.openstreetmap.model.OsmElement;
 import com.revolsys.io.openstreetmap.model.OsmNode;
 import com.revolsys.io.openstreetmap.model.OsmRelation;
 import com.revolsys.io.openstreetmap.model.OsmWay;
-import com.revolsys.io.openstreetmap.pbf.Osmformat.Info;
-import com.revolsys.io.openstreetmap.pbf.Osmformat.Node;
-import com.revolsys.io.openstreetmap.pbf.Osmformat.PrimitiveGroup;
-import com.revolsys.io.openstreetmap.pbf.Osmformat.Relation;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.spring.SpringUtil;
 
 public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
-RecordIterator {
+  RecordIterator {
 
   public static Date toDate(final long time) {
     return new Date(DATE_GRANULARITY * time);
@@ -74,13 +70,21 @@ RecordIterator {
 
   private final LongHashMap<Point> nodePoints = new LongHashMap<>();
 
-  private final LongHashMap<Geometry> wayLines = new LongHashMap<>();
+  private final LongHashMap<Geometry> wayGeometries = new LongHashMap<>();
+
+  private final LongHashMap<Geometry> relationGeometries = new LongHashMap<>();
+
+  private final LinkedList<List<Integer>> relationMemberTypes = new LinkedList<>();
+
+  private final LinkedList<List<String>> relationMemberRoles = new LinkedList<>();
+
+  private final LinkedList<List<Long>> relationMemberIds = new LinkedList<>();
+
+  private final LinkedList<OsmRelation> relations = new LinkedList<>();
 
   private final LinkedList<List<Long>> wayNodeIds = new LinkedList<>();
 
   private final LinkedList<OsmWay> ways = new LinkedList<>();
-
-  private final LinkedList<OsmRelation> relations = new LinkedList<>();
 
   private List<String> strings = Collections.emptyList();
 
@@ -158,24 +162,27 @@ RecordIterator {
     return this.strings.get(stringId);
   }
 
-  private Map<String, String> getTags(final List<Integer> keys,
-    final List<Integer> values, final PbfFieldDecoder fieldDecoder) {
-    final Map<String, String> tags = new LinkedHashMap<>();
+  public boolean isPolygon(final OsmWay way, final Geometry geometry) {
+    if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
 
-    // Ensure parallel lists are of equal size.
-    if (keys.size() != values.size()) {
-      throw new RuntimeException("Number of tag keys (" + keys.size()
-        + ") and tag values (" + values.size() + ") don't match");
+      if (line.isClosed()) {
+        boolean isPolygon = true;
+        if (!"yes".equals(way.getTag("area"))) {
+          if (way.containsKey("barrier")) {
+            isPolygon = false;
+          } else if (way.containsKey("highway")) {
+            isPolygon = false;
+          }
+        }
+        if (isPolygon) {
+          final Polygon polygon = line.getGeometryFactory().polygon(line);
+          way.setGeometryValue(polygon);
+        }
+        return isPolygon;
+      }
     }
-
-    final Iterator<Integer> keyIterator = keys.iterator();
-    final Iterator<Integer> valueIterator = values.iterator();
-    while (keyIterator.hasNext()) {
-      final String key = fieldDecoder.decodeString(keyIterator.next());
-      final String value = fieldDecoder.decodeString(valueIterator.next());
-      tags.put(key, value);
-    }
-    return tags;
+    return false;
   }
 
   private void parseBlob() throws IOException {
@@ -197,7 +204,7 @@ RecordIterator {
   }
 
   private void parseBlock(final ProtocolBufferInputStream in)
-      throws IOException {
+    throws IOException {
     boolean running = true;
     this.strings = new ArrayList<>();
     double lonOffset = 0;
@@ -210,35 +217,35 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 10:
           readStrings(in, this.strings);
-          break;
+        break;
         case 18:
           parseOsmElement(in);
-          break;
+        break;
         case 136:
           granularity = in.readInt32();
-          break;
+        break;
         case 144:
           dateGranularity = in.readInt32();
-          break;
+        break;
         case 152:
           latOffset = in.readInt64();
-          break;
+        break;
         case 160:
           lonOffset = in.readInt64();
-          break;
+        break;
         default:
           this.blobIn.skipField(tag);
           running = false;
-          break;
+        break;
       }
     }
   }
 
   private DenseInfo parseDenseInfo(final ProtocolBufferInputStream input)
-      throws IOException {
+    throws IOException {
     final DenseInfo info = new DenseInfo();
     final int inLength = input.startLengthDelimited();
 
@@ -248,44 +255,44 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 8:
           input.readInt(info.versions);
-          break;
+        break;
         case 10:
           input.readInts(info.versions);
-          break;
+        break;
         case 16:
           input.readLong(info.timestamps);
-          break;
+        break;
         case 18:
           input.readLongs(info.timestamps);
-          break;
+        break;
         case 24:
           input.readLong(info.changesets);
         case 26:
           input.readLongs(info.changesets);
         case 32:
           input.readInt(info.uids);
-          break;
+        break;
         case 34:
           input.readInts(info.uids);
-          break;
+        break;
         case 40:
           readStringById(input, info.userNames);
-          break;
+        break;
         case 42:
           readStringsByIds(input, info.userNames);
-          break;
+        break;
         case 48:
           input.readBool(info.visibles);
-          break;
+        break;
         case 50:
           input.readBools(info.visibles);
-          break;
+        break;
         default:
           input.skipField(tag);
-          break;
+        break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -308,37 +315,37 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 8:
           in.readLong(ids);
-          break;
+        break;
         case 10:
           in.readLongs(ids);
-          break;
+        break;
         case 42:
           denseInfo = parseDenseInfo(in);
-          break;
+        break;
         case 64:
           readDegreesById(in, latitudes);
-          break;
+        break;
         case 66:
           readDegreesByIds(in, latitudes);
-          break;
+        break;
         case 72:
           readDegreesById(in, longitudes);
-          break;
+        break;
         case 74:
           readDegreesByIds(in, longitudes);
-          break;
+        break;
         case 80:
           readStringById(in, keysAndValues);
-          break;
+        break;
         case 82:
           readStringsByIds(in, keysAndValues);
-          break;
+        break;
         default:
           in.skipField(tag);
-          break;
+        break;
       }
     }
     in.endLengthDelimited(inLength);
@@ -374,7 +381,7 @@ RecordIterator {
           }
           if (!keysAndValuesIterator.hasNext()) {
             throw new RuntimeException(
-                "The PBF DenseInfo keys/values list contains a key with no corresponding value.");
+              "The PBF DenseInfo keys/values list contains a key with no corresponding value.");
           }
           if (node == null) {
             node = new OsmNode();
@@ -410,43 +417,43 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 8:
           final int version = input.readInt32();
           element.setVersion(version);
-          break;
+        break;
         case 16:
           final long time = input.readInt64();
           final Date timestamp = toDate(time);
           element.setTimestamp(timestamp);
-          break;
+        break;
         case 24:
           final long changeset = input.readInt64();
           element.setChangeset(changeset);
-          break;
+        break;
         case 32:
           final int uid = input.readInt32();
           element.setUid(uid);
-          break;
+        break;
         case 40:
           final int userSid = input.readUInt32();
           final String userName = getString(userSid);
           element.setUser(userName);
-          break;
+        break;
         case 48:
           final boolean visible = input.readBool();
           element.setVisible(visible);
-          break;
+        break;
         default:
           input.skipField(tag);
-          break;
+        break;
       }
     }
     input.endLengthDelimited(inLength);
   }
 
   private void parseNode(final ProtocolBufferInputStream input)
-      throws IOException {
+    throws IOException {
 
     final OsmNode node = new OsmNode();
     final List<String> keys = new ArrayList<>();
@@ -460,32 +467,32 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 8:
-          final long id = input.readSInt64();
+          final long id = input.readInt64();
           node.setId(id);
-          break;
+        break;
         case 16:
           readStringById(input, keys);
-          break;
+        break;
         case 18:
           readStringsByIds(input, keys);
-          break;
+        break;
         case 24:
           readStringById(input, values);
-          break;
+        break;
         case 26:
           readStringsByIds(input, values);
-          break;
+        break;
         case 34:
           parseInfo(input, node);
-          break;
+        break;
         case 64:
           lat = toDegrees(input.readSInt64());
-          break;
+        break;
         case 72:
           lon = toDegrees(input.readSInt64());
-          break;
+        break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -496,7 +503,7 @@ RecordIterator {
   }
 
   private void parseOsmElement(final ProtocolBufferInputStream in)
-      throws IOException {
+    throws IOException {
     final int inLength = in.startLengthDelimited();
     boolean running = true;
     while (running) {
@@ -504,23 +511,18 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 10:
           parseNode(in);
-          break;
+        break;
         case 18:
           parseDenseNodes(in);
-          break;
+        break;
         case 26:
           parseWay(in);
-          break;
+        break;
         case 34: {
-          // org.openstreetmap.osmosis.osmbinary.Osmformat.Relation.Builder
-          // subBuilder =
-          // org.openstreetmap.osmosis.osmbinary.Osmformat.Relation.newBuilder();
-          // input.readMessage(subBuilder, extensionRegistry);
-          // addRelations(subBuilder.buildPartial());
-          in.skipField(tag);
+          parseRelation(in);
           break;
         }
         case 42: {
@@ -534,19 +536,23 @@ RecordIterator {
         }
         default:
           in.skipField(tag);
-          break;
+        break;
       }
     }
     in.endLengthDelimited(inLength);
   }
 
-  private void parseWay(final ProtocolBufferInputStream input)
-      throws IOException {
+  private void parseRelation(final ProtocolBufferInputStream input)
+    throws IOException {
 
-    final OsmWay way = new OsmWay();
+    final OsmRelation relation = new OsmRelation();
     final List<String> keys = new ArrayList<>();
     final List<String> values = new ArrayList<>();
-    final List<Long> nodeIds = new ArrayList<>();
+    final List<Long> memberIds = new ArrayList<>();
+    final List<Integer> memberTypes = new ArrayList<>();
+
+    final List<String> memberRoles = new ArrayList<>();
+
     final int inLength = input.startLengthDelimited();
     boolean running = true;
     while (running) {
@@ -554,32 +560,131 @@ RecordIterator {
       switch (tag) {
         case 0:
           running = false;
-          break;
+        break;
         case 8:
-          final long id = input.readSInt64();
-          way.setId(id);
-          break;
+          final long id = input.readInt64();
+          relation.setId(id);
+        break;
         case 16:
           readStringById(input, keys);
-          break;
+        break;
         case 18:
           readStringsByIds(input, keys);
-          break;
+        break;
         case 24:
           readStringById(input, values);
-          break;
+        break;
         case 26:
           readStringsByIds(input, values);
-          break;
+        break;
+        case 34:
+          parseInfo(input, relation);
+        break;
+        case 64:
+          readStrings(input, memberRoles);
+        break;
+        case 66:
+          readStringsByIds(input, memberRoles);
+        break;
+        case 72:
+          input.readLong(memberIds);
+        break;
+        case 74:
+          input.readLongs(memberIds);
+        break;
+        case 80:
+          input.readEnum(memberTypes);
+        break;
+        case 82:
+          input.readEnums(memberTypes);
+        break;
+      }
+    }
+    input.endLengthDelimited(inLength);
+    addTags(relation, keys, values);
+
+    final List<Geometry> parts = new ArrayList<>();
+    long memberId = 0;
+    for (int i = 0; i < memberIds.size(); i++) {
+      final long memberIdOffset = memberIds.get(i);
+      memberId += memberIdOffset;
+      Geometry geometry = null;
+      final int memberType = memberTypes.get(i);
+      switch (memberType) {
+        case 0:
+          geometry = this.nodePoints.get(memberId);
+        break;
+
+        case 1:
+          geometry = this.wayGeometries.get(memberId);
+        break;
+        default:
+          throw new RuntimeException("Unknown member type " + memberType);
+      }
+
+      if (geometry != null) {
+        parts.add(geometry);
+      }
+    }
+
+    if (memberIds.size() == parts.size()) {
+      final Geometry geometry = OsmConstants.WGS84_2D.geometry(parts);
+      if (memberTypes.get(0) == 1 && !StringUtils.hasText(memberRoles.get(0))) {
+
+      }
+      relation.setGeometryValue(geometry);
+      this.currentRecords.add(relation);
+      final long relationId = relation.getId();
+      this.relationGeometries.put(relationId, geometry);
+    } else {
+      this.relations.add(relation);
+      this.relationMemberIds.add(memberIds);
+      this.relationMemberRoles.add(memberRoles);
+      this.relationMemberTypes.add(memberTypes);
+    }
+  }
+
+  private void parseWay(final ProtocolBufferInputStream input)
+    throws IOException {
+
+    final OsmWay way = new OsmWay();
+    final List<String> keys = new ArrayList<>();
+    final List<String> values = new ArrayList<>();
+    final List<Long> nodeIds = new ArrayList<>();
+    final int inLength = input.startLengthDelimited();
+    boolean running = true;
+    long wayId = 0;
+    while (running) {
+      final int tag = input.readTag();
+      switch (tag) {
+        case 0:
+          running = false;
+        break;
+        case 8:
+          wayId = input.readInt64();
+          way.setId(wayId);
+        break;
+        case 16:
+          readStringById(input, keys);
+        break;
+        case 18:
+          readStringsByIds(input, keys);
+        break;
+        case 24:
+          readStringById(input, values);
+        break;
+        case 26:
+          readStringsByIds(input, values);
+        break;
         case 34:
           parseInfo(input, way);
-          break;
+        break;
         case 64:
           input.readLong(nodeIds);
-          break;
+        break;
         case 66:
           input.readLongs(nodeIds);
-          break;
+        break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -597,53 +702,27 @@ RecordIterator {
     }
 
     if (nodeIds.size() == points.size()) {
-      final Geometry geometry = OsmConstants.WGS84_2D.lineString(points);
+      Geometry geometry;
+      if (points.size() == 1) {
+        geometry = points.get(0);
+      } else {
+        geometry = OsmConstants.WGS84_2D.lineString(points);
+      }
       way.setGeometryValue(geometry);
-      this.currentRecords.add(way);
-      final long wayId = way.getId();
-      this.wayLines.put(wayId, geometry);
+      isPolygon(way, geometry);
+      if (way.hasTags()) {
+        this.currentRecords.add(way);
+      }
+      geometry = way.getGeometryValue();
+      this.wayGeometries.put(wayId, geometry);
     } else {
       this.ways.add(way);
       this.wayNodeIds.add(nodeIds);
     }
   }
 
-  private void processNodes(final List<Node> nodes,
-    final PbfFieldDecoder fieldDecoder) {
-    // System.out.println("node");
-    for (final Node node : nodes) {
-      final long nodeId = node.getId();
-      final boolean visible = true;
-      int version = -1;
-      long changeset = -1;
-      int userId = -1;
-      long time = 0;
-      String username = "";
-      final List<Integer> keysList = node.getKeysList();
-      final List<Integer> valsList = node.getValsList();
-      if (node.hasInfo()) {
-        final Info info = node.getInfo();
-        version = info.getVersion();
-        changeset = info.getChangeset();
-        userId = info.getUid();
-        time = info.getTimestamp();
-        final int userSid = info.getUserSid();
-        if (userSid >= 0) {
-          username = fieldDecoder.decodeString(userSid);
-        }
-      }
-      final Date timestamp = fieldDecoder.decodeTimestamp(time);
-      final Map<String, String> tags = getTags(keysList, valsList, fieldDecoder);
-      final double latitude = fieldDecoder.decodeLatitude(node.getLat());
-      final double longitude = fieldDecoder.decodeLatitude(node.getLon());
-      final OsmNode osmNode = new OsmNode(nodeId, visible, version, changeset,
-        timestamp, username, userId, tags, longitude, latitude);
-      addNode(this.currentRecords, osmNode);
-    }
-  }
-
   private void processOsmHeader(final byte[] data)
-      throws InvalidProtocolBufferException {
+    throws InvalidProtocolBufferException {
     // Osmformat.HeaderBlock header = Osmformat.HeaderBlock.parseFrom(data);
     //
     // // Build the list of active and unsupported features in the file.
@@ -684,79 +763,6 @@ RecordIterator {
     // decodedEntities.add(new BoundContainer(bound));
   }
 
-  private void processOsmPrimitives(final byte[] data) throws IOException {
-    final Osmformat.PrimitiveBlock block = Osmformat.PrimitiveBlock.parseFrom(data);
-
-    for (final PrimitiveGroup primitiveGroup : block.getPrimitivegroupList()) {
-      // processNodes(primitiveGroup.getDense(), fieldDecoder);
-      // processWays(waysList, fieldDecoder);
-      // TODO processRelations(primitiveGroup.getRelationsList(), fieldDecoder);
-    }
-    final ProtocolBufferInputStream blockIn = new ProtocolBufferInputStream();
-    blockIn.setBuffer(data);
-    parseBlock(blockIn);
-  }
-
-  private void processRelations(final List<Relation> relations,
-    final PbfFieldDecoder fieldDecoder) {
-    for (final Relation relation : relations) {
-      final OsmRelation osmRelation = new OsmRelation();
-
-      final long relationId = relation.getId();
-      osmRelation.setId(relationId);
-
-      if (relation.hasInfo()) {
-        final Info info = relation.getInfo();
-
-        final int version = info.getVersion();
-        osmRelation.setVersion(version);
-
-        final long changeset = info.getChangeset();
-        osmRelation.setChangeset(changeset);
-
-        final int userId = info.getUid();
-        osmRelation.setUid(userId);
-
-        final long time = info.getTimestamp();
-        final Date timestamp = fieldDecoder.decodeTimestamp(time);
-        osmRelation.setTimestamp(timestamp);
-
-        final int userSid = info.getUserSid();
-        if (userSid >= 0) {
-          final String username = fieldDecoder.decodeString(userSid);
-          osmRelation.setUser(username);
-        }
-      }
-
-      final List<Integer> keysList = relation.getKeysList();
-      final List<Integer> valsList = relation.getValsList();
-      final Map<String, String> tags = getTags(keysList, valsList, fieldDecoder);
-      osmRelation.setTags(tags);
-
-      final List<Long> nodeIds = new ArrayList<>();
-      final List<Point> points = new ArrayList<>();
-      final long nodeId = 0;
-      // for (final long nodeIdOffset : relation.get()) {
-      // nodeId += nodeIdOffset;
-      // nodeIds.add(nodeId);
-      // final Point point = this.nodePoints.get(nodeId);
-      //
-      // if (point != null) {
-      // points.add(point);
-      // }
-      // }
-
-      if (nodeIds.size() == points.size()) {
-        final Geometry geometry = OsmConstants.WGS84_2D.lineString(points);
-        osmRelation.setGeometryValue(geometry);
-        this.currentRecords.add(osmRelation);
-      } else {
-        this.relations.add(osmRelation);
-        this.wayNodeIds.add(nodeIds);
-      }
-    }
-  }
-
   public Record processWaysWithMissingNodes() {
     while (!this.ways.isEmpty()) {
       final OsmWay way = this.ways.removeFirst();
@@ -785,7 +791,7 @@ RecordIterator {
         final Geometry geometry = OsmConstants.WGS84_2D.geometry(lines);
         way.setGeometryValue(geometry);
         final long wayId = way.getId();
-        this.wayLines.put(wayId, geometry);
+        this.wayGeometries.put(wayId, geometry);
         return way;
       }
     }
@@ -807,16 +813,16 @@ RecordIterator {
         switch (tag) {
           case 0:
             running = false;
-            break;
+          break;
           case 10:
             raw = this.blobIn.readBytes();
-            break;
+          break;
           case 16:
             rawSize = this.blobIn.readInt32();
-            break;
+          break;
           case 26:
             zlibData = this.blobIn.readBytes();
-            break;
+          break;
           case 34:
             throw new RuntimeException("LZMA not supported");
           case 42:
@@ -824,7 +830,7 @@ RecordIterator {
           default:
             this.blobIn.skipField(tag);
             running = false;
-            break;
+          break;
         }
       }
 
@@ -841,12 +847,12 @@ RecordIterator {
         }
         if (!inflater.finished()) {
           throw new RuntimeException(
-              "PBF blob contains incomplete compressed data.");
+            "PBF blob contains incomplete compressed data.");
         }
         return blobData;
       } else {
         throw new RuntimeException(
-            "PBF blob uses unsupported compression, only raw or zlib may be used.");
+          "PBF blob uses unsupported compression, only raw or zlib may be used.");
       }
     } finally {
       this.blobIn.setInputStream(null);
@@ -881,7 +887,7 @@ RecordIterator {
           }
           default:
             this.blobHeaderIn.skipField(tag);
-            break;
+          break;
         }
       }
 
@@ -901,8 +907,10 @@ RecordIterator {
     final List<Double> numbers) throws IOException {
     final int length = in.readRawVarint32();
     final int oldLength = in.pushLimit(length);
+    int number = 0;
     while (in.getBytesUntilLimit() > 0) {
-      final long number = in.readSInt64();
+      final long numberOffset = in.readSInt64();
+      number += numberOffset;
       final double degrees = toDegrees(number);
       numbers.add(degrees);
     }
@@ -928,10 +936,10 @@ RecordIterator {
         case 10:
           final String string = in.readString();
           strings.add(string);
-          break;
+        break;
         default:
           this.blobIn.skipField(tag);
-          break;
+        break;
       }
     }
   }

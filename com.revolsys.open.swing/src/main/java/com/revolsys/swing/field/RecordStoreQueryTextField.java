@@ -46,7 +46,6 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.collection.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.equals.StringEqualsIgnoreCase;
 import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Equal;
 import com.revolsys.data.query.Q;
@@ -96,9 +95,9 @@ public class RecordStoreQueryTextField extends TextField implements
 
   public RecordStoreQueryTextField(final RecordDefinition recordDefinition,
     final String displayAttributeName) {
-    this(recordDefinition, displayAttributeName, new Query(recordDefinition, new Equal(
-      F.upper(displayAttributeName), new Value(null))), new Query(recordDefinition,
-      Q.iLike(displayAttributeName, "")));
+    this(recordDefinition, displayAttributeName, new Query(recordDefinition,
+      new Equal(F.upper(displayAttributeName), new Value(null))), new Query(
+        recordDefinition, Q.iLike(displayAttributeName, "")));
 
   }
 
@@ -127,8 +126,7 @@ public class RecordStoreQueryTextField extends TextField implements
     this.listModel = new RecordStoreQueryListModel(this.recordStore,
       displayAttributeName, queries);
     this.list = new JXList(this.listModel);
-    this.list.setCellRenderer(new RecordListCellRenderer(
-      displayAttributeName));
+    this.list.setCellRenderer(new RecordListCellRenderer(displayAttributeName));
     this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.list.setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
     this.list.addMouseListener(this);
@@ -157,9 +155,9 @@ public class RecordStoreQueryTextField extends TextField implements
 
   public RecordStoreQueryTextField(final RecordStore recordStore,
     final String typeName, final String displayAttributeName) {
-    this(recordStore.getRecordDefinition(typeName), displayAttributeName, new Query(
-      typeName, new Equal(F.upper(displayAttributeName), new Value(null))),
-      new Query(typeName, Q.iLike(displayAttributeName, "")));
+    this(recordStore.getRecordDefinition(typeName), displayAttributeName,
+      new Query(typeName, new Equal(F.upper(displayAttributeName), new Value(
+        null))), new Query(typeName, Q.iLike(displayAttributeName, "")));
   }
 
   @Override
@@ -277,7 +275,7 @@ public class RecordStoreQueryTextField extends TextField implements
     final Record object = this.listModel.getElementAt(adapter.row);
     final String text = getText();
     final String value = object.getString(this.displayAttributeName);
-    if (StringEqualsIgnoreCase.equal(text, value)) {
+    if (EqualsRegistry.equal(text, value)) {
       return true;
     } else {
       return false;
@@ -291,7 +289,7 @@ public class RecordStoreQueryTextField extends TextField implements
       final String text = getText();
       if (StringUtils.hasText(text)) {
         final String value = this.selectedItem.getString(this.displayAttributeName);
-        return text.equalsIgnoreCase(value);
+        return text.equals(value);
       } else {
         return false;
       }

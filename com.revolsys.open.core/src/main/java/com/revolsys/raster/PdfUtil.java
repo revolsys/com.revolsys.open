@@ -2,12 +2,15 @@ package com.revolsys.raster;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSFloat;
+import org.apache.pdfbox.cos.COSInteger;
 import org.apache.pdfbox.cos.COSNumber;
 import org.apache.pdfbox.cos.COSObject;
 import org.springframework.util.StringUtils;
@@ -19,13 +22,37 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class PdfUtil {
 
+  public static void addFloat(final COSArray array, final double number) {
+    try {
+      array.add(new COSFloat(String.valueOf(number)));
+    } catch (final IOException e) {
+    }
+  }
+
+  public static void addInt(final COSArray array, final long number) {
+    array.add(COSInteger.get(number));
+  }
+
+  public static COSArray floatArray(final double... numbers) {
+    final COSArray array = new COSArray();
+    for (final double number : numbers) {
+      addFloat(array, number);
+    }
+    return array;
+  }
+
   public static COSArray getArray(final COSDictionary dictionary,
     final String key) {
     final COSBase item = dictionary.getDictionaryObject(key);
-    if (item instanceof COSArray) {
+    if (item == null) {
+      final COSArray array = new COSArray();
+      dictionary.setItem(key, array);
+      return array;
+    } else if (item instanceof COSArray) {
       return (COSArray)item;
     } else {
-      return null;
+      throw new IllegalArgumentException("Expecting COSArray not "
+          + item.getClass());
     }
   }
 
@@ -47,10 +74,15 @@ public class PdfUtil {
   public static COSDictionary getDictionary(final COSDictionary dictionary,
     final String key) {
     final COSBase item = dictionary.getDictionaryObject(key);
-    if (item instanceof COSDictionary) {
+    if (item == null) {
+      final COSDictionary childDictionary = new COSDictionary();
+      dictionary.setItem(key, childDictionary);
+      return childDictionary;
+    } else if (item instanceof COSDictionary) {
       return (COSDictionary)item;
     } else {
-      return null;
+      throw new IllegalArgumentException("Expecting COSDictionary not "
+          + item.getClass());
     }
   }
 
@@ -103,6 +135,7 @@ public class PdfUtil {
         }
         if (item instanceof COSDictionary) {
           final COSDictionary viewport = (COSDictionary)item;
+          // System.out.println(viewport);
           if (hasNameValue(viewport, "Type", "Viewport")) {
             return viewport;
           }
@@ -168,5 +201,13 @@ public class PdfUtil {
     final String key, final String value) {
     final String name = dictionary.getNameAsString(key);
     return value.equals(name);
+  }
+
+  public static COSArray intArray(final long... numbers) {
+    final COSArray array = new COSArray();
+    for (final long number : numbers) {
+      addInt(array, number);
+    }
+    return array;
   }
 }

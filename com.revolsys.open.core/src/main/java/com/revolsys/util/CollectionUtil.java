@@ -494,6 +494,20 @@ public final class CollectionUtil {
     }
   }
 
+  public static <K, V> boolean removeFromCollection(
+    final Map<K, Collection<V>> map, final K key, final V value) {
+    final Collection<V> values = map.get(key);
+    if (values == null) {
+      return false;
+    } else {
+      final boolean removed = values.remove(value);
+      if (values.isEmpty()) {
+        map.remove(key);
+      }
+      return removed;
+    }
+  }
+
   public static <K, V> boolean removeFromSet(final Map<K, Set<V>> map,
     final K key, final V value) {
     final Set<V> values = map.get(key);
@@ -577,11 +591,11 @@ public final class CollectionUtil {
                 }
               }
             }
-          break;
+            break;
 
           default:
             buffer.append(c);
-          break;
+            break;
         }
       }
       return buffer.toString();
@@ -605,7 +619,7 @@ public final class CollectionUtil {
   public static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
     final Map<K, V> map) {
     final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(
-      map);
+        map);
     final Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
     sortedMap.putAll(map);
     return new LinkedHashMap<K, V>(sortedMap);

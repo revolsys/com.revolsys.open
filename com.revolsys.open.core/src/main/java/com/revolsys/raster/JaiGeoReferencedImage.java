@@ -6,6 +6,8 @@ import javax.media.jai.PlanarImage;
 import org.springframework.core.io.Resource;
 
 public class JaiGeoReferencedImage extends AbstractGeoReferencedImage {
+  protected JaiGeoReferencedImage() {
+  }
 
   public JaiGeoReferencedImage(final Resource imageResource) {
     setImageResource(imageResource);

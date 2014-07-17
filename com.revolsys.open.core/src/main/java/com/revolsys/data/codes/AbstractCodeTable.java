@@ -42,6 +42,8 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
 
   private String name;
 
+  private boolean caseSensitive = false;
+
   public AbstractCodeTable() {
   }
 
@@ -62,7 +64,11 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
     this.idIdCache.put(id, id);
     this.valueIdCache.put(values, id);
     this.valueIdCache.put(getNormalizedValues(values), id);
-    this.stringIdMap.put(id.toString().toLowerCase(), id);
+    String lowerId = id.toString();
+    if (!this.caseSensitive) {
+      lowerId = lowerId.toLowerCase();
+    }
+    this.stringIdMap.put(lowerId, id);
   }
 
   protected void addValue(final Identifier id, final Object... values) {
@@ -120,9 +126,7 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
     return getId(values, true);
   }
 
-  @SuppressWarnings("unchecked")
-  public Identifier getId(final List<Object> values,
-    final boolean loadValues) {
+  public Identifier getId(final List<Object> values, final boolean loadValues) {
     if (values.size() == 1) {
       final Object id = values.get(0);
       if (id == null) {
@@ -132,7 +136,10 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
         if (cachedId != null) {
           return cachedId;
         } else {
-          final String lowerId = id.toString().toLowerCase();
+          String lowerId = id.toString();
+          if (!this.caseSensitive) {
+            lowerId = lowerId.toLowerCase();
+          }
           if (this.stringIdMap.containsKey(lowerId)) {
             return this.stringIdMap.get(lowerId);
           }
@@ -232,11 +239,6 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
   }
 
   @Override
-  public <V> V getValue(final Object id) {
-    return getValue(SingleIdentifier.create(id));
-  }
-
-  @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Identifier id) {
     final List<Object> values = getValues(id);
@@ -245,6 +247,11 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
     } else {
       return null;
     }
+  }
+
+  @Override
+  public <V> V getValue(final Object id) {
+    return getValue(SingleIdentifier.create(id));
   }
 
   @Override
@@ -258,7 +265,10 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
     } else {
       List<Object> values = this.idValueCache.get(id);
       if (values == null) {
-        final String lowerId = id.toString().toLowerCase();
+        String lowerId = id.toString();
+        if (!this.caseSensitive) {
+          lowerId = lowerId.toLowerCase();
+        }
         if (this.stringIdMap.containsKey(lowerId)) {
           id = this.stringIdMap.get(lowerId);
           values = this.idValueCache.get(id);
@@ -293,12 +303,15 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
     return this.capitalizeWords;
   }
 
+  public boolean isCaseSensitive() {
+    return this.caseSensitive;
+  }
+
   public boolean isEmpty() {
     return this.idIdCache.isEmpty();
   }
 
-  protected Identifier loadId(final List<Object> values,
-    final boolean createId) {
+  protected Identifier loadId(final List<Object> values, final boolean createId) {
     return null;
   }
 
@@ -327,6 +340,10 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
 
   public void setCapitalizeWords(final boolean capitalizedWords) {
     this.capitalizeWords = capitalizedWords;
+  }
+
+  public void setCaseSensitive(final boolean caseSensitive) {
+    this.caseSensitive = caseSensitive;
   }
 
   public void setName(final String name) {

@@ -115,7 +115,7 @@ public class RecordStoreQueryListModel implements ListModel {
             if (allObjects.size() < this.maxResults) {
               final String key = object.getString(this.displayAttributeName);
               if (!allObjects.containsKey(key)) {
-                if (searchParam.equalsIgnoreCase(key)) {
+                if (searchParam.equals(key)) {
                   this.selectedItem = object;
                 }
                 allObjects.put(key, object);
@@ -154,8 +154,8 @@ public class RecordStoreQueryListModel implements ListModel {
 
   public void setSearchText(final String searchText) {
     if (StringUtils.hasText(searchText)) {
-      if (!this.searchText.equalsIgnoreCase(searchText)) {
-        this.searchText = searchText.toUpperCase();
+      if (!this.searchText.equals(searchText)) {
+        this.searchText = searchText;
         this.objects = getObjects(this.searchText);
         fireContentsChanged(this, 0, this.objects.size());
       }

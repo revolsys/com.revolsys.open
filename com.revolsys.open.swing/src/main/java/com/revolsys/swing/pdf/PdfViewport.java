@@ -8,6 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,22 +20,30 @@ import javax.measure.Measure;
 import javax.measure.quantity.Length;
 
 import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
 import org.apache.pdfbox.pdmodel.graphics.PDExtendedGraphicsState;
 import org.apache.pdfbox.pdmodel.graphics.PDLineDashPattern;
 import org.springframework.util.StringUtils;
 
+import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
+import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.gis.model.coordinates.PointWithOrientation;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.raster.PdfUtil;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -66,20 +75,80 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
     this.document = document;
     this.page = page;
     this.contentStream = new PDPageContentStream(document, page);
+    final COSArray viewports = PdfUtil.getArray(page.getCOSDictionary(), "VP");
+
+    final COSDictionary viewport = new COSDictionary();
+    viewports.add(viewport);
+    viewport.setItem("Type", COSName.getPDFName("Viewport"));
+
+    final COSArray bbox = new COSArray();
+    PdfUtil.addInt(bbox, 0);
+    PdfUtil.addInt(bbox, height);
+    PdfUtil.addInt(bbox, width);
+    PdfUtil.addInt(bbox, 0);
+
+    viewport.setItem("BBox", bbox);
+    viewport.setString("Name", "Main Map");
+
+    final COSDictionary measure = PdfUtil.getDictionary(viewport, "Measure");
+    measure.setName("Type", "Measure");
+    measure.setName("Subtype", "GEO");
+
+    final COSArray bounds = PdfUtil.intArray(0, 0, 0, 1, 1, 1, 1, 0);
+    measure.setItem("Bounds", bounds);
+
+    final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+
+    final double minX = boundingBox.getMinX();
+    final double maxX = boundingBox.getMaxX();
+    final double minY = boundingBox.getMinY();
+    final double maxY = boundingBox.getMaxY();
+    final COSArray geoPoints = new COSArray();
+    addPoint(geoPoints, geometryFactory, minX, maxY);
+    addPoint(geoPoints, geometryFactory, minX, minY);
+    addPoint(geoPoints, geometryFactory, maxX, minY);
+    addPoint(geoPoints, geometryFactory, maxX, maxY);
+    measure.setItem("GPTS", geoPoints);
+
+    final COSArray lpts = PdfUtil.intArray(0, 0, 0, 1, 1, 1, 1, 0);
+    measure.setItem("LPTS", lpts);
+
+    final COSDictionary gcs = PdfUtil.getDictionary(measure, "GCS");
+    if (geometryFactory.isProjected()) {
+      gcs.setName("Type", "PROJCS");
+    } else {
+      gcs.setName("Type", "GEOGCS");
+    }
+    // final int srid = geometryFactory.getSrid();
+    // gcs.setInt("EPSG", srid);
+    final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(geometryFactory.getCoordinateSystem());
+    final String wkt = EsriCsWktWriter.toWkt(coordinateSystem);
+    gcs.setString("WKT", wkt);
+  }
+
+  private void addPoint(final COSArray geoPoints,
+    final GeometryFactory geometryFactory, final double x, final double y) {
+    final Point point = geometryFactory.point(x, y);
+    final GeometryFactory geographicGeometryFactory = geometryFactory.getGeographicGeometryFactory();
+    final Point geoPoint = point.convert(geographicGeometryFactory);
+    final double lon = geoPoint.getX();
+    final double lat = geoPoint.getY();
+    PdfUtil.addFloat(geoPoints, lat);
+    PdfUtil.addFloat(geoPoints, lon);
   }
 
   @Override
   public void close() throws IOException {
-    contentStream.close();
+    this.contentStream.close();
   }
 
   @Override
   public void drawGeometry(final Geometry geometry, final GeometryStyle style) {
     try {
-      contentStream.saveGraphicsState();
+      this.contentStream.saveGraphicsState();
       setGeometryStyle(style);
-      contentStream.setNonStrokingColor(style.getPolygonFill());
-      contentStream.setStrokingColor(style.getLineColor());
+      this.contentStream.setNonStrokingColor(style.getPolygonFill());
+      this.contentStream.setStrokingColor(style.getLineColor());
 
       for (Geometry part : geometry.geometries()) {
         part = part.convert(getGeometryFactory());
@@ -87,7 +156,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
           final LineString line = (LineString)part;
 
           drawLine(line);
-          contentStream.stroke();
+          this.contentStream.stroke();
         } else if (part instanceof Polygon) {
           final Polygon polygon = (Polygon)part;
 
@@ -106,14 +175,14 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
                 drawLine(ring);
               }
             }
-            contentStream.closeSubPath();
+            this.contentStream.closeSubPath();
             i++;
           }
-          contentStream.fill(PathIterator.WIND_NON_ZERO);
+          this.contentStream.fill(PathIterator.WIND_NON_ZERO);
           for (final LinearRing ring : polygon.rings()) {
 
             drawLine(ring);
-            contentStream.stroke();
+            this.contentStream.stroke();
           }
         }
       }
@@ -122,7 +191,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
       e.printStackTrace();
     } finally {
       try {
-        contentStream.restoreGraphicsState();
+        this.contentStream.restoreGraphicsState();
       } catch (final IOException e) {
       }
     }
@@ -136,9 +205,9 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
       final float viewX = (float)viewCoordinates[0];
       final float viewY = (float)(getViewHeightPixels() - viewCoordinates[1]);
       if (i == 0) {
-        contentStream.moveTo(viewX, viewY);
+        this.contentStream.moveTo(viewX, viewY);
       } else {
-        contentStream.lineTo(viewX, viewY);
+        this.contentStream.lineTo(viewX, viewY);
       }
     }
   }
@@ -152,9 +221,9 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
       final float viewX = (float)viewCoordinates[0];
       final float viewY = (float)(getViewHeightPixels() - viewCoordinates[1]);
       if (i == toVertexIndex) {
-        contentStream.moveTo(viewX, viewY);
+        this.contentStream.moveTo(viewX, viewY);
       } else {
-        contentStream.lineTo(viewX, viewY);
+        this.contentStream.lineTo(viewX, viewY);
       }
     }
   }
@@ -170,7 +239,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
         if (point != null) {
           final double orientation = point.getOrientation();
 
-          contentStream.saveGraphicsState();
+          this.contentStream.saveGraphicsState();
           try {
             // style.setTextStyle(viewport, graphics);
 
@@ -184,15 +253,15 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
             double dx = Viewport2D.toDisplayValue(this, textDx);
 
             final Measure<Length> textDy = style.getTextDy();
-            double dy = Viewport2D.toDisplayValue(this, textDy);
+            double dy = -Viewport2D.toDisplayValue(this, textDy);
             final Font font = style.getFont(this);
-            final FontMetrics fontMetrics = canvas.getFontMetrics(font);
+            final FontMetrics fontMetrics = this.canvas.getFontMetrics(font);
 
             double maxWidth = 0;
             final String[] lines = label.split("[\\r\\n]");
             for (final String line : lines) {
               final Rectangle2D bounds = fontMetrics.getStringBounds(line,
-                canvas.getGraphics());
+                this.canvas.getGraphics());
               final double width = bounds.getWidth();
               maxWidth = Math.max(width, maxWidth);
             }
@@ -204,9 +273,9 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
             final String verticalAlignment = style.getTextVerticalAlignment();
             if ("top".equals(verticalAlignment)) {
             } else if ("middle".equals(verticalAlignment)) {
-              dy += maxHeight / 2;
+              dy -= maxHeight / 2;
             } else {
-              dy += maxHeight;
+              dy -= maxHeight;
             }
 
             String horizontalAlignment = style.getTextHorizontalAlignment();
@@ -248,7 +317,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
               final AffineTransform lineTransform = new AffineTransform(
                 transform);
               final Rectangle2D bounds = fontMetrics.getStringBounds(line,
-                canvas.getGraphics());
+                this.canvas.getGraphics());
               final double width = bounds.getWidth();
               final double height = bounds.getHeight();
 
@@ -282,31 +351,33 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
                */
               final Color textBoxColor = style.getTextBoxColor();
               if (textBoxColor != null) {
-                contentStream.setNonStrokingColor(textBoxColor);
+                this.contentStream.setNonStrokingColor(textBoxColor);
                 final double cornerSize = Math.max(height / 2, 5);
                 // final RoundRectangle2D.Double box = new
                 // RoundRectangle2D.Double(
                 // bounds.getX() - 3, bounds.getY() - 1, width + 6, height + 2,
                 // cornerSize, cornerSize);
-                contentStream.fillRect((float)bounds.getX() - 3,
+                this.contentStream.fillRect((float)bounds.getX() - 3,
                   (float)bounds.getY() - 1, (float)width + 6, (float)height + 2);
               }
-              contentStream.setNonStrokingColor(style.getTextFill());
+              this.contentStream.setNonStrokingColor(style.getTextFill());
 
-              contentStream.beginText();
-              final PDFont font2 = PDType1Font.HELVETICA_BOLD;
+              this.contentStream.beginText();
+              final InputStream fontStream = PDDocument.class.getResourceAsStream("/org/apache/pdfbox/resources/ttf/ArialMT.ttf");
+              final PDFont pdfFont = PDTrueTypeFont.loadTTF(this.document,
+                fontStream);
 
-              contentStream.setFont(font2, font.getSize2D());
-              contentStream.setTextMatrix(transform);
-              contentStream.drawString(line);
-              contentStream.endText();
+              this.contentStream.setFont(pdfFont, font.getSize2D());
+              this.contentStream.setTextMatrix(transform);
+              this.contentStream.drawString(line);
+              this.contentStream.endText();
 
               transform = lineTransform;
-              transform.translate(0, (leading + descent));
+              transform.translate(0, leading + descent);
             }
 
           } finally {
-            contentStream.restoreGraphicsState();
+            this.contentStream.restoreGraphicsState();
           }
         }
       }
@@ -322,9 +393,9 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
   }
 
   private void setGeometryStyle(final GeometryStyle style) throws IOException {
-    String styleName = styleNames.get(style);
+    String styleName = this.styleNames.get(style);
     if (styleName == null) {
-      styleName = "rgStyle" + styleId++;
+      styleName = "rgStyle" + this.styleId++;
 
       final PDExtendedGraphicsState graphicsState = new PDExtendedGraphicsState();
 
@@ -388,7 +459,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
         graphicsState.setNonStrokingAlphaConstant(polygonFillOpacity / 255f);
       }
 
-      final PDResources resources = page.findResources();
+      final PDResources resources = this.page.findResources();
       Map<String, PDExtendedGraphicsState> graphicsStateDictionary = resources.getGraphicsStates();
       if (graphicsStateDictionary == null) {
         graphicsStateDictionary = new TreeMap<>();
@@ -396,8 +467,8 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
       graphicsStateDictionary.put(styleName, graphicsState);
       resources.setGraphicsStates(graphicsStateDictionary);
 
-      styleNames.put(style, styleName);
+      this.styleNames.put(style, styleName);
     }
-    contentStream.appendRawCommands("/" + styleName + " gs\n");
+    this.contentStream.appendRawCommands("/" + styleName + " gs\n");
   }
 }

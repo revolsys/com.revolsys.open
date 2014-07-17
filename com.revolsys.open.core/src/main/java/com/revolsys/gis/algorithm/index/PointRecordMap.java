@@ -11,8 +11,6 @@ import java.util.Set;
 import com.revolsys.data.record.Record;
 import com.revolsys.filter.Filter;
 import com.revolsys.filter.FilterUtil;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
-import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.parallel.channel.Channel;
@@ -21,7 +19,7 @@ public class PointRecordMap {
 
   private Comparator<Record> comparator;
 
-  private Map<Point, List<Record>> objectMap = new HashMap<Point, List<Record>>();
+  private Map<PointDouble, List<Record>> objectMap = new HashMap<>();
 
   private int size = 0;
 
@@ -37,125 +35,129 @@ public class PointRecordMap {
   /**
    * Add a {@link Point} {@link Record} to the list of objects at the given
    * coordinate.
-   * 
+   *
    * @param pointObjects The map of point objects.
-   * @param object The object to add.
+   * @param record The object to add.
    */
-  public void add(final Record object) {
-    final Point point = object.getGeometryValue();
-    final Point coordinates = new PointDouble(point, 2);
-    final List<Record> objects = getObjectInternal(coordinates);
-    objects.add(object);
-    if (comparator != null) {
-      Collections.sort(objects, comparator);
+  public void add(final Record record) {
+    final PointDouble key = getKey(record);
+    final List<Record> records = getOrCreateRecords(key);
+    records.add(record);
+    if (this.comparator != null) {
+      Collections.sort(records, this.comparator);
     }
-    size++;
+    this.size++;
   }
 
   public void clear() {
-    size = 0;
-    objectMap = new HashMap<Point, List<Record>>();
+    this.size = 0;
+    this.objectMap = new HashMap<>();
   }
 
   public boolean containsKey(final Point point) {
-    final PointDouble coordinates = new PointDouble(point, 2);
-    return objectMap.containsKey(coordinates);
+    final PointDouble key = getKey(point);
+    return this.objectMap.containsKey(key);
   }
 
   public List<Record> getAll() {
-    final List<Record> objects = new ArrayList<Record>();
-    for (final List<Record> objectsAtPoint : objectMap.values()) {
-      objects.addAll(objectsAtPoint);
+    final List<Record> records = new ArrayList<Record>();
+    for (final List<Record> recordsAtPoint : this.objectMap.values()) {
+      records.addAll(recordsAtPoint);
     }
-    return objects;
+    return records;
   }
 
-  public Set<Point> getCoordinates() {
-    return Collections.unmodifiableSet(objectMap.keySet());
+  @SuppressWarnings("unchecked")
+  public <V extends Record> V getFirstMatch(final Point point) {
+    final List<Record> records = getRecords(point);
+    if (records.isEmpty()) {
+      return null;
+    } else {
+      return (V)records.get(0);
+    }
+
   }
 
-  public Record getFirstMatch(final Record object,
-    final Filter<Record> filter) {
-    final List<Record> objects = getObjects(object);
-    for (final Record matchObject : objects) {
-      if (filter.accept(matchObject)) {
-        return matchObject;
+  public Record getFirstMatch(final Record record, final Filter<Record> filter) {
+    final List<Record> records = getRecords(record);
+    for (final Record matchRecord : records) {
+      if (filter.accept(matchRecord)) {
+        return matchRecord;
       }
     }
     return null;
   }
 
-  @SuppressWarnings("unchecked")
-  public <V extends Record> V getFirstMatch(final Point point) {
-    final List<Record> objects = getObjects(point);
-    if (objects.isEmpty()) {
-      return null;
-    } else {
-      return (V)objects.get(0);
-    }
-
+  private PointDouble getKey(final Point point) {
+    return new PointDouble(point, 2);
   }
 
-  public List<Record> getMatches(final Record object,
+  private PointDouble getKey(final Record object) {
+    final Point point = object.getGeometryValue();
+    return getKey(point);
+  }
+
+  public Set<Point> getKeys() {
+    return Collections.<Point> unmodifiableSet(this.objectMap.keySet());
+  }
+
+  public List<Record> getMatches(final Record record,
     final Filter<Record> filter) {
-    final List<Record> objects = getObjects(object);
-    final List<Record> filteredObjects = FilterUtil.filter(objects, filter);
-    return filteredObjects;
+    final List<Record> records = getRecords(record);
+    final List<Record> filteredRecords = FilterUtil.filter(records, filter);
+    return filteredRecords;
   }
 
-  protected List<Record> getObjectInternal(final Point coordinates) {
-    List<Record> objects = objectMap.get(coordinates);
+  protected List<Record> getOrCreateRecords(final PointDouble key) {
+    List<Record> objects = this.objectMap.get(key);
     if (objects == null) {
       objects = new ArrayList<Record>(1);
-      final Point indexCoordinates = new PointDouble(coordinates.getX(),
-        coordinates.getY());
-      objectMap.put(indexCoordinates, objects);
+      this.objectMap.put(key, objects);
     }
     return objects;
   }
 
-  public List<Record> getObjects(final Record object) {
-    final Point point = object.getGeometryValue();
-    final List<Record> objects = getObjects(point);
-    return objects;
-  }
-
-  public List<Record> getObjects(final Point point) {
-    final Point coordinates = new PointDouble(point, 2);
-    final List<Record> objects = objectMap.get(coordinates);
-    if (objects == null) {
+  public List<Record> getRecords(final Point point) {
+    final PointDouble key = getKey(point);
+    final List<Record> records = this.objectMap.get(key);
+    if (records == null) {
       return Collections.emptyList();
     } else {
-      return new ArrayList<Record>(objects);
+      return new ArrayList<Record>(records);
     }
+  }
+
+  public List<Record> getRecords(final Record record) {
+    final Point point = record.getGeometryValue();
+    final List<Record> objects = getRecords(point);
+    return objects;
   }
 
   public void initialize(final Point point) {
     if (!isRemoveEmptyLists()) {
-      final Point coordinates = new PointDouble(point, 2);
-      getObjectInternal(coordinates);
+      final PointDouble key = getKey(point);
+      getOrCreateRecords(key);
     }
   }
 
   public boolean isRemoveEmptyLists() {
-    return removeEmptyLists;
+    return this.removeEmptyLists;
   }
 
-  public void remove(final Record object) {
-    final Geometry geometry = object.getGeometryValue();
-    final Point coordinates = geometry.getPoint();
-    final List<Record> objects = objectMap.get(coordinates);
+  public void remove(final Record record) {
+    final PointDouble key = getKey(record);
+    final List<Record> objects = this.objectMap.get(key);
     if (objects != null) {
-      objects.remove(object);
+      objects.remove(record);
       if (objects.isEmpty()) {
         if (isRemoveEmptyLists()) {
-          objectMap.remove(coordinates);
+          this.objectMap.remove(key);
         }
-      } else if (comparator != null) {
-        Collections.sort(objects, comparator);
+      } else if (this.comparator != null) {
+        Collections.sort(objects, this.comparator);
       }
     }
-    size--;
+    this.size--;
   }
 
   public void setRemoveEmptyLists(final boolean removeEmptyLists) {
@@ -163,25 +165,23 @@ public class PointRecordMap {
   }
 
   public int size() {
-    return size;
+    return this.size;
   }
 
-  public void sort(final Record object) {
-    if (comparator != null) {
-      final Geometry geometry = object.getGeometryValue();
-      final Point coordinate = geometry.getPoint();
-      final List<Record> objects = objectMap.get(coordinate);
-      if (objects != null) {
-        Collections.sort(objects, comparator);
+  public void sort(final Record record) {
+    if (this.comparator != null) {
+      final List<Record> records = getRecords(record);
+      if (records != null) {
+        Collections.sort(records, this.comparator);
       }
     }
   }
 
   public void write(final Channel<Record> out) {
     if (out != null) {
-      for (final Point coordinates : getCoordinates()) {
-        final List<Record> objects = getObjects(coordinates);
-        for (final Record object : objects) {
+      for (final Point point : getKeys()) {
+        final List<Record> points = getRecords(point);
+        for (final Record object : points) {
           out.write(object);
         }
       }
