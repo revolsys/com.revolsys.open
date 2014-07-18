@@ -5,11 +5,11 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.BeanNameAware;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.Writer;
 
-public class StatisticsWriter extends AbstractWriter<Record> implements
-  BeanNameAware {
+public class StatisticsWriter extends AbstractRecordWriter implements
+BeanNameAware {
   private String beanName;
 
   private Statistics statistics;
@@ -25,32 +25,32 @@ public class StatisticsWriter extends AbstractWriter<Record> implements
 
   @Override
   public void close() {
-    writer.close();
-    statistics.disconnect();
+    this.writer.close();
+    this.statistics.disconnect();
   }
 
   @Override
   public void flush() {
-    writer.flush();
+    this.writer.flush();
   }
 
   /**
    * @return the statistics
    */
   public Statistics getStatistics() {
-    return statistics;
+    return this.statistics;
   }
 
   public Writer<Record> getWriter() {
-    return writer;
+    return this.writer;
   }
 
   @PostConstruct
   public void init() {
-    if (statistics == null) {
-      setStatistics(new Statistics("Write " + writer));
+    if (this.statistics == null) {
+      setStatistics(new Statistics("Write " + this.writer));
     }
-    statistics.connect();
+    this.statistics.connect();
   }
 
   @Override
@@ -71,14 +71,14 @@ public class StatisticsWriter extends AbstractWriter<Record> implements
 
   @Override
   public String toString() {
-    return writer.toString();
+    return this.writer.toString();
   }
 
   @Override
   public void write(final Record object) {
     if (object != null) {
-      writer.write(object);
-      statistics.add(object);
+      this.writer.write(object);
+      this.statistics.add(object);
     }
   }
 }

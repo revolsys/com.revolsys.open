@@ -67,7 +67,7 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
       final MapWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
         MapWriterFactory.class, mediaTypeString);
       final MapWriter writer = writerFactory.getMapWriter(body, charset);
-      writer.setProperty(IoConstants.INDENT_PROPERTY, true);
+      writer.setProperty(IoConstants.INDENT, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
       final HttpServletRequest request = HttpServletUtils.getRequest();
       String callback = request.getParameter("jsonp");

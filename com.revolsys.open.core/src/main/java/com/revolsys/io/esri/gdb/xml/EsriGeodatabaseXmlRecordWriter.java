@@ -17,7 +17,7 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
@@ -34,8 +34,8 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.util.DateUtil;
 
-public class EsriGeodatabaseXmlRecordWriter extends
-  AbstractWriter<Record> implements EsriGeodatabaseXmlConstants {
+public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
+  implements EsriGeodatabaseXmlConstants {
   private static final Logger LOG = LoggerFactory.getLogger(EsriGeodatabaseXmlRecordWriter.class);
 
   private int datasetId = 1;
@@ -54,56 +54,56 @@ public class EsriGeodatabaseXmlRecordWriter extends
 
   private String geometryType;
 
-  public EsriGeodatabaseXmlRecordWriter(final RecordDefinition recordDefinition,
-    final Writer out) {
+  public EsriGeodatabaseXmlRecordWriter(
+    final RecordDefinition recordDefinition, final Writer out) {
     this.recordDefinition = recordDefinition;
     this.out = new XmlWriter(out);
   }
 
   @Override
   public void close() {
-    if (!opened) {
+    if (!this.opened) {
       writeHeader(null);
     }
 
     writeFooter();
-    out.close();
+    this.out.close();
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   @Override
   public void write(final Record object) {
-    if (!opened) {
+    if (!this.opened) {
       writeHeader(object.getGeometryValue());
       writeWorkspaceDataHeader();
     }
-    out.startTag(RECORD);
-    out.attribute(XsiConstants.TYPE, RECORD_TYPE);
+    this.out.startTag(RECORD);
+    this.out.attribute(XsiConstants.TYPE, RECORD_TYPE);
 
-    out.startTag(VALUES);
-    out.attribute(XsiConstants.TYPE, VALUES_TYPE);
+    this.out.startTag(VALUES);
+    this.out.attribute(XsiConstants.TYPE, VALUES_TYPE);
 
-    for (final Attribute attribute : recordDefinition.getAttributes()) {
+    for (final Attribute attribute : this.recordDefinition.getAttributes()) {
       final String attributeName = attribute.getName();
       final Object value = object.getValue(attributeName);
       final DataType type = attribute.getType();
-      final EsriGeodatabaseXmlFieldType fieldType = fieldTypes.getFieldType(type);
+      final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(type);
       if (fieldType != null) {
-        fieldType.writeValue(out, value);
+        fieldType.writeValue(this.out, value);
       }
     }
-    if (recordDefinition.getAttribute("OBJECTID") == null) {
-      final EsriGeodatabaseXmlFieldType fieldType = fieldTypes.getFieldType(DataTypes.INTEGER);
-      fieldType.writeValue(out, objectId++);
+    if (this.recordDefinition.getAttribute("OBJECTID") == null) {
+      final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(DataTypes.INTEGER);
+      fieldType.writeValue(this.out, this.objectId++);
     }
 
-    out.endTag(VALUES);
+    this.out.endTag(VALUES);
 
-    out.endTag(RECORD);
+    this.out.endTag(RECORD);
   }
 
   private void writeDataElement(final RecordDefinition recordDefinition,
@@ -114,30 +114,30 @@ public class EsriGeodatabaseXmlRecordWriter extends
     DataType geometryDataType = null;
     if (geometryAttribute != null) {
       geometryDataType = geometryAttribute.getType();
-      if (fieldTypes.getFieldType(geometryDataType) != null) {
+      if (this.fieldTypes.getFieldType(geometryDataType) != null) {
         hasGeometry = true;
 
         if (geometryDataType.equals(DataTypes.POINT)) {
-          geometryType = GEOMETRY_TYPE_POINT;
+          this.geometryType = GEOMETRY_TYPE_POINT;
         } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
-          geometryType = GEOMETRY_TYPE_MULTI_POINT;
+          this.geometryType = GEOMETRY_TYPE_MULTI_POINT;
         } else if (geometryDataType.equals(DataTypes.LINE_STRING)) {
-          geometryType = GEOMETRY_TYPE_POLYLINE;
+          this.geometryType = GEOMETRY_TYPE_POLYLINE;
         } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
-          geometryType = GEOMETRY_TYPE_POLYLINE;
+          this.geometryType = GEOMETRY_TYPE_POLYLINE;
         } else if (geometryDataType.equals(DataTypes.POLYGON)) {
-          geometryType = GEOMETRY_TYPE_POLYGON;
+          this.geometryType = GEOMETRY_TYPE_POLYGON;
         } else {
           if (geometry instanceof Point) {
-            geometryType = GEOMETRY_TYPE_POINT;
+            this.geometryType = GEOMETRY_TYPE_POINT;
           } else if (geometry instanceof MultiPoint) {
-            geometryType = GEOMETRY_TYPE_MULTI_POINT;
+            this.geometryType = GEOMETRY_TYPE_MULTI_POINT;
           } else if (geometry instanceof LineString) {
-            geometryType = GEOMETRY_TYPE_POLYLINE;
+            this.geometryType = GEOMETRY_TYPE_POLYLINE;
           } else if (geometry instanceof MultiLineString) {
-            geometryType = GEOMETRY_TYPE_POLYLINE;
+            this.geometryType = GEOMETRY_TYPE_POLYLINE;
           } else if (geometry instanceof Polygon) {
-            geometryType = GEOMETRY_TYPE_POLYGON;
+            this.geometryType = GEOMETRY_TYPE_POLYGON;
           } else {
             hasGeometry = false;
           }
@@ -147,86 +147,86 @@ public class EsriGeodatabaseXmlRecordWriter extends
 
     if (hasGeometry) {
       dataElementType = DATA_ELEMENT_FEATURE_CLASS;
-      datasetType = DATASET_TYPE_FEATURE_CLASS;
+      this.datasetType = DATASET_TYPE_FEATURE_CLASS;
     } else {
       dataElementType = DATA_ELEMENT_TABLE;
-      datasetType = DATASET_TYPE_TABLE;
+      this.datasetType = DATASET_TYPE_TABLE;
     }
 
-    out.startTag(DATA_ELEMENT);
-    out.attribute(XsiConstants.TYPE, dataElementType);
+    this.out.startTag(DATA_ELEMENT);
+    this.out.attribute(XsiConstants.TYPE, dataElementType);
 
     final String path = recordDefinition.getPath();
     final String localName = PathUtil.getName(path);
-    out.element(CATALOG_PATH, "/FC=" + localName);
-    out.element(NAME, localName);
-    out.element(METADATA_RETRIEVED, true);
+    this.out.element(CATALOG_PATH, "/FC=" + localName);
+    this.out.element(NAME, localName);
+    this.out.element(METADATA_RETRIEVED, true);
 
-    out.startTag(METADATA);
-    out.attribute(XsiConstants.TYPE, XML_PROPERTY_SET_TYPE);
-    out.startTag(XML_DOC);
-    out.text("<?xml version=\"1.0\"?>");
-    out.text("<metadata xml:lang=\"en\">");
-    out.text("<Esri>");
-    out.text("<MetaID>{");
-    out.text(UUID.randomUUID().toString().toUpperCase());
-    out.text("}</MetaID>");
-    out.text("<CreaDate>");
+    this.out.startTag(METADATA);
+    this.out.attribute(XsiConstants.TYPE, XML_PROPERTY_SET_TYPE);
+    this.out.startTag(XML_DOC);
+    this.out.text("<?xml version=\"1.0\"?>");
+    this.out.text("<metadata xml:lang=\"en\">");
+    this.out.text("<Esri>");
+    this.out.text("<MetaID>{");
+    this.out.text(UUID.randomUUID().toString().toUpperCase());
+    this.out.text("}</MetaID>");
+    this.out.text("<CreaDate>");
     final Timestamp date = new Timestamp(System.currentTimeMillis());
-    out.text(DateUtil.format("yyyyMMdd", date));
-    out.text("</CreaDate>");
-    out.text("<CreaTime>");
-    out.text(DateUtil.format("HHmmssSS", date));
-    out.text("</CreaTime>");
-    out.text("<SyncOnce>TRUE</SyncOnce>");
-    out.text("</Esri>");
-    out.text("</metadata>");
-    out.endTag(XML_DOC);
-    out.endTag(METADATA);
+    this.out.text(DateUtil.format("yyyyMMdd", date));
+    this.out.text("</CreaDate>");
+    this.out.text("<CreaTime>");
+    this.out.text(DateUtil.format("HHmmssSS", date));
+    this.out.text("</CreaTime>");
+    this.out.text("<SyncOnce>TRUE</SyncOnce>");
+    this.out.text("</Esri>");
+    this.out.text("</metadata>");
+    this.out.endTag(XML_DOC);
+    this.out.endTag(METADATA);
 
-    out.element(DATASET_TYPE, datasetType);
-    out.element(DSID, datasetId++);
-    out.element(VERSIONED, false);
-    out.element(CAN_VERSION, false);
-    out.element(HAS_OID, true);
-    out.element(OBJECT_ID_FIELD_NAME, "OBJECTID");
+    this.out.element(DATASET_TYPE, this.datasetType);
+    this.out.element(DSID, this.datasetId++);
+    this.out.element(VERSIONED, false);
+    this.out.element(CAN_VERSION, false);
+    this.out.element(HAS_OID, true);
+    this.out.element(OBJECT_ID_FIELD_NAME, "OBJECTID");
     writeFields(recordDefinition);
 
-    out.element(CLSID, "{52353152-891A-11D0-BEC6-00805F7C4268}");
-    out.emptyTag(EXTCLSID);
-    out.startTag(RELATIONSHIP_CLASS_NAMES);
-    out.attribute(XsiConstants.TYPE, NAMES_TYPE);
-    out.endTag(RELATIONSHIP_CLASS_NAMES);
-    out.element(ALIAS_NAME, localName);
-    out.emptyTag(MODEL_NAME);
-    out.element(HAS_GLOBAL_ID, false);
-    out.emptyTag(GLOBAL_ID_FIELD_NAME);
-    out.emptyTag(RASTER_FIELD_NAME);
-    out.startTag(EXTENSION_PROPERTIES);
-    out.attribute(XsiConstants.TYPE, PROPERTY_SET_TYPE);
-    out.startTag(PROPERTY_ARRAY);
-    out.attribute(XsiConstants.TYPE, PROPERTY_ARRAY_TYPE);
-    out.endTag(PROPERTY_ARRAY);
-    out.endTag(EXTENSION_PROPERTIES);
-    out.startTag(CONTROLLER_MEMBERSHIPS);
-    out.attribute(XsiConstants.TYPE, CONTROLLER_MEMBERSHIPS_TYPE);
-    out.endTag(CONTROLLER_MEMBERSHIPS);
+    this.out.element(CLSID, "{52353152-891A-11D0-BEC6-00805F7C4268}");
+    this.out.emptyTag(EXTCLSID);
+    this.out.startTag(RELATIONSHIP_CLASS_NAMES);
+    this.out.attribute(XsiConstants.TYPE, NAMES_TYPE);
+    this.out.endTag(RELATIONSHIP_CLASS_NAMES);
+    this.out.element(ALIAS_NAME, localName);
+    this.out.emptyTag(MODEL_NAME);
+    this.out.element(HAS_GLOBAL_ID, false);
+    this.out.emptyTag(GLOBAL_ID_FIELD_NAME);
+    this.out.emptyTag(RASTER_FIELD_NAME);
+    this.out.startTag(EXTENSION_PROPERTIES);
+    this.out.attribute(XsiConstants.TYPE, PROPERTY_SET_TYPE);
+    this.out.startTag(PROPERTY_ARRAY);
+    this.out.attribute(XsiConstants.TYPE, PROPERTY_ARRAY_TYPE);
+    this.out.endTag(PROPERTY_ARRAY);
+    this.out.endTag(EXTENSION_PROPERTIES);
+    this.out.startTag(CONTROLLER_MEMBERSHIPS);
+    this.out.attribute(XsiConstants.TYPE, CONTROLLER_MEMBERSHIPS_TYPE);
+    this.out.endTag(CONTROLLER_MEMBERSHIPS);
     if (hasGeometry) {
-      out.element(FEATURE_TYPE, FEATURE_TYPE_SIMPLE);
-      out.element(SHAPE_TYPE, geometryType);
-      out.element(SHAPE_FIELD_NAME, geometryAttribute.getName());
+      this.out.element(FEATURE_TYPE, FEATURE_TYPE_SIMPLE);
+      this.out.element(SHAPE_TYPE, this.geometryType);
+      this.out.element(SHAPE_FIELD_NAME, geometryAttribute.getName());
       final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-      out.element(HAS_M, false);
-      out.element(HAS_Z, geometryFactory.hasZ());
-      out.element(HAS_SPATIAL_INDEX, false);
-      out.emptyTag(AREA_FIELD_NAME);
-      out.emptyTag(LENGTH_FIELD_NAME);
+      this.out.element(HAS_M, false);
+      this.out.element(HAS_Z, geometryFactory.hasZ());
+      this.out.element(HAS_SPATIAL_INDEX, false);
+      this.out.emptyTag(AREA_FIELD_NAME);
+      this.out.emptyTag(LENGTH_FIELD_NAME);
 
       writeExtent(geometryFactory);
       writeSpatialReference(geometryFactory);
     }
 
-    out.endTag(DATA_ELEMENT);
+    this.out.endTag(DATA_ELEMENT);
   }
 
   public void writeExtent(final GeometryFactory geometryFactory) {
@@ -234,16 +234,16 @@ public class EsriGeodatabaseXmlRecordWriter extends
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
         final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
-        out.startTag(EXTENT);
-        out.attribute(XsiConstants.TYPE, ENVELOPE_N_TYPE);
-        out.element(X_MIN, boundingBox.getMinX());
-        out.element(Y_MIN, boundingBox.getMinY());
-        out.element(X_MAX, boundingBox.getMaxX());
-        out.element(Y_MAX, boundingBox.getMaxY());
-        out.element(Z_MIN, boundingBox.getMin(2));
-        out.element(Z_MAX, boundingBox.getMax(2));
+        this.out.startTag(EXTENT);
+        this.out.attribute(XsiConstants.TYPE, ENVELOPE_N_TYPE);
+        this.out.element(X_MIN, boundingBox.getMinX());
+        this.out.element(Y_MIN, boundingBox.getMinY());
+        this.out.element(X_MAX, boundingBox.getMaxX());
+        this.out.element(Y_MAX, boundingBox.getMaxY());
+        this.out.element(Z_MIN, boundingBox.getMin(2));
+        this.out.element(Z_MAX, boundingBox.getMax(2));
         writeSpatialReference(geometryFactory);
-        out.endTag(EXTENT);
+        this.out.endTag(EXTENT);
       }
     }
   }
@@ -254,55 +254,55 @@ public class EsriGeodatabaseXmlRecordWriter extends
       writeOidField();
     } else {
       final DataType dataType = attribute.getType();
-      final EsriGeodatabaseXmlFieldType fieldType = fieldTypes.getFieldType(dataType);
+      final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(dataType);
       if (fieldType == null) {
         LOG.error("Data type not supported " + dataType);
       } else {
-        out.startTag(FIELD);
-        out.attribute(XsiConstants.TYPE, FIELD_TYPE);
-        out.element(NAME, fieldName);
-        out.element(TYPE, fieldType.getEsriFieldType());
-        out.element(IS_NULLABLE, !attribute.isRequired());
+        this.out.startTag(FIELD);
+        this.out.attribute(XsiConstants.TYPE, FIELD_TYPE);
+        this.out.element(NAME, fieldName);
+        this.out.element(TYPE, fieldType.getEsriFieldType());
+        this.out.element(IS_NULLABLE, !attribute.isRequired());
         int length = fieldType.getFixedLength();
         if (length < 0) {
           length = attribute.getLength();
         }
-        out.element(LENGTH, length);
+        this.out.element(LENGTH, length);
         final int precision;
         if (fieldType.isUsePrecision()) {
           precision = attribute.getLength();
         } else {
           precision = 0;
         }
-        out.element(PRECISION, precision);
-        out.element(SCALE, attribute.getScale());
+        this.out.element(PRECISION, precision);
+        this.out.element(SCALE, attribute.getScale());
 
         final GeometryFactory geometryFactory = attribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
         if (geometryFactory != null) {
-          out.startTag(GEOMETRY_DEF);
-          out.attribute(XsiConstants.TYPE, GEOMETRY_DEF_TYPE);
+          this.out.startTag(GEOMETRY_DEF);
+          this.out.attribute(XsiConstants.TYPE, GEOMETRY_DEF_TYPE);
 
-          out.element(AVG_NUM_POINTS, 0);
+          this.out.element(AVG_NUM_POINTS, 0);
 
-          out.element(GEOMETRY_TYPE, geometryType);
-          out.element(HAS_M, false);
-          out.element(HAS_Z, geometryFactory.hasZ());
+          this.out.element(GEOMETRY_TYPE, this.geometryType);
+          this.out.element(HAS_M, false);
+          this.out.element(HAS_Z, geometryFactory.hasZ());
 
           writeSpatialReference(geometryFactory);
 
-          out.endTag();
+          this.out.endTag();
         }
-        out.endTag(FIELD);
+        this.out.endTag(FIELD);
       }
     }
   }
 
   private void writeFields(final RecordDefinition recordDefinition) {
-    out.startTag(FIELDS);
-    out.attribute(XsiConstants.TYPE, FIELDS_TYPE);
+    this.out.startTag(FIELDS);
+    this.out.attribute(XsiConstants.TYPE, FIELDS_TYPE);
 
-    out.startTag(FIELD_ARRAY);
-    out.attribute(XsiConstants.TYPE, FIELD_ARRAY_TYPE);
+    this.out.startTag(FIELD_ARRAY);
+    this.out.attribute(XsiConstants.TYPE, FIELD_ARRAY_TYPE);
 
     for (final Attribute attribute : recordDefinition.getAttributes()) {
       writeField(attribute);
@@ -310,54 +310,54 @@ public class EsriGeodatabaseXmlRecordWriter extends
     if (recordDefinition.getAttribute("OBJECTID") == null) {
       writeOidField();
     }
-    out.endTag(FIELD_ARRAY);
+    this.out.endTag(FIELD_ARRAY);
 
-    out.endTag(FIELDS);
+    this.out.endTag(FIELDS);
   }
 
   public void writeFooter() {
-    out.endDocument();
+    this.out.endDocument();
   }
 
   private void writeHeader(final Geometry geometry) {
-    opened = true;
-    out.startDocument("UTF-8", "1.0");
-    out.startTag(WORKSPACE);
-    out.setPrefix(XsiConstants.PREFIX, XsiConstants.NAMESPACE_URI);
-    out.setPrefix(XmlConstants.XML_SCHEMA_NAMESPACE_PREFIX,
+    this.opened = true;
+    this.out.startDocument("UTF-8", "1.0");
+    this.out.startTag(WORKSPACE);
+    this.out.setPrefix(XsiConstants.PREFIX, XsiConstants.NAMESPACE_URI);
+    this.out.setPrefix(XmlConstants.XML_SCHEMA_NAMESPACE_PREFIX,
       XmlConstants.XML_SCHEMA_NAMESPACE_URI);
 
-    out.startTag(WORKSPACE_DEFINITION);
-    out.attribute(XsiConstants.TYPE, WORKSPACE_DEFINITION_TYPE);
+    this.out.startTag(WORKSPACE_DEFINITION);
+    this.out.attribute(XsiConstants.TYPE, WORKSPACE_DEFINITION_TYPE);
 
-    out.element(WORKSPACE_TYPE, "esriLocalDatabaseWorkspace");
-    out.element(VERSION, "");
+    this.out.element(WORKSPACE_TYPE, "esriLocalDatabaseWorkspace");
+    this.out.element(VERSION, "");
 
-    out.startTag(DOMAINS);
-    out.attribute(XsiConstants.TYPE, DOMAINS_TYPE);
-    out.endTag(DOMAINS);
+    this.out.startTag(DOMAINS);
+    this.out.attribute(XsiConstants.TYPE, DOMAINS_TYPE);
+    this.out.endTag(DOMAINS);
 
-    out.startTag(DATASET_DEFINITIONS);
-    out.attribute(XsiConstants.TYPE, DATASET_DEFINITIONS_TYPE);
-    writeDataElement(recordDefinition, geometry);
-    out.endTag(DATASET_DEFINITIONS);
+    this.out.startTag(DATASET_DEFINITIONS);
+    this.out.attribute(XsiConstants.TYPE, DATASET_DEFINITIONS_TYPE);
+    writeDataElement(this.recordDefinition, geometry);
+    this.out.endTag(DATASET_DEFINITIONS);
 
-    out.endTag(WORKSPACE_DEFINITION);
+    this.out.endTag(WORKSPACE_DEFINITION);
   }
 
   private void writeOidField() {
-    out.startTag(FIELD);
-    out.attribute(XsiConstants.TYPE, FIELD_TYPE);
-    out.element(NAME, "OBJECTID");
-    out.element(TYPE, FIELD_TYPE_OBJECT_ID);
-    out.element(IS_NULLABLE, false);
-    out.element(LENGTH, 4);
-    out.element(PRECISION, 10);
-    out.element(SCALE, 0);
+    this.out.startTag(FIELD);
+    this.out.attribute(XsiConstants.TYPE, FIELD_TYPE);
+    this.out.element(NAME, "OBJECTID");
+    this.out.element(TYPE, FIELD_TYPE_OBJECT_ID);
+    this.out.element(IS_NULLABLE, false);
+    this.out.element(LENGTH, 4);
+    this.out.element(PRECISION, 10);
+    this.out.element(SCALE, 0);
 
-    out.element(REQUIRED, true);
-    out.element(EDIATBLE, false);
-    out.endTag(FIELD);
+    this.out.element(REQUIRED, true);
+    this.out.element(EDIATBLE, false);
+    this.out.endTag(FIELD);
   }
 
   public void writeSpatialReference(final GeometryFactory geometryFactory) {
@@ -366,50 +366,52 @@ public class EsriGeodatabaseXmlRecordWriter extends
       if (coordinateSystem != null) {
         final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
         if (esriCoordinateSystem != null) {
-          out.startTag(SPATIAL_REFERENCE);
+          this.out.startTag(SPATIAL_REFERENCE);
           if (esriCoordinateSystem instanceof ProjectedCoordinateSystem) {
-            out.attribute(XsiConstants.TYPE, PROJECTED_COORDINATE_SYSTEM_TYPE);
+            this.out.attribute(XsiConstants.TYPE,
+              PROJECTED_COORDINATE_SYSTEM_TYPE);
           } else {
-            out.attribute(XsiConstants.TYPE, GEOGRAPHIC_COORDINATE_SYSTEM_TYPE);
+            this.out.attribute(XsiConstants.TYPE,
+              GEOGRAPHIC_COORDINATE_SYSTEM_TYPE);
           }
-          out.element(WKT, EsriCsWktWriter.toWkt(esriCoordinateSystem));
-          out.element(X_ORIGIN, 0);
-          out.element(Y_ORIGIN, 0);
+          this.out.element(WKT, EsriCsWktWriter.toWkt(esriCoordinateSystem));
+          this.out.element(X_ORIGIN, 0);
+          this.out.element(Y_ORIGIN, 0);
           final double scaleXy = geometryFactory.getScaleXY();
-          out.element(XY_SCALE, (int)scaleXy);
-          out.element(Z_ORIGIN, 0);
+          this.out.element(XY_SCALE, (int)scaleXy);
+          this.out.element(Z_ORIGIN, 0);
           final double scaleZ = geometryFactory.getScaleZ();
-          out.element(Z_SCALE, (int)scaleZ);
-          out.element(M_ORIGIN, 0);
-          out.element(M_SCALE, 1);
-          out.element(XY_TOLERANCE, 1.0 / scaleXy * 2.0);
-          out.element(Z_TOLERANCE, 1.0 / scaleZ * 2.0);
-          out.element(M_TOLERANCE, 1);
-          out.element(HIGH_PRECISION, true);
-          out.element(WKID, coordinateSystem.getId());
-          out.endTag(SPATIAL_REFERENCE);
+          this.out.element(Z_SCALE, (int)scaleZ);
+          this.out.element(M_ORIGIN, 0);
+          this.out.element(M_SCALE, 1);
+          this.out.element(XY_TOLERANCE, 1.0 / scaleXy * 2.0);
+          this.out.element(Z_TOLERANCE, 1.0 / scaleZ * 2.0);
+          this.out.element(M_TOLERANCE, 1);
+          this.out.element(HIGH_PRECISION, true);
+          this.out.element(WKID, coordinateSystem.getId());
+          this.out.endTag(SPATIAL_REFERENCE);
         }
       }
     }
   }
 
   public void writeWorkspaceDataHeader() {
-    out.startTag(WORKSPACE_DATA);
-    out.attribute(XsiConstants.TYPE, WORKSPACE_DATA_TYPE);
+    this.out.startTag(WORKSPACE_DATA);
+    this.out.attribute(XsiConstants.TYPE, WORKSPACE_DATA_TYPE);
 
-    out.startTag(DATASET_DATA);
-    out.attribute(XsiConstants.TYPE, DATASET_DATA_TABLE_DATA);
+    this.out.startTag(DATASET_DATA);
+    this.out.attribute(XsiConstants.TYPE, DATASET_DATA_TABLE_DATA);
 
-    out.element(DATASET_NAME, recordDefinition.getTypeName());
-    out.element(DATASET_TYPE, datasetType);
+    this.out.element(DATASET_NAME, this.recordDefinition.getTypeName());
+    this.out.element(DATASET_TYPE, this.datasetType);
 
-    out.startTag(DATA);
-    out.attribute(XsiConstants.TYPE, DATA_RECORD_SET);
+    this.out.startTag(DATA);
+    this.out.attribute(XsiConstants.TYPE, DATA_RECORD_SET);
 
-    writeFields(recordDefinition);
+    writeFields(this.recordDefinition);
 
-    out.startTag(RECORDS);
-    out.attribute(XsiConstants.TYPE, RECORDS_TYPE);
+    this.out.startTag(RECORDS);
+    this.out.attribute(XsiConstants.TYPE, RECORDS_TYPE);
 
   }
 

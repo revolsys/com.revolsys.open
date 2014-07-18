@@ -80,6 +80,41 @@ import com.revolsys.util.MathUtil;
  */
 public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
+  public static BoundingBox create(final String wkt) {
+    if (StringUtils.hasLength(wkt)) {
+      GeometryFactory geometryFactory = null;
+      final StringBuffer text = new StringBuffer(wkt);
+      if (WktParser.hasText(text, "SRID=")) {
+        final Integer srid = WktParser.parseInteger(text);
+        if (srid != null) {
+          geometryFactory = GeometryFactory.floating(srid, 2);
+        }
+        WktParser.hasText(text, ";");
+      }
+      if (WktParser.hasText(text, "BBOX(")) {
+        final Double x1 = WktParser.parseDouble(text);
+        if (WktParser.hasText(text, ",")) {
+          final Double y1 = WktParser.parseDouble(text);
+          WktParser.skipWhitespace(text);
+          final Double x2 = WktParser.parseDouble(text);
+          if (WktParser.hasText(text, ",")) {
+            final Double y2 = WktParser.parseDouble(text);
+            return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
+          } else {
+            throw new IllegalArgumentException("Expecting a ',' not " + text);
+          }
+
+        } else {
+          throw new IllegalArgumentException("Expecting a ',' not " + text);
+        }
+      } else if (WktParser.hasText(text, "BBOX EMPTY")) {
+        return new BoundingBoxDoubleGf(geometryFactory);
+      }
+    }
+
+    return new BoundingBoxDoubleGf();
+  }
+
   static {
     ConvertUtils.register(new Converter() {
 
@@ -132,41 +167,6 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
    */
   public static final int OUT_BOTTOM = 8;
 
-  public static BoundingBox create(final String wkt) {
-    if (StringUtils.hasLength(wkt)) {
-      GeometryFactory geometryFactory = null;
-      final StringBuffer text = new StringBuffer(wkt);
-      if (WktParser.hasText(text, "SRID=")) {
-        final Integer srid = WktParser.parseInteger(text);
-        if (srid != null) {
-          geometryFactory = GeometryFactory.floating(srid, 2);
-        }
-        WktParser.hasText(text, ";");
-      }
-      if (WktParser.hasText(text, "BBOX(")) {
-        final Double x1 = WktParser.parseDouble(text);
-        if (WktParser.hasText(text, ",")) {
-          final Double y1 = WktParser.parseDouble(text);
-          WktParser.skipWhitespace(text);
-          final Double x2 = WktParser.parseDouble(text);
-          if (WktParser.hasText(text, ",")) {
-            final Double y2 = WktParser.parseDouble(text);
-            return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
-          } else {
-            throw new IllegalArgumentException("Expecting a ',' not " + text);
-          }
-
-        } else {
-          throw new IllegalArgumentException("Expecting a ',' not " + text);
-        }
-      } else if (WktParser.hasText(text, "BBOX EMPTY")) {
-        return new BoundingBoxDoubleGf(geometryFactory);
-      }
-    }
-
-    return new BoundingBoxDoubleGf();
-  }
-
   private final double[] bounds;
 
   private GeometryFactory geometryFactory;
@@ -177,7 +177,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   /**
    * Construct a new Bounding Box.
-   * 
+   *
    * @param geometryFactory The geometry factory.
    */
   public BoundingBoxDoubleGf(final GeometryFactory geometryFactory) {
@@ -269,7 +269,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   /**
    * <p>Bounding boxes are immutable so clone returns this.</p>
-   * 
+   *
    * @return this
    */
   @Override
@@ -404,7 +404,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
    * lies wholely inside this <code>BoundingBoxDoubleGf</code> (inclusive of the boundary).
    *
    *@param  other the <code>BoundingBoxDoubleGf</code> to check
-   *@return true if this <code>BoundingBoxDoubleGf</code> covers the <code>other</code> 
+   *@return true if this <code>BoundingBoxDoubleGf</code> covers the <code>other</code>
    */
   @Override
   public boolean covers(BoundingBox other) {
@@ -551,7 +551,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   /**
    * Return a new bounding box expanded by delta.
-   * 
+   *
    * @param delta
    * @return
    */
@@ -562,13 +562,13 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   /**
    * Return a new bounding box expanded by deltaX, deltaY.
-   * 
+   *
    * @param delta
    * @return
    */
   @Override
   public BoundingBox expand(final double deltaX, final double deltaY) {
-    if (isEmpty() || (deltaX == 0 && deltaY == 0)) {
+    if (isEmpty() || deltaX == 0 && deltaY == 0) {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
@@ -662,15 +662,6 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public BoundingBox expandToInclude(final Record object) {
-    if (object != null) {
-      final Geometry geometry = object.getGeometryValue();
-      return expandToInclude(geometry);
-    }
-    return this;
-  }
-
-  @Override
   public BoundingBox expandToInclude(final Geometry geometry) {
     if (geometry == null || geometry.isEmpty()) {
       return this;
@@ -686,9 +677,18 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     return expandToInclude((Geometry)point);
   }
 
+  @Override
+  public BoundingBox expandToInclude(final Record object) {
+    if (object != null) {
+      final Geometry geometry = object.getGeometryValue();
+      return expandToInclude(geometry);
+    }
+    return this;
+  }
+
   /**
    * Gets the area of this envelope.
-   * 
+   *
    * @return the area of the envelope
    * @return 0.0 if the envelope is null
    */
@@ -705,7 +705,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   /**
    * Get the aspect ratio x:y.
-   * 
+   *
    * @return The aspect ratio.
    */
   @Override
@@ -718,10 +718,10 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   @Override
   public int getAxisCount() {
-    if (bounds == null) {
+    if (this.bounds == null) {
       return 0;
     } else {
-      return bounds.length / 2;
+      return this.bounds.length / 2;
     }
   }
 
@@ -735,10 +735,10 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   @Override
   public double[] getBounds() {
-    if (bounds == null) {
-      return bounds;
+    if (this.bounds == null) {
+      return this.bounds;
     } else {
-      return bounds.clone();
+      return this.bounds.clone();
     }
   }
 
@@ -759,27 +759,27 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   @Override
   public Point getCentre() {
     if (isEmpty()) {
-      return geometryFactory.point();
+      return this.geometryFactory.point();
     } else {
       final double centreX = getCentreX();
       final double centreY = getCentreY();
-      return geometryFactory.point(centreX, centreY);
+      return this.geometryFactory.point(centreX, centreY);
     }
   }
 
   @Override
   public double getCentreX() {
-    return getMinX() + (getWidth() / 2);
+    return getMinX() + getWidth() / 2;
   }
 
   @Override
   public double getCentreY() {
-    return getMinY() + (getHeight() / 2);
+    return getMinY() + getHeight() / 2;
   }
 
   /**
    * Get the geometry factory.
-   * 
+   *
    * @return The geometry factory.
    */
   @Override
@@ -827,7 +827,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   /**
@@ -857,10 +857,10 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   @Override
   public double getMax(final int axisIndex) {
-    if (bounds == null || axisIndex >= getAxisCount()) {
+    if (this.bounds == null || axisIndex >= getAxisCount()) {
       return Double.NaN;
     } else {
-      return BoundingBoxUtil.getMax(bounds, axisIndex);
+      return BoundingBoxUtil.getMax(this.bounds, axisIndex);
     }
   }
 
@@ -905,10 +905,10 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   @Override
   public double getMin(final int axisIndex) {
-    if (bounds == null) {
+    if (this.bounds == null) {
       return Double.NaN;
     } else {
-      return BoundingBoxUtil.getMin(bounds, axisIndex);
+      return BoundingBoxUtil.getMin(this.bounds, axisIndex);
     }
   }
 
@@ -1034,7 +1034,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     if (isEmpty() || convertedBoundingBox.isEmpty()
-      || !intersects(convertedBoundingBox)) {
+        || !intersects(convertedBoundingBox)) {
       return new BoundingBoxDoubleGf(geometryFactory);
     } else {
       final double intMinX = Math.max(getMinX(), convertedBoundingBox.getMinX());
@@ -1067,8 +1067,8 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       final double maxY = getMaxY();
 
       return !(convertedBoundingBox.getMinX() > maxX
-        || convertedBoundingBox.getMaxX() < minX
-        || convertedBoundingBox.getMinY() > maxY || convertedBoundingBox.getMaxY() < minY);
+          || convertedBoundingBox.getMaxX() < minX
+          || convertedBoundingBox.getMinY() > maxY || convertedBoundingBox.getMaxY() < minY);
     }
   }
 
@@ -1156,14 +1156,14 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
    * <p>Create a new BoundingBox by moving the min/max x coordinates by xDisplacement and
    * the min/max y coordinates by yDisplacement. If the bounding box is null or the xDisplacement
    * and yDisplacement are 0 then this bounding box will be returned.</p>
-   * 
+   *
    * @param xDisplacement The distance to move the min/max x coordinates.
    * @param yDisplacement The distance to move the min/max y coordinates.
    * @return The moved bounding box.
    */
   @Override
   public BoundingBox move(final double xDisplacement, final double yDisplacement) {
-    if (isEmpty() || (xDisplacement == 0 && yDisplacement == 0)) {
+    if (isEmpty() || xDisplacement == 0 && yDisplacement == 0) {
       return this;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
@@ -1247,7 +1247,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       }
       try {
         double minStep = 0.00001;
-        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+        final CoordinateSystem coordinateSystem = factory.getCoordinateSystem();
         if (coordinateSystem instanceof ProjectedCoordinateSystem) {
           minStep = 1;
         } else {
@@ -1321,12 +1321,12 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
         }
         CoordinatesListUtil.setCoordinates(coordinates, 2, i, maxX, minY);
 
-        final LinearRing ring = geometryFactory.linearRing(2, coordinates);
-        final Polygon polygon = geometryFactory.polygon(ring);
-        if (factory == null) {
+        final LinearRing ring = factory.linearRing(2, coordinates);
+        final Polygon polygon = factory.polygon(ring);
+        if (geometryFactory == null) {
           return polygon;
         } else {
-          return (Polygon)polygon.convert(factory);
+          return (Polygon)polygon.convert(geometryFactory);
         }
       } catch (final IllegalArgumentException e) {
         LoggerFactory.getLogger(getClass()).error(

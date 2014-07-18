@@ -24,29 +24,29 @@ public class JsonListMapWriter extends AbstractMapWriter {
    */
   @Override
   public void close() {
-    if (out != null) {
+    if (this.out != null) {
       try {
-        out.print("\n]\n");
+        this.out.print("\n]\n");
       } finally {
-        FileUtil.closeSilent(out);
-        out = null;
+        FileUtil.closeSilent(this.out);
+        this.out = null;
       }
     }
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   @Override
   public void write(final Map<String, ? extends Object> values) {
-    if (written) {
-      out.print(",\n");
+    if (this.written) {
+      this.out.print(",\n");
     } else {
-      out.print("\n");
-      written = true;
+      this.out.print("\n");
+      this.written = true;
     }
-    JsonWriterUtil.write(out, values, null);
+    JsonWriterUtil.write(this.out, values, null, isWriteNulls());
   }
 }

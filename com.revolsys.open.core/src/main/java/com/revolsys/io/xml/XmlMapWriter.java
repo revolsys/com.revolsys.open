@@ -30,24 +30,24 @@ public class XmlMapWriter extends AbstractMapWriter {
    */
   @Override
   public void close() {
-    if (out != null) {
+    if (this.out != null) {
       try {
-        if (opened) {
-          if (!singleObject) {
-            out.endTag();
+        if (this.opened) {
+          if (!this.singleObject) {
+            this.out.endTag();
           }
-          out.endDocument();
+          this.out.endDocument();
         }
       } finally {
-        FileUtil.closeSilent(out);
-        out = null;
+        FileUtil.closeSilent(this.out);
+        this.out = null;
       }
     }
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   private void list(final Collection<? extends Object> list) {
@@ -59,19 +59,20 @@ public class XmlMapWriter extends AbstractMapWriter {
         final Collection<?> subList = (Collection<?>)value;
         list(subList);
       } else {
-        out.startTag(new QName("item"));
-        out.text(value);
-        out.endTag();
+        this.out.startTag(new QName("item"));
+        this.out.text(value);
+        this.out.endTag();
       }
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void map(final Map<String, ? extends Object> values) {
     if (values instanceof NamedObject) {
       final NamedObject namedObject = (NamedObject)values;
-      out.startTag(new QName(namedObject.getName()));
+      this.out.startTag(new QName(namedObject.getName()));
     } else {
-      out.startTag(new QName("item"));
+      this.out.startTag(new QName("item"));
     }
 
     for (final Entry<String, ? extends Object> field : values.entrySet()) {
@@ -80,43 +81,43 @@ public class XmlMapWriter extends AbstractMapWriter {
       final QName tagName = new QName(key.toString());
       if (value instanceof Map) {
         final Map<String, ?> map = (Map<String, ?>)value;
-        out.startTag(tagName);
+        this.out.startTag(tagName);
         map(map);
-        out.endTag();
+        this.out.endTag();
       } else if (value instanceof Collection) {
         final Collection<?> list = (Collection<?>)value;
-        out.startTag(tagName);
+        this.out.startTag(tagName);
         list(list);
-        out.endTag();
-      } else {
-        out.nillableElement(tagName, value);
+        this.out.endTag();
+      } else if (isWritable(value)) {
+        this.out.nillableElement(tagName, value);
       }
     }
-    out.endTag();
+    this.out.endTag();
   }
 
   @Override
   public void setProperty(final String name, final Object value) {
     super.setProperty(name, value);
-    if (name.equals(IoConstants.INDENT_PROPERTY)) {
-      out.setIndent((Boolean)value);
+    if (name.equals(IoConstants.INDENT)) {
+      this.out.setIndent((Boolean)value);
     }
   }
 
   @Override
   public void write(final Map<String, ? extends Object> values) {
-    if (!opened) {
+    if (!this.opened) {
       writeHeader();
-      opened = true;
+      this.opened = true;
     }
     map(values);
   }
 
   private void writeHeader() {
-    out.startDocument("UTF-8", "1.0");
-    singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
-    if (!singleObject) {
-      out.startTag(new QName("items"));
+    this.out.startDocument("UTF-8", "1.0");
+    this.singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
+    if (!this.singleObject) {
+      this.out.startTag(new QName("items"));
     }
   }
 }

@@ -1,16 +1,14 @@
 package com.revolsys.io;
 
 public interface IoConstants {
-  String CSS_CLASS_PROPERTY = "java:" + IoConstants.class.getName()
-    + ".cssClass";
+  String CSS_CLASS = "cssClass";
 
   String DESCRIPTION_PROPERTY = "java:" + IoConstants.class.getName()
     + ".description";
 
-  String GEOMETRY_FACTORY = "java:" + IoConstants.class.getName()
-    + ".geometryFactory";
+  String GEOMETRY_FACTORY = "geometryFactory";
 
-  String INDENT_PROPERTY = "java:" + IoConstants.class.getName() + ".indent";
+  String INDENT = "indent";
 
   String JSONP_PROPERTY = "java:" + IoConstants.class.getName() + ".jsonp";
 
@@ -26,4 +24,6 @@ public interface IoConstants {
 
   String GEOMETRY_TYPE = "java:" + IoConstants.class.getName()
     + ".geometryType";
+
+  String WRITE_NULLS = "writeNulls";
 }

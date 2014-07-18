@@ -46,7 +46,7 @@ public class ListOfMapHttpMessageConverter extends
       final MapWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
         MapWriterFactory.class, mediaTypeString);
       final MapWriter writer = writerFactory.getMapWriter(body, charset);
-      writer.setProperty(IoConstants.INDENT_PROPERTY, true);
+      writer.setProperty(IoConstants.INDENT, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, false);
       final HttpServletRequest request = HttpServletUtils.getRequest();
       writer.setProperty(IoConstants.JSON_LIST_ROOT_PROPERTY,

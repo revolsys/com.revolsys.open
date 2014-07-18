@@ -13,15 +13,13 @@ import java.util.TimeZone;
 import javax.xml.namespace.QName;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
-public class GpxWriter extends AbstractWriter<Record> {
+public class GpxWriter extends AbstractRecordWriter {
 
   private String commentAttribute = "comment";
 
@@ -39,38 +37,38 @@ public class GpxWriter extends AbstractWriter<Record> {
   }
 
   public GpxWriter(final Writer writer) throws IOException {
-    out = new XmlWriter(new BufferedWriter(writer));
-    out.setIndent(false);
-    out.startDocument("UTF-8", "1.0");
+    this.out = new XmlWriter(new BufferedWriter(writer));
+    this.out.setIndent(false);
+    this.out.startDocument("UTF-8", "1.0");
 
-    out.startTag(GpxConstants.GPX_ELEMENT);
-    out.attribute(GpxConstants.VERSION_ATTRIBUTE, "1.1");
-    out.attribute(GpxConstants.CREATOR_ATTRIBUTE,
-      "Revolution Systems Inc. - GIS");
+    this.out.startTag(GpxConstants.GPX_ELEMENT);
+    this.out.attribute(GpxConstants.VERSION_ATTRIBUTE, "1.1");
+    this.out.attribute(GpxConstants.CREATOR_ATTRIBUTE,
+        "Revolution Systems Inc. - GIS");
   }
 
   @Override
   public void close() {
-    out.endTag();
-    out.endDocument();
-    out.close();
+    this.out.endTag();
+    this.out.endDocument();
+    this.out.close();
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   public String getCommentAttribute() {
-    return commentAttribute;
+    return this.commentAttribute;
   }
 
   public String getDescriptionAttribute() {
-    return descriptionAttribute;
+    return this.descriptionAttribute;
   }
 
   public String getNameAttribute() {
-    return nameAttribute;
+    return this.nameAttribute;
   }
 
   public void setCommentAttribute(final String commentAttribute) {
@@ -87,7 +85,7 @@ public class GpxWriter extends AbstractWriter<Record> {
 
   @Override
   public String toString() {
-    return file.getAbsolutePath();
+    return this.file.getAbsolutePath();
   }
 
   @Override
@@ -109,64 +107,68 @@ public class GpxWriter extends AbstractWriter<Record> {
     if (time != null) {
       if (time instanceof Date) {
         final DateFormat timestampFormat = new SimpleDateFormat(
-          "yyyy-MM-dd'T'HH:mm:ss.");
+            "yyyy-MM-dd'T'HH:mm:ss.");
         timestampFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        out.element(GpxConstants.TIME_ELEMENT, timestampFormat.format(time));
+        this.out.element(GpxConstants.TIME_ELEMENT,
+          timestampFormat.format(time));
       } else {
-        out.element(GpxConstants.TIME_ELEMENT, time.toString());
+        this.out.element(GpxConstants.TIME_ELEMENT, time.toString());
       }
     }
-    writeElement(object, GpxConstants.NAME_ELEMENT, nameAttribute);
-    writeElement(object, GpxConstants.COMMENT_ELEMENT, commentAttribute);
-    writeElement(object, GpxConstants.DESCRIPTION_ELEMENT, descriptionAttribute);
+    writeElement(object, GpxConstants.NAME_ELEMENT, this.nameAttribute);
+    writeElement(object, GpxConstants.COMMENT_ELEMENT, this.commentAttribute);
+    writeElement(object, GpxConstants.DESCRIPTION_ELEMENT,
+      this.descriptionAttribute);
   }
 
   private void writeElement(final Record object, final QName tag,
     final String attributeName) {
     final String name = object.getValue(attributeName);
     if (name != null && name.length() > 0) {
-      out.element(tag, name);
+      this.out.element(tag, name);
     }
   }
 
   private void writeTrack(final Record object) throws IOException {
-    out.startTag(GpxConstants.TRACK_ELEMENT);
+    this.out.startTag(GpxConstants.TRACK_ELEMENT);
     LineString line = object.getGeometryValue();
     line = line.convert(GpxConstants.GEOMETRY_FACTORY);
     final LineString coordinatesList = line;
     writeAttributes(object);
-    out.startTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
+    this.out.startTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
 
     for (final Point coordinates : line.vertices()) {
-      out.startTag(GpxConstants.TRACK_POINT_ELEMENT);
-      out.attribute(GpxConstants.LON_ATTRIBUTE, coordinates.getX());
-      out.attribute(GpxConstants.LAT_ATTRIBUTE, coordinates.getY());
+      this.out.startTag(GpxConstants.TRACK_POINT_ELEMENT);
+      this.out.attribute(GpxConstants.LON_ATTRIBUTE, coordinates.getX());
+      this.out.attribute(GpxConstants.LAT_ATTRIBUTE, coordinates.getY());
       if (coordinatesList.getAxisCount() > 2) {
         final double elevation = coordinates.getCoordinate(2);
         if (!Double.isNaN(elevation)) {
-          out.element(GpxConstants.ELEVATION_ELEMENT, String.valueOf(elevation));
+          this.out.element(GpxConstants.ELEVATION_ELEMENT,
+            String.valueOf(elevation));
         }
       }
-      out.endTag(GpxConstants.TRACK_POINT_ELEMENT);
+      this.out.endTag(GpxConstants.TRACK_POINT_ELEMENT);
     }
-    out.endTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
-    out.endTag(GpxConstants.TRACK_ELEMENT);
+    this.out.endTag(GpxConstants.TRACK_SEGMENT_ELEMENT);
+    this.out.endTag(GpxConstants.TRACK_ELEMENT);
   }
 
   private void writeWaypoint(final Record wayPoint) throws IOException {
-    out.startTag(GpxConstants.WAYPOINT_ELEMENT);
+    this.out.startTag(GpxConstants.WAYPOINT_ELEMENT);
     final Point point = wayPoint.getGeometryValue();
     final Point geoCoordinate = point.convert(GpxConstants.GEOMETRY_FACTORY);
-    out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinate.getX());
-    out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinate.getY());
+    this.out.attribute(GpxConstants.LON_ATTRIBUTE, geoCoordinate.getX());
+    this.out.attribute(GpxConstants.LAT_ATTRIBUTE, geoCoordinate.getY());
     if (point.getAxisCount() > 2) {
       final double elevation = geoCoordinate.getZ();
       if (!Double.isNaN(elevation)) {
-        out.element(GpxConstants.ELEVATION_ELEMENT, String.valueOf(elevation));
+        this.out.element(GpxConstants.ELEVATION_ELEMENT,
+          String.valueOf(elevation));
       }
     }
     writeAttributes(wayPoint);
-    out.endTag(GpxConstants.WAYPOINT_ELEMENT);
+    this.out.endTag(GpxConstants.WAYPOINT_ELEMENT);
   }
 
 }

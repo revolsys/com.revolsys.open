@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.slf4j.LoggerFactory;
@@ -42,15 +43,16 @@ public class PdfImage extends JaiGeoReferencedImage {
         }
         final PDPage page = pages.get(0);
         final COSDictionary pageDictionary = page.getCOSDictionary();
-        final Rectangle2D mediaBox = PdfUtil.getPageMediaBox(pageDictionary);
+        final Rectangle2D mediaBox = PdfUtil.findRectangle(pageDictionary, COSName.MEDIA_BOX);
         final int resolution = 144;
         final double scaleFactor = resolution / 72;
-        BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_ARGB,
-          resolution);
-
+        // BufferedImage image =
+        // page.convertToImage(BufferedImage.TYPE_INT_ARGB,
+        // resolution);
+        BufferedImage image = null;
         final COSDictionary viewport = PdfUtil.getPageViewport(pageDictionary);
         if (viewport != null) {
-          final Rectangle2D bbox = PdfUtil.getBBox(viewport);
+          final Rectangle2D bbox = PdfUtil.findRectangle(viewport, COSName.BBOX);
           if (bbox != null) {
             final int width = (int)(bbox.getWidth() * scaleFactor);
             final int height = (int)(bbox.getHeight() * scaleFactor);
@@ -59,14 +61,13 @@ public class PdfImage extends JaiGeoReferencedImage {
             final Graphics2D graphics = (Graphics2D)viewportImage.getGraphics();
             graphics.translate(-bbox.getX() * scaleFactor,
               -(mediaBox.getHeight() - (bbox.getHeight() + bbox.getY()))
-              * scaleFactor);
+                * scaleFactor);
             graphics.scale(1, 1);
             graphics.drawImage(image, 0, 0, null);
             graphics.dispose();
             image = viewportImage;
           }
-          final BoundingBox boundingBox = PdfUtil.getViewportBoundingBox(
-            mediaBox, viewport);
+          final BoundingBox boundingBox = PdfUtil.getViewportBoundingBox(viewport);
           setBoundingBox(boundingBox);
           setResolution(boundingBox.getWidth() / image.getWidth());
         }

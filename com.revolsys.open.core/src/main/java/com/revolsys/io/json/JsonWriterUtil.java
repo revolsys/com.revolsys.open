@@ -19,31 +19,31 @@ public final class JsonWriterUtil {
       switch (c) {
         case '"':
           out.print("\\\"");
-        break;
+          break;
         case '\\':
           out.print("\\\\");
-        break;
+          break;
         case '/':
           out.print("\\/");
-        break;
+          break;
         case '\b':
           out.print("\\b");
-        break;
+          break;
         case '\f':
           out.print("\\f");
-        break;
+          break;
         case '\n':
           out.print("\\n");
-        break;
+          break;
         case '\r':
           out.print("\\r");
-        break;
+          break;
         case '\t':
           out.print("\\t");
-        break;
+          break;
         default:
           out.print(c);
-        break;
+          break;
       }
     }
   }
@@ -64,7 +64,10 @@ public final class JsonWriterUtil {
   public static void label(final PrintWriter out, final String key,
     final String indent) {
     writeIndent(out, indent);
-    write(out, key, null);
+    out.write('"');
+    charSequence(out, key);
+    out.write('"');
+
     out.print(":");
   }
 
@@ -85,7 +88,8 @@ public final class JsonWriterUtil {
   }
 
   public static void write(final PrintWriter out,
-    final Collection<? extends Object> values, final String indent) {
+    final Collection<? extends Object> values, final String indent,
+    final boolean writeNulls) {
     startList(out, indent);
     String newIndent = indent;
     if (newIndent != null) {
@@ -98,14 +102,14 @@ public final class JsonWriterUtil {
       while (i < size - 1) {
         writeIndent(out, newIndent);
         final Object value = iterator.next();
-        write(out, value, newIndent);
+        write(out, value, newIndent, writeNulls);
         endAttribute(out, indent);
         i++;
       }
       if (iterator.hasNext()) {
         writeIndent(out, newIndent);
         final Object value = iterator.next();
-        write(out, value, newIndent);
+        write(out, value, newIndent, writeNulls);
         newLine(out, indent);
       }
     }
@@ -114,7 +118,8 @@ public final class JsonWriterUtil {
   }
 
   public static void write(final PrintWriter out,
-    final Map<String, ? extends Object> values, final String indent) {
+    final Map<String, ? extends Object> values, final String indent,
+    final boolean writeNulls) {
 
     startObject(out, indent);
     if (values != null) {
@@ -123,23 +128,19 @@ public final class JsonWriterUtil {
         newIndent += "  ";
       }
       final Set<String> fields = values.keySet();
-      int i = 0;
-      final int size = fields.size();
-      final Iterator<String> iterator = fields.iterator();
-      while (i < size - 1) {
-        final String key = iterator.next();
+      boolean hasValue = false;
+      for (final String key : fields) {
+        if (hasValue) {
+          endAttribute(out, indent);
+        } else {
+          hasValue = true;
+        }
         final Object value = values.get(key);
         label(out, key, newIndent);
-        write(out, value, newIndent);
-        endAttribute(out, indent);
-        i++;
+        write(out, value, newIndent, writeNulls);
       }
-      if (iterator.hasNext()) {
-        final String key = iterator.next();
-        final Object value = values.get(key);
-        label(out, key, newIndent);
-        write(out, value, newIndent);
-        newLine(out, indent);
+      if (hasValue) {
+        newLine(out, newIndent);
       }
     }
     writeIndent(out, indent);
@@ -148,7 +149,7 @@ public final class JsonWriterUtil {
 
   @SuppressWarnings("unchecked")
   public static void write(final PrintWriter out, final Object value,
-    final String indent) {
+    final String indent, final boolean writeNulls) {
     if (value == null) {
       out.print("null");
     } else if (value instanceof StringPrinter) {
@@ -168,10 +169,10 @@ public final class JsonWriterUtil {
       }
     } else if (value instanceof Collection) {
       final Collection<? extends Object> list = (Collection<? extends Object>)value;
-      write(out, list, indent);
+      write(out, list, indent, writeNulls);
     } else if (value instanceof Map) {
       final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
-      write(out, map, indent);
+      write(out, map, indent, false);
     } else if (value instanceof CharSequence) {
       final CharSequence string = (CharSequence)value;
       out.write('"');
@@ -179,9 +180,9 @@ public final class JsonWriterUtil {
       out.write('"');
     } else if (value.getClass().isArray()) {
       final List<? extends Object> list = CollectionUtil.arrayToList(value);
-      write(out, list, indent);
+      write(out, list, indent, writeNulls);
     } else {
-      write(out, StringConverterRegistry.toString(value), indent);
+      write(out, StringConverterRegistry.toString(value), indent, writeNulls);
     }
 
   }

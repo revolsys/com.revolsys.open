@@ -23,13 +23,12 @@ import com.revolsys.data.record.property.GlobalIdProperty;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.io.StatisticsMap;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.transaction.Transaction;
 
-public class JdbcWriterImpl extends AbstractWriter<Record> implements
-  JdbcWriter {
+public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
   private static final Logger LOG = Logger.getLogger(JdbcWriterImpl.class);
 
   private int batchSize = 1;
@@ -100,7 +99,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
   private void addSqlColumEqualsPlaceholder(final StringBuffer sqlBuffer,
     final JdbcAttribute attribute) {
     final String attributeName = attribute.getName();
-    if (quoteColumnNames) {
+    if (this.quoteColumnNames) {
       sqlBuffer.append('"').append(attributeName).append('"');
     } else {
       sqlBuffer.append(attributeName);
@@ -126,7 +125,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
       try {
         processCurrentBatch(typePath, sql, statement, batchCountMap);
       } catch (final DataAccessException e) {
-        if (throwExceptions) {
+        if (this.throwExceptions) {
           throw e;
         } else {
           LOG.error("Error commiting records", e);
@@ -138,7 +137,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
 
   public synchronized void commit() {
     flush();
-    JdbcUtils.commit(connection);
+    JdbcUtils.commit(this.connection);
   }
 
   private void delete(final Record object) throws SQLException {
@@ -146,12 +145,12 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
     final String typePath = objectType.getPath();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     flushIfRequired(recordDefinition);
-    PreparedStatement statement = typeDeleteStatementMap.get(typePath);
+    PreparedStatement statement = this.typeDeleteStatementMap.get(typePath);
     if (statement == null) {
       final String sql = getDeleteSql(recordDefinition);
       try {
-        statement = connection.prepareStatement(sql);
-        typeDeleteStatementMap.put(typePath, statement);
+        statement = this.connection.prepareStatement(sql);
+        this.typeDeleteStatementMap.put(typePath, statement);
       } catch (final SQLException e) {
         LOG.error(sql, e);
       }
@@ -161,15 +160,15 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
     parameterIndex = idAttribute.setInsertPreparedStatementValue(statement,
       parameterIndex, object);
     statement.addBatch();
-    Integer batchCount = typeDeleteBatchCountMap.get(typePath);
+    Integer batchCount = this.typeDeleteBatchCountMap.get(typePath);
     if (batchCount == null) {
       batchCount = 1;
-      typeDeleteBatchCountMap.put(typePath, 1);
+      this.typeDeleteBatchCountMap.put(typePath, 1);
     } else {
       batchCount += 1;
-      typeDeleteBatchCountMap.put(typePath, batchCount);
+      this.typeDeleteBatchCountMap.put(typePath, batchCount);
     }
-    recordStore.addStatistic("Delete", object);
+    this.recordStore.addStatistic("Delete", object);
 
     // TODO this locks code tables which prevents insert
     // if (batchCount >= batchSize) {
@@ -180,43 +179,47 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
   }
 
   protected synchronized void doClose() {
-    if (recordStore != null) {
+    if (this.recordStore != null) {
       try {
 
-        close(typeInsertSqlMap, typeInsertStatementMap, typeInsertBatchCountMap);
-        close(typeInsertSequenceSqlMap, typeInsertSequenceStatementMap,
-          typeInsertSequenceBatchCountMap);
-        close(typeUpdateSqlMap, typeUpdateStatementMap, typeUpdateBatchCountMap);
-        close(typeDeleteSqlMap, typeDeleteStatementMap, typeDeleteBatchCountMap);
-        if (statistics != null) {
-          statistics.disconnect();
-          statistics = null;
+        close(this.typeInsertSqlMap, this.typeInsertStatementMap,
+          this.typeInsertBatchCountMap);
+        close(this.typeInsertSequenceSqlMap,
+          this.typeInsertSequenceStatementMap,
+          this.typeInsertSequenceBatchCountMap);
+        close(this.typeUpdateSqlMap, this.typeUpdateStatementMap,
+          this.typeUpdateBatchCountMap);
+        close(this.typeDeleteSqlMap, this.typeDeleteStatementMap,
+          this.typeDeleteBatchCountMap);
+        if (this.statistics != null) {
+          this.statistics.disconnect();
+          this.statistics = null;
         }
       } finally {
-        typeInsertSqlMap = null;
-        typeInsertStatementMap = null;
-        typeInsertBatchCountMap = null;
-        typeInsertSequenceSqlMap = null;
-        typeInsertSequenceStatementMap = null;
-        typeInsertSequenceBatchCountMap = null;
-        typeUpdateBatchCountMap = null;
-        typeUpdateSqlMap = null;
-        typeUpdateStatementMap = null;
-        typeDeleteBatchCountMap = null;
-        typeDeleteSqlMap = null;
-        typeDeleteStatementMap = null;
-        recordStore = null;
-        if (dataSource != null) {
+        this.typeInsertSqlMap = null;
+        this.typeInsertStatementMap = null;
+        this.typeInsertBatchCountMap = null;
+        this.typeInsertSequenceSqlMap = null;
+        this.typeInsertSequenceStatementMap = null;
+        this.typeInsertSequenceBatchCountMap = null;
+        this.typeUpdateBatchCountMap = null;
+        this.typeUpdateSqlMap = null;
+        this.typeUpdateStatementMap = null;
+        this.typeDeleteBatchCountMap = null;
+        this.typeDeleteSqlMap = null;
+        this.typeDeleteStatementMap = null;
+        this.recordStore = null;
+        if (this.dataSource != null) {
           try {
             if (!Transaction.isHasCurrentTransaction()) {
-              connection.commit();
+              this.connection.commit();
             }
           } catch (final SQLException e) {
             throw new RuntimeException("Failed to commit data:", e);
           } finally {
-            JdbcUtils.release(connection, dataSource);
-            dataSource = null;
-            connection = null;
+            JdbcUtils.release(this.connection, this.dataSource);
+            this.dataSource = null;
+            this.connection = null;
           }
         }
       }
@@ -225,11 +228,14 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
 
   @Override
   public synchronized void flush() {
-    flush(typeInsertSqlMap, typeInsertStatementMap, typeInsertBatchCountMap);
-    flush(typeInsertSequenceSqlMap, typeInsertSequenceStatementMap,
-      typeInsertSequenceBatchCountMap);
-    flush(typeUpdateSqlMap, typeUpdateStatementMap, typeUpdateBatchCountMap);
-    flush(typeDeleteSqlMap, typeDeleteStatementMap, typeDeleteBatchCountMap);
+    flush(this.typeInsertSqlMap, this.typeInsertStatementMap,
+      this.typeInsertBatchCountMap);
+    flush(this.typeInsertSequenceSqlMap, this.typeInsertSequenceStatementMap,
+      this.typeInsertSequenceBatchCountMap);
+    flush(this.typeUpdateSqlMap, this.typeUpdateStatementMap,
+      this.typeUpdateBatchCountMap);
+    flush(this.typeDeleteSqlMap, this.typeDeleteStatementMap,
+      this.typeDeleteBatchCountMap);
   }
 
   private void flush(final Map<String, String> sqlMap,
@@ -243,7 +249,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
         try {
           processCurrentBatch(typePath, sql, statement, batchCountMap);
         } catch (final DataAccessException e) {
-          if (throwExceptions) {
+          if (this.throwExceptions) {
             throw e;
           } else {
             LOG.error("Error writing to database", e);
@@ -254,41 +260,32 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
   }
 
   private void flushIfRequired(final RecordDefinition recordDefinition) {
-    if (flushBetweenTypes && recordDefinition != lastMetaData) {
+    if (this.flushBetweenTypes && recordDefinition != this.lastMetaData) {
       flush();
-      lastMetaData = recordDefinition;
+      this.lastMetaData = recordDefinition;
     }
   }
 
   public int getBatchSize() {
-    return batchSize;
-  }
-
-  private RecordDefinition getRecordDefinition(final String typePath) {
-    if (recordStore == null) {
-      return null;
-    } else {
-      final RecordDefinition recordDefinition = recordStore.getRecordDefinition(typePath);
-      return recordDefinition;
-    }
+    return this.batchSize;
   }
 
   public DataSource getDataSource() {
-    return dataSource;
+    return this.dataSource;
   }
 
   private String getDeleteSql(final RecordDefinition type) {
     final String typePath = type.getPath();
     final String tableName = JdbcUtils.getQualifiedTableName(typePath);
-    String sql = typeDeleteSqlMap.get(typePath);
+    String sql = this.typeDeleteSqlMap.get(typePath);
     if (sql == null) {
       final StringBuffer sqlBuffer = new StringBuffer();
-      if (sqlPrefix != null) {
-        sqlBuffer.append(sqlPrefix);
+      if (this.sqlPrefix != null) {
+        sqlBuffer.append(this.sqlPrefix);
       }
       sqlBuffer.append("delete ");
-      if (hints != null) {
-        sqlBuffer.append(hints);
+      if (this.hints != null) {
+        sqlBuffer.append(this.hints);
       }
       sqlBuffer.append(" from ");
       sqlBuffer.append(tableName);
@@ -300,25 +297,26 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
       addSqlColumEqualsPlaceholder(sqlBuffer, idAttribute);
 
       sqlBuffer.append(" ");
-      if (sqlSuffix != null) {
-        sqlBuffer.append(sqlSuffix);
+      if (this.sqlSuffix != null) {
+        sqlBuffer.append(this.sqlSuffix);
       }
       sql = sqlBuffer.toString();
 
-      typeDeleteSqlMap.put(typePath, sql);
+      this.typeDeleteSqlMap.put(typePath, sql);
     }
     return sql;
   }
 
-  private String getGeneratePrimaryKeySql(final RecordDefinition recordDefinition) {
-    return recordStore.getGeneratePrimaryKeySql(recordDefinition);
+  private String getGeneratePrimaryKeySql(
+    final RecordDefinition recordDefinition) {
+    return this.recordStore.getGeneratePrimaryKeySql(recordDefinition);
   }
 
   /**
    * @return the hints
    */
   public String getHints() {
-    return hints;
+    return this.hints;
   }
 
   private String getInsertSql(final RecordDefinition type,
@@ -327,25 +325,25 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
     final String tableName = JdbcUtils.getQualifiedTableName(typePath);
     String sql;
     if (generatePrimaryKey) {
-      sql = typeInsertSequenceSqlMap.get(typePath);
+      sql = this.typeInsertSequenceSqlMap.get(typePath);
     } else {
-      sql = typeInsertSqlMap.get(typePath);
+      sql = this.typeInsertSqlMap.get(typePath);
     }
     if (sql == null) {
       final StringBuffer sqlBuffer = new StringBuffer();
-      if (sqlPrefix != null) {
-        sqlBuffer.append(sqlPrefix);
+      if (this.sqlPrefix != null) {
+        sqlBuffer.append(this.sqlPrefix);
       }
       sqlBuffer.append("insert ");
-      if (hints != null) {
-        sqlBuffer.append(hints);
+      if (this.hints != null) {
+        sqlBuffer.append(this.hints);
       }
       sqlBuffer.append(" into ");
       sqlBuffer.append(tableName);
       sqlBuffer.append(" (");
       if (generatePrimaryKey) {
         final String idAttributeName = type.getIdAttributeName();
-        if (quoteColumnNames) {
+        if (this.quoteColumnNames) {
           sqlBuffer.append('"').append(idAttributeName).append('"');
         } else {
           sqlBuffer.append(idAttributeName);
@@ -355,7 +353,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
       for (int i = 0; i < type.getAttributeCount(); i++) {
         if (!generatePrimaryKey || i != type.getIdAttributeIndex()) {
           final String attributeName = type.getAttributeName(i);
-          if (quoteColumnNames) {
+          if (this.quoteColumnNames) {
             sqlBuffer.append('"').append(attributeName).append('"');
           } else {
             sqlBuffer.append(attributeName);
@@ -380,43 +378,52 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
         }
       }
       sqlBuffer.append(")");
-      if (sqlSuffix != null) {
-        sqlBuffer.append(sqlSuffix);
+      if (this.sqlSuffix != null) {
+        sqlBuffer.append(this.sqlSuffix);
       }
       sql = sqlBuffer.toString();
       if (generatePrimaryKey) {
-        typeInsertSequenceSqlMap.put(typePath, sql);
+        this.typeInsertSequenceSqlMap.put(typePath, sql);
       } else {
-        typeInsertSqlMap.put(typePath, sql);
+        this.typeInsertSqlMap.put(typePath, sql);
       }
     }
     return sql;
   }
 
   public String getLabel() {
-    return label;
+    return this.label;
+  }
+
+  private RecordDefinition getRecordDefinition(final String typePath) {
+    if (this.recordStore == null) {
+      return null;
+    } else {
+      final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(typePath);
+      return recordDefinition;
+    }
   }
 
   public String getSqlPrefix() {
-    return sqlPrefix;
+    return this.sqlPrefix;
   }
 
   public String getSqlSuffix() {
-    return sqlSuffix;
+    return this.sqlSuffix;
   }
 
   private String getUpdateSql(final RecordDefinition type) {
     final String typePath = type.getPath();
     final String tableName = JdbcUtils.getQualifiedTableName(typePath);
-    String sql = typeUpdateSqlMap.get(typePath);
+    String sql = this.typeUpdateSqlMap.get(typePath);
     if (sql == null) {
       final StringBuffer sqlBuffer = new StringBuffer();
-      if (sqlPrefix != null) {
-        sqlBuffer.append(sqlPrefix);
+      if (this.sqlPrefix != null) {
+        sqlBuffer.append(this.sqlPrefix);
       }
       sqlBuffer.append("update ");
-      if (hints != null) {
-        sqlBuffer.append(hints);
+      if (this.hints != null) {
+        sqlBuffer.append(this.hints);
       }
       sqlBuffer.append(tableName);
       sqlBuffer.append(" set ");
@@ -446,12 +453,12 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
       }
 
       sqlBuffer.append(" ");
-      if (sqlSuffix != null) {
-        sqlBuffer.append(sqlSuffix);
+      if (this.sqlSuffix != null) {
+        sqlBuffer.append(this.sqlSuffix);
       }
       sql = sqlBuffer.toString();
 
-      typeUpdateSqlMap.put(typePath, sql);
+      this.typeUpdateSqlMap.put(typePath, sql);
     }
     return sql;
   }
@@ -473,7 +480,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
     }
 
     final boolean hasIdValue = hasId
-      && object.getValue(idAttributeName) != null;
+        && object.getValue(idAttributeName) != null;
 
     if (!hasId || hasIdValue) {
       insert(object, typePath, recordDefinition);
@@ -481,17 +488,17 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
       insertSequence(object, typePath, recordDefinition);
     }
     object.setState(RecordState.Persisted);
-    recordStore.addStatistic("Insert", object);
+    this.recordStore.addStatistic("Insert", object);
   }
 
   private void insert(final Record object, final String typePath,
     final RecordDefinition recordDefinition) throws SQLException {
-    PreparedStatement statement = typeInsertStatementMap.get(typePath);
+    PreparedStatement statement = this.typeInsertStatementMap.get(typePath);
     if (statement == null) {
       final String sql = getInsertSql(recordDefinition, false);
       try {
-        statement = connection.prepareStatement(sql);
-        typeInsertStatementMap.put(typePath, statement);
+        statement = this.connection.prepareStatement(sql);
+        this.typeInsertStatementMap.put(typePath, statement);
       } catch (final SQLException e) {
         LOG.error(sql, e);
       }
@@ -503,28 +510,29 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
         parameterIndex, object);
     }
     statement.addBatch();
-    Integer batchCount = typeInsertBatchCountMap.get(typePath);
+    Integer batchCount = this.typeInsertBatchCountMap.get(typePath);
     if (batchCount == null) {
       batchCount = 1;
-      typeInsertBatchCountMap.put(typePath, 1);
+      this.typeInsertBatchCountMap.put(typePath, 1);
     } else {
       batchCount += 1;
-      typeInsertBatchCountMap.put(typePath, batchCount);
+      this.typeInsertBatchCountMap.put(typePath, batchCount);
     }
-    if (batchCount >= batchSize) {
+    if (batchCount >= this.batchSize) {
       final String sql = getInsertSql(recordDefinition, false);
-      processCurrentBatch(typePath, sql, statement, typeInsertBatchCountMap);
+      processCurrentBatch(typePath, sql, statement,
+        this.typeInsertBatchCountMap);
     }
   }
 
   private void insertSequence(final Record object, final String typePath,
     final RecordDefinition recordDefinition) throws SQLException {
-    PreparedStatement statement = typeInsertSequenceStatementMap.get(typePath);
+    PreparedStatement statement = this.typeInsertSequenceStatementMap.get(typePath);
     if (statement == null) {
       final String sql = getInsertSql(recordDefinition, true);
       try {
-        statement = connection.prepareStatement(sql);
-        typeInsertSequenceStatementMap.put(typePath, statement);
+        statement = this.connection.prepareStatement(sql);
+        this.typeInsertSequenceStatementMap.put(typePath, statement);
       } catch (final SQLException e) {
         LOG.error(sql, e);
       }
@@ -539,31 +547,31 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
       }
     }
     statement.addBatch();
-    Integer batchCount = typeInsertSequenceBatchCountMap.get(typePath);
+    Integer batchCount = this.typeInsertSequenceBatchCountMap.get(typePath);
     if (batchCount == null) {
       batchCount = 1;
-      typeInsertSequenceBatchCountMap.put(typePath, 1);
+      this.typeInsertSequenceBatchCountMap.put(typePath, 1);
     } else {
       batchCount += 1;
-      typeInsertSequenceBatchCountMap.put(typePath, batchCount);
+      this.typeInsertSequenceBatchCountMap.put(typePath, batchCount);
     }
-    if (batchCount >= batchSize) {
+    if (batchCount >= this.batchSize) {
       final String sql = getInsertSql(recordDefinition, true);
       processCurrentBatch(typePath, sql, statement,
-        typeInsertSequenceBatchCountMap);
+        this.typeInsertSequenceBatchCountMap);
     }
   }
 
   public boolean isFlushBetweenTypes() {
-    return flushBetweenTypes;
+    return this.flushBetweenTypes;
   }
 
   public boolean isQuoteColumnNames() {
-    return quoteColumnNames;
+    return this.quoteColumnNames;
   }
 
   public boolean isThrowExceptions() {
-    return throwExceptions;
+    return this.throwExceptions;
   }
 
   private void processCurrentBatch(final String typePath, final String sql,
@@ -573,16 +581,16 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
       batchCount = 0;
     }
     try {
-      Integer typeCount = typeCountMap.get(typePath);
+      Integer typeCount = this.typeCountMap.get(typePath);
       if (typeCount == null) {
         typeCount = batchCount;
       } else {
         typeCount += batchCount;
       }
-      typeCountMap.put(typePath, typeCount);
+      this.typeCountMap.put(typePath, typeCount);
       statement.executeBatch();
     } catch (final SQLException e) {
-      throw JdbcUtils.getException(getDataSource(), connection,
+      throw JdbcUtils.getException(getDataSource(), this.connection,
         "Process Batch", sql, e);
     } catch (final RuntimeException e) {
       LOG.error(sql, e);
@@ -604,7 +612,7 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
     this.dataSource = dataSource;
     try {
       setConnection(JdbcUtils.getConnection(dataSource));
-      connection.setAutoCommit(false);
+      this.connection.setAutoCommit(false);
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to create connection", e);
     }
@@ -643,10 +651,10 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
 
   @Override
   public String toString() {
-    if (recordStore == null) {
+    if (this.recordStore == null) {
       return super.toString();
     } else {
-      return recordStore.toString() + " writer";
+      return this.recordStore.toString() + " writer";
     }
   }
 
@@ -655,12 +663,12 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
     final String typePath = objectType.getPath();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     flushIfRequired(recordDefinition);
-    PreparedStatement statement = typeUpdateStatementMap.get(typePath);
+    PreparedStatement statement = this.typeUpdateStatementMap.get(typePath);
     if (statement == null) {
       final String sql = getUpdateSql(recordDefinition);
       try {
-        statement = connection.prepareStatement(sql);
-        typeUpdateStatementMap.put(typePath, statement);
+        statement = this.connection.prepareStatement(sql);
+        this.typeUpdateStatementMap.put(typePath, statement);
       } catch (final SQLException e) {
         LOG.error(sql, e);
       }
@@ -681,19 +689,20 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
 
     }
     statement.addBatch();
-    Integer batchCount = typeUpdateBatchCountMap.get(typePath);
+    Integer batchCount = this.typeUpdateBatchCountMap.get(typePath);
     if (batchCount == null) {
       batchCount = 1;
-      typeUpdateBatchCountMap.put(typePath, 1);
+      this.typeUpdateBatchCountMap.put(typePath, 1);
     } else {
       batchCount += 1;
-      typeUpdateBatchCountMap.put(typePath, batchCount);
+      this.typeUpdateBatchCountMap.put(typePath, batchCount);
     }
-    if (batchCount >= batchSize) {
+    if (batchCount >= this.batchSize) {
       final String sql = getUpdateSql(recordDefinition);
-      processCurrentBatch(typePath, sql, statement, typeUpdateBatchCountMap);
+      processCurrentBatch(typePath, sql, statement,
+        this.typeUpdateBatchCountMap);
     }
-    recordStore.addStatistic("Update", object);
+    this.recordStore.addStatistic("Update", object);
   }
 
   @Override
@@ -710,16 +719,16 @@ public class JdbcWriterImpl extends AbstractWriter<Record> implements
         switch (state) {
           case New:
             insert(object);
-          break;
+            break;
           case Modified:
             update(object);
-          break;
+            break;
           case Persisted:
-          // No action required
-          break;
+            // No action required
+            break;
           case Deleted:
             delete(object);
-          break;
+            break;
           default:
             throw new IllegalStateException("State not known");
         }

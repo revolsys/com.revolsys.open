@@ -13,14 +13,14 @@ import com.revolsys.data.io.AbstractRecordWriterFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.xbase.XbaseRecordWriter;
 import com.revolsys.jts.geom.Geometry;
 
-public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
+public class ShapefileDirectoryWriter extends AbstractRecordWriter {
   private File directory;
 
   private boolean useZeroForNull = true;
@@ -45,26 +45,26 @@ public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
   @Override
   @PreDestroy
   public void close() {
-    if (writers != null) {
-      for (final Writer<Record> writer : writers.values()) {
+    if (this.writers != null) {
+      for (final Writer<Record> writer : this.writers.values()) {
         try {
           writer.close();
         } catch (final RuntimeException e) {
           e.printStackTrace();
         }
       }
-      writers = null;
-      recordDefinitionMap = null;
+      this.writers = null;
+      this.recordDefinitionMap = null;
     }
-    if (statistics != null) {
-      statistics.disconnect();
-      statistics = null;
+    if (this.statistics != null) {
+      this.statistics.disconnect();
+      this.statistics = null;
     }
   }
 
   @Override
   public void flush() {
-    for (final Writer<Record> writer : writers.values()) {
+    for (final Writer<Record> writer : this.writers.values()) {
       try {
         writer.flush();
       } catch (final RuntimeException e) {
@@ -74,84 +74,85 @@ public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
   }
 
   public File getDirectory() {
-    return directory;
+    return this.directory;
   }
 
   private File getDirectory(final RecordDefinition recordDefinition) {
-    if (useNamespaceAsSubDirectory) {
+    if (this.useNamespaceAsSubDirectory) {
       final String typePath = recordDefinition.getPath();
       final String schemaName = PathUtil.getPath(typePath);
       if (StringUtils.hasText(schemaName)) {
-        final File childDirectory = new File(directory, schemaName);
+        final File childDirectory = new File(this.directory, schemaName);
         if (!childDirectory.mkdirs()) {
           if (!childDirectory.isDirectory()) {
             throw new IllegalArgumentException("Unable to create directory "
-              + childDirectory);
+                + childDirectory);
           }
         }
         return childDirectory;
       }
     }
-    return directory;
+    return this.directory;
   }
 
   private String getFileName(final RecordDefinition recordDefinition) {
     return recordDefinition.getTypeName();
   }
 
-  public RecordDefinition getRecordDefinition(final String path) {
-    return recordDefinitionMap.get(path);
+  public String getNameSuffix() {
+    return this.nameSuffix;
   }
 
-  public String getNameSuffix() {
-    return nameSuffix;
+  public RecordDefinition getRecordDefinition(final String path) {
+    return this.recordDefinitionMap.get(path);
   }
 
   public Statistics getStatistics() {
-    return statistics;
+    return this.statistics;
   }
 
   private Writer<Record> getWriter(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     final String path = recordDefinition.getPath();
-    Writer<Record> writer = writers.get(path);
+    Writer<Record> writer = this.writers.get(path);
     if (writer == null) {
       final File directory = getDirectory(recordDefinition);
       directory.mkdirs();
-      final File file = new File(directory, getFileName(recordDefinition) + nameSuffix
-        + ".shp");
+      final File file = new File(directory, getFileName(recordDefinition)
+        + this.nameSuffix + ".shp");
       writer = AbstractRecordWriterFactory.recordWriter(recordDefinition,
         new FileSystemResource(file));
 
-      ((XbaseRecordWriter)writer).setUseZeroForNull(useZeroForNull);
+      ((XbaseRecordWriter)writer).setUseZeroForNull(this.useZeroForNull);
       final Geometry geometry = object.getGeometryValue();
       if (geometry != null) {
         setProperty(IoConstants.GEOMETRY_FACTORY, geometry.getGeometryFactory());
       }
-      writers.put(path, writer);
-      recordDefinitionMap.put(path, ((ShapefileRecordWriter)writer).getRecordDefinition());
+      this.writers.put(path, writer);
+      this.recordDefinitionMap.put(path,
+        ((ShapefileRecordWriter)writer).getRecordDefinition());
     }
     return writer;
   }
 
   public boolean isUseNamespaceAsSubDirectory() {
-    return useNamespaceAsSubDirectory;
+    return this.useNamespaceAsSubDirectory;
   }
 
   public boolean isUseZeroForNull() {
-    return useZeroForNull;
+    return this.useZeroForNull;
   }
 
   public void setDirectory(final File baseDirectory) {
     this.directory = baseDirectory;
     baseDirectory.mkdirs();
-    statistics = new Statistics("Write Shape "
-      + baseDirectory.getAbsolutePath());
-    statistics.connect();
+    this.statistics = new Statistics("Write Shape "
+        + baseDirectory.getAbsolutePath());
+    this.statistics.connect();
   }
 
   public void setLogCounts(final boolean logCounts) {
-    statistics.setLogCounts(false);
+    this.statistics.setLogCounts(false);
   }
 
   public void setNameSuffix(final String nameSuffix) {
@@ -176,14 +177,14 @@ public class ShapefileDirectoryWriter extends AbstractWriter<Record> {
 
   @Override
   public String toString() {
-    return directory.getAbsolutePath();
+    return this.directory.getAbsolutePath();
   }
 
   @Override
   public void write(final Record object) {
     final Writer<Record> writer = getWriter(object);
     writer.write(object);
-    statistics.add(object);
+    this.statistics.add(object);
   }
 
 }

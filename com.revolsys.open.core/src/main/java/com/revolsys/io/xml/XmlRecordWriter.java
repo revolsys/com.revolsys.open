@@ -11,12 +11,12 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.RecordProperties;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.NamedObject;
 
-public class XmlRecordWriter extends AbstractWriter<Record> {
+public class XmlRecordWriter extends AbstractRecordWriter {
 
   private final RecordDefinition recordDefinition;
 
@@ -43,24 +43,24 @@ public class XmlRecordWriter extends AbstractWriter<Record> {
    */
   @Override
   public void close() {
-    if (out != null) {
+    if (this.out != null) {
       try {
-        if (opened) {
-          if (!singleObject) {
-            out.endTag();
+        if (this.opened) {
+          if (!this.singleObject) {
+            this.out.endTag();
           }
-          out.endDocument();
+          this.out.endDocument();
         }
       } finally {
-        FileUtil.closeSilent(out);
-        out = null;
+        FileUtil.closeSilent(this.out);
+        this.out = null;
       }
     }
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   private void list(final List<? extends Object> list) {
@@ -72,9 +72,9 @@ public class XmlRecordWriter extends AbstractWriter<Record> {
         final List<?> subList = (List<?>)value;
         list(subList);
       } else {
-        out.startTag(new QName("item"));
-        out.text(value);
-        out.endTag();
+        this.out.startTag(new QName("item"));
+        this.out.text(value);
+        this.out.endTag();
       }
     }
   }
@@ -82,9 +82,9 @@ public class XmlRecordWriter extends AbstractWriter<Record> {
   private void map(final Map<String, ? extends Object> values) {
     if (values instanceof NamedObject) {
       final NamedObject namedObject = (NamedObject)values;
-      out.startTag(new QName(namedObject.getName()));
+      this.out.startTag(new QName(namedObject.getName()));
     } else {
-      out.startTag(new QName("item"));
+      this.out.startTag(new QName("item"));
     }
 
     for (final Entry<String, ? extends Object> field : values.entrySet()) {
@@ -93,77 +93,73 @@ public class XmlRecordWriter extends AbstractWriter<Record> {
       final QName tagName = new QName(key.toString());
       if (value instanceof Map) {
         final Map<String, ?> map = (Map<String, ?>)value;
-        out.startTag(tagName);
+        this.out.startTag(tagName);
         map(map);
-        out.endTag();
+        this.out.endTag();
       } else if (value instanceof List) {
         final List<?> list = (List<?>)value;
-        out.startTag(tagName);
+        this.out.startTag(tagName);
         list(list);
-        out.endTag();
+        this.out.endTag();
       } else {
-        out.nillableElement(tagName, value);
+        this.out.nillableElement(tagName, value);
       }
     }
-    out.endTag();
-  }
-
-  @Override
-  public void setProperty(final String name, final Object value) {
-    super.setProperty(name, value);
-    if (name.equals(IoConstants.INDENT_PROPERTY)) {
-      out.setIndent((Boolean)value);
-    }
+    this.out.endTag();
   }
 
   @Override
   public String toString() {
-    return recordDefinition.getPath().toString();
+    return this.recordDefinition.getPath().toString();
   }
 
   @Override
   public void write(final Record object) {
-    if (!opened) {
+    if (!this.opened) {
       writeHeader();
     }
-    QName qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
+    QName qualifiedName = this.recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (qualifiedName == null) {
-      qualifiedName = new QName(recordDefinition.getTypeName());
+      qualifiedName = new QName(this.recordDefinition.getTypeName());
     }
 
-    out.startTag(qualifiedName);
+    this.out.startTag(qualifiedName);
 
-    final int attributeCount = recordDefinition.getAttributeCount();
+    final int attributeCount = this.recordDefinition.getAttributeCount();
     for (int i = 0; i < attributeCount; i++) {
-      final String name = recordDefinition.getAttributeName(i);
       final Object value = object.getValue(i);
-      final QName tagName = new QName(name);
-      if (value instanceof Map) {
-        @SuppressWarnings("unchecked")
-        final Map<String, ?> map = (Map<String, ?>)value;
-        out.startTag(tagName);
-        map(map);
-        out.endTag();
-      } else if (value instanceof List) {
-        final List<?> list = (List<?>)value;
-        out.startTag(tagName);
-        list(list);
-        out.endTag();
-      } else {
-        final DataType dataType = recordDefinition.getAttributeType(i);
-        final String string = StringConverterRegistry.toString(dataType, value);
-        out.nillableElement(tagName, string);
+      if (isWritable(value)) {
+        final String name = this.recordDefinition.getAttributeName(i);
+        final QName tagName = new QName(name);
+        if (value instanceof Map) {
+          @SuppressWarnings("unchecked")
+          final Map<String, ?> map = (Map<String, ?>)value;
+          this.out.startTag(tagName);
+          map(map);
+          this.out.endTag();
+        } else if (value instanceof List) {
+          final List<?> list = (List<?>)value;
+          this.out.startTag(tagName);
+          list(list);
+          this.out.endTag();
+        } else {
+          final DataType dataType = this.recordDefinition.getAttributeType(i);
+          final String string = StringConverterRegistry.toString(dataType,
+            value);
+          this.out.nillableElement(tagName, string);
+        }
       }
     }
-    out.endTag();
+    this.out.endTag();
   }
 
   private void writeHeader() {
-    out.startDocument("UTF-8", "1.0");
-    singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
-    if (!singleObject) {
-      out.startTag(new QName("items"));
+    setIndent(isIndent());
+    this.out.startDocument("UTF-8", "1.0");
+    this.singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
+    if (!this.singleObject) {
+      this.out.startTag(new QName("items"));
     }
-    opened = true;
+    this.opened = true;
   }
 }

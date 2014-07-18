@@ -8,6 +8,8 @@ import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
+import javax.swing.DefaultComboBoxModel;
+
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -20,14 +22,17 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.util.Property;
 
 public class SelectMapCoordinateSystem extends ComboBox implements
-  ItemListener, PropertyChangeListener {
+ItemListener, PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private final Reference<MapPanel> map;
 
+  @SuppressWarnings({
+    "unchecked"
+  })
   public SelectMapCoordinateSystem(final MapPanel map) {
     super(3857, 3005// , 26907, 26908, 26909, 26910, 26911
-    );
+        );
 
     this.map = new WeakReference<MapPanel>(map);
     setSelectedItem(map.getGeometryFactory().getSrid());
@@ -41,6 +46,19 @@ public class SelectMapCoordinateSystem extends ComboBox implements
     final Dimension size = new Dimension(200, 22);
     setMaximumSize(size);
     setToolTipText("Coordinate System");
+  }
+
+  @SuppressWarnings("unchecked")
+  public void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
+    final int srid = coordinateSystem.getId();
+    addCoordinateSystem(srid);
+  }
+
+  public void addCoordinateSystem(final int srid) {
+    final DefaultComboBoxModel<Object> model = (DefaultComboBoxModel<Object>)getModel();
+    if (model.getIndexOf(srid) == -1) {
+      model.addElement(srid);
+    }
   }
 
   public String formatCoordinateSystem(final Object value) {
@@ -67,7 +85,7 @@ public class SelectMapCoordinateSystem extends ComboBox implements
   }
 
   public MapPanel getMap() {
-    return map.get();
+    return this.map.get();
   }
 
   @Override

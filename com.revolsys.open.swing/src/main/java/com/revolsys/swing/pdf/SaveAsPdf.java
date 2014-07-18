@@ -1,7 +1,6 @@
 package com.revolsys.swing.pdf;
 
 import java.io.File;
-import java.io.InputStream;
 
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.apache.jempbox.xmp.XMPSchemaDublinCore;
@@ -10,8 +9,6 @@ import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.swing.map.MapPanel;
@@ -28,33 +25,24 @@ public class SaveAsPdf {
 
       final Project project = Project.get();
       final Viewport2D viewport = MapPanel.get(project).getViewport();
-      final BoundingBox boundingBox = viewport.getBoundingBox();
+      BoundingBox boundingBox = viewport.getBoundingBox();
       final int width = viewport.getViewWidthPixels();
       final int height = viewport.getViewHeightPixels();
+
+      final int srid = boundingBox.getSrid();
+      if (srid == 3857) {
+        boundingBox = boundingBox.convert(boundingBox.getGeometryFactory()
+          .getGeographicGeometryFactory());
+      }
       final PDRectangle pageSize = new PDRectangle(width, height);
       final PDPage page = new PDPage(pageSize);
       try (
-        PdfViewport pdfViewport = new PdfViewport(document, page, project,
-          width, height, boundingBox)) {
+          PdfViewport pdfViewport = new PdfViewport(document, page, project,
+            width, height, boundingBox)) {
         final LayerRenderer<? extends Layer> renderer = project.getRenderer();
         renderer.render(pdfViewport);
       }
       document.addPage(page);
-
-      // load the font from pdfbox.jar
-      final InputStream fontStream = PDDocument.class.getResourceAsStream("/org/apache/pdfbox/resources/ttf/ArialMT.ttf");
-      final PDFont font = PDTrueTypeFont.loadTTF(document, fontStream);
-
-      // // create a page with the message where needed
-      // PDPageContentStream contentStream = new PDPageContentStream(document,
-      // page);
-      // contentStream.beginText();
-      // contentStream.setFont( font, 12 );
-      // contentStream.moveTextPositionByAmount( 100, 700 );
-      // contentStream.drawString( message );
-      // contentStream.endText();
-      // contentStream.saveGraphicsState();
-      // contentStream.close();
 
       final PDDocumentCatalog catalog = document.getDocumentCatalog();
       final PDMetadata metadata = new PDMetadata(document);
@@ -66,16 +54,6 @@ public class SaveAsPdf {
       xmp.addSchema(xmpSchema);
       xmpSchema.setAbout("");
       metadata.importXMPMetadata(xmp);
-
-      // final InputStream colorProfile =
-      // PDDocument.class.getResourceAsStream("/com/revolsys/pdf/colorprofile/sRGB.icm");
-      // // create output intent
-      // final PDOutputIntent oi = new PDOutputIntent(document, colorProfile);
-      // oi.setInfo("sRGB IEC61966-2.1");
-      // oi.setOutputCondition("sRGB IEC61966-2.1");
-      // oi.setOutputConditionIdentifier("sRGB IEC61966-2.1");
-      // oi.setRegistryName("http://www.color.org");
-      // catalog.addOutputIntent(oi);
 
       document.save(new File("/Users/paustin/Downloads/map.pdf"));
     } catch (final Throwable e) {

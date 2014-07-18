@@ -11,14 +11,14 @@ import org.springframework.util.StringUtils;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
-public class KmlRecordWriter extends AbstractWriter<Record> implements
+public class KmlRecordWriter extends AbstractRecordWriter implements
   Kml22Constants {
   private static final Map<Class<?>, String> TYPE_MAP = new HashMap<Class<?>, String>();
 
@@ -49,21 +49,27 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
   public void close() {
     open();
     if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
-      writer.endTag(DOCUMENT);
+      this.writer.endTag(DOCUMENT);
     }
-    writer.endTag(KML);
-    writer.endDocument();
-    writer.close();
+    this.writer.endTag(KML);
+    this.writer.endDocument();
+    this.writer.close();
   }
 
   @Override
   public void flush() {
-    writer.flush();
+    this.writer.flush();
+  }
+
+  @Override
+  public boolean isWriteNulls() {
+    return super.isWriteNulls()
+        || BooleanStringConverter.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY));
   }
 
   @Override
   public void open() {
-    if (!opened) {
+    if (!this.opened) {
       writeHeader();
     }
   }
@@ -79,13 +85,13 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
         styleUrl = value.toString();
       }
       if (StringUtils.hasText(styleUrl)) {
-        if (StringUtils.hasText(defaultStyleUrl)) {
+        if (StringUtils.hasText(this.defaultStyleUrl)) {
           this.styleUrl = styleUrl;
         } else {
-          defaultStyleUrl = styleUrl;
+          this.defaultStyleUrl = styleUrl;
         }
       } else {
-        this.styleUrl = defaultStyleUrl;
+        this.styleUrl = this.defaultStyleUrl;
       }
     }
   }
@@ -98,7 +104,7 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
   @Override
   public void write(final Record object) {
     open();
-    writer.startTag(PLACEMARK);
+    this.writer.startTag(PLACEMARK);
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     final int geometryIndex = recordDefinition.getGeometryAttributeIndex();
     final int idIndex = recordDefinition.getIdAttributeIndex();
@@ -114,49 +120,48 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
       name = typeName + " " + id;
     }
     if (name != null) {
-      writer.element(NAME, name);
+      this.writer.element(NAME, name);
     }
     final String snippet = getProperty(SNIPPET_PROPERTY);
     if (snippet != null) {
-      writer.startTag(SNIPPET);
-      writer.text(snippet);
-      writer.endTag(SNIPPET);
+      this.writer.startTag(SNIPPET);
+      this.writer.text(snippet);
+      this.writer.endTag(SNIPPET);
     }
     String description = getProperty(PLACEMARK_DESCRIPTION_PROPERTY);
     if (description == null) {
       description = getProperty(IoConstants.DESCRIPTION_PROPERTY);
     }
     if (description != null) {
-      writer.startTag(DESCRIPTION);
-      writer.cdata(description);
-      writer.endTag(DESCRIPTION);
+      this.writer.startTag(DESCRIPTION);
+      this.writer.cdata(description);
+      this.writer.endTag(DESCRIPTION);
     }
     writeLookAt(object.getGeometryValue());
-    if (StringUtils.hasText(styleUrl)) {
-      writer.element(STYLE_URL, styleUrl);
-    } else if (StringUtils.hasText(defaultStyleUrl)) {
-      writer.element(STYLE_URL, defaultStyleUrl);
+    if (StringUtils.hasText(this.styleUrl)) {
+      this.writer.element(STYLE_URL, this.styleUrl);
+    } else if (StringUtils.hasText(this.defaultStyleUrl)) {
+      this.writer.element(STYLE_URL, this.defaultStyleUrl);
     }
     boolean hasValues = false;
     for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
       if (i != geometryIndex) {
         final String attributeName = recordDefinition.getAttributeName(i);
         final Object value = object.getValue(i);
-        if (value != null
-          || BooleanStringConverter.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY))) {
+        if (isWritable(value)) {
           if (!hasValues) {
             hasValues = true;
-            writer.startTag(EXTENDED_DATA);
+            this.writer.startTag(EXTENDED_DATA);
           }
-          writer.startTag(DATA);
-          writer.attribute(NAME, attributeName);
-          writer.element(VALUE, value);
-          writer.endTag(DATA);
+          this.writer.startTag(DATA);
+          this.writer.attribute(NAME, attributeName);
+          this.writer.element(VALUE, value);
+          this.writer.endTag(DATA);
         }
       }
     }
     if (hasValues) {
-      writer.endTag(EXTENDED_DATA);
+      this.writer.endTag(EXTENDED_DATA);
     }
     final List<Integer> geometryAttributeIndexes = recordDefinition.getGeometryAttributeIndexes();
     if (!geometryAttributeIndexes.isEmpty()) {
@@ -180,35 +185,36 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
         if (geometryFactory == null) {
           geometryFactory = geometry.getGeometryFactory();
         }
-        int axisCount = geometryFactory.getAxisCount();
-        writer.writeGeometry(geometry, axisCount);
+        final int axisCount = geometryFactory.getAxisCount();
+        this.writer.writeGeometry(geometry, axisCount);
       }
     }
-    writer.endTag();
+    this.writer.endTag();
   }
 
   private void writeHeader() {
-    opened = true;
-    writer.startDocument("UTF-8", "1.0");
+    this.writer.setIndent(isIndent());
+    this.opened = true;
+    this.writer.startDocument("UTF-8", "1.0");
 
-    writer.startTag(KML);
+    this.writer.startTag(KML);
     if (!Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY))) {
-      writer.startTag(DOCUMENT);
+      this.writer.startTag(DOCUMENT);
       final String name = getProperty(DOCUMENT_NAME_PROPERTY);
       if (name != null) {
-        writer.element(NAME, name);
+        this.writer.element(NAME, name);
       }
       final String snippet = getProperty(SNIPPET_PROPERTY);
       if (snippet != null) {
-        writer.startTag(SNIPPET);
-        writer.text(snippet);
-        writer.endTag(SNIPPET);
+        this.writer.startTag(SNIPPET);
+        this.writer.text(snippet);
+        this.writer.endTag(SNIPPET);
       }
       final String description = getProperty(DOCUMENT_DESCRIPTION_PROPERTY);
       if (description != null) {
-        writer.element(DESCRIPTION, description);
+        this.writer.element(DESCRIPTION, description);
       }
-      writer.element(OPEN, 1);
+      this.writer.element(OPEN, 1);
       final Point point = getProperty(LOOK_AT_POINT_PROPERTY);
       if (point != null) {
         Number range = getProperty(LOOK_AT_RANGE_PROPERTY);
@@ -219,7 +225,7 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
       }
       final String style = getProperty(STYLE_PROPERTY);
       if (StringUtils.hasText(style)) {
-        writer.write(style);
+        this.writer.write(style);
       }
 
     }
@@ -258,14 +264,14 @@ public class KmlRecordWriter extends AbstractWriter<Record> implements
       }
     }
 
-    writer.startTag(LOOK_AT);
+    this.writer.startTag(LOOK_AT);
     point = (Point)point.convert(GeometryFactory.wgs84());
-    writer.element(LONGITUDE, point.getX());
-    writer.element(LATITUDE, point.getY());
-    writer.element(ALTITUDE, 0);
-    writer.element(HEADING, 0);
-    writer.element(TILT, 0);
-    writer.element(RANGE, range);
-    writer.endTag(LOOK_AT);
+    this.writer.element(LONGITUDE, point.getX());
+    this.writer.element(LATITUDE, point.getY());
+    this.writer.element(ALTITUDE, 0);
+    this.writer.element(HEADING, 0);
+    this.writer.element(TILT, 0);
+    this.writer.element(RANGE, range);
+    this.writer.endTag(LOOK_AT);
   }
 }

@@ -424,7 +424,7 @@ public class PageInfoHttpMessageConverter extends
       MapWriterFactory.class, mediaTypeString);
     if (writerFactory != null) {
       final MapWriter writer = writerFactory.getMapWriter(out, charset);
-      writer.setProperty(IoConstants.INDENT_PROPERTY, true);
+      writer.setProperty(IoConstants.INDENT, true);
       writer.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
       final HttpServletRequest request = HttpServletUtils.getRequest();
       String callback = request.getParameter("jsonp");

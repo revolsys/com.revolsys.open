@@ -11,6 +11,7 @@ import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSFloat;
 import org.apache.pdfbox.cos.COSInteger;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSNumber;
 import org.apache.pdfbox.cos.COSObject;
 import org.springframework.util.StringUtils;
@@ -33,6 +34,32 @@ public class PdfUtil {
     array.add(COSInteger.get(number));
   }
 
+  public static COSArray findArray(final COSDictionary dictionary,
+    final COSName key) {
+    final COSBase item = dictionary.getDictionaryObject(key);
+    if (item == null) {
+      return null;
+    } else if (item instanceof COSArray) {
+      return (COSArray)item;
+    } else {
+      throw new IllegalArgumentException("Expecting COSArray not "
+        + item.getClass());
+    }
+  }
+
+  public static COSArray findArray(final COSDictionary dictionary,
+    final String key) {
+    final COSBase item = dictionary.getDictionaryObject(key);
+    if (item == null) {
+      return null;
+    } else if (item instanceof COSArray) {
+      return (COSArray)item;
+    } else {
+      throw new IllegalArgumentException("Expecting COSArray not "
+        + item.getClass());
+    }
+  }
+
   public static COSArray floatArray(final double... numbers) {
     final COSArray array = new COSArray();
     for (final double number : numbers) {
@@ -52,22 +79,7 @@ public class PdfUtil {
       return (COSArray)item;
     } else {
       throw new IllegalArgumentException("Expecting COSArray not "
-          + item.getClass());
-    }
-  }
-
-  public static Rectangle2D getBBox(final COSDictionary dictionary) {
-    final COSArray bbox = PdfUtil.getArray(dictionary, "BBox");
-    if (bbox == null) {
-      return null;
-    } else {
-      final float x1 = getFloat(bbox, 0);
-      final float y1 = getFloat(bbox, 1);
-      final float x2 = getFloat(bbox, 2);
-      final float y2 = getFloat(bbox, 3);
-      final float x = Math.min(x1, x2);
-      final float y = Math.min(y1, y2);
-      return new Rectangle2D.Float(x, y, Math.abs(x1 - x2), Math.abs(y1 - y2));
+        + item.getClass());
     }
   }
 
@@ -82,7 +94,7 @@ public class PdfUtil {
       return (COSDictionary)item;
     } else {
       throw new IllegalArgumentException("Expecting COSDictionary not "
-          + item.getClass());
+        + item.getClass());
     }
   }
 
@@ -96,37 +108,8 @@ public class PdfUtil {
     }
   }
 
-  public static BoundingBox getPageBoundingBox(final COSDictionary page) {
-    final Rectangle2D mediaBox = getPageMediaBox(page);
-    final COSArray viewports = PdfUtil.getArray(page, "VP");
-    for (final COSBase item : viewports) {
-      if (item instanceof COSDictionary) {
-        final COSDictionary viewport = (COSDictionary)item;
-        final BoundingBox boundingBox = PdfUtil.getViewportBoundingBox(
-          mediaBox, viewport);
-        if (!boundingBox.isEmpty()) {
-          return boundingBox;
-        }
-      }
-    }
-    return new BoundingBoxDoubleGf();
-  }
-
-  public static Rectangle2D getPageMediaBox(final COSDictionary page) {
-    final COSArray mediaBox = PdfUtil.getArray(page, "MediaBox");
-    if (mediaBox == null) {
-      return null;
-    } else {
-      final float x = getFloat(mediaBox, 0);
-      final float y = getFloat(mediaBox, 1);
-      final float width = getFloat(mediaBox, 2);
-      final float height = getFloat(mediaBox, 3);
-      return new Rectangle2D.Float(x, y, width, height);
-    }
-  }
-
   public static COSDictionary getPageViewport(final COSDictionary page) {
-    final COSArray viewports = PdfUtil.getArray(page, "VP");
+    final COSArray viewports = PdfUtil.findArray(page, "VP");
     if (viewports != null) {
       for (COSBase item : viewports) {
         if (item instanceof COSObject) {
@@ -135,7 +118,7 @@ public class PdfUtil {
         }
         if (item instanceof COSDictionary) {
           final COSDictionary viewport = (COSDictionary)item;
-          // System.out.println(viewport);
+          System.out.println(viewport);
           if (hasNameValue(viewport, "Type", "Viewport")) {
             return viewport;
           }
@@ -147,7 +130,7 @@ public class PdfUtil {
 
   public static List<Point2D> getPoints(final COSDictionary dictionary,
     final String key) {
-    final COSArray array = PdfUtil.getArray(dictionary, key);
+    final COSArray array = PdfUtil.findArray(dictionary, key);
     final List<Point2D> points = new ArrayList<Point2D>();
     if (array != null) {
       for (int i = 0; i < array.size(); i++) {
@@ -160,8 +143,23 @@ public class PdfUtil {
     return points;
   }
 
-  public static BoundingBox getViewportBoundingBox(final Rectangle2D mediaBox,
-    final COSDictionary viewport) {
+  public static Rectangle2D findRectangle(final COSDictionary dictionary,
+    final COSName key) {
+    final COSArray bbox = PdfUtil.findArray(dictionary, key);
+    if (bbox == null) {
+      return null;
+    } else {
+      final float x1 = getFloat(bbox, 0);
+      final float y1 = getFloat(bbox, 1);
+      final float x2 = getFloat(bbox, 2);
+      final float y2 = getFloat(bbox, 3);
+      final float x = Math.min(x1, x2);
+      final float y = Math.min(y1, y2);
+      return new Rectangle2D.Float(x, y, Math.abs(x1 - x2), Math.abs(y1 - y2));
+    }
+  }
+
+  public static BoundingBox getViewportBoundingBox(final COSDictionary viewport) {
     if (hasNameValue(viewport, "Type", "Viewport")) {
       final COSDictionary measure = PdfUtil.getDictionary(viewport, "Measure");
       if (PdfUtil.hasNameValue(measure, "Type", "Measure")) {
@@ -172,6 +170,7 @@ public class PdfUtil {
             final int srid = gcs.getInt("EPSG");
             if (srid == -1) {
               final String wkt = gcs.getString("WKT");
+              System.out.println(wkt);
               if (StringUtils.hasText(wkt)) {
                 geometryFactory = GeometryFactory.getFactory(wkt);
               }
@@ -181,7 +180,7 @@ public class PdfUtil {
             final GeometryFactory geoGeometryFactory = geometryFactory.getGeographicGeometryFactory();
 
             BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
-            final COSArray geoPoints = PdfUtil.getArray(measure, "GPTS");
+            final COSArray geoPoints = PdfUtil.findArray(measure, "GPTS");
 
             for (int i = 0; i < geoPoints.size(); i++) {
               final float lat = PdfUtil.getFloat(geoPoints, i++);

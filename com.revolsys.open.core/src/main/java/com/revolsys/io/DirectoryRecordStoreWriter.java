@@ -4,7 +4,7 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.data.record.Record;
 
-public class DirectoryRecordStoreWriter extends AbstractWriter<Record> {
+public class DirectoryRecordStoreWriter extends AbstractRecordWriter {
 
   private DirectoryRecordStore recordStore;
 
@@ -16,7 +16,7 @@ public class DirectoryRecordStoreWriter extends AbstractWriter<Record> {
   @Override
   public void close() {
     super.close();
-    recordStore = null;
+    this.recordStore = null;
   }
 
   @Override
@@ -24,23 +24,23 @@ public class DirectoryRecordStoreWriter extends AbstractWriter<Record> {
     if (object != null) {
       try {
         final boolean currentRecordStore = object.getRecordDefinition()
-          .getRecordStore() == recordStore;
+            .getRecordStore() == this.recordStore;
         switch (object.getState()) {
           case New:
-            recordStore.insert(object);
-          break;
+            this.recordStore.insert(object);
+            break;
           case Modified:
             if (currentRecordStore) {
               throw new UnsupportedOperationException();
             } else {
-              recordStore.insert(object);
+              this.recordStore.insert(object);
             }
-          break;
+            break;
           case Persisted:
             if (currentRecordStore) {
               throw new UnsupportedOperationException();
             } else {
-              recordStore.insert(object);
+              this.recordStore.insert(object);
             }
           case Deleted:
             throw new UnsupportedOperationException();

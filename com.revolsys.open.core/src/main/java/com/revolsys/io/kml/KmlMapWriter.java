@@ -24,51 +24,53 @@ public class KmlMapWriter extends AbstractMapWriter {
    */
   @Override
   public void close() {
-    if (out != null) {
+    if (this.out != null) {
       try {
-        out.endTag();
-        out.endTag();
-        out.endDocument();
+        this.out.endTag();
+        this.out.endTag();
+        this.out.endDocument();
       } finally {
-        FileUtil.closeSilent(out);
-        out = null;
+        FileUtil.closeSilent(this.out);
+        this.out = null;
       }
     }
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   @Override
   public void write(final Map<String, ? extends Object> values) {
-    out.startTag(Kml22Constants.PLACEMARK);
+    this.out.startTag(Kml22Constants.PLACEMARK);
     Geometry multiGeometry = null;
-    out.startTag(Kml22Constants.EXTENDED_DATA);
+    this.out.startTag(Kml22Constants.EXTENDED_DATA);
     for (final Entry<String, ? extends Object> field : values.entrySet()) {
       final String key = field.getKey();
       final Object value = field.getValue();
-      if (value instanceof Geometry) {
-        final Geometry geometry = (Geometry)value;
-        if (multiGeometry == null) {
-          multiGeometry = geometry;
+      if (isWritable(value)) {
+        if (value instanceof Geometry) {
+          final Geometry geometry = (Geometry)value;
+          if (multiGeometry == null) {
+            multiGeometry = geometry;
+          } else {
+            multiGeometry = multiGeometry.union(geometry);
+          }
         } else {
-          multiGeometry = multiGeometry.union(geometry);
+          this.out.writeData(key, value);
         }
-      } else {
-        out.writeData(key, value);
       }
     }
 
-    out.endTag();
-    out.writeGeometry(multiGeometry, 2);
-    out.endTag();
+    this.out.endTag();
+    this.out.writeGeometry(multiGeometry, 2);
+    this.out.endTag();
   }
 
   private void writeHeader() {
-    out.startDocument("UTF-8", "1.0");
-    out.startTag(Kml22Constants.KML);
-    out.startTag(Kml22Constants.DOCUMENT);
+    this.out.startDocument("UTF-8", "1.0");
+    this.out.startTag(Kml22Constants.KML);
+    this.out.startTag(Kml22Constants.DOCUMENT);
   }
 }

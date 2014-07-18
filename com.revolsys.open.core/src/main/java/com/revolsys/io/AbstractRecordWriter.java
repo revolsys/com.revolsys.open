@@ -1,21 +1,10 @@
 package com.revolsys.io;
 
-import java.util.Map;
-
 import com.revolsys.converter.string.BooleanStringConverter;
+import com.revolsys.data.record.Record;
 import com.revolsys.util.Property;
 
-public abstract class AbstractMapWriter extends
-AbstractWriter<Map<String, ? extends Object>> implements MapWriter {
-
-  @Override
-  public void close() {
-  }
-
-  @Override
-  public void flush() {
-  }
-
+public abstract class AbstractRecordWriter extends AbstractWriter<Record> {
   public boolean isIndent() {
     return BooleanStringConverter.isTrue(getProperty(IoConstants.INDENT));
   }

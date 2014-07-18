@@ -34,46 +34,46 @@ public class XhtmlMapWriter extends AbstractMapWriter {
    */
   @Override
   public void close() {
-    if (out != null) {
+    if (this.out != null) {
       try {
-        if (opened) {
-          out.endTag(HtmlUtil.TABLE);
-          out.endTag(HtmlUtil.DIV);
-          out.endTag(HtmlUtil.DIV);
-          if (wrap) {
-            out.endTag(HtmlUtil.BODY);
-            out.endTag(HtmlUtil.HTML);
+        if (this.opened) {
+          this.out.endTag(HtmlUtil.TABLE);
+          this.out.endTag(HtmlUtil.DIV);
+          this.out.endTag(HtmlUtil.DIV);
+          if (this.wrap) {
+            this.out.endTag(HtmlUtil.BODY);
+            this.out.endTag(HtmlUtil.HTML);
           }
         }
-        out.flush();
+        this.out.flush();
       } finally {
-        if (wrap) {
-          FileUtil.closeSilent(out);
+        if (this.wrap) {
+          FileUtil.closeSilent(this.out);
         }
-        out = null;
+        this.out = null;
       }
     }
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   @Override
   public void setProperty(final String name, final Object value) {
     if (name.equals(IoConstants.WRAP_PROPERTY)) {
-      wrap = Boolean.valueOf(value.toString());
+      this.wrap = Boolean.valueOf(value.toString());
     } else if (name.equals(IoConstants.TITLE_PROPERTY)) {
-      title = value.toString();
+      this.title = value.toString();
     }
     super.setProperty(name, value);
   }
 
   @Override
   public void write(final Map<String, ? extends Object> values) {
-    if (!opened) {
-      if (title == null) {
+    if (!this.opened) {
+      if (this.title == null) {
         if (values instanceof NamedObject) {
           final String name = ((NamedObject)values).getName();
           if (name != null) {
@@ -81,47 +81,50 @@ public class XhtmlMapWriter extends AbstractMapWriter {
           }
         }
       }
-      if (wrap) {
+      if (this.wrap) {
         writeHeader();
       }
-      out.startTag(HtmlUtil.DIV);
-      if (title != null) {
-        out.element(HtmlUtil.H1, title);
+      this.out.startTag(HtmlUtil.DIV);
+      if (this.title != null) {
+        this.out.element(HtmlUtil.H1, this.title);
       }
-      out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, "objectView");
-      out.startTag(HtmlUtil.TABLE);
-      out.attribute(HtmlUtil.ATTR_CLASS, "data");
-      opened = true;
+      this.out.startTag(HtmlUtil.DIV);
+      this.out.attribute(HtmlUtil.ATTR_CLASS, "objectView");
+      this.out.startTag(HtmlUtil.TABLE);
+      this.out.attribute(HtmlUtil.ATTR_CLASS, "data");
+      this.opened = true;
     }
-    out.startTag(HtmlUtil.TBODY);
+    this.out.startTag(HtmlUtil.TBODY);
 
     for (final Entry<String, ? extends Object> field : values.entrySet()) {
       final Object key = field.getKey();
       final Object value = field.getValue();
-      out.startTag(HtmlUtil.TR);
-      // TODO case converter on key name
-      out.element(HtmlUtil.TH, CaseConverter.toCapitalizedWords(key.toString()));
-      out.startTag(HtmlUtil.TD);
-      if (value instanceof URI) {
-        HtmlUtil.serializeA(out, null, value, value);
-      } else {
-        out.text(value);
+      if (isWritable(value)) {
+        this.out.startTag(HtmlUtil.TR);
+        // TODO case converter on key name
+        this.out.element(HtmlUtil.TH,
+          CaseConverter.toCapitalizedWords(key.toString()));
+        this.out.startTag(HtmlUtil.TD);
+        if (value instanceof URI) {
+          HtmlUtil.serializeA(this.out, null, value, value);
+        } else {
+          this.out.text(value);
+        }
+        this.out.endTag(HtmlUtil.TD);
+        this.out.endTag(HtmlUtil.TR);
       }
-      out.endTag(HtmlUtil.TD);
-      out.endTag(HtmlUtil.TR);
     }
-    out.endTag(HtmlUtil.TBODY);
+    this.out.endTag(HtmlUtil.TBODY);
   }
 
   private void writeHeader() {
-    out.startTag(HtmlUtil.HTML);
+    this.out.startTag(HtmlUtil.HTML);
 
-    out.startTag(HtmlUtil.HEAD);
-    out.element(HtmlUtil.TITLE, title);
+    this.out.startTag(HtmlUtil.HEAD);
+    this.out.element(HtmlUtil.TITLE, this.title);
 
-    out.endTag(HtmlUtil.HEAD);
+    this.out.endTag(HtmlUtil.HEAD);
 
-    out.startTag(HtmlUtil.BODY);
+    this.out.startTag(HtmlUtil.BODY);
   }
 }

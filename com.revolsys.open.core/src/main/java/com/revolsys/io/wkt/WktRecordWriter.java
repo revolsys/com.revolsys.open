@@ -2,17 +2,18 @@ package com.revolsys.io.wkt;
 
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
+import java.io.Writer;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.AttributeProperties;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class WktRecordWriter extends AbstractWriter<Record> {
+public class WktRecordWriter extends AbstractRecordWriter {
 
   private final RecordDefinition recordDefinition;
 
@@ -21,7 +22,7 @@ public class WktRecordWriter extends AbstractWriter<Record> {
   private boolean open;
 
   public WktRecordWriter(final RecordDefinition recordDefinition,
-    final java.io.Writer out) {
+    final Writer out) {
     this.recordDefinition = recordDefinition;
     this.out = new PrintWriter(new BufferedWriter(out));
     final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
@@ -34,33 +35,33 @@ public class WktRecordWriter extends AbstractWriter<Record> {
 
   @Override
   public void close() {
-    out.close();
+    this.out.close();
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   @Override
   public String toString() {
-    return recordDefinition.getPath().toString();
+    return this.recordDefinition.getPath().toString();
   }
 
   @Override
   public void write(final Record object) {
-    if (!open) {
-      open = true;
+    if (!this.open) {
+      this.open = true;
     }
     final Geometry geometry = object.getGeometryValue();
     final int srid = geometry.getSrid();
     if (srid > 0) {
-      out.print("SRID=");
-      out.print(srid);
-      out.print(';');
+      this.out.print("SRID=");
+      this.out.print(srid);
+      this.out.print(';');
     }
-    WktWriter.write(out, geometry);
-    out.println();
+    WktWriter.write(this.out, geometry);
+    this.out.println();
   }
 
 }

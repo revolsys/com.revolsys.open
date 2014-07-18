@@ -17,11 +17,11 @@ public class KmzMapWriter extends AbstractMapWriter {
 
   public KmzMapWriter(final OutputStream out) {
     try {
-      zipOut = new ZipOutputStream(out);
+      this.zipOut = new ZipOutputStream(out);
       final ZipEntry entry = new ZipEntry("doc.kml");
-      zipOut.putNextEntry(entry);
-      final java.io.Writer writer = FileUtil.createUtf8Writer(zipOut);
-      kmlWriter = new KmlMapWriter(writer);
+      this.zipOut.putNextEntry(entry);
+      final java.io.Writer writer = FileUtil.createUtf8Writer(this.zipOut);
+      this.kmlWriter = new KmlMapWriter(writer);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to create KMZ file ", e);
     }
@@ -31,8 +31,8 @@ public class KmzMapWriter extends AbstractMapWriter {
   @Override
   public void close() {
     try {
-      kmlWriter.close();
-      zipOut.close();
+      this.kmlWriter.close();
+      this.zipOut.close();
     } catch (final IOException e) {
     }
   }
@@ -40,16 +40,21 @@ public class KmzMapWriter extends AbstractMapWriter {
   @Override
   public void flush() {
     try {
-      kmlWriter.flush();
-      zipOut.flush();
+      this.kmlWriter.flush();
+      this.zipOut.flush();
     } catch (final IOException e) {
       throw new RuntimeException("Unable to flush: ", e);
     }
   }
 
   @Override
+  public void setProperty(final String name, final Object value) {
+    this.kmlWriter.setProperty(name, value);
+  }
+
+  @Override
   public void write(final Map<String, ? extends Object> values) {
-    kmlWriter.write(values);
+    this.kmlWriter.write(values);
   }
 
 }

@@ -10,20 +10,18 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.util.MathUtil;
 
-public class JsonRecordWriter extends AbstractWriter<Record> {
+public class JsonRecordWriter extends AbstractRecordWriter {
 
   private RecordDefinition recordDefinition;
 
   private PrintWriter out;
 
   private int depth = 0;
-
-  private boolean indent;
 
   boolean startAttribute;
 
@@ -46,80 +44,80 @@ public class JsonRecordWriter extends AbstractWriter<Record> {
       final char c = string.charAt(i);
       switch (c) {
         case '"':
-          out.print("\\\"");
-        break;
+          this.out.print("\\\"");
+          break;
         case '\\':
-          out.print("\\\\");
-        break;
+          this.out.print("\\\\");
+          break;
         case '\b':
-          out.print("\\b");
-        break;
+          this.out.print("\\b");
+          break;
         case '\f':
-          out.print("\\f");
-        break;
+          this.out.print("\\f");
+          break;
         case '\n':
-          out.print("\\n");
-        break;
+          this.out.print("\\n");
+          break;
         case '\r':
-          out.print("\\r");
-        break;
+          this.out.print("\\r");
+          break;
         case '\t':
-          out.print("\\t");
-        break;
+          this.out.print("\\t");
+          break;
         default:
-          out.print(c);
-        break;
+          this.out.print(c);
+          break;
       }
     }
   }
 
   @Override
   public void close() {
-    if (out != null) {
+    if (this.out != null) {
       try {
-        if (!singleObject) {
-          out.print("\n]}\n");
+        if (!this.singleObject) {
+          this.out.print("\n]}\n");
         }
         final String callback = getProperty(IoConstants.JSONP_PROPERTY);
         if (callback != null) {
-          out.print(");\n");
+          this.out.print(");\n");
         }
       } finally {
-        FileUtil.closeSilent(out);
-        out = null;
+        FileUtil.closeSilent(this.out);
+        this.out = null;
       }
     }
-    recordDefinition = null;
+    this.recordDefinition = null;
   }
 
   private void endAttribute() {
-    out.print(",\n");
-    startAttribute = false;
+    this.out.print(",\n");
+    this.startAttribute = false;
   }
 
   private void endList() {
-    depth--;
-    out.print('\n');
+    this.depth--;
+    this.out.print('\n');
     indent();
-    out.print("]");
+    this.out.print("]");
   }
 
   private void endObject() {
-    depth--;
-    out.print('\n');
+    this.depth--;
+    this.out.print('\n');
     indent();
-    out.print("}");
+    this.out.print("}");
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   private void indent() {
-    if (indent) {
-      for (int i = 0; i < depth; i++) {
-        out.write("  ");
+    if (isIndent()) {
+      for (int i = 0; i < this.depth; i++) {
+        this.out.write("  ");
       }
     }
   }
@@ -127,11 +125,11 @@ public class JsonRecordWriter extends AbstractWriter<Record> {
   private void label(final String key) {
     indent();
     string(key);
-    out.print(":");
-    if (indent) {
-      out.print(" ");
+    this.out.print(":");
+    if (isIndent()) {
+      this.out.print(" ");
     }
-    startAttribute = true;
+    this.startAttribute = true;
   }
 
   private void list(final List<? extends Object> values) {
@@ -152,47 +150,43 @@ public class JsonRecordWriter extends AbstractWriter<Record> {
     endList();
   }
 
-  public void setIndent(final boolean indent) {
-    this.indent = indent;
-  }
-
   private void startList() {
-    if (!startAttribute) {
+    if (!this.startAttribute) {
       indent();
     }
-    out.print("[\n");
-    depth++;
-    startAttribute = false;
+    this.out.print("[\n");
+    this.depth++;
+    this.startAttribute = false;
   }
 
   private void startObject() {
-    if (!startAttribute) {
+    if (!this.startAttribute) {
       indent();
     }
-    out.print("{\n");
-    depth++;
-    startAttribute = false;
+    this.out.print("{\n");
+    this.depth++;
+    this.startAttribute = false;
   }
 
   private void string(final CharSequence string) {
-    out.print('"');
+    this.out.print('"');
     charSequence(string);
-    out.print('"');
+    this.out.print('"');
   }
 
   @Override
   public String toString() {
-    return recordDefinition.getPath().toString();
+    return this.recordDefinition.getPath().toString();
   }
 
   @SuppressWarnings("unchecked")
   private void value(final DataType dataType, final Object value) {
     if (value == null) {
-      out.print("null");
+      this.out.print("null");
     } else if (value instanceof Boolean) {
-      out.print(value);
+      this.out.print(value);
     } else if (value instanceof Number) {
-      out.print(MathUtil.toString((Number)value));
+      this.out.print(MathUtil.toString((Number)value));
     } else if (value instanceof List) {
       final List<? extends Object> list = (List<? extends Object>)value;
       list(list);
@@ -208,32 +202,6 @@ public class JsonRecordWriter extends AbstractWriter<Record> {
       final String string = StringConverterRegistry.toString(dataType, value);
       string(string);
     }
-  }
-
-  @Override
-  public void write(final Record object) {
-    if (written) {
-      out.print(",\n");
-    } else {
-      writeHeader();
-    }
-    startObject();
-    boolean first = true;
-    final int attributeCount = recordDefinition.getAttributeCount();
-    for (int i = 0; i < attributeCount; i++) {
-      final Object value = object.getValue(i);
-      if (value != null) {
-        if (!first) {
-          endAttribute();
-        }
-        final String name = recordDefinition.getAttributeName(i);
-        final DataType dataType = recordDefinition.getAttributeType(i);
-        label(name);
-        value(dataType, value);
-        first = false;
-      }
-    }
-    endObject();
   }
 
   private void write(final Map<String, ? extends Object> values) {
@@ -254,16 +222,43 @@ public class JsonRecordWriter extends AbstractWriter<Record> {
     endObject();
   }
 
+  @Override
+  public void write(final Record object) {
+    if (this.written) {
+      this.out.print(",\n");
+    } else {
+      writeHeader();
+    }
+    startObject();
+    boolean hasValue = false;
+    final int attributeCount = this.recordDefinition.getAttributeCount();
+    for (int i = 0; i < attributeCount; i++) {
+      final Object value = object.getValue(i);
+      if (isWritable(value)) {
+        if (hasValue) {
+          endAttribute();
+        } else {
+          hasValue = true;
+        }
+        final String name = this.recordDefinition.getAttributeName(i);
+        final DataType dataType = this.recordDefinition.getAttributeType(i);
+        label(name);
+        value(dataType, value);
+      }
+    }
+    endObject();
+  }
+
   private void writeHeader() {
     final String callback = getProperty(IoConstants.JSONP_PROPERTY);
     if (callback != null) {
       this.out.print(callback);
       this.out.print('(');
     }
-    singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
-    if (!singleObject) {
+    this.singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
+    if (!this.singleObject) {
       this.out.print("{\"items\": [\n");
     }
-    written = true;
+    this.written = true;
   }
 }

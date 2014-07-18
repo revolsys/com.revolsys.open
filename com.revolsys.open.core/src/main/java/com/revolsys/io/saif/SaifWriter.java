@@ -43,7 +43,7 @@ import org.springframework.util.StringUtils;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.ZipUtil;
@@ -59,7 +59,7 @@ import com.revolsys.io.saif.util.OsnSerializer;
  * @author Paul Austin
  * @see SaifReader
  */
-public class SaifWriter extends AbstractWriter<Record> {
+public class SaifWriter extends AbstractRecordWriter {
   private static final String GLOBAL_METADATA = "/GlobalMetadata";
 
   private static final Logger log = Logger.getLogger(SaifWriter.class);
@@ -192,14 +192,14 @@ public class SaifWriter extends AbstractWriter<Record> {
     exportsSerializer.attributeName("handles");
     exportsSerializer.startCollection("Set");
     writeExport(exportsSerializer, "GlobalMetadata", "GlobalMetadata",
-        "globmeta.osn");
+      "globmeta.osn");
     for (final Map<String, Object> export : this.exports.values()) {
       final String compositeType = (String)export.get("compositeType");
       final String referenceId = (String)export.get("referenceId");
       final String objectSubset = (String)export.get("objectSubset");
       String compositeTypeName = PathUtil.getName(compositeType);
       final String compositeNamespace = PathUtil.getPath(compositeType)
-          .replaceAll("/", "");
+        .replaceAll("/", "");
       if (StringUtils.hasText(compositeNamespace)) {
         compositeTypeName += "::" + compositeNamespace;
       }
@@ -404,7 +404,7 @@ public class SaifWriter extends AbstractWriter<Record> {
             this.tempDirectory, "imports.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
         } else if (PathUtil.getName(typePath).endsWith(
-            "InternallyReferencedObjects")) {
+          "InternallyReferencedObjects")) {
           serializer = createSerializer("/InternallyReferencedObject",
             new File(this.tempDirectory, "internal.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);

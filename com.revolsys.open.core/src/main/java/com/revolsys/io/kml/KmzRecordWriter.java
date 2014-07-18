@@ -9,10 +9,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 
-public class KmzRecordWriter extends AbstractWriter<Record> {
+public class KmzRecordWriter extends AbstractRecordWriter {
 
   private final KmlRecordWriter kmlWriter;
 
@@ -22,11 +22,11 @@ public class KmzRecordWriter extends AbstractWriter<Record> {
     try {
       final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(
         out);
-      zipOut = new ZipOutputStream(bufferedOutputStream);
+      this.zipOut = new ZipOutputStream(bufferedOutputStream);
       final ZipEntry entry = new ZipEntry("doc.kml");
-      zipOut.putNextEntry(entry);
-      final OutputStreamWriter writer = FileUtil.createUtf8Writer(zipOut);
-      kmlWriter = new KmlRecordWriter(writer);
+      this.zipOut.putNextEntry(entry);
+      final OutputStreamWriter writer = FileUtil.createUtf8Writer(this.zipOut);
+      this.kmlWriter = new KmlRecordWriter(writer);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to create KMZ file", e);
     }
@@ -36,8 +36,8 @@ public class KmzRecordWriter extends AbstractWriter<Record> {
   @Override
   public void close() {
     try {
-      kmlWriter.close();
-      zipOut.close();
+      this.kmlWriter.close();
+      this.zipOut.close();
     } catch (final IOException e) {
     }
   }
@@ -45,8 +45,8 @@ public class KmzRecordWriter extends AbstractWriter<Record> {
   @Override
   public void flush() {
     try {
-      kmlWriter.flush();
-      zipOut.flush();
+      this.kmlWriter.flush();
+      this.zipOut.flush();
     } catch (final IOException e) {
       throw new RuntimeException("Unable to flush: ", e);
     }
@@ -54,13 +54,13 @@ public class KmzRecordWriter extends AbstractWriter<Record> {
 
   @Override
   public void open() {
-    kmlWriter.open();
+    this.kmlWriter.open();
   }
 
   @Override
   public void setProperty(final String name, final Object value) {
     super.setProperty(name, value);
-    kmlWriter.setProperty(name, value);
+    this.kmlWriter.setProperty(name, value);
   }
 
   @Override
@@ -70,7 +70,7 @@ public class KmzRecordWriter extends AbstractWriter<Record> {
 
   @Override
   public void write(final Record object) {
-    kmlWriter.write(object);
+    this.kmlWriter.write(object);
   }
 
 }

@@ -34,42 +34,42 @@ public class JsonMapWriter extends AbstractMapWriter {
    */
   @Override
   public void close() {
-    if (out != null) {
-      if (!written) {
+    if (this.out != null) {
+      if (!this.written) {
         writeHeader();
       }
       try {
-        if (!singleObject) {
+        if (!this.singleObject) {
           newLine();
-          if (listRoot) {
-            out.print("]");
+          if (this.listRoot) {
+            this.out.print("]");
           } else {
-            out.print("]}");
+            this.out.print("]}");
           }
         }
         final String callback = getProperty(IoConstants.JSONP_PROPERTY);
         if (callback != null) {
-          out.print(");");
+          this.out.print(");");
         }
       } finally {
-        FileUtil.closeSilent(out);
-        out = null;
+        FileUtil.closeSilent(this.out);
+        this.out = null;
       }
     }
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   public boolean isListRoot() {
-    return listRoot;
+    return this.listRoot;
   }
 
   private void newLine() {
-    if (indent) {
-      out.print('\n');
+    if (this.indent) {
+      this.out.print('\n');
     }
   }
 
@@ -83,43 +83,43 @@ public class JsonMapWriter extends AbstractMapWriter {
 
   @Override
   public void write(final Map<String, ? extends Object> values) {
-    if (written) {
-      out.print(",");
+    if (this.written) {
+      this.out.print(",");
       newLine();
     } else {
       writeHeader();
     }
     String indentString = null;
-    if (indent) {
-      if (singleObject) {
+    if (this.indent) {
+      if (this.singleObject) {
         indentString = "";
       } else {
         indentString = "  ";
-        out.print(indentString);
+        this.out.print(indentString);
       }
     }
-    JsonWriterUtil.write(out, values, indentString);
+    JsonWriterUtil.write(this.out, values, indentString, isWriteNulls());
     newLine();
   }
 
   private void writeHeader() {
     final String callback = getProperty(IoConstants.JSONP_PROPERTY);
     if (callback != null) {
-      out.print(callback);
-      out.print('(');
+      this.out.print(callback);
+      this.out.print('(');
     }
-    listRoot = Boolean.TRUE.equals(getProperty(IoConstants.JSON_LIST_ROOT_PROPERTY));
-    singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
+    this.listRoot = Boolean.TRUE.equals(getProperty(IoConstants.JSON_LIST_ROOT_PROPERTY));
+    this.singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
 
-    if (!singleObject) {
-      if (listRoot) {
-        out.print("[");
+    if (!this.singleObject) {
+      if (this.listRoot) {
+        this.out.print("[");
         newLine();
       } else {
-        out.print("{\"items\": [");
+        this.out.print("{\"items\": [");
         newLine();
       }
     }
-    written = true;
+    this.written = true;
   }
 }

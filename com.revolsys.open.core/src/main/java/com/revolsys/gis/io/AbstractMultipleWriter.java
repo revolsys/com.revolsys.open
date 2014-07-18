@@ -7,10 +7,10 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.Writer;
 
-public abstract class AbstractMultipleWriter extends AbstractWriter<Record> {
+public abstract class AbstractMultipleWriter extends AbstractRecordWriter {
   private static final Logger LOG = Logger.getLogger(AbstractMultipleWriter.class);
 
   private final Map<RecordDefinition, Writer<Record>> writers = new HashMap<RecordDefinition, Writer<Record>>();
@@ -20,7 +20,7 @@ public abstract class AbstractMultipleWriter extends AbstractWriter<Record> {
 
   @Override
   public void close() {
-    for (final Writer<Record> writer : writers.values()) {
+    for (final Writer<Record> writer : this.writers.values()) {
       try {
         writer.close();
       } catch (final Throwable t) {
@@ -33,10 +33,10 @@ public abstract class AbstractMultipleWriter extends AbstractWriter<Record> {
     final RecordDefinition recordDefinition);
 
   private Writer<Record> getWriter(final RecordDefinition recordDefinition) {
-    Writer<Record> writer = writers.get(recordDefinition);
+    Writer<Record> writer = this.writers.get(recordDefinition);
     if (writer == null) {
       writer = createWriter(recordDefinition);
-      writers.put(recordDefinition, writer);
+      this.writers.put(recordDefinition, writer);
     }
     return writer;
   }

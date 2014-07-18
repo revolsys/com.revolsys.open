@@ -14,6 +14,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.swing.map.Viewport2D;
@@ -44,8 +45,8 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
             if (!intersectBoundingBox.isEmpty()) {
               final String tileName = tile.getName().toUpperCase();
 
-              final Polygon polygon = tile.getPolygon(
-                viewport.getGeometryFactory(), 50);
+              final GeometryFactory geometryFactory = viewport.getGeometryFactory();
+              final Polygon polygon = tile.getPolygon(geometryFactory, 50);
               GeometryStyleRenderer.renderOutline(viewport, graphics, polygon,
                 GeometryStyle.line(Color.LIGHT_GRAY));
 
@@ -98,7 +99,6 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
         }
       }
     } catch (final IllegalArgumentException e) {
-
     }
   }
 

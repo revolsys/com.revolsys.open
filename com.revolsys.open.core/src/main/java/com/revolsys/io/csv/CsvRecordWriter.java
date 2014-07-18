@@ -8,10 +8,10 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
-import com.revolsys.io.AbstractWriter;
+import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 
-public class CsvRecordWriter extends AbstractWriter<Record> {
+public class CsvRecordWriter extends AbstractRecordWriter {
   private final char fieldSeparator = ',';
 
   /** The writer */
@@ -21,7 +21,8 @@ public class CsvRecordWriter extends AbstractWriter<Record> {
 
   private final boolean useQuotes;
 
-  public CsvRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
+  public CsvRecordWriter(final RecordDefinition recordDefinition,
+    final Writer out) {
     this(recordDefinition, out, CsvConstants.FIELD_SEPARATOR, true);
 
   }
@@ -46,41 +47,41 @@ public class CsvRecordWriter extends AbstractWriter<Record> {
    */
   @Override
   public void close() {
-    FileUtil.closeSilent(out);
+    FileUtil.closeSilent(this.out);
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   private void string(final Object value) {
     String string = value.toString();
-    if (useQuotes) {
+    if (this.useQuotes) {
       string = string.replaceAll("\"", "\"\"");
-      out.print('"');
-      out.print(string);
-      out.print('"');
+      this.out.print('"');
+      this.out.print(string);
+      this.out.print('"');
     } else {
-      out.print(string);
+      this.out.print(string);
     }
   }
 
   @Override
   public void write(final Record object) {
-    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
+    for (int i = 0; i < this.recordDefinition.getAttributeCount(); i++) {
       if (i > 0) {
-        out.print(fieldSeparator);
+        this.out.print(this.fieldSeparator);
       }
       final Object value = object.getValue(i);
       if (value != null) {
-        final String name = recordDefinition.getAttributeName(i);
-        final DataType dataType = recordDefinition.getAttributeType(name);
+        final String name = this.recordDefinition.getAttributeName(i);
+        final DataType dataType = this.recordDefinition.getAttributeType(name);
 
         @SuppressWarnings("unchecked")
         final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
         final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-          .getConverter(dataTypeClass);
+            .getConverter(dataTypeClass);
         if (converter == null) {
           string(value);
         } else {
@@ -88,12 +89,12 @@ public class CsvRecordWriter extends AbstractWriter<Record> {
           if (converter.requiresQuotes()) {
             string(stringValue);
           } else {
-            out.print(stringValue);
+            this.out.print(stringValue);
           }
         }
       }
     }
-    out.println();
+    this.out.println();
   }
 
 }
