@@ -14,7 +14,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.CapiFileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
-import com.revolsys.gis.util.NoOp;
+import com.revolsys.gis.util.Debug;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.Reader;
@@ -46,7 +46,7 @@ public class FileGdbIoTest {
       name += "_" + geometry.getGeometryCount();
     }
     if (geometry instanceof MultiPolygon) {
-      NoOp.noOp();
+      Debug.noOp();
     }
     if (geometry instanceof Polygonal) {
       name += "_" + geometry.getGeometryComponents(LinearRing.class).size();

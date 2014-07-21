@@ -43,7 +43,7 @@ import junit.framework.Test;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.util.NoOp;
+import com.revolsys.gis.util.Debug;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
@@ -84,7 +84,7 @@ public class TestCase extends junit.framework.TestSuite implements
     this.caseIndex = caseIndex;
     if (StringUtils.hasText(description)) {
       if (description.startsWith("P/L-2")) {
-        NoOp.noOp();
+        Debug.noOp();
       }
       this.testDescription = description.replaceAll("\\s+", " ").replaceAll(
         "[^A-Za-z0-9\\-_ ]", " ");

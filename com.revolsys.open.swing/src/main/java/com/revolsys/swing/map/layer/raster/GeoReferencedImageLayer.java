@@ -51,6 +51,11 @@ import com.revolsys.util.Property;
 
 public class GeoReferencedImageLayer extends AbstractLayer {
 
+  public static GeoReferencedImageLayer create(
+    final Map<String, Object> properties) {
+    return new GeoReferencedImageLayer(properties);
+  }
+
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "geoReferencedImage", "Geo-referenced Image",
     GeoReferencedImageLayer.class, "create");
@@ -87,11 +92,6 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       "arrow_out", editable, "fitToViewport"));
   }
 
-  public static GeoReferencedImageLayer create(
-    final Map<String, Object> properties) {
-    return new GeoReferencedImageLayer(properties);
-  }
-
   private GeoReferencedImage image;
 
   private Resource resource;
@@ -112,13 +112,13 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   protected ValueField addPropertiesTabGeneralPanelSource(final BasePanel parent) {
     final ValueField panel = super.addPropertiesTabGeneralPanelSource(parent);
 
-    if (url.startsWith("file:")) {
-      final String fileName = url.replaceFirst("file:(//)?", "");
+    if (this.url.startsWith("file:")) {
+      final String fileName = this.url.replaceFirst("file:(//)?", "");
       SwingUtil.addReadOnlyTextField(panel, "File", fileName);
     } else {
-      SwingUtil.addReadOnlyTextField(panel, "URL", url);
+      SwingUtil.addReadOnlyTextField(panel, "URL", this.url);
     }
-    final String fileNameExtension = FileUtil.getFileNameExtension(url);
+    final String fileNameExtension = FileUtil.getFileNameExtension(this.url);
     if (StringUtils.hasText(fileNameExtension)) {
       SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
       final GeoReferencedImageFactory factory = IoFactoryRegistry.getInstance()
@@ -173,7 +173,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     final String url = getProperty("url");
     if (StringUtils.hasText(url)) {
       this.url = url;
-      resource = SpringUtil.getResource(url);
+      this.resource = SpringUtil.getResource(url);
       cancelChanges();
       return true;
     } else {
@@ -185,10 +185,10 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   @Override
   protected boolean doSaveChanges() {
-    if (image == null) {
+    if (this.image == null) {
       return true;
     } else {
-      return image.saveChanges();
+      return this.image.saveChanges();
     }
   }
 
@@ -246,10 +246,10 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    if (image == null) {
+    if (this.image == null) {
       return getBoundingBox().getGeometryFactory();
     } else {
-      return image.getGeometryFactory();
+      return this.image.getGeometryFactory();
     }
   }
 
@@ -259,19 +259,19 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   @Override
   public boolean isHasChanges() {
-    if (image == null) {
+    if (this.image == null) {
       return false;
     } else {
-      return image.isHasChanages();
+      return this.image.isHasChanages();
     }
   }
 
   public boolean isShowOriginalImage() {
-    return showOriginalImage;
+    return this.showOriginalImage;
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
-    if (image != null) {
+    if (this.image != null) {
       this.image.setBoundingBox(boundingBox);
     }
   }
@@ -363,10 +363,13 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   public Point sourcePixelToTargetPoint(final Point sourcePixel) {
     final BoundingBox boundingBox = getBoundingBox();
     final double[] coordinates = sourcePixel.getCoordinates();
-    final AffineTransform transform = image.getAffineTransformation(boundingBox);
-    transform.transform(coordinates, 0, coordinates, 0, 1);
+    if (!isShowOriginalImage()) {
+      final AffineTransform transform = this.image.getAffineTransformation(boundingBox);
+      transform.transform(coordinates, 0, coordinates, 0, 1);
+    }
     final double imageX = coordinates[0];
-    final double imageY = coordinates[0];
+    final double imageY = coordinates[1];
+
     final GeoReferencedImage image = getImage();
     final double xPercent = imageX / image.getImageWidth();
     final double yPercent = imageY / image.getImageHeight();
@@ -401,11 +404,13 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     final double[] coordinates = new double[] {
       imageX, imageY
     };
-    try {
-      final AffineTransform transform = image.getAffineTransformation(
-        boundingBox).createInverse();
-      transform.transform(coordinates, 0, coordinates, 0, 1);
-    } catch (final NoninvertibleTransformException e) {
+    if (!isShowOriginalImage()) {
+      try {
+        final AffineTransform transform = image.getAffineTransformation(
+          boundingBox).createInverse();
+        transform.transform(coordinates, 0, coordinates, 0, 1);
+      } catch (final NoninvertibleTransformException e) {
+      }
     }
     return new PointDouble(coordinates);
   }
@@ -423,13 +428,13 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     map.remove("editable");
     map.remove("TableView");
     MapSerializerUtil.add(map, "url", this.url);
-    MapSerializerUtil.add(map, "showOriginalImage", showOriginalImage);
+    MapSerializerUtil.add(map, "showOriginalImage", this.showOriginalImage);
 
     final Map<String, Object> imageSettings;
-    if (image == null) {
+    if (this.image == null) {
       imageSettings = getProperty("imageSettings");
     } else {
-      imageSettings = image.toMap();
+      imageSettings = this.image.toMap();
     }
     MapSerializerUtil.add(map, "imageSettings", imageSettings);
 

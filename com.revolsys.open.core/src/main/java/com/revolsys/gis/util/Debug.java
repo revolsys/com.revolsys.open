@@ -7,17 +7,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
-public class NoOp {
-  public static void equals(final Record object, final double x,
-    final double y) {
-    equals(object.getGeometryValue(), x, y);
-  }
-
-  public static void equals(final Record object, final Double x,
-    final Double y) {
-    equals(object.getGeometryValue(), x, y);
-  }
-
+public class Debug {
   public static boolean equals(final Geometry geometry, final double x,
     final double y) {
     final Point firstPoint = geometry.getPoint();
@@ -55,6 +45,14 @@ public class NoOp {
     } else {
       return false;
     }
+  }
+
+  public static void equals(final Record object, final double x, final double y) {
+    equals(object.getGeometryValue(), x, y);
+  }
+
+  public static void equals(final Record object, final Double x, final Double y) {
+    equals(object.getGeometryValue(), x, y);
   }
 
   public static void idNull(final Record object) {
@@ -96,13 +94,13 @@ public class NoOp {
   public static void noOp() {
   }
 
-  public static void typePath(final Record object, final String typePath) {
-    final String typePath2 = object.getRecordDefinition().getPath();
+  public static void typePath(final Edge<?> edge, final String typePath) {
+    final String typePath2 = edge.getTypeName();
     equals(typePath2, typePath);
   }
 
-  public static void typePath(final Edge<?> edge, final String typePath) {
-    final String typePath2 = edge.getTypeName();
+  public static void typePath(final Record object, final String typePath) {
+    final String typePath2 = object.getRecordDefinition().getPath();
     equals(typePath2, typePath);
   }
 
@@ -110,6 +108,10 @@ public class NoOp {
     if (line.getLength() == 0) {
       noOp();
     }
+  }
+
+  public void println(final Object object) {
+    System.out.println(object);
   }
 
 }

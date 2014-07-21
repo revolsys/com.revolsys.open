@@ -35,7 +35,7 @@ import com.revolsys.util.MathUtil;
  * @see RecordDefinition
  */
 public class Attribute extends AbstractObjectWithProperties implements
-Cloneable, MapSerializer {
+  Cloneable, MapSerializer {
 
   public static Attribute create(final Map<String, Object> properties) {
     return new Attribute(properties);
@@ -107,7 +107,7 @@ Cloneable, MapSerializer {
     }
     this.description = CollectionUtil.getString(properties, "description");
     this.type = DataTypes.getType(CollectionUtil.getString(properties,
-        "dataType"));
+      "dataType"));
     this.required = CollectionUtil.getBool(properties, "required");
     this.length = CollectionUtil.getInteger(properties, "length", 0);
     this.scale = CollectionUtil.getInteger(properties, "scale", 0);
@@ -311,6 +311,10 @@ Cloneable, MapSerializer {
     return new Attribute(this);
   }
 
+  public <V> V convert(final Object value) {
+    return StringConverterRegistry.toObject(this.type, value);
+  }
+
   @Override
   public boolean equals(final Object object) {
     if (object instanceof Attribute) {
@@ -371,14 +375,6 @@ Cloneable, MapSerializer {
     return (V)this.maxValue;
   }
 
-  public RecordDefinition getRecordDefinition() {
-    if (this.recordDefinition == null) {
-      return null;
-    } else {
-      return this.recordDefinition.get();
-    }
-  }
-
   @SuppressWarnings("unchecked")
   public <V> V getMinValue() {
     return (V)this.minValue;
@@ -391,6 +387,14 @@ Cloneable, MapSerializer {
    */
   public String getName() {
     return this.name;
+  }
+
+  public RecordDefinition getRecordDefinition() {
+    if (this.recordDefinition == null) {
+      return null;
+    } else {
+      return this.recordDefinition.get();
+    }
   }
 
   /**
@@ -515,12 +519,13 @@ Cloneable, MapSerializer {
     this.maxValue = maxValue;
   }
 
-  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.recordDefinition = new WeakReference<RecordDefinition>(recordDefinition);
-  }
-
   public void setMinValue(final Object minValue) {
     this.minValue = minValue;
+  }
+
+  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = new WeakReference<RecordDefinition>(
+      recordDefinition);
   }
 
   public void setRequired(final boolean required) {
@@ -585,7 +590,7 @@ Cloneable, MapSerializer {
 
     if (isRequired()) {
       if (value == null || value instanceof String
-          && !StringUtils.hasText((String)value)) {
+        && !StringUtils.hasText((String)value)) {
         throw new IllegalArgumentException(fieldName + " is required");
       }
     }

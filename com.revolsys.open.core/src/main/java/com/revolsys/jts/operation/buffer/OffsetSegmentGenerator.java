@@ -32,7 +32,7 @@
  */
 package com.revolsys.jts.operation.buffer;
 
-import com.revolsys.gis.util.NoOp;
+import com.revolsys.gis.util.Debug;
 import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.algorithm.HCoordinate;
@@ -585,7 +585,7 @@ class OffsetSegmentGenerator {
    */
   public void createCircle(final Point point) {
     if (point == null) {
-      NoOp.noOp();
+      Debug.noOp();
     } else {
       // add start point
       final double x = point.getX() + distance;

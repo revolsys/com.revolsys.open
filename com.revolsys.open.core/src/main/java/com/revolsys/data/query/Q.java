@@ -120,8 +120,18 @@ public class Q {
     return new Equal(left, right);
   }
 
-  public static Condition equal(final Identifier identifier,
-    final List<?> attributes) {
+  public static Equal equal(final String name, final Object value) {
+    final Value valueCondition = new Value(value);
+    return equal(name, valueCondition);
+  }
+
+  public static Equal equal(final String left, final QueryValue right) {
+    final Column leftCondition = new Column(left);
+    return new Equal(leftCondition, right);
+  }
+
+  public static Condition equalId(final List<?> attributes,
+    final Identifier identifier) {
     final And and = new And();
     List<Object> values;
     if (identifier == null) {
@@ -132,7 +142,7 @@ public class Q {
     if (attributes.size() == values.size()) {
       for (int i = 0; i < attributes.size(); i++) {
         final Object attributeKey = attributes.get(i);
-        final Object value = values.get(i);
+        Object value = values.get(i);
 
         Condition condition;
         if (value == null) {
@@ -143,7 +153,9 @@ public class Q {
           }
         } else {
           if (attributeKey instanceof Attribute) {
-            condition = equal((Attribute)attributeKey, value);
+            final Attribute attribute = (Attribute)attributeKey;
+            value = attribute.convert(value);
+            condition = equal(attribute, value);
           } else {
             condition = equal(attributeKey.toString(), value);
           }
@@ -155,16 +167,6 @@ public class Q {
         + " != count for values " + values);
     }
     return and;
-  }
-
-  public static Equal equal(final String name, final Object value) {
-    final Value valueCondition = new Value(value);
-    return equal(name, valueCondition);
-  }
-
-  public static Equal equal(final String left, final QueryValue right) {
-    final Column leftCondition = new Column(left);
-    return new Equal(leftCondition, right);
   }
 
   public static GreaterThan greaterThan(final Attribute attribute,
@@ -351,7 +353,7 @@ public class Q {
       left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "", "g");
     }
     final String right = "%"
-        + StringConverterRegistry.toString(value)
+      + StringConverterRegistry.toString(value)
         .toUpperCase()
         .replaceAll("[^A-Z0-9]", "") + "%";
     return Q.like(left, right);

@@ -57,7 +57,7 @@ import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.util.NoOp;
+import com.revolsys.gis.util.Debug;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
@@ -1003,7 +1003,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   protected void init(final int axisCount, final double... scales) {
     this.axisCount = Math.max(axisCount, 2);
     if (axisCount > 3) {
-      NoOp.noOp();
+      Debug.noOp();
     }
     this.scales = getScales(axisCount, scales);
   }
