@@ -2,12 +2,12 @@ package com.revolsys.data.equals;
 
 import java.util.Collection;
 
-import org.springframework.util.StringUtils;
+import com.revolsys.util.Property;
 
 public class StringEqualsIgnoreCase extends AbstractEquals<String> {
   public static boolean equal(final String value1, final String value2) {
-    if (StringUtils.hasText(value1)) {
-      if (StringUtils.hasText(value2)) {
+    if (Property.hasValue(value1)) {
+      if (Property.hasValue(value2)) {
         return value1.trim().equalsIgnoreCase(value2.trim());
       }
     }

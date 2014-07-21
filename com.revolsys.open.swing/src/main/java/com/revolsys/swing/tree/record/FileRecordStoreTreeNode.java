@@ -14,8 +14,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.tree.TreeNode;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.RecordStoreConnectionMapProxy;
 import com.revolsys.data.io.RecordStoreProxy;
@@ -29,9 +27,10 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.file.FileTreeNode;
+import com.revolsys.util.Property;
 
 public class FileRecordStoreTreeNode extends FileTreeNode implements
-RecordStoreProxy, RecordStoreConnectionMapProxy {
+  RecordStoreProxy, RecordStoreConnectionMapProxy {
   public static void addRecordStoreConnection() {
     final FileRecordStoreTreeNode node = BaseTree.getMouseClickItem();
     final File file = node.getUserData();
@@ -52,7 +51,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
 
     SwingUtil.addLabel(panel, "Folder Connections");
     final List<RecordStoreConnectionRegistry> registries = RecordStoreConnectionManager.get()
-        .getVisibleConnectionRegistries();
+      .getVisibleConnectionRegistries();
     final JComboBox registryField = new JComboBox(
       new Vector<RecordStoreConnectionRegistry>(registries));
 
@@ -63,7 +62,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
     if (panel.isSaved()) {
       final RecordStoreConnectionRegistry registry = (RecordStoreConnectionRegistry)registryField.getSelectedItem();
       String connectionName = nameField.getText();
-      if (!StringUtils.hasText(connectionName)) {
+      if (!Property.hasValue(connectionName)) {
         connectionName = fileName;
       }
       final String baseConnectionName = connectionName;
@@ -85,7 +84,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
   static {
     MENU.addMenuItemTitleIcon("default", "Add Data Store Connection",
       "link_add", null, FileRecordStoreTreeNode.class,
-        "addRecordStoreConnection");
+      "addRecordStoreConnection");
   }
 
   public FileRecordStoreTreeNode(final TreeNode parent, final File file) {

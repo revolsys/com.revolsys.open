@@ -12,8 +12,6 @@ import javax.swing.SortOrder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.Attribute;
@@ -23,10 +21,10 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
+import com.revolsys.util.Property;
 
-public abstract class RecordRowTableModel extends
-  AbstractRecordTableModel implements SortableTableModel,
-  CellEditorListener {
+public abstract class RecordRowTableModel extends AbstractRecordTableModel
+  implements SortableTableModel, CellEditorListener {
 
   public static final String LOADING_VALUE = "\u2026";
 
@@ -75,7 +73,7 @@ public abstract class RecordRowTableModel extends
   }
 
   public int getAttributesOffset() {
-    return attributesOffset;
+    return this.attributesOffset;
   }
 
   public List<String> getAttributeTitles() {
@@ -83,7 +81,7 @@ public abstract class RecordRowTableModel extends
   }
 
   public Attribute getColumnAttribute(final int columnIndex) {
-    if (columnIndex < attributesOffset) {
+    if (columnIndex < this.attributesOffset) {
       return null;
     } else {
       final String name = getFieldName(columnIndex);
@@ -94,7 +92,7 @@ public abstract class RecordRowTableModel extends
 
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
-    if (columnIndex < attributesOffset) {
+    if (columnIndex < this.attributesOffset) {
       return Object.class;
     } else {
       final String name = getFieldName(columnIndex);
@@ -110,26 +108,26 @@ public abstract class RecordRowTableModel extends
 
   @Override
   public int getColumnCount() {
-    final int numColumns = attributesOffset + this.attributeNames.size();
+    final int numColumns = this.attributesOffset + this.attributeNames.size();
     return numColumns;
   }
 
   @Override
   public String getColumnName(final int columnIndex) {
-    if (columnIndex < attributesOffset) {
+    if (columnIndex < this.attributesOffset) {
       return null;
     } else {
-      return this.attributeTitles.get(columnIndex - attributesOffset);
+      return this.attributeTitles.get(columnIndex - this.attributesOffset);
     }
   }
 
   @Override
   public String getFieldName(final int columnIndex) {
-    if (columnIndex < attributesOffset) {
+    if (columnIndex < this.attributesOffset) {
       return null;
     } else {
       final String attributeName = this.attributeNames.get(columnIndex
-        - attributesOffset);
+        - this.attributesOffset);
       if (attributeName == null) {
         return null;
       } else {
@@ -178,7 +176,7 @@ public abstract class RecordRowTableModel extends
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    if (columnIndex < attributesOffset) {
+    if (columnIndex < this.attributesOffset) {
       return null;
     } else {
       final Record record = getRecord(rowIndex);
@@ -200,8 +198,7 @@ public abstract class RecordRowTableModel extends
       final Record record = getRecord(rowIndex);
       if (record != null) {
         final RecordState state = record.getState();
-        if (state != RecordState.Initalizing
-          && state != RecordState.Deleted) {
+        if (state != RecordState.Initalizing && state != RecordState.Deleted) {
           final String attributeName = getFieldName(rowIndex, columnIndex);
           if (attributeName != null) {
             if (!isReadOnly(attributeName)) {
@@ -221,7 +218,7 @@ public abstract class RecordRowTableModel extends
   @Override
   public boolean isSelected(boolean selected, final int rowIndex,
     final int columnIndex) {
-    final int[] selectedRows = table.getSelectedRows();
+    final int[] selectedRows = this.table.getSelectedRows();
     selected = false;
     for (final int selectedRow : selectedRows) {
       if (rowIndex == selectedRow) {
@@ -234,7 +231,8 @@ public abstract class RecordRowTableModel extends
   public void setAttributeNames(final Collection<String> attributeNames) {
     if (attributeNames == null || attributeNames.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      this.attributeNames = new ArrayList<String>(recordDefinition.getAttributeNames());
+      this.attributeNames = new ArrayList<String>(
+        recordDefinition.getAttributeNames());
     } else {
       this.attributeNames = new ArrayList<String>(attributeNames);
     }
@@ -278,7 +276,7 @@ public abstract class RecordRowTableModel extends
   }
 
   public void setSortOrder(final String idAttributeName) {
-    if (StringUtils.hasText(idAttributeName)) {
+    if (Property.hasValue(idAttributeName)) {
       final int index = this.attributeNames.indexOf(idAttributeName);
       if (index != -1) {
         setSortOrder(index);
@@ -296,7 +294,7 @@ public abstract class RecordRowTableModel extends
     final int columnIndex) {
     if (isCellEditable(rowIndex, columnIndex)) {
 
-      if (columnIndex >= attributesOffset) {
+      if (columnIndex >= this.attributesOffset) {
         final Record object = getRecord(rowIndex);
         if (object != null) {
           final String name = getFieldName(columnIndex);
@@ -311,7 +309,7 @@ public abstract class RecordRowTableModel extends
   @Override
   public final String toDisplayValue(final int rowIndex,
     final int attributeIndex, final Object objectValue) {
-    int rowHeight = table.getRowHeight();
+    int rowHeight = this.table.getRowHeight();
     String displayValue;
     final Record record = getRecord(rowIndex);
     if (record == null) {
@@ -325,8 +323,8 @@ public abstract class RecordRowTableModel extends
           objectValue);
       }
     }
-    if (rowHeight != table.getRowHeight(rowIndex)) {
-      table.setRowHeight(rowIndex, rowHeight);
+    if (rowHeight != this.table.getRowHeight(rowIndex)) {
+      this.table.setRowHeight(rowIndex, rowHeight);
     }
     return displayValue;
   }

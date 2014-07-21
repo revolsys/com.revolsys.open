@@ -11,7 +11,6 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.filter.MultipleAttributeValuesFilter;
 import com.revolsys.data.record.Record;
@@ -35,9 +34,10 @@ import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayerRenderer extends
-AbstractLayerRenderer<AbstractRecordLayer> {
+  AbstractLayerRenderer<AbstractRecordLayer> {
 
   public static void addRendererClass(final String name,
     final Class<? extends AbstractRecordLayerRenderer> clazz) {
@@ -52,8 +52,8 @@ AbstractLayerRenderer<AbstractRecordLayer> {
     }
   }
 
-  public static Filter<Record> getFilter(
-    final AbstractRecordLayer layer, final Map<String, Object> style) {
+  public static Filter<Record> getFilter(final AbstractRecordLayer layer,
+    final Map<String, Object> style) {
     @SuppressWarnings("unchecked")
     Map<String, Object> filterDefinition = (Map<String, Object>)style.get("filter");
     if (filterDefinition != null) {
@@ -63,23 +63,23 @@ AbstractLayerRenderer<AbstractRecordLayer> {
         return new MultipleAttributeValuesFilter(filterDefinition);
       } else if ("queryFilter".equals(type)) {
         String query = (String)filterDefinition.remove("query");
-        if (StringUtils.hasText(query)) {
+        if (Property.hasValue(query)) {
           query = query.replaceAll("!= null", "IS NOT NULL");
           query = query.replaceAll("== null", "IS NULL");
           query = query.replaceAll("==", "=");
           query = query.replaceAll("!=", "<>");
           query = query.replaceAll("\\{(.*)\\}.contains\\((.*)\\)",
-              "$2 IN ($1)");
+            "$2 IN ($1)");
           query = query.replaceAll("\\[(.*)\\]", "$1");
           query = query.replaceAll("(.*).startsWith\\('(.*)'\\)",
-              "$1 LIKE '$2%'");
+            "$1 LIKE '$2%'");
           query = query.replaceAll("#systemProperties\\['user.name'\\]",
-              "'{gbaUsername}'");
+            "'{gbaUsername}'");
           return new SqlLayerFilter(layer, query);
         }
       } else if ("sqlFilter".equals(type)) {
         final String query = (String)filterDefinition.remove("query");
-        if (StringUtils.hasText(query)) {
+        if (Property.hasValue(query)) {
           return new SqlLayerFilter(layer, query);
         }
       } else {
@@ -130,7 +130,7 @@ AbstractLayerRenderer<AbstractRecordLayer> {
     final MenuFactory menu = ObjectTreeModel.getMenu(AbstractRecordLayerRenderer.class);
     menu.addMenuItem("layer", TreeItemRunnable.createAction("View/Edit Style",
       "palette", new TreeItemPropertyEnableCheck("editing", false),
-        "showProperties"));
+      "showProperties"));
     menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete", "delete",
       new TreeItemPropertyEnableCheck("parent", null, true), "delete"));
 
@@ -203,8 +203,7 @@ AbstractLayerRenderer<AbstractRecordLayer> {
   }
 
   @Override
-  public void render(final Viewport2D viewport,
-    final AbstractRecordLayer layer) {
+  public void render(final Viewport2D viewport, final AbstractRecordLayer layer) {
     if (layer.hasGeometryAttribute()) {
       final BoundingBox boundingBox = viewport.getBoundingBox();
       final List<LayerRecord> records = layer.queryBackground(boundingBox);
@@ -230,7 +229,7 @@ AbstractLayerRenderer<AbstractRecordLayer> {
             ExceptionUtil.log(
               getClass(),
               "Unabled to render " + layer.getName() + " #"
-                  + record.getIdentifier(), e);
+                + record.getIdentifier(), e);
           }
         }
       }
@@ -280,8 +279,8 @@ AbstractLayerRenderer<AbstractRecordLayer> {
 
   public void setQueryFilter(final String query) {
     if (this.filter instanceof SqlLayerFilter
-      || this.filter instanceof AcceptAllFilter) {
-      if (StringUtils.hasText(query)) {
+        || this.filter instanceof AcceptAllFilter) {
+      if (Property.hasValue(query)) {
         final AbstractRecordLayer layer = getLayer();
         this.filter = new SqlLayerFilter(layer, query);
       } else {

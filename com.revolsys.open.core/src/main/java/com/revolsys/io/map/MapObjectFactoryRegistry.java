@@ -7,7 +7,6 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
@@ -15,16 +14,9 @@ import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class MapObjectFactoryRegistry {
-
-  public static final Map<String, MapObjectFactory> TYPE_NAME_TO_FACTORY = new HashMap<String, MapObjectFactory>();
-
-  static {
-    addFactory(com.revolsys.jts.geom.GeometryFactory.FACTORY);
-    addFactory(RecordDefinitionImpl.FACTORY);
-    addFactory(Attribute.FACTORY);
-  }
 
   public static void addFactory(final MapObjectFactory factory) {
     final String typeName = factory.getTypeName();
@@ -40,7 +32,7 @@ public class MapObjectFactoryRegistry {
   @SuppressWarnings("unchecked")
   public static <V> V toObject(final Map<String, ? extends Object> map) {
     final String typeClass = CollectionUtil.getString(map, "typeClass");
-    if (StringUtils.hasText(typeClass)) {
+    if (Property.hasValue(typeClass)) {
       // TODO factory methods and constructor arguments
       final V object = (V)JavaBeanUtil.createInstance(typeClass);
       return object;
@@ -87,5 +79,13 @@ public class MapObjectFactoryRegistry {
     final MapSerializer serializer) {
     final Map<String, Object> properties = serializer.toMap();
     JsonMapIoFactory.write(properties, resource, true);
+  }
+
+  public static final Map<String, MapObjectFactory> TYPE_NAME_TO_FACTORY = new HashMap<String, MapObjectFactory>();
+
+  static {
+    addFactory(com.revolsys.jts.geom.GeometryFactory.FACTORY);
+    addFactory(RecordDefinitionImpl.FACTORY);
+    addFactory(Attribute.FACTORY);
   }
 }

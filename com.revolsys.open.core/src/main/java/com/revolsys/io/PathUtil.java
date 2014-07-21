@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.util.StringUtils;
+import com.revolsys.util.Property;
 
 public final class PathUtil {
 
@@ -61,7 +61,7 @@ public final class PathUtil {
         if (part != null) {
           part = part.replaceAll("^/*", "");
           part = part.replaceAll("/*", "");
-          if (StringUtils.hasText(part)) {
+          if (Property.hasValue(part)) {
             path.append('/');
             path.append(part);
           }

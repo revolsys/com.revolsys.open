@@ -7,8 +7,6 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.record.AbstractRecord;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -86,9 +84,9 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   }
 
   public synchronized void addTag(final String key, final String value) {
-    if (StringUtils.hasText(key)) {
+    if (Property.hasValue(key)) {
       if (key.length() <= 255) {
-        if (StringUtils.hasText(value)) {
+        if (Property.hasValue(value)) {
           if (value.length() <= 255) {
             if (this.tags.isEmpty()) {
               this.tags = new HashMap<>();

@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
@@ -19,15 +18,12 @@ import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMeth
 import org.springframework.web.util.WebUtils;
 
 import com.revolsys.ui.web.utils.HttpServletUtils;
+import com.revolsys.util.Property;
 
 public class PathAliasController implements Controller {
-  public static final String PATH_PREFIX = PathAliasController.class.getName()
-    + ".originalPrefix";
-
-  public static boolean forward(
-    final HttpServletRequest request,
-    final HttpServletResponse response,
-    final String path) throws IOException, ServletException {
+  public static boolean forward(final HttpServletRequest request,
+    final HttpServletResponse response, final String path) throws IOException,
+    ServletException {
     final RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
     if (requestDispatcher == null) {
       return false;
@@ -73,7 +69,7 @@ public class PathAliasController implements Controller {
     final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
     final String prefix = (String)requestAttributes.getAttribute(PATH_PREFIX,
       RequestAttributes.SCOPE_REQUEST);
-    if (StringUtils.hasText(prefix)) {
+    if (Property.hasValue(prefix)) {
       return prefix;
     } else {
       return "";
@@ -93,29 +89,33 @@ public class PathAliasController implements Controller {
     }
   }
 
+  public static final String PATH_PREFIX = PathAliasController.class.getName()
+      + ".originalPrefix";
+
   private String prefix;
 
   private String aliasPrefix;
 
   public String getAliasPrefix() {
-    return aliasPrefix;
+    return this.aliasPrefix;
   }
 
   public String getPrefix() {
-    return prefix;
+    return this.prefix;
   }
 
-  public ModelAndView handleRequest(
-    final HttpServletRequest request,
+  @Override
+  public ModelAndView handleRequest(final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
     String path = request.getServletPath() + request.getPathInfo();
-    if (path.startsWith(prefix)) {
+    if (path.startsWith(this.prefix)) {
       if (getOriginalPrefix().length() == 0) {
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        requestAttributes.setAttribute(PATH_PREFIX, prefix.replaceAll(aliasPrefix +"$", ""),
+        requestAttributes.setAttribute(PATH_PREFIX,
+          this.prefix.replaceAll(this.aliasPrefix + "$", ""),
           RequestAttributes.SCOPE_REQUEST);
       }
-      path = path.replaceFirst(prefix, aliasPrefix);
+      path = path.replaceFirst(this.prefix, this.aliasPrefix);
       if (!forward(request, response, path)) {
         throw new NoSuchRequestHandlingMethodException(request);
       }

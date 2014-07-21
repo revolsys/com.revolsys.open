@@ -6,13 +6,12 @@ import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.io.datastore.RecordStoreConnection;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.PasswordUtil;
+import com.revolsys.util.Property;
 
 public class AddRecordStoreConnectionPanel extends ValueField {
   private static final long serialVersionUID = 2750736040832727823L;
@@ -36,13 +35,12 @@ public class AddRecordStoreConnectionPanel extends ValueField {
   }
 
   public AddRecordStoreConnectionPanel(
-    final ConnectionRegistry<RecordStoreConnection> registry,
-    final String name) {
+    final ConnectionRegistry<RecordStoreConnection> registry, final String name) {
     this.registry = registry;
     this.name = name;
     add(new JLabel("Name:"));
     this.nameField = new JTextField("", 50);
-    if (StringUtils.hasText(name)) {
+    if (Property.hasValue(name)) {
       setTitle("Add Data Store " + name);
       this.nameField.setText(name);
       this.nameField.setEditable(false);
@@ -67,7 +65,7 @@ public class AddRecordStoreConnectionPanel extends ValueField {
   public void save() {
     super.save();
     final Map<String, Object> properties = new LinkedHashMap<String, Object>();
-    if (StringUtils.hasText(this.name)) {
+    if (Property.hasValue(this.name)) {
       properties.put("name", this.name);
     } else {
       properties.put("name", this.nameField.getText());

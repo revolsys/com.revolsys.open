@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeConnection;
@@ -32,8 +31,8 @@ import com.revolsys.gis.oracle.io.OracleRecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
-import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
+import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -42,6 +41,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.util.PasswordUtil;
+import com.revolsys.util.Property;
 
 public class ArcSdeBinaryGeometryRecordStoreUtil {
 
@@ -102,10 +102,12 @@ public class ArcSdeBinaryGeometryRecordStoreUtil {
     final ArcSdeBinaryGeometryAttribute sdeAttribute = new ArcSdeBinaryGeometryAttribute(
       this, columnName, columnName, dataType, attribute.isRequired(),
       "The GEOMETRY reference", attribute.getProperties(), geometryFactory);
-    ((RecordDefinitionImpl)recordDefinition).replaceAttribute(attribute, sdeAttribute);
+    ((RecordDefinitionImpl)recordDefinition).replaceAttribute(attribute,
+      sdeAttribute);
     sdeAttribute.setRecordDefinition(recordDefinition);
 
-    recordDefinition.setProperty("recordStoreIteratorFactory", this.iteratorFactory);
+    recordDefinition.setProperty("recordStoreIteratorFactory",
+      this.iteratorFactory);
 
     ((RecordDefinitionImpl)recordDefinition).setGeometryAttributeName(columnName);
   }
@@ -125,16 +127,16 @@ public class ArcSdeBinaryGeometryRecordStoreUtil {
   public SeConnection createSeConnection() {
     final String server = (String)this.connectionProperties.get("sdeServer");
 
-    if (!StringUtils.hasText(server)) {
+    if (!Property.hasValue(server)) {
       throw new IllegalArgumentException(
-        "The connection properties must include a sdeServer to support ESRI ArcSDE SDEBINARY columns");
+          "The connection properties must include a sdeServer to support ESRI ArcSDE SDEBINARY columns");
     }
     String instance = (String)this.connectionProperties.get("sdeInstance");
-    if (!StringUtils.hasText(instance)) {
+    if (!Property.hasValue(instance)) {
       instance = "5151";
     }
     String database = (String)this.connectionProperties.get("sdeDatabase");
-    if (!StringUtils.hasText(database)) {
+    if (!Property.hasValue(database)) {
       database = "none";
     }
     final String username = (String)this.connectionProperties.get("username");
@@ -157,9 +159,9 @@ public class ArcSdeBinaryGeometryRecordStoreUtil {
       for (int coordinateIndex = 0; coordinateIndex < numCoords; coordinateIndex++) {
 
         final double x = allCoordinates[partIndex][ringIndex][coordinateIndex
-          * axisCount];
+                                                              * axisCount];
         final double y = allCoordinates[partIndex][ringIndex][coordinateIndex
-          * axisCount + 1];
+                                                              * axisCount + 1];
         CoordinatesListUtil.setCoordinates(coordinates, axisCount,
           coordinateIndex, x, y);
       }
@@ -187,64 +189,64 @@ public class ArcSdeBinaryGeometryRecordStoreUtil {
           switch (type) {
             case SeColumnDefinition.TYPE_INT16:
               value = row.getShort(columnIndex);
-            break;
+              break;
 
             case SeColumnDefinition.TYPE_INT32:
               value = row.getInteger(columnIndex);
-            break;
+              break;
 
             case SeColumnDefinition.TYPE_INT64:
               value = row.getLong(columnIndex);
-            break;
+              break;
 
             case SeColumnDefinition.TYPE_FLOAT32:
               value = row.getFloat(columnIndex);
-            break;
+              break;
 
             case SeColumnDefinition.TYPE_FLOAT64:
               value = row.getDouble(columnIndex);
-            break;
+              break;
 
             case SeColumnDefinition.TYPE_STRING:
               value = row.getString(columnIndex);
-            break;
+              break;
 
             case SeColumnDefinition.TYPE_NSTRING:
               value = row.getNString(columnIndex);
-            break;
+              break;
 
             case SeColumnDefinition.TYPE_CLOB:
               final ByteArrayInputStream clob = row.getClob(columnIndex);
               value = FileUtil.getString(clob);
-            break;
+              break;
             case SeColumnDefinition.TYPE_NCLOB:
               final ByteArrayInputStream nClob = row.getNClob(columnIndex);
               value = FileUtil.getString(nClob);
-            break;
+              break;
 
             case SeColumnDefinition.TYPE_XML:
               value = row.getXml(columnIndex).getText();
-            break;
+              break;
 
             case SeColumnDefinition.TYPE_UUID:
               value = row.getUuid(columnIndex);
-            break;
+              break;
 
             case SeColumnDefinition.TYPE_DATE:
               value = row.getTime(columnIndex);
-            break;
+              break;
 
             case SeColumnDefinition.TYPE_SHAPE:
               final SeShape shape = row.getShape(columnIndex);
               value = toGeometry(shape);
-            break;
+              break;
 
             default:
               LoggerFactory.getLogger(ArcSdeBinaryGeometryRecordStoreUtil.class)
-                .error(
-                  "Unsupported column type: " + object.getRecordDefinition() + "."
-                    + name);
-            break;
+              .error(
+                "Unsupported column type: " + object.getRecordDefinition()
+                    + "." + name);
+              break;
           }
           object.setValue(name, value);
         }
@@ -269,8 +271,8 @@ public class ArcSdeBinaryGeometryRecordStoreUtil {
       if (shape.isMeasured()) {
         axisCount = 4;
       }
-      final GeometryFactory geometryFactory = GeometryFactory.fixed(
-        srid, axisCount, scaleXy, scaleZ);
+      final GeometryFactory geometryFactory = GeometryFactory.fixed(srid,
+        axisCount, scaleXy, scaleZ);
 
       final int numParts = shape.getNumParts();
       final double[][][] allCoordinates = shape.getAllCoords();
@@ -340,7 +342,7 @@ public class ArcSdeBinaryGeometryRecordStoreUtil {
 
         default:
           throw new IllegalArgumentException("Shape not supported:"
-            + shape.asText(1000));
+              + shape.asText(1000));
       }
 
     } catch (final SeException e) {

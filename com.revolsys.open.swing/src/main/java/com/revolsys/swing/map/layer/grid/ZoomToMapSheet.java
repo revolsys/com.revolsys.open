@@ -6,23 +6,23 @@ import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
+import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.tree.TreeUtil;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PreferencesUtil;
+import com.revolsys.util.Property;
 
 @SuppressWarnings("serial")
 public class ZoomToMapSheet extends AbstractAction {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 
@@ -41,18 +41,18 @@ public class ZoomToMapSheet extends AbstractAction {
       final RectangularMapGrid grid = layer.getGrid();
       final String gridName = grid.getName();
       final String preferenceName = CaseConverter.toCapitalizedWords(gridName)
-        + "MapSheet";
+          + "MapSheet";
       String mapSheet = PreferencesUtil.getString(getClass(), preferenceName);
       mapSheet = JOptionPane.showInputDialog("Enter name of the" + gridName
         + " map sheet to zoom to", mapSheet);
-      if (StringUtils.hasText(mapSheet)) {
+      if (Property.hasValue(mapSheet)) {
         try {
           final RectangularMapTile mapTile = grid.getTileByName(mapSheet);
           final BoundingBox boundingBox = mapTile.getBoundingBox();
           project.setViewBoundingBox(boundingBox);
         } catch (final Throwable t) {
           final String message = "Invalid map sheet " + mapSheet + " for "
-            + gridName;
+              + gridName;
           LoggerFactory.getLogger(getClass()).error(message, e);
           JOptionPane.showMessageDialog((Component)e.getSource(), message);
         } finally {

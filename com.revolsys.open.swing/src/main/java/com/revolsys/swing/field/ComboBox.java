@@ -17,11 +17,11 @@ import javax.swing.ListCellRenderer;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.Property;
 
 public class ComboBox extends JComboBox implements Field {
   private static final long serialVersionUID = 1L;
@@ -204,7 +204,7 @@ public class ComboBox extends JComboBox implements Field {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(this.errorMessage)) {
+    if (!Property.hasValue(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

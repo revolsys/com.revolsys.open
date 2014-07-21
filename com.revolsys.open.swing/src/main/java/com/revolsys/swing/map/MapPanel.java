@@ -338,7 +338,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       final String name = JOptionPane.showInputDialog(this,
         "Enter bookmark name", "Add Zoom Bookmark",
         JOptionPane.QUESTION_MESSAGE);
-      if (StringUtils.hasText(name)) {
+      if (Property.hasValue(name)) {
         final Project project = getProject();
         project.addZoomBookmark(name, boundingBox);
       }

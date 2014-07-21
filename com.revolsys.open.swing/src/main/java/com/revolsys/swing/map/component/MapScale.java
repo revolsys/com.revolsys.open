@@ -34,7 +34,7 @@ public class MapScale extends JLabel implements PropertyChangeListener {
         return "Unknown";
       } else {
         final String string = scale.toString();
-        if (StringUtils.hasText(string)) {
+        if (Property.hasValue(string)) {
           return string;
         } else {
           return "Unknown";

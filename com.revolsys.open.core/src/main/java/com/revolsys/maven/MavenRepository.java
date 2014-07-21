@@ -16,11 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.io.xml.XmlMapIoFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class MavenRepository implements URLStreamHandlerFactory {
 
@@ -45,13 +45,13 @@ public class MavenRepository implements URLStreamHandlerFactory {
     path.append(artifactId);
     path.append('-');
     path.append(version);
-    if (StringUtils.hasText(classifier)) {
+    if (Property.hasValue(classifier)) {
       path.append('-');
       path.append(classifier);
     }
     path.append('.');
     path.append(type);
-    if (StringUtils.hasText(algorithm)) {
+    if (Property.hasValue(algorithm)) {
       path.append('.');
       path.append(algorithm);
 
@@ -69,7 +69,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   /**
    * Root resource must end in a /
-   * 
+   *
    * @param root
    */
   public MavenRepository(final Resource root) {
@@ -97,15 +97,16 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
   @Override
   public URLStreamHandler createURLStreamHandler(final String protocol) {
-    return urlHandler;
+    return this.urlHandler;
   }
 
   public Map<String, Object> getMavenMetadata(final String groupId,
     final String artifactId, final String version) {
     final String recordDefinitionPath = "/"
-      + CollectionUtil.toString("/", groupId.replace('.', '/'), artifactId,
-        version, "maven-metadata.xml");
-    final Resource recordDefinitionResource = SpringUtil.getResource(root, recordDefinitionPath);
+        + CollectionUtil.toString("/", groupId.replace('.', '/'), artifactId,
+          version, "maven-metadata.xml");
+    final Resource recordDefinitionResource = SpringUtil.getResource(this.root,
+      recordDefinitionPath);
     if (recordDefinitionResource.exists()) {
       try {
         return XmlMapIoFactory.toMap(recordDefinitionResource);
@@ -116,8 +117,10 @@ public class MavenRepository implements URLStreamHandlerFactory {
           try {
             final File file = recordDefinitionResource.getFile();
             if (file.delete()) {
-              LoggerFactory.getLogger(getClass()).error(
-                "Deleting corrupt maven resource" + recordDefinitionResource, e);
+              LoggerFactory.getLogger(getClass())
+                .error(
+                  "Deleting corrupt maven resource" + recordDefinitionResource,
+                  e);
             }
           } catch (final IOException ioe) {
           }
@@ -161,7 +164,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
     if (parts.length < 3) {
       throw new IllegalArgumentException(
         id
-          + " is not a valid Maven identifier. Should be in the format: <groupId>:<artifactId>:<version>.");
+        + " is not a valid Maven identifier. Should be in the format: <groupId>:<artifactId>:<version>.");
     }
     final String groupId = parts[0];
     final String artifactId = parts[1];
@@ -221,7 +224,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
 
     final String path = getPath(groupId, artifactId, version, type, classifier,
       version, algorithm);
-    final Resource artifactResource = SpringUtil.getResource(root, path);
+    final Resource artifactResource = SpringUtil.getResource(this.root, path);
     if (!artifactResource.exists()) {
       return handleMissingResource(artifactResource, groupId, artifactId, type,
         classifier, version, algorithm);
@@ -230,13 +233,13 @@ public class MavenRepository implements URLStreamHandlerFactory {
   }
 
   public Resource getRoot() {
-    return root;
+    return this.root;
   }
 
   public String getSha1(final String groupId, final String artifactId,
     final String type, final String classifier, final String version,
     final String algorithm) {
-    if (!StringUtils.hasText(algorithm)) {
+    if (!Property.hasValue(algorithm)) {
       final Resource digestResource = getResource(groupId, artifactId, type,
         classifier, version, "sha1");
       if (digestResource.exists()) {
@@ -251,7 +254,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
           } else {
             LoggerFactory.getLogger(getClass()).error(
               "Error in SHA-1 checksum " + digestContents + " for "
-                + digestResource, e);
+                  + digestResource, e);
           }
         }
       }
@@ -266,9 +269,9 @@ public class MavenRepository implements URLStreamHandlerFactory {
       final Map<String, Object> snapshot = (Map<String, Object>)versioning.get("snapshot");
       if (snapshot != null) {
         final String timestamp = (String)snapshot.get("timestamp");
-        if (StringUtils.hasText(timestamp)) {
+        if (Property.hasValue(timestamp)) {
           final String buildNumber = (String)snapshot.get("buildNumber");
-          if (StringUtils.hasText(timestamp)) {
+          if (Property.hasValue(timestamp)) {
             return timestamp + "-" + buildNumber;
           } else {
             return timestamp + "-1";
@@ -282,7 +285,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
   public URL getURL(final String id) {
     final String path = id.replace(':', '/');
     try {
-      return new URL("mvn", "", -1, path, urlHandler);
+      return new URL("mvn", "", -1, path, this.urlHandler);
     } catch (final MalformedURLException e) {
       throw new IllegalArgumentException("Not a valid maven identifier " + id,
         e);

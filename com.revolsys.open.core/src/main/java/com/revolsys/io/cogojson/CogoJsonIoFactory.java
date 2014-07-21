@@ -15,8 +15,8 @@ import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.geojson.GeoJsonConstants;
-import com.revolsys.io.geojson.GeoJsonRecordWriter;
 import com.revolsys.io.geojson.GeoJsonGeometryIterator;
+import com.revolsys.io.geojson.GeoJsonRecordWriter;
 
 public class CogoJsonIoFactory extends
   AbstractRecordAndGeometryWriterFactory implements GeometryReaderFactory {

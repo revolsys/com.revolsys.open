@@ -18,32 +18,15 @@ import javax.measure.quantity.Length;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.util.Property;
 
 public class ShapeMarker extends AbstractMarker {
 
-  private static final Map<String, Shape> SHAPES = new TreeMap<String, Shape>();
-
-  static {
-    SHAPES.put("square", square(1));
-    SHAPES.put("rectangle", square(1));
-    SHAPES.put("circle", circle(1));
-    SHAPES.put("ellipse", circle(1));
-    SHAPES.put("triangle", triangle(1));
-    SHAPES.put("star", star(1));
-    SHAPES.put("cross", cross(1));
-    SHAPES.put("x", x(1));
-    SHAPES.put("arrow", arrow(1));
-    SHAPES.put("solidArrow", solidArrow(1));
-    SHAPES.put("diamond", diamond(1));
-  }
-
   /**
    * Get an arrow shape pointing right for the size of the graphic.
-   * 
+   *
    * @return The shape.
    */
   public static Shape arrow(final double size) {
@@ -97,7 +80,7 @@ public class ShapeMarker extends AbstractMarker {
 
   /**
    * Get a solid arrow shape pointing right for the size of the graphic.
-   * 
+   *
    * @return The shape.
    */
   public static Shape solidArrow(final double size) {
@@ -140,7 +123,7 @@ public class ShapeMarker extends AbstractMarker {
 
   /**
    * Get an X shape for the size of the graphic.
-   * 
+   *
    * @return The shape.
    */
   public static Shape x(final double size) {
@@ -159,6 +142,22 @@ public class ShapeMarker extends AbstractMarker {
     path.lineTo(0, size * .75);
     path.closePath();
     return path;
+  }
+
+  private static final Map<String, Shape> SHAPES = new TreeMap<String, Shape>();
+
+  static {
+    SHAPES.put("square", square(1));
+    SHAPES.put("rectangle", square(1));
+    SHAPES.put("circle", circle(1));
+    SHAPES.put("ellipse", circle(1));
+    SHAPES.put("triangle", triangle(1));
+    SHAPES.put("star", star(1));
+    SHAPES.put("cross", cross(1));
+    SHAPES.put("x", x(1));
+    SHAPES.put("arrow", arrow(1));
+    SHAPES.put("solidArrow", solidArrow(1));
+    SHAPES.put("diamond", diamond(1));
   }
 
   private String name;
@@ -223,7 +222,7 @@ public class ShapeMarker extends AbstractMarker {
   }
 
   public String getName() {
-    if (StringUtils.hasText(name)) {
+    if (Property.hasValue(this.name)) {
       return this.name;
     } else {
       return "unknown";
@@ -231,7 +230,7 @@ public class ShapeMarker extends AbstractMarker {
   }
 
   public Shape getShape() {
-    return shape;
+    return this.shape;
   }
 
   @Override

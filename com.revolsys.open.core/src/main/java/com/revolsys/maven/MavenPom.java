@@ -12,9 +12,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class MavenPom extends LinkedHashMap<String, Object> {
   public static String getGroupAndArtifactId(final String id) {
@@ -73,12 +72,12 @@ public class MavenPom extends LinkedHashMap<String, Object> {
   }
 
   public ClassLoader createClassLoader() {
-    return mavenRepository.createClassLoader(getMavenId());
+    return this.mavenRepository.createClassLoader(getMavenId());
   }
 
   public ClassLoader createClassLoader(final Collection<String> exclusionIds) {
     final String id = getMavenId();
-    return mavenRepository.createClassLoader(id, exclusionIds);
+    return this.mavenRepository.createClassLoader(id, exclusionIds);
   }
 
   public Set<String> getDependencies() {
@@ -112,33 +111,33 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     final Map<String, Object> dependencyMap = (Map<String, Object>)get("dependencies");
     if (dependencyMap != null) {
       final List<Map<String, Object>> dependencyList = getList(dependencyMap,
-        "dependency");
+          "dependency");
       if (dependencyList != null) {
         for (final Map<String, Object> dependency : dependencyList) {
           final String groupId = getMapValue(dependency, "groupId", null);
           final String artifactId = getMapValue(dependency, "artifactId", null);
           final String dependencyKey = groupId + ":" + artifactId;
           String version = versions.get(dependencyKey);
-          if (!StringUtils.hasText(version)) {
+          if (!Property.hasValue(version)) {
             version = getMapValue(dependency, "version", null);
           }
           final String scope = getMapValue(dependency, "scope", "compile");
           final String optional = getMapValue(dependency, "optional", "false");
           if (scope.equals("compile")
-            && (includeOptional || "false".equals(optional))) {
-            if (!StringUtils.hasText(version)) {
+              && (includeOptional || "false".equals(optional))) {
+            if (!Property.hasValue(version)) {
               if (groupId.equals(getGroupId())) {
                 version = getVersion();
               }
             }
             if (!exclusionIds.contains(dependencyKey)
-              && !exclusionIds.contains(groupId + ":*")) {
+                && !exclusionIds.contains(groupId + ":*")) {
               try {
-                final MavenPom pom = mavenRepository.getPom(groupId,
+                final MavenPom pom = this.mavenRepository.getPom(groupId,
                   artifactId, version);
                 final String dependencyId = pom.getMavenId();
                 final Set<String> mergedExclusionIds = new HashSet<String>(
-                  exclusionIds);
+                    exclusionIds);
                 mergedExclusionIds.addAll(getExclusionIds(dependency));
 
                 // Add child dependencies first so they don't override parent
@@ -152,7 +151,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
               } catch (final Exception e) {
                 throw new IllegalArgumentException(
                   "Unable to download pom for " + dependencyKey + ":" + version
-                    + " in pom " + getMavenId(), e);
+                  + " in pom " + getMavenId(), e);
               }
             }
           }
@@ -173,7 +172,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
       final Map<String, Object> dependencyMap = (Map<String, Object>)dependencyManagement.get("dependencies");
       if (dependencyMap != null) {
         final List<Map<String, Object>> dependencyList = getList(dependencyMap,
-          "dependency");
+            "dependency");
         if (dependencyList != null) {
           for (final Map<String, Object> dependency : dependencyList) {
             final String groupId = getMapValue(dependency, "groupId", null);
@@ -208,7 +207,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
     final Map<String, Object> exclusionsMap = (Map<String, Object>)dependency.get("exclusions");
     if (exclusionsMap != null) {
       final List<Map<String, Object>> exclusionsList = getList(exclusionsMap,
-        "exclusion");
+          "exclusion");
       if (exclusionsList != null) {
         for (final Map<String, Object> exclusion : exclusionsList) {
           final String groupId = getMapValue(exclusion, "groupId", null);
@@ -283,28 +282,28 @@ public class MavenPom extends LinkedHashMap<String, Object> {
       final String groupId = (String)parent.get("groupId");
       final String artifactId = (String)parent.get("artifactId");
       final String version = (String)parent.get("version");
-      return mavenRepository.getPom(groupId, artifactId, version);
+      return this.mavenRepository.getPom(groupId, artifactId, version);
     }
   }
 
   public Map<String, Object> getProperties() {
-    if (properties == null) {
-      properties = new LinkedHashMap<String, Object>();
+    if (this.properties == null) {
+      this.properties = new LinkedHashMap<String, Object>();
       final MavenPom parentPom = getParentPom();
       if (parentPom != null) {
         final Map<String, Object> parentProperties = parentPom.getProperties();
-        properties.putAll(parentProperties);
+        this.properties.putAll(parentProperties);
       }
 
       final Map<String, Object> pomProperties = (Map<String, Object>)get("properties");
       if (pomProperties != null) {
-        properties.putAll(pomProperties);
+        this.properties.putAll(pomProperties);
       }
-      properties.put("project.artifactId", get("artifactId"));
-      properties.put("project.version", getVersion());
-      properties.put("project.groupId", getGroupId());
+      this.properties.put("project.artifactId", get("artifactId"));
+      this.properties.put("project.version", getVersion());
+      this.properties.put("project.groupId", getGroupId());
     }
-    return properties;
+    return this.properties;
   }
 
   public String getVersion() {

@@ -40,7 +40,6 @@ import java.util.TreeMap;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.geom.CoordinateArrays;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;

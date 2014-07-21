@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
+import com.revolsys.util.Property;
 
 public class KeySerializerTableSerializer implements RowsTableSerializer {
   private int colCount = 0;
@@ -26,43 +25,49 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
   }
 
   public KeySerializerTableSerializer(final List<KeySerializer> serializers,
-    Collection<? extends Object> rows) {
+    final Collection<? extends Object> rows) {
     this(serializers);
     setRows(rows);
   }
 
+  @Override
   public String getBodyCssClass(final int row, final int col) {
     final KeySerializer serializer = getSerializer(col);
     if (serializer != null) {
-      String name = serializer.getName();
-      if (StringUtils.hasText(name)) {
+      final String name = serializer.getName();
+      if (Property.hasValue(name)) {
         return name.replaceAll("\\.", "_");
       }
     }
     return "";
   }
 
+  @Override
   public int getBodyRowCount() {
-    return rowCount;
+    return this.rowCount;
   }
 
+  @Override
   public int getColumnCount() {
-    return colCount;
+    return this.colCount;
   }
 
+  @Override
   public String getFooterCssClass(final int row, final int col) {
     return "";
   }
 
+  @Override
   public int getFooterRowCount() {
     return 0;
   }
 
+  @Override
   public String getHeaderCssClass(final int col) {
-    if (col < colCount) {
+    if (col < this.colCount) {
       final KeySerializer serializer = getSerializer(col);
-      String name = serializer.getName();
-      if (StringUtils.hasText(name)) {
+      final String name = serializer.getName();
+      if (Property.hasValue(name)) {
         return name.replaceAll("\\.", "_");
       }
     }
@@ -70,18 +75,19 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
   }
 
   public KeySerializer getSerializer(final int col) {
-    final KeySerializer serializer = serializers.get(col);
+    final KeySerializer serializer = this.serializers.get(col);
     return serializer;
   }
 
   public List<KeySerializer> getSerializers() {
-    return serializers;
+    return this.serializers;
   }
 
+  @Override
   public void serializeBodyCell(final XmlWriter out, final int row,
     final int col) {
-    if (col < colCount) {
-      final Object object = rows.get(row);
+    if (col < this.colCount) {
+      final Object object = this.rows.get(row);
       final KeySerializer serializer = getSerializer(col);
       serializer.serialize(out, object);
     } else {
@@ -89,12 +95,14 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
     }
   }
 
+  @Override
   public void serializeFooterCell(final XmlWriter out, final int row,
     final int col) {
   }
 
+  @Override
   public void serializeHeaderCell(final XmlWriter out, final int col) {
-    if (col < colCount) {
+    if (col < this.colCount) {
       final KeySerializer serializer = getSerializer(col);
       out.text(serializer.getLabel());
     } else {
@@ -102,6 +110,7 @@ public class KeySerializerTableSerializer implements RowsTableSerializer {
     }
   }
 
+  @Override
   public void setRows(final Collection<? extends Object> rows) {
     this.rows.clear();
     if (rows != null) {

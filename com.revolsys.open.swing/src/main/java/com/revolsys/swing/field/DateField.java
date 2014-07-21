@@ -149,7 +149,7 @@ public class DateField extends JXDatePicker implements Field,
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(this.errorMessage)) {
+    if (!Property.hasValue(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

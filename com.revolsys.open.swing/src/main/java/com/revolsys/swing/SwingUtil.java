@@ -346,7 +346,7 @@ public class SwingUtil {
     fileChooser.setDialogTitle("Open File");
     final String currentDirectoryName = PreferencesUtil.getString(
       preferencesClass, preferenceName);
-    if (StringUtils.hasText(currentDirectoryName)) {
+    if (Property.hasValue(currentDirectoryName)) {
       final File directory = new File(currentDirectoryName);
       if (directory.exists() && directory.canRead()) {
         fileChooser.setCurrentDirectory(directory);
@@ -361,7 +361,7 @@ public class SwingUtil {
     fileChooser.setDialogTitle(title);
     final String currentDirectoryName = PreferencesUtil.getUserString(
       preferencesGroup, preferenceName);
-    if (StringUtils.hasText(currentDirectoryName)) {
+    if (Property.hasValue(currentDirectoryName)) {
       final File directory = new File(currentDirectoryName);
       if (directory.exists() && directory.canRead()) {
         fileChooser.setCurrentDirectory(directory);
@@ -485,7 +485,7 @@ public class SwingUtil {
     } else if (component instanceof JTextComponent) {
       final JTextComponent textComponent = (JTextComponent)component;
       final String text = textComponent.getText();
-      if (StringUtils.hasText(text)) {
+      if (Property.hasValue(text)) {
         return (V)text;
       } else {
         return null;

@@ -3,9 +3,6 @@ package com.revolsys.io.wkt;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.util.StringUtils;
-
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -15,6 +12,7 @@ import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
+import com.revolsys.util.Property;
 
 public class WktParser {
 
@@ -126,9 +124,8 @@ public class WktParser {
     }
   }
 
-  private LineString parseCoordinates(
-    final GeometryFactory geometryFactory, final StringBuffer text,
-    final int axisCount) {
+  private LineString parseCoordinates(final GeometryFactory geometryFactory,
+    final StringBuffer text, final int axisCount) {
     final int geometryFactoryAxisCount = geometryFactory.getAxisCount();
     char c = text.charAt(0);
     if (c == '(') {
@@ -160,7 +157,7 @@ public class WktParser {
           } else {
             throw new IllegalArgumentException(
               "Too many coordinates, vertex must have " + axisCount
-                + " coordinates not " + (axisNum + 1));
+              + " coordinates not " + (axisNum + 1));
           }
           if (c == ')') {
             finished = true;
@@ -176,7 +173,7 @@ public class WktParser {
           } else {
             throw new IllegalArgumentException(
               "Too many coordinates, vertex must have " + axisCount
-                + " coordinates not " + (axisNum + 1));
+              + " coordinates not " + (axisNum + 1));
 
           }
         }
@@ -196,7 +193,7 @@ public class WktParser {
   @SuppressWarnings("unchecked")
   public <T extends Geometry> T parseGeometry(final String value,
     final boolean useAxisCountFromGeometryFactory) {
-    if (StringUtils.hasLength(value)) {
+    if (Property.hasValue(value)) {
       GeometryFactory geometryFactory = this.geometryFactory;
       final int axisCount = geometryFactory.getAxisCount();
       final double scaleXY = geometryFactory.getScaleXY();
@@ -234,8 +231,8 @@ public class WktParser {
       if (this.geometryFactory.getSrid() == 0) {
         final int srid = geometry.getSrid();
         if (useAxisCountFromGeometryFactory) {
-          geometryFactory = GeometryFactory.fixed(srid, axisCount,
-            scaleXY, scaleZ);
+          geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY,
+            scaleZ);
           return (T)geometryFactory.geometry(geometry);
         } else {
           return (T)geometry;
@@ -308,8 +305,8 @@ public class WktParser {
     if (isEmpty(text)) {
       return geometryFactory.multiPoint();
     } else {
-      final List<LineString> pointsList = parseParts(geometryFactory,
-        text, axisCount);
+      final List<LineString> pointsList = parseParts(geometryFactory, text,
+        axisCount);
       return geometryFactory.multiPoint(pointsList);
     }
   }
@@ -336,9 +333,8 @@ public class WktParser {
     return geometryFactory.multiPolygon(polygons);
   }
 
-  private List<LineString> parseParts(
-    final GeometryFactory geometryFactory, final StringBuffer text,
-    final int axisCount) {
+  private List<LineString> parseParts(final GeometryFactory geometryFactory,
+    final StringBuffer text, final int axisCount) {
     final List<LineString> parts = new ArrayList<LineString>();
     final char firstChar = text.charAt(0);
     switch (firstChar) {
@@ -354,10 +350,10 @@ public class WktParser {
         } else {
           throw new IllegalArgumentException("Expecting ) not" + text);
         }
-      break;
+        break;
       case ')':
         text.delete(0, 2);
-      break;
+        break;
 
       default:
         throw new IllegalArgumentException("Expecting ( not" + text);
@@ -383,10 +379,10 @@ public class WktParser {
         } else {
           throw new IllegalArgumentException("Expecting ) not" + text);
         }
-      break;
+        break;
       case ')':
         text.delete(0, 2);
-      break;
+        break;
 
       default:
         throw new IllegalArgumentException("Expecting ( not" + text);

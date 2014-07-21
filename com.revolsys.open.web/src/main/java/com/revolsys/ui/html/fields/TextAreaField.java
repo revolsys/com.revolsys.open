@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,11 +17,10 @@ package com.revolsys.ui.html.fields;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
+import com.revolsys.util.Property;
 
 public class TextAreaField extends Field {
   private int cols = 50;
@@ -82,37 +81,37 @@ public class TextAreaField extends Field {
   }
 
   public int getCols() {
-    return cols;
+    return this.cols;
   }
 
   public String getInputValue() {
-    return inputValue;
+    return this.inputValue;
   }
 
   public final int getMaxLength() {
-    return maxLength;
+    return this.maxLength;
   }
 
   public int getMinLength() {
-    return minLength;
+    return this.minLength;
   }
 
   public int getRows() {
-    return rows;
+    return this.rows;
   }
 
   @Override
   public boolean hasValue() {
-    return inputValue != null && !inputValue.equals("");
+    return this.inputValue != null && !this.inputValue.equals("");
   }
 
   @Override
   public void initialize(final Form form, final HttpServletRequest request) {
-    inputValue = request.getParameter(getName());
-    if (inputValue == null) {
+    this.inputValue = request.getParameter(getName());
+    if (this.inputValue == null) {
       setValue(getInitialValue(request));
       if (getValue() != null) {
-        inputValue = getValue().toString();
+        this.inputValue = getValue().toString();
       }
     }
   }
@@ -123,15 +122,15 @@ public class TextAreaField extends Field {
     if (!super.isValid()) {
       valid = false;
     } else if (hasValue()) {
-      final int length = inputValue.length();
-      if (length > maxLength) {
-        addValidationError("Cannot exceed " + maxLength + " characters");
+      final int length = this.inputValue.length();
+      if (length > this.maxLength) {
+        addValidationError("Cannot exceed " + this.maxLength + " characters");
         valid = false;
-      } else if (length < minLength) {
-        addValidationError("Must be at least " + minLength + " characters");
+      } else if (length < this.minLength) {
+        addValidationError("Must be at least " + this.minLength + " characters");
         valid = false;
       } else {
-        setValue(inputValue);
+        setValue(this.inputValue);
       }
     }
     if (!valid) {
@@ -144,13 +143,13 @@ public class TextAreaField extends Field {
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.TEXT_AREA);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_COLS, Integer.toString(cols));
-    out.attribute(HtmlUtil.ATTR_ROWS, Integer.toString(rows));
+    out.attribute(HtmlUtil.ATTR_COLS, Integer.toString(this.cols));
+    out.attribute(HtmlUtil.ATTR_ROWS, Integer.toString(this.rows));
     if (isRequired()) {
       out.attribute(HtmlUtil.ATTR_CLASS, "required");
     }
-    if (StringUtils.hasText(inputValue)) {
-      out.text(inputValue);
+    if (Property.hasValue(this.inputValue)) {
+      out.text(this.inputValue);
     } else {
       out.text("");
     }

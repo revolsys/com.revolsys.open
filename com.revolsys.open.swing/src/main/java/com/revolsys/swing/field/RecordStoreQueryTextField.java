@@ -40,7 +40,6 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.collection.LruMap;
@@ -59,11 +58,12 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.list.RecordListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.util.Property;
 
 public class RecordStoreQueryTextField extends TextField implements
-  DocumentListener, KeyListener, MouseListener, FocusListener,
-  ListDataListener, ItemSelectable, Field, ListSelectionListener,
-  HighlightPredicate {
+DocumentListener, KeyListener, MouseListener, FocusListener,
+ListDataListener, ItemSelectable, Field, ListSelectionListener,
+HighlightPredicate {
   private static final Icon ICON_DELETE = SilkIconLoader.getIcon("delete");
 
   private static final long serialVersionUID = 1L;
@@ -87,7 +87,7 @@ public class RecordStoreQueryTextField extends TextField implements
   public Record selectedItem;
 
   private final Map<String, String> valueToDisplayMap = new LruMap<String, String>(
-    100);
+      100);
 
   private Object originalValue;
 
@@ -97,7 +97,7 @@ public class RecordStoreQueryTextField extends TextField implements
     final String displayAttributeName) {
     this(recordDefinition, displayAttributeName, new Query(recordDefinition,
       new Equal(F.upper(displayAttributeName), new Value(null))), new Query(
-        recordDefinition, Q.iLike(displayAttributeName, "")));
+      recordDefinition, Q.iLike(displayAttributeName, "")));
 
   }
 
@@ -207,7 +207,7 @@ public class RecordStoreQueryTextField extends TextField implements
   protected String getDisplayText(final Object value) {
     final String stringValue = StringConverterRegistry.toString(value);
     String displayText = this.valueToDisplayMap.get(stringValue);
-    if (!StringUtils.hasText(displayText) && StringUtils.hasText(stringValue)) {
+    if (!Property.hasValue(displayText) && Property.hasValue(stringValue)) {
       final Record record = this.recordStore.queryFirst(Query.equal(
         this.recordDefinition, this.idAttributeName, stringValue));
       if (record == null) {
@@ -287,7 +287,7 @@ public class RecordStoreQueryTextField extends TextField implements
       return false;
     } else {
       final String text = getText();
-      if (StringUtils.hasText(text)) {
+      if (Property.hasValue(text)) {
         final String value = this.selectedItem.getString(this.displayAttributeName);
         return text.equals(value);
       } else {
@@ -317,7 +317,7 @@ public class RecordStoreQueryTextField extends TextField implements
         }
         this.list.setSelectedIndex(selectedIndex);
         e.consume();
-      break;
+        break;
       case KeyEvent.VK_ENTER:
         if (size > 0) {
           if (selectedIndex >= 0 && selectedIndex < size) {
@@ -333,7 +333,7 @@ public class RecordStoreQueryTextField extends TextField implements
       case KeyEvent.VK_TAB:
         return;
       default:
-      break;
+        break;
     }
     showMenu();
   }
@@ -455,7 +455,7 @@ public class RecordStoreQueryTextField extends TextField implements
       if (this.below) {
         x = 0;
         final Insets screenInsets = Toolkit.getDefaultToolkit()
-          .getScreenInsets(getGraphicsConfiguration());
+            .getScreenInsets(getGraphicsConfiguration());
 
         final Rectangle bounds = getGraphicsConfiguration().getBounds();
         final int menuHeight = this.menu.getBounds().height;

@@ -3,8 +3,6 @@ package com.revolsys.gis.oracle.io;
 import java.io.PrintWriter;
 import java.util.List;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.AttributeProperties;
@@ -19,6 +17,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.util.Property;
 
 public class OracleDdlWriter extends JdbcDdlWriter {
   public OracleDdlWriter() {
@@ -36,14 +35,14 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     if (shortNameProperty != null) {
       shortName = shortNameProperty.getShortName();
     }
-    if (StringUtils.hasText(shortName) && shortNameProperty.isUseForSequence()) {
+    if (Property.hasValue(shortName) && shortNameProperty.isUseForSequence()) {
       final String schema = JdbcUtils.getSchemaName(typePath);
       final String sequenceName = schema + "." + shortName.toUpperCase()
-          + "_SEQ";
+        + "_SEQ";
       return sequenceName;
     } else {
       final String tableName = JdbcUtils.getQualifiedTableName(typePath)
-          .toUpperCase();
+        .toUpperCase();
       return tableName + "_SEQ";
     }
   }

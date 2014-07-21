@@ -6,13 +6,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.io.StringBufferWriter;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -21,6 +18,7 @@ import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
 public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
@@ -69,7 +67,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
       } else {
         final double lookAtScale = 1.2;
         final double lookAtRange = maxMetres / 2 / Math.tan(Math.toRadians(25))
-          * lookAtScale;
+            * lookAtScale;
         return (long)Math.ceil(lookAtRange);
       }
     }
@@ -139,7 +137,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
       if (!(value instanceof Geometry)) {
         if (value != null) {
           final String stringValue = value.toString();
-          if (StringUtils.hasText(stringValue)) {
+          if (Property.hasValue(stringValue)) {
             if (!hasValues) {
               hasValues = true;
               startTag(EXTENDED_DATA);
@@ -428,7 +426,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     startTag(ICON);
     final Map<String, String> parameters = Collections.singletonMap("BBOX",
       envelope.getMinX() + "," + envelope.getMinY() + "," + envelope.getMaxX()
-        + "," + envelope.getMaxY());
+      + "," + envelope.getMaxY());
     element(HREF, UrlUtil.getUrl(baseUrl, parameters));
 
     endTag();

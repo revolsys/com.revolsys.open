@@ -1,6 +1,6 @@
 package com.revolsys.converter.string;
 
-import org.springframework.util.StringUtils;
+import com.revolsys.util.Property;
 
 public class ByteStringConverter extends AbstractNumberStringConverter<Byte> {
   public ByteStringConverter() {
@@ -34,7 +34,7 @@ public class ByteStringConverter extends AbstractNumberStringConverter<Byte> {
 
   @Override
   public Byte toObject(final String string) {
-    if (StringUtils.hasText(string)) {
+    if (Property.hasValue(string)) {
       return Byte.valueOf(string);
     } else {
       return null;

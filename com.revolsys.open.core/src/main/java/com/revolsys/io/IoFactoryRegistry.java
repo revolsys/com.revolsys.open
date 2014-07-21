@@ -18,10 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.io.RecordWriterFactory;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class IoFactoryRegistry {
 
@@ -81,7 +81,7 @@ public class IoFactoryRegistry {
           properties.load(resourceUrl.openStream());
           final String factoryClassNames = properties.getProperty("com.revolsys.io.IoFactory.factoryClassNames");
           for (final String factoryClassName : factoryClassNames.split(",")) {
-            if (StringUtils.hasText(factoryClassName)) {
+            if (Property.hasValue(factoryClassName)) {
               try {
                 final Class<?> factoryClass = Class.forName(factoryClassName.trim());
                 if (IoFactory.class.isAssignableFrom(factoryClass)) {
@@ -90,7 +90,7 @@ public class IoFactoryRegistry {
                   addFactory(factory);
                 } else {
                   LOG.error(factoryClassName + " is not a subclass of "
-                      + IoFactory.class);
+                    + IoFactory.class);
                 }
               } catch (final Throwable e) {
                 LOG.error("Unable to load: " + factoryClassName, e);

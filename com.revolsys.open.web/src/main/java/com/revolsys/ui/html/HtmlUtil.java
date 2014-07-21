@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,11 +17,146 @@ package com.revolsys.ui.html;
 
 import javax.xml.namespace.QName;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.util.Property;
 
 public final class HtmlUtil {
+  public static void serializeA(final XmlWriter out, final String cssClass,
+    final String url, final Object content) {
+    if (content != null) {
+      if (url != null) {
+        out.startTag(A);
+        if (Property.hasValue(cssClass)) {
+          out.attribute(ATTR_CLASS, cssClass);
+        }
+        out.attribute(ATTR_HREF, url);
+      }
+      out.text(content);
+      if (url != null) {
+        out.endTag(A);
+      }
+    }
+  }
+
+  public static void serializeB(final XmlWriter out, final String content) {
+    out.startTag(B);
+    out.text(content);
+    out.endTag(B);
+  }
+
+  public static void serializeButton(final XmlWriter out, final String name,
+    final String type, final Object value, final String text,
+    final String cssClass) {
+    out.startTag(BUTTON);
+    out.attribute(ATTR_NAME, name);
+    out.attribute(ATTR_TYPE, type);
+    out.attribute(ATTR_VALUE, value);
+    out.attribute(ATTR_CLASS, cssClass);
+    if (Property.hasValue(text)) {
+      out.text(text);
+    }
+    out.endTag(BUTTON);
+  }
+
+  public static void serializeCheckBox(final XmlWriter out, final String name,
+    final String value, final boolean selected, final String onClick) {
+    out.startTag(INPUT);
+    out.attribute(ATTR_NAME, name);
+    out.attribute(ATTR_TYPE, "checkbox");
+    if (selected) {
+      out.attribute(HtmlUtil.ATTR_CHECKED, "checked");
+    }
+    if (value != null) {
+      out.attribute(ATTR_VALUE, value);
+    }
+    if (onClick != null) {
+      out.attribute(ATTR_ON_CLICK, onClick);
+    }
+    out.endTag(INPUT);
+  }
+
+  public static void serializeDiv(final XmlWriter out, final String cssClass,
+    final Object content) {
+    if (content != null) {
+      final String text = content.toString().trim();
+      if (text.length() > 0) {
+        out.startTag(DIV);
+        if (cssClass != null) {
+          out.attribute(ATTR_CLASS, cssClass);
+        }
+        out.text(text);
+        out.endTag(DIV);
+      }
+    }
+  }
+
+  public static void serializeHiddenInput(final XmlWriter out,
+    final String name, final Object value) {
+
+    String stringValue = null;
+    if (value != null) {
+      stringValue = value.toString();
+    }
+    serializeHiddenInput(out, name, stringValue);
+  }
+
+  public static void serializeHiddenInput(final XmlWriter out,
+    final String name, final String value) {
+    out.startTag(INPUT);
+    out.attribute(ATTR_NAME, name);
+    out.attribute(ATTR_TYPE, "hidden");
+    if (value != null) {
+      out.attribute(ATTR_VALUE, value);
+    }
+    out.endTag(INPUT);
+  }
+
+  public static void serializePre(final XmlWriter out, final String text) {
+    out.startTag(PRE);
+    out.text(text);
+    out.endTag(PRE);
+  }
+
+  public static void serializeScript(final XmlWriter out, final String script) {
+    out.startTag(SCRIPT);
+    out.attribute(ATTR_TYPE, "text/javascript");
+    out.text(script);
+    out.endTag(SCRIPT);
+  }
+
+  public static void serializeSpan(final XmlWriter out, final String cssClass,
+    final Object content) {
+    if (content != null) {
+      final String text = content.toString().trim();
+      if (text.length() > 0) {
+        out.startTag(SPAN);
+        if (cssClass != null) {
+          out.attribute(ATTR_CLASS, cssClass);
+        }
+        out.text(text);
+        out.endTag(SPAN);
+      }
+    }
+  }
+
+  public static void serializeSubmitInput(final XmlWriter out,
+    final String name, final Object value) {
+    out.startTag(INPUT);
+    out.attribute(ATTR_NAME, name);
+    out.attribute(ATTR_TYPE, "submit");
+    if (value != null) {
+      out.attribute(ATTR_VALUE, value);
+    }
+    out.endTag(INPUT);
+  }
+
+  public static void serializeTag(final XmlWriter out, final QName tag,
+    final String content) {
+    out.startTag(tag);
+    out.text(content);
+    out.endTag(tag);
+  }
+
   public static final String HTML_NS_URI = "http://www.w3.org/1999/xhtml";
 
   public static final String HTML_NS_PREFIX = "";
@@ -193,142 +328,6 @@ public final class HtmlUtil {
   public static final QName ATTR_ENCTYPE = new QName("enctype");
 
   public static final QName ATTR_ACCEPT_CHARSET = new QName("accept-charset");
-
-  public static void serializeA(final XmlWriter out, final String cssClass,
-    final String url, final Object content) {
-    if (content != null) {
-      if (url != null) {
-        out.startTag(A);
-        if (StringUtils.hasText(cssClass)) {
-          out.attribute(ATTR_CLASS, cssClass);
-        }
-        out.attribute(ATTR_HREF, url);
-      }
-      out.text(content);
-      if (url != null) {
-        out.endTag(A);
-      }
-    }
-  }
-
-  public static void serializeB(final XmlWriter out, final String content) {
-    out.startTag(B);
-    out.text(content);
-    out.endTag(B);
-  }
-
-  public static void serializeButton(final XmlWriter out, final String name,
-    final String type, final Object value, final String text,
-    final String cssClass) {
-    out.startTag(BUTTON);
-    out.attribute(ATTR_NAME, name);
-    out.attribute(ATTR_TYPE, type);
-    out.attribute(ATTR_VALUE, value);
-    out.attribute(ATTR_CLASS, cssClass);
-    if (StringUtils.hasText(text)) {
-      out.text(text);
-    }
-    out.endTag(BUTTON);
-  }
-
-  public static void serializeCheckBox(final XmlWriter out, final String name,
-    final String value, final boolean selected, final String onClick) {
-    out.startTag(INPUT);
-    out.attribute(ATTR_NAME, name);
-    out.attribute(ATTR_TYPE, "checkbox");
-    if (selected) {
-      out.attribute(HtmlUtil.ATTR_CHECKED, "checked");
-    }
-    if (value != null) {
-      out.attribute(ATTR_VALUE, value);
-    }
-    if (onClick != null) {
-      out.attribute(ATTR_ON_CLICK, onClick);
-    }
-    out.endTag(INPUT);
-  }
-
-  public static void serializeDiv(final XmlWriter out, final String cssClass,
-    final Object content) {
-    if (content != null) {
-      final String text = content.toString().trim();
-      if (text.length() > 0) {
-        out.startTag(DIV);
-        if (cssClass != null) {
-          out.attribute(ATTR_CLASS, cssClass);
-        }
-        out.text(text);
-        out.endTag(DIV);
-      }
-    }
-  }
-
-  public static void serializeHiddenInput(final XmlWriter out,
-    final String name, final Object value) {
-
-    String stringValue = null;
-    if (value != null) {
-      stringValue = value.toString();
-    }
-    serializeHiddenInput(out, name, stringValue);
-  }
-
-  public static void serializeHiddenInput(final XmlWriter out,
-    final String name, final String value) {
-    out.startTag(INPUT);
-    out.attribute(ATTR_NAME, name);
-    out.attribute(ATTR_TYPE, "hidden");
-    if (value != null) {
-      out.attribute(ATTR_VALUE, value);
-    }
-    out.endTag(INPUT);
-  }
-
-  public static void serializePre(final XmlWriter out, final String text) {
-    out.startTag(PRE);
-    out.text(text);
-    out.endTag(PRE);
-  }
-
-  public static void serializeScript(final XmlWriter out, final String script) {
-    out.startTag(SCRIPT);
-    out.attribute(ATTR_TYPE, "text/javascript");
-    out.text(script);
-    out.endTag(SCRIPT);
-  }
-
-  public static void serializeSpan(final XmlWriter out, final String cssClass,
-    final Object content) {
-    if (content != null) {
-      final String text = content.toString().trim();
-      if (text.length() > 0) {
-        out.startTag(SPAN);
-        if (cssClass != null) {
-          out.attribute(ATTR_CLASS, cssClass);
-        }
-        out.text(text);
-        out.endTag(SPAN);
-      }
-    }
-  }
-
-  public static void serializeSubmitInput(final XmlWriter out,
-    final String name, final Object value) {
-    out.startTag(INPUT);
-    out.attribute(ATTR_NAME, name);
-    out.attribute(ATTR_TYPE, "submit");
-    if (value != null) {
-      out.attribute(ATTR_VALUE, value);
-    }
-    out.endTag(INPUT);
-  }
-
-  public static void serializeTag(final XmlWriter out, final QName tag,
-    final String content) {
-    out.startTag(tag);
-    out.text(content);
-    out.endTag(tag);
-  }
 
   /**
    * Construct a new HtmlUtil.

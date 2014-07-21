@@ -4,8 +4,6 @@ import java.io.Writer;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.Record;
@@ -17,6 +15,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.Property;
 
 public class XhtmlRecordWriter extends AbstractRecordWriter {
 
@@ -149,7 +148,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
       this.out.attribute(HtmlUtil.ATTR_CONTENT, "text/html; charset=utf-8");
       this.out.endTag(HtmlUtil.META);
 
-      if (StringUtils.hasText(this.title)) {
+      if (Property.hasValue(this.title)) {
         this.out.element(HtmlUtil.TITLE, this.title);
       }
 
@@ -213,7 +212,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
     @SuppressWarnings("unchecked")
     final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
     final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-        .getConverter(dataTypeClass);
+      .getConverter(dataTypeClass);
     if (converter == null) {
       this.out.text(value);
     } else {

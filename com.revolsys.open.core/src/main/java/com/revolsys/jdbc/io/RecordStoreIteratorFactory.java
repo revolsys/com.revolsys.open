@@ -4,8 +4,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Query;
@@ -30,7 +28,7 @@ public class RecordStoreIteratorFactory {
     final RecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     final Object factory = this.factory.get();
-    if (factory != null && StringUtils.hasText(methodName)) {
+    if (factory != null && Property.hasValue(methodName)) {
       return Property.invoke(factory, methodName, recordStore, query, properties);
     } else {
       throw new UnsupportedOperationException(

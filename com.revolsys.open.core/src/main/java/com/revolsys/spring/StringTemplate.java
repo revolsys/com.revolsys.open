@@ -9,15 +9,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
 public class StringTemplate implements Serializable {
   /**
-  * Static inner class to parse URI template strings into a matching regular
-  * expression.
-  */
+   * Static inner class to parse URI template strings into a matching regular
+   * expression.
+   */
   private static class Parser {
 
     private final List<String> variableNames = new LinkedList<String>();
@@ -65,7 +65,7 @@ public class StringTemplate implements Serializable {
 
   public StringTemplate(final String template) {
     this.template = template;
-    if (StringUtils.hasText(template)) {
+    if (Property.hasValue(template)) {
       try {
         final Parser parser = new Parser(template);
         this.variableNames = parser.getVariableNames();
@@ -76,8 +76,8 @@ public class StringTemplate implements Serializable {
   }
 
   public String expand(Map<String, ?> uriVariables) {
-    if (variableNames == null) {
-      return template;
+    if (this.variableNames == null) {
+      return this.template;
     } else {
       if (uriVariables == null) {
         uriVariables = Collections.emptyMap();
@@ -115,12 +115,12 @@ public class StringTemplate implements Serializable {
   }
 
   public List<String> getVariableNames() {
-    return variableNames;
+    return this.variableNames;
   }
 
   @Override
   public String toString() {
-    return template;
+    return this.template;
   }
 
 }

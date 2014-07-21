@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -17,9 +15,10 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.util.Property;
 
 public class KmlRecordWriter extends AbstractRecordWriter implements
-  Kml22Constants {
+Kml22Constants {
   private static final Map<Class<?>, String> TYPE_MAP = new HashMap<Class<?>, String>();
 
   static {
@@ -64,7 +63,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements
   @Override
   public boolean isWriteNulls() {
     return super.isWriteNulls()
-        || BooleanStringConverter.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY));
+      || BooleanStringConverter.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY));
   }
 
   @Override
@@ -84,8 +83,8 @@ public class KmlRecordWriter extends AbstractRecordWriter implements
       } else {
         styleUrl = value.toString();
       }
-      if (StringUtils.hasText(styleUrl)) {
-        if (StringUtils.hasText(this.defaultStyleUrl)) {
+      if (Property.hasValue(styleUrl)) {
+        if (Property.hasValue(this.defaultStyleUrl)) {
           this.styleUrl = styleUrl;
         } else {
           this.defaultStyleUrl = styleUrl;
@@ -138,9 +137,9 @@ public class KmlRecordWriter extends AbstractRecordWriter implements
       this.writer.endTag(DESCRIPTION);
     }
     writeLookAt(object.getGeometryValue());
-    if (StringUtils.hasText(this.styleUrl)) {
+    if (Property.hasValue(this.styleUrl)) {
       this.writer.element(STYLE_URL, this.styleUrl);
-    } else if (StringUtils.hasText(this.defaultStyleUrl)) {
+    } else if (Property.hasValue(this.defaultStyleUrl)) {
       this.writer.element(STYLE_URL, this.defaultStyleUrl);
     }
     boolean hasValues = false;
@@ -224,7 +223,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements
         writeLookAt(point, range.longValue());
       }
       final String style = getProperty(STYLE_PROPERTY);
-      if (StringUtils.hasText(style)) {
+      if (Property.hasValue(style)) {
         this.writer.write(style);
       }
 

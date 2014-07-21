@@ -2,7 +2,7 @@ package com.revolsys.ui.html.fields;
 
 import java.math.BigDecimal;
 
-import org.springframework.util.StringUtils;
+import com.revolsys.util.Property;
 
 public class BigDecimalField extends NumberField {
 
@@ -17,7 +17,7 @@ public class BigDecimalField extends NumberField {
   }
 
   public BigDecimalField(final String name, final boolean required,
-    Object defaultValue) {
+    final Object defaultValue) {
     super(name, 20, 50, defaultValue, required);
   }
 
@@ -27,11 +27,16 @@ public class BigDecimalField extends NumberField {
     this.scale = scale;
   }
 
+  @Override
+  public Number getNumber(final String value) {
+    return new BigDecimal(value);
+  }
+
   /**
    * @return Returns the scale.
    */
   public final int getScale() {
-    return scale;
+    return this.scale;
   }
 
   public void setScale(final int scale) {
@@ -39,17 +44,12 @@ public class BigDecimalField extends NumberField {
   }
 
   @Override
-  public Number getNumber(String value) {
-    return new BigDecimal(value);
-  }
-
-  @Override
   public void setTextValue(final String value) {
-    if (StringUtils.hasLength(value)) {
+    if (Property.hasValue(value)) {
       super.setTextValue(value);
       final BigDecimal numericValue = getValue();
-      if ((numericValue).scale() > scale) {
-        throw new IllegalArgumentException("Scale must be <= " + scale);
+      if (numericValue.scale() > this.scale) {
+        throw new IllegalArgumentException("Scale must be <= " + this.scale);
       }
     } else {
       setValue(null);

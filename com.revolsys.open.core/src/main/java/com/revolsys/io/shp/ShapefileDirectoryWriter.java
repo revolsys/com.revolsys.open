@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.io.AbstractRecordWriterFactory;
 import com.revolsys.data.record.Record;
@@ -19,6 +18,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.xbase.XbaseRecordWriter;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.util.Property;
 
 public class ShapefileDirectoryWriter extends AbstractRecordWriter {
   private File directory;
@@ -81,12 +81,12 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
     if (this.useNamespaceAsSubDirectory) {
       final String typePath = recordDefinition.getPath();
       final String schemaName = PathUtil.getPath(typePath);
-      if (StringUtils.hasText(schemaName)) {
+      if (Property.hasValue(schemaName)) {
         final File childDirectory = new File(this.directory, schemaName);
         if (!childDirectory.mkdirs()) {
           if (!childDirectory.isDirectory()) {
             throw new IllegalArgumentException("Unable to create directory "
-                + childDirectory);
+              + childDirectory);
           }
         }
         return childDirectory;
@@ -147,7 +147,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
     this.directory = baseDirectory;
     baseDirectory.mkdirs();
     this.statistics = new Statistics("Write Shape "
-        + baseDirectory.getAbsolutePath());
+      + baseDirectory.getAbsolutePath());
     this.statistics.connect();
   }
 

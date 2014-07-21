@@ -16,30 +16,9 @@ import org.springframework.web.util.WebUtils;
 
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.ui.web.utils.HttpServletUtils;
+import com.revolsys.util.Property;
 
 public class MediaTypeUtil {
-  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
-
-  private static final String ACCEPT_HEADER = "Accept";
-
-  public static final String CONTENT_TYPE_HEADER = "Content-type";
-
-  private static Map<String, MediaType> extensionToMediaTypeMap = new HashMap<String, MediaType>();
-
-  private static Map<MediaType, String> mediaTypeToExtensionMap = new HashMap<MediaType, String>();
-
-  static {
-    for (final Entry<String, String> entry : IoFactoryRegistry.getInstance()
-      .getExtensionMimeTypeMap()
-      .entrySet()) {
-      final String exetension = entry.getKey();
-      final String mimeType = entry.getValue();
-      final MediaType mediaType = MediaType.parseMediaType(mimeType);
-      extensionToMediaTypeMap.put(exetension, mediaType);
-      mediaTypeToExtensionMap.put(mediaType, exetension);
-    }
-  }
-
   public static void addMediaType(final List<MediaType> mediaTypes,
     final String extension) {
     final MediaType mediaType = getMediaTypeFromParameter(
@@ -60,7 +39,7 @@ public class MediaTypeUtil {
     final List<MediaType> mediaTypes = getAcceptedMediaTypes(request);
     for (final MediaType mediaType : mediaTypes) {
       final String extension = mediaTypeToExtensionMap.get(mediaType);
-      if (StringUtils.hasText(extension)) {
+      if (Property.hasValue(extension)) {
         return extension;
       }
     }
@@ -72,11 +51,11 @@ public class MediaTypeUtil {
     final List<MediaType> mediaTypes = new ArrayList<MediaType>();
 
     String format = (String)request.getAttribute("format");
-    if (StringUtils.hasText(format)) {
+    if (Property.hasValue(format)) {
       addMediaType(mediaTypes, format);
     }
     format = request.getParameter("format");
-    if (StringUtils.hasText(format)) {
+    if (Property.hasValue(format)) {
       addMediaType(mediaTypes, format);
     }
     final String requestUri = URL_PATH_HELPER.getRequestUri(request);
@@ -84,7 +63,7 @@ public class MediaTypeUtil {
     addMediaTypeFromFilename(mediaTypes, filename);
 
     final String acceptHeader = request.getHeader(ACCEPT_HEADER);
-    if (StringUtils.hasText(acceptHeader)) {
+    if (Property.hasValue(acceptHeader)) {
       mediaTypes.addAll(MediaType.parseMediaTypes(acceptHeader));
     }
     mediaTypes.add(MediaType.TEXT_HTML);
@@ -109,7 +88,7 @@ public class MediaTypeUtil {
         }
       } else if (source.equals("attribute")) {
         final String parameterValue = (String)request.getAttribute(parameterName);
-        if (StringUtils.hasText(parameterValue)) {
+        if (Property.hasValue(parameterValue)) {
           final MediaType mediaType = getMediaTypeFromParameter(
             extensionToMediaTypeMap, parameterValue);
           if (mediaType != null) {
@@ -118,7 +97,7 @@ public class MediaTypeUtil {
         }
       } else if (source.equals("parameter")) {
         final String parameterValue = request.getParameter(parameterName);
-        if (StringUtils.hasText(parameterValue)) {
+        if (Property.hasValue(parameterValue)) {
           final MediaType mediaType = getMediaTypeFromParameter(
             extensionToMediaTypeMap, parameterValue);
           if (mediaType != null) {
@@ -127,7 +106,7 @@ public class MediaTypeUtil {
         }
       } else if (source.equals("acceptHeader")) {
         final String acceptHeader = request.getHeader(ACCEPT_HEADER);
-        if (StringUtils.hasText(acceptHeader)) {
+        if (Property.hasValue(acceptHeader)) {
           mediaTypes.addAll(MediaType.parseMediaTypes(acceptHeader));
         }
       } else if (source.equals("defaultMediaType")) {
@@ -146,7 +125,7 @@ public class MediaTypeUtil {
 
   public static MediaType getContentType(final HttpServletRequest request) {
     final String contentTypeHeader = request.getHeader(CONTENT_TYPE_HEADER);
-    if (StringUtils.hasText(contentTypeHeader)) {
+    if (Property.hasValue(contentTypeHeader)) {
       return MediaType.parseMediaType(contentTypeHeader);
     } else {
       return null;
@@ -161,7 +140,7 @@ public class MediaTypeUtil {
 
   public static MediaType getMediaTypeFromParameter(
     final Map<String, MediaType> extensionToMediaTypeMap, final String extension) {
-    if (!StringUtils.hasText(extension)) {
+    if (!Property.hasValue(extension)) {
       return null;
     } else if (extension.matches("[^/]+/[^/]+")) {
       return MediaType.valueOf(extension);
@@ -200,7 +179,7 @@ public class MediaTypeUtil {
         }
       } else if (source.equals("attribute")) {
         final String parameterValue = (String)request.getAttribute(parameterName);
-        if (StringUtils.hasText(parameterValue)) {
+        if (Property.hasValue(parameterValue)) {
           final MediaType mediaType = getMediaTypeFromParameter(
             extensionToMediaTypeMap, parameterValue);
           if (mediaType != null) {
@@ -255,18 +234,18 @@ public class MediaTypeUtil {
   public static boolean isHtmlPage() {
     final HttpServletRequest request = HttpServletUtils.getRequest();
     final String format = request.getParameter("format");
-    if (StringUtils.hasText(format)) {
+    if (Property.hasValue(format)) {
       return false;
     }
     final String requestUri = URL_PATH_HELPER.getRequestUri(request);
     final String filename = WebUtils.extractFullFilenameFromUrlPath(requestUri);
     final String extension = StringUtils.getFilenameExtension(filename);
-    if (StringUtils.hasText(extension)) {
+    if (Property.hasValue(extension)) {
       return false;
     }
 
     final String acceptHeader = request.getHeader(ACCEPT_HEADER);
-    if (StringUtils.hasText(acceptHeader)) {
+    if (Property.hasValue(acceptHeader)) {
       for (final MediaType mediaType : MediaType.parseMediaTypes(acceptHeader)) {
         if (mediaType.includes(MediaType.TEXT_HTML)) {
           return true;
@@ -288,12 +267,34 @@ public class MediaTypeUtil {
         if (acceptedMediaType.includes(mediaType)) {
           return true;
         } else if (!acceptedMediaType.isWildcardType()
-          && !acceptedMediaType.isWildcardSubtype()) {
+            && !acceptedMediaType.isWildcardSubtype()) {
           return false;
         }
       }
       return false;
 
+    }
+  }
+
+  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
+
+  private static final String ACCEPT_HEADER = "Accept";
+
+  public static final String CONTENT_TYPE_HEADER = "Content-type";
+
+  private static Map<String, MediaType> extensionToMediaTypeMap = new HashMap<String, MediaType>();
+
+  private static Map<MediaType, String> mediaTypeToExtensionMap = new HashMap<MediaType, String>();
+
+  static {
+    for (final Entry<String, String> entry : IoFactoryRegistry.getInstance()
+        .getExtensionMimeTypeMap()
+        .entrySet()) {
+      final String exetension = entry.getKey();
+      final String mimeType = entry.getValue();
+      final MediaType mediaType = MediaType.parseMediaType(mimeType);
+      extensionToMediaTypeMap.put(exetension, mediaType);
+      mediaTypeToExtensionMap.put(mediaType, exetension);
     }
   }
 }

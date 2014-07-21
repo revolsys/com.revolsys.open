@@ -7,21 +7,15 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.ui.web.controller.PathAliasController;
+import com.revolsys.util.Property;
 
 public final class HttpServletUtils {
-  private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
-
-  private static ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<HttpServletResponse>();
-
-  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
-
   public static void clearRequestAndResponse() {
     REQUEST_LOCAL.remove();
     RESPONSE_LOCAL.remove();
@@ -38,10 +32,20 @@ public final class HttpServletUtils {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public static <T> T getAttribute(final String name) {
+    final HttpServletRequest request = getRequest();
+    if (request == null) {
+      return null;
+    } else {
+      return (T)request.getAttribute(name);
+    }
+  }
+
   public static boolean getBooleanParameter(final HttpServletRequest request,
     final String paramName) {
     final String value = request.getParameter(paramName);
-    if (StringUtils.hasText(value)) {
+    if (Property.hasValue(value)) {
       return Boolean.parseBoolean(value);
     }
     return false;
@@ -66,7 +70,7 @@ public final class HttpServletUtils {
   public static int getIntegerParameter(final HttpServletRequest request,
     final String paramName) {
     final String value = request.getParameter(paramName);
-    if (StringUtils.hasText(value)) {
+    if (Property.hasValue(value)) {
       try {
         return Integer.parseInt(value);
       } catch (final NumberFormatException e) {
@@ -120,16 +124,6 @@ public final class HttpServletUtils {
     return request;
   }
 
-  @SuppressWarnings("unchecked")
-  public static <T> T getAttribute(final String name) {
-    final HttpServletRequest request = getRequest();
-    if (request == null) {
-      return null;
-    } else {
-      return (T)request.getAttribute(name);
-    }
-  }
-
   public static String getRequestBaseFileName() {
     final String originatingRequestUri = getOriginatingRequestUri();
     final String baseName = WebUtils.extractFilenameFromUrlPath(originatingRequestUri);
@@ -180,11 +174,11 @@ public final class HttpServletUtils {
 
   public static boolean isApiCall(final HttpServletRequest request) {
     final String requestedWith = request.getHeader("x-requested-with");
-    if (StringUtils.hasText(requestedWith)) {
+    if (Property.hasValue(requestedWith)) {
       return true;
     } else {
       final String referrer = request.getHeader("referrer");
-      if (StringUtils.hasText(referrer)) {
+      if (Property.hasValue(referrer)) {
         return false;
       } else {
         final String accept = request.getHeader("accept");
@@ -252,6 +246,12 @@ public final class HttpServletUtils {
     REQUEST_LOCAL.set(request);
     RESPONSE_LOCAL.set(response);
   }
+
+  private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<HttpServletRequest>();
+
+  private static ThreadLocal<HttpServletResponse> RESPONSE_LOCAL = new ThreadLocal<HttpServletResponse>();
+
+  private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
   private HttpServletUtils() {
 

@@ -175,7 +175,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     final String name = JOptionPane.showInputDialog(
       SwingUtil.getActiveWindow(), "Enter the name of the new Layer Group.",
       "Add Layer Group", JOptionPane.PLAIN_MESSAGE);
-    if (StringUtils.hasText(name)) {
+    if (Property.hasValue(name)) {
       return addLayerGroup(name);
     } else {
       return null;

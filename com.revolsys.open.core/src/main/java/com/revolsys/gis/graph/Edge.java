@@ -22,7 +22,6 @@ import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
 public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,

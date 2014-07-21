@@ -7,12 +7,11 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.Property;
 
 public class CheckBox extends JCheckBox implements Field, ActionListener {
 
@@ -39,7 +38,7 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
   }
 
   public CheckBox(final String fieldName, final Object fieldValue) {
-    if (StringUtils.hasText(fieldName)) {
+    if (Property.hasValue(fieldName)) {
       this.fieldName = fieldName;
     } else {
       this.fieldName = "fieldValue";
@@ -100,7 +99,8 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+  public void setFieldInvalid(final String message,
+    final Color foregroundColor, final Color backgroundColor) {
     setForeground(foregroundColor);
     setBackground(backgroundColor);
     this.errorMessage = message;
@@ -141,7 +141,7 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(this.errorMessage)) {
+    if (!Property.hasValue(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

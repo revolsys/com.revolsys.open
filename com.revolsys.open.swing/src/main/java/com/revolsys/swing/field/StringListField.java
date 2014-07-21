@@ -19,7 +19,6 @@ import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.component.ValueField;
@@ -27,6 +26,7 @@ import com.revolsys.swing.list.BaseListModel;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class StringListField extends ValueField {
   public static final String SELECTED = "selected";
@@ -65,7 +65,7 @@ public class StringListField extends ValueField {
     fieldPanel.add(this.valueEntry);
 
     this.addButton = this.toolBar.addButtonTitleIcon("add", "Add", "add", this,
-      "addValue");
+        "addValue");
 
     this.valueEntry.addActionListener(this.addButton.getAction());
 
@@ -85,7 +85,7 @@ public class StringListField extends ValueField {
       new InvokeMethodListener(this, "updateFields"));
 
     this.valuesField.addListSelectionListener(new InvokeMethodListener(this,
-      "updateFields"));
+        "updateFields"));
 
   }
 
@@ -101,7 +101,7 @@ public class StringListField extends ValueField {
   }
 
   public boolean addValue(final String value) {
-    if (StringUtils.hasText(value)) {
+    if (Property.hasValue(value)) {
       if (!this.values.contains(value)) {
 
         if (this.comparator == null || this.values.isEmpty()) {
@@ -162,10 +162,10 @@ public class StringListField extends ValueField {
           this.values.clear();
         } else {
           final String string = value.toString();
-          if (StringUtils.hasText(string)) {
+          if (Property.hasValue(string)) {
             final List<String> newValues = new ArrayList<String>();
             for (final String item : string.replaceAll("\\s+", "").split(",+")) {
-              if (StringUtils.hasText(item)) {
+              if (Property.hasValue(item)) {
                 newValues.add(item);
               }
             }
@@ -194,7 +194,7 @@ public class StringListField extends ValueField {
 
   public void updateFields() {
     this.valueEntry.setEnabled(true);
-    if (StringUtils.hasText(this.valueEntry.getText())) {
+    if (Property.hasValue(this.valueEntry.getText())) {
       this.addButton.setEnabled(true);
     } else {
       this.addButton.setEnabled(false);

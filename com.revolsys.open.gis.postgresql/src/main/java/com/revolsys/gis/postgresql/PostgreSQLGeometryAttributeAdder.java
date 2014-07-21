@@ -8,7 +8,6 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.record.property.AttributeProperties;
 import com.revolsys.data.record.schema.Attribute;
@@ -19,6 +18,7 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.util.Property;
 
 public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
 
@@ -52,11 +52,11 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
     final String typePath = recordDefinition.getPath();
-    String owner = recordStore.getDatabaseSchemaName(PathUtil.getPath(typePath));
-    if (!StringUtils.hasText(owner)) {
+    String owner = this.recordStore.getDatabaseSchemaName(PathUtil.getPath(typePath));
+    if (!Property.hasValue(owner)) {
       owner = "public";
     }
-    final String tableName = recordStore.getDatabaseTableName(typePath);
+    final String tableName = this.recordStore.getDatabaseTableName(typePath);
     final String columnName = name.toLowerCase();
     try {
       int srid = 0;
@@ -64,18 +64,18 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       int axisCount = 3;
       try {
         final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where UPPER(F_TABLE_SCHEMA) = UPPER(?) AND UPPER(F_TABLE_NAME) = UPPER(?) AND UPPER(F_GEOMETRY_COLUMN) = UPPER(?)";
-        final Map<String, Object> values = JdbcUtils.selectMap(dataSource, sql,
-          owner, tableName, columnName);
+        final Map<String, Object> values = JdbcUtils.selectMap(this.dataSource,
+          sql, owner, tableName, columnName);
         srid = (Integer)values.get("srid");
         type = (String)values.get("type");
         axisCount = (Integer)values.get("coord_dimension");
       } catch (final IllegalArgumentException e) {
         LOG.warn("Cannot get geometry column metadata for " + typePath + "."
-          + columnName);
+            + columnName);
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
-      final GeometryFactory storeGeometryFactory = recordStore.getGeometryFactory();
+      final GeometryFactory storeGeometryFactory = this.recordStore.getGeometryFactory();
       final GeometryFactory geometryFactory;
       if (storeGeometryFactory == null) {
         geometryFactory = GeometryFactory.floating(srid, axisCount);

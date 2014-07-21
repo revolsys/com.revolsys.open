@@ -5,12 +5,12 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import org.jdesktop.swingx.JXSearchField;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.Property;
 
 public class SearchField extends JXSearchField implements FocusListener, Field {
   private static final long serialVersionUID = 1L;
@@ -88,7 +88,8 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+  public void setFieldInvalid(final String message,
+    final Color foregroundColor, final Color backgroundColor) {
     setForeground(foregroundColor);
     setSelectedTextColor(foregroundColor);
     setBackground(backgroundColor);
@@ -128,7 +129,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(this.errorMessage)) {
+    if (!Property.hasValue(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

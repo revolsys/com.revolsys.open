@@ -8,8 +8,6 @@ import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.SqlCondition;
@@ -18,9 +16,10 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.util.Property;
 
 public class RecordStoreQueryReader extends IteratorReader<Record> implements
-  RecordReader {
+RecordReader {
 
   private AbstractRecordStore recordStore;
 
@@ -59,12 +58,12 @@ public class RecordStoreQueryReader extends IteratorReader<Record> implements
   protected AbstractIterator<Record> createQueryIterator(final int i) {
     if (i < this.queries.size()) {
       final Query query = this.queries.get(i);
-      if (StringUtils.hasText(this.whereClause)) {
+      if (Property.hasValue(this.whereClause)) {
         query.and(new SqlCondition(this.whereClause));
       }
       if (this.boundingBox != null) {
         final Attribute geometryAttribute = query.getRecordDefinition()
-            .getGeometryAttribute();
+          .getGeometryAttribute();
         query.and(F.envelopeIntersects(geometryAttribute, this.boundingBox));
       }
 

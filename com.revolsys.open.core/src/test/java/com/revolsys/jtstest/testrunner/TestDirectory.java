@@ -5,10 +5,9 @@ import java.io.File;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.util.Property;
 
 public class TestDirectory extends TestSuite {
 
@@ -46,14 +45,14 @@ public class TestDirectory extends TestSuite {
   }
 
   public String getId() {
-    if (parent == null) {
+    if (this.parent == null) {
       return "";
     } else {
-      final String parentId = parent.getId();
-      if (StringUtils.hasText(parentId)) {
-        return parentId + "." + index;
+      final String parentId = this.parent.getId();
+      if (Property.hasValue(parentId)) {
+        return parentId + "." + this.index;
       } else {
-        return String.valueOf(index);
+        return String.valueOf(this.index);
       }
     }
   }

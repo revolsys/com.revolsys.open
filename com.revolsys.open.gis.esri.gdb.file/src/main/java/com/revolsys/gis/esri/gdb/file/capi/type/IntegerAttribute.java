@@ -1,19 +1,18 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.esri.gdb.file.CapiFileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.esri.gdb.xml.model.Field;
+import com.revolsys.util.Property;
 
 public class IntegerAttribute extends AbstractFileGdbAttribute {
   public IntegerAttribute(final Field field) {
     super(field.getName(), DataTypes.INT,
       BooleanStringConverter.getBoolean(field.getRequired())
-        || !field.isIsNullable());
+      || !field.isIsNullable());
   }
 
   @Override
@@ -24,7 +23,7 @@ public class IntegerAttribute extends AbstractFileGdbAttribute {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore recordStore = getRecordStore();
+    final CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
@@ -35,8 +34,7 @@ public class IntegerAttribute extends AbstractFileGdbAttribute {
   }
 
   @Override
-  public Object setValue(final Record object, final Row row,
-    final Object value) {
+  public Object setValue(final Record object, final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -55,7 +53,7 @@ public class IntegerAttribute extends AbstractFileGdbAttribute {
       return intValue;
     } else {
       final String string = value.toString().trim();
-      if (StringUtils.hasText(string)) {
+      if (Property.hasValue(string)) {
         final int intValue = Integer.parseInt(string);
         synchronized (getRecordStore()) {
           row.setInteger(name, intValue);

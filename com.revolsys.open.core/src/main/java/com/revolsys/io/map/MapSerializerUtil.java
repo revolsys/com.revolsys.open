@@ -8,17 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.util.Property;
 
 public class MapSerializerUtil {
   /**
    * <p>Add the value to the map. If the value is a {@link MapSerializer} then add the result of
    * {@link MapSerializer#toMap()}. If the value is a supported type add it to the map, otherwise
    * convert the value to a string. Null values will be ignored.</p>
-   * 
+   *
    * @param map
    * @param name
    * @param value
@@ -100,7 +99,7 @@ public class MapSerializerUtil {
         return value;
       } else if (value instanceof String) {
         final String string = (String)value;
-        if (StringUtils.hasText(string)) {
+        if (Property.hasValue(string)) {
           return string.trim();
         } else {
           return null;
@@ -109,7 +108,7 @@ public class MapSerializerUtil {
         return null;
       } else {
         final String string = StringConverterRegistry.toString(value);
-        if (StringUtils.hasText(string)) {
+        if (Property.hasValue(string)) {
           return string.trim();
         } else {
           return null;

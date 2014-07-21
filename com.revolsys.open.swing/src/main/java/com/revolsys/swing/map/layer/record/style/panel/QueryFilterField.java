@@ -40,7 +40,7 @@ public class QueryFilterField extends ValueField implements
 
     clearButton = toolBar.addButtonTitleIcon("search", "Clear Filter",
       "filter_delete", queryField, "setFieldValue", "");
-    clearButton.setEnabled(StringUtils.hasText(queryField.getText()));
+    clearButton.setEnabled(Property.hasValue(queryField.getText()));
 
     add(toolBar);
     add(new JScrollPane(queryField));
@@ -79,7 +79,7 @@ public class QueryFilterField extends ValueField implements
         queryField.setFieldValue(filter.toFormattedString());
       }
     }
-    clearButton.setEnabled(StringUtils.hasText(queryField.getText()));
+    clearButton.setEnabled(Property.hasValue(queryField.getText()));
   }
 
   @Override

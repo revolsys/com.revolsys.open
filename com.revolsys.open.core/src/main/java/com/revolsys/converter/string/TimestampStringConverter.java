@@ -3,9 +3,8 @@ package com.revolsys.converter.string;
 import java.sql.Timestamp;
 import java.util.Date;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.util.DateUtil;
+import com.revolsys.util.Property;
 
 public class TimestampStringConverter implements StringConverter<Timestamp> {
   private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
@@ -41,7 +40,7 @@ public class TimestampStringConverter implements StringConverter<Timestamp> {
 
   @Override
   public Timestamp toObject(final String string) {
-    if (StringUtils.hasText(string)) {
+    if (Property.hasValue(string)) {
       return DateUtil.getTimestamp(string);
     } else {
       return null;

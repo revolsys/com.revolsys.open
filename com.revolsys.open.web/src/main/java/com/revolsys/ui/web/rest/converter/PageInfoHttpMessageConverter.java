@@ -20,7 +20,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.FileUtil;
@@ -39,9 +38,10 @@ import com.revolsys.ui.model.ParameterInfo;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.Property;
 
 public class PageInfoHttpMessageConverter extends
-  AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
+AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
   private static final MediaType APPLICATION_VND_SUN_WADL_XML = MediaType.parseMediaType("application/vnd.sun.wadl+xml");
 
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
@@ -69,22 +69,22 @@ public class PageInfoHttpMessageConverter extends
 
   private Map<String, Object> getMap(final String url, final PageInfo pageInfo) {
     final Map<String, Object> pageMap = new NamedLinkedHashMap<String, Object>(
-      "resource");
+        "resource");
     pageMap.put("resourceUri", url);
     pageMap.put("title", pageInfo.getTitle());
     final String description = pageInfo.getDescription();
-    if (StringUtils.hasText(description)) {
+    if (Property.hasValue(description)) {
       pageMap.put("description", description);
     }
     for (final Entry<String, Object> attribute : pageInfo.getAttributes()
-      .entrySet()) {
+        .entrySet()) {
       final String key = attribute.getKey();
       final Object value = attribute.getValue();
       pageMap.put(key, value);
     }
     final List<Map<String, Object>> childPages = new ArrayList<Map<String, Object>>();
     for (final Entry<String, PageInfo> childPage : pageInfo.getPages()
-      .entrySet()) {
+        .entrySet()) {
       final String childPath = childPage.getKey();
       final PageInfo childPageInfo = childPage.getValue();
       final String childUri = getUrl(url, childPath);
@@ -144,7 +144,7 @@ public class PageInfoHttpMessageConverter extends
         if (APPLICATION_VND_SUN_WADL_XML.equals(mediaType)) {
           writeWadl(out, url, pageInfo);
         } else if (MediaType.TEXT_HTML.equals(mediaType)
-          || MediaType.APPLICATION_XHTML_XML.equals(mediaType)) {
+            || MediaType.APPLICATION_XHTML_XML.equals(mediaType)) {
           writeHtml(out, url, pageInfo, showTitle);
         } else if (TEXT_URI_LIST.equals(mediaType)) {
           writeUriList(out, url, pageInfo);
@@ -339,7 +339,7 @@ public class PageInfoHttpMessageConverter extends
   private void writeInstructions(final XmlWriter writer,
     final ParameterInfo parameter) {
     final String description = parameter.getDescription();
-    if (StringUtils.hasText(description)) {
+    if (Property.hasValue(description)) {
       writer.startTag(HtmlUtil.DIV);
       writer.attribute(HtmlUtil.ATTR_CLASS, "fieldDescription");
       writer.text(description);
@@ -419,8 +419,8 @@ public class PageInfoHttpMessageConverter extends
       charset = FileUtil.UTF8;
     }
     final String mediaTypeString = mediaType.getType() + "/"
-      + mediaType.getSubtype();
-    final MapWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
+        + mediaType.getSubtype();
+    final MapWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
       MapWriterFactory.class, mediaTypeString);
     if (writerFactory != null) {
       final MapWriter writer = writerFactory.getMapWriter(out, charset);
@@ -499,7 +499,7 @@ public class PageInfoHttpMessageConverter extends
     writeWadlDoc(writer, pageInfo);
     if (writeChildren) {
       for (final Entry<String, PageInfo> childPage : pageInfo.getPages()
-        .entrySet()) {
+          .entrySet()) {
         final String childPath = childPage.getKey();
         final PageInfo childPageInfo = childPage.getValue();
         writeWadlResource(writer, childPath, childPageInfo, false);

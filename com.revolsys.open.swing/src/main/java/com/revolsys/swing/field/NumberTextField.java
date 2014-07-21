@@ -12,7 +12,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jdesktop.swingx.JXTextField;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
@@ -22,11 +21,10 @@ import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.Property;
 
 public class NumberTextField extends JXTextField implements Field,
-  DocumentListener, FocusListener {
-
-  private static final long serialVersionUID = 1L;
+DocumentListener, FocusListener {
 
   public static Number createMaximumValue(final DataType dataType,
     final int length, final int scale) {
@@ -127,6 +125,8 @@ public class NumberTextField extends JXTextField implements Field,
     return length;
   }
 
+  private static final long serialVersionUID = 1L;
+
   private final DataType dataType;
 
   private String fieldValidationMessage;
@@ -181,7 +181,7 @@ public class NumberTextField extends JXTextField implements Field,
   public NumberTextField(final String fieldName, final DataType dataType,
     final int length, final int scale, final Number minimumValue,
     final Number maximumValue) {
-    if (StringUtils.hasText(fieldName)) {
+    if (Property.hasValue(fieldName)) {
       this.fieldName = fieldName;
     } else {
       this.fieldName = "fieldValue";
@@ -235,7 +235,7 @@ public class NumberTextField extends JXTextField implements Field,
   @SuppressWarnings("unchecked")
   @Override
   public <V> V getFieldValue() {
-    return (V)fieldValue;
+    return (V)this.fieldValue;
   }
 
   public int getLength() {
@@ -336,8 +336,8 @@ public class NumberTextField extends JXTextField implements Field,
           newText = "";
         } else if (newValue instanceof Number) {
           BigDecimal decimal = new BigDecimal(newText);
-          if (decimal.scale() < scale) {
-            decimal = decimal.setScale(scale, RoundingMode.HALF_UP);
+          if (decimal.scale() < this.scale) {
+            decimal = decimal.setScale(this.scale, RoundingMode.HALF_UP);
           }
           newText = decimal.toPlainString();
         } else {
@@ -377,7 +377,7 @@ public class NumberTextField extends JXTextField implements Field,
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(this.errorMessage)) {
+    if (!Property.hasValue(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }
@@ -402,7 +402,7 @@ public class NumberTextField extends JXTextField implements Field,
     final boolean oldValid = this.fieldValid;
     boolean valid = true;
     final String text = getText();
-    if (StringUtils.hasText(text)) {
+    if (Property.hasValue(text)) {
       try {
         BigDecimal number = new BigDecimal(text.trim());
         if (number.scale() < 0) {
@@ -410,14 +410,14 @@ public class NumberTextField extends JXTextField implements Field,
         }
         if (number.scale() > this.scale) {
           this.fieldValidationMessage = "Number of decimal places must be < "
-            + this.scale;
+              + this.scale;
           valid = false;
         } else if (this.minimumValue != null
-          && this.minimumValue.compareTo(number) > 0) {
+            && this.minimumValue.compareTo(number) > 0) {
           this.fieldValidationMessage = "Value must be >= " + this.minimumValue;
           valid = false;
         } else if (this.maximumValue != null
-          && this.maximumValue.compareTo(number) < 0) {
+            && this.maximumValue.compareTo(number) < 0) {
           this.fieldValidationMessage = "Value must be <= " + this.maximumValue;
           valid = false;
         } else {

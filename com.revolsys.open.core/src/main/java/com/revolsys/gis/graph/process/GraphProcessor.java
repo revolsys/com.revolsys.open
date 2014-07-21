@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.Edge;
+import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;

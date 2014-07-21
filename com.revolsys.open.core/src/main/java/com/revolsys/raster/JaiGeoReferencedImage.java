@@ -19,4 +19,12 @@ public class JaiGeoReferencedImage extends AbstractGeoReferencedImage {
     loadImageMetaData();
     postConstruct();
   }
+
+  @Override
+  public void cancelChanges() {
+    if (getImageResource() != null) {
+      loadImageMetaData();
+      setHasChanges(false);
+    }
+  }
 }

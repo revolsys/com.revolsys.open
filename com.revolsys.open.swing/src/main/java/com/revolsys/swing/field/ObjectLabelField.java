@@ -7,14 +7,13 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class ObjectLabelField extends JLabel implements Field {
   private static final long serialVersionUID = 1L;
@@ -74,7 +73,7 @@ public class ObjectLabelField extends JLabel implements Field {
 
   @Override
   public boolean isFieldValid() {
-    return !StringUtils.hasText(this.errorMessage);
+    return !Property.hasValue(this.errorMessage);
   }
 
   @Override
@@ -141,7 +140,7 @@ public class ObjectLabelField extends JLabel implements Field {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(this.errorMessage)) {
+    if (!Property.hasValue(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

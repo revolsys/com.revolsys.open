@@ -6,18 +6,16 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.io.RecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class RecordStoreConnectionRegistry extends
-  AbstractConnectionRegistry<RecordStoreConnection> {
-
-  private static final ThreadLocal<RecordStoreConnectionRegistry> threadRegistry = new ThreadLocal<RecordStoreConnectionRegistry>();
+AbstractConnectionRegistry<RecordStoreConnection> {
 
   public static RecordStoreConnectionRegistry getForThread() {
     return RecordStoreConnectionRegistry.threadRegistry.get();
@@ -30,17 +28,19 @@ public class RecordStoreConnectionRegistry extends
     return oldValue;
   }
 
+  private static final ThreadLocal<RecordStoreConnectionRegistry> threadRegistry = new ThreadLocal<RecordStoreConnectionRegistry>();
+
   protected RecordStoreConnectionRegistry(
-    final RecordStoreConnectionManager connectionManager,
-    final String name, final boolean visible) {
+    final RecordStoreConnectionManager connectionManager, final String name,
+    final boolean visible) {
     super(connectionManager, name);
     setVisible(visible);
     init();
   }
 
   protected RecordStoreConnectionRegistry(
-    final RecordStoreConnectionManager connectionManager,
-    final String name, final Resource resource) {
+    final RecordStoreConnectionManager connectionManager, final String name,
+    final Resource resource) {
     super(connectionManager, name);
     setDirectory(resource);
     init();
@@ -58,19 +58,19 @@ public class RecordStoreConnectionRegistry extends
     init();
   }
 
+  public void addConnection(final Map<String, Object> config) {
+    final RecordStoreConnection connection = new RecordStoreConnection(this,
+      null, config);
+    addConnection(connection);
+  }
+
   public void addConnection(final RecordStoreConnection connection) {
     addConnection(connection.getName(), connection);
   }
 
-  public void addConnection(final Map<String, Object> config) {
-    final RecordStoreConnection connection = new RecordStoreConnection(
-      this, null, config);
-    addConnection(connection);
-  }
-
   public void addConnection(final String name, final RecordStore recordStore) {
-    final RecordStoreConnection connection = new RecordStoreConnection(
-      this, name, recordStore);
+    final RecordStoreConnection connection = new RecordStoreConnection(this,
+      name, recordStore);
     addConnection(connection);
   }
 
@@ -78,7 +78,7 @@ public class RecordStoreConnectionRegistry extends
   protected RecordStoreConnection loadConnection(final File recordStoreFile) {
     final Map<String, ? extends Object> config = JsonMapIoFactory.toMap(recordStoreFile);
     String name = CollectionUtil.getString(config, "name");
-    if (!StringUtils.hasText(name)) {
+    if (!Property.hasValue(name)) {
       name = FileUtil.getBaseName(recordStoreFile);
     }
     try {
@@ -87,7 +87,7 @@ public class RecordStoreConnectionRegistry extends
       if (connectionProperties.isEmpty()) {
         LoggerFactory.getLogger(getClass()).error(
           "Data store must include a 'connection' map property: "
-            + recordStoreFile);
+              + recordStoreFile);
         return null;
       } else {
         final RecordStoreConnection recordStoreConnection = new RecordStoreConnection(

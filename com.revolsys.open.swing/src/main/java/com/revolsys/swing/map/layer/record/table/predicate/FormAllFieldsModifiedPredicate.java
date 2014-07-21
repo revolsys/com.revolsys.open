@@ -6,13 +6,13 @@ import java.lang.ref.WeakReference;
 
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerAttributesTableModel;
 import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.util.Property;
 
 public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
 
@@ -54,7 +54,7 @@ public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
               if (originalValue == null) {
                 if (fieldValue instanceof String) {
                   final String string = (String)fieldValue;
-                  if (!StringUtils.hasText(string)) {
+                  if (!Property.hasValue(string)) {
                     equal = true;
                   }
                 }

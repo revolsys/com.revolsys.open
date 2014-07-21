@@ -38,7 +38,6 @@ import java.util.List;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 

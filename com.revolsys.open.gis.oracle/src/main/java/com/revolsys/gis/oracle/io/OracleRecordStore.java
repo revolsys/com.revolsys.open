@@ -9,7 +9,6 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.IntHashMap;
@@ -42,6 +41,7 @@ import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.util.Property;
 
 public class OracleRecordStore extends AbstractJdbcRecordStore {
   private boolean initialized;
@@ -61,17 +61,6 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     this(new ArrayRecordFactory());
   }
 
-  public OracleRecordStore(final RecordFactory recordFactory) {
-    super(recordFactory);
-    initSettings();
-  }
-
-  public OracleRecordStore(final RecordFactory recordFactory,
-    final DataSource dataSource) {
-    this(recordFactory);
-    setDataSource(dataSource);
-  }
-
   public OracleRecordStore(final DataSource dataSource) {
     super(dataSource);
     initSettings();
@@ -85,6 +74,17 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     setDataSource(dataSource);
     initSettings();
 
+  }
+
+  public OracleRecordStore(final RecordFactory recordFactory) {
+    super(recordFactory);
+    initSettings();
+  }
+
+  public OracleRecordStore(final RecordFactory recordFactory,
+    final DataSource dataSource) {
+    this(recordFactory);
+    setDataSource(dataSource);
   }
 
   private void appendEnvelopeIntersects(final Query query,
@@ -125,7 +125,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(") = 1");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryAttribute.getClass());
+          + geometryAttribute.getClass());
     }
   }
 
@@ -167,7 +167,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(") = 1");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryAttribute.getClass());
+          + geometryAttribute.getClass());
     }
   }
 
@@ -214,8 +214,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
       final Column column = (Column)withinDistance.getGeometry1Value();
       final GeometryFactory geometryFactory = column.getAttribute()
-        .getRecordDefinition()
-        .getGeometryFactory();
+          .getRecordDefinition()
+          .getGeometryFactory();
       final Value geometry2Value = (Value)withinDistance.getGeometry2Value();
       final Value distanceValue = (Value)withinDistance.getDistanceValue();
       final Number distance = (Number)distanceValue.getValue();
@@ -250,7 +250,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(")");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryAttribute.getClass());
+          + geometryAttribute.getClass());
     }
   }
 
@@ -261,7 +261,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   public synchronized CoordinateSystem getCoordinateSystem(final int oracleSrid) {
-    CoordinateSystem coordinateSystem = oracleCoordinateSystems.get(oracleSrid);
+    CoordinateSystem coordinateSystem = this.oracleCoordinateSystems.get(oracleSrid);
     if (coordinateSystem == null) {
       try {
         final Map<String, Object> result = JdbcUtils.selectMap(getDataSource(),
@@ -278,7 +278,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
           "Unable to load coordinate system: " + oracleSrid, e);
         return null;
       }
-      oracleCoordinateSystems.put(oracleSrid, coordinateSystem);
+      this.oracleCoordinateSystems.put(oracleSrid, coordinateSystem);
     }
     return coordinateSystem;
   }
@@ -329,15 +329,15 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
       final String shortName = ShortNameProperty.getShortName(recordDefinition);
       final String sequenceName;
-      if (StringUtils.hasText(shortName)) {
-        if (useSchemaSequencePrefix) {
+      if (Property.hasValue(shortName)) {
+        if (this.useSchemaSequencePrefix) {
           sequenceName = schema + "." + shortName.toLowerCase() + "_SEQ";
         } else {
           sequenceName = shortName.toLowerCase() + "_SEQ";
         }
       } else {
         final String tableName = getDatabaseTableName(typePath);
-        if (useSchemaSequencePrefix) {
+        if (this.useSchemaSequencePrefix) {
           sequenceName = schema + "." + tableName + "_SEQ";
         } else {
           sequenceName = tableName + "_SEQ";
@@ -351,8 +351,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   @PostConstruct
   public void initialize() {
     super.initialize();
-    if (!initialized) {
-      initialized = true;
+    if (!this.initialized) {
+      this.initialized = true;
       final JdbcAttributeAdder attributeAdder = new JdbcAttributeAdder();
       addAttributeAdder("NUMBER", attributeAdder);
 
@@ -381,12 +381,12 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       setPrimaryKeySql("SELECT distinct cols.table_name, cols.column_name FROM all_constraints cons, all_cons_columns cols WHERE cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner AND cons.owner =?");
 
       setSchemaPermissionsSql("select distinct p.owner \"SCHEMA_NAME\" "
-        + "from ALL_TAB_PRIVS_RECD P "
-        + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
+          + "from ALL_TAB_PRIVS_RECD P "
+          + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
       setTablePermissionsSql("select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\" "
-        + "from ALL_TAB_PRIVS_RECD P "
-        + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
-        + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') ");
+          + "from ALL_TAB_PRIVS_RECD P "
+          + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
+          + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') ");
 
       addRecordStoreExtension(new ArcSdeStGeometryRecordStoreExtension());
       addRecordStoreExtension(new ArcSdeBinaryGeometryRecordStoreExtension());
@@ -399,7 +399,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
     setIteratorFactory(new RecordStoreIteratorFactory(this,
-      "createOracleIterator"));
+        "createOracleIterator"));
   }
 
   @Override
@@ -408,7 +408,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   public boolean isUseSchemaSequencePrefix() {
-    return useSchemaSequencePrefix;
+    return this.useSchemaSequencePrefix;
   }
 
   @Override

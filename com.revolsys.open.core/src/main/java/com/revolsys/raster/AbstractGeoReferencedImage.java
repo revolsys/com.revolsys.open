@@ -27,7 +27,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -201,10 +200,6 @@ public abstract class AbstractGeoReferencedImage extends
 
   @Override
   public void cancelChanges() {
-    if (this.imageResource != null) {
-      loadImageMetaData();
-      setHasChanges(false);
-    }
   }
 
   @Override
@@ -301,8 +296,10 @@ public abstract class AbstractGeoReferencedImage extends
     if (mappings.size() < 3) {
       return new AffineTransform();
     } else {
+      final int imageWidth = getImageWidth();
+      final int imageHeight = getImageHeight();
       final double[] affineTransformMatrix = calculateLSM(boundingBox,
-        this.imageWidth, this.imageHeight, mappings);
+        imageWidth, imageHeight, mappings);
       final double translateX = affineTransformMatrix[2];
       final double translateY = affineTransformMatrix[5];
       final double scaleX = affineTransformMatrix[0];
@@ -620,7 +617,7 @@ public abstract class AbstractGeoReferencedImage extends
       try {
         final Map<String, Object> settings = JsonMapIoFactory.toMap(settingsFile);
         final String boundingBoxWkt = (String)settings.get("boundingBox");
-        if (StringUtils.hasText(boundingBoxWkt)) {
+        if (Property.hasValue(boundingBoxWkt)) {
           final BoundingBox boundingBox = BoundingBoxDoubleGf.create(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
             setBoundingBox(boundingBox);

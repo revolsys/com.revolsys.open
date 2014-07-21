@@ -14,13 +14,12 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.Property;
 
 public class ValueField extends JPanel implements Field {
   private static final long serialVersionUID = 1L;
@@ -188,7 +187,7 @@ public class ValueField extends JPanel implements Field {
     final Object oldValue = this.fieldValue;
     this.fieldValue = value;
     firePropertyChange("fieldValue", oldValue, value);
-    if (StringUtils.hasText(this.fieldName)) {
+    if (Property.hasValue(this.fieldName)) {
       firePropertyChange(this.fieldName, oldValue, value);
     }
   }
@@ -200,7 +199,7 @@ public class ValueField extends JPanel implements Field {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(this.errorMessage)) {
+    if (!Property.hasValue(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

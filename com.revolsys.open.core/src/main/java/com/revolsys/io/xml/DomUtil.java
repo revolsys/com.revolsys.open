@@ -3,11 +3,12 @@ package com.revolsys.io.xml;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.revolsys.util.Property;
 
 public class DomUtil {
   public static void appendChildText(final StringBuffer text, final Node node) {
@@ -37,7 +38,7 @@ public class DomUtil {
 
   public static Double getDouble(final Node node) {
     final String text = getChildText(node);
-    if (StringUtils.hasText(text)) {
+    if (Property.hasValue(text)) {
       return Double.valueOf(text);
     } else {
       return null;
@@ -76,7 +77,7 @@ public class DomUtil {
 
   public static Integer getInteger(final Node node) {
     final String text = getChildText(node);
-    if (StringUtils.hasText(text)) {
+    if (Property.hasValue(text)) {
       return Integer.valueOf(text);
     } else {
       return null;

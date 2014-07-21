@@ -16,7 +16,6 @@ import java.util.Map.Entry;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.io.AbstractMapReaderFactory;
 import com.revolsys.io.FileUtil;
@@ -24,9 +23,10 @@ import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.util.Property;
 
 public class JsonMapIoFactory extends AbstractMapReaderFactory implements
-  MapWriterFactory {
+MapWriterFactory {
   public static Map<String, Object> toMap(final File file) {
     if (file == null) {
       return new LinkedHashMap<String, Object>();
@@ -58,7 +58,7 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
       try {
         final java.io.Reader reader = FileUtil.createUtf8Reader(in);
         try (
-          final JsonMapIterator iterator = new JsonMapIterator(reader, true)) {
+            final JsonMapIterator iterator = new JsonMapIterator(reader, true)) {
           if (iterator.hasNext()) {
             return iterator.next();
           } else {
@@ -73,7 +73,7 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
 
   public static final Map<String, Object> toMap(final Resource resource) {
     if (resource != null
-      && (!(resource instanceof FileSystemResource) || resource.exists())) {
+        && (!(resource instanceof FileSystemResource) || resource.exists())) {
       try {
         final InputStream in = resource.getInputStream();
         return toMap(in);
@@ -115,7 +115,7 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
   }
 
   public static Map<String, Object> toObjectMap(final String string) {
-    if (StringUtils.hasText(string)) {
+    if (Property.hasValue(string)) {
       final StringReader reader = new StringReader(string);
       final Reader<Map<String, Object>> mapReader = new JsonMapReader(reader,
         true);
@@ -139,7 +139,7 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
   public static String toString(final Map<String, ? extends Object> values) {
     final StringWriter writer = new StringWriter();
     try (
-      final JsonWriter jsonWriter = new JsonWriter(writer, false)) {
+        final JsonWriter jsonWriter = new JsonWriter(writer, false)) {
       jsonWriter.write(values);
     }
     return writer.toString();
@@ -149,7 +149,7 @@ public class JsonMapIoFactory extends AbstractMapReaderFactory implements
     final boolean indent) {
     final StringWriter writer = new StringWriter();
     try (
-      final JsonWriter jsonWriter = new JsonWriter(writer, indent)) {
+        final JsonWriter jsonWriter = new JsonWriter(writer, indent)) {
       jsonWriter.write(values);
     }
     return writer.toString();

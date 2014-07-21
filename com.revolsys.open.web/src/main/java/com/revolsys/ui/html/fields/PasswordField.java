@@ -1,9 +1,8 @@
 package com.revolsys.ui.html.fields;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.Property;
 
 public class PasswordField extends TextField {
 
@@ -31,7 +30,7 @@ public class PasswordField extends TextField {
     if (getSize() > 0) {
       out.attribute(HtmlUtil.ATTR_SIZE, getSize());
     }
-    if (StringUtils.hasText(getStyle())) {
+    if (Property.hasValue(getStyle())) {
       out.attribute(HtmlUtil.ATTR_STYLE, getStyle());
     }
     if (isRequired()) {

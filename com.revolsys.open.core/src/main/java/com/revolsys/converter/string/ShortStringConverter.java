@@ -1,6 +1,6 @@
 package com.revolsys.converter.string;
 
-import org.springframework.util.StringUtils;
+import com.revolsys.util.Property;
 
 public class ShortStringConverter extends AbstractNumberStringConverter<Short> {
   public ShortStringConverter() {
@@ -34,7 +34,7 @@ public class ShortStringConverter extends AbstractNumberStringConverter<Short> {
 
   @Override
   public Short toObject(final String string) {
-    if (StringUtils.hasText(string)) {
+    if (Property.hasValue(string)) {
       return Short.valueOf(string);
     } else {
       return null;

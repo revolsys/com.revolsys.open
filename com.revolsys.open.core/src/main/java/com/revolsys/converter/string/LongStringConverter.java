@@ -1,6 +1,6 @@
 package com.revolsys.converter.string;
 
-import org.springframework.util.StringUtils;
+import com.revolsys.util.Property;
 
 public class LongStringConverter extends AbstractNumberStringConverter<Long> {
   public LongStringConverter() {
@@ -34,7 +34,7 @@ public class LongStringConverter extends AbstractNumberStringConverter<Long> {
 
   @Override
   public Long toObject(final String string) {
-    if (StringUtils.hasText(string)) {
+    if (Property.hasValue(string)) {
       return Long.valueOf(string);
     } else {
       return null;

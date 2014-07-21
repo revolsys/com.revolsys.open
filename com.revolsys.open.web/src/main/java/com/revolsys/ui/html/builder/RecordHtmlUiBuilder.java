@@ -9,8 +9,6 @@ import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.collection.ResultPager;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.identifier.Identifier;
@@ -26,6 +24,7 @@ import com.revolsys.ui.html.serializer.key.KeySerializer;
 import com.revolsys.ui.html.view.TabElementContainer;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
 
@@ -99,11 +98,11 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   protected Map<String, Object> createDataTableMap(
     final HttpServletRequest request, final String pageName, final Query query) {
     final String search = request.getParameter("sSearch");
-    if (StringUtils.hasText(search)) {
+    if (Property.hasValue(search)) {
       final List<KeySerializer> serializers = getSerializers(pageName, "list");
       final Or or = new Or();
       final int numSortColumns = HttpServletUtils.getIntegerParameter(request,
-        "iColumns");
+          "iColumns");
       for (int i = 0; i < numSortColumns; i++) {
         if (HttpServletUtils.getBooleanParameter(request, "bSearchable_" + i)) {
           final KeySerializer serializer = serializers.get(i);
@@ -119,7 +118,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     query.setOrderBy(orderBy);
 
     try (
-      final ResultPager<Record> pager = getResultPager(query)) {
+        final ResultPager<Record> pager = getResultPager(query)) {
       return createDataTableMap(request, pager, pageName);
     }
   }
@@ -150,12 +149,12 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     this.tableName = null;
   }
 
-  public RecordStore getRecordStore() {
-    return this.recordStore;
-  }
-
   protected RecordDefinition getRecordDefinition() {
     return getRecordStore().getRecordDefinition(getTableName());
+  }
+
+  public RecordStore getRecordStore() {
+    return this.recordStore;
   }
 
   public ResultPager<Record> getResultPager(final Query query) {

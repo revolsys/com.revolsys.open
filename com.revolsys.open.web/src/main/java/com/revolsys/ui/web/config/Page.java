@@ -19,7 +19,6 @@ import org.springframework.security.access.expression.ExpressionUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriTemplate;
 
 import com.revolsys.spring.StringTemplate;
@@ -76,14 +75,14 @@ public class Page extends Component {
 
   public Page(final Page page) {
     super(page);
-    menuId = page.menuId;
+    this.menuId = page.menuId;
     setPath(page.path);
     setTitle(page.title);
-    properties.putAll(page.properties);
-    arguments.addAll(page.arguments);
-    argumentsMap.putAll(page.argumentsMap);
-    attributes.addAll(page.attributes);
-    attributesMap.putAll(page.attributesMap);
+    this.properties.putAll(page.properties);
+    this.arguments.addAll(page.arguments);
+    this.argumentsMap.putAll(page.argumentsMap);
+    this.attributes.addAll(page.attributes);
+    this.attributesMap.putAll(page.attributesMap);
   }
 
   public Page(final String name, final String title, final String path,
@@ -94,15 +93,10 @@ public class Page extends Component {
     this.secure = secure;
   }
 
-  @Override
-  public String toString() {
-    return getName();
-  }
-
   public void addArgument(final Argument argument) {
     if (!hasArgument(argument.getName())) {
-      arguments.add(argument);
-      argumentsMap.put(argument.getName(), argument);
+      this.arguments.add(argument);
+      this.argumentsMap.put(argument.getName(), argument);
     }
     if (argument.isInheritable()) {
       for (final Page page : this.pages.values()) {
@@ -113,36 +107,36 @@ public class Page extends Component {
 
   public void addAttribute(final Attribute attribute) {
     if (!hasArgument(attribute.getName())) {
-      attributes.add(attribute);
-      attributesMap.put(attribute.getName(), attribute);
+      this.attributes.add(attribute);
+      this.attributesMap.put(attribute.getName(), attribute);
     }
     if (attribute.isInheritable()) {
-      for (final Page page : pages.values()) {
+      for (final Page page : this.pages.values()) {
         page.addAttribute(attribute);
       }
     }
   }
 
   public void addMenu(final Menu menu) {
-    menus.put(menu.getName(), menu);
+    this.menus.put(menu.getName(), menu);
   }
 
   public void addPage(final Page page) {
-    pages.put(page.getName(), page);
-    pathMap.put(page.getPath(), page);
+    this.pages.put(page.getName(), page);
+    this.pathMap.put(page.getPath(), page);
     page.setParent(this);
     for (final Entry<String, Page> entry : page.getPathMap().entrySet()) {
       final String path = page.getPath() + entry.getKey();
       final Page childPage = entry.getValue();
-      pathMap.put(path, childPage);
+      this.pathMap.put(path, childPage);
     }
 
-    for (final Argument argument : arguments) {
+    for (final Argument argument : this.arguments) {
       if (argument.isInheritable()) {
         page.addArgument(argument);
       }
     }
-    for (final Attribute attribute : attributes) {
+    for (final Attribute attribute : this.attributes) {
       if (attribute.isInheritable()) {
         page.addAttribute(attribute);
       }
@@ -150,11 +144,11 @@ public class Page extends Component {
   }
 
   public void addProperty(final String name, final String value) {
-    properties.put(name, value);
+    this.properties.put(name, value);
   }
 
   public boolean canAccess(final Map<String, ? extends Object> parameters) {
-    if (permissionExpression == null) {
+    if (this.permissionExpression == null) {
       return true;
     } else {
       try {
@@ -164,10 +158,10 @@ public class Page extends Component {
           final Object value = entry.getValue();
           securityEvaluationContext.setVariable(name, value);
         }
-        return ExpressionUtils.evaluateAsBoolean(permissionExpression,
+        return ExpressionUtils.evaluateAsBoolean(this.permissionExpression,
           securityEvaluationContext);
       } catch (final Throwable t) {
-        LOG.error("Unable to evaluate " + permission, t);
+        LOG.error("Unable to evaluate " + this.permission, t);
         return false;
       }
     }
@@ -183,10 +177,11 @@ public class Page extends Component {
     if (o instanceof Page) {
       final Page p = (Page)o;
       if (super.equals(o)
-        && p.menuId == menuId
-        && p.path.equals(path)
-        && (p.title == title || p.title != null && title != null
-          && p.title.equals(title)) && p.properties.equals(properties)) {
+          && p.menuId == this.menuId
+          && p.path.equals(this.path)
+          && (p.title == this.title || p.title != null && this.title != null
+          && p.title.equals(this.title))
+        && p.properties.equals(this.properties)) {
         return true;
       }
     }
@@ -194,8 +189,8 @@ public class Page extends Component {
   }
 
   public String getAbsolutePath() {
-    if (parent != null) {
-      return parent.getAbsolutePath() + path;
+    if (this.parent != null) {
+      return this.parent.getAbsolutePath() + this.path;
     } else {
       final WebUiContext uiContext = WebUiContext.get();
       if (uiContext != null) {
@@ -203,20 +198,20 @@ public class Page extends Component {
         if (config != null) {
           final String basePath = config.getBasePath();
           if (basePath != null) {
-            return basePath + path;
+            return basePath + this.path;
           }
         }
       }
     }
-    return path;
+    return this.path;
   }
 
   public List<Argument> getArguments() {
-    return arguments;
+    return this.arguments;
   }
 
   public List<Attribute> getAttributes() {
-    return attributes;
+    return this.attributes;
   }
 
   public String getExpandedTitle() {
@@ -225,7 +220,7 @@ public class Page extends Component {
   }
 
   public String getFullPath() {
-    if (secure) {
+    if (this.secure) {
       return getAbsolutePath() + ".wps";
     } else {
       return getAbsolutePath();
@@ -239,11 +234,11 @@ public class Page extends Component {
 
   public String getFullUrl(final Map<String, ? extends Object> parameters) {
     final Map<String, Object> uriParameters = new HashMap<String, Object>(
-      parameters);
+        parameters);
     final HttpServletRequest request = HttpServletUtils.getRequest();
     if (request != null) {
 
-      for (final Argument argument : arguments) {
+      for (final Argument argument : this.arguments) {
         final String name = argument.getName();
         if (!uriParameters.containsKey(name)) {
           final String value = request.getParameter(name);
@@ -256,21 +251,21 @@ public class Page extends Component {
     if (canAccess(uriParameters)) {
       try {
         final Map<String, Object> uriTemplateVariables = getUriTemplateVariables(uriParameters);
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        Authentication authentication = securityContext.getAuthentication();
+        final SecurityContext securityContext = SecurityContextHolder.getContext();
+        final Authentication authentication = securityContext.getAuthentication();
         if (authentication != null) {
           uriTemplateVariables.put("remoteUser", authentication.getName());
         } else if (request != null) {
-          Principal userPrincipal = request.getUserPrincipal();
+          final Principal userPrincipal = request.getUserPrincipal();
           if (userPrincipal != null) {
             uriTemplateVariables.put("remoteUser", userPrincipal.getName());
           }
         }
-        final URI path = uriTemplate.expand(uriTemplateVariables);
+        final URI path = this.uriTemplate.expand(uriTemplateVariables);
         final String url = UrlUtil.getUrl(path, uriParameters);
         return HttpServletUtils.getFullUrl(url);
-      } catch (IllegalArgumentException e) {
-        LOG.debug("Unable to expand variables for " + uriTemplate, e);
+      } catch (final IllegalArgumentException e) {
+        LOG.debug("Unable to expand variables for " + this.uriTemplate, e);
         return null;
       }
     } else {
@@ -279,15 +274,15 @@ public class Page extends Component {
   }
 
   public Layout getLayout() {
-    return layout;
+    return this.layout;
   }
 
   public Menu getMenu(final String name) {
-    return menus.get(name);
+    return this.menus.get(name);
   }
 
   public long getMenuId() {
-    return menuId;
+    return this.menuId;
   }
 
   public Page getPage(final String name) {
@@ -298,7 +293,7 @@ public class Page extends Component {
       if (name.startsWith("/")) {
         return WebUiContext.get().getConfig().getPage(name);
       }
-      Page page = pages.get(name);
+      Page page = this.pages.get(name);
       if (page == null) {
         final Page parent = getParent();
         if (parent != null) {
@@ -314,44 +309,44 @@ public class Page extends Component {
   }
 
   public Page getParent() {
-    return parent;
+    return this.parent;
   }
 
   public String getPath() {
-    return path;
+    return this.path;
   }
 
   public Map<String, Page> getPathMap() {
-    return pathMap;
+    return this.pathMap;
   }
 
   public String getPermission() {
-    return permission;
+    return this.permission;
   }
 
   public Expression getPermissionExpression() {
-    return permissionExpression;
+    return this.permissionExpression;
   }
 
   public String getProperty(final String name) {
-    return properties.get(name);
+    return this.properties.get(name);
   }
 
   public String getTitle() {
-    if (titleExpression != null) {
+    if (this.titleExpression != null) {
       final WebUiContext context = WebUiContext.get();
-      return (String)context.evaluateExpression(titleExpression);
+      return (String)context.evaluateExpression(this.titleExpression);
     } else {
-      return title;
+      return this.title;
     }
   }
 
   public String getTitle(final Map<String, Object> parameters) {
-    if (titleTemplate == null) {
-      return title;
+    if (this.titleTemplate == null) {
+      return this.title;
     } else {
       final Map<String, Object> uriTemplateVariables = getUriTemplateVariables(parameters);
-      return titleTemplate.expand(uriTemplateVariables);
+      return this.titleTemplate.expand(uriTemplateVariables);
     }
   }
 
@@ -361,7 +356,7 @@ public class Page extends Component {
     final Map<String, String> pathVariables = HttpServletUtils.getPathVariables();
     final Map<String, Object> uriTemplateVariables = new HashMap<String, Object>();
 
-    for (final String name : uriTemplate.getVariableNames()) {
+    for (final String name : this.uriTemplate.getVariableNames()) {
       Object value = parameters.remove(name);
       if (value == null) {
         if (pathVariables != null) {
@@ -379,25 +374,25 @@ public class Page extends Component {
   }
 
   public boolean hasArgument(final String name) {
-    return argumentsMap.containsKey(name);
+    return this.argumentsMap.containsKey(name);
   }
 
   public boolean hasAttribute(final String name) {
-    return attributesMap.containsKey(name);
+    return this.attributesMap.containsKey(name);
   }
 
   /**
    * Generate the hash code for the object.
-   * 
+   *
    * @return The hashCode.
    */
   @Override
   public int hashCode() {
-    return super.hashCode() + (path.hashCode() << 2);
+    return super.hashCode() + (this.path.hashCode() << 2);
   }
 
   public final boolean isSecure() {
-    return secure;
+    return this.secure;
   }
 
   public void setLayout(final Layout layout) {
@@ -412,7 +407,7 @@ public class Page extends Component {
   public void setParent(final Page parent) {
     this.parent = parent;
     if (parent.isSecure()) {
-      secure = true;
+      this.secure = true;
     }
   }
 
@@ -422,7 +417,7 @@ public class Page extends Component {
     } else {
       this.path = "/" + CaseConverter.toLowerCamelCase(getName());
     }
-    uriTemplate = new UriTemplate(this.path);
+    this.uriTemplate = new UriTemplate(this.path);
   }
 
   public void setPathMap(final Map<String, Page> pathMap) {
@@ -431,7 +426,7 @@ public class Page extends Component {
 
   public void setPermission(final String permission) {
     this.permission = permission;
-    if (StringUtils.hasText(permission)) {
+    if (com.revolsys.util.Property.hasValue(permission)) {
       final SpelExpressionParser parser = new SpelExpressionParser();
       this.permissionExpression = parser.parseExpression(permission);
     } else {
@@ -446,17 +441,22 @@ public class Page extends Component {
   public void setTitle(final String title) {
     if (title != null) {
       this.title = title;
-      titleTemplate = new StringTemplate(title);
-      if (titleTemplate.getVariableNames().isEmpty()) {
-        titleTemplate = null;
+      this.titleTemplate = new StringTemplate(title);
+      if (this.titleTemplate.getVariableNames().isEmpty()) {
+        this.titleTemplate = null;
       }
       try {
-        titleExpression = JexlUtil.createExpression(title);
+        this.titleExpression = JexlUtil.createExpression(title);
       } catch (final Exception e) {
         LOG.error(e.getMessage(), e);
       }
     } else {
       this.title = CaseConverter.toCapitalizedWords(getName());
     }
+  }
+
+  @Override
+  public String toString() {
+    return getName();
   }
 }

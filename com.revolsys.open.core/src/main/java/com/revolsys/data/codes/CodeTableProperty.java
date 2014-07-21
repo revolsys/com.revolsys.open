@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.comparator.RecordAttributeComparator;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.ListIdentifier;
@@ -166,13 +164,13 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   @Override
   public String getIdAttributeName() {
-    if (StringUtils.hasText(this.idAttributeName)) {
+    if (Property.hasValue(this.idAttributeName)) {
       return this.idAttributeName;
     } else if (this.recordDefinition == null) {
       return "";
     } else {
       final String idAttributeName = this.recordDefinition.getIdAttributeName();
-      if (StringUtils.hasText(idAttributeName)) {
+      if (Property.hasValue(idAttributeName)) {
         return idAttributeName;
       } else {
         return this.recordDefinition.getAttributeName(0);

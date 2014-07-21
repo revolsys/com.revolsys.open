@@ -8,7 +8,6 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.NoSuchElementException;
 
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.data.io.RecordIterator;
@@ -32,9 +31,10 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.util.Property;
 
 public class ShapefileIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
 
   private boolean closeFile = true;
 
@@ -64,30 +64,31 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
 
   private RecordDefinition returnMetaData;
 
-  public ShapefileIterator(final Resource resource,
-    final RecordFactory factory) throws IOException {
+  public ShapefileIterator(final Resource resource, final RecordFactory factory)
+    throws IOException {
     this.recordDefinitionFactory = factory;
     final String baseName = FileUtil.getBaseName(resource.getFilename());
-    name = baseName;
-    this.typeName = "/" + name;
+    this.name = baseName;
+    this.typeName = "/" + this.name;
     this.resource = resource;
   }
 
   @Override
   protected void doClose() {
-    if (closeFile) {
+    if (this.closeFile) {
       forceClose();
     }
   }
 
   @Override
   protected synchronized void doInit() {
-    if (in == null) {
+    if (this.in == null) {
       try {
         final Boolean memoryMapped = getProperty("memoryMapped");
         try {
-          final File file = SpringUtil.getFile(resource);
-          final File indexFile = new File(file.getParentFile(), name + ".shx");
+          final File file = SpringUtil.getFile(this.resource);
+          final File indexFile = new File(file.getParentFile(), this.name
+            + ".shx");
           if (Boolean.TRUE == memoryMapped) {
             this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
             this.indexIn = new EndianMappedByteBuffer(indexFile,
@@ -97,37 +98,37 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
             this.in = new LittleEndianRandomAccessFile(file, "r");
           }
         } catch (final IllegalArgumentException e) {
-          this.in = new EndianInputStream(resource.getInputStream());
+          this.in = new EndianInputStream(this.resource.getInputStream());
         } catch (final FileNotFoundException e) {
-          this.in = new EndianInputStream(resource.getInputStream());
+          this.in = new EndianInputStream(this.resource.getInputStream());
         }
 
-        final Resource xbaseResource = this.resource.createRelative(name
+        final Resource xbaseResource = this.resource.createRelative(this.name
           + ".dbf");
         if (xbaseResource.exists()) {
-          xbaseIterator = new XbaseIterator(xbaseResource,
+          this.xbaseIterator = new XbaseIterator(xbaseResource,
             this.recordDefinitionFactory, new InvokeMethodRunnable(this,
-              "updateMetaData"));
-          xbaseIterator.setTypeName(typeName);
-          xbaseIterator.setProperty("memoryMapped", memoryMapped);
-          xbaseIterator.setCloseFile(closeFile);
+                "updateMetaData"));
+          this.xbaseIterator.setTypeName(this.typeName);
+          this.xbaseIterator.setProperty("memoryMapped", memoryMapped);
+          this.xbaseIterator.setCloseFile(this.closeFile);
         }
         loadHeader();
         int axisCount;
         int srid = 0;
-        switch (shapeType) {
+        switch (this.shapeType) {
           case ShapefileConstants.POINT_SHAPE: // 1
           case ShapefileConstants.POLYLINE_SHAPE: // 3
           case ShapefileConstants.POLYGON_SHAPE: // 5
           case ShapefileConstants.MULTI_POINT_SHAPE: // 8
             axisCount = 2;
-          break;
+            break;
           case ShapefileConstants.POINT_Z_SHAPE: // 9
           case ShapefileConstants.POLYLINE_Z_SHAPE: // 10
           case ShapefileConstants.POLYGON_Z_SHAPE: // 19
           case ShapefileConstants.MULTI_POINT_Z_SHAPE: // 20
             axisCount = 3;
-          break;
+            break;
           case ShapefileConstants.POINT_ZM_SHAPE: // 11
           case ShapefileConstants.POLYLINE_ZM_SHAPE: // 13
           case ShapefileConstants.POLYGON_ZM_SHAPE: // 15
@@ -137,82 +138,73 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
           case ShapefileConstants.POLYGON_M_SHAPE: // 25
           case ShapefileConstants.MULTI_POINT_M_SHAPE: // 28
             axisCount = 4;
-          break;
+            break;
           default:
-            throw new RuntimeException("Unknown shape type:" + shapeType);
+            throw new RuntimeException("Unknown shape type:" + this.shapeType);
         }
-        geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-        final Resource projResource = this.resource.createRelative(name
+        this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+        final Resource projResource = this.resource.createRelative(this.name
           + ".prj");
         if (projResource.exists()) {
           try {
             final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(projResource);
             srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
-            setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
+            setProperty(IoConstants.GEOMETRY_FACTORY, this.geometryFactory);
           } catch (final Exception e) {
             e.printStackTrace();
           }
         }
-        if (geometryFactory == null) {
+        if (this.geometryFactory == null) {
           if (srid < 1) {
             srid = 4326;
           }
-          geometryFactory = GeometryFactory.floating(srid, axisCount);
+          this.geometryFactory = GeometryFactory.floating(srid, axisCount);
         }
 
-        if (xbaseIterator != null) {
-          xbaseIterator.hasNext();
+        if (this.xbaseIterator != null) {
+          this.xbaseIterator.hasNext();
         }
-        if (recordDefinition == null) {
-          recordDefinition = RecordUtil.createGeometryMetaData();
+        if (this.recordDefinition == null) {
+          this.recordDefinition = RecordUtil.createGeometryMetaData();
         }
-        recordDefinition.setGeometryFactory(geometryFactory);
+        this.recordDefinition.setGeometryFactory(this.geometryFactory);
       } catch (final IOException e) {
-        throw new RuntimeException("Error initializing mappedFile " + resource,
-          e);
+        throw new RuntimeException("Error initializing mappedFile "
+          + this.resource, e);
       }
     }
   }
 
   public void forceClose() {
-    FileUtil.closeSilent(in, indexIn);
-    if (xbaseIterator != null) {
-      xbaseIterator.forceClose();
+    FileUtil.closeSilent(this.in, this.indexIn);
+    if (this.xbaseIterator != null) {
+      this.xbaseIterator.forceClose();
     }
-    recordDefinitionFactory = null;
-    geometryFactory = null;
-    in = null;
-    indexIn = null;
-    recordDefinition = null;
-    resource = null;
-    xbaseIterator = null;
-  }
-
-  public RecordFactory getRecordDefinitionFactory() {
-    return recordDefinitionFactory;
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    return recordDefinition;
+    this.recordDefinitionFactory = null;
+    this.geometryFactory = null;
+    this.in = null;
+    this.indexIn = null;
+    this.recordDefinition = null;
+    this.resource = null;
+    this.xbaseIterator = null;
   }
 
   @Override
   protected Record getNext() {
     Record record;
     try {
-      if (xbaseIterator != null) {
-        if (xbaseIterator.hasNext()) {
-          record = xbaseIterator.next();
-          for (int i = 0; i < xbaseIterator.getDeletedCount(); i++) {
-            position++;
+      if (this.xbaseIterator != null) {
+        if (this.xbaseIterator.hasNext()) {
+          record = this.xbaseIterator.next();
+          for (int i = 0; i < this.xbaseIterator.getDeletedCount(); i++) {
+            this.position++;
             readGeometry();
           }
         } else {
           throw new NoSuchElementException();
         }
       } else {
-        record = recordDefinitionFactory.createRecord(recordDefinition);
+        record = this.recordDefinitionFactory.createRecord(this.recordDefinition);
       }
 
       final Geometry geometry = readGeometry();
@@ -220,19 +212,28 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
     } catch (final EOFException e) {
       throw new NoSuchElementException();
     } catch (final IOException e) {
-      throw new RuntimeException("Error reading geometry " + resource, e);
+      throw new RuntimeException("Error reading geometry " + this.resource, e);
     }
-    if (returnMetaData == null) {
+    if (this.returnMetaData == null) {
       return record;
     } else {
-      final Record copy = recordDefinitionFactory.createRecord(returnMetaData);
+      final Record copy = this.recordDefinitionFactory.createRecord(this.returnMetaData);
       copy.setValues(record);
       return copy;
     }
   }
 
   public int getPosition() {
-    return position;
+    return this.position;
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
+  }
+
+  public RecordFactory getRecordDefinitionFactory() {
+    return this.recordDefinitionFactory;
   }
 
   public String getTypeName() {
@@ -240,36 +241,36 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
   }
 
   public boolean isCloseFile() {
-    return closeFile;
+    return this.closeFile;
   }
 
   /**
    * Load the header record from the shape mappedFile.
-   * 
+   *
    * @throws IOException If an I/O error occurs.
    */
   @SuppressWarnings("unused")
   private void loadHeader() throws IOException {
-    in.readInt();
-    in.skipBytes(20);
-    final int fileLength = in.readInt();
-    final int version = in.readLEInt();
-    shapeType = in.readLEInt();
-    final double minX = in.readLEDouble();
-    final double minY = in.readLEDouble();
-    final double maxX = in.readLEDouble();
-    final double maxY = in.readLEDouble();
-    final double minZ = in.readLEDouble();
-    final double maxZ = in.readLEDouble();
-    final double minM = in.readLEDouble();
-    final double maxM = in.readLEDouble();
+    this.in.readInt();
+    this.in.skipBytes(20);
+    final int fileLength = this.in.readInt();
+    final int version = this.in.readLEInt();
+    this.shapeType = this.in.readLEInt();
+    final double minX = this.in.readLEDouble();
+    final double minY = this.in.readLEDouble();
+    final double maxX = this.in.readLEDouble();
+    final double maxY = this.in.readLEDouble();
+    final double minZ = this.in.readLEDouble();
+    final double maxZ = this.in.readLEDouble();
+    final double minM = this.in.readLEDouble();
+    final double maxM = this.in.readLEDouble();
   }
 
   @SuppressWarnings("unused")
   private Geometry readGeometry() throws IOException {
-    final int recordNumber = in.readInt();
-    final int recordLength = in.readInt();
-    final int shapeType = in.readLEInt();
+    final int recordNumber = this.in.readInt();
+    final int recordLength = this.in.readInt();
+    final int shapeType = this.in.readLEInt();
     final ShapefileGeometryUtil util = ShapefileGeometryUtil.SHP_INSTANCE;
     switch (shapeType) {
       case ShapefileConstants.NULL_SHAPE:
@@ -278,64 +279,65 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
           case ShapefileConstants.POINT_M_SHAPE:
           case ShapefileConstants.POINT_Z_SHAPE:
           case ShapefileConstants.POINT_ZM_SHAPE:
-            return geometryFactory.point();
+            return this.geometryFactory.point();
 
           case ShapefileConstants.MULTI_POINT_SHAPE:
           case ShapefileConstants.MULTI_POINT_M_SHAPE:
           case ShapefileConstants.MULTI_POINT_Z_SHAPE:
           case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
-            return geometryFactory.multiPoint();
+            return this.geometryFactory.multiPoint();
 
           case ShapefileConstants.POLYLINE_SHAPE:
           case ShapefileConstants.POLYLINE_M_SHAPE:
           case ShapefileConstants.POLYLINE_Z_SHAPE:
           case ShapefileConstants.POLYLINE_ZM_SHAPE:
-            return geometryFactory.multiLineString();
+            return this.geometryFactory.multiLineString();
 
           case ShapefileConstants.POLYGON_SHAPE:
           case ShapefileConstants.POLYGON_M_SHAPE:
           case ShapefileConstants.POLYGON_Z_SHAPE:
           case ShapefileConstants.POLYGON_ZM_SHAPE:
-            return geometryFactory.multiPolygon();
+            return this.geometryFactory.multiPolygon();
           default:
             throw new IllegalArgumentException(
               "Shapefile shape type not supported: " + shapeType);
         }
       case ShapefileConstants.POINT_SHAPE:
-        return util.readPoint(geometryFactory, in, recordLength);
+        return util.readPoint(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.POINT_M_SHAPE:
-        return util.readPointM(geometryFactory, in, recordLength);
+        return util.readPointM(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.POINT_Z_SHAPE:
-        return util.readPointZ(geometryFactory, in, recordLength);
+        return util.readPointZ(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.POINT_ZM_SHAPE:
-        return util.readPointZM(geometryFactory, in, recordLength);
+        return util.readPointZM(this.geometryFactory, this.in, recordLength);
 
       case ShapefileConstants.MULTI_POINT_SHAPE:
-        return util.readMultipoint(geometryFactory, in, recordLength);
+        return util.readMultipoint(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.MULTI_POINT_M_SHAPE:
-        return util.readMultipointM(geometryFactory, in, recordLength);
+        return util.readMultipointM(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.MULTI_POINT_Z_SHAPE:
-        return util.readMultipointZ(geometryFactory, in, recordLength);
+        return util.readMultipointZ(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
-        return util.readMultipointZM(geometryFactory, in, recordLength);
+        return util.readMultipointZM(this.geometryFactory, this.in,
+          recordLength);
 
       case ShapefileConstants.POLYLINE_SHAPE:
-        return util.readPolyline(geometryFactory, in, recordLength);
+        return util.readPolyline(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.POLYLINE_M_SHAPE:
-        return util.readPolylineM(geometryFactory, in, recordLength);
+        return util.readPolylineM(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.POLYLINE_Z_SHAPE:
-        return util.readPolylineZ(geometryFactory, in, recordLength);
+        return util.readPolylineZ(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.POLYLINE_ZM_SHAPE:
-        return util.readPolylineZM(geometryFactory, in, recordLength);
+        return util.readPolylineZM(this.geometryFactory, this.in, recordLength);
 
       case ShapefileConstants.POLYGON_SHAPE:
-        return util.readPolygon(geometryFactory, in, recordLength);
+        return util.readPolygon(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.POLYGON_M_SHAPE:
-        return util.readPolygonM(geometryFactory, in, recordLength);
+        return util.readPolygonM(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.POLYGON_Z_SHAPE:
-        return util.readPolygonZ(geometryFactory, in, recordLength);
+        return util.readPolygonZ(this.geometryFactory, this.in, recordLength);
       case ShapefileConstants.POLYGON_ZM_SHAPE:
-        return util.readPolygonZM(geometryFactory, in, recordLength);
+        return util.readPolygonZM(this.geometryFactory, this.in, recordLength);
       default:
         throw new IllegalArgumentException(
           "Shapefile shape type not supported: " + shapeType);
@@ -344,8 +346,29 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
 
   public void setCloseFile(final boolean closeFile) {
     this.closeFile = closeFile;
-    if (xbaseIterator != null) {
-      xbaseIterator.setCloseFile(closeFile);
+    if (this.xbaseIterator != null) {
+      this.xbaseIterator.setCloseFile(closeFile);
+    }
+  }
+
+  public void setPosition(final int position) {
+    if (this.mappedFile) {
+      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)this.in;
+      this.position = position;
+      try {
+        this.indexIn.seek(100 + 8 * position);
+        final int offset = this.indexIn.readInt();
+        file.seek(offset * 2);
+        setLoadNext(true);
+      } catch (final IOException e) {
+        throw new RuntimeException("Unable to find record " + position, e);
+      }
+      if (this.xbaseIterator != null) {
+        this.xbaseIterator.setPosition(position);
+      }
+    } else {
+      throw new UnsupportedOperationException(
+          "The position can only be set on files");
     }
   }
 
@@ -353,76 +376,55 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
     this.returnMetaData = recordDefinition;
   }
 
-  public void setPosition(final int position) {
-    if (mappedFile) {
-      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
-      this.position = position;
-      try {
-        indexIn.seek(100 + 8 * position);
-        final int offset = indexIn.readInt();
-        file.seek(offset * 2);
-        setLoadNext(true);
-      } catch (final IOException e) {
-        throw new RuntimeException("Unable to find record " + position, e);
-      }
-      if (xbaseIterator != null) {
-        xbaseIterator.setPosition(position);
-      }
-    } else {
-      throw new UnsupportedOperationException(
-        "The position can only be set on files");
-    }
-  }
-
   public void setTypeName(final String typeName) {
-    if (StringUtils.hasText(typeName)) {
+    if (Property.hasValue(typeName)) {
       this.typeName = typeName;
     }
   }
 
   @Override
   public String toString() {
-    return ShapefileConstants.DESCRIPTION + " " + resource;
+    return ShapefileConstants.DESCRIPTION + " " + this.resource;
   }
 
   public void updateMetaData() {
     assert this.recordDefinition == null : "Cannot override recordDefinition when set";
-    if (xbaseIterator != null) {
-      final RecordDefinitionImpl recordDefinition = xbaseIterator.getRecordDefinition();
+    if (this.xbaseIterator != null) {
+      final RecordDefinitionImpl recordDefinition = this.xbaseIterator.getRecordDefinition();
       this.recordDefinition = recordDefinition;
       if (recordDefinition.getGeometryAttributeIndex() == -1) {
         DataType geometryType = DataTypes.GEOMETRY;
-        switch (shapeType) {
+        switch (this.shapeType) {
           case ShapefileConstants.POINT_SHAPE:
           case ShapefileConstants.POINT_Z_SHAPE:
           case ShapefileConstants.POINT_M_SHAPE:
           case ShapefileConstants.POINT_ZM_SHAPE:
             geometryType = DataTypes.POINT;
-          break;
+            break;
 
           case ShapefileConstants.POLYLINE_SHAPE:
           case ShapefileConstants.POLYLINE_Z_SHAPE:
           case ShapefileConstants.POLYLINE_M_SHAPE:
           case ShapefileConstants.POLYLINE_ZM_SHAPE:
             geometryType = DataTypes.MULTI_LINE_STRING;
-          break;
+            break;
 
           case ShapefileConstants.POLYGON_SHAPE:
           case ShapefileConstants.POLYGON_Z_SHAPE:
           case ShapefileConstants.POLYGON_M_SHAPE:
           case ShapefileConstants.POLYGON_ZM_SHAPE:
             geometryType = DataTypes.MULTI_POLYGON;
-          break;
+            break;
 
           case ShapefileConstants.MULTI_POINT_SHAPE:
           case ShapefileConstants.MULTI_POINT_Z_SHAPE:
           case ShapefileConstants.MULTI_POINT_M_SHAPE:
           case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
             geometryType = DataTypes.MULTI_POINT;
-          break;
+            break;
 
           default:
-          break;
+            break;
         }
         recordDefinition.addAttribute("geometry", geometryType, true);
       }

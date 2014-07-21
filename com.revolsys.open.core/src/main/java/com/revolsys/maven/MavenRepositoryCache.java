@@ -15,10 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.HexConverter;
+import com.revolsys.util.Property;
 
 public class MavenRepositoryCache extends MavenRepository {
   private static final Logger LOG = LoggerFactory.getLogger(MavenRepository.class);
@@ -54,7 +54,7 @@ public class MavenRepositoryCache extends MavenRepository {
       repository.getRoot(), path);
     if (repositoryResource.exists()) {
       try {
-        if (StringUtils.hasText(sha1Digest)) {
+        if (Property.hasValue(sha1Digest)) {
           final InputStream in = SpringUtil.getInputStream(repositoryResource);
           final DigestInputStream digestIn = new DigestInputStream(in,
             MessageDigest.getInstance("SHA-1"));
@@ -81,7 +81,7 @@ public class MavenRepositoryCache extends MavenRepository {
   }
 
   public List<MavenRepository> getRepositories() {
-    return repositories;
+    return this.repositories;
   }
 
   @Override
@@ -91,7 +91,7 @@ public class MavenRepositoryCache extends MavenRepository {
     if (version.endsWith("-SNAPSHOT")) {
       final TreeMap<String, MavenRepository> versionsByRepository = new TreeMap<String, MavenRepository>();
 
-      for (final MavenRepository repository : repositories) {
+      for (final MavenRepository repository : this.repositories) {
         final Map<String, Object> mavenMetadata = repository.getMavenMetadata(
           groupId, artifactId, version);
         final String snapshotVersion = getSnapshotVersion(mavenMetadata);
@@ -126,7 +126,7 @@ public class MavenRepositoryCache extends MavenRepository {
     }
     final String path = getPath(groupId, artifactId, version, type, classifier,
       version, algorithm);
-    for (final MavenRepository repository : repositories) {
+    for (final MavenRepository repository : this.repositories) {
       final String sha1Digest = repository.getSha1(groupId, artifactId, type,
         classifier, version, algorithm);
       if (copyRepositoryResource(resource, repository, path, sha1Digest)) {
@@ -142,7 +142,7 @@ public class MavenRepositoryCache extends MavenRepository {
 
   public void setRepositoryLocations(final List<Resource> repositoryLocations) {
     for (final Resource resource : repositoryLocations) {
-      repositories.add(new MavenRepository(resource));
+      this.repositories.add(new MavenRepository(resource));
     }
   }
 

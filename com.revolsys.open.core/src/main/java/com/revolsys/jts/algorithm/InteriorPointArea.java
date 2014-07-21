@@ -34,7 +34,6 @@
 package com.revolsys.jts.algorithm;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;

@@ -12,8 +12,6 @@ import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.springframework.util.StringUtils;
-
 public class DateUtil {
 
   private static final String DATE_TIME_NANOS_PATTERN = "\\s*(\\d{4})-(\\d{2})-(\\d{2})(?:[\\sT]+(\\d{2})\\:(\\d{2})\\:(\\d{2})(?:\\.(\\d{1,9}))?)?\\s*";
@@ -52,7 +50,7 @@ public class DateUtil {
   }
 
   public static Calendar getCalendar(final String dateString) {
-    if (StringUtils.hasText(dateString)) {
+    if (Property.hasValue(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
       if (matcher.find()) {
@@ -85,7 +83,7 @@ public class DateUtil {
   }
 
   public static Date getDate(final DateFormat format, final String dateString) {
-    if (!StringUtils.hasText(dateString)) {
+    if (!Property.hasValue(dateString)) {
       return null;
     } else {
       try {
@@ -104,7 +102,7 @@ public class DateUtil {
   }
 
   public static Date getDate(final String dateString) {
-    if (StringUtils.hasText(dateString)) {
+    if (Property.hasValue(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
       if (matcher.find()) {
@@ -141,7 +139,7 @@ public class DateUtil {
   public static int getInteger(final Matcher matcher, final int groupIndex,
     final int defaultValue) {
     final String group = matcher.group(groupIndex);
-    if (StringUtils.hasText(group)) {
+    if (Property.hasValue(group)) {
       return Integer.parseInt(group);
     } else {
       return defaultValue;
@@ -153,7 +151,7 @@ public class DateUtil {
   }
 
   public static java.sql.Date getSqlDate(final String dateString) {
-    if (StringUtils.hasText(dateString)) {
+    if (Property.hasValue(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
       if (matcher.find()) {
@@ -195,7 +193,7 @@ public class DateUtil {
   }
 
   public static Timestamp getTimestamp(final String dateString) {
-    if (StringUtils.hasText(dateString)) {
+    if (Property.hasValue(dateString)) {
       final Pattern pattern = Pattern.compile(DATE_TIME_NANOS_PATTERN);
       final Matcher matcher = pattern.matcher(dateString);
       if (matcher.find()) {

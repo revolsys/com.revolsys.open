@@ -1,13 +1,12 @@
 package com.revolsys.ui.html.decorator;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.ui.html.view.TableRow;
+import com.revolsys.util.Property;
 
 public class TableHeadingDecorator implements Decorator {
   public static void addRow(final ElementContainer container,
@@ -24,8 +23,8 @@ public class TableHeadingDecorator implements Decorator {
     final Element element, final String labelUrl, final String label,
     final String instructions) {
 
-    final TableHeadingDecorator decorator = new TableHeadingDecorator(labelUrl,label,
-      instructions);
+    final TableHeadingDecorator decorator = new TableHeadingDecorator(labelUrl,
+      label, instructions);
     final TableRow row = new TableRow();
     row.add(element, decorator);
     container.add(row);
@@ -56,19 +55,19 @@ public class TableHeadingDecorator implements Decorator {
   }
 
   public String getInstructions() {
-    return instructions;
+    return this.instructions;
   }
 
   public String getLabel() {
-    return label;
+    return this.label;
   }
 
   public String getLabelUrl() {
-    return labelUrl;
+    return this.labelUrl;
   }
 
   public boolean isRequired() {
-    return required;
+    return this.required;
   }
 
   @Override
@@ -131,7 +130,7 @@ public class TableHeadingDecorator implements Decorator {
         if (field.isRequired()) {
           cssClass = "label required";
         }
-      } else if (required) {
+      } else if (this.required) {
         cssClass = "label required";
       }
       out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
@@ -140,12 +139,12 @@ public class TableHeadingDecorator implements Decorator {
         final Field field = (Field)element;
         out.attribute(HtmlUtil.ATTR_FOR, field.getName());
       }
-      if (StringUtils.hasText(labelUrl)) {
+      if (Property.hasValue(this.labelUrl)) {
         out.startTag(HtmlUtil.A);
-        out.attribute(HtmlUtil.ATTR_HREF, labelUrl);
+        out.attribute(HtmlUtil.ATTR_HREF, this.labelUrl);
       }
       out.text(label);
-      if (StringUtils.hasText(labelUrl)) {
+      if (Property.hasValue(this.labelUrl)) {
         out.endTag(HtmlUtil.A);
       }
       out.endTag(HtmlUtil.LABEL);

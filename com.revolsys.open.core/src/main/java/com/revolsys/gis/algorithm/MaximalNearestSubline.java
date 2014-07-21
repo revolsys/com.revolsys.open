@@ -2,7 +2,6 @@ package com.revolsys.gis.algorithm;
 
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
 /**

@@ -3,7 +3,6 @@ package com.revolsys.jts.edgegraph;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 

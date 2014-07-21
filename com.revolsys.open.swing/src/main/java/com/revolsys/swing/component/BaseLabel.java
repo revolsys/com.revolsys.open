@@ -3,9 +3,9 @@ package com.revolsys.swing.component;
 import javax.swing.JLabel;
 
 import org.jdesktop.swingx.JXLabel;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.util.Property;
 
 public class BaseLabel extends JXLabel {
 
@@ -25,7 +25,7 @@ public class BaseLabel extends JXLabel {
 
   @Override
   public void setText(String text) {
-    if (StringUtils.hasText(text)) {
+    if (Property.hasValue(text)) {
       if (!text.startsWith("<html")) {
         if (text.startsWith("<")) {
           text = "<html>" + text + "</html>";

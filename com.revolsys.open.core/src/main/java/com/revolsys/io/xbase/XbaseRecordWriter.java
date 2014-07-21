@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.Record;
@@ -29,6 +28,7 @@ import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 
 public class XbaseRecordWriter extends AbstractRecordWriter {
   private static final Logger log = Logger.getLogger(XbaseRecordWriter.class);
@@ -65,7 +65,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
     if (dataType == DataTypes.DECIMAL) {
       if (length > 18) {
         throw new IllegalArgumentException("Length  must be less < 18 for "
-            + fullName);
+          + fullName);
       }
       field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, length,
         scale);
@@ -178,7 +178,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
   }
 
   protected boolean hasField(final String name) {
-    if (StringUtils.hasText(name)) {
+    if (Property.hasValue(name)) {
       return this.fieldNames.contains(name.toUpperCase());
     } else {
       return false;
@@ -257,7 +257,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
   }
 
   protected boolean writeField(final Record object, final FieldDefinition field)
-    throws IOException {
+      throws IOException {
     if (this.out == null) {
       return true;
     } else {

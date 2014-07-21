@@ -33,7 +33,6 @@
 package com.revolsys.jts.operation.linemerge;
 
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.util.CleanDuplicatePoints;
 import com.revolsys.jts.planargraph.DirectedEdge;

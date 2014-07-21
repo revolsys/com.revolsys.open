@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
@@ -19,8 +18,13 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.util.Property;
 
 public class BingLayer extends AbstractTiledImageLayer {
+
+  public static BingLayer create(final Map<String, Object> properties) {
+    return new BingLayer(properties);
+  }
 
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "bing", "Bing Tiles", BingLayer.class, "create");
@@ -29,10 +33,6 @@ public class BingLayer extends AbstractTiledImageLayer {
 
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(
     GEOMETRY_FACTORY, 2, -180, -85, 180, 85);
-
-  public static BingLayer create(final Map<String, Object> properties) {
-    return new BingLayer(properties);
-  }
 
   private BingClient client;
 
@@ -49,7 +49,7 @@ public class BingLayer extends AbstractTiledImageLayer {
   protected boolean doInitialize() {
     ImagerySet imagerySet = ImagerySet.Road;
     final String imagerySetName = getProperty("imagerySet");
-    if (StringUtils.hasText(imagerySetName)) {
+    if (Property.hasValue(imagerySetName)) {
       try {
         imagerySet = ImagerySet.valueOf(imagerySetName);
       } catch (final Throwable e) {
@@ -59,7 +59,7 @@ public class BingLayer extends AbstractTiledImageLayer {
     }
     MapLayer mapLayer = null;
     final String mapLayerName = getProperty("mapLayer");
-    if (StringUtils.hasText(mapLayerName)) {
+    if (Property.hasValue(mapLayerName)) {
       try {
         mapLayer = MapLayer.valueOf(mapLayerName);
       } catch (final Throwable e) {
@@ -87,7 +87,7 @@ public class BingLayer extends AbstractTiledImageLayer {
   }
 
   public ImagerySet getImagerySetEnum() {
-    return imagerySet;
+    return this.imagerySet;
   }
 
   public String getMapLayer() {
@@ -95,7 +95,7 @@ public class BingLayer extends AbstractTiledImageLayer {
   }
 
   public MapLayer getMapLayerEnum() {
-    return mapLayer;
+    return this.mapLayer;
   }
 
   @Override
@@ -106,8 +106,8 @@ public class BingLayer extends AbstractTiledImageLayer {
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
-        .convert(GEOMETRY_FACTORY)
-        .intersection(MAX_BOUNDING_BOX);
+          .convert(GEOMETRY_FACTORY)
+          .intersection(MAX_BOUNDING_BOX);
       final double minX = geographicBoundingBox.getMinX();
       final double minY = geographicBoundingBox.getMinY();
       final double maxX = geographicBoundingBox.getMaxX();

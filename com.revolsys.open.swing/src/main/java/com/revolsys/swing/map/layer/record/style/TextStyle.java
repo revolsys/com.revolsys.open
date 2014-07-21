@@ -286,7 +286,7 @@ public class TextStyle implements MapSerializer, Cloneable {
   }
 
   public void setTextHorizontalAlignment(final String textHorizontalAlignment) {
-    if (StringUtils.hasText(textHorizontalAlignment)) {
+    if (Property.hasValue(textHorizontalAlignment)) {
       this.textHorizontalAlignment = textHorizontalAlignment;
     } else {
       this.textHorizontalAlignment = AUTO;
@@ -322,7 +322,7 @@ public class TextStyle implements MapSerializer, Cloneable {
   }
 
   public void setTextPlacementType(final String textPlacementType) {
-    if (StringUtils.hasText(textPlacementType)) {
+    if (Property.hasValue(textPlacementType)) {
       this.textPlacementType = textPlacementType;
     } else {
       this.textPlacementType = AUTO;
@@ -361,7 +361,7 @@ public class TextStyle implements MapSerializer, Cloneable {
   }
 
   public void setTextVerticalAlignment(final String textVerticalAlignment) {
-    if (StringUtils.hasText(textVerticalAlignment)) {
+    if (Property.hasValue(textVerticalAlignment)) {
       this.textVerticalAlignment = textVerticalAlignment;
     } else {
       this.textVerticalAlignment = AUTO;

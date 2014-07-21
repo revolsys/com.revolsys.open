@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,25 +30,24 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 
 /**
  * <p>
  * The XmlWriter class is a subclass of {@link Writer} that provides additional
  * methods to write XML documents.
  * </p>
- * 
+ *
  * @author Paul Austin
  */
 public class XmlWriter extends Writer {
   /**
    * The TagConfiguration class is used to record the XML Namespace URIs defined
    * for an XML element.
-   * 
+   *
    * @author Paul Austin
    */
   private class TagConfiguration {
@@ -62,7 +61,7 @@ public class XmlWriter extends Writer {
 
     /**
      * Construct a new TagConfiguration
-     * 
+     *
      * @param element The QName of the current element.
      */
     TagConfiguration(final QName element) {
@@ -71,33 +70,33 @@ public class XmlWriter extends Writer {
 
     /**
      * Add the namespace URI to the list of namespaces for the element.
-     * 
+     *
      * @param namespaceUri The namespace URI to add.
      */
     public void addAttributeDefinedNamespace(final String namespaceUri) {
-      attributeDefinedNamespaces.add(namespaceUri);
+      this.attributeDefinedNamespaces.add(namespaceUri);
     }
 
     /**
      * Get the namespaces defined on the element.
-     * 
+     *
      * @return The namespaces defined on the element.
      */
     public List<String> getAttributeDefinedNamespaces() {
-      return attributeDefinedNamespaces;
+      return this.attributeDefinedNamespaces;
     }
 
     /**
      * Get the current element.
-     * 
+     *
      * @return The current element.
      */
     public QName getElement() {
-      return element;
+      return this.element;
     }
 
     public String getTagDefinedNamespace() {
-      return tagDefinedNamespace;
+      return this.tagDefinedNamespace;
     }
 
     public void setTagDefinedNamespace(final String tagDefinedNamespace) {
@@ -106,12 +105,12 @@ public class XmlWriter extends Writer {
 
     /**
      * Return a string representation.
-     * 
+     *
      * @return The string representation.
      */
     @Override
     public String toString() {
-      return element.toString();
+      return this.element.toString();
     }
   }
 
@@ -165,7 +164,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Construct a new XmlWriter.
-   * 
+   *
    * @param out The output stream to write to.
    */
   public XmlWriter(final OutputStream out) {
@@ -174,7 +173,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Construct a new XmlWriter that optionally ignores namespaces.
-   * 
+   *
    * @param out The output stream to write to.
    * @param useNamespaces True if namespaces should be written, false if they
    *          should be ignored.
@@ -185,7 +184,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Construct a new XmlWriter.
-   * 
+   *
    * @param out The writer to write to.
    */
   public XmlWriter(final Writer out) {
@@ -194,7 +193,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Construct a new XmlWriter that optionally ignores namespaces.
-   * 
+   *
    * @param out The writer to write to.
    * @param useNamespaces True if namespaces should be written, false if they
    *          should be ignored.
@@ -206,7 +205,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Add an attribute to the current open tag.
-   * 
+   *
    * @param attribute The QName of the attribute.
    * @param value The attribute value.
    * @throws IOException If there was an error writing.
@@ -218,7 +217,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Add an attribute to the current open tag.
-   * 
+   *
    * @param attribute The QName of the attribute.
    * @param value The attribute value.
    * @throws IOException If there was an error writing.
@@ -230,7 +229,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Add an attribute to the current open tag.
-   * 
+   *
    * @param attribute The QName of the attribute.
    * @param value The attribute value.
    * @throws IOException If there was an error writing.
@@ -242,7 +241,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Add an attribute to the current open tag.
-   * 
+   *
    * @param attribute The QName of the attribute.
    * @param value The attribute value.
    * @throws IOException If there was an error writing.
@@ -254,7 +253,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Add an attribute to the current open tag.
-   * 
+   *
    * @param attribute The QName of the attribute.
    * @param value The attribute value.
    * @throws IOException If there was an error writing.
@@ -266,7 +265,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Add an attribute to the current open tag.
-   * 
+   *
    * @param attribute The QName of the attribute.
    * @param value The attribute value.
    * @throws IOException If there was an error writing.
@@ -278,7 +277,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Add an attribute to the current open tag.
-   * 
+   *
    * @param attribute The QName of the attribute.
    * @param value The attribute value.
    * @throws IOException If there was an error writing.
@@ -293,7 +292,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Add an attribute to the current open tag.
-   * 
+   *
    * @param attribute The QName of the attribute.
    * @param value The attribute value.
    * @throws IOException If there was an error writing.
@@ -305,22 +304,23 @@ public class XmlWriter extends Writer {
 
       final String namespaceUri = attribute.getNamespaceURI();
       if (namespaceUri.length() > 0) {
-        String prefix = namespacePrefixMap.get(namespaceUri);
+        String prefix = this.namespacePrefixMap.get(namespaceUri);
         if (prefix == null) {
           prefix = attribute.getPrefix();
-          if (prefix == null || namespacePrefixMap.containsValue(prefix)) {
-            prefix = "p" + ++prefixNum;
+          if (prefix == null || this.namespacePrefixMap.containsValue(prefix)) {
+            prefix = "p" + ++this.prefixNum;
           }
-          namespacePrefixMap.put(namespaceUri, prefix);
-          elementStack.getFirst().addAttributeDefinedNamespace(namespaceUri);
+          this.namespacePrefixMap.put(namespaceUri, prefix);
+          this.elementStack.getFirst().addAttributeDefinedNamespace(
+            namespaceUri);
           writeNamespaceAttribute(namespaceUri, prefix);
         }
       }
-      out.write(' ');
+      this.out.write(' ');
       writeName(attribute, true);
-      out.write("=\"");
+      this.out.write("=\"");
       writeAttributeValue(value);
-      out.write('"');
+      this.out.write('"');
     }
   }
 
@@ -333,28 +333,28 @@ public class XmlWriter extends Writer {
   }
 
   public void attribute(final String name, final String value) {
-    if (StringUtils.hasText(value)) {
+    if (Property.hasValue(value)) {
       checkWriteAttribute();
-      out.write(' ');
-      out.write(name);
-      out.write("=\"");
+      this.out.write(' ');
+      this.out.write(name);
+      this.out.write("=\"");
       writeAttributeValue(value);
-      out.write('"');
+      this.out.write('"');
     }
   }
 
   /**
    * Write the contents in a CDATA section. No escaping will be done on the data
    * the text must not contain "]]>".
-   * 
+   *
    * @param text The text to wrap in a CDATA section
    * @throws IOException If there was a problem writing the text
    */
   public void cdata(final String text) {
     closeStartTag();
-    out.write("<![CDATA[");
-    out.write(text);
-    out.write("]]>");
+    this.out.write("<![CDATA[");
+    this.out.write(text);
+    this.out.write("]]>");
     setElementHasContent();
   }
 
@@ -362,23 +362,23 @@ public class XmlWriter extends Writer {
    * Check that the document is not finished and can be written to.
    */
   private void checkNotFinished() {
-    if (documentFinished) {
+    if (this.documentFinished) {
       throw new IllegalStateException(
-        "Cannot write to a document after it has been finished");
+          "Cannot write to a document after it has been finished");
     }
   }
 
   /**
    * Check that it is valid to write an attribute. A attribute declaration can
    * only be written if there is a start tag that is open.
-   * 
+   *
    * @throws IllegalStateException If a start tag is not open.
    */
   private void checkWriteAttribute() {
     checkNotFinished();
-    if (!writingStartTag) {
+    if (!this.writingStartTag) {
       throw new IllegalStateException(
-        "A start tag must be open to write an attribute");
+          "A start tag must be open to write an attribute");
     }
   }
 
@@ -386,18 +386,18 @@ public class XmlWriter extends Writer {
    * Check that it is valid to write a DOCTYPE declaration. A DOCTYPE
    * declaration can only be written if there has not been a DOCTYPE declaraion,
    * an element has not been written and the document has not been finished.
-   * 
+   *
    * @throws IllegalStateException If a DOCTYPE cannot be written.
    */
   private void checkWriteDocType() {
     checkNotFinished();
-    if (elementsStarted) {
+    if (this.elementsStarted) {
       throw new IllegalStateException(
-        "Cannot create doc type after elements have been created");
+          "Cannot create doc type after elements have been created");
     }
-    if (docTypeWritten) {
+    if (this.docTypeWritten) {
       throw new IllegalStateException(
-        "A document can only have one DOCTYPE declaration");
+          "A document can only have one DOCTYPE declaration");
     }
   }
 
@@ -405,103 +405,103 @@ public class XmlWriter extends Writer {
    * Check that it is valid to write an XML declaration. An XML declaration can
    * only be written if there has not been a DOCTYPE declaraion or an element
    * written.
-   * 
+   *
    * @throws IllegalStateException If an XML declaration cannot be written.
    */
   private void checkWriteXmlDeclaration() {
     checkNotFinished();
-    if (!canWriteXmlDeclaration) {
+    if (!this.canWriteXmlDeclaration) {
       throw new IllegalStateException(
-        "An XML declaration must be the first item in a document");
+          "An XML declaration must be the first item in a document");
     }
-    if (xmlDeclarationWritten) {
+    if (this.xmlDeclarationWritten) {
       throw new IllegalStateException(
-        "A document can only have one XML declaration");
+          "A document can only have one XML declaration");
     }
   }
 
   /**
    * Close the underlying output stream or writer.
-   * 
+   *
    * @throws IOException If the output stream or writer could not be closed.
    */
   @Override
   public void close() {
-    out.flush();
-    out.close();
+    this.out.flush();
+    this.out.close();
   }
 
   /**
    * Close the current open start tag. If a start tag is not open then no action
    * will be taken.
-   * 
+   *
    * @throws IOException If there was an error writing.
    */
   public void closeStartTag() {
-    if (writingStartTag) {
+    if (this.writingStartTag) {
       checkNotFinished();
       writeNamespaces();
-      out.write('>');
-      writingStartTag = false;
+      this.out.write('>');
+      this.writingStartTag = false;
     }
   }
 
   /**
    * Write an XML comment. The comment should not contain the string '--'.
-   * 
+   *
    * @param comment The comment to write
    * @throws IOException If there was a problem writing the comment
    */
   public void comment(final String comment) {
     closeStartTag();
-    out.write("<!--");
+    this.out.write("<!--");
     writeIndent();
-    out.write(comment);
+    this.out.write(comment);
     writeEndIndent();
-    out.write("-->");
-    canWriteXmlDeclaration = false;
+    this.out.write("-->");
+    this.canWriteXmlDeclaration = false;
     setElementHasContent();
   }
 
   /**
    * Write a DTD section. This string represents the entire doctypedecl
    * production from the XML 1.0 specification.
-   * 
+   *
    * @param dtd The DTD to be written
    * @throws IOException If there was a problem writing the declaration
    */
   public void docType(final String dtd) {
     checkWriteDocType();
-    out.write(dtd);
-    canWriteXmlDeclaration = false;
-    docTypeWritten = true;
+    this.out.write(dtd);
+    this.canWriteXmlDeclaration = false;
+    this.docTypeWritten = true;
   }
 
   /**
    * Write a DOCTYPE declaration using a SYSTEM identifier.
-   * 
+   *
    * @param name The root element name
    * @param systemId The system id
    * @throws IOException If there was a problem writing the declaration
    */
   public void docType(final String name, final String systemId) {
     checkWriteDocType();
-    out.write("<!DOCTYPE ");
-    out.write(name);
+    this.out.write("<!DOCTYPE ");
+    this.out.write(name);
     if (systemId != null) {
-      out.write(" SYSTEM \"");
-      out.write(systemId);
-      out.write("\"");
+      this.out.write(" SYSTEM \"");
+      this.out.write(systemId);
+      this.out.write("\"");
     }
-    out.write(">");
+    this.out.write(">");
     newLine();
-    canWriteXmlDeclaration = false;
-    docTypeWritten = true;
+    this.canWriteXmlDeclaration = false;
+    this.docTypeWritten = true;
   }
 
   /**
    * Write a DOCTYPE declaration using a PUBLIC identifier.
-   * 
+   *
    * @param name The root element name.
    * @param publicId The public id.
    * @param systemId The system id.
@@ -510,20 +510,20 @@ public class XmlWriter extends Writer {
   public void docType(final String name, final String publicId,
     final String systemId) {
     checkWriteDocType();
-    out.write("<!DOCTYPE ");
-    out.write(name);
-    out.write(" PUBLIC \"");
-    out.write(publicId);
-    out.write("\" \"");
-    out.write(systemId);
-    out.write("\">");
-    canWriteXmlDeclaration = false;
-    docTypeWritten = true;
+    this.out.write("<!DOCTYPE ");
+    this.out.write(name);
+    this.out.write(" PUBLIC \"");
+    this.out.write(publicId);
+    this.out.write("\" \"");
+    this.out.write(systemId);
+    this.out.write("\">");
+    this.canWriteXmlDeclaration = false;
+    this.docTypeWritten = true;
   }
 
   /**
    * Write the element with the specified content.
-   * 
+   *
    * @param element The QName of the tag.
    * @param content The body context for the element.
    * @throws IOException If there was a problem writing the element.
@@ -538,7 +538,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Write an empty tag.
-   * 
+   *
    * @param element The QName of the tag.
    * @throws IOException If there was a problem writing the tag.
    */
@@ -549,25 +549,25 @@ public class XmlWriter extends Writer {
 
   /**
    * End a document, closing all tags and flushing the output.
-   * 
+   *
    * @throws IOException If the document could not be ended
    */
   public void endDocument() {
-    endingDocument = true;
-    for (final Iterator<TagConfiguration> elements = elementStack.iterator(); elements.hasNext();) {
+    this.endingDocument = true;
+    for (final Iterator<TagConfiguration> elements = this.elementStack.iterator(); elements.hasNext();) {
       final TagConfiguration tag = elements.next();
       final QName element = tag.getElement();
       endTag(element);
       elements.remove();
     }
-    documentFinished = true;
+    this.documentFinished = true;
     flush();
   }
 
   /**
    * Write the end tag for the current element. If the element has no content it
    * will be written as an empty tag.
-   * 
+   *
    * @throws IOException If there was a problem writing the element.
    */
   public void endTag() {
@@ -577,7 +577,7 @@ public class XmlWriter extends Writer {
   /**
    * Write the end tag for an element. If the element has no content it will be
    * written as an empty tag.
-   * 
+   *
    * @param element The QName of the tag.
    * @throws IOException If there was a problem writing the element.
    */
@@ -593,18 +593,18 @@ public class XmlWriter extends Writer {
         throw new IllegalArgumentException("Cannot end tag " + element
           + " expecting " + currentElement);
       }
-      if (writingStartTag) {
+      if (this.writingStartTag) {
         writeNamespaces();
-        out.write(" />");
-        writingStartTag = false;
+        this.out.write(" />");
+        this.writingStartTag = false;
       } else {
         writeEndIndent();
-        out.write("</");
+        this.out.write("</");
         writeName(element, false);
-        out.write('>');
+        this.out.write('>');
       }
       removeCurrentTag();
-      elementHasContent = false;
+      this.elementHasContent = false;
     }
   }
 
@@ -615,61 +615,61 @@ public class XmlWriter extends Writer {
 
   /**
    * Write the entity reference for the specified character.
-   * 
+   *
    * @param ch The character to write the entity for
    * @throws IOException If there was a problem writing the entity
    */
   public void entityRef(final char ch) {
     closeStartTag();
-    out.write("&#");
-    out.write(ch);
-    out.write(';');
+    this.out.write("&#");
+    this.out.write(ch);
+    this.out.write(';');
     setElementHasContent();
   }
 
   /**
    * Write the entity reference with the specified text.
-   * 
+   *
    * @param name The name of the entity
    * @throws IOException If there was a problem writing the entity
    */
   public void entityRef(final String name) {
     closeStartTag();
-    out.write('&');
-    out.write(name);
-    out.write(';');
+    this.out.write('&');
+    this.out.write(name);
+    this.out.write(';');
     setElementHasContent();
   }
 
   /**
    * Flush the output closing the current start tag.
-   * 
+   *
    * @throws IOException If there was an exception flushing the writer.
    */
   @Override
   public void flush() {
-    if (!documentFinished) {
+    if (!this.documentFinished) {
       closeStartTag();
     }
-    out.flush();
+    this.out.flush();
   }
 
   /**
    * Get the TagConfiguration of the current open tag.
-   * 
+   *
    * @return The TagConfiguration of the current open tag.
    */
   private TagConfiguration getCurrentTag() {
-    if (elementStack.isEmpty()) {
+    if (this.elementStack.isEmpty()) {
       return null;
     } else {
-      return elementStack.getFirst();
+      return this.elementStack.getFirst();
     }
   }
 
   /**
    * Get the prefix for the XML Namespace URI.
-   * 
+   *
    * @param namespaceUri The XML Namespace URI.
    * @return The prefix.
    */
@@ -677,14 +677,14 @@ public class XmlWriter extends Writer {
     if (namespaceUri == null || namespaceUri.equals("")) {
       return null;
     } else {
-      return namespacePrefixMap.get(namespaceUri);
+      return this.namespacePrefixMap.get(namespaceUri);
     }
   }
 
   /**
    * Get a new QName for the specified QName with the defined prefix for that
    * XML Namespace.
-   * 
+   *
    * @param qName The QName without the prefix.
    * @param attribute
    * @return The QName with the prefix.
@@ -695,13 +695,13 @@ public class XmlWriter extends Writer {
       return new QName(qName.getLocalPart());
 
     }
-    String prefix = namespacePrefixMap.get(namespaceUri);
+    String prefix = this.namespacePrefixMap.get(namespaceUri);
     if (prefix == null) {
       prefix = qName.getPrefix();
       if (!attribute) {
         getCurrentTag().setTagDefinedNamespace(namespaceUri);
       }
-      namespacePrefixMap.put(namespaceUri, prefix);
+      this.namespacePrefixMap.put(namespaceUri, prefix);
       return new QName(namespaceUri, qName.getLocalPart(), prefix);
     }
     if (prefix == qName.getPrefix()) {
@@ -713,32 +713,32 @@ public class XmlWriter extends Writer {
 
   /**
    * Get the flag indicating that the xml elements should be indented.
-   * 
+   *
    * @return The flag indicating that the xml elements should be indented.
    */
   public boolean isIndent() {
-    return indent;
+    return this.indent;
   }
 
   public boolean isWriteNewLine() {
-    return writeNewLine;
+    return this.writeNewLine;
   }
 
   /**
    * Write a newLine to the writer. If an XML start tag is open it will be
    * closed before the new line is written.
-   * 
+   *
    * @throws IOException If there was an exception writing the new line.
    */
   public void newLine() {
     closeStartTag();
-    out.write(newLine);
+    this.out.write(this.newLine);
   }
 
   /**
    * Write the element with the specified content, if null xsi:nil attribute
    * will be set.
-   * 
+   *
    * @param element The QName of the tag.
    * @param content The body context for the element.
    * @throws IOException If there was a problem writing the element.
@@ -755,33 +755,33 @@ public class XmlWriter extends Writer {
 
   /**
    * Write an XML processing instruction.
-   * 
+   *
    * @param target The PI Target (must not be xml)
    * @param value The value of the processing instruction
    * @throws IOException If there was a problem writing the comment
    */
   public void processingInstruction(final String target, final String value) {
     closeStartTag();
-    out.write("<?");
-    out.write(target);
+    this.out.write("<?");
+    this.out.write(target);
     if (value != null) {
-      out.write(" ");
-      out.write(value);
+      this.out.write(" ");
+      this.out.write(value);
     }
-    out.write("?>");
+    this.out.write("?>");
   }
 
   /**
    * Remove the current tag from the stack of open tags.
    */
   private void removeCurrentTag() {
-    if (!endingDocument) {
-      final TagConfiguration tag = elementStack.removeFirst();
+    if (!this.endingDocument) {
+      final TagConfiguration tag = this.elementStack.removeFirst();
       final Iterator<String> namespaceUris = tag.getAttributeDefinedNamespaces()
-        .iterator();
+          .iterator();
       while (namespaceUris.hasNext()) {
         final String namespaceUri = namespaceUris.next();
-        namespacePrefixMap.remove(namespaceUri);
+        this.namespacePrefixMap.remove(namespaceUri);
       }
     }
   }
@@ -790,16 +790,16 @@ public class XmlWriter extends Writer {
    * @param element
    */
   private void setCurrentTag(final QName element) {
-    elementStack.addFirst(new TagConfiguration(element));
+    this.elementStack.addFirst(new TagConfiguration(element));
   }
 
   public void setElementHasContent() {
-    elementHasContent = true;
+    this.elementHasContent = true;
   }
 
   /**
    * Set the flag indicating that the xml elements should be indented.
-   * 
+   *
    * @param indent The flag indicating that the xml elements should be indented.
    */
   public void setIndent(final boolean indent) {
@@ -816,13 +816,13 @@ public class XmlWriter extends Writer {
 
   /**
    * Set the prefix for the XML Namespace URI.
-   * 
+   *
    * @param prefix The prefix.
    * @param namespaceUri The XML Namespace URI.
    */
   public void setPrefix(final String prefix, final String namespaceUri) {
     if (getPrefix(namespaceUri) == null) {
-      namespacePrefixMap.put(namespaceUri, prefix);
+      this.namespacePrefixMap.put(namespaceUri, prefix);
     }
     final TagConfiguration currentTag = getCurrentTag();
     if (currentTag != null) {
@@ -836,7 +836,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Start a document with an empty XML Declaration.
-   * 
+   *
    * @throws IOException If there was a problem writing the XML Declaration.
    */
   public void startDocument() {
@@ -845,7 +845,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Start a document with an XML Declaration for the specified encoding.
-   * 
+   *
    * @param encoding The encoding for the document
    * @throws IOException If there was a problem writing the XML Declaration.
    */
@@ -856,7 +856,7 @@ public class XmlWriter extends Writer {
   /**
    * Start a document with an XML Declaration for the specified encoding and the
    * standalone flag.
-   * 
+   *
    * @param encoding The encoding for the document
    * @param standalone The standalone flag
    * @throws IOException If there was a problem writing the XML Declaration.
@@ -868,7 +868,7 @@ public class XmlWriter extends Writer {
   /**
    * Start a document with an XML Declaration for the specified encoding and the
    * standalone flag (null will omit the flag).
-   * 
+   *
    * @param encoding The encoding for the document
    * @param standalone The standalone flag
    * @throws IOException If there was a problem writing the XML Declaration.
@@ -878,7 +878,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Start a document with an XML Declaration for the specified encoding.
-   * 
+   *
    * @param encoding The encoding for the document
    * @param version The XML version.
    * @throws IOException If there was a problem writing the XML Declaration.
@@ -890,7 +890,7 @@ public class XmlWriter extends Writer {
   /**
    * Start a document with an XML Declaration for the specified encoding and the
    * standalone flag (null will omit the flag).
-   * 
+   *
    * @param encoding The encoding for the document
    * @param version The XML version.
    * @param standalone The standalone flag
@@ -900,31 +900,31 @@ public class XmlWriter extends Writer {
     final Boolean standalone) {
     checkWriteXmlDeclaration();
     if (version == null) {
-      out.write("<?xml version=\"1.0\"");
+      this.out.write("<?xml version=\"1.0\"");
     } else {
-      out.write("<?xml version=\"" + version + "\"");
+      this.out.write("<?xml version=\"" + version + "\"");
 
     }
     if (encoding != null) {
-      out.write(" encoding=\"");
-      out.write(encoding);
-      out.write('"');
+      this.out.write(" encoding=\"");
+      this.out.write(encoding);
+      this.out.write('"');
     }
     if (standalone != null) {
       if (standalone.booleanValue()) {
-        out.write(" standalone=\"yes\"");
+        this.out.write(" standalone=\"yes\"");
       } else {
-        out.write(" standalone=\"no\"");
+        this.out.write(" standalone=\"no\"");
       }
     }
-    out.write("?>\n");
-    xmlDeclarationWritten = true;
-    canWriteXmlDeclaration = false;
+    this.out.write("?>\n");
+    this.xmlDeclarationWritten = true;
+    this.canWriteXmlDeclaration = false;
   }
 
   /**
    * Write the start tag for an element.
-   * 
+   *
    * @param element The QName of the tag.
    * @throws IOException If there was a problem writing the element.
    */
@@ -932,16 +932,16 @@ public class XmlWriter extends Writer {
     checkNotFinished();
     closeStartTag();
     writeIndent();
-    writingStartTag = true;
+    this.writingStartTag = true;
     setCurrentTag(element);
-    out.write('<');
+    this.out.write('<');
     writeName(element, false);
-    elementHasContent = false;
+    this.elementHasContent = false;
   }
 
   /**
    * Write the start tag for an element.
-   * 
+   *
    * @param namespaceUri The namespace URI.
    * @param localPart The local name.
    * @throws IOException If there was a problem writing the element.
@@ -958,7 +958,7 @@ public class XmlWriter extends Writer {
   /**
    * Write the boolean value as the content of a tag with special characters
    * escaped.
-   * 
+   *
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
@@ -969,7 +969,7 @@ public class XmlWriter extends Writer {
   /**
    * Write a portion of the character buffer to the outpu, escaping special
    * characters.
-   * 
+   *
    * @param buffer The buffer to write.
    * @param offset The starting offset in the buffer.
    * @param length The number of characters to write.
@@ -984,7 +984,7 @@ public class XmlWriter extends Writer {
   /**
    * Write the double value as the content of a tag with special characters
    * escaped.
-   * 
+   *
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
@@ -996,7 +996,7 @@ public class XmlWriter extends Writer {
   /**
    * Write the float value as the content of a tag with special characters
    * escaped.
-   * 
+   *
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
@@ -1008,7 +1008,7 @@ public class XmlWriter extends Writer {
   /**
    * Write the int value as the content of a tag with special characters
    * escaped.
-   * 
+   *
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
@@ -1019,7 +1019,7 @@ public class XmlWriter extends Writer {
   /**
    * Write the long value as the content of a tag with special characters
    * escaped.
-   * 
+   *
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
@@ -1030,7 +1030,7 @@ public class XmlWriter extends Writer {
   /**
    * Write the object value as the content of a tag with special characters
    * escaped. If the value is null it will not be written.
-   * 
+   *
    * @param value The value.
    * @throws IOException If there was a problem writing the text.
    */
@@ -1048,7 +1048,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Write the text string to the output, escaping special characters.
-   * 
+   *
    * @param text The text to write
    * @throws IOException If there was a problem writing the text
    */
@@ -1060,7 +1060,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Write an array of characters.
-   * 
+   *
    * @param buffer The character buffer to write.
    * @throws IOException If an I/O exception occurs.
    */
@@ -1071,7 +1071,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Write a portion of an array of characters.
-   * 
+   *
    * @param buffer The character buffer to write.
    * @param offset The starting offset in the buffer.
    * @param length The number of characters to write.
@@ -1080,26 +1080,26 @@ public class XmlWriter extends Writer {
   @Override
   public void write(final char[] buffer, final int offset, final int length) {
     closeStartTag();
-    out.write(buffer, offset, length);
+    this.out.write(buffer, offset, length);
     setElementHasContent();
   }
 
   /**
    * Write a single character.
-   * 
+   *
    * @param character The character to write.
    * @throws IOException If an I/O exception occurs.
    */
   @Override
   public void write(final int character) {
     closeStartTag();
-    out.write(character);
+    this.out.write(character);
     setElementHasContent();
   }
 
   /**
    * Write a String.
-   * 
+   *
    * @param string The String to write.
    * @throws IOException If an I/O exception occurs.
    */
@@ -1110,7 +1110,7 @@ public class XmlWriter extends Writer {
 
   /**
    * Write a portion of a String.
-   * 
+   *
    * @param string The String to write.
    * @param offset The starting offset in the buffer.
    * @param length The number of characters to write.
@@ -1122,17 +1122,17 @@ public class XmlWriter extends Writer {
   }
 
   /**
-           * Write content for an attribute value to the output, escaping the characters
-           * that are used within markup. This method will escape characters ' <', '>',
-           * '&', 9, 10, 13 and '"'. Note the XML 1.0 standard does allow '>' to be used
-           * unless it is part of "]]>" for simplicity it is allways escaped in this
-           * implementation.
-           * 
-           * @param buffer The character buffer to write
-           * @param offset The offset in the character data to write
-           * @param length The number of characters to write.
-           * @throws IOException If an I/O exception occurs.
-           */
+   * Write content for an attribute value to the output, escaping the characters
+   * that are used within markup. This method will escape characters ' <', '>',
+   * '&', 9, 10, 13 and '"'. Note the XML 1.0 standard does allow '>' to be used
+   * unless it is part of "]]>" for simplicity it is allways escaped in this
+   * implementation.
+   *
+   * @param buffer The character buffer to write
+   * @param offset The offset in the character data to write
+   * @param length The number of characters to write.
+   * @throws IOException If an I/O exception occurs.
+   */
   protected void writeAttributeContent(final char[] buffer, final int offset,
     final int length) {
     final int lastIndex = offset + length;
@@ -1143,50 +1143,50 @@ public class XmlWriter extends Writer {
       switch (ch) {
         case '&':
           escapeString = "&amp;";
-        break;
+          break;
         case '<':
           escapeString = "&lt;";
-        break;
+          break;
         case '>':
           escapeString = "&gt;";
-        break;
+          break;
         case '"':
           escapeString = "&quot;";
-        break;
+          break;
         case 9:
           escapeString = "&#9;";
-        break;
+          break;
         case 10:
           escapeString = "&#10;";
-        break;
+          break;
         case 13:
           escapeString = "&#13;";
-        break;
+          break;
         default:
           // Reject all other control characters
           if (ch < 32) {
             throw new IllegalStateException("character " + Integer.toString(ch)
               + " is not allowed in output");
           }
-        break;
+          break;
       }
       if (escapeString != null) {
         if (i > index) {
-          out.write(buffer, index, i - index);
+          this.out.write(buffer, index, i - index);
         }
-        out.write(escapeString);
+        this.out.write(escapeString);
         escapeString = null;
         index = i + 1;
       }
     }
     if (lastIndex > index) {
-      out.write(buffer, index, lastIndex - index);
+      this.out.write(buffer, index, lastIndex - index);
     }
   }
 
   /**
    * Write the value of an attribute.
-   * 
+   *
    * @param value The value to write.
    * @throws IOException If an I/O exception occurs.
    */
@@ -1195,16 +1195,16 @@ public class XmlWriter extends Writer {
   }
 
   /**
-           * Write content for an element to the output, escaping the characters that
-           * are used within markup. This method will escape characters ' <', '>' and
-           * '&'. Note the XML 1.0 standard does allow '>' to be used unless it is part
-           * of "]]>" for simplicity it is allways escaped in this implementation.
-           * 
-           * @param buffer The character buffer to write
-           * @param offest The offset in the character data to write
-           * @param length The number of characters to write.
-           * @throws IOException If an I/O exception occurs.
-           */
+   * Write content for an element to the output, escaping the characters that
+   * are used within markup. This method will escape characters ' <', '>' and
+   * '&'. Note the XML 1.0 standard does allow '>' to be used unless it is part
+   * of "]]>" for simplicity it is allways escaped in this implementation.
+   *
+   * @param buffer The character buffer to write
+   * @param offest The offset in the character data to write
+   * @param length The number of characters to write.
+   * @throws IOException If an I/O exception occurs.
+   */
   protected void writeElementContent(final char[] buffer, final int offest,
     final int length) {
     int index = offest;
@@ -1215,54 +1215,54 @@ public class XmlWriter extends Writer {
       switch (ch) {
         case '&':
           escapeString = "&amp;";
-        break;
+          break;
         case '<':
           escapeString = "&lt;";
-        break;
+          break;
         case '>':
           escapeString = "&gt;";
-        break;
+          break;
         case 9:
         case 10:
         case 13:
-        // Accept these control characters
-        break;
+          // Accept these control characters
+          break;
         default:
           // Reject all other control characters
           if (ch < 32) {
             throw new IllegalStateException("character " + Integer.toString(ch)
               + " is not allowed in output");
           }
-        break;
+          break;
       }
       if (escapeString != null) {
         if (i > index) {
-          out.write(buffer, index, i - index);
+          this.out.write(buffer, index, i - index);
         }
-        out.write(escapeString);
+        this.out.write(escapeString);
         escapeString = null;
         index = i + 1;
       }
     }
     if (lastIndex > index) {
-      out.write(buffer, index, lastIndex - index);
+      this.out.write(buffer, index, lastIndex - index);
     }
   }
 
   /**
    * Write the indent for the end of an element.
-   * 
+   *
    * @throws IOException If an I/O exception occurs.
    */
   private void writeEndIndent() {
-    if (!elementHasContent) {
-      if (writeNewLine) {
-        out.write(newLine);
+    if (!this.elementHasContent) {
+      if (this.writeNewLine) {
+        this.out.write(this.newLine);
       }
-      if (indent) {
-        final int depth = elementStack.size() - 1;
+      if (this.indent) {
+        final int depth = this.elementStack.size() - 1;
         for (int i = 0; i < depth; i++) {
-          out.write("  ");
+          this.out.write("  ");
         }
       }
     }
@@ -1270,74 +1270,74 @@ public class XmlWriter extends Writer {
 
   /**
    * Write the indent for a child of an element.
-   * 
+   *
    * @throws IOException If an I/O exception occurs.
    */
   private void writeIndent() {
-    if (elementsStarted) {
-      if (writeNewLine) {
-        out.write(newLine);
+    if (this.elementsStarted) {
+      if (this.writeNewLine) {
+        this.out.write(this.newLine);
       }
-      if (indent) {
-        final int depth = elementStack.size();
+      if (this.indent) {
+        final int depth = this.elementStack.size();
         for (int i = 0; i < depth; i++) {
-          out.write("  ");
+          this.out.write("  ");
         }
       }
     } else {
-      elementsStarted = true;
+      this.elementsStarted = true;
     }
   }
 
   /**
    * Write out a QName, if namespaces are used the name will be written with the
    * prefix of the namespace.
-   * 
+   *
    * @param qName The QName to write
    * @param attribute TODO
    * @throws IOException If an I/O exception occurs.
    */
   private void writeName(final QName qName, final boolean attribute) {
-    if (useNamespaces) {
+    if (this.useNamespaces) {
       final String namespaceUri = qName.getNamespaceURI();
-      String prefix = namespacePrefixMap.get(namespaceUri);
+      String prefix = this.namespacePrefixMap.get(namespaceUri);
       final QName prefixedQName = getQNameWithPrefix(qName, attribute);
       prefix = prefixedQName.getPrefix();
       if (prefix.length() != 0) {
-        out.write(prefix);
-        out.write(':');
+        this.out.write(prefix);
+        this.out.write(':');
       }
     }
     final String name = qName.getLocalPart();
-    out.write(name);
+    this.out.write(name);
   }
 
   public void writeNamespaceAttribute(final String namespaceUri,
     final String prefix) {
     if (prefix.length() == 0) {
-      out.write(" xmlns");
+      this.out.write(" xmlns");
 
     } else {
-      out.write(" xmlns:");
-      out.write(prefix);
+      this.out.write(" xmlns:");
+      this.out.write(prefix);
     }
-    out.write("=\"");
+    this.out.write("=\"");
     writeAttributeValue(namespaceUri);
-    out.write("\"");
+    this.out.write("\"");
   }
 
   /**
    * Write the XML namespace declarations for an element.
-   * 
+   *
    * @throws IOException If an I/O exception occurs.
    */
   private void writeNamespaces() {
-    if (useNamespaces) {
+    if (this.useNamespaces) {
       final TagConfiguration tag = getCurrentTag();
 
       final Collection<String> namespaceUris;
-      if (elementStack.size() == 1) {
-        namespaceUris = namespacePrefixMap.keySet();
+      if (this.elementStack.size() == 1) {
+        namespaceUris = this.namespacePrefixMap.keySet();
       } else {
         final String tagNamespace = tag.getTagDefinedNamespace();
         if (tagNamespace == null) {
@@ -1347,8 +1347,8 @@ public class XmlWriter extends Writer {
         }
       }
       for (final String namespaceUri : namespaceUris) {
-        final String prefix = namespacePrefixMap.get(namespaceUri);
-        final String alias = namespaceAliasMap.get(namespaceUri);
+        final String prefix = this.namespacePrefixMap.get(namespaceUri);
+        final String alias = this.namespaceAliasMap.get(namespaceUri);
         if (alias == null) {
           writeNamespaceAttribute(namespaceUri, prefix);
         } else {
@@ -1362,13 +1362,13 @@ public class XmlWriter extends Writer {
     final String namespaceUri = xsiTagName.getNamespaceURI();
     final String xsiName = xsiTagName.getLocalPart();
     if (namespaceUri.length() > 0) {
-      String prefix = namespacePrefixMap.get(namespaceUri);
+      String prefix = this.namespacePrefixMap.get(namespaceUri);
       if (prefix == null) {
         prefix = xsiTagName.getPrefix();
-        if (prefix == null || namespacePrefixMap.containsValue(prefix)) {
-          prefix = "p" + ++prefixNum;
+        if (prefix == null || this.namespacePrefixMap.containsValue(prefix)) {
+          prefix = "p" + ++this.prefixNum;
         }
-        namespacePrefixMap.put(namespaceUri, prefix);
+        this.namespacePrefixMap.put(namespaceUri, prefix);
         writeNamespaceAttribute(namespaceUri, prefix);
       }
       attribute(XsiConstants.TYPE, prefix + ":" + xsiName);

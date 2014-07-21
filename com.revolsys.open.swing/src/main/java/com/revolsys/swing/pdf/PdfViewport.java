@@ -30,7 +30,6 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
 import org.apache.pdfbox.pdmodel.graphics.PDExtendedGraphicsState;
 import org.apache.pdfbox.pdmodel.graphics.PDLineDashPattern;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
@@ -51,6 +50,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
+import com.revolsys.util.Property;
 
 public class PdfViewport extends Viewport2D implements AutoCloseable {
 
@@ -235,7 +235,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
     final TextStyle style) {
     try {
       final String label = TextStyleRenderer.getLabel(object, style);
-      if (StringUtils.hasText(label) && geometry != null) {
+      if (Property.hasValue(label) && geometry != null) {
         final PointWithOrientation point = TextStyleRenderer.getTextLocation(
           this, geometry, style);
         if (point != null) {
@@ -271,7 +271,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
             final int ascent = fontMetrics.getAscent();
             final int leading = fontMetrics.getLeading();
             final double maxHeight = lines.length * (ascent + descent)
-                + (lines.length - 1) * leading;
+              + (lines.length - 1) * leading;
             final String verticalAlignment = style.getTextVerticalAlignment();
             if ("top".equals(verticalAlignment)) {
             } else if ("middle".equals(verticalAlignment)) {
@@ -443,25 +443,25 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
       switch (style.getLineCap()) {
         case BUTT:
           graphicsState.setLineCapStyle(0);
-          break;
+        break;
         case ROUND:
           graphicsState.setLineCapStyle(1);
-          break;
+        break;
         case SQUARE:
           graphicsState.setLineCapStyle(2);
-          break;
+        break;
       }
 
       switch (style.getLineJoin()) {
         case MITER:
           graphicsState.setLineJoinStyle(0);
-          break;
+        break;
         case ROUND:
           graphicsState.setLineJoinStyle(1);
-          break;
+        break;
         case BEVEL:
           graphicsState.setLineJoinStyle(2);
-          break;
+        break;
       }
 
       final int polygonFillOpacity = style.getPolygonFillOpacity();

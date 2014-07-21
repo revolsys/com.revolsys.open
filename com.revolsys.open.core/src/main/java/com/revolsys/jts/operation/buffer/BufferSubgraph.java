@@ -45,8 +45,8 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geomgraph.DirectedEdge;

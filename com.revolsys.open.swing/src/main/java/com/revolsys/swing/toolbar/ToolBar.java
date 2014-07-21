@@ -12,12 +12,11 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentGroup;
+import com.revolsys.util.Property;
 
 public class ToolBar extends JToolBar {
   private static final long serialVersionUID = 1L;
@@ -60,7 +59,7 @@ public class ToolBar extends JToolBar {
     final String methodName, final Object... parameters) {
     String name = null;
     Icon icon = null;
-    if (StringUtils.hasText(iconName)) {
+    if (Property.hasValue(iconName)) {
       icon = SilkIconLoader.getIcon(iconName);
     } else {
       name = title;
@@ -135,13 +134,13 @@ public class ToolBar extends JToolBar {
 
   public void clear() {
     super.removeAll();
-    groups.clear();
+    this.groups.clear();
   }
 
   protected JButton createButton(final Action action) {
     final JButton button = new JButton(action);
     if (action != null
-      && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
+        && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
       button.setHideActionText(true);
     }
     button.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -154,7 +153,7 @@ public class ToolBar extends JToolBar {
   protected JToggleButton createToggleButton(final Action action) {
     final JToggleButton button = new JToggleButton(action);
     if (action != null
-      && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
+        && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
       button.setHideActionText(true);
     }
     button.setHorizontalTextPosition(SwingConstants.CENTER);

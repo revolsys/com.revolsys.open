@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,13 +21,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.web.config.Menu;
 import com.revolsys.ui.web.config.MenuItem;
 import com.revolsys.ui.web.config.WebUiContext;
+import com.revolsys.util.Property;
 
 public class MenuView extends ObjectView {
   private static final Logger log = Logger.getLogger(MenuView.class);
@@ -52,7 +52,7 @@ public class MenuView extends ObjectView {
             out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
           }
           menuItemLink(out, menuItem);
-          if (level < numLevels && menuItem instanceof Menu) {
+          if (level < this.numLevels && menuItem instanceof Menu) {
             menu(out, ((Menu)menuItem).getItems(), level + 1);
           }
           out.endTag(HtmlUtil.LI);
@@ -69,7 +69,7 @@ public class MenuView extends ObjectView {
   private void menuItemLink(final XmlWriter out, final MenuItem menuItem) {
 
     final String uri = menuItem.getUri();
-    if (StringUtils.hasText(uri)) {
+    if (Property.hasValue(uri)) {
       if (uri.startsWith("javascript:")) {
         out.startTag(HtmlUtil.BUTTON);
         out.attribute(HtmlUtil.ATTR_ON_CLICK, uri.substring(11));
@@ -91,9 +91,9 @@ public class MenuView extends ObjectView {
   public void processProperty(final String name, final Object value) {
     final String stringValue = (String)value;
     if (name.equals("cssClass")) {
-      cssClass = value.toString();
+      this.cssClass = value.toString();
     } else if (name.equals("numLevels")) {
-      numLevels = Integer.parseInt(stringValue);
+      this.numLevels = Integer.parseInt(stringValue);
     } else if (name.equals("menuName")) {
       final WebUiContext context = WebUiContext.get();
       setObject(context.getMenu(stringValue));
@@ -101,7 +101,7 @@ public class MenuView extends ObjectView {
         throw new IllegalArgumentException("Menu " + value + " does not exist");
       }
     } else if (name.equals("showRoot")) {
-      showRoot = Boolean.valueOf(stringValue).booleanValue();
+      this.showRoot = Boolean.valueOf(stringValue).booleanValue();
     }
   }
 
@@ -116,11 +116,11 @@ public class MenuView extends ObjectView {
           menuItems.add(menuItem);
         }
       }
-      if (showRoot || !menuItems.isEmpty()) {
+      if (this.showRoot || !menuItems.isEmpty()) {
         out.startTag(HtmlUtil.DIV);
-        out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+        out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
 
-        if (showRoot) {
+        if (this.showRoot) {
           out.startTag(HtmlUtil.DIV);
           out.attribute(HtmlUtil.ATTR_CLASS, "title");
           menuItemLink(out, menu);

@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,13 +27,13 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.util.StringUtils;
 import org.springframework.web.util.UrlPathHelper;
 
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.ElementContainer;
+import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
 public class Form extends ElementContainer {
@@ -93,7 +93,7 @@ public class Form extends ElementContainer {
       this.action = action;
     }
     this.title = title;
-    defaultFormTask = name;
+    this.defaultFormTask = name;
     addCssClass(name);
   }
 
@@ -102,7 +102,7 @@ public class Form extends ElementContainer {
   }
 
   public void addOnSubmit(final String script) {
-    onSubmit.add(script);
+    this.onSubmit.add(script);
   }
 
   public void addSavedParameter(final String name, final Object value) {
@@ -110,14 +110,14 @@ public class Form extends ElementContainer {
   }
 
   public String getAcceptCharset() {
-    return acceptCharset;
+    return this.acceptCharset;
   }
 
   /**
    * @return Returns the action.
    */
   public String getAction() {
-    return action;
+    return this.action;
   }
 
   protected Map getActionParameters(final HttpServletRequest request) {
@@ -133,7 +133,7 @@ public class Form extends ElementContainer {
   }
 
   public String getEncType() {
-    return encType;
+    return this.encType;
   }
 
   @Override
@@ -148,19 +148,19 @@ public class Form extends ElementContainer {
   }
 
   public String getMethod() {
-    return method;
+    return this.method;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public String getTask() {
-    return formTask;
+    return this.formTask;
   }
 
   public String getTitle() {
-    return title;
+    return this.title;
   }
 
   public <T> T getValue(final String fieldName) {
@@ -173,7 +173,7 @@ public class Form extends ElementContainer {
   }
 
   public boolean hasTask() {
-    return formTask != null;
+    return this.formTask != null;
   }
 
   public boolean hasValue(final String fieldName) {
@@ -187,15 +187,15 @@ public class Form extends ElementContainer {
 
   @Override
   public void initialize(final HttpServletRequest request) {
-    if (action == null || action.trim().length() == 0) {
-      action = URL_HELPER.getOriginatingRequestUri(request);
+    if (this.action == null || this.action.trim().length() == 0) {
+      this.action = URL_HELPER.getOriginatingRequestUri(request);
     }
     // ensure the formTaskField is initialized first so that it can be used
     // by the other fields
-    formTask = request.getParameter(FORM_TASK_PARAM);
+    this.formTask = request.getParameter(FORM_TASK_PARAM);
 
     final String method = request.getMethod();
-    posted = method.equalsIgnoreCase(POST_METHOD);
+    this.posted = method.equalsIgnoreCase(POST_METHOD);
     preInit(request);
     super.initialize(request);
 
@@ -208,15 +208,15 @@ public class Form extends ElementContainer {
       field.postInit(request);
     }
     final Map parameters = getActionParameters(request);
-    action = UrlUtil.getUrl(action, parameters);
+    this.action = UrlUtil.getUrl(this.action, parameters);
   }
 
   public boolean isMainFormTask() {
-    return hasTask() && formTask.equals(name);
+    return hasTask() && this.formTask.equals(this.name);
   }
 
   public boolean isPosted() {
-    return posted;
+    return this.posted;
   }
 
   public boolean isValid() {
@@ -225,7 +225,7 @@ public class Form extends ElementContainer {
       success &= field.isValid();
     }
     success &= validate();
-    valid = success;
+    this.valid = success;
     return success;
   }
 
@@ -235,10 +235,10 @@ public class Form extends ElementContainer {
   @Override
   public void serializeElement(final XmlWriter out) {
     serializeStartTag(out);
-    if (defaultFormTask != null) {
-      HtmlUtil.serializeHiddenInput(out, FORM_TASK_PARAM, defaultFormTask);
+    if (this.defaultFormTask != null) {
+      HtmlUtil.serializeHiddenInput(out, FORM_TASK_PARAM, this.defaultFormTask);
     }
-    for (final Entry<String, Object> savedParam : savedParameters.entrySet()) {
+    for (final Entry<String, Object> savedParam : this.savedParameters.entrySet()) {
       final Object value = savedParam.getValue();
       if (value != null) {
         HtmlUtil.serializeHiddenInput(out, savedParam.getKey(), value);
@@ -265,8 +265,8 @@ public class Form extends ElementContainer {
   public void serializeStartTag(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     String cssClass = this.cssClass;
-    if (!valid) {
-      if (StringUtils.hasText(cssClass)) {
+    if (!this.valid) {
+      if (Property.hasValue(cssClass)) {
         cssClass += " formInvalid";
       } else {
         cssClass = "formInvalid";
@@ -291,9 +291,9 @@ public class Form extends ElementContainer {
     out.endTag(HtmlUtil.DIV);
 
     out.startTag(HtmlUtil.FORM);
-    if (onSubmit.size() > 0) {
+    if (this.onSubmit.size() > 0) {
       final StringBuffer submitScripts = new StringBuffer();
-      for (final String script : onSubmit) {
+      for (final String script : this.onSubmit) {
         submitScripts.append(script).append(';');
       }
       out.attribute(HtmlUtil.ATTR_ON_SUBMIT, submitScripts.toString());

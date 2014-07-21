@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
@@ -23,65 +21,9 @@ import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
-public class EsriXmlRecordMetaDataUtil implements
-  EsriGeodatabaseXmlConstants {
-  private static final String DE_TABLE_PROPERTY = EsriXmlRecordMetaDataUtil.class
-    + ".DETable";
-
-  public static final EsriGeodatabaseXmlFieldTypeRegistry FIELD_TYPES = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;
-
-  private static void addField(final RecordDefinitionImpl recordDefinition,
-    final DETable deTable, final String tableName, final Field field,
-    final String fieldName) {
-    final FieldType fieldType = field.getType();
-    final int precision = field.getPrecision();
-    final DataType dataType;
-    if (fieldType == FieldType.esriFieldTypeGeometry
-      && deTable instanceof DEFeatureClass) {
-      final DEFeatureClass featureClass = (DEFeatureClass)deTable;
-      final GeometryType shapeType = featureClass.getShapeType();
-      switch (shapeType) {
-        case esriGeometryPoint:
-          dataType = DataTypes.POINT;
-        break;
-        case esriGeometryMultipoint:
-          dataType = DataTypes.MULTI_POINT;
-        break;
-        case esriGeometryPolyline:
-          dataType = DataTypes.MULTI_LINE_STRING;
-        break;
-        case esriGeometryPolygon:
-          dataType = DataTypes.POLYGON;
-        break;
-
-        default:
-          throw new RuntimeException("Unknown geometry type" + shapeType
-            + " for " + tableName + "." + fieldName);
-      }
-
-    } else if (precision > 0
-      && (fieldType.equals(FieldType.esriFieldTypeSingle) || fieldType.equals(FieldType.esriFieldTypeDouble))) {
-      dataType = DataTypes.DECIMAL;
-    } else {
-      dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
-    }
-    final int scale = field.getScale();
-    int length = field.getLength();
-    if (precision != 0) {
-      length = precision;
-    }
-    final Boolean required = !field.isIsNullable()
-      || BooleanStringConverter.getBoolean(field.getRequired());
-    final Attribute attribute = new Attribute(fieldName, dataType, length,
-      scale, required);
-
-    recordDefinition.addAttribute(attribute);
-    if (fieldName.equals(tableName + "_ID")) {
-      recordDefinition.setIdAttributeName(fieldName);
-    }
-  }
-
+public class EsriXmlRecordMetaDataUtil implements EsriGeodatabaseXmlConstants {
   private static Field addField(final DETable table, final Attribute attribute) {
     final String fieldName = attribute.getName();
     final DataType dataType = attribute.getType();
@@ -111,6 +53,57 @@ public class EsriXmlRecordMetaDataUtil implements
       field.setScale(scale);
       table.addField(field);
       return field;
+    }
+  }
+
+  private static void addField(final RecordDefinitionImpl recordDefinition,
+    final DETable deTable, final String tableName, final Field field,
+    final String fieldName) {
+    final FieldType fieldType = field.getType();
+    final int precision = field.getPrecision();
+    final DataType dataType;
+    if (fieldType == FieldType.esriFieldTypeGeometry
+        && deTable instanceof DEFeatureClass) {
+      final DEFeatureClass featureClass = (DEFeatureClass)deTable;
+      final GeometryType shapeType = featureClass.getShapeType();
+      switch (shapeType) {
+        case esriGeometryPoint:
+          dataType = DataTypes.POINT;
+          break;
+        case esriGeometryMultipoint:
+          dataType = DataTypes.MULTI_POINT;
+          break;
+        case esriGeometryPolyline:
+          dataType = DataTypes.MULTI_LINE_STRING;
+          break;
+        case esriGeometryPolygon:
+          dataType = DataTypes.POLYGON;
+          break;
+
+        default:
+          throw new RuntimeException("Unknown geometry type" + shapeType
+            + " for " + tableName + "." + fieldName);
+      }
+
+    } else if (precision > 0
+        && (fieldType.equals(FieldType.esriFieldTypeSingle) || fieldType.equals(FieldType.esriFieldTypeDouble))) {
+      dataType = DataTypes.DECIMAL;
+    } else {
+      dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
+    }
+    final int scale = field.getScale();
+    int length = field.getLength();
+    if (precision != 0) {
+      length = precision;
+    }
+    final Boolean required = !field.isIsNullable()
+        || BooleanStringConverter.getBoolean(field.getRequired());
+    final Attribute attribute = new Attribute(fieldName, dataType, length,
+      scale, required);
+
+    recordDefinition.addAttribute(attribute);
+    if (fieldName.equals(tableName + "_ID")) {
+      recordDefinition.setIdAttributeName(fieldName);
     }
   }
 
@@ -169,7 +162,7 @@ public class EsriXmlRecordMetaDataUtil implements
       return createDEFeatureDatasets(schemaName, spatialReference);
     } else {
       throw new IllegalArgumentException("Expected a "
-        + DEFeatureClass.class.getName());
+          + DEFeatureClass.class.getName());
     }
   }
 
@@ -191,13 +184,14 @@ public class EsriXmlRecordMetaDataUtil implements
     final SpatialReference spatialReference) {
     final String typePath = recordDefinition.getPath();
     final String schemaPath = PathUtil.getPath(typePath)
-      .replaceAll("/", "\\\\");
+        .replaceAll("/", "\\\\");
 
     return createDETable(schemaPath, recordDefinition, spatialReference);
   }
 
   public static DETable createDETable(final String schemaPath,
-    final RecordDefinition recordDefinition, final SpatialReference spatialReference) {
+    final RecordDefinition recordDefinition,
+    final SpatialReference spatialReference) {
     DETable table;
     final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
     boolean hasGeometry = false;
@@ -206,7 +200,7 @@ public class EsriXmlRecordMetaDataUtil implements
     if (geometryAttribute != null) {
       if (spatialReference == null) {
         throw new IllegalArgumentException(
-          "A Geometry Factory with a coordinate system must be specified.");
+            "A Geometry Factory with a coordinate system must be specified.");
       }
       geometryDataType = geometryAttribute.getType();
       if (FIELD_TYPES.getFieldType(geometryDataType) != null) {
@@ -251,7 +245,7 @@ public class EsriXmlRecordMetaDataUtil implements
     }
 
     String oidFieldName = recordDefinition.getProperty(EsriGeodatabaseXmlConstants.ESRI_OBJECT_ID_FIELD_NAME);
-    if (!StringUtils.hasText(oidFieldName)) {
+    if (!Property.hasValue(oidFieldName)) {
       oidFieldName = "OBJECTID";
     }
     final String catalogPath;
@@ -302,7 +296,8 @@ public class EsriXmlRecordMetaDataUtil implements
       tableName = domain.getName();
     }
     final String typePath = PathUtil.toPath(schemaName, tableName);
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
+      typePath);
     final FieldType fieldType = domain.getFieldType();
     final DataType dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
     int length = 0;
@@ -318,7 +313,7 @@ public class EsriXmlRecordMetaDataUtil implements
   /**
    * Get a recordDefinition instance for the table definition excluding any ESRI
    * specific fields.
-   * 
+   *
    * @param schemaName
    * @param deTable
    * @return
@@ -332,7 +327,8 @@ public class EsriXmlRecordMetaDataUtil implements
     final DETable deTable, final boolean ignoreEsriFields) {
     final String tableName = deTable.getName();
     final String typePath = PathUtil.toPath(schemaName, tableName);
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
+      typePath);
     final List<String> ignoreFieldNames = new ArrayList<String>();
     if (ignoreEsriFields) {
       ignoreFieldNames.add(deTable.getOIDFieldName());
@@ -365,11 +361,11 @@ public class EsriXmlRecordMetaDataUtil implements
       final SpatialReference spatialReference = featureClass.getSpatialReference();
       GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
       if (featureClass.isHasM()) {
-        geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(),
-          4, geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
+        geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(), 4,
+          geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
       } else if (featureClass.isHasZ()) {
-        geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(),
-          3, geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
+        geometryFactory = GeometryFactory.fixed(geometryFactory.getSrid(), 3,
+          geometryFactory.getScaleXY(), geometryFactory.getScaleZ());
       }
       final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
       geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
@@ -390,4 +386,9 @@ public class EsriXmlRecordMetaDataUtil implements
     }
     return values;
   }
+
+  private static final String DE_TABLE_PROPERTY = EsriXmlRecordMetaDataUtil.class
+      + ".DETable";
+
+  public static final EsriGeodatabaseXmlFieldTypeRegistry FIELD_TYPES = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;
 }

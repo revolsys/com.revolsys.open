@@ -94,7 +94,7 @@ public class LoggingEventPanel extends JPanel {
     addLabel(fieldName);
 
     String stringValue = StringConverterRegistry.toString(value);
-    if (!StringUtils.hasText(stringValue)) {
+    if (!Property.hasValue(stringValue)) {
       stringValue = "-";
     }
     if (fieldName.equals("message")) {

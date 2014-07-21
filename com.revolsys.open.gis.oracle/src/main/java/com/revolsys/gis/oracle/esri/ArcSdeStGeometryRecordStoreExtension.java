@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.RecordStoreExtension;
@@ -18,9 +17,10 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.util.Property;
 
 public class ArcSdeStGeometryRecordStoreExtension implements
-RecordStoreExtension {
+  RecordStoreExtension {
 
   public ArcSdeStGeometryRecordStoreExtension() {
   }
@@ -90,7 +90,7 @@ RecordStoreExtension {
             ArcSdeConstants.getGeometryDataType(geometryType));
 
           String geometryColumnType = resultSet.getString(6);
-          if (!StringUtils.hasText(geometryColumnType)) {
+          if (!Property.hasValue(geometryColumnType)) {
             geometryColumnType = ArcSdeConstants.SDEBINARY;
           }
           JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
@@ -116,7 +116,7 @@ RecordStoreExtension {
       while (resultSet.next()) {
         final String tableName = resultSet.getString(2);
         final String typePath = PathUtil.toPath(schemaName, tableName)
-            .toUpperCase();
+          .toUpperCase();
 
         final int registrationId = resultSet.getInt(1);
         JdbcAttributeAdder.setTableProperty(schema, typePath,

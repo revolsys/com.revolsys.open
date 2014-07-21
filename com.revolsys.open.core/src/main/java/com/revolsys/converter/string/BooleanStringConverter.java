@@ -1,6 +1,6 @@
 package com.revolsys.converter.string;
 
-import org.springframework.util.StringUtils;
+import com.revolsys.util.Property;
 
 public class BooleanStringConverter implements StringConverter<Boolean> {
   public static boolean getBoolean(final Object value) {
@@ -38,7 +38,7 @@ public class BooleanStringConverter implements StringConverter<Boolean> {
   }
 
   public static Boolean valueOf(final String string) {
-    if (StringUtils.hasText(string)) {
+    if (Property.hasValue(string)) {
       if ("on".equals(string)) {
         return true;
       } else {

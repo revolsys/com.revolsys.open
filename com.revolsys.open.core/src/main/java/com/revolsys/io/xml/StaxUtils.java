@@ -31,10 +31,10 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.io.input.XmlStreamReader;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
 /**
  * The StaxUtils class provides utility methods for processing XML using the
@@ -110,10 +110,10 @@ public final class StaxUtils {
       switch (parser.getEventType()) {
         case XMLStreamConstants.CHARACTERS:
           text.append(parser.getText());
-          break;
+        break;
         case XMLStreamConstants.START_ELEMENT:
           text.append(getElementText(parser));
-          break;
+        break;
       }
     }
     return text.toString();
@@ -122,7 +122,7 @@ public final class StaxUtils {
   public static double getElementTextDouble(final XMLStreamReader in,
     final double defaultValue) {
     final String text = getElementText(in);
-    if (StringUtils.hasText(text)) {
+    if (Property.hasValue(text)) {
       try {
         return Double.parseDouble(text);
       } catch (final Throwable e) {
@@ -135,7 +135,7 @@ public final class StaxUtils {
   public static int getElementTextInt(final XMLStreamReader in,
     final int defaultValue) {
     final String text = getElementText(in);
-    if (StringUtils.hasText(text)) {
+    if (Property.hasValue(text)) {
       try {
         return Integer.parseInt(text);
       } catch (final Throwable e) {
@@ -394,10 +394,10 @@ public final class StaxUtils {
   public static void skipToEndElementByLocalName(final XMLStreamReader parser,
     final QName name) {
     while (!parser.isEndElement()
-        || !parser.getName().getLocalPart().equals(name.getLocalPart())) {
+      || !parser.getName().getLocalPart().equals(name.getLocalPart())) {
       next(parser);
       if (parser.getEventType() == XMLStreamConstants.START_ELEMENT
-          || parser.getEventType() == XMLStreamConstants.END_ELEMENT) {
+        || parser.getEventType() == XMLStreamConstants.END_ELEMENT) {
       }
     }
     skipWhitespace(parser);
@@ -464,7 +464,7 @@ public final class StaxUtils {
    */
   public static int skipWhitespace(final XMLStreamReader parser) {
     while (next(parser) == XMLStreamConstants.CHARACTERS
-        && parser.isWhiteSpace()) {
+      && parser.isWhiteSpace()) {
       switch (parser.getEventType()) {
         case XMLStreamConstants.END_DOCUMENT:
         case XMLStreamConstants.START_ELEMENT:

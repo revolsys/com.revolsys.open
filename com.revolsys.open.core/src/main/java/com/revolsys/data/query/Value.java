@@ -8,8 +8,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.codes.CodeTableProperty;
@@ -22,6 +20,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
+import com.revolsys.util.Property;
 
 public class Value extends QueryValue {
   public static Object getValue(final Object value) {
@@ -100,7 +99,7 @@ public class Value extends QueryValue {
       final Class<?> typeClass = dataType.getJavaClass();
       if (newValue == null || !typeClass.isAssignableFrom(newValue.getClass())) {
         throw new IllegalArgumentException(this.queryValue + " is not a valid "
-          + typeClass);
+            + typeClass);
       } else {
         setQueryValue(newValue);
       }
@@ -190,17 +189,17 @@ public class Value extends QueryValue {
     }
   }
 
+  protected void setQueryValue(final Object value) {
+    this.queryValue = getValue(value);
+  }
+
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     final String attributeName = this.attribute.getName();
-    if (StringUtils.hasText(attributeName)) {
+    if (Property.hasValue(attributeName)) {
       final Attribute attribute = recordDefinition.getAttribute(attributeName);
       setAttribute(attribute);
     }
-  }
-
-  protected void setQueryValue(final Object value) {
-    this.queryValue = getValue(value);
   }
 
   public void setValue(final Object value) {

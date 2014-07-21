@@ -10,11 +10,10 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.swing.layout.SpringLayoutUtil;
 import com.revolsys.swing.listener.InvokeMethodActionListener;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.Property;
 
 public class DirectoryNameField extends JPanel implements Field {
   private static final long serialVersionUID = -8433151755294925911L;
@@ -35,7 +34,7 @@ public class DirectoryNameField extends JPanel implements Field {
     add(this.directoryName);
     this.browseButton.setText("Browse...");
     this.browseButton.addActionListener(new InvokeMethodActionListener(this,
-      "browseClick"));
+        "browseClick"));
     add(this.browseButton);
     SpringLayoutUtil.makeCompactGrid(this, 1, 2, 5, 5, 5, 5);
   }
@@ -50,7 +49,7 @@ public class DirectoryNameField extends JPanel implements Field {
       final File initialFile = new File(directoryPath);
 
       if (initialFile.getParentFile() != null
-        && initialFile.getParentFile().exists()) {
+          && initialFile.getParentFile().exists()) {
         fileChooser.setCurrentDirectory(initialFile.getParentFile());
       }
 
@@ -76,7 +75,7 @@ public class DirectoryNameField extends JPanel implements Field {
 
   public File getDirectoryFile() {
     final String directoryPath = getDirectoryPath();
-    if (StringUtils.hasText(directoryPath)) {
+    if (Property.hasValue(directoryPath)) {
       return new File(directoryPath);
     } else {
       return null;
@@ -147,7 +146,8 @@ public class DirectoryNameField extends JPanel implements Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message, final Color foregroundColor, Color backgroundColor) {
+  public void setFieldInvalid(final String message,
+    final Color foregroundColor, final Color backgroundColor) {
     this.directoryName.setForeground(foregroundColor);
     this.directoryName.setSelectedTextColor(foregroundColor);
     this.directoryName.setBackground(backgroundColor);
@@ -177,7 +177,7 @@ public class DirectoryNameField extends JPanel implements Field {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(this.errorMessage)) {
+    if (!Property.hasValue(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }
@@ -194,6 +194,6 @@ public class DirectoryNameField extends JPanel implements Field {
 
   @Override
   public void updateFieldValue() {
-    setFieldValue(directoryName.getText());
+    setFieldValue(this.directoryName.getText());
   }
 }

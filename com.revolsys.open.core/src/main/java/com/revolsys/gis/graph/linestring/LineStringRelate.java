@@ -9,12 +9,10 @@ import com.revolsys.collection.InvokeMethodVisitor;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.segment.LineSegment;
 
 public class LineStringRelate {

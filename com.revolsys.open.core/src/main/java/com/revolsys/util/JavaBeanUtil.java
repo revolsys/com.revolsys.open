@@ -46,7 +46,6 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.beanutils.expression.Resolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 /**
  * The JavaBeanUtil is a utility class that provides methods to set/get
@@ -177,7 +176,7 @@ public final class JavaBeanUtil {
   }
 
   public static String getFirstName(final String name) {
-    if (StringUtils.hasText(name)) {
+    if (Property.hasValue(name)) {
       final int index = name.indexOf(".");
       if (index == -1) {
         return name;
@@ -300,7 +299,7 @@ public final class JavaBeanUtil {
   }
 
   public static String getSubName(final String name) {
-    if (StringUtils.hasText(name)) {
+    if (Property.hasValue(name)) {
       final int index = name.indexOf(".");
       if (index == -1) {
         return "";
@@ -471,7 +470,7 @@ public final class JavaBeanUtil {
    */
   public static boolean setProperty(final Object object, String propertyName,
     final Object value) {
-    if (object == null || !StringUtils.hasText(propertyName)) {
+    if (object == null || !Property.hasValue(propertyName)) {
       return false;
     } else {
       try {

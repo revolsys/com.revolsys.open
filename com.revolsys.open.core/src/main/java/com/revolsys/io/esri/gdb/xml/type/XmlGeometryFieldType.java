@@ -1,11 +1,9 @@
 package com.revolsys.io.esri.gdb.xml.type;
 
 import com.revolsys.data.types.DataType;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;

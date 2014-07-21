@@ -4,7 +4,7 @@ import javax.measure.Measure;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 
-import org.springframework.util.StringUtils;
+import com.revolsys.util.Property;
 
 public class MeasureStringConverter implements StringConverter<Measure> {
   @Override
@@ -33,7 +33,7 @@ public class MeasureStringConverter implements StringConverter<Measure> {
 
   @Override
   public Measure toObject(final String string) {
-    if (StringUtils.hasText(string)) {
+    if (Property.hasValue(string)) {
       final Measure<?> measure = Measure.valueOf(string);
       final Number value = measure.getValue();
       final Unit<?> unit = measure.getUnit();

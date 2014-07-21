@@ -4,13 +4,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.json.JsonMapIoFactory;
-import com.revolsys.io.json.JsonParser;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class MapTableKeySerializer extends AbstractKeySerializer {
 
@@ -25,18 +23,19 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
 
   /**
    * Serialize the value to the XML writer.
-   * 
+   *
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
    */
+  @Override
   public void serialize(final XmlWriter out, final Object object) {
-     Object value = JavaBeanUtil.getProperty(object, getKey());
+    Object value = JavaBeanUtil.getProperty(object, getKey());
     if (value == null) {
       out.text("-");
     } else {
       if (value instanceof String) {
-        String string = (String)value;
-        if (StringUtils.hasText(string)) {
+        final String string = (String)value;
+        if (Property.hasValue(string)) {
           value = JsonMapIoFactory.toMap(string);
         } else {
           out.text("-");
@@ -60,12 +59,12 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
 
           out.startTag(HtmlUtil.TH);
           out.attribute(HtmlUtil.ATTR_CLASS, "firstCol");
-          out.text(keyLabel);
+          out.text(this.keyLabel);
           out.endTag(HtmlUtil.TH);
 
           out.startTag(HtmlUtil.TH);
           out.attribute(HtmlUtil.ATTR_CLASS, "lastCol");
-          out.text(valueLabel);
+          out.text(this.valueLabel);
           out.endTag(HtmlUtil.TH);
 
           out.endTag(HtmlUtil.TR);
@@ -75,7 +74,7 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
           boolean odd = true;
           boolean first = true;
           for (final Iterator<Entry<Object, Object>> entries = map.entrySet()
-            .iterator(); entries.hasNext();) {
+              .iterator(); entries.hasNext();) {
             final Entry<Object, Object> entry = entries.next();
             out.startTag(HtmlUtil.TR);
             String cssClass = "";
@@ -97,7 +96,7 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
             String keyText = "-";
             if (key != null) {
               keyText = key.toString();
-              if (!StringUtils.hasText(keyText)) {
+              if (!Property.hasValue(keyText)) {
                 keyText = "-";
               }
             }
@@ -110,7 +109,7 @@ public class MapTableKeySerializer extends AbstractKeySerializer {
             String valueText = "-";
             if (entryValue != null) {
               valueText = entryValue.toString();
-              if (!StringUtils.hasText(valueText)) {
+              if (!Property.hasValue(valueText)) {
                 valueText = "-";
               }
             }

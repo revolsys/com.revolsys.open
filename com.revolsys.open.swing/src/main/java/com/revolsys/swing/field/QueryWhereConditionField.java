@@ -35,7 +35,6 @@ import javax.swing.text.Document;
 
 import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.akiban.sql.StandardException;
 import com.akiban.sql.parser.BetweenOperatorNode;
@@ -95,9 +94,10 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.component.AttributeTitleStringConveter;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class QueryWhereConditionField extends ValueField implements
-  MouseListener, CaretListener, ItemListener {
+MouseListener, CaretListener, ItemListener {
 
   public static JComponent createSearchField(final Attribute attribute,
     final CodeTable codeTable) {
@@ -114,14 +114,14 @@ public class QueryWhereConditionField extends ValueField implements
         JComponent field;
         if (attribute.equals(recordDefinition.getIdAttribute())) {
           field = new TextField(20);
-        } else if (StringUtils.hasText(searchFieldFactory)) {
+        } else if (Property.hasValue(searchFieldFactory)) {
           final Map<String, Object> searchFieldFactoryParameters = attribute.getProperty("searchFieldFactoryParameters");
           field = SpelUtil.getValue(searchFieldFactory, attribute,
             searchFieldFactoryParameters);
         } else {
           if (codeTable == null) {
             if (Number.class.isAssignableFrom(typeClass)
-              || String.class.isAssignableFrom(typeClass)) {
+                || String.class.isAssignableFrom(typeClass)) {
               field = new TextField(20);
             } else {
               field = SwingUtil.createField(typeClass, name, null);
@@ -218,8 +218,8 @@ public class QueryWhereConditionField extends ValueField implements
       "Add Unary Condition", ICON, this, "actionAddLikeCondition");
     this.likeConditionField = new TextField(20);
     this.likePanel = new BasePanel(SwingUtil.createLabel("LIKE"), new JLabel(
-        " '%"), this.likeConditionField, new JLabel("%' "),
-        likeConditionAddButton);
+      " '%"), this.likeConditionField, new JLabel("%' "),
+      likeConditionAddButton);
     GroupLayoutUtil.makeColumns(this.likePanel, false);
 
     final JButton inConditionAddButton = InvokeMethodAction.createButton("",
@@ -240,21 +240,21 @@ public class QueryWhereConditionField extends ValueField implements
     final ToolBar buttonsPanel = new ToolBar();
     buttonsPanel.setBorderPainted(true);
     buttonsPanel.addButton("relational", "AND", this, "insertText", "AND")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("relational", "OR", this, "insertText", "OR")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("relational", "NOT", this, "insertText", "NOT")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("grouping", "( )", this, "insertText", "( )")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("math", "+", this, "insertText", "+")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("math", "-", this, "insertText", "-")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("math", "*", this, "insertText", "*")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("math", "/", this, "insertText", "/")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
 
     final BasePanel widgetPanel = new BasePanel(new VerticalLayout(5),
       fieldConditions, buttonsPanel);
@@ -269,7 +269,8 @@ public class QueryWhereConditionField extends ValueField implements
     // pane
 
     this.sqlPrefix = "SELECT * FROM "
-      + this.recordDefinition.getPath().substring(1).replace('/', '.') + " WHERE";
+        + this.recordDefinition.getPath().substring(1).replace('/', '.')
+      + " WHERE";
 
     final JPanel filterTextPanel = new JPanel(new BorderLayout());
     filterTextPanel.setOpaque(false);
@@ -312,7 +313,7 @@ public class QueryWhereConditionField extends ValueField implements
     if (filter != null) {
       this.whereTextField.setText(filter.toFormattedString());
     }
-    if (StringUtils.hasText(query)) {
+    if (Property.hasValue(query)) {
       this.whereTextField.setText(query);
     }
     final String searchField = layer.getProperty("searchField");
@@ -333,7 +334,7 @@ public class QueryWhereConditionField extends ValueField implements
     final Attribute attribute = (Attribute)this.fieldNamesList.getSelectedItem();
     if (attribute != null) {
       final String operator = (String)this.binaryConditionOperator.getSelectedItem();
-      if (StringUtils.hasText(operator)) {
+      if (Property.hasValue(operator)) {
         Object fieldValue = ((Field)this.binaryConditionField).getFieldValue();
         if (fieldValue != null) {
           final int position = this.whereTextField.getCaretPosition();
@@ -344,12 +345,11 @@ public class QueryWhereConditionField extends ValueField implements
                 fieldValue);
             } catch (final Throwable e) {
               setInvalidMessage(fieldValue + " is not a valid "
-                + attribute.getType());
+                  + attribute.getType());
               return;
             }
           } else {
-            final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(
-              fieldValue));
+            final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(fieldValue));
             if (values.size() == 1) {
               fieldValue = values.get(0);
             } else {
@@ -398,12 +398,11 @@ public class QueryWhereConditionField extends ValueField implements
                 fieldValue);
             } catch (final Throwable e) {
               setInvalidMessage(fieldValue + " is not a valid "
-                + attribute.getType());
+                  + attribute.getType());
               return;
             }
           } else {
-            fieldValue = this.codeTable.getValue(SingleIdentifier.create(
-              fieldValue));
+            fieldValue = this.codeTable.getValue(SingleIdentifier.create(fieldValue));
             if (fieldValue != null) {
               attributeClass = fieldValue.getClass();
             }
@@ -477,7 +476,7 @@ public class QueryWhereConditionField extends ValueField implements
     final Attribute attribute = (Attribute)this.fieldNamesList.getSelectedItem();
     if (attribute != null) {
       final String operator = (String)this.rightUnaryConditionOperator.getSelectedItem();
-      if (StringUtils.hasText(operator)) {
+      if (Property.hasValue(operator)) {
         final int position = this.whereTextField.getCaretPosition();
 
         final Document document = this.whereTextField.getDocument();
@@ -529,7 +528,7 @@ public class QueryWhereConditionField extends ValueField implements
   }
 
   public void insertText(final String operator) {
-    if (StringUtils.hasText(operator)) {
+    if (Property.hasValue(operator)) {
       int position = this.whereTextField.getCaretPosition();
       String previousText;
       try {
@@ -537,17 +536,17 @@ public class QueryWhereConditionField extends ValueField implements
       } catch (final BadLocationException e) {
         previousText = "";
       }
-      if (!StringUtils.hasText(previousText)
-        || !previousText.matches(".*"
-          + operator.replaceAll("\\(", "\\\\(")
-            .replaceAll("\\)", "\\\\)")
-            .replaceAll("\\*", "\\\\*")
-            .replaceAll("\\+", "\\\\+") + "\\s*$")) {
+      if (!Property.hasValue(previousText)
+          || !previousText.matches(".*"
+              + operator.replaceAll("\\(", "\\\\(")
+              .replaceAll("\\)", "\\\\)")
+              .replaceAll("\\*", "\\\\*")
+              .replaceAll("\\+", "\\\\+") + "\\s*$")) {
         final Document document = this.whereTextField.getDocument();
         try {
-          if (StringUtils.hasText(previousText)
-            && !previousText.substring(previousText.length() - 1).matches(
-              "\\s$")) {
+          if (Property.hasValue(previousText)
+              && !previousText.substring(previousText.length() - 1).matches(
+                  "\\s$")) {
             document.insertString(position++, " ", null);
           }
           document.insertString(position, operator + " ", null);
@@ -598,7 +597,7 @@ public class QueryWhereConditionField extends ValueField implements
     if (event.getSource() == this.fieldNamesList) {
       if (SwingUtilities.isLeftMouseButton(event) && event.getClickCount() == 2) {
         final String fieldName = (String)this.fieldNamesList.getSelectedItem();
-        if (StringUtils.hasText(fieldName)) {
+        if (Property.hasValue(fieldName)) {
           int position = this.whereTextField.getCaretPosition();
           String previousText;
           try {
@@ -606,13 +605,13 @@ public class QueryWhereConditionField extends ValueField implements
           } catch (final BadLocationException e) {
             previousText = "";
           }
-          if (!StringUtils.hasText(previousText)
-            || !previousText.matches(".*\"?" + fieldName + "\"?\\s*$")) {
+          if (!Property.hasValue(previousText)
+              || !previousText.matches(".*\"?" + fieldName + "\"?\\s*$")) {
             final Document document = this.whereTextField.getDocument();
             try {
-              if (StringUtils.hasText(previousText)
-                && !previousText.substring(previousText.length() - 1).matches(
-                  "\\s$")) {
+              if (Property.hasValue(previousText)
+                  && !previousText.substring(previousText.length() - 1).matches(
+                      "\\s$")) {
                 document.insertString(position++, " ", null);
               }
 
@@ -728,18 +727,18 @@ public class QueryWhereConditionField extends ValueField implements
       final ValueNode betweenExpressionEnd = rightOperandList.get(1);
       if (!(leftValueNode instanceof ColumnReference)) {
         setInvalidMessage("Between operator must use a column name not: "
-          + leftValueNode);
+            + leftValueNode);
         return null;
       }
 
       if (!(betweenExpressionStart instanceof NumericConstantNode)) {
         setInvalidMessage("Between min value must be a number not: "
-          + betweenExpressionStart);
+            + betweenExpressionStart);
         return null;
       }
       if (!(betweenExpressionEnd instanceof NumericConstantNode)) {
         setInvalidMessage("Between max value must be a number not: "
-          + betweenExpressionEnd);
+            + betweenExpressionEnd);
         return null;
       }
       final Column column = toQueryValue(leftValueNode);
@@ -787,15 +786,15 @@ public class QueryWhereConditionField extends ValueField implements
               final Attribute attribute = this.recordDefinition.getAttribute(name);
               final CodeTable codeTable = this.recordDefinition.getCodeTableByColumn(name);
               if (codeTable == null
-                  || attribute == this.recordDefinition.getIdAttribute()) {
+                || attribute == this.recordDefinition.getIdAttribute()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
                   final Object convertedValue = StringConverterRegistry.toObject(
                     typeClass, value);
                   if (convertedValue == null
-                    || !typeClass.isAssignableFrom(typeClass)) {
+                      || !typeClass.isAssignableFrom(typeClass)) {
                     setInvalidMessage(name + " requires a "
-                      + attribute.getType() + " not the value " + value);
+                        + attribute.getType() + " not the value " + value);
                     return null;
                   } else {
                     rightCondition = new Value(attribute, convertedValue);
@@ -921,7 +920,7 @@ public class QueryWhereConditionField extends ValueField implements
       return null;
     } else {
       setInvalidMessage("Unsupported expression" + expression.getClass() + " "
-        + expression);
+          + expression);
     }
     return null;
   }
@@ -932,7 +931,7 @@ public class QueryWhereConditionField extends ValueField implements
     this.statusLabel.setText("");
     try {
       final String whereClause = this.whereTextField.getText();
-      if (StringUtils.hasText(whereClause)) {
+      if (Property.hasValue(whereClause)) {
         final String sql = "SELECT * FROM X WHERE " + "\n" + whereClause;
         try {
           final StatementNode statement = new SQLParser().parseStatement(sql);

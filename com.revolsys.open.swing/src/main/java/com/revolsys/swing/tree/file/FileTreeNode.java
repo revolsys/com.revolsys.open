@@ -15,8 +15,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.tree.TreeNode;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.io.AbstractRecordReaderFactory;
 import com.revolsys.data.io.RecordReaderFactory;
@@ -41,47 +39,11 @@ import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.record.FileRecordStoreTreeNode;
+import com.revolsys.util.Property;
 import com.revolsys.util.UrlProxy;
 import com.revolsys.util.UrlUtil;
 
 public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
-
-  public static final Icon ICON_FILE = SilkIconLoader.getIcon("file");
-
-  public static final Icon ICON_FILE_DATABASE = SilkIconLoader.getIcon("file_database");
-
-  public static final Icon ICON_FILE_IMAGE = SilkIconLoader.getIcon("file_image");
-
-  public static final Icon ICON_FILE_TABLE = SilkIconLoader.getIcon("file_table");
-
-  public static final Icon ICON_FILE_VECTOR = SilkIconLoader.getIcon("file_table");
-
-  public static final Icon ICON_FOLDER = SilkIconLoader.getIcon("folder");
-
-  public static final Icon ICON_DRIVE = SilkIconLoader.getIcon("drive");
-
-  public static final Icon ICON_DRIVE_MISSING = SilkIconLoader.getIcon("drive_error");
-
-  public static final ImageIcon ICON_FOLDER_LINK = SilkIconLoader.getIcon("folder_link");
-
-  public static final Icon ICON_FOLDER_MISSING = SilkIconLoader.getIcon("folder_error");
-
-  private static final MenuFactory MENU = new MenuFactory();
-
-  static {
-    final EnableCheck isDirectory = new TreeItemPropertyEnableCheck("directory");
-    final EnableCheck isFileLayer = new TreeItemPropertyEnableCheck("fileLayer");
-
-    final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
-      "arrow_refresh", "refresh");
-    MENU.addMenuItem("default", refresh);
-
-    MENU.addMenuItemTitleIcon("default", "Add Layer", "map_add", isFileLayer,
-      FileTreeNode.class, "addLayer");
-
-    MENU.addMenuItemTitleIcon("default", "Add Folder Connection", "link_add",
-      isDirectory, FileTreeNode.class, "addFolderConnection");
-  }
 
   public static void addFolderConnection() {
     final FileTreeNode node = BaseTree.getMouseClickItem();
@@ -104,7 +66,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
       SwingUtil.addLabel(panel, "Folder Connections");
       final List<FolderConnectionRegistry> registries = FolderConnectionManager.get()
-        .getVisibleConnectionRegistries();
+          .getVisibleConnectionRegistries();
       final JComboBox registryField = new JComboBox(
         new Vector<FolderConnectionRegistry>(registries));
 
@@ -115,7 +77,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       if (panel.isSaved()) {
         final FolderConnectionRegistry registry = (FolderConnectionRegistry)registryField.getSelectedItem();
         String connectionName = nameField.getText();
-        if (!StringUtils.hasText(connectionName)) {
+        if (!Property.hasValue(connectionName)) {
           connectionName = fileName;
         }
         final String baseConnectionName = connectionName;
@@ -220,12 +182,6 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     }
   }
 
-  public static boolean isRecordStore(final File file) {
-    final Set<String> fileExtensions = RecordStoreFactoryRegistry.getFileExtensions();
-    final String extension = FileUtil.getFileNameExtension(file).toLowerCase();
-    return fileExtensions.contains(extension);
-  }
-
   public static boolean isImage(final File file) {
     final String fileNameExtension = FileUtil.getFileNameExtension(file);
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
@@ -233,11 +189,54 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       GeoReferencedImageFactory.class, fileNameExtension);
   }
 
+  public static boolean isRecordStore(final File file) {
+    final Set<String> fileExtensions = RecordStoreFactoryRegistry.getFileExtensions();
+    final String extension = FileUtil.getFileNameExtension(file).toLowerCase();
+    return fileExtensions.contains(extension);
+  }
+
   public static boolean isVector(final File file) {
     final String fileNameExtension = FileUtil.getFileNameExtension(file);
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     return ioFactoryRegistry.isFileExtensionSupported(
       RecordReaderFactory.class, fileNameExtension);
+  }
+
+  public static final Icon ICON_FILE = SilkIconLoader.getIcon("file");
+
+  public static final Icon ICON_FILE_DATABASE = SilkIconLoader.getIcon("file_database");
+
+  public static final Icon ICON_FILE_IMAGE = SilkIconLoader.getIcon("file_image");
+
+  public static final Icon ICON_FILE_TABLE = SilkIconLoader.getIcon("file_table");
+
+  public static final Icon ICON_FILE_VECTOR = SilkIconLoader.getIcon("file_table");
+
+  public static final Icon ICON_FOLDER = SilkIconLoader.getIcon("folder");
+
+  public static final Icon ICON_DRIVE = SilkIconLoader.getIcon("drive");
+
+  public static final Icon ICON_DRIVE_MISSING = SilkIconLoader.getIcon("drive_error");
+
+  public static final ImageIcon ICON_FOLDER_LINK = SilkIconLoader.getIcon("folder_link");
+
+  public static final Icon ICON_FOLDER_MISSING = SilkIconLoader.getIcon("folder_error");
+
+  private static final MenuFactory MENU = new MenuFactory();
+
+  static {
+    final EnableCheck isDirectory = new TreeItemPropertyEnableCheck("directory");
+    final EnableCheck isFileLayer = new TreeItemPropertyEnableCheck("fileLayer");
+
+    final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
+      "arrow_refresh", "refresh");
+    MENU.addMenuItem("default", refresh);
+
+    MENU.addMenuItemTitleIcon("default", "Add Layer", "map_add", isFileLayer,
+      FileTreeNode.class, "addLayer");
+
+    MENU.addMenuItemTitleIcon("default", "Add Folder Connection", "link_add",
+      isDirectory, FileTreeNode.class, "addFolderConnection");
   }
 
   public FileTreeNode(final TreeNode parent, final File file) {
@@ -288,9 +287,9 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       return "Folder";
     } else if (file.exists()) {
       final String extension = FileUtil.getFileNameExtension(file);
-      if (StringUtils.hasText(extension)) {
+      if (Property.hasValue(extension)) {
         final IoFactory factory = IoFactoryRegistry.getInstance()
-          .getFactoryByFileExtension(IoFactory.class, extension);
+            .getFactoryByFileExtension(IoFactory.class, extension);
         if (factory != null) {
           return factory.getName();
         }

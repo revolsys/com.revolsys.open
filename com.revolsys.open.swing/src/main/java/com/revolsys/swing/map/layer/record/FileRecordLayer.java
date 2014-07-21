@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.io.AbstractRecordReaderFactory;
 import com.revolsys.data.io.RecordReader;
@@ -27,6 +26,7 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
 public class FileRecordLayer extends ListRecordLayer {
 
@@ -63,10 +63,10 @@ public class FileRecordLayer extends ListRecordLayer {
       SwingUtil.addReadOnlyTextField(panel, "URL", url);
     }
     final String fileNameExtension = FileUtil.getFileNameExtension(url);
-    if (StringUtils.hasText(fileNameExtension)) {
+    if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
       final RecordReaderFactory factory = IoFactoryRegistry.getInstance()
-        .getFactoryByFileExtension(RecordReaderFactory.class, fileNameExtension);
+          .getFactoryByFileExtension(RecordReaderFactory.class, fileNameExtension);
       if (factory != null) {
         SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
       }
@@ -78,7 +78,7 @@ public class FileRecordLayer extends ListRecordLayer {
   @Override
   protected boolean doInitialize() {
     this.url = getProperty("url");
-    if (StringUtils.hasText(this.url)) {
+    if (Property.hasValue(this.url)) {
       this.resource = SpringUtil.getResource(this.url);
       return revert();
     } else {

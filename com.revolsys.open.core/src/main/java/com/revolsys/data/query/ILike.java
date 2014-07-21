@@ -2,10 +2,9 @@ package com.revolsys.data.query;
 
 import java.util.Map;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.io.RecordStore;
+import com.revolsys.util.Property;
 
 public class ILike extends BinaryCondition {
 
@@ -21,8 +20,8 @@ public class ILike extends BinaryCondition {
     final QueryValue right = getRight();
     String value2 = right.getStringValue(record);
 
-    if (StringUtils.hasText(value1)) {
-      if (StringUtils.hasText(value2)) {
+    if (Property.hasValue(value1)) {
+      if (Property.hasValue(value2)) {
         value1 = value1.toUpperCase();
         value2 = value2.toUpperCase();
         if (value2.contains("%")) {
@@ -39,12 +38,12 @@ public class ILike extends BinaryCondition {
         return false;
       }
     } else {
-      return !StringUtils.hasText(value2);
+      return !Property.hasValue(value2);
     }
   }
 
   @Override
-  public void appendDefaultSql(Query query,
+  public void appendDefaultSql(final Query query,
     final RecordStore recordStore, final StringBuffer buffer) {
     final QueryValue left = getLeft();
     final QueryValue right = getRight();

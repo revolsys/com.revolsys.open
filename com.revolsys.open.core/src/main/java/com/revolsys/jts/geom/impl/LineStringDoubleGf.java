@@ -36,7 +36,6 @@ import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.LineString;
 
 /**
  *  Models an OGC-style <code>LineString</code>.

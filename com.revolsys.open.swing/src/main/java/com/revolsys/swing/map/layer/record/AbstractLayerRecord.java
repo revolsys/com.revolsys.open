@@ -143,7 +143,7 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
-          && !StringUtils.hasText((String)value)) {
+          && !Property.hasValue((String)value)) {
           return false;
         }
       }

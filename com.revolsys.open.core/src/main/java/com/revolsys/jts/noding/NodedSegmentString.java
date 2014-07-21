@@ -37,8 +37,8 @@ import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 

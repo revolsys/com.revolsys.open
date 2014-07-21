@@ -1,6 +1,6 @@
 package com.revolsys.converter.string;
 
-import org.springframework.util.StringUtils;
+import com.revolsys.util.Property;
 
 public class FloatStringConverter extends AbstractNumberStringConverter<Float> {
   public FloatStringConverter() {
@@ -34,7 +34,7 @@ public class FloatStringConverter extends AbstractNumberStringConverter<Float> {
 
   @Override
   public Float toObject(final String string) {
-    if (StringUtils.hasText(string)) {
+    if (Property.hasValue(string)) {
       return Float.valueOf(string);
     } else {
       return null;

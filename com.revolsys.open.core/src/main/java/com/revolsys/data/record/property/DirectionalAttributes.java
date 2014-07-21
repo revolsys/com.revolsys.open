@@ -16,8 +16,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.equals.EqualsInstance;
+import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordUtil;
 import com.revolsys.data.record.schema.RecordDefinition;

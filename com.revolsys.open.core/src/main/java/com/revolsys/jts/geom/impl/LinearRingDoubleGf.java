@@ -38,7 +38,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
-import com.revolsys.jts.geom.LineString;
 
 /**
  * Models an OGC SFS <code>LinearRing</code>.

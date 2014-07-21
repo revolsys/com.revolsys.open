@@ -6,12 +6,11 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.ui.model.Menu;
 import com.revolsys.ui.web.config.JexlHttpServletRequestContext;
+import com.revolsys.util.Property;
 
 public class MenuElement extends Element {
   private String cssClass = "menu";
@@ -36,21 +35,21 @@ public class MenuElement extends Element {
    * @return Returns the cssClass.
    */
   public String getCssClass() {
-    return cssClass;
+    return this.cssClass;
   }
 
   /**
    * @return Returns the menu.
    */
   public Menu getMenu() {
-    return menu;
+    return this.menu;
   }
 
   /**
    * @return Returns the numLevels.
    */
   public int getNumLevels() {
-    return numLevels;
+    return this.numLevels;
   }
 
   @Override
@@ -62,12 +61,10 @@ public class MenuElement extends Element {
    * @return Returns the showRoot.
    */
   public boolean isShowRoot() {
-    return showRoot;
+    return this.showRoot;
   }
 
-  private void menu(
-    final XmlWriter out,
-    final Collection<Menu> items,
+  private void menu(final XmlWriter out, final Collection<Menu> items,
     final int level) {
     if (items.size() > 0) {
       out.startTag(HtmlUtil.UL);
@@ -80,7 +77,7 @@ public class MenuElement extends Element {
             out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
           }
           menuLink(out, menu);
-          if (level < numLevels) {
+          if (level < this.numLevels) {
             menu(out, menu.getMenus(), level + 1);
           }
           out.endTag(HtmlUtil.LI);
@@ -91,13 +88,13 @@ public class MenuElement extends Element {
   }
 
   private void menuLink(final XmlWriter out, final Menu menu) {
-    String uri = menu.getLink(jexlContext);
+    String uri = menu.getLink(this.jexlContext);
     final String linkTitle = menu.getLinkTitle();
     final String onClick = menu.getOnClick();
     if (onClick != null && uri == null) {
       uri = "#";
     }
-    if (StringUtils.hasText(uri)) {
+    if (Property.hasValue(uri)) {
       if (uri.startsWith("javascript:")) {
         out.startTag(HtmlUtil.BUTTON);
         out.attribute(HtmlUtil.ATTR_ON_CLICK, uri.substring(11));
@@ -120,21 +117,21 @@ public class MenuElement extends Element {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    if (menu != null) {
+    if (this.menu != null) {
       final List<Menu> menus = new ArrayList<Menu>();
-      for (final Menu menuItem : menu.getMenus()) {
+      for (final Menu menuItem : this.menu.getMenus()) {
         if (menuItem.isVisible()) {
           menus.add(menuItem);
         }
       }
-      if (showRoot || !menus.isEmpty()) {
+      if (this.showRoot || !menus.isEmpty()) {
         out.startTag(HtmlUtil.DIV);
-        out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+        out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
 
-        if (showRoot && menu.getTitle() != null) {
+        if (this.showRoot && this.menu.getTitle() != null) {
           out.startTag(HtmlUtil.DIV);
           out.attribute(HtmlUtil.ATTR_CLASS, "title");
-          menuLink(out, menu);
+          menuLink(out, this.menu);
           out.endTag(HtmlUtil.DIV);
 
         }

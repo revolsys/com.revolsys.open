@@ -35,7 +35,7 @@ package com.revolsys.jts.algorithm;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.jts.algorithm.locate.IndexedPointInAreaLocator;
+import com.revolsys.gis.jts.GeometryFactoryIndexedPointInAreaLocator;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;

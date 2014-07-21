@@ -1,7 +1,6 @@
 package com.revolsys.jts.testold.geom;
 
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;

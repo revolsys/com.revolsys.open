@@ -2,11 +2,10 @@ package com.revolsys.ui.html.serializer.key;
 
 import java.util.List;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.ui.html.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class UnorderedListKeySerializer extends AbstractKeySerializer {
   public UnorderedListKeySerializer() {
@@ -18,10 +17,11 @@ public class UnorderedListKeySerializer extends AbstractKeySerializer {
 
   /**
    * Serialize the value to the XML writer.
-   * 
+   *
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
    */
+  @Override
   public void serialize(final XmlWriter out, final Object object) {
     final Object value = JavaBeanUtil.getProperty(object, getName());
     if (value == null) {
@@ -39,7 +39,7 @@ public class UnorderedListKeySerializer extends AbstractKeySerializer {
           } else {
             text = object.toString();
           }
-          if (!StringUtils.hasText(text)) {
+          if (!Property.hasValue(text)) {
             text = "-";
           }
           out.element(HtmlUtil.LI, text);

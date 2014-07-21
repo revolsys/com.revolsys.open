@@ -12,8 +12,6 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.BinaryCondition;
 import com.revolsys.data.query.Condition;
@@ -21,6 +19,7 @@ import com.revolsys.data.query.Q;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.io.Reader;
+import com.revolsys.util.Property;
 
 public class RecordStoreQueryListModel implements ListModel {
 
@@ -101,7 +100,7 @@ public class RecordStoreQueryListModel implements ListModel {
           final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
           if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
             final String likeString = "%"
-              + searchParam.toUpperCase().replaceAll("[^A-Z0-9 ]", "%") + "%";
+                + searchParam.toUpperCase().replaceAll("[^A-Z0-9 ]", "%") + "%";
             Q.setValue(0, binaryCondition, likeString);
           } else {
             Q.setValue(0, binaryCondition, searchParam);
@@ -153,7 +152,7 @@ public class RecordStoreQueryListModel implements ListModel {
   }
 
   public void setSearchText(final String searchText) {
-    if (StringUtils.hasText(searchText)) {
+    if (Property.hasValue(searchText)) {
       if (!this.searchText.equals(searchText)) {
         this.searchText = searchText;
         this.objects = getObjects(this.searchText);

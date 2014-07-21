@@ -5,10 +5,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
 public class ColorStringConverter implements StringConverter<Color> {
 
@@ -86,11 +86,11 @@ public class ColorStringConverter implements StringConverter<Color> {
   }
 
   public static Color getWebColor(final String colorName) {
-    if (StringUtils.hasText(colorName)) {
+    if (Property.hasValue(colorName)) {
       for (final Field field : WebColors.class.getFields()) {
         final String fieldName = field.getName();
         if (Modifier.isStatic(field.getModifiers())
-          && Modifier.isPublic(field.getModifiers())) {
+            && Modifier.isPublic(field.getModifiers())) {
           if (fieldName.equalsIgnoreCase(colorName)) {
             try {
               return (Color)field.get(WebColors.class);
@@ -128,7 +128,7 @@ public class ColorStringConverter implements StringConverter<Color> {
 
   @Override
   public Color toObject(final String string) {
-    if (StringUtils.hasText(string)) {
+    if (Property.hasValue(string)) {
       if (string.startsWith("#")) {
         return getColor(string);
       } else if (string.startsWith("rgb(")) {
@@ -154,16 +154,16 @@ public class ColorStringConverter implements StringConverter<Color> {
     if (value instanceof Color) {
       final Color color = (Color)value;
       final String colorName = WebColors.getName(color);
-      if (StringUtils.hasText(colorName)) {
+      if (Property.hasValue(colorName)) {
         return colorName;
       } else {
         final int alpha = color.getAlpha();
         if (alpha == 255) {
           return "rgb(" + color.getRed() + "," + color.getGreen() + ","
-            + color.getBlue() + ")";
+              + color.getBlue() + ")";
         } else {
           return "rgba(" + color.getRed() + "," + color.getGreen() + ","
-            + color.getBlue() + "," + alpha / 255.0 + ")";
+              + color.getBlue() + "," + alpha / 255.0 + ")";
         }
       }
     } else {

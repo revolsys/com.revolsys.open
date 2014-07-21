@@ -43,13 +43,12 @@ import java.util.Map;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jtstest.geomop.GeometryOperation;
+import com.revolsys.util.Property;
 
 /**
  * @version 1.7
@@ -73,7 +72,7 @@ public class TestFile extends TestSuite implements MapSerializer {
   private final TestDirectory parent;
 
   /**
-   * 
+   *
    * @param testDescription
    * @param runIndex
    * @param precisionModel
@@ -86,7 +85,7 @@ public class TestFile extends TestSuite implements MapSerializer {
     final File testFile) {
     this.parent = parent;
     this.runIndex = runIndex;
-    if (StringUtils.hasText(description)) {
+    if (Property.hasValue(description)) {
       this.testDescription = description.replaceAll("\\s+", " ");
     }
     setName(getId() + "." + FileUtil.getBaseName(testFile));
@@ -97,38 +96,38 @@ public class TestFile extends TestSuite implements MapSerializer {
   }
 
   public File getFile() {
-    return file;
+    return this.file;
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public GeometryOperation getGeometryOperation() {
-    return geometryOperation;
+    return this.geometryOperation;
   }
 
   public String getId() {
-    final String parentId = parent.getId();
-    if (StringUtils.hasText(parentId)) {
-      return parentId + "." + runIndex;
+    final String parentId = this.parent.getId();
+    if (Property.hasValue(parentId)) {
+      return parentId + "." + this.runIndex;
     } else {
-      return String.valueOf(runIndex);
+      return String.valueOf(this.runIndex);
     }
   }
 
   public Map<String, Object> getProperties() {
     final Map<String, Object> properties = new LinkedHashMap<String, Object>();
-    MapSerializerUtil.add(properties, "geometryFactory", geometryFactory);
+    MapSerializerUtil.add(properties, "geometryFactory", this.geometryFactory);
     return properties;
   }
 
   public ResultMatcher getResultMatcher() {
-    return resultMatcher;
+    return this.resultMatcher;
   }
 
   public int getRunIndex() {
-    return runIndex;
+    return this.runIndex;
   }
 
   public List<TestCase> getTestCases() {
@@ -145,14 +144,14 @@ public class TestFile extends TestSuite implements MapSerializer {
   }
 
   public String getTestDescription() {
-    return testDescription;
+    return this.testDescription;
   }
 
   /**
    * @return null if no workspace set
    */
   public File getWorkspace() {
-    return workspace;
+    return this.workspace;
   }
 
   public void setTestCaseIndexToRun(final int testCaseIndexToRun) {
@@ -166,7 +165,7 @@ public class TestFile extends TestSuite implements MapSerializer {
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     map.put("type", "test");
-    MapSerializerUtil.add(map, "testDescription", testDescription);
+    MapSerializerUtil.add(map, "testDescription", this.testDescription);
 
     final Map<String, Object> properties = getProperties();
     MapSerializerUtil.add(map, "properties", properties, Collections.emptyMap());

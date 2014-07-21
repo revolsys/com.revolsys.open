@@ -12,10 +12,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class BasicCorsFilter extends OncePerRequestFilter {
 
@@ -34,40 +34,42 @@ public class BasicCorsFilter extends OncePerRequestFilter {
   public BasicCorsFilter() {
     setAllowedMethods(Arrays.asList("DELETE", "GET", "POST", "PUT"));
     setAllowedHeaders(Arrays.asList("Accept-Encoding", "Accept",
-      "Accept-Language"));
+        "Accept-Language"));
     setMaxAge(3600);
   }
 
   @Override
   protected void doFilterInternal(final HttpServletRequest request,
     final HttpServletResponse response, final FilterChain filterChain)
-    throws ServletException, IOException {
+        throws ServletException, IOException {
     final String method = request.getMethod();
     final String origin = request.getHeader("Origin");
     final String requestMethod = request.getHeader("Access-Control-Request-Method");
     response.addHeader("Access-Control-Allow-Origin", "*");
-    if ("OPTIONS".equals(method) && StringUtils.hasText(origin)
-      && StringUtils.hasText(requestMethod)) {
-      response.addHeader("Access-Control-Allow-Methods", allowedMethodsString);
+    if ("OPTIONS".equals(method) && Property.hasValue(origin)
+        && Property.hasValue(requestMethod)) {
+      response.addHeader("Access-Control-Allow-Methods",
+        this.allowedMethodsString);
       final String requestHeaders = request.getHeader("Access-Control-Request-Headers");
-      if (StringUtils.hasText(requestHeaders)) {
-        response.addHeader("Access-Control-Allow-Headers", allowedHeadersString);
+      if (Property.hasValue(requestHeaders)) {
+        response.addHeader("Access-Control-Allow-Headers",
+          this.allowedHeadersString);
       }
-      response.addHeader("Access-Control-Max-Age", maxAgeString);
+      response.addHeader("Access-Control-Max-Age", this.maxAgeString);
     }
     filterChain.doFilter(request, response);
   }
 
   public Collection<String> getAllowedHeaders() {
-    return allowedHeaders;
+    return this.allowedHeaders;
   }
 
   public Set<String> getAllowedMethods() {
-    return allowedMethods;
+    return this.allowedMethods;
   }
 
   public int getMaxAge() {
-    return maxAge;
+    return this.maxAge;
   }
 
   public void setAllowedHeaders(final Collection<String> allowedHeaders) {

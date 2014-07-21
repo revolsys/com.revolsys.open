@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
@@ -32,6 +31,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public abstract class AbstractRecord extends AbstractMap<String, Object>
 implements Record, Cloneable {
@@ -57,7 +57,8 @@ implements Record, Cloneable {
     if (this == other) {
       return 0;
     } else {
-      final int recordDefinitionCompare = getRecordDefinition().compareTo(other.getRecordDefinition());
+      final int recordDefinitionCompare = getRecordDefinition().compareTo(
+        other.getRecordDefinition());
       if (recordDefinitionCompare == 0) {
         final Identifier id1 = getIdentifier();
         final Identifier id2 = other.getIdentifier();
@@ -384,8 +385,8 @@ implements Record, Cloneable {
         if (propertyValue == null) {
           return null;
         } else if (i + 1 < propertyPath.length) {
-          final CodeTable codeTable = this.getRecordDefinition().getCodeTableByColumn(
-            propertyName);
+          final CodeTable codeTable = this.getRecordDefinition()
+              .getCodeTableByColumn(propertyName);
           if (codeTable != null) {
             propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
           }
@@ -527,8 +528,8 @@ implements Record, Cloneable {
           name.length());
         final Object objectValue = getValue(key);
         if (objectValue == null) {
-          final DataType attributeType = this.getRecordDefinition().getAttributeType(
-            key);
+          final DataType attributeType = this.getRecordDefinition()
+              .getAttributeType(key);
           if (attributeType != null) {
             if (attributeType.getJavaClass() == Record.class) {
               final String typePath = attributeType.getName();
@@ -573,17 +574,17 @@ implements Record, Cloneable {
       codeTableAttributeName = name.substring(0, dotIndex);
       codeTableValueName = name.substring(dotIndex + 1);
     }
-    final CodeTable codeTable = this.getRecordDefinition().getCodeTableByColumn(
-      codeTableAttributeName);
+    final CodeTable codeTable = this.getRecordDefinition()
+        .getCodeTableByColumn(codeTableAttributeName);
     if (codeTable == null) {
       if (dotIndex != -1) {
         LoggerFactory.getLogger(getClass()).debug(
-          "Cannot get code table for " + this.getRecordDefinition().getPath() + "."
-              + name);
+          "Cannot get code table for " + this.getRecordDefinition().getPath()
+          + "." + name);
         return;
       }
       setValue(name, value);
-    } else if (value == null || !StringUtils.hasText(value.toString())) {
+    } else if (!Property.hasValue(value.toString())) {
       setValue(codeTableAttributeName, null);
     } else {
       Object targetValue;

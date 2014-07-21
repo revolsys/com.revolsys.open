@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.RecordStoreFactoryRegistry;
@@ -18,24 +17,11 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.OS;
+import com.revolsys.util.Property;
 
 public class RecordStoreConnectionManager
-  extends
-  AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConnection> {
-
-  private static final RecordStoreConnectionManager INSTANCE;
-
-  static {
-    INSTANCE = new RecordStoreConnectionManager();
-    final File recordStoresDirectory = OS.getApplicationDataDirectory("com.revolsys.gis/Data Stores");
-    INSTANCE.addConnectionRegistry("User", new FileSystemResource(
-      recordStoresDirectory));
-  }
-
-  // TODO make this garbage collectable with reference counting.
-  private static Map<Map<String, Object>, RecordStore> recordStoreByConfig = new HashMap<Map<String, Object>, RecordStore>();
-
-  private static Map<Map<String, Object>, AtomicInteger> recordStoreCounts = new HashMap<Map<String, Object>, AtomicInteger>();
+extends
+AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConnection> {
 
   public static RecordStoreConnectionManager get() {
     return INSTANCE;
@@ -64,7 +50,7 @@ public class RecordStoreConnectionManager
       if (recordStore == null) {
         final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone.get("connection");
         final String name = (String)connectionProperties.get("name");
-        if (StringUtils.hasText(name)) {
+        if (Property.hasValue(name)) {
           recordStore = getRecordStore(name);
           if (recordStore == null) {
             // TODO give option to add
@@ -104,7 +90,8 @@ public class RecordStoreConnectionManager
   }
 
   @SuppressWarnings("unchecked")
-  public static void releaseRecordStore(final Map<String, ? extends Object> config) {
+  public static void releaseRecordStore(
+    final Map<String, ? extends Object> config) {
     @SuppressWarnings("rawtypes")
     final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
     synchronized (recordStoreByConfig) {
@@ -114,7 +101,7 @@ public class RecordStoreConnectionManager
         if (count.decrementAndGet() == 0) {
           final Map<String, ? extends Object> connectionProperties = (Map<String, ? extends Object>)configClone.get("connection");
           final String name = (String)connectionProperties.get("name");
-          if (!StringUtils.hasText(name)) {
+          if (!Property.hasValue(name)) {
             // TODO release for connections from connection registries
             recordStore.close();
           }
@@ -125,20 +112,34 @@ public class RecordStoreConnectionManager
     }
   }
 
+  private static final RecordStoreConnectionManager INSTANCE;
+
+  static {
+    INSTANCE = new RecordStoreConnectionManager();
+    final File recordStoresDirectory = OS.getApplicationDataDirectory("com.revolsys.gis/Data Stores");
+    INSTANCE.addConnectionRegistry("User", new FileSystemResource(
+      recordStoresDirectory));
+  }
+
+  // TODO make this garbage collectable with reference counting.
+  private static Map<Map<String, Object>, RecordStore> recordStoreByConfig = new HashMap<Map<String, Object>, RecordStore>();
+
+  private static Map<Map<String, Object>, AtomicInteger> recordStoreCounts = new HashMap<Map<String, Object>, AtomicInteger>();
+
   public RecordStoreConnectionManager() {
     super("Data Stores");
   }
 
-  public RecordStoreConnectionRegistry addConnectionRegistry(
-    final String name, final boolean visible) {
+  public RecordStoreConnectionRegistry addConnectionRegistry(final String name,
+    final boolean visible) {
     final RecordStoreConnectionRegistry registry = new RecordStoreConnectionRegistry(
       this, name, visible);
     addConnectionRegistry(registry);
     return registry;
   }
 
-  public RecordStoreConnectionRegistry addConnectionRegistry(
-    final String name, final Resource recordStoresDirectory) {
+  public RecordStoreConnectionRegistry addConnectionRegistry(final String name,
+    final Resource recordStoresDirectory) {
     final RecordStoreConnectionRegistry registry = new RecordStoreConnectionRegistry(
       this, name, recordStoresDirectory);
     addConnectionRegistry(registry);

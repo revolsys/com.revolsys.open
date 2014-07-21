@@ -25,8 +25,6 @@ import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.swing.Icon;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.Record;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
@@ -47,6 +45,7 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.layer.record.style.panel.TextStylePanel;
+import com.revolsys.util.Property;
 
 public class TextStyleRenderer extends AbstractRecordLayerRenderer {
 
@@ -154,8 +153,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           point = geometry.getCentroid().copy(geometryFactory);
           if (!viewport.getBoundingBox().covers(point)) {
             final Geometry clippedGeometry = viewport.getBoundingBox()
-                .toPolygon()
-                .intersection(geometry);
+              .toPolygon()
+              .intersection(geometry);
             if (!clippedGeometry.isEmpty()) {
               double maxArea = 0;
               double maxLength = 0;
@@ -201,7 +200,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     final Graphics2D graphics, final Record object, final Geometry geometry,
     final TextStyle style) {
     final String label = getLabel(object, style);
-    if (StringUtils.hasText(label) && geometry != null || viewport == null) {
+    if (Property.hasValue(label) && geometry != null || viewport == null) {
       final PointWithOrientation point = getTextLocation(viewport, geometry,
         style);
       if (point != null) {
@@ -248,7 +247,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           final int ascent = fontMetrics.getAscent();
           final int leading = fontMetrics.getLeading();
           final double maxHeight = lines.length * (ascent + descent)
-              + (lines.length - 1) * leading;
+            + (lines.length - 1) * leading;
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
           } else if ("middle".equals(verticalAlignment)) {

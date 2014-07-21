@@ -72,7 +72,7 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
           HtmlUtil.serializeHiddenInput(out, parameterName,
             request.getParameter(parameterName));
         }
-        if (!StringUtils.hasText(cssClass)) {
+        if (!Property.hasValue(cssClass)) {
           cssClass = lowerLabel;
         }
 

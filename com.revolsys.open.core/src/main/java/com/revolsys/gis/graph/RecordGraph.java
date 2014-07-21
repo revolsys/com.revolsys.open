@@ -11,7 +11,6 @@ import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.graph.filter.EdgeObjectFilter;
-import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;

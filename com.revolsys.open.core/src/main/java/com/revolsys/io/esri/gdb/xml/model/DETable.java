@@ -3,10 +3,9 @@ package com.revolsys.io.esri.gdb.xml.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
+import com.revolsys.util.Property;
 
 public class DETable extends DEDataset {
 
@@ -53,10 +52,10 @@ public class DETable extends DEDataset {
   }
 
   public void addField(final Field field) {
-    fields.add(field);
+    this.fields.add(field);
     if (field.getType() == FieldType.esriFieldTypeGlobalID) {
-      hasGlobalID = true;
-      globalIDFieldName = field.getName();
+      this.hasGlobalID = true;
+      this.globalIDFieldName = field.getName();
     }
   }
 
@@ -74,79 +73,79 @@ public class DETable extends DEDataset {
   }
 
   public String getAliasName() {
-    return aliasName;
+    return this.aliasName;
   }
 
   public String getCLSID() {
-    return clsid;
+    return this.clsid;
   }
 
   public List<ControllerMembership> getControllerMemberships() {
-    return controllerMemberships;
+    return this.controllerMemberships;
   }
 
   public String getDefaultSubtypeCode() {
-    return defaultSubtypeCode;
+    return this.defaultSubtypeCode;
   }
 
   public String getEXTCLSID() {
-    return extclsid;
+    return this.extclsid;
   }
 
   public List<PropertySetProperty> getExtensionProperties() {
-    return extensionProperties;
+    return this.extensionProperties;
   }
 
   public List<Field> getFields() {
-    return fields;
+    return this.fields;
   }
 
   public String getGlobalIDFieldName() {
-    if (!StringUtils.hasText(globalIDFieldName)) {
+    if (!Property.hasValue(this.globalIDFieldName)) {
       for (final Field field : getFields()) {
         if (field.getType() == FieldType.esriFieldTypeGlobalID) {
-          hasGlobalID = true;
-          globalIDFieldName = field.getName();
+          this.hasGlobalID = true;
+          this.globalIDFieldName = field.getName();
         }
       }
     }
-    return globalIDFieldName;
+    return this.globalIDFieldName;
   }
 
   public List<Index> getIndexes() {
-    return indexes;
+    return this.indexes;
   }
 
   public String getModelName() {
-    return modelName;
+    return this.modelName;
   }
 
   public String getOIDFieldName() {
-    return oidFieldName;
+    return this.oidFieldName;
   }
 
   public String getRasterFieldName() {
-    return rasterFieldName;
+    return this.rasterFieldName;
   }
 
   public List<String> getRelationshipClassNames() {
-    return relationshipClassNames;
+    return this.relationshipClassNames;
   }
 
   public String getSubtypeFieldName() {
-    return subtypeFieldName;
+    return this.subtypeFieldName;
   }
 
   public List<Subtype> getSubtypes() {
-    return subtypes;
+    return this.subtypes;
   }
 
   public boolean isHasGlobalID() {
-    return StringUtils.hasText(getGlobalIDFieldName());
+    return Property.hasValue(getGlobalIDFieldName());
   }
 
   public boolean isHasOID() {
-    return hasOID;
+    return this.hasOID;
   }
 
   public void setAliasName(final String aliasName) {
@@ -179,8 +178,8 @@ public class DETable extends DEDataset {
     this.fields = fields;
     for (final Field field : fields) {
       if (field.getType() == FieldType.esriFieldTypeGlobalID) {
-        hasGlobalID = true;
-        globalIDFieldName = field.getName();
+        this.hasGlobalID = true;
+        this.globalIDFieldName = field.getName();
       }
     }
   }

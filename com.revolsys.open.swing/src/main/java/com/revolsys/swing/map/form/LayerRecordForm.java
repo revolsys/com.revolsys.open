@@ -707,7 +707,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
         string = CollectionUtil.toString(values);
       }
     }
-    if (!StringUtils.hasText(string)) {
+    if (!Property.hasValue(string)) {
       string = "-";
     }
     return string;
@@ -1023,7 +1023,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
             boolean equal = false;
             if (fieldValue instanceof String) {
               final String string = (String)fieldValue;
-              if (!StringUtils.hasText(string) && objectValue == null) {
+              if (!Property.hasValue(string) && objectValue == null) {
                 equal = true;
               }
             }
@@ -1127,7 +1127,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   public void setFieldInvalidToolTip(final String fieldName,
     final JComponent field) {
     final String message = this.fieldInValidMessage.get(fieldName);
-    if (StringUtils.hasText(message)) {
+    if (Property.hasValue(message)) {
       field.setToolTipText(message);
     }
   }
@@ -1217,7 +1217,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     this.recordDefinition = recordDefinition;
     setRecordStore(recordDefinition.getRecordStore());
     final String idAttributeName = recordDefinition.getIdAttributeName();
-    if (StringUtils.hasText(idAttributeName)) {
+    if (Property.hasValue(idAttributeName)) {
       this.readOnlyFieldNames.add(idAttributeName);
     }
     for (final Attribute attribute : recordDefinition.getAttributes()) {
@@ -1395,7 +1395,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
             setFieldInvalid(fieldName, "Required");
           } else if (value instanceof String) {
             final String string = (String)value;
-            if (!StringUtils.hasText(string)) {
+            if (!Property.hasValue(string)) {
               setFieldInvalid(fieldName, "Required");
             }
           }

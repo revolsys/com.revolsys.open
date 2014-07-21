@@ -18,7 +18,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ListResultPager;
@@ -50,12 +49,12 @@ import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
-public abstract class AbstractRecordStore extends
-  AbstractObjectWithProperties implements RecordStore {
+public abstract class AbstractRecordStore extends AbstractObjectWithProperties
+  implements RecordStore {
 
-  public static RecordStore close(
-    final Collection<RecordStore> recordStores) {
+  public static RecordStore close(final Collection<RecordStore> recordStores) {
     final List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
     for (final RecordStore recordStore : recordStores) {
       if (recordStore != null) {
@@ -135,7 +134,7 @@ public abstract class AbstractRecordStore extends
             for (final Attribute attribute : recordDefinition.getAttributes()) {
               final String fieldName = attribute.getName();
               if (fieldName.equals(columnName)
-                && !fieldName.equals(idFieldName)) {
+                  && !fieldName.equals(idFieldName)) {
                 attribute.setCodeTable(codeTable);
               }
             }
@@ -149,18 +148,6 @@ public abstract class AbstractRecordStore extends
   public void addCodeTables(final Collection<CodeTable> codeTables) {
     for (final CodeTable codeTable : codeTables) {
       addCodeTable(codeTable);
-    }
-  }
-
-  public void addRecordStoreExtension(final RecordStoreExtension extension) {
-    if (extension != null) {
-      try {
-        final Map<String, Object> connectionProperties = getConnectionProperties();
-        extension.initialize(this, connectionProperties);
-        this.recordStoreExtensions.add(extension);
-      } catch (final Throwable e) {
-        ExceptionUtil.log(extension.getClass(), "Unable to initialize", e);
-      }
     }
   }
 
@@ -181,7 +168,8 @@ public abstract class AbstractRecordStore extends
     }
   }
 
-  protected void addMetaDataProperties(final RecordDefinitionImpl recordDefinition) {
+  protected void addMetaDataProperties(
+    final RecordDefinitionImpl recordDefinition) {
     final String typePath = recordDefinition.getPath();
     for (final RecordDefinitionProperty property : this.commonMetaDataProperties) {
       final RecordDefinitionProperty clonedProperty = property.clone();
@@ -189,6 +177,18 @@ public abstract class AbstractRecordStore extends
     }
     final Map<String, Object> properties = this.typeMetaDataProperties.get(typePath);
     recordDefinition.setProperties(properties);
+  }
+
+  public void addRecordStoreExtension(final RecordStoreExtension extension) {
+    if (extension != null) {
+      try {
+        final Map<String, Object> connectionProperties = getConnectionProperties();
+        extension.initialize(this, connectionProperties);
+        this.recordStoreExtensions.add(extension);
+      } catch (final Throwable e) {
+        ExceptionUtil.log(extension.getClass(), "Unable to initialize", e);
+      }
+    }
   }
 
   protected void addSchema(final RecordStoreSchema schema) {
@@ -293,7 +293,7 @@ public abstract class AbstractRecordStore extends
       if (record != null) {
         record.setValues(values);
         final String idAttributeName = recordDefinition.getIdAttributeName();
-        if (StringUtils.hasText(idAttributeName)) {
+        if (Property.hasValue(idAttributeName)) {
           if (values.get(idAttributeName) == null) {
             final Object id = createPrimaryIdValue(typePath);
             record.setIdValue(id);
@@ -340,8 +340,7 @@ public abstract class AbstractRecordStore extends
   }
 
   public RecordStoreQueryReader createReader() {
-    final RecordStoreQueryReader reader = new RecordStoreQueryReader(
-      this);
+    final RecordStoreQueryReader reader = new RecordStoreQueryReader(this);
     return reader;
   }
 
@@ -356,18 +355,13 @@ public abstract class AbstractRecordStore extends
     final Record record = create(recordDefinition);
     if (record != null) {
       final String idAttributeName = recordDefinition.getIdAttributeName();
-      if (StringUtils.hasText(idAttributeName)) {
+      if (Property.hasValue(idAttributeName)) {
         final String typePath = recordDefinition.getPath();
         final Object id = createPrimaryIdValue(typePath);
         record.setIdValue(id);
       }
     }
     return record;
-  }
-
-  @Override
-  public void delete(final Record object) {
-    throw new UnsupportedOperationException("Delete not supported");
   }
 
   @Override
@@ -383,6 +377,11 @@ public abstract class AbstractRecordStore extends
       reader.close();
     }
     return i;
+  }
+
+  @Override
+  public void delete(final Record object) {
+    throw new UnsupportedOperationException("Delete not supported");
   }
 
   @Override
@@ -434,15 +433,6 @@ public abstract class AbstractRecordStore extends
     return this.connectionProperties;
   }
 
-  @Override
-  public RecordFactory getRecordFactory() {
-    return this.recordFactory;
-  }
-
-  public Collection<RecordStoreExtension> getRecordStoreExtensions() {
-    return this.recordStoreExtensions;
-  }
-
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
@@ -457,7 +447,8 @@ public abstract class AbstractRecordStore extends
   }
 
   @Override
-  public RecordDefinition getRecordDefinition(final RecordDefinition objectMetaData) {
+  public RecordDefinition getRecordDefinition(
+    final RecordDefinition objectMetaData) {
     final String typePath = objectMetaData.getPath();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     return recordDefinition;
@@ -472,6 +463,15 @@ public abstract class AbstractRecordStore extends
     } else {
       return schema.getRecordDefinition(typePath);
     }
+  }
+
+  @Override
+  public RecordFactory getRecordFactory() {
+    return this.recordFactory;
+  }
+
+  public Collection<RecordStoreExtension> getRecordStoreExtensions() {
+    return this.recordStoreExtensions;
   }
 
   @Override
@@ -612,6 +612,33 @@ public abstract class AbstractRecordStore extends
   }
 
   @Override
+  public Record load(final String typePath, final Identifier id) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      final List<Object> values = id.getValues();
+      final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
+      if (idAttributeNames.isEmpty()) {
+        throw new IllegalArgumentException(typePath
+          + " does not have a primary key");
+      } else if (values.size() != idAttributeNames.size()) {
+        throw new IllegalArgumentException(id + " not a valid id for "
+            + typePath + " requires " + idAttributeNames);
+      } else {
+        final Query query = new Query(recordDefinition);
+        for (int i = 0; i < idAttributeNames.size(); i++) {
+          final String name = idAttributeNames.get(i);
+          final Object value = values.get(i);
+          final Attribute attribute = recordDefinition.getAttribute(name);
+          query.and(Q.equal(attribute, value));
+        }
+        return queryFirst(query);
+      }
+    }
+  }
+
+  @Override
   public Record load(final String typePath, final Object... id) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null) {
@@ -637,38 +664,10 @@ public abstract class AbstractRecordStore extends
     }
   }
 
-  @Override
-  public Record load(final String typePath, final Identifier id) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      final List<Object> values = id.getValues();
-      final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
-      if (idAttributeNames.isEmpty()) {
-        throw new IllegalArgumentException(typePath
-          + " does not have a primary key");
-      } else if (values.size() != idAttributeNames.size()) {
-        throw new IllegalArgumentException(id + " not a valid id for "
-          + typePath + " requires " + idAttributeNames);
-      } else {
-        final Query query = new Query(recordDefinition);
-        for (int i = 0; i < idAttributeNames.size(); i++) {
-          final String name = idAttributeNames.get(i);
-          final Object value = values.get(i);
-          final Attribute attribute = recordDefinition.getAttribute(name);
-          query.and(Q.equal(attribute, value));
-        }
-        return queryFirst(query);
-      }
-    }
-  }
+  protected abstract void loadSchemaRecordDefinitions(RecordStoreSchema schema,
+    Map<String, RecordDefinition> recordDefinitionMap);
 
-  protected abstract void loadSchemaRecordDefinitions(
-    RecordStoreSchema schema, Map<String, RecordDefinition> recordDefinitionMap);
-
-  protected abstract void loadSchemas(
-    Map<String, RecordStoreSchema> schemaMap);
+  protected abstract void loadSchemas(Map<String, RecordStoreSchema> schemaMap);
 
   @Override
   public Record lock(final String typePath, final Object id) {
@@ -777,16 +776,12 @@ public abstract class AbstractRecordStore extends
     this.connectionProperties = CollectionUtil.createHashMap(connectionProperties);
   }
 
-  @Override
-  public void setRecordFactory(final RecordFactory recordFactory) {
-    this.recordFactory = recordFactory;
-  }
-
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
 
-  public void setIteratorFactory(final RecordStoreIteratorFactory iteratorFactory) {
+  public void setIteratorFactory(
+    final RecordStoreIteratorFactory iteratorFactory) {
     this.iteratorFactory = iteratorFactory;
   }
 
@@ -799,6 +794,11 @@ public abstract class AbstractRecordStore extends
   @Override
   public void setLogCounts(final boolean logCounts) {
     this.statistics.setLogCounts(logCounts);
+  }
+
+  @Override
+  public void setRecordFactory(final RecordFactory recordFactory) {
+    this.recordFactory = recordFactory;
   }
 
   public void setSchemaMap(final Map<String, RecordStoreSchema> schemaMap) {
@@ -829,7 +829,7 @@ public abstract class AbstractRecordStore extends
 
   @Override
   public String toString() {
-    if (StringUtils.hasText(this.label)) {
+    if (Property.hasValue(this.label)) {
       return this.label;
     } else {
       return super.toString();

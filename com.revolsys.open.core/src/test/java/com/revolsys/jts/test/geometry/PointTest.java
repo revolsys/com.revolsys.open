@@ -7,8 +7,8 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.jts.TestConstants;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 import com.revolsys.jts.geom.impl.PointDouble;
 

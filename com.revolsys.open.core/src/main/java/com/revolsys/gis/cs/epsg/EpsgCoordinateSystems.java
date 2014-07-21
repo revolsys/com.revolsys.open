@@ -13,8 +13,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.collection.IntHashMap;
 import com.revolsys.gis.cs.AngularUnit;
 import com.revolsys.gis.cs.Area;
@@ -33,28 +31,9 @@ import com.revolsys.io.csv.CsvIterator;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.util.Property;
 
 public final class EpsgCoordinateSystems {
-  private static Set<CoordinateSystem> coordinateSystems;
-
-  private static IntHashMap<List<CoordinateSystem>> coordinateSystemsByCoordinateSystem = new IntHashMap<>();
-
-  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new TreeMap<Integer, CoordinateSystem>();
-
-  private static Map<String, CoordinateSystem> coordinateSystemsByName = new TreeMap<String, CoordinateSystem>();
-
-  private static Map<String, Projection> projectionsByName = new TreeMap<String, Projection>();
-
-  private static Map<Integer, Projection> projectionsByCode = new TreeMap<Integer, Projection>();
-
-  private static boolean initialized = false;
-
-  private static int nextSrid = 2000000;
-
-  private static final IntHashMap<LinearUnit> linearUnits = new IntHashMap<>();
-
-  private static Map<String, LinearUnit> linearUnitsByName = new TreeMap<String, LinearUnit>();
-
   private static void addCoordinateSystem(
     final CoordinateSystem coordinateSystem) {
     final Integer id = coordinateSystem.getId();
@@ -100,7 +79,7 @@ public final class EpsgCoordinateSystems {
                   matchCoordinateSystemId = srid3;
                 } else if (srid3 < matchCoordinateSystemId) {
                   if (!coordinateSystem3.isDeprecated()
-                    || matchedCoordinateSystem.isDeprecated()) {
+                      || matchedCoordinateSystem.isDeprecated()) {
                     matchedCoordinateSystem = coordinateSystem3;
                     matchCoordinateSystemId = srid3;
                   }
@@ -177,7 +156,7 @@ public final class EpsgCoordinateSystems {
    * Get the coordinate systems for the list of coordinate system identifiers.
    * Null identifiers will be ignored. If the coordinate system does not exist
    * then it will be ignored.
-   * 
+   *
    * @param coordinateSystemIds The coordinate system identifiers.
    * @return The list of coordinate systems.
    */
@@ -329,7 +308,7 @@ public final class EpsgCoordinateSystems {
         final ProjectedCoordinateSystem worldMercator = (ProjectedCoordinateSystem)coordinateSystemsById.get(3857);
         coordinateSystemsById.put(900913, worldMercator);
         coordinateSystems = Collections.unmodifiableSet(new LinkedHashSet<CoordinateSystem>(
-          coordinateSystemsById.values()));
+            coordinateSystemsById.values()));
         initialized = true;
       } catch (final Throwable t) {
         t.printStackTrace();
@@ -389,8 +368,8 @@ public final class EpsgCoordinateSystems {
             final boolean deprecated = Boolean.parseBoolean(values.get(6));
             final Authority authority = new EpsgAuthority(code);
 
-            final Area area = new Area(name, new BoundingBoxDoubleGf(2, minX, minY, maxX,
-              maxY), authority, deprecated);
+            final Area area = new Area(name, new BoundingBoxDoubleGf(2, minX,
+              minY, maxX, maxY), authority, deprecated);
             areas.put(code, area);
           }
         }
@@ -418,7 +397,7 @@ public final class EpsgCoordinateSystems {
             final List<Axis> axisList = new ArrayList<Axis>();
             for (int i = 1; i < values.size(); i += 2) {
               final String name = values.get(i);
-              if (StringUtils.hasText(name)) {
+              if (Property.hasValue(name)) {
                 final String direction = values.get(i + 1);
                 final Axis axis = new Axis(name, direction);
                 axisList.add(axis);
@@ -650,6 +629,26 @@ public final class EpsgCoordinateSystems {
   public static CoordinateSystem wgs84() {
     return EpsgCoordinateSystems.<CoordinateSystem> getCoordinateSystem(4326);
   }
+
+  private static Set<CoordinateSystem> coordinateSystems;
+
+  private static IntHashMap<List<CoordinateSystem>> coordinateSystemsByCoordinateSystem = new IntHashMap<>();
+
+  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new TreeMap<Integer, CoordinateSystem>();
+
+  private static Map<String, CoordinateSystem> coordinateSystemsByName = new TreeMap<String, CoordinateSystem>();
+
+  private static Map<String, Projection> projectionsByName = new TreeMap<String, Projection>();
+
+  private static Map<Integer, Projection> projectionsByCode = new TreeMap<Integer, Projection>();
+
+  private static boolean initialized = false;
+
+  private static int nextSrid = 2000000;
+
+  private static final IntHashMap<LinearUnit> linearUnits = new IntHashMap<>();
+
+  private static Map<String, LinearUnit> linearUnitsByName = new TreeMap<String, LinearUnit>();
 
   private EpsgCoordinateSystems() {
   }

@@ -1,8 +1,8 @@
 package com.revolsys.jts.simplify;
 
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.geom.impl.PointDouble;
 

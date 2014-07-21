@@ -8,8 +8,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
@@ -25,6 +23,7 @@ import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 
 /**
  * The Attribute class defines the name, type and other properties about each
@@ -35,7 +34,7 @@ import com.revolsys.util.MathUtil;
  * @see RecordDefinition
  */
 public class Attribute extends AbstractObjectWithProperties implements
-  Cloneable, MapSerializer {
+Cloneable, MapSerializer {
 
   public static Attribute create(final Map<String, Object> properties) {
     return new Attribute(properties);
@@ -102,12 +101,12 @@ public class Attribute extends AbstractObjectWithProperties implements
   public Attribute(final Map<String, Object> properties) {
     this.name = CollectionUtil.getString(properties, "name");
     this.title = CollectionUtil.getString(properties, "title");
-    if (!StringUtils.hasText(this.title)) {
+    if (!Property.hasValue(this.title)) {
       this.title = CaseConverter.toCapitalizedWords(this.name);
     }
     this.description = CollectionUtil.getString(properties, "description");
     this.type = DataTypes.getType(CollectionUtil.getString(properties,
-      "dataType"));
+        "dataType"));
     this.required = CollectionUtil.getBool(properties, "required");
     this.length = CollectionUtil.getInteger(properties, "length", 0);
     this.scale = CollectionUtil.getInteger(properties, "scale", 0);
@@ -525,7 +524,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = new WeakReference<RecordDefinition>(
-      recordDefinition);
+        recordDefinition);
   }
 
   public void setRequired(final boolean required) {
@@ -590,7 +589,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
     if (isRequired()) {
       if (value == null || value instanceof String
-        && !StringUtils.hasText((String)value)) {
+          && !Property.hasValue((String)value)) {
         throw new IllegalArgumentException(fieldName + " is required");
       }
     }

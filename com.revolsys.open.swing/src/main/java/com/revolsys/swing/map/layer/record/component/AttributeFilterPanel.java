@@ -189,9 +189,9 @@ ItemListener, DocumentListener, PropertyChangeListener {
     try {
       this.settingFilter = true;
       String searchField = this.previousSearchFieldName;
-      if (!StringUtils.hasText(searchField)) {
+      if (!Property.hasValue(searchField)) {
         searchField = this.layer.getProperty("searchField");
-        if (!StringUtils.hasText(searchField)) {
+        if (!Property.hasValue(searchField)) {
           searchField = this.recordDefinition.getAttributeNames().get(0);
         }
       }
@@ -345,7 +345,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
             final Value value = (Value)rightCondition;
             final Object searchValue = value.getValue();
             String searchText = StringConverterRegistry.toString(searchValue);
-            if (StringUtils.hasText(searchText)) {
+            if (Property.hasValue(searchText)) {
               setSearchField(this.searchTextField);
               searchText = searchText.replaceAll("%", "");
               final String previousSearchText = this.searchTextField.getText();
@@ -551,10 +551,10 @@ ItemListener, DocumentListener, PropertyChangeListener {
       } else if ("IS NOT NULL".equalsIgnoreCase(searchOperator)) {
         condition = Q.isNotNull(this.attribute);
       } else if (this.attribute != null) {
-        if (StringUtils.hasText(StringConverterRegistry.toString(searchValue))) {
+        if (Property.hasValue(StringConverterRegistry.toString(searchValue))) {
           if ("Like".equalsIgnoreCase(searchOperator)) {
             final String searchText = StringConverterRegistry.toString(searchValue);
-            if (StringUtils.hasText(searchText)) {
+            if (Property.hasValue(searchText)) {
               condition = Q.iLike(this.attribute, "%" + searchText + "%");
             }
           } else {

@@ -38,7 +38,6 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 

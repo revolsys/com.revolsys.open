@@ -6,17 +6,15 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class FolderConnectionRegistry extends
-  AbstractConnectionRegistry<FolderConnection> {
-
-  private static final ThreadLocal<FolderConnectionRegistry> threadRegistry = new ThreadLocal<FolderConnectionRegistry>();
+AbstractConnectionRegistry<FolderConnection> {
 
   public static FolderConnectionRegistry getForThread() {
     return FolderConnectionRegistry.threadRegistry.get();
@@ -28,6 +26,8 @@ public class FolderConnectionRegistry extends
     FolderConnectionRegistry.threadRegistry.set(registry);
     return oldValue;
   }
+
+  private static final ThreadLocal<FolderConnectionRegistry> threadRegistry = new ThreadLocal<FolderConnectionRegistry>();
 
   public FolderConnectionRegistry(
     final FolderConnectionManager connectionManager, final String name) {
@@ -87,7 +87,7 @@ public class FolderConnectionRegistry extends
   protected FolderConnection loadConnection(final File connectionFile) {
     final Map<String, ? extends Object> config = JsonMapIoFactory.toMap(connectionFile);
     String name = CollectionUtil.getString(config, "name");
-    if (!StringUtils.hasText(name)) {
+    if (!Property.hasValue(name)) {
       name = FileUtil.getBaseName(connectionFile);
     }
     try {

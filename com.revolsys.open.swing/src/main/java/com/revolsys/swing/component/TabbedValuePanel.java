@@ -5,9 +5,8 @@ import java.awt.Component;
 
 import javax.swing.JTabbedPane;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.util.Property;
 
 public class TabbedValuePanel extends ValueField {
   private static final long serialVersionUID = 1L;
@@ -40,10 +39,10 @@ public class TabbedValuePanel extends ValueField {
 
   @SuppressWarnings("unchecked")
   public <V extends Component> V getTab(final String tabName) {
-    for (int i = 0; i < tabs.getTabCount(); i++) {
-      final String title = tabs.getTitleAt(i);
+    for (int i = 0; i < this.tabs.getTabCount(); i++) {
+      final String title = this.tabs.getTitleAt(i);
       if (EqualsRegistry.equal(tabName, title)) {
-        return (V)tabs.getComponentAt(i);
+        return (V)this.tabs.getComponentAt(i);
       }
     }
     return null;
@@ -54,7 +53,7 @@ public class TabbedValuePanel extends ValueField {
   }
 
   public void setSelectdTab(final String tabName) {
-    if (StringUtils.hasText(tabName)) {
+    if (Property.hasValue(tabName)) {
       for (int i = 0; i < this.tabs.getTabCount(); i++) {
         final String name = this.tabs.getTitleAt(i);
         if (tabName.equals(name)) {

@@ -32,7 +32,6 @@ import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -51,11 +50,12 @@ import com.revolsys.swing.map.list.RecordListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.Property;
 
 public class RecordStoreSearchTextField extends JXSearchField implements
-  DocumentListener, KeyListener, MouseListener, FocusListener,
-  ListDataListener, ItemSelectable, Field, ListSelectionListener,
-  HighlightPredicate {
+DocumentListener, KeyListener, MouseListener, FocusListener,
+ListDataListener, ItemSelectable, Field, ListSelectionListener,
+HighlightPredicate {
   private static final long serialVersionUID = 1L;
 
   private final String displayAttributeName;
@@ -76,9 +76,10 @@ public class RecordStoreSearchTextField extends JXSearchField implements
 
   public RecordStoreSearchTextField(final RecordDefinition recordDefinition,
     final String displayAttributeName) {
-    this(recordDefinition.getRecordStore(), displayAttributeName, new Query(recordDefinition,
-      new Equal(F.upper(displayAttributeName), new Value(null))), new Query(
-      recordDefinition, Q.iLike(displayAttributeName, "")));
+    this(recordDefinition.getRecordStore(), displayAttributeName, new Query(
+      recordDefinition, new Equal(F.upper(displayAttributeName),
+        new Value(null))), new Query(recordDefinition, Q.iLike(
+      displayAttributeName, "")));
   }
 
   public RecordStoreSearchTextField(final RecordStore recordStore,
@@ -94,8 +95,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
     this.listModel = new RecordStoreQueryListModel(recordStore,
       displayAttributeName, queries);
     this.list = new JXList(this.listModel);
-    this.list.setCellRenderer(new RecordListCellRenderer(
-      displayAttributeName));
+    this.list.setCellRenderer(new RecordListCellRenderer(displayAttributeName));
     this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.list.setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
     this.list.addMouseListener(this);
@@ -126,7 +126,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
     final String typeName, final String displayAttributeName) {
     this(recordStore, displayAttributeName, new Query(typeName, new Equal(
       F.upper(displayAttributeName), new Value(null))), new Query(typeName,
-      Q.iLike(displayAttributeName, "")));
+        Q.iLike(displayAttributeName, "")));
   }
 
   @Override
@@ -249,7 +249,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
       return false;
     } else {
       final String text = getText();
-      if (StringUtils.hasText(text)) {
+      if (Property.hasValue(text)) {
         final String value = this.selectedItem.getString(this.displayAttributeName);
         return text.equalsIgnoreCase(value);
       } else {
@@ -279,7 +279,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
         }
         this.list.setSelectedIndex(selectedIndex);
         e.consume();
-      break;
+        break;
       case KeyEvent.VK_ENTER:
         if (size > 0) {
           if (selectedIndex >= 0 && selectedIndex < size) {
@@ -298,9 +298,9 @@ public class RecordStoreSearchTextField extends JXSearchField implements
           findButton.doClick();
           setText("");
         }
-      break;
+        break;
       default:
-      break;
+        break;
     }
     showMenu();
   }
@@ -435,7 +435,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(this.errorMessage)) {
+    if (!Property.hasValue(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

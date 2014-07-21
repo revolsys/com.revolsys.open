@@ -4,11 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.util.Property;
 
 /**
  * The ArrayRecord is an implementation of {@link Record} which uses an
@@ -22,6 +21,17 @@ public class ArrayRecord extends BaseRecord {
 
   /** The object's attribute values. */
   private Object[] attributes;
+
+  /**
+   * Construct a new ArrayRecord as a deep clone of the attribute values.
+   * Objects can only be cloned if they have a publicly accessible
+   * {@link #clone()} method.
+   *
+   * @param object The object to clone.
+   */
+  public ArrayRecord(final Record object) {
+    this(object.getRecordDefinition(), object);
+  }
 
   /**
    * Construct a new empty ArrayRecord using the recordDefinition.
@@ -45,17 +55,6 @@ public class ArrayRecord extends BaseRecord {
       setValues(values);
     }
     setState(RecordState.New);
-  }
-
-  /**
-   * Construct a new ArrayRecord as a deep clone of the attribute values.
-   * Objects can only be cloned if they have a publicly accessible
-   * {@link #clone()} method.
-   *
-   * @param object The object to clone.
-   */
-  public ArrayRecord(final Record object) {
-    this(object.getRecordDefinition(), object);
   }
 
   /**
@@ -112,7 +111,7 @@ public class ArrayRecord extends BaseRecord {
     if (index >= 0) {
       if (value instanceof String) {
         final String string = (String)value;
-        if (!StringUtils.hasText(string)) {
+        if (!Property.hasValue(string)) {
           value = null;
         }
       }

@@ -34,7 +34,6 @@ package com.revolsys.jts.testold.algorithm;
 
 import junit.textui.TestRunner;
 
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;

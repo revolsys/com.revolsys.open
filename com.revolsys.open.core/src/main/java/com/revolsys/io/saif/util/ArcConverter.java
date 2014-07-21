@@ -7,9 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.gis.jts.GeometryProperties;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.saif.SaifConstants;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;

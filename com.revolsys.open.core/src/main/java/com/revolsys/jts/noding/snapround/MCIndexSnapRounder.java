@@ -37,8 +37,8 @@ import java.util.List;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.noding.InteriorIntersectionFinderAdder;
 import com.revolsys.jts.noding.MCIndexNoder;
 import com.revolsys.jts.noding.NodedSegmentString;

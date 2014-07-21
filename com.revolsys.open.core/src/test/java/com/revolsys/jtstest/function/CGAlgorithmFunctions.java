@@ -1,7 +1,6 @@
 package com.revolsys.jtstest.function;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Geometry;

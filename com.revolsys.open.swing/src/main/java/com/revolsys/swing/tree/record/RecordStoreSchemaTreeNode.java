@@ -8,8 +8,6 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.tree.TreeNode;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.RecordStoreConnectionMapProxy;
 import com.revolsys.data.io.RecordStoreProxy;
@@ -19,9 +17,10 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.PathUtil;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
+import com.revolsys.util.Property;
 
 public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
-  RecordStoreConnectionMapProxy {
+RecordStoreConnectionMapProxy {
 
   public static final ImageIcon ICON_SCHEMA = SilkIconLoader.getIcon("folder_table");
 
@@ -36,7 +35,7 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
     setParent(parent);
     this.schemaPath = schemaPath;
     String name = PathUtil.getName(schemaPath);
-    if (!StringUtils.hasText(name)) {
+    if (!Property.hasValue(name)) {
       name = "/";
     }
     setName(name);
@@ -47,7 +46,7 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
     final List<TreeNode> children = new ArrayList<TreeNode>();
     final RecordStore recordStore = getRecordStore();
     if (recordStore != null) {
-      final RecordStoreSchema schema = recordStore.getSchema(schemaPath);
+      final RecordStoreSchema schema = recordStore.getSchema(this.schemaPath);
       if (schema != null) {
         for (final RecordDefinition recordDefinition : schema.getTypes()) {
           final String typeName = recordDefinition.getPath();

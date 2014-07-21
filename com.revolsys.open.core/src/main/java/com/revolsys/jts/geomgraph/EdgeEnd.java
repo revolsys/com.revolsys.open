@@ -35,7 +35,6 @@ package com.revolsys.jts.geomgraph;
 import java.io.PrintStream;
 
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
-import com.revolsys.jts.algorithm.CGAlgorithms;
 import com.revolsys.jts.algorithm.CGAlgorithmsDD;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.util.Assert;

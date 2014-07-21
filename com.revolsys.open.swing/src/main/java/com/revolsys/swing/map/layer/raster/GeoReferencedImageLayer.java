@@ -119,7 +119,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       SwingUtil.addReadOnlyTextField(panel, "URL", this.url);
     }
     final String fileNameExtension = FileUtil.getFileNameExtension(this.url);
-    if (StringUtils.hasText(fileNameExtension)) {
+    if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
       final GeoReferencedImageFactory factory = IoFactoryRegistry.getInstance()
         .getFactoryByFileExtension(GeoReferencedImageFactory.class,
@@ -171,7 +171,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   @Override
   protected boolean doInitialize() {
     final String url = getProperty("url");
-    if (StringUtils.hasText(url)) {
+    if (Property.hasValue(url)) {
       this.url = url;
       this.resource = SpringUtil.getResource(url);
       cancelChanges();

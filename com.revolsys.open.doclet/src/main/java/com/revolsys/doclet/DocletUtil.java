@@ -9,11 +9,10 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
+import com.revolsys.util.Property;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationTypeDoc;
 import com.sun.javadoc.ClassDoc;
@@ -31,14 +30,6 @@ import com.sun.javadoc.Type;
 import com.sun.javadoc.WildcardType;
 
 public class DocletUtil {
-
-  private static final Map<String, String> PACKAGE_URLS = new LinkedHashMap<String, String>();
-
-  static {
-    addPackageUrl("java.", "http://docs.oracle.com/javase/6/docs/api/");
-    addPackageUrl("com.revolsys.jts.",
-      "http://tsusiatsoftware.net/jts/javadoc/");
-  }
 
   public static void addPackageUrl(final String packagePrefix, final String url) {
     PACKAGE_URLS.put(packagePrefix, url);
@@ -161,7 +152,7 @@ public class DocletUtil {
       if (qualifiedTypeName.startsWith(packagePrefix)) {
         final String baseUrl = entry.getValue();
         final String url = baseUrl + qualifiedTypeName.replaceAll("\\.", "/")
-          + ".html?is-external=true";
+            + ".html?is-external=true";
         return url;
       }
     }
@@ -196,19 +187,19 @@ public class DocletUtil {
     writer.element(HtmlUtil.TITLE, docTitle);
     HtmlUtil.serializeCss(
       writer,
-      "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables_themeroller.css");
+        "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables_themeroller.css");
     HtmlUtil.serializeCss(
       writer,
-      "https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/cupertino/jquery-ui.css");
+        "https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/cupertino/jquery-ui.css");
     HtmlUtil.serializeCss(writer, "prettify.css");
     HtmlUtil.serializeCss(writer, "javadoc.css");
     HtmlUtil.serializeScriptLink(writer,
-      "https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js");
+        "https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js");
     HtmlUtil.serializeScriptLink(writer,
-      "https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js");
+        "https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js");
     HtmlUtil.serializeScriptLink(
       writer,
-      "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js");
+        "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js");
     HtmlUtil.serializeScriptLink(writer, "prettify.js");
     HtmlUtil.serializeScriptLink(writer, "javadoc.js");
     writer.endTagLn(HtmlUtil.HEAD);
@@ -218,8 +209,8 @@ public class DocletUtil {
     final ClassDoc classDoc = type.asClassDoc();
     final ClassDoc annotationDoc = type.asAnnotationTypeDoc();
     final boolean included = annotationDoc != null
-      && annotationDoc.isIncluded() || classDoc != null
-      && classDoc.isIncluded();
+        && annotationDoc.isIncluded() || classDoc != null
+        && classDoc.isIncluded();
     return included;
   }
 
@@ -236,7 +227,7 @@ public class DocletUtil {
 
   public static void link(final XmlWriter writer, final String url,
     final String label, final boolean code) {
-    final boolean hasUrl = StringUtils.hasText(url);
+    final boolean hasUrl = Property.hasValue(url);
     if (hasUrl) {
       writer.startTag(HtmlUtil.A);
       writer.attribute(HtmlUtil.ATTR_HREF, url);
@@ -303,7 +294,7 @@ public class DocletUtil {
           final PackageDoc packagedoc = seeTag.referencedPackage();
           if (packagedoc != null && packagedoc.isIncluded()) {
             final String packageName = packagedoc.name();
-            if (!StringUtils.hasText(label)) {
+            if (!Property.hasValue(label)) {
               label = packageName;
             }
             link(writer, "#" + packageName, label, code);
@@ -330,7 +321,7 @@ public class DocletUtil {
             url = "#" + className;
           } else {
             url = getExternalUrl(className);
-            if (!StringUtils.hasText(url)) {
+            if (!Property.hasValue(url)) {
               label = className;
             }
           }
@@ -339,9 +330,9 @@ public class DocletUtil {
               if (referencedMemberName.indexOf('(') < 0) {
                 final ExecutableMemberDoc executableDoc = (ExecutableMemberDoc)referencedMember;
                 referencedMemberName = referencedMemberName
-                  + executableDoc.signature();
+                    + executableDoc.signature();
               }
-              if (StringUtils.hasText(referencedMemberName)) {
+              if (Property.hasValue(referencedMemberName)) {
                 label = referencedMemberName;
               } else {
                 label = seeTagText;
@@ -349,13 +340,13 @@ public class DocletUtil {
             }
             if (referencedClass.isIncluded()) {
               url += "." + referencedMemberName;
-            } else if (StringUtils.hasText(url)) {
+            } else if (Property.hasValue(url)) {
               url += "#" + referencedMemberName;
             } else {
               label = referencedMember.toString();
             }
           }
-          if (!StringUtils.hasText(label)) {
+          if (!Property.hasValue(label)) {
             label = referencedClass.name();
           }
           link(writer, url, label, code);
@@ -448,5 +439,13 @@ public class DocletUtil {
       }
     }
     writer.text(type.dimension());
+  }
+
+  private static final Map<String, String> PACKAGE_URLS = new LinkedHashMap<String, String>();
+
+  static {
+    addPackageUrl("java.", "http://docs.oracle.com/javase/6/docs/api/");
+    addPackageUrl("com.revolsys.jts.",
+        "http://tsusiatsoftware.net/jts/javadoc/");
   }
 }

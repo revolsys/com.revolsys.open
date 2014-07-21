@@ -3,8 +3,6 @@ package com.revolsys.gis.postgresql;
 import java.io.PrintWriter;
 import java.util.List;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.AttributeProperties;
@@ -19,6 +17,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.util.Property;
 
 public class PostgreSQLDdlWriter extends JdbcDdlWriter {
   public PostgreSQLDdlWriter() {
@@ -37,14 +36,14 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
     if (shortNameProperty != null) {
       shortName = shortNameProperty.getShortName();
     }
-    if (StringUtils.hasText(shortName) && shortNameProperty.isUseForSequence()) {
+    if (Property.hasValue(shortName) && shortNameProperty.isUseForSequence()) {
       final String sequenceName = schema + "." + shortName.toLowerCase()
-        + "_seq";
+          + "_seq";
       return sequenceName;
     } else {
       final String tableName = PathUtil.getName(typePath).toLowerCase();
       final String idAttributeName = recordDefinition.getIdAttributeName()
-        .toLowerCase();
+          .toLowerCase();
       return schema + "." + tableName + "_" + idAttributeName + "_seq";
     }
   }

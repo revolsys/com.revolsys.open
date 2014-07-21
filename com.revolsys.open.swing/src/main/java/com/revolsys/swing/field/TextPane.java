@@ -10,14 +10,13 @@ import javax.swing.text.Element;
 
 import jsyntaxpane.DefaultSyntaxKit;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.Property;
 
 public class TextPane extends JEditorPane implements Field, FocusListener {
   private static final long serialVersionUID = 1L;
@@ -177,7 +176,7 @@ public class TextPane extends JEditorPane implements Field, FocusListener {
   @Override
   public void setToolTipText(final String text) {
     this.originalToolTip = text;
-    if (!StringUtils.hasText(this.errorMessage)) {
+    if (!Property.hasValue(this.errorMessage)) {
       super.setToolTipText(text);
     }
   }

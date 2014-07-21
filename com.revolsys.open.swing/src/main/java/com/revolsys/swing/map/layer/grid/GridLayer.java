@@ -5,7 +5,6 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
@@ -23,8 +22,13 @@ import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PreferencesUtil;
+import com.revolsys.util.Property;
 
 public class GridLayer extends AbstractLayer {
+
+  public static GridLayer create(final Map<String, Object> properties) {
+    return new GridLayer(properties);
+  }
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(GridLayer.class);
@@ -34,10 +38,6 @@ public class GridLayer extends AbstractLayer {
 
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "grid", "Grid", GridLayer.class, "create");
-
-  public static GridLayer create(final Map<String, Object> properties) {
-    return new GridLayer(properties);
-  }
 
   private RectangularMapGrid grid;
 
@@ -52,9 +52,9 @@ public class GridLayer extends AbstractLayer {
   @Override
   protected boolean doInitialize() {
     final String gridName = getProperty("gridName");
-    if (StringUtils.hasText(gridName)) {
-      grid = RectangularMapGridFactory.getGrid(gridName);
-      if (grid == null) {
+    if (Property.hasValue(gridName)) {
+      this.grid = RectangularMapGridFactory.getGrid(gridName);
+      if (this.grid == null) {
         LoggerFactory.getLogger(getClass()).error(
           "Cannot find gridName=" + gridName);
       } else {
@@ -62,7 +62,7 @@ public class GridLayer extends AbstractLayer {
       }
     } else {
       LoggerFactory.getLogger(getClass()).error(
-        "Layer definition does not contain a 'gridName' property");
+          "Layer definition does not contain a 'gridName' property");
     }
     return false;
   }
@@ -91,10 +91,10 @@ public class GridLayer extends AbstractLayer {
       final RectangularMapGrid grid = getGrid();
       final String gridName = grid.getName();
       final String preferenceName = CaseConverter.toCapitalizedWords(gridName)
-        + "Mapsheet";
+          + "Mapsheet";
       String mapsheet = PreferencesUtil.getString(getClass(), preferenceName);
       mapsheet = JOptionPane.showInputDialog(map, "Enter name of the"
-        + gridName + " mapsheet to zoom to", mapsheet);
+          + gridName + " mapsheet to zoom to", mapsheet);
       zoomTosheet(mapsheet);
     }
   }
@@ -102,7 +102,7 @@ public class GridLayer extends AbstractLayer {
   public void zoomTosheet(final String mapsheet) {
     final Project project = getProject();
     if (project != null) {
-      if (StringUtils.hasText(mapsheet)) {
+      if (Property.hasValue(mapsheet)) {
         final MapPanel map = MapPanel.get(this);
         final RectangularMapGrid grid = getGrid();
         final String gridName = grid.getName();
@@ -112,12 +112,12 @@ public class GridLayer extends AbstractLayer {
           project.setViewBoundingBox(boundingBox);
         } catch (final Throwable e) {
           final String message = "Invalid mapsheet " + mapsheet + " for "
-            + gridName;
+              + gridName;
           LoggerFactory.getLogger(getClass()).error(message, e);
           JOptionPane.showMessageDialog(map, message);
         } finally {
           final String preferenceName = CaseConverter.toCapitalizedWords(gridName)
-            + "Mapsheet";
+              + "Mapsheet";
           PreferencesUtil.setString(getClass(), preferenceName, mapsheet);
         }
       }

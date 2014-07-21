@@ -23,7 +23,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Condition;
@@ -34,6 +33,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.io.JdbcRecordStore;
+import com.revolsys.util.Property;
 
 public final class JdbcUtils {
   public static void addAttributeName(final StringBuffer sql,
@@ -79,7 +79,7 @@ public final class JdbcUtils {
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
       for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
-        .iterator(); iterator.hasNext();) {
+          .iterator(); iterator.hasNext();) {
         final Entry<String, Boolean> entry = iterator.next();
         final String column = entry.getKey();
         sql.append(column);
@@ -163,7 +163,7 @@ public final class JdbcUtils {
     addColumnNames(sql, recordDefinition, tablePrefix, attributeNames,
       hasColumns);
     sql.append(" FROM ");
-    if (StringUtils.hasText(fromClause)) {
+    if (Property.hasValue(fromClause)) {
       sql.append(fromClause);
     } else {
       final String tableName = getQualifiedTableName(typePath);
@@ -183,7 +183,7 @@ public final class JdbcUtils {
     final String tableName, final String idColumn, final Object id) {
 
     final String sql = "DELETE FROM " + cleanObjectName(tableName) + " WHERE "
-      + cleanObjectName(idColumn) + " = ?";
+        + cleanObjectName(idColumn) + " = ?";
     try {
       final PreparedStatement statement = connection.prepareStatement(sql);
       try {
@@ -199,7 +199,7 @@ public final class JdbcUtils {
     } catch (final SQLException e) {
       LOG.error("Invalid table name or id column: " + sql, e);
       throw new IllegalArgumentException("Invalid table name or id column: "
-        + sql);
+          + sql);
     }
 
   }
@@ -264,9 +264,9 @@ public final class JdbcUtils {
           if (dataSource.getClass().getName().toLowerCase().contains("oracle")) {
             return "Oracle";
           } else if (dataSource.getClass()
-            .getName()
-            .toLowerCase()
-            .contains("postgres")) {
+              .getName()
+              .toLowerCase()
+              .contains("postgres")) {
             return "PostgreSQL";
           } else {
             return null;
@@ -285,7 +285,7 @@ public final class JdbcUtils {
   }
 
   public static String getQualifiedTableName(final String typePath) {
-    if (StringUtils.hasText(typePath)) {
+    if (Property.hasValue(typePath)) {
       final String tableName = typePath.replaceAll("^/+", "");
       return tableName.replaceAll("/", ".");
     } else {
@@ -294,7 +294,7 @@ public final class JdbcUtils {
   }
 
   public static String getSchemaName(final String typePath) {
-    if (StringUtils.hasText(typePath)) {
+    if (Property.hasValue(typePath)) {
       final String path = PathUtil.getPath(typePath);
       return path.replaceAll("(^/|/$)", "");
     } else {
@@ -316,7 +316,7 @@ public final class JdbcUtils {
         // tableName);
       }
       final List<String> attributeNames = new ArrayList<String>(
-        query.getAttributeNames());
+          query.getAttributeNames());
       if (attributeNames.isEmpty()) {
         final List<String> recordDefinitionAttributeNames = recordDefinition.getAttributeNames();
         if (recordDefinitionAttributeNames.isEmpty()) {
@@ -375,7 +375,7 @@ public final class JdbcUtils {
   }
 
   public static Map<String, Object> readMap(final ResultSet rs)
-    throws SQLException {
+      throws SQLException {
     final Map<String, Object> values = new LinkedHashMap<String, Object>();
     final ResultSetMetaData metaData = rs.getMetaData();
     for (int i = 1; i <= metaData.getColumnCount(); i++) {
@@ -415,7 +415,7 @@ public final class JdbcUtils {
 
   public static Date selectDate(final DataSource dataSource,
     final Connection connection, final String sql, final Object... parameters)
-    throws SQLException {
+        throws SQLException {
     if (dataSource == null) {
       return selectDate(connection, sql, parameters);
     } else {
@@ -478,7 +478,7 @@ public final class JdbcUtils {
 
   public static <T> List<T> selectList(final Connection connection,
     final String sql, final int columnIndex, final Object... parameters)
-    throws SQLException {
+        throws SQLException {
     final List<T> results = new ArrayList<T>();
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
@@ -521,7 +521,7 @@ public final class JdbcUtils {
 
   public static long selectLong(final DataSource dataSource,
     final Connection connection, final String sql, final Object... parameters)
-    throws SQLException {
+        throws SQLException {
     if (dataSource == null) {
       return selectLong(connection, sql, parameters);
     } else {
@@ -550,7 +550,7 @@ public final class JdbcUtils {
           return readMap(resultSet);
         } else {
           throw new IllegalArgumentException("Value not found for " + sql + " "
-            + Arrays.asList(parameters));
+              + Arrays.asList(parameters));
         }
       } finally {
         close(resultSet);
@@ -592,7 +592,7 @@ public final class JdbcUtils {
 
   public static String selectString(final DataSource dataSource,
     final Connection connection, final String sql, final Object... parameters)
-    throws SQLException {
+        throws SQLException {
     if (dataSource == null) {
       return selectString(connection, sql, parameters);
     } else {

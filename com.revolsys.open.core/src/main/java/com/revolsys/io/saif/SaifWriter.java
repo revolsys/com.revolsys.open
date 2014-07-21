@@ -38,7 +38,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -50,6 +49,7 @@ import com.revolsys.io.ZipUtil;
 import com.revolsys.io.saif.util.ObjectSetUtil;
 import com.revolsys.io.saif.util.OsnConverterRegistry;
 import com.revolsys.io.saif.util.OsnSerializer;
+import com.revolsys.util.Property;
 
 /**
  * <p>
@@ -192,15 +192,15 @@ public class SaifWriter extends AbstractRecordWriter {
     exportsSerializer.attributeName("handles");
     exportsSerializer.startCollection("Set");
     writeExport(exportsSerializer, "GlobalMetadata", "GlobalMetadata",
-      "globmeta.osn");
+        "globmeta.osn");
     for (final Map<String, Object> export : this.exports.values()) {
       final String compositeType = (String)export.get("compositeType");
       final String referenceId = (String)export.get("referenceId");
       final String objectSubset = (String)export.get("objectSubset");
       String compositeTypeName = PathUtil.getName(compositeType);
       final String compositeNamespace = PathUtil.getPath(compositeType)
-        .replaceAll("/", "");
-      if (StringUtils.hasText(compositeNamespace)) {
+          .replaceAll("/", "");
+      if (Property.hasValue(compositeNamespace)) {
         compositeTypeName += "::" + compositeNamespace;
       }
       writeExport(exportsSerializer, referenceId, compositeTypeName,
@@ -404,7 +404,7 @@ public class SaifWriter extends AbstractRecordWriter {
             this.tempDirectory, "imports.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
         } else if (PathUtil.getName(typePath).endsWith(
-          "InternallyReferencedObjects")) {
+            "InternallyReferencedObjects")) {
           serializer = createSerializer("/InternallyReferencedObject",
             new File(this.tempDirectory, "internal.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);

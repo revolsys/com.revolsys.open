@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
@@ -22,10 +20,12 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public final class RecordUtil {
 
-  public static Record copy(final RecordDefinition recordDefinition, final Record object) {
+  public static Record copy(final RecordDefinition recordDefinition,
+    final Record object) {
     final Record copy = new ArrayRecord(recordDefinition);
     copy.setValues(object);
     return copy;
@@ -225,7 +225,7 @@ public final class RecordUtil {
             object.setValue(name, value);
           } else {
             final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-              .getConverter(dataTypeClass);
+                .getConverter(dataTypeClass);
             if (converter == null) {
               object.setValue(name, value);
             } else {
@@ -239,7 +239,8 @@ public final class RecordUtil {
     return object;
   }
 
-  public static List<Record> getObjects(final RecordDefinition recordDefinition,
+  public static List<Record> getObjects(
+    final RecordDefinition recordDefinition,
     final Collection<? extends Map<String, Object>> list) {
     final List<Record> objects = new ArrayList<Record>();
     for (final Map<String, Object> map : list) {
@@ -255,9 +256,9 @@ public final class RecordUtil {
     final String value1 = object1.getString(fieldName);
     final String value2 = object2.getString(fieldName);
     Object value;
-    if (!StringUtils.hasText(value1)) {
+    if (!Property.hasValue(value1)) {
       value = value2;
-    } else if (!StringUtils.hasText(value2)) {
+    } else if (!Property.hasValue(value2)) {
       value = value1;
     } else if (EqualsRegistry.equal(value1, value2)) {
       value = value1;

@@ -44,7 +44,6 @@ import javax.measure.unit.Unit;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.equals.NumberEquals;
 import com.revolsys.data.record.Record;
@@ -64,6 +63,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 
 /**
  *  Defines a rectangular region of the 2D coordinate plane.
@@ -81,7 +81,7 @@ import com.revolsys.util.MathUtil;
 public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   public static BoundingBox create(final String wkt) {
-    if (StringUtils.hasLength(wkt)) {
+    if (Property.hasValue(wkt)) {
       GeometryFactory geometryFactory = null;
       final StringBuffer text = new StringBuffer(wkt);
       if (WktParser.hasText(text, "SRID=")) {
@@ -1034,7 +1034,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     if (isEmpty() || convertedBoundingBox.isEmpty()
-        || !intersects(convertedBoundingBox)) {
+      || !intersects(convertedBoundingBox)) {
       return new BoundingBoxDoubleGf(geometryFactory);
     } else {
       final double intMinX = Math.max(getMinX(), convertedBoundingBox.getMinX());
@@ -1067,8 +1067,8 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       final double maxY = getMaxY();
 
       return !(convertedBoundingBox.getMinX() > maxX
-          || convertedBoundingBox.getMaxX() < minX
-          || convertedBoundingBox.getMinY() > maxY || convertedBoundingBox.getMaxY() < minY);
+        || convertedBoundingBox.getMaxX() < minX
+        || convertedBoundingBox.getMinY() > maxY || convertedBoundingBox.getMaxY() < minY);
     }
   }
 

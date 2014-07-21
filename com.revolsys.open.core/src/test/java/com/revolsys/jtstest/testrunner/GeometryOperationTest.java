@@ -47,6 +47,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.geomop.GeometryOperation;
+import com.revolsys.util.Property;
 
 /**
  *  A test for two geometries.
@@ -54,7 +55,7 @@ import com.revolsys.jtstest.geomop.GeometryOperation;
  * @version 1.7
  */
 public class GeometryOperationTest extends junit.framework.TestCase implements
-  MapSerializer {
+MapSerializer {
   private String testDescription;
 
   private final String operation;
@@ -94,10 +95,10 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
     final Result expectedResult, final double tolerance) {
     this.tolerance = tolerance;
     this.testDescription = StringUtils.trimWhitespace(description);
-    if (!StringUtils.hasText(description)) {
+    if (!Property.hasValue(description)) {
       this.testDescription = operation;
     }
-    setName(testCase.getId() + "." + testIndex + "." + testDescription);
+    setName(testCase.getId() + "." + testIndex + "." + this.testDescription);
     this.operation = operation;
     this.expectedResult = expectedResult;
     this.testIndex = testIndex;
@@ -119,14 +120,14 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
 
   public boolean computePassed() throws Exception {
     final Result actualResult = getActualResult();
-    final ResultMatcher matcher = testCase.getTestRun().getResultMatcher();
+    final ResultMatcher matcher = this.testCase.getTestRun().getResultMatcher();
 
     // check that provided expected result geometry is valid
     // MD - disable except for testing
     // if (! isExpectedResultGeometryValid()) return false;
 
-    return matcher.isMatch(targetGeometry, operation, operationArgs,
-      actualResult, expectedResult, tolerance);
+    return matcher.isMatch(this.targetGeometry, this.operation,
+      this.operationArgs, actualResult, this.expectedResult, this.tolerance);
     // return expectedResult.equals(actualResult, tolerance);
   }
 
@@ -143,78 +144,79 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
       return null;
     }
     if (argStr.equalsIgnoreCase("A")) {
-      return testCase.getGeometryA();
+      return this.testCase.getGeometryA();
     }
     if (argStr.equalsIgnoreCase("B")) {
-      return testCase.getGeometryB();
+      return this.testCase.getGeometryB();
     }
     return argStr;
   }
 
   /**
    * Computes the actual result and caches the result value.
-   * 
+   *
    * @return the actual result computed
    * @throws Exception if the operation fails
    */
   public Result getActualResult() throws Exception {
-    if (isRun) {
-      return actualResult;
+    if (this.isRun) {
+      return this.actualResult;
     }
 
-    isRun = true;
-    targetGeometry = geometryIndex.equalsIgnoreCase("A") ? testCase.getGeometryA()
-      : testCase.getGeometryB();
+    this.isRun = true;
+    this.targetGeometry = this.geometryIndex.equalsIgnoreCase("A") ? this.testCase.getGeometryA()
+      : this.testCase.getGeometryB();
 
-    operationArgs = convertArgs(arguments);
+    this.operationArgs = convertArgs(this.arguments);
     final GeometryOperation op = getGeometryOperation();
-    actualResult = op.invoke(operation, targetGeometry, operationArgs);
-    return actualResult;
+    this.actualResult = op.invoke(this.operation, this.targetGeometry,
+      this.operationArgs);
+    return this.actualResult;
   }
 
   public String getArgument(final int i) {
-    return arguments.get(i);
+    return this.arguments.get(i);
   }
 
   public int getArgumentCount() {
-    return arguments.size();
+    return this.arguments.size();
   }
 
   public Exception getException() {
-    return exception;
+    return this.exception;
   }
 
   public Result getExpectedResult() {
-    return expectedResult;
+    return this.expectedResult;
   }
 
   public String getGeometryIndex() {
-    return geometryIndex;
+    return this.geometryIndex;
   }
 
   private GeometryOperation getGeometryOperation() {
-    return testCase.getTestRun().getGeometryOperation();
+    return this.testCase.getTestRun().getGeometryOperation();
   }
 
   public String getOperation() {
-    return operation;
+    return this.operation;
   }
 
   public TestCase getTestCase() {
-    return testCase;
+    return this.testCase;
   }
 
   public String getTestDescription() {
-    return testDescription;
+    return this.testDescription;
   }
 
   public int getTestIndex() {
-    return testIndex;
+    return this.testIndex;
   }
 
   private boolean isExpectedResultGeometryValid() {
-    if (expectedResult instanceof GeometryResult) {
-      final Geometry expectedGeom = ((GeometryResult)expectedResult).getGeometry();
+    if (this.expectedResult instanceof GeometryResult) {
+      final Geometry expectedGeom = ((GeometryResult)this.expectedResult).getGeometry();
       return expectedGeom.isValid();
     }
     return true;
@@ -224,31 +226,31 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
    *  Returns whether the Test is passed.
    */
   public boolean isPassed() {
-    return passed;
+    return this.passed;
   }
 
   public boolean isRun() {
-    return isRun;
+    return this.isRun;
   }
 
   public void removeArgument(final int i) {
-    arguments.remove(i);
+    this.arguments.remove(i);
   }
 
   @Override
   protected void runTest() throws Throwable {
     try {
-      passed = computePassed();
+      this.passed = computePassed();
     } catch (final Throwable e) {
-      System.err.println(testCase.getTestRun() + "\t" + testCase + "\t"
-        + getName());
+      System.err.println(this.testCase.getTestRun() + "\t" + this.testCase
+        + "\t" + getName());
       e.printStackTrace();
       throw e;
     }
   }
 
   public void setArgument(final int i, final String value) {
-    arguments.set(i, value);
+    this.arguments.set(i, value);
   }
 
   public void setResult(final Result result) {
@@ -259,10 +261,10 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     map.put("type", "test");
-    MapSerializerUtil.add(map, "description", testDescription);
+    MapSerializerUtil.add(map, "description", this.testDescription);
 
-    map.put("propertyName", geometryIndex.toLowerCase());
-    map.put("methodName", operation);
+    map.put("propertyName", this.geometryIndex.toLowerCase());
+    map.put("methodName", this.operation);
     final List<Object> arguments = new ArrayList<>();
 
     for (int i = 0; i < this.arguments.size(); i++) {
@@ -293,14 +295,14 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
   public String toXml() {
     String xml = "";
     xml += "<test>" + StringUtil.newLine;
-    if (testDescription != null && testDescription.length() > 0) {
-      xml += "  <desc>" + StringUtil.escapeHTML(testDescription) + "</desc>"
-        + StringUtil.newLine;
+    if (this.testDescription != null && this.testDescription.length() > 0) {
+      xml += "  <desc>" + StringUtil.escapeHTML(this.testDescription)
+        + "</desc>" + StringUtil.newLine;
     }
-    xml += "  <op name=\"" + operation + "\"";
-    xml += " arg1=\"" + geometryIndex + "\"";
+    xml += "  <op name=\"" + this.operation + "\"";
+    xml += " arg1=\"" + this.geometryIndex + "\"";
     int j = 2;
-    for (final Iterator i = arguments.iterator(); i.hasNext();) {
+    for (final Iterator i = this.arguments.iterator(); i.hasNext();) {
       final String argument = (String)i.next();
       Assert.assertTrue(argument != null);
       xml += " arg" + j + "=\"" + argument + "\"";
@@ -308,8 +310,8 @@ public class GeometryOperationTest extends junit.framework.TestCase implements
     }
 
     xml += ">" + StringUtil.newLine;
-    xml += StringUtil.indent(expectedResult.toFormattedString(), 4)
-      + StringUtil.newLine;
+    xml += StringUtil.indent(this.expectedResult.toFormattedString(), 4)
+        + StringUtil.newLine;
     xml += "  </op>" + StringUtil.newLine;
     xml += "</test>" + StringUtil.newLine;
     return xml;

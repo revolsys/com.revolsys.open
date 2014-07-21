@@ -14,20 +14,25 @@ import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
 
 import org.jdesktop.swingx.color.ColorUtil;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.util.Property;
 
 public class GeometryStyle extends MarkerStyle {
 
-  private static int colorIndex = -1;
-
-  public static final List<Color> COLORS = Arrays.asList(WebColors.Maroon,
-    WebColors.Olive, WebColors.Green, WebColors.Teal, WebColors.Navy,
-    WebColors.Purple, WebColors.Red, WebColors.Yellow, WebColors.Lime,
-    WebColors.Aqua, WebColors.Blue, WebColors.Fuchsia);
+  public static GeometryStyle createStyle() {
+    final GeometryStyle style = new GeometryStyle();
+    Color color;
+    synchronized (COLORS) {
+      colorIndex = (colorIndex + 1) % COLORS.size();
+      color = COLORS.get(colorIndex);
+    }
+    style.setLineColor(color);
+    style.setPolygonFill(ColorUtil.setAlpha(color, 127));
+    return style;
+  }
 
   public static GeometryStyle line(final Color color) {
     final GeometryStyle style = new GeometryStyle();
@@ -58,6 +63,13 @@ public class GeometryStyle extends MarkerStyle {
     style.setPolygonFill(fillColor);
     return style;
   }
+
+  private static int colorIndex = -1;
+
+  public static final List<Color> COLORS = Arrays.asList(WebColors.Maroon,
+    WebColors.Olive, WebColors.Green, WebColors.Teal, WebColors.Navy,
+    WebColors.Purple, WebColors.Red, WebColors.Yellow, WebColors.Lime,
+    WebColors.Aqua, WebColors.Blue, WebColors.Fuchsia);
 
   private Measure<Length> lineDashOffset = ZERO_PIXEL;
 
@@ -162,18 +174,6 @@ public class GeometryStyle extends MarkerStyle {
 
   }
 
-  public static GeometryStyle createStyle() {
-    final GeometryStyle style = new GeometryStyle();
-    Color color;
-    synchronized (COLORS) {
-      colorIndex = (colorIndex + 1) % COLORS.size();
-      color = COLORS.get(colorIndex);
-    }
-    style.setLineColor(color);
-    style.setPolygonFill(ColorUtil.setAlpha(color, 127));
-    return style;
-  }
-
   private LineCap lineCap = LineCap.ROUND;
 
   private boolean lineClip = true;
@@ -239,11 +239,11 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public List<Measure<Length>> getLineDashArray() {
-    return Collections.unmodifiableList(lineDashArray);
+    return Collections.unmodifiableList(this.lineDashArray);
   }
 
   public Measure<Length> getLineDashOffset() {
-    return lineDashOffset;
+    return this.lineDashOffset;
   }
 
   public double getLineGamma() {
@@ -353,7 +353,7 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public void setLineCompOp(final String lineCompOp) {
-    if (StringUtils.hasText(lineCompOp)) {
+    if (Property.hasValue(lineCompOp)) {
       this.lineCompOp = CompositionOperation.valueOf(lineCompOp);
     } else {
       this.lineCompOp = CompositionOperation.src_over;
@@ -406,7 +406,7 @@ public class GeometryStyle extends MarkerStyle {
   public void setLineOpacity(final double lineOpacity) {
     if (lineOpacity < 0 || lineOpacity > 1) {
       throw new IllegalArgumentException(
-        "Line opacity must be between 0.0 - 1.0");
+          "Line opacity must be between 0.0 - 1.0");
     } else {
       this.lineOpacity = (int)(255 * lineOpacity);
       this.lineColor = WebColors.getColorWithOpacity(this.lineColor,
@@ -439,13 +439,13 @@ public class GeometryStyle extends MarkerStyle {
       this.lineDashOffset);
 
     final float[] dashArray;
-    final int dashArraySize = lineDashArray.size();
+    final int dashArraySize = this.lineDashArray.size();
     if (dashArraySize == 0) {
       dashArray = null;
     } else {
       dashArray = new float[dashArraySize];
       for (int i = 0; i < dashArray.length; i++) {
-        final Measure<Length> dashMeasure = lineDashArray.get(i);
+        final Measure<Length> dashMeasure = this.lineDashArray.get(i);
         final float dash = (float)Viewport2D.toDisplayValue(viewport,
           dashMeasure);
         dashArray[i] = dash;
@@ -468,7 +468,7 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public void setPolygonCompOp(final String polygonCompOp) {
-    if (StringUtils.hasText(polygonCompOp)) {
+    if (Property.hasValue(polygonCompOp)) {
       this.polygonCompOp = CompositionOperation.valueOf(polygonCompOp);
     } else {
       this.polygonCompOp = CompositionOperation.src_over;
@@ -487,7 +487,7 @@ public class GeometryStyle extends MarkerStyle {
   public void setPolygonFillOpacity(final double polygonFillOpacity) {
     if (polygonFillOpacity < 0 || polygonFillOpacity > 1) {
       throw new IllegalArgumentException(
-        "Polygon fill opacity must be between 0.0 - 1.0");
+          "Polygon fill opacity must be between 0.0 - 1.0");
     } else {
       this.polygonFillOpacity = (int)(255 * polygonFillOpacity);
       this.polygonFill = WebColors.getColorWithOpacity(this.polygonFill,

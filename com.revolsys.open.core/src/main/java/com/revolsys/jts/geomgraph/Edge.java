@@ -34,8 +34,8 @@ package com.revolsys.jts.geomgraph;
 
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.IntersectionMatrix;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.LineStringDouble;

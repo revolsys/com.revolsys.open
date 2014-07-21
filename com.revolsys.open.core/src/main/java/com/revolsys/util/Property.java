@@ -21,7 +21,6 @@ import javax.swing.JComponent;
 
 import org.apache.commons.beanutils.MethodUtils;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.beans.NonWeakListener;
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -66,7 +65,7 @@ public final class Property {
 
   public static PropertyDescriptor descriptor(final Class<?> beanClass,
     final String name) {
-    if (beanClass != null && StringUtils.hasText(name)) {
+    if (beanClass != null && Property.hasValue(name)) {
       try {
         final BeanInfo beanInfo = Introspector.getBeanInfo(beanClass);
         final PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
@@ -127,7 +126,7 @@ public final class Property {
         final String firstName = JavaBeanUtil.getFirstName(key);
         final String subName = JavaBeanUtil.getSubName(key);
         final Object value = JavaBeanUtil.getProperty(object, firstName);
-        if (value == null || !StringUtils.hasText(subName)) {
+        if (value == null || !Property.hasValue(subName)) {
           return (T)value;
         } else {
           return (T)get(value, subName);
@@ -264,12 +263,31 @@ public final class Property {
     }
   }
 
+  private static boolean hasText(final CharSequence string) {
+    final int length = string.length();
+    for (int i = 0; i < length; i++) {
+      final char character = string.charAt(i);
+      if (!Character.isWhitespace(character)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean hasValue(final CharSequence string) {
+    if (string == null) {
+      return false;
+    } else {
+      return hasText(string);
+    }
+  }
+
   public static boolean hasValue(final Object value) {
     if (value == null) {
       return false;
     } else if (value instanceof CharSequence) {
       final CharSequence string = (CharSequence)value;
-      return StringUtils.hasText(string);
+      return hasText(string);
     } else {
       return true;
     }
@@ -290,7 +308,7 @@ public final class Property {
       return (V)ExceptionUtil.throwCauseException(e);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to invoke "
-        + toString(object, methodName, parameterArray), e);
+          + toString(object, methodName, parameterArray), e);
     }
   }
 
@@ -299,7 +317,7 @@ public final class Property {
       return true;
     } else if (value instanceof CharSequence) {
       final CharSequence charSequence = (CharSequence)value;
-      return !StringUtils.hasText(charSequence);
+      return !Property.hasValue(charSequence);
     } else {
       return false;
     }
@@ -387,7 +405,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-              || listenerReference == propertyChangeListener) {
+                || listenerReference == propertyChangeListener) {
               propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
             }
           }
@@ -402,7 +420,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-              || listenerReference == propertyChangeListener) {
+                || listenerReference == propertyChangeListener) {
               component.removePropertyChangeListener(propertyChangeListener);
             }
           }
@@ -425,7 +443,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-              || listenerReference == propertyChangeListener) {
+                || listenerReference == propertyChangeListener) {
               propertyChangeSupport.removePropertyChangeListener(propertyName,
                 propertyChangeListener);
             }
@@ -442,7 +460,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-              || listenerReference == propertyChangeListener) {
+                || listenerReference == propertyChangeListener) {
               component.removePropertyChangeListener(propertyName,
                 propertyChangeListener);
             }
@@ -462,7 +480,7 @@ public final class Property {
           set(object, propertyName, value);
         } catch (final Throwable e) {
           ExceptionUtil.log(Property.class, "Unable to set property "
-            + propertyName, e);
+              + propertyName, e);
         }
       }
     }

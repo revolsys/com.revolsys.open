@@ -15,12 +15,12 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.swing.listener.MacApplicationListenerHandler;
 import com.revolsys.swing.logging.ListLog4jAppender;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
 public class BaseMain implements UncaughtExceptionHandler {
 
@@ -45,7 +45,7 @@ public class BaseMain implements UncaughtExceptionHandler {
       }
       final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
       final Object closeAllWindows = quitStrategyClass.getField(
-        "CLOSE_ALL_WINDOWS").get(quitStrategyClass);
+          "CLOSE_ALL_WINDOWS").get(quitStrategyClass);
       MethodUtils.invokeExactMethod(application, "setQuitStrategy",
         closeAllWindows);
       MacApplicationListenerHandler.init(application);
@@ -86,7 +86,8 @@ public class BaseMain implements UncaughtExceptionHandler {
         logger, Level.ERROR, "Unable to start application", e);
 
       LoggingEventPanel.showDialog(null, event);
-      ExceptionUtil.log(getClass(), "Unable to start application " + name, e);
+      ExceptionUtil.log(getClass(), "Unable to start application " + this.name,
+        e);
     }
   }
 
@@ -94,7 +95,7 @@ public class BaseMain implements UncaughtExceptionHandler {
   public void uncaughtException(final Thread t, final Throwable e) {
     final Class<? extends BaseMain> logClass = getClass();
     String message = e.getMessage();
-    if (!StringUtils.hasText(message)) {
+    if (!Property.hasValue(message)) {
       if (e instanceof NullPointerException) {
         message = "Null pointer";
       } else {
@@ -104,7 +105,7 @@ public class BaseMain implements UncaughtExceptionHandler {
     ExceptionUtil.log(logClass, message, e);
     @SuppressWarnings("unchecked")
     final Enumeration<Appender> allAppenders = Logger.getRootLogger()
-      .getAllAppenders();
+    .getAllAppenders();
     while (allAppenders.hasMoreElements()) {
       final Appender appender = allAppenders.nextElement();
       if (appender instanceof ListLog4jAppender) {

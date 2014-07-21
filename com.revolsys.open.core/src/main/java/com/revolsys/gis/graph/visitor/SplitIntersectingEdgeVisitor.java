@@ -17,7 +17,6 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.filter.LineFilter;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.jts.filter.EqualFilter;
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;

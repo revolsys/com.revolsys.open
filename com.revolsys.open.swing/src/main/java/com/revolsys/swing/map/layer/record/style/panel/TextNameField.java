@@ -61,7 +61,7 @@ public class TextNameField extends ValueField {
 
   public void addFieldName() {
     final String selectedFieldName = (String)fieldNamesField.getSelectedItem();
-    if (StringUtils.hasText(selectedFieldName)) {
+    if (Property.hasValue(selectedFieldName)) {
       final int position = textNameField.getCaretPosition();
       final Document document = textNameField.getDocument();
       try {

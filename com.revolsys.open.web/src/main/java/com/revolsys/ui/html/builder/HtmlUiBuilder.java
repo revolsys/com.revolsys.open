@@ -329,7 +329,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public ElementContainer createDataTable(final HttpServletRequest request,
     final String pageName, final Map<String, ? extends Object> parameters) {
     final String pageUrl = getPageUrl(pageName);
-    if (StringUtils.hasText(pageUrl)) {
+    if (Property.hasValue(pageUrl)) {
       final Map<String, Object> params = new HashMap<String, Object>();
       params.putAll(parameters);
       params.put("ajaxSource", pageUrl.replaceAll("/+$", ".json"));
@@ -379,7 +379,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
     Boolean serverSide = (Boolean)parameters.get("serverSide");
     final String ajaxSource = (String)parameters.get("ajaxSource");
-    if (StringUtils.hasText(ajaxSource)) {
+    if (Property.hasValue(ajaxSource)) {
       if (serverSide == null) {
         serverSide = true;
       }
@@ -1179,7 +1179,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   private String getName(final String prefix, final String keyListName) {
-    if (StringUtils.hasText(prefix)) {
+    if (Property.hasValue(prefix)) {
       return prefix + CaseConverter.toUpperFirstChar(keyListName);
     } else {
       return keyListName;
@@ -1360,7 +1360,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final HttpServletRequest request = HttpServletUtils.getRequest();
     for (final String parameterName : Arrays.asList("plain", "htmlCss")) {
       final String value = request.getParameter(parameterName);
-      if (StringUtils.hasText(value)) {
+      if (Property.hasValue(value)) {
         parameters.put(parameterName, value);
       }
     }

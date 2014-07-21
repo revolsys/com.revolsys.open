@@ -14,12 +14,12 @@ import org.apache.pdfbox.cos.COSInteger;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSNumber;
 import org.apache.pdfbox.cos.COSObject;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.util.Property;
 
 public class PdfUtil {
 
@@ -57,6 +57,22 @@ public class PdfUtil {
     } else {
       throw new IllegalArgumentException("Expecting COSArray not "
         + item.getClass());
+    }
+  }
+
+  public static Rectangle2D findRectangle(final COSDictionary dictionary,
+    final COSName key) {
+    final COSArray bbox = PdfUtil.findArray(dictionary, key);
+    if (bbox == null) {
+      return null;
+    } else {
+      final float x1 = getFloat(bbox, 0);
+      final float y1 = getFloat(bbox, 1);
+      final float x2 = getFloat(bbox, 2);
+      final float y2 = getFloat(bbox, 3);
+      final float x = Math.min(x1, x2);
+      final float y = Math.min(y1, y2);
+      return new Rectangle2D.Float(x, y, Math.abs(x1 - x2), Math.abs(y1 - y2));
     }
   }
 
@@ -143,22 +159,6 @@ public class PdfUtil {
     return points;
   }
 
-  public static Rectangle2D findRectangle(final COSDictionary dictionary,
-    final COSName key) {
-    final COSArray bbox = PdfUtil.findArray(dictionary, key);
-    if (bbox == null) {
-      return null;
-    } else {
-      final float x1 = getFloat(bbox, 0);
-      final float y1 = getFloat(bbox, 1);
-      final float x2 = getFloat(bbox, 2);
-      final float y2 = getFloat(bbox, 3);
-      final float x = Math.min(x1, x2);
-      final float y = Math.min(y1, y2);
-      return new Rectangle2D.Float(x, y, Math.abs(x1 - x2), Math.abs(y1 - y2));
-    }
-  }
-
   public static BoundingBox getViewportBoundingBox(final COSDictionary viewport) {
     if (hasNameValue(viewport, "Type", "Viewport")) {
       final COSDictionary measure = PdfUtil.getDictionary(viewport, "Measure");
@@ -170,8 +170,7 @@ public class PdfUtil {
             final int srid = gcs.getInt("EPSG");
             if (srid == -1) {
               final String wkt = gcs.getString("WKT");
-              System.out.println(wkt);
-              if (StringUtils.hasText(wkt)) {
+              if (Property.hasValue(wkt)) {
                 geometryFactory = GeometryFactory.getFactory(wkt);
               }
             } else {

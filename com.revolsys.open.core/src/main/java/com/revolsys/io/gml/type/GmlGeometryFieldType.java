@@ -3,11 +3,9 @@ package com.revolsys.io.gml.type;
 import javax.xml.namespace.QName;
 
 import com.revolsys.data.types.DataType;
-import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.gml.GmlConstants;
 import com.revolsys.io.gml.GmlRecordWriter;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;

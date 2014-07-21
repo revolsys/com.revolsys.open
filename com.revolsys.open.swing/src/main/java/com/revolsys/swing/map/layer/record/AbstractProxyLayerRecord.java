@@ -37,7 +37,9 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   public void firePropertyChange(final String propertyName,
     final Object oldValue, final Object newValue) {
     final LayerRecord record = getLayerRecord();
-    record.firePropertyChange(propertyName, oldValue, newValue);
+    if (record != null) {
+      record.firePropertyChange(propertyName, oldValue, newValue);
+    }
   }
 
   protected LayerRecord getLayerRecord() {

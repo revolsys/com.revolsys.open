@@ -7,14 +7,13 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.codes.CodeTableProperty;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcRecordStore;
+import com.revolsys.util.Property;
 
 public class JdbcCodeTableProperty extends CodeTableProperty {
 
@@ -73,7 +72,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
 
     } catch (final SQLException e) {
       throw new RuntimeException(this.tableName + ": Unable to create ID for  "
-          + values, e);
+        + values, e);
     }
 
   }
@@ -97,7 +96,7 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
 
       final List<String> valueAttributeNames = getValueAttributeNames();
       String idColumn = recordDefinition.getIdAttributeName();
-      if (!StringUtils.hasText(idColumn)) {
+      if (!Property.hasValue(idColumn)) {
         idColumn = recordDefinition.getAttributeName(0);
       }
       this.insertSql = "INSERT INTO " + this.tableName + " (" + idColumn;
@@ -114,8 +113,8 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
       }
       if (this.useAuditColumns) {
         if (this.recordStore.getClass()
-            .getName()
-            .equals("com.revolsys.gis.oracle.io.OracleRecordStore")) {
+          .getName()
+          .equals("com.revolsys.gis.oracle.io.OracleRecordStore")) {
           this.insertSql += ", USER, SYSDATE, USER, SYSDATE";
         } else {
           this.insertSql += ", current_user, current_timestamp, current_user, current_timestamp";

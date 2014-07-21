@@ -30,7 +30,6 @@ import org.gdal.osr.osr;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.gdal.raster.GdalImageFactory;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -44,6 +43,7 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
+import com.revolsys.util.Property;
 
 public class Gdal {
   private static void addGeoreferencedImageFactory(
@@ -82,7 +82,7 @@ public class Gdal {
    * {@link BufferedImage} . The result image will be the dimensions of the
    * overview raster.
    * </p>
-   * 
+   *
    * @param dataset
    *            The image dataset.
    * @param overviewIndex
@@ -104,7 +104,7 @@ public class Gdal {
    * image. The result image will be the dimensions of sourceWidth,
    * sourceHeight.
    * </p>
-   * 
+   *
    * @param dataset
    *            The image dataset.
    * @param overviewIndex
@@ -136,7 +136,7 @@ public class Gdal {
    * image. The result image will scaled to the the dimensions of targetWidth,
    * targetHeight.
    * </p>
-   * 
+   *
    * @param dataset
    *            The image dataset.
    * @param overviewIndex
@@ -194,7 +194,7 @@ public class Gdal {
                 sourceOffsetY = 0;
               }
               if (sourceOffsetX >= overviewWidth
-                || sourceOffsetY >= overviewHeight) {
+                  || sourceOffsetY >= overviewHeight) {
                 return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
               }
 
@@ -222,7 +222,7 @@ public class Gdal {
             }
             if (pixels > 0 && sourceHeight > 0 && sourceWidth > 0) {
               final int bufferSize = pixels
-                * gdal.GetDataTypeSize(bandDataType) / 8;
+                  * gdal.GetDataTypeSize(bandDataType) / 8;
 
               final ByteBuffer data = ByteBuffer.allocateDirect(bufferSize);
               data.order(ByteOrder.nativeOrder());
@@ -358,7 +358,7 @@ public class Gdal {
   }
 
   public static Dataset getDataset(final String name, final int mode) {
-    if (StringUtils.hasText(name)) {
+    if (Property.hasValue(name)) {
       final File file = new File(name);
       return getDataset(file, mode);
     } else {
@@ -415,7 +415,7 @@ public class Gdal {
    * It is worth to point out that a successful loading of the native library
    * is not sufficient to grant the support for a specific format. We should
    * also check if the proper driver is available.
-   * 
+   *
    * @return <code>true</code> if a driver for the specific format is
    *         available. <code>false</code> otherwise.<BR>
    */
@@ -445,7 +445,7 @@ public class Gdal {
 
         final Map<String, Object> settings = JsonMapIoFactory.toMap(settingsFile);
         final String boundingBoxWkt = (String)settings.get("boundingBox");
-        if (StringUtils.hasText(boundingBoxWkt)) {
+        if (Property.hasValue(boundingBoxWkt)) {
           final BoundingBox boundingBox = BoundingBoxDoubleGf.create(boundingBoxWkt);
           if (!boundingBox.isEmpty()) {
             setSpatialReference(dataset, boundingBox.getCoordinateSystem());
@@ -475,13 +475,13 @@ public class Gdal {
   private static void setGdalProperty(final String name,
     final String defaultValue) {
     String value = System.getProperty(name);
-    if (!StringUtils.hasText(value)) {
+    if (!Property.hasValue(value)) {
       value = System.getenv(name);
-      if (!StringUtils.hasText(value)) {
+      if (!Property.hasValue(value)) {
         value = defaultValue;
       }
     }
-    if (StringUtils.hasText(value)) {
+    if (Property.hasValue(value)) {
       gdal.SetConfigOption(name, value);
     }
   }

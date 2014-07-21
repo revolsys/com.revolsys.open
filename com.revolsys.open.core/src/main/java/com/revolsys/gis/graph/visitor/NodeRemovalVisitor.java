@@ -9,9 +9,9 @@ import com.revolsys.collection.Visitor;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
+import com.revolsys.gis.graph.RecordGraph;
 
 public class NodeRemovalVisitor implements Visitor<Node<Record>> {
 

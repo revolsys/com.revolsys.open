@@ -48,6 +48,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.util.Property;
 
 /**
  *  A set of tests for two Geometry's.
@@ -58,7 +59,7 @@ import com.revolsys.jts.geom.GeometryFactory;
  * @version 1.7
  */
 public class TestCase extends junit.framework.TestSuite implements
-  MapSerializer {
+MapSerializer {
   private String testDescription;
 
   private Geometry a;
@@ -82,13 +83,13 @@ public class TestCase extends junit.framework.TestSuite implements
     final int caseIndex, final int lineNumber) {
     this.testFile = testFile;
     this.caseIndex = caseIndex;
-    if (StringUtils.hasText(description)) {
+    if (Property.hasValue(description)) {
       if (description.startsWith("P/L-2")) {
         Debug.noOp();
       }
       this.testDescription = description.replaceAll("\\s+", " ").replaceAll(
         "[^A-Za-z0-9\\-_ ]", " ");
-      setName(getId() + "." + testDescription);
+      setName(getId() + "." + this.testDescription);
     } else {
       setName(getId() + ".");
 
@@ -105,23 +106,23 @@ public class TestCase extends junit.framework.TestSuite implements
   }
 
   public int getCaseIndex() {
-    return caseIndex;
+    return this.caseIndex;
   }
 
   public Geometry getGeometryA() {
-    return a;
+    return this.a;
   }
 
   public Geometry getGeometryB() {
-    return b;
+    return this.b;
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public String getId() {
-    return testFile.getId() + "." + caseIndex;
+    return this.testFile.getId() + "." + this.caseIndex;
   }
 
   public int getLineNumber() {
@@ -138,11 +139,11 @@ public class TestCase extends junit.framework.TestSuite implements
   }
 
   public String getTestDescription() {
-    return testDescription;
+    return this.testDescription;
   }
 
   public TestFile getTestRun() {
-    return testFile;
+    return this.testFile;
   }
 
   public List<GeometryOperationTest> getTests() {
@@ -155,7 +156,7 @@ public class TestCase extends junit.framework.TestSuite implements
   }
 
   public boolean isRun() {
-    return isRun;
+    return this.isRun;
   }
 
   public void setGeometryA(final Geometry a) {
@@ -175,16 +176,16 @@ public class TestCase extends junit.framework.TestSuite implements
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     map.put("type", "test");
 
-    if (StringUtils.hasText(testDescription)) {
-      map.put("description", testDescription);
+    if (Property.hasValue(this.testDescription)) {
+      map.put("description", this.testDescription);
     }
-    MapSerializerUtil.add(map, "geometryFactory", geometryFactory);
+    MapSerializerUtil.add(map, "geometryFactory", this.geometryFactory);
     final Map<String, Object> properties = new LinkedHashMap<String, Object>();
-    if (testFile != null) {
-      MapSerializerUtil.addAll(properties, testFile.getProperties());
+    if (this.testFile != null) {
+      MapSerializerUtil.addAll(properties, this.testFile.getProperties());
     }
-    MapSerializerUtil.add(properties, "a", a);
-    MapSerializerUtil.add(properties, "b", b);
+    MapSerializerUtil.add(properties, "a", this.a);
+    MapSerializerUtil.add(properties, "b", this.b);
 
     if (!properties.isEmpty()) {
       map.put("properties", properties);
@@ -202,12 +203,12 @@ public class TestCase extends junit.framework.TestSuite implements
   public String toXml() {
     String xml = "";
     xml += "<case>" + StringUtil.newLine;
-    if (testDescription != null && testDescription.length() > 0) {
-      xml += "  <desc>" + StringUtil.escapeHTML(testDescription) + "</desc>"
-        + StringUtil.newLine;
+    if (this.testDescription != null && this.testDescription.length() > 0) {
+      xml += "  <desc>" + StringUtil.escapeHTML(this.testDescription)
+        + "</desc>" + StringUtil.newLine;
     }
-    xml += xml("a", a) + StringUtil.newLine;
-    xml += xml("b", b);
+    xml += xml("a", this.a) + StringUtil.newLine;
+    xml += xml("b", this.b);
     for (final GeometryOperationTest test : getTests()) {
       xml += test.toXml();
     }

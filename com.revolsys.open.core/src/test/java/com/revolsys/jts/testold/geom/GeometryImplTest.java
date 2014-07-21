@@ -44,7 +44,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.io.WKTReader;

@@ -2,10 +2,10 @@ package com.revolsys.converter.string;
 
 import java.math.BigDecimal;
 
-import org.springframework.util.StringUtils;
+import com.revolsys.util.Property;
 
 public class BigDecimalStringConverter extends
-  AbstractNumberStringConverter<BigDecimal> {
+AbstractNumberStringConverter<BigDecimal> {
 
   public static boolean isNumber(final Object value) {
     if (value instanceof Number) {
@@ -54,7 +54,7 @@ public class BigDecimalStringConverter extends
 
   @Override
   public BigDecimal toObject(final String string) {
-    if (StringUtils.hasText(string)) {
+    if (Property.hasValue(string)) {
       return new BigDecimal(string);
     } else {
       return null;

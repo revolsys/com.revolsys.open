@@ -17,7 +17,6 @@ import javax.swing.SwingWorker;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
@@ -59,6 +58,7 @@ import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Label;
+import com.revolsys.util.Property;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
 
@@ -314,8 +314,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     final Map<String, String> connectionProperties = getProperty("connection");
     if (connectionProperties == null) {
       LoggerFactory.getLogger(getClass())
-      .error(
-        "A data store layer requires a connectionProperties entry with a name or url, username, and password: "
+        .error(
+          "A data store layer requires a connectionProperties entry with a name or url, username, and password: "
             + getPath());
     } else {
       final Map<String, Object> config = new HashMap<String, Object>();
@@ -398,7 +398,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
           final Statistics statistics = query.getProperty("statistics");
           query.setProperty("recordFactory", this);
           try (
-              final Reader<LayerRecord> reader = (Reader)recordStore.query(query)) {
+            final Reader<LayerRecord> reader = (Reader)recordStore.query(query)) {
             final List<LayerRecord> records = new ArrayList<>();
             for (final LayerRecord record : reader) {
               final boolean added = addProxyRecordToList(records, record);
@@ -428,7 +428,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       synchronized (getSync()) {
         final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
         if (!this.boundingBox.covers(boundingBox)
-            && !this.loadingBoundingBox.covers(boundingBox)) {
+          && !this.loadingBoundingBox.covers(boundingBox)) {
           if (this.loadingWorker != null) {
             this.loadingWorker.cancel(true);
           }
@@ -459,16 +459,16 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     final RecordStore recordStore = getRecordStore();
     final PlatformTransactionManager transactionManager = recordStore.getTransactionManager();
     try (
-        Transaction transaction = new Transaction(transactionManager,
-          Propagation.REQUIRES_NEW)) {
+      Transaction transaction = new Transaction(transactionManager,
+        Propagation.REQUIRES_NEW)) {
       try {
 
         if (isExists()) {
           if (recordStore != null) {
             try (
-                final Writer<Record> writer = recordStore.createWriter()) {
+              final Writer<Record> writer = recordStore.createWriter()) {
               if (isCached(this.getCacheIdDeleted(), record)
-                  || super.isDeleted(record)) {
+                || super.isDeleted(record)) {
                 preDeleteRecord(record);
                 record.setState(RecordState.Deleted);
                 writer.write(record);
@@ -810,7 +810,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       boolean removed = false;
       if (isLayerRecord(record)) {
         for (final Label cacheId : new ArrayList<>(
-            this.cacheIdToRecordIdMap.keySet())) {
+          this.cacheIdToRecordIdMap.keySet())) {
           removed |= removeRecordFromCache(cacheId, record);
         }
       }
@@ -850,10 +850,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   public void setTypePath(final String typePath) {
     this.typePath = typePath;
-    if (!StringUtils.hasText(getName())) {
+    if (!Property.hasValue(getName())) {
       setName(PathUtil.getName(typePath));
     }
-    if (StringUtils.hasText(typePath)) {
+    if (Property.hasValue(typePath)) {
       if (isExists()) {
         final RecordStore recordStore = getRecordStore();
         if (recordStore != null) {

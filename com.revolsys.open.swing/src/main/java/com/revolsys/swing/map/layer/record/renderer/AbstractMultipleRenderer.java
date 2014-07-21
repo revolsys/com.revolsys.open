@@ -7,8 +7,6 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -21,26 +19,10 @@ import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public abstract class AbstractMultipleRenderer extends
-  AbstractRecordLayerRenderer {
-  static {
-    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractMultipleRenderer.class);
-
-    for (final String type : Arrays.asList("Geometry", "Text", "Marker",
-      "Multiple", "Filter", "Scale")) {
-      final String iconName = ("style_" + type + "_add").toLowerCase();
-      final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-      final InvokeMethodAction action = TreeItemRunnable.createAction("Add "
-        + type + " Style", icon, null, "add" + type + "Style");
-      menu.addMenuItem("add", action);
-    }
-
-    addMenuItem(menu, "Multiple", MultipleRenderer.class);
-    addMenuItem(menu, "Filter", FilterMultipleRenderer.class);
-    addMenuItem(menu, "Scale", ScaleMultipleRenderer.class);
-  }
-
+AbstractRecordLayerRenderer {
   protected static void addMenuItem(final MenuFactory menu, final String type,
     final Class<?> rendererClass) {
     final String iconName = ("style_" + type + "_go").toLowerCase();
@@ -50,8 +32,25 @@ public abstract class AbstractMultipleRenderer extends
       "class", rendererClass, true);
     final InvokeMethodAction action = TreeItemRunnable.createAction(
       "Convert to " + type + " Style", icon, enableCheck, "convertTo" + type
-        + "Style");
+      + "Style");
     menu.addMenuItem("convert", action);
+  }
+
+  static {
+    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractMultipleRenderer.class);
+
+    for (final String type : Arrays.asList("Geometry", "Text", "Marker",
+      "Multiple", "Filter", "Scale")) {
+      final String iconName = ("style_" + type + "_add").toLowerCase();
+      final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+      final InvokeMethodAction action = TreeItemRunnable.createAction("Add "
+          + type + " Style", icon, null, "add" + type + "Style");
+      menu.addMenuItem("add", action);
+    }
+
+    addMenuItem(menu, "Multiple", MultipleRenderer.class);
+    addMenuItem(menu, "Filter", FilterMultipleRenderer.class);
+    addMenuItem(menu, "Scale", ScaleMultipleRenderer.class);
   }
 
   private List<AbstractRecordLayerRenderer> renderers = new ArrayList<AbstractRecordLayerRenderer>();
@@ -104,8 +103,7 @@ public abstract class AbstractMultipleRenderer extends
     return addRenderer(-1, renderer);
   }
 
-  public int addRenderer(int index,
-    final AbstractRecordLayerRenderer renderer) {
+  public int addRenderer(int index, final AbstractRecordLayerRenderer renderer) {
     if (renderer == null) {
       return -1;
     } else {
@@ -118,7 +116,7 @@ public abstract class AbstractMultipleRenderer extends
       }
       renderer.setName(name);
       renderer.setParent(this);
-      synchronized (renderers) {
+      synchronized (this.renderers) {
         if (index < 0) {
           index = this.renderers.size();
         }
@@ -145,7 +143,7 @@ public abstract class AbstractMultipleRenderer extends
   @Override
   public AbstractMultipleRenderer clone() {
     final AbstractMultipleRenderer clone = (AbstractMultipleRenderer)super.clone();
-    clone.renderers = JavaBeanUtil.clone(renderers);
+    clone.renderers = JavaBeanUtil.clone(this.renderers);
     for (final AbstractRecordLayerRenderer renderer : clone.renderers) {
       renderer.setParent(clone);
     }
@@ -234,7 +232,7 @@ public abstract class AbstractMultipleRenderer extends
 
   @SuppressWarnings("unchecked")
   public <V extends LayerRenderer<?>> V getRenderer(final String name) {
-    if (StringUtils.hasText(name)) {
+    if (Property.hasValue(name)) {
       for (final LayerRenderer<?> renderer : this.renderers) {
         final String rendererName = renderer.getName();
         if (EqualsRegistry.equal(name, rendererName)) {
@@ -246,14 +244,14 @@ public abstract class AbstractMultipleRenderer extends
   }
 
   public List<AbstractRecordLayerRenderer> getRenderers() {
-    synchronized (renderers) {
+    synchronized (this.renderers) {
       return new ArrayList<AbstractRecordLayerRenderer>(this.renderers);
     }
   }
 
   public boolean hasRendererWithSameName(final LayerRenderer<?> renderer,
     final String name) {
-    for (final AbstractRecordLayerRenderer otherRenderer : renderers) {
+    for (final AbstractRecordLayerRenderer otherRenderer : this.renderers) {
       if (renderer != otherRenderer) {
         final String layerName = otherRenderer.getName();
         if (name.equals(layerName)) {
@@ -278,8 +276,8 @@ public abstract class AbstractMultipleRenderer extends
 
   public int removeRenderer(final AbstractRecordLayerRenderer renderer) {
     boolean removed = false;
-    synchronized (renderers) {
-      final int index = renderers.indexOf(renderer);
+    synchronized (this.renderers) {
+      final int index = this.renderers.indexOf(renderer);
       if (index != -1) {
         if (renderer.getParent() == this) {
           renderer.setParent(null);

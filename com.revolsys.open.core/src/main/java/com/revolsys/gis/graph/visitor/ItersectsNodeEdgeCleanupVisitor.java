@@ -14,10 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.record.Record;
-import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
+import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.gis.graph.attribute.NodeAttributes;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.util.ObjectProcessor;

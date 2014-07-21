@@ -35,8 +35,8 @@ package com.revolsys.jts.simplify;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.CoordinateList;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Point;
 
 /**
  * Simplifies a linestring (sequence of points) using

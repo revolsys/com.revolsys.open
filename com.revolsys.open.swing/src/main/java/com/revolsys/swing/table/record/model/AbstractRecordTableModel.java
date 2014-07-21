@@ -12,8 +12,6 @@ import java.util.Set;
 import javax.annotation.PreDestroy;
 import javax.swing.table.AbstractTableModel;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
@@ -24,7 +22,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordTableModel extends AbstractTableModel
-implements PropertyChangeSupportProxy {
+  implements PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
 
@@ -84,10 +82,6 @@ implements PropertyChangeSupportProxy {
 
   public abstract String getFieldName(int rowIndex, int columnIndex);
 
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
-  }
-
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
     return this.propertyChangeSupport;
@@ -95,6 +89,10 @@ implements PropertyChangeSupportProxy {
 
   public Set<String> getReadOnlyFieldNames() {
     return this.readOnlyFieldNames;
+  }
+
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   public boolean isEditable() {
@@ -117,18 +115,18 @@ implements PropertyChangeSupportProxy {
     this.editable = editable;
   }
 
-  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
-    if (recordDefinition != this.recordDefinition) {
-      this.recordDefinition = recordDefinition;
-      fireTableStructureChanged();
-    }
-  }
-
   public void setReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {
     if (readOnlyFieldNames == null) {
       this.readOnlyFieldNames = new HashSet<String>();
     } else {
       this.readOnlyFieldNames = new HashSet<String>(readOnlyFieldNames);
+    }
+  }
+
+  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+    if (recordDefinition != this.recordDefinition) {
+      this.recordDefinition = recordDefinition;
+      fireTableStructureChanged();
     }
   }
 
@@ -152,8 +150,7 @@ implements PropertyChangeSupportProxy {
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
       } else {
-        final List<Object> values = codeTable.getValues(SingleIdentifier.create(
-          objectValue));
+        final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
         if (values == null || values.isEmpty()) {
           return null;
         } else {
@@ -191,8 +188,7 @@ implements PropertyChangeSupportProxy {
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
       } else {
-        final List<Object> values = codeTable.getValues(SingleIdentifier.create(
-          objectValue));
+        final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
         if (values == null || values.isEmpty()) {
           text = "-";
         } else {
@@ -213,7 +209,7 @@ implements PropertyChangeSupportProxy {
     }
     if (displayValue instanceof String) {
       final String string = (String)displayValue;
-      if (!StringUtils.hasLength(string)) {
+      if (!Property.hasValue(string)) {
         return null;
       }
     }

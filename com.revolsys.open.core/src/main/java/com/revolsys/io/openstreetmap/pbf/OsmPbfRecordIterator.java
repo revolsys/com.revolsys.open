@@ -14,7 +14,6 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.revolsys.collection.AbstractIterator;
@@ -35,9 +34,10 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.util.Property;
 
 public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
 
   public static Date toDate(final long time) {
     return new Date(DATE_GRANULARITY * time);
@@ -204,7 +204,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
   }
 
   private void parseBlock(final ProtocolBufferInputStream in)
-    throws IOException {
+      throws IOException {
     boolean running = true;
     this.strings = new ArrayList<>();
     double lonOffset = 0;
@@ -217,35 +217,35 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
       switch (tag) {
         case 0:
           running = false;
-        break;
+          break;
         case 10:
           readStrings(in, this.strings);
-        break;
+          break;
         case 18:
           parseOsmElement(in);
-        break;
+          break;
         case 136:
           granularity = in.readInt32();
-        break;
+          break;
         case 144:
           dateGranularity = in.readInt32();
-        break;
+          break;
         case 152:
           latOffset = in.readInt64();
-        break;
+          break;
         case 160:
           lonOffset = in.readInt64();
-        break;
+          break;
         default:
           this.blobIn.skipField(tag);
           running = false;
-        break;
+          break;
       }
     }
   }
 
   private DenseInfo parseDenseInfo(final ProtocolBufferInputStream input)
-    throws IOException {
+      throws IOException {
     final DenseInfo info = new DenseInfo();
     final int inLength = input.startLengthDelimited();
 
@@ -255,44 +255,44 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
       switch (tag) {
         case 0:
           running = false;
-        break;
+          break;
         case 8:
           input.readInt(info.versions);
-        break;
+          break;
         case 10:
           input.readInts(info.versions);
-        break;
+          break;
         case 16:
           input.readLong(info.timestamps);
-        break;
+          break;
         case 18:
           input.readLongs(info.timestamps);
-        break;
+          break;
         case 24:
           input.readLong(info.changesets);
         case 26:
           input.readLongs(info.changesets);
         case 32:
           input.readInt(info.uids);
-        break;
+          break;
         case 34:
           input.readInts(info.uids);
-        break;
+          break;
         case 40:
           readStringById(input, info.userNames);
-        break;
+          break;
         case 42:
           readStringsByIds(input, info.userNames);
-        break;
+          break;
         case 48:
           input.readBool(info.visibles);
-        break;
+          break;
         case 50:
           input.readBools(info.visibles);
-        break;
+          break;
         default:
           input.skipField(tag);
-        break;
+          break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -300,7 +300,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
   }
 
   private void parseDenseNodes(final ProtocolBufferInputStream in)
-    throws IOException {
+      throws IOException {
 
     final List<Long> ids = new ArrayList<>();
     final List<Double> latitudes = new ArrayList<>();
@@ -315,37 +315,37 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
       switch (tag) {
         case 0:
           running = false;
-        break;
+          break;
         case 8:
           in.readLong(ids);
-        break;
+          break;
         case 10:
           in.readLongs(ids);
-        break;
+          break;
         case 42:
           denseInfo = parseDenseInfo(in);
-        break;
+          break;
         case 64:
           readDegreesById(in, latitudes);
-        break;
+          break;
         case 66:
           readDegreesByIds(in, latitudes);
-        break;
+          break;
         case 72:
           readDegreesById(in, longitudes);
-        break;
+          break;
         case 74:
           readDegreesByIds(in, longitudes);
-        break;
+          break;
         case 80:
           readStringById(in, keysAndValues);
-        break;
+          break;
         case 82:
           readStringsByIds(in, keysAndValues);
-        break;
+          break;
         default:
           in.skipField(tag);
-        break;
+          break;
       }
     }
     in.endLengthDelimited(inLength);
@@ -381,7 +381,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
           }
           if (!keysAndValuesIterator.hasNext()) {
             throw new RuntimeException(
-              "The PBF DenseInfo keys/values list contains a key with no corresponding value.");
+                "The PBF DenseInfo keys/values list contains a key with no corresponding value.");
           }
           if (node == null) {
             node = new OsmNode();
@@ -417,43 +417,43 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
       switch (tag) {
         case 0:
           running = false;
-        break;
+          break;
         case 8:
           final int version = input.readInt32();
           element.setVersion(version);
-        break;
+          break;
         case 16:
           final long time = input.readInt64();
           final Date timestamp = toDate(time);
           element.setTimestamp(timestamp);
-        break;
+          break;
         case 24:
           final long changeset = input.readInt64();
           element.setChangeset(changeset);
-        break;
+          break;
         case 32:
           final int uid = input.readInt32();
           element.setUid(uid);
-        break;
+          break;
         case 40:
           final int userSid = input.readUInt32();
           final String userName = getString(userSid);
           element.setUser(userName);
-        break;
+          break;
         case 48:
           final boolean visible = input.readBool();
           element.setVisible(visible);
-        break;
+          break;
         default:
           input.skipField(tag);
-        break;
+          break;
       }
     }
     input.endLengthDelimited(inLength);
   }
 
   private void parseNode(final ProtocolBufferInputStream input)
-    throws IOException {
+      throws IOException {
 
     final OsmNode node = new OsmNode();
     final List<String> keys = new ArrayList<>();
@@ -467,32 +467,32 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
       switch (tag) {
         case 0:
           running = false;
-        break;
+          break;
         case 8:
           final long id = input.readInt64();
           node.setId(id);
-        break;
+          break;
         case 16:
           readStringById(input, keys);
-        break;
+          break;
         case 18:
           readStringsByIds(input, keys);
-        break;
+          break;
         case 24:
           readStringById(input, values);
-        break;
+          break;
         case 26:
           readStringsByIds(input, values);
-        break;
+          break;
         case 34:
           parseInfo(input, node);
-        break;
+          break;
         case 64:
           lat = toDegrees(input.readSInt64());
-        break;
+          break;
         case 72:
           lon = toDegrees(input.readSInt64());
-        break;
+          break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -503,7 +503,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
   }
 
   private void parseOsmElement(final ProtocolBufferInputStream in)
-    throws IOException {
+      throws IOException {
     final int inLength = in.startLengthDelimited();
     boolean running = true;
     while (running) {
@@ -511,16 +511,16 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
       switch (tag) {
         case 0:
           running = false;
-        break;
+          break;
         case 10:
           parseNode(in);
-        break;
+          break;
         case 18:
           parseDenseNodes(in);
-        break;
+          break;
         case 26:
           parseWay(in);
-        break;
+          break;
         case 34: {
           parseRelation(in);
           break;
@@ -536,14 +536,14 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
         }
         default:
           in.skipField(tag);
-        break;
+          break;
       }
     }
     in.endLengthDelimited(inLength);
   }
 
   private void parseRelation(final ProtocolBufferInputStream input)
-    throws IOException {
+      throws IOException {
 
     final OsmRelation relation = new OsmRelation();
     final List<String> keys = new ArrayList<>();
@@ -560,44 +560,44 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
       switch (tag) {
         case 0:
           running = false;
-        break;
+          break;
         case 8:
           final long id = input.readInt64();
           relation.setId(id);
-        break;
+          break;
         case 16:
           readStringById(input, keys);
-        break;
+          break;
         case 18:
           readStringsByIds(input, keys);
-        break;
+          break;
         case 24:
           readStringById(input, values);
-        break;
+          break;
         case 26:
           readStringsByIds(input, values);
-        break;
+          break;
         case 34:
           parseInfo(input, relation);
-        break;
+          break;
         case 64:
           readStrings(input, memberRoles);
-        break;
+          break;
         case 66:
           readStringsByIds(input, memberRoles);
-        break;
+          break;
         case 72:
           input.readLong(memberIds);
-        break;
+          break;
         case 74:
           input.readLongs(memberIds);
-        break;
+          break;
         case 80:
           input.readEnum(memberTypes);
-        break;
+          break;
         case 82:
           input.readEnums(memberTypes);
-        break;
+          break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -613,11 +613,11 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
       switch (memberType) {
         case 0:
           geometry = this.nodePoints.get(memberId);
-        break;
+          break;
 
         case 1:
           geometry = this.wayGeometries.get(memberId);
-        break;
+          break;
         default:
           throw new RuntimeException("Unknown member type " + memberType);
       }
@@ -629,7 +629,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
 
     if (memberIds.size() == parts.size()) {
       final Geometry geometry = OsmConstants.WGS84_2D.geometry(parts);
-      if (memberTypes.get(0) == 1 && !StringUtils.hasText(memberRoles.get(0))) {
+      if (memberTypes.get(0) == 1 && !Property.hasValue(memberRoles.get(0))) {
 
       }
       relation.setGeometryValue(geometry);
@@ -645,7 +645,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
   }
 
   private void parseWay(final ProtocolBufferInputStream input)
-    throws IOException {
+      throws IOException {
 
     final OsmWay way = new OsmWay();
     final List<String> keys = new ArrayList<>();
@@ -659,32 +659,32 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
       switch (tag) {
         case 0:
           running = false;
-        break;
+          break;
         case 8:
           wayId = input.readInt64();
           way.setId(wayId);
-        break;
+          break;
         case 16:
           readStringById(input, keys);
-        break;
+          break;
         case 18:
           readStringsByIds(input, keys);
-        break;
+          break;
         case 24:
           readStringById(input, values);
-        break;
+          break;
         case 26:
           readStringsByIds(input, values);
-        break;
+          break;
         case 34:
           parseInfo(input, way);
-        break;
+          break;
         case 64:
           input.readLong(nodeIds);
-        break;
+          break;
         case 66:
           input.readLongs(nodeIds);
-        break;
+          break;
       }
     }
     input.endLengthDelimited(inLength);
@@ -722,7 +722,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
   }
 
   private void processOsmHeader(final byte[] data)
-    throws InvalidProtocolBufferException {
+      throws InvalidProtocolBufferException {
     // Osmformat.HeaderBlock header = Osmformat.HeaderBlock.parseFrom(data);
     //
     // // Build the list of active and unsupported features in the file.
@@ -813,16 +813,16 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
         switch (tag) {
           case 0:
             running = false;
-          break;
+            break;
           case 10:
             raw = this.blobIn.readBytes();
-          break;
+            break;
           case 16:
             rawSize = this.blobIn.readInt32();
-          break;
+            break;
           case 26:
             zlibData = this.blobIn.readBytes();
-          break;
+            break;
           case 34:
             throw new RuntimeException("LZMA not supported");
           case 42:
@@ -830,7 +830,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
           default:
             this.blobIn.skipField(tag);
             running = false;
-          break;
+            break;
         }
       }
 
@@ -847,12 +847,12 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
         }
         if (!inflater.finished()) {
           throw new RuntimeException(
-            "PBF blob contains incomplete compressed data.");
+              "PBF blob contains incomplete compressed data.");
         }
         return blobData;
       } else {
         throw new RuntimeException(
-          "PBF blob uses unsupported compression, only raw or zlib may be used.");
+            "PBF blob uses unsupported compression, only raw or zlib may be used.");
       }
     } finally {
       this.blobIn.setInputStream(null);
@@ -887,7 +887,7 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
           }
           default:
             this.blobHeaderIn.skipField(tag);
-          break;
+            break;
         }
       }
 
@@ -936,10 +936,10 @@ public class OsmPbfRecordIterator extends AbstractIterator<Record> implements
         case 10:
           final String string = in.readString();
           strings.add(string);
-        break;
+          break;
         default:
           this.blobIn.skipField(tag);
-        break;
+          break;
       }
     }
   }

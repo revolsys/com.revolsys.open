@@ -9,10 +9,10 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.io.NamedLinkedHashMap;
+import com.revolsys.util.Property;
 
 public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
 
@@ -37,23 +37,23 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
   @Override
   protected void doClose() {
     super.doClose();
-    if (in != null) {
-      StaxUtils.closeSilent(in);
-      in = null;
+    if (this.in != null) {
+      StaxUtils.closeSilent(this.in);
+      this.in = null;
     }
-    resource = null;
+    this.resource = null;
   }
 
   @Override
   protected void doInit() {
     super.doInit();
-    in = StaxUtils.createXmlReader(resource);
-    if (StaxUtils.skipToStartElement(in) == XMLStreamConstants.START_ELEMENT) {
-      if (single) {
-        hasNext = true;
+    this.in = StaxUtils.createXmlReader(this.resource);
+    if (StaxUtils.skipToStartElement(this.in) == XMLStreamConstants.START_ELEMENT) {
+      if (this.single) {
+        this.hasNext = true;
       } else {
-        if (StaxUtils.skipToStartElement(in) == XMLStreamConstants.START_ELEMENT) {
-          hasNext = true;
+        if (StaxUtils.skipToStartElement(this.in) == XMLStreamConstants.START_ELEMENT) {
+          this.hasNext = true;
         }
       }
     }
@@ -62,10 +62,10 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
 
   @Override
   protected Map<String, Object> getNext() throws NoSuchElementException {
-    if (hasNext) {
+    if (this.hasNext) {
       final Map<String, Object> map = readMap();
-      if (StaxUtils.skipToStartElement(in) != XMLStreamConstants.START_ELEMENT) {
-        hasNext = false;
+      if (StaxUtils.skipToStartElement(this.in) != XMLStreamConstants.START_ELEMENT) {
+        this.hasNext = false;
       }
       return map;
     } else {
@@ -75,24 +75,24 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
 
   @SuppressWarnings("unchecked")
   private Object readElement() {
-    final String name = in.getLocalName();
+    final String name = this.in.getLocalName();
     final Map<String, Object> map = new NamedLinkedHashMap<String, Object>(name);
     int textIndex = 0;
     int elementIndex = 0;
-    while (StaxUtils.next(in) != XMLStreamConstants.END_ELEMENT) {
-      switch (in.getEventType()) {
+    while (StaxUtils.next(this.in) != XMLStreamConstants.END_ELEMENT) {
+      switch (this.in.getEventType()) {
         case XMLStreamConstants.CDATA:
         case XMLStreamConstants.CHARACTERS:
-          final String text = in.getText();
-          if (StringUtils.hasText(text)) {
+          final String text = this.in.getText();
+          if (Property.hasValue(text)) {
             map.put("xmlText" + ++textIndex, text);
           }
-        break;
+          break;
         case XMLStreamConstants.SPACE:
-        break;
+          break;
         case XMLStreamConstants.START_ELEMENT:
           elementIndex++;
-          final String tagName = in.getLocalName();
+          final String tagName = this.in.getLocalName();
           final Object value = readElement();
           final Object oldValue = map.get(tagName);
           if (oldValue == null) {
@@ -109,12 +109,12 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
             list.add(value);
 
           }
-        break;
+          break;
         case XMLStreamConstants.COMMENT:
-        break;
+          break;
         default:
-          System.err.println(in.getEventType() + " " + in.getText());
-        break;
+          System.err.println(this.in.getEventType() + " " + this.in.getText());
+          break;
       }
     }
     if (elementIndex == 0) {
@@ -131,22 +131,22 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
 
   @SuppressWarnings("unchecked")
   private Map<String, Object> readMap() {
-    final String name = in.getLocalName();
+    final String name = this.in.getLocalName();
     final Map<String, Object> map = new NamedLinkedHashMap<String, Object>(name);
     int textIndex = 0;
-    while (StaxUtils.next(in) != XMLStreamConstants.END_ELEMENT) {
-      switch (in.getEventType()) {
+    while (StaxUtils.next(this.in) != XMLStreamConstants.END_ELEMENT) {
+      switch (this.in.getEventType()) {
         case XMLStreamConstants.CDATA:
         case XMLStreamConstants.CHARACTERS:
-          final String text = in.getText();
-          if (StringUtils.hasText(text)) {
+          final String text = this.in.getText();
+          if (Property.hasValue(text)) {
             map.put("xmlText" + ++textIndex, text);
           }
-        break;
+          break;
         case XMLStreamConstants.SPACE:
-        break;
+          break;
         case XMLStreamConstants.START_ELEMENT:
-          final String tagName = in.getLocalName();
+          final String tagName = this.in.getLocalName();
           final Object value = readElement();
           final Object oldValue = map.get(tagName);
           if (oldValue == null) {
@@ -163,9 +163,9 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
             list.add(value);
 
           }
-        break;
+          break;
         default:
-        break;
+          break;
       }
     }
     return map;

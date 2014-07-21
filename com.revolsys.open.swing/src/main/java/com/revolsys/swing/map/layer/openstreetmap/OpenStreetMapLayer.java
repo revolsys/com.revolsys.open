@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
@@ -16,21 +15,22 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractTiledImageLayer;
 import com.revolsys.swing.map.layer.MapTile;
+import com.revolsys.util.Property;
 
 public class OpenStreetMapLayer extends AbstractTiledImageLayer {
 
+  public static OpenStreetMapLayer create(final Map<String, Object> properties) {
+    return new OpenStreetMapLayer(properties);
+  }
+
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "openStreetMap", "Open Street Map Tiles", OpenStreetMapLayer.class,
-    "create");
+      "create");
 
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
 
   private static final BoundingBox MAX_BOUNDING_BOX = new BoundingBoxDoubleGf(
     GEOMETRY_FACTORY, 2, -180, -85, 180, 85);
-
-  public static OpenStreetMapLayer create(final Map<String, Object> properties) {
-    return new OpenStreetMapLayer(properties);
-  }
 
   private OpenStreetMapClient client;
 
@@ -42,10 +42,10 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
   @Override
   protected boolean doInitialize() {
     final String serverUrl = getProperty("url");
-    if (StringUtils.hasText(serverUrl)) {
-      client = new OpenStreetMapClient(serverUrl);
+    if (Property.hasValue(serverUrl)) {
+      this.client = new OpenStreetMapClient(serverUrl);
     } else {
-      client = new OpenStreetMapClient();
+      this.client = new OpenStreetMapClient();
     }
     return true;
   }
@@ -67,8 +67,8 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
-        .convert(GEOMETRY_FACTORY)
-        .intersection(MAX_BOUNDING_BOX);
+          .convert(GEOMETRY_FACTORY)
+          .intersection(MAX_BOUNDING_BOX);
       final double minX = geographicBoundingBox.getMinX();
       final double minY = geographicBoundingBox.getMinY();
       final double maxX = geographicBoundingBox.getMaxX();
