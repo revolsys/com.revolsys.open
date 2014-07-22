@@ -180,6 +180,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final BoundingBox boundingBox = project.getViewBoundingBox();
     if (boundingBox != null && !boundingBox.isEmpty()) {
       this.zoomHistory.add(boundingBox);
+      this.zoomHistoryIndex = 0;
     }
     Property.addListener(this.viewport, this);
 
@@ -656,7 +657,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public synchronized void setBoundingBox(final BoundingBox boundingBox) {
     if (!this.settingBoundingBox) {
-      System.out.println("V:" + boundingBox);
       this.settingBoundingBox = true;
       try {
         final BoundingBox oldBoundingBox = getBoundingBox();

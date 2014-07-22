@@ -45,15 +45,15 @@ public class Project extends LayerGroup {
   }
 
   private static WeakReference<Project> project = new WeakReference<Project>(
-      null);
+    null);
 
   private LayerGroup baseMapLayers = new LayerGroup("Base Maps");
 
   private RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
-      "Project");
+    "Project");
 
   private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry(
-      "Project");
+    "Project");
 
   private BoundingBox initialBoundingBox;
 
@@ -191,7 +191,7 @@ public class Project extends LayerGroup {
 
   protected void readBaseMapsLayers(final Resource resource) {
     final Resource baseMapsResource = SpringUtil.getResource(resource,
-        "Base Maps");
+      "Base Maps");
     final Resource layerGroupResource = SpringUtil.getResource(
       baseMapsResource, "rgLayerGroup.rgobject");
     if (layerGroupResource.exists()) {
@@ -217,7 +217,7 @@ public class Project extends LayerGroup {
 
   protected void readLayers(final Resource resource) {
     final Resource layerGroupResource = SpringUtil.getResource(resource,
-        "rgLayerGroup.rgobject");
+      "rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       LoggerFactory.getLogger(getClass()).error(
         "File not found: " + layerGroupResource);
@@ -272,7 +272,7 @@ public class Project extends LayerGroup {
 
   protected void readProperties(final Resource resource) {
     final Resource layerGroupResource = SpringUtil.getResource(resource,
-        "rgLayerGroup.rgobject");
+      "rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       LoggerFactory.getLogger(getClass()).error(
         "File not found: " + layerGroupResource);
@@ -321,9 +321,9 @@ public class Project extends LayerGroup {
         final MapPanel mapPanel = MapPanel.get(this);
         final JLabel message = new JLabel(
           "<html><body><p><b>The following layers have un-saved changes.</b></p>"
-              + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
-              + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-              + "</li></ul></body></html>");
+            + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
+            + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
+            + "</li></ul></body></html>");
 
         final int option = JOptionPane.showConfirmDialog(mapPanel, message,
           "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION,
@@ -344,9 +344,9 @@ public class Project extends LayerGroup {
           } else {
             final JLabel message2 = new JLabel(
               "<html><body><p><b>The following layers could not be saved.</b></p>"
-                  + "<p><b>Do you want to ignore these changes and continue?</b></p><ul><li>"
-                  + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-                  + "</li></ul></body></html>");
+                + "<p><b>Do you want to ignore these changes and continue?</b></p><ul><li>"
+                + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
+                + "</li></ul></body></html>");
 
             final int option2 = JOptionPane.showConfirmDialog(mapPanel,
               message2, "Ignore Changes", JOptionPane.OK_CANCEL_OPTION,
@@ -368,7 +368,7 @@ public class Project extends LayerGroup {
     } else {
       final MapPanel mapPanel = MapPanel.get(this);
       final JLabel message = new JLabel(
-          "<html><body><p><b>Save changes to project?</b></p></body></html>");
+        "<html><body><p><b>Save changes to project?</b></p></body></html>");
 
       final int option = JOptionPane.showConfirmDialog(mapPanel, message,
         "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION,
@@ -383,7 +383,7 @@ public class Project extends LayerGroup {
         } else {
           final JLabel message2 = new JLabel(
             "<html><body><p>Saving project failed.</b></p>"
-                + "<p><b>Do you want to ignore any changes and continue?</b></p></body></html>");
+              + "<p><b>Do you want to ignore any changes and continue?</b></p></body></html>");
 
           final int option2 = JOptionPane.showConfirmDialog(mapPanel, message2,
             "Ignore Changes", JOptionPane.OK_CANCEL_OPTION,
@@ -471,9 +471,6 @@ public class Project extends LayerGroup {
         viewBoundingBox = viewBoundingBox.expand(0, (minDimension - height) / 2);
       }
       this.viewBoundingBox = viewBoundingBox;
-      if (isEventsEnabled()) {
-        System.out.println("P:" + viewBoundingBox);
-      }
       firePropertyChange("viewBoundingBox", oldValue, viewBoundingBox);
     }
   }

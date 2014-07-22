@@ -4,13 +4,20 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.RecordIoFactories;
+import com.revolsys.data.io.RecordReaderFactory;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.functions.EnvelopeIntersects;
 import com.revolsys.data.query.functions.F;
@@ -19,9 +26,11 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TogglePanel;
+import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -39,9 +48,32 @@ public class ExportLayerRecordsPanel extends BasePanel {
     this.layer = layer;
 
     createRecordsFilterPanel();
-
+    addFileChooser(this);
     final BasePanel centre = new BasePanel();
     centre.add(this.recordsFilterType);
+  }
+
+  private void addFileChooser(final JComponent component) {
+
+    final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(),
+      "currentDirectory");
+
+    final List<FileFilter> recordFileFilters = new ArrayList<FileFilter>();
+    final Set<String> allRecordExtensions = new TreeSet<String>();
+    AddFileLayerAction.getFileFilters(recordFileFilters, allRecordExtensions,
+      RecordReaderFactory.class);
+
+    final FileNameExtensionFilter allRecordFilter = AddFileLayerAction.createFileFilter(
+      "All Vector/Data files", allRecordExtensions);
+    fileChooser.addChoosableFileFilter(allRecordFilter);
+
+    for (final FileFilter fileFilter : recordFileFilters) {
+      fileChooser.addChoosableFileFilter(fileFilter);
+    }
+
+    fileChooser.setAcceptAllFileFilterUsed(false);
+    fileChooser.setFileFilter(allRecordFilter);
+    component.add(fileChooser);
   }
 
   private void createRecordsFilterPanel() {
@@ -62,7 +94,7 @@ public class ExportLayerRecordsPanel extends BasePanel {
 
   public void doExport() {
     this.exportResource = new FileSystemResource("/Users/paustin/Desktop/"
-        + getName() + ".gpx");
+      + getName() + ".gpx");
 
     final RecordDefinition recordDefinition = getRecordDefinition();
     final Query query = new Query(recordDefinition);
@@ -93,8 +125,8 @@ public class ExportLayerRecordsPanel extends BasePanel {
 
   private void writeRecords(final Iterable<LayerRecord> records) {
     try (
-        Writer<Record> writer = RecordIoFactories.recordWriter(
-          this.layer.getRecordDefinition(), this.exportResource)) {
+      Writer<Record> writer = RecordIoFactories.recordWriter(
+        this.layer.getRecordDefinition(), this.exportResource)) {
       for (final LayerRecord record : records) {
         writer.write(record);
       }

@@ -50,6 +50,7 @@ import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.net.urlcache.FileResponseCache;
@@ -473,13 +474,18 @@ public class ProjectFrame extends BaseFrame {
     folderConnectionManager.removeConnectionRegistry("Project");
     folderConnectionManager.addConnectionRegistry(this.project.getFolderConnections());
 
+    final MapPanel mapPanel = getMapPanel();
     final BoundingBox initialBoundingBox = this.project.getInitialBoundingBox();
+    final Viewport2D viewport = mapPanel.getViewport();
     if (!BoundingBoxUtil.isEmpty(initialBoundingBox)) {
-      this.project.setGeometryFactory(initialBoundingBox.getGeometryFactory());
-      getMapPanel().setGeometryFactory(initialBoundingBox.getGeometryFactory());
+      final GeometryFactory geometryFactory = initialBoundingBox.getGeometryFactory();
+      this.project.setGeometryFactory(geometryFactory);
       this.project.setViewBoundingBox(initialBoundingBox);
+      viewport.setGeometryFactory(geometryFactory);
+      viewport.setBoundingBox(initialBoundingBox);
+
     }
-    getMapPanel().getViewport().setInitialized(true);
+    viewport.setInitialized(true);
   }
 
   public void runScript() {
