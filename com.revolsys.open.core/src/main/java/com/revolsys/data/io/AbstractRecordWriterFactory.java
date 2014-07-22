@@ -13,32 +13,11 @@ import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractRecordWriterFactory extends AbstractIoFactory
   implements RecordWriterFactory {
-
-  public static Writer<Record> recordWriter(
-    final RecordDefinition recordDefinition, final Resource resource) {
-    final RecordWriterFactory writerFactory = getRecordWriterFactory(resource);
-    if (writerFactory == null) {
-      return null;
-    } else {
-      final Writer<Record> writer = writerFactory.createRecordWriter(
-        recordDefinition, resource);
-      return writer;
-    }
-  }
-
-  protected static RecordWriterFactory getRecordWriterFactory(
-    final Resource resource) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    final RecordWriterFactory writerFactory = ioFactoryRegistry.getFactoryByResource(
-      RecordWriterFactory.class, resource);
-    return writerFactory;
-  }
 
   private boolean singleFile = true;
 

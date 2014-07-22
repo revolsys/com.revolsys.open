@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractRecordAndGeometryReaderFactory;
+import com.revolsys.data.io.RecordIoFactories;
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
@@ -28,7 +28,7 @@ public class TestUtil {
     boolean valid = true;
     final Resource resource = new ClassPathResource(file, clazz);
     try (
-      Reader<Record> reader = AbstractRecordAndGeometryReaderFactory.recordReader(resource)) {
+      Reader<Record> reader = RecordIoFactories.recordReader(resource)) {
       int i = 0;
       for (final Record object : reader) {
         final int srid = object.getInteger("srid");

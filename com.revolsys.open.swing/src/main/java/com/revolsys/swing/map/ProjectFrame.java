@@ -50,6 +50,7 @@ import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
@@ -166,13 +167,15 @@ public class ProjectFrame extends BaseFrame {
     addSaveActions(rootPane, project);
 
     this.project = project;
+    final BoundingBox defaultBoundingBox = getDefaultBoundingBox();
+    this.project.setViewBoundingBox(defaultBoundingBox);
     Project.set(project);
     SwingUtil.setSizeAndMaximize(this, 100, 100);
     setLocationByPlatform(true);
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-        .getTheme();
+      .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -261,7 +264,7 @@ public class ProjectFrame extends BaseFrame {
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = InvokeMethodAction.createButton(null,
       "View Running Tasks", SilkIconLoader.getIcon("time_go"), dockable,
-        "toFront");
+      "toFront");
     viewTasksAction.setBorderPainted(false);
     progressBar.add(viewTasksAction, BorderLayout.EAST);
   }
@@ -392,6 +395,16 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
+  public void expandLayers(final PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source instanceof LayerGroup) {
+      final Object newValue = event.getNewValue();
+      if (newValue instanceof LayerGroup) {
+        expandLayers((LayerGroup)newValue);
+      }
+    }
+  }
+
   // public void expandConnectionManagers(final PropertyChangeEvent event) {
   // final Object newValue = event.getNewValue();
   // if (newValue instanceof ConnectionRegistry) {
@@ -409,18 +422,12 @@ public class ProjectFrame extends BaseFrame {
   // }
   // }
 
-  public void expandLayers(final PropertyChangeEvent event) {
-    final Object source = event.getSource();
-    if (source instanceof LayerGroup) {
-      final Object newValue = event.getNewValue();
-      if (newValue instanceof LayerGroup) {
-        expandLayers((LayerGroup)newValue);
-      }
-    }
-  }
-
   public double getControlWidth() {
     return 0.20;
+  }
+
+  protected BoundingBox getDefaultBoundingBox() {
+    return new BoundingBoxDoubleGf();
   }
 
   public CControl getDockControl() {
@@ -469,6 +476,7 @@ public class ProjectFrame extends BaseFrame {
     final BoundingBox initialBoundingBox = this.project.getInitialBoundingBox();
     if (!BoundingBoxUtil.isEmpty(initialBoundingBox)) {
       this.project.setGeometryFactory(initialBoundingBox.getGeometryFactory());
+      getMapPanel().setGeometryFactory(initialBoundingBox.getGeometryFactory());
       this.project.setViewBoundingBox(initialBoundingBox);
     }
     getMapPanel().getViewport().setInitialized(true);

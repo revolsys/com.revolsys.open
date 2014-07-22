@@ -16,8 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.tree.TreeNode;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.AbstractRecordReaderFactory;
-import com.revolsys.data.io.RecordReaderFactory;
+import com.revolsys.data.io.RecordIoFactories;
 import com.revolsys.data.io.RecordStoreFactoryRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.FileUtil;
@@ -66,7 +65,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
       SwingUtil.addLabel(panel, "Folder Connections");
       final List<FolderConnectionRegistry> registries = FolderConnectionManager.get()
-          .getVisibleConnectionRegistries();
+        .getVisibleConnectionRegistries();
       final JComboBox registryField = new JComboBox(
         new Vector<FolderConnectionRegistry>(registries));
 
@@ -143,7 +142,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
           return ICON_FILE_DATABASE;
         } else if (isImage(file)) {
           return ICON_FILE_IMAGE;
-        } else if (isVector(file)) {
+        } else if (RecordIoFactories.canReadRecords(file)) {
           return ICON_FILE_TABLE;
         } else if (file.isDirectory()) {
           return ICON_FOLDER;
@@ -193,13 +192,6 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     final Set<String> fileExtensions = RecordStoreFactoryRegistry.getFileExtensions();
     final String extension = FileUtil.getFileNameExtension(file).toLowerCase();
     return fileExtensions.contains(extension);
-  }
-
-  public static boolean isVector(final File file) {
-    final String fileNameExtension = FileUtil.getFileNameExtension(file);
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    return ioFactoryRegistry.isFileExtensionSupported(
-      RecordReaderFactory.class, fileNameExtension);
   }
 
   public static final Icon ICON_FILE = SilkIconLoader.getIcon("file");
@@ -289,7 +281,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       final String extension = FileUtil.getFileNameExtension(file);
       if (Property.hasValue(extension)) {
         final IoFactory factory = IoFactoryRegistry.getInstance()
-            .getFactoryByFileExtension(IoFactory.class, extension);
+          .getFactoryByFileExtension(IoFactory.class, extension);
         if (factory != null) {
           return factory.getName();
         }
@@ -333,7 +325,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     final String fileName = FileUtil.getFileName(file);
     if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(fileName)) {
       return true;
-    } else if (AbstractRecordReaderFactory.hasRecordReaderFactory(fileName)) {
+    } else if (RecordIoFactories.hasRecordReaderFactory(fileName)) {
       return true;
     } else {
       return false;

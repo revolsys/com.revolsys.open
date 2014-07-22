@@ -17,8 +17,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.revolsys.data.io.RecordReaderFactory;
-import com.revolsys.data.io.RecordStoreFactory;
-import com.revolsys.data.io.RecordStoreFactoryRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -51,7 +49,7 @@ public class AddFileLayerAction extends AbstractAction {
     }
 
     final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(),
-      "currentDirectory");
+        "currentDirectory");
 
     final List<FileFilter> imageFileFilters = new ArrayList<FileFilter>();
     final Set<String> allImageExtensions = new TreeSet<String>();
@@ -104,25 +102,11 @@ public class AddFileLayerAction extends AbstractAction {
     return new FileNameExtensionFilter(description, array);
   }
 
-  private void getFileRecordStoreFilters(final List<FileFilter> fileFilters,
-    final Set<String> allExtensions) {
-    final List<RecordStoreFactory> factories = RecordStoreFactoryRegistry.getFileRecordStoreFactories();
-    for (final RecordStoreFactory factory : factories) {
-      final List<String> fileExtensions = factory.getFileExtensions();
-      String description = factory.getName();
-      description += " (" + CollectionUtil.toString(fileExtensions) + ")";
-      final FileNameExtensionFilter filter = createFilter(description,
-        fileExtensions);
-      fileFilters.add(filter);
-      allExtensions.addAll(fileExtensions);
-    }
-  }
-
   private void getFilters(final List<FileFilter> fileFilters,
     final Set<String> allExtensions,
     final Class<? extends IoFactory> factoryClass) {
     final Set<IoFactory> factories = IoFactoryRegistry.getInstance()
-      .getFactories(factoryClass);
+        .getFactories(factoryClass);
     for (final IoFactory factory : factories) {
       final List<String> fileExtensions = factory.getFileExtensions();
       String description = factory.getName();

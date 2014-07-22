@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.data.io.AbstractRecordReaderFactory;
+import com.revolsys.data.io.RecordIoFactories;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
@@ -608,7 +608,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
         properties);
       add(layer);
       layer.setEditable(true);
-    } else if (AbstractRecordReaderFactory.hasRecordReaderFactory(urlString)) {
+    } else if (RecordIoFactories.hasRecordReaderFactory(urlString)) {
       final FileRecordLayer layer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = layer.getRenderer();
       renderer.setStyle(GeometryStyle.createStyle());

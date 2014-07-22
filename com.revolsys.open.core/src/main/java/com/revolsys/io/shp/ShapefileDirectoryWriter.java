@@ -8,7 +8,7 @@ import javax.annotation.PreDestroy;
 
 import org.springframework.core.io.FileSystemResource;
 
-import com.revolsys.data.io.AbstractRecordWriterFactory;
+import com.revolsys.data.io.RecordIoFactories;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.io.Statistics;
@@ -120,7 +120,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
       directory.mkdirs();
       final File file = new File(directory, getFileName(recordDefinition)
         + this.nameSuffix + ".shp");
-      writer = AbstractRecordWriterFactory.recordWriter(recordDefinition,
+      writer = RecordIoFactories.recordWriter(recordDefinition,
         new FileSystemResource(file));
 
       ((XbaseRecordWriter)writer).setUseZeroForNull(this.useZeroForNull);

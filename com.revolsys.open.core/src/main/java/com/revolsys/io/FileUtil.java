@@ -154,7 +154,7 @@ public final class FileUtil {
    * @throws IOException If an I/O error occurs.
    */
   public static long copy(final File file, final OutputStream out)
-    throws IOException {
+      throws IOException {
     final FileInputStream in = new FileInputStream(file);
     try {
       return copy(in, out);
@@ -211,7 +211,7 @@ public final class FileUtil {
    * @throws IOException if an i/o error
    */
   public static void copy(final InputStream zin, final File file, final long sz)
-    throws IOException {
+      throws IOException {
 
     ReadableByteChannel rc = null;
     FileOutputStream out = null;
@@ -639,7 +639,7 @@ public final class FileUtil {
 
       File file = null;
       for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
-        .getConnectionRegistries()) {
+          .getConnectionRegistries()) {
         final FolderConnection connection = registry.getConnection(connectionName);
         if (connection != null) {
           final File directory = connection.getFile();
@@ -724,6 +724,11 @@ public final class FileUtil {
     } else {
       return "";
     }
+  }
+
+  public static List<String> getFileNameExtensions(final File file) {
+    final String fileName = file.getName();
+    return getFileNameExtensions(fileName);
   }
 
   public static List<String> getFileNameExtensions(final String fileName) {
@@ -938,8 +943,8 @@ public final class FileUtil {
     for (int i = 0; i < len; i++) {
       final char ch = host.charAt(i);
       if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0'
-          && ch <= '9' || ch == '-' || ch == ',' || ch == '.' || ch == '_'
-          || ch == '~' || ch == ' ') {
+        && ch <= '9' || ch == '-' || ch == ',' || ch == '.' || ch == '_'
+        || ch == '~' || ch == ' ') {
         encoded.append(ch);
       } else {
         encoded.append('%');

@@ -12,32 +12,11 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractRecordIoFactory extends
-AbstractRecordReaderFactory implements RecordWriterFactory {
-
-  protected static RecordWriterFactory getRecordWriterFactory(
-    final Resource resource) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    final RecordWriterFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
-      RecordWriterFactory.class, resource);
-    return readerFactory;
-  }
-
-  public static Writer<Record> recordWriter(final RecordDefinition recordDefinition,
-    final Resource resource) {
-    final RecordWriterFactory writerFactory = getRecordWriterFactory(resource);
-    if (writerFactory == null) {
-      return null;
-    } else {
-      final Writer<Record> writer = writerFactory.createRecordWriter(recordDefinition,
-        resource);
-      return writer;
-    }
-  }
+  AbstractRecordReaderFactory implements RecordWriterFactory {
 
   private final boolean geometrySupported;
 
@@ -58,8 +37,8 @@ AbstractRecordReaderFactory implements RecordWriterFactory {
    * @return The writer.
    */
   @Override
-  public Writer<Record> createRecordWriter(final RecordDefinition recordDefinition,
-    final Resource resource) {
+  public Writer<Record> createRecordWriter(
+    final RecordDefinition recordDefinition, final Resource resource) {
     final OutputStream out = SpringUtil.getOutputStream(resource);
     final String fileName = resource.getFilename();
     final String baseName = FileUtil.getBaseName(fileName);
@@ -92,7 +71,7 @@ AbstractRecordReaderFactory implements RecordWriterFactory {
   protected void setCoordinateSystems(
     final CoordinateSystem... coordinateSystems) {
     setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
-        Arrays.asList(coordinateSystems)));
+      Arrays.asList(coordinateSystems)));
   }
 
   protected void setCoordinateSystems(

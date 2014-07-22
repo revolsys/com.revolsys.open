@@ -23,7 +23,7 @@ public class Debug {
     final double y1, final double x2, final double y2) {
     final LineString points = line;
     if (points.getPoint(0).equals(x1, y1)
-        && points.getPoint(points.getVertexCount() - 1).equals(x2, y2)) {
+      && points.getPoint(points.getVertexCount() - 1).equals(x2, y2)) {
       noOp();
       return true;
     } else {
@@ -94,6 +94,10 @@ public class Debug {
   public static void noOp() {
   }
 
+  public static void println(final Object object) {
+    System.out.println(object);
+  }
+
   public static void typePath(final Edge<?> edge, final String typePath) {
     final String typePath2 = edge.getTypeName();
     equals(typePath2, typePath);
@@ -108,10 +112,6 @@ public class Debug {
     if (line.getLength() == 0) {
       noOp();
     }
-  }
-
-  public void println(final Object object) {
-    System.out.println(object);
   }
 
 }

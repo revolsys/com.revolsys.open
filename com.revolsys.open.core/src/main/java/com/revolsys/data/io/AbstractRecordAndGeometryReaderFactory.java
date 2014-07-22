@@ -4,50 +4,18 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
-import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.Reader;
 
 public abstract class AbstractRecordAndGeometryReaderFactory extends
   AbstractGeometryReaderFactory implements RecordReaderFactory,
   MapReaderFactory {
-
-  public static RecordReader recordReader(
-    final FileSystemResource resource, final RecordFactory factory) {
-    final RecordReaderFactory readerFactory = getRecordReaderFactory(resource);
-    if (readerFactory == null) {
-      return null;
-    } else {
-      final RecordReader reader = readerFactory.createRecordReader(
-        resource, factory);
-      return reader;
-    }
-  }
-
-  public static RecordReader recordReader(final Resource resource) {
-    final RecordReaderFactory readerFactory = getRecordReaderFactory(resource);
-    if (readerFactory == null) {
-      return null;
-    } else {
-      final RecordReader reader = readerFactory.createRecordReader(resource);
-      return reader;
-    }
-  }
-
-  public static RecordReaderFactory getRecordReaderFactory(
-    final Resource resource) {
-    final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
-      RecordReaderFactory.class, resource);
-    return readerFactory;
-  }
 
   private final ArrayRecordFactory recordFactory = new ArrayRecordFactory();
 

@@ -4,6 +4,7 @@ import com.revolsys.data.query.Column;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.query.Value;
 import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 
@@ -25,14 +26,25 @@ public class F {
 
   public static EnvelopeIntersects envelopeIntersects(
     final Attribute attribute, final BoundingBox boundingBox) {
-    return new EnvelopeIntersects(new Column(attribute), new Value(attribute,
-      boundingBox));
+    if (attribute == null) {
+      return null;
+    } else {
+      final Column column = new Column(attribute);
+      final Value value = new Value(attribute, boundingBox);
+      return new EnvelopeIntersects(column, value);
+    }
   }
 
   public static EnvelopeIntersects envelopeIntersects(
     final Attribute attribute, final Geometry geometry) {
     return new EnvelopeIntersects(new Column(attribute), new Value(attribute,
       geometry.getBoundingBox()));
+  }
+
+  public static EnvelopeIntersects envelopeIntersects(
+    final RecordDefinition recordDefinition, final BoundingBox boundingBox) {
+    final Attribute attribute = recordDefinition.getGeometryAttribute();
+    return envelopeIntersects(attribute, boundingBox);
   }
 
   public static EnvelopeIntersects envelopeIntersects(final String name,

@@ -8,7 +8,6 @@ import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
@@ -68,7 +67,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       false);
     final EnableCheck editable = new TreeItemPropertyEnableCheck("editable");
     final EnableCheck showOriginalImage = new TreeItemPropertyEnableCheck(
-      "showOriginalImage");
+        "showOriginalImage");
 
     menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
       "pencil", readonly, "toggleEditable"), editable);
@@ -122,8 +121,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
       final GeoReferencedImageFactory factory = IoFactoryRegistry.getInstance()
-        .getFactoryByFileExtension(GeoReferencedImageFactory.class,
-          fileNameExtension);
+          .getFactoryByFileExtension(GeoReferencedImageFactory.class,
+            fileNameExtension);
       if (factory != null) {
         SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
       }
@@ -178,7 +177,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       return true;
     } else {
       LoggerFactory.getLogger(getClass()).error(
-        "Layer definition does not contain a 'url' property");
+          "Layer definition does not contain a 'url' property");
       return false;
     }
   }
@@ -192,7 +191,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     }
   }
 
-  public BoundingBox fitToViewport() {
+  public synchronized BoundingBox fitToViewport() {
     final Project project = getProject();
     if (project == null || this.image == null || !isInitialized()) {
       return new BoundingBoxDoubleGf();
@@ -337,8 +336,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
                 final boolean visible = dockable.isVisible();
                 if (!visible) {
                   dockable.getControl()
-                    .getOwner()
-                    .remove((SingleCDockable)dockable);
+                  .getOwner()
+                  .remove((SingleCDockable)dockable);
                   setProperty("TableView", null);
                 }
               }

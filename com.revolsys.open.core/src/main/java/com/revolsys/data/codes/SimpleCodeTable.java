@@ -7,7 +7,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
-import com.revolsys.data.io.AbstractRecordReaderFactory;
+import com.revolsys.data.io.RecordIoFactories;
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
 
@@ -15,7 +15,7 @@ public class SimpleCodeTable extends AbstractCodeTable {
 
   public static CodeTable create(final String name, final Resource resource) {
     final SimpleCodeTable codeTable = new SimpleCodeTable(name);
-    final RecordReader reader = AbstractRecordReaderFactory.recordReader(resource);
+    final RecordReader reader = RecordIoFactories.recordReader(resource);
     try {
       for (final Record codeObject : reader) {
         final Identifier id = SingleIdentifier.create(

@@ -52,28 +52,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordStore extends AbstractObjectWithProperties
-  implements RecordStore {
-
-  public static RecordStore close(final Collection<RecordStore> recordStores) {
-    final List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
-    for (final RecordStore recordStore : recordStores) {
-      if (recordStore != null) {
-        try {
-          recordStore.close();
-        } catch (final RuntimeException e) {
-          exceptions.add(e);
-        }
-      }
-    }
-    if (!exceptions.isEmpty()) {
-      throw exceptions.get(0);
-    }
-    return null;
-  }
-
-  public static RecordStore close(final RecordStore... recordStores) {
-    return close(Arrays.asList(recordStores));
-  }
+implements RecordStore {
 
   private Map<String, Object> connectionProperties = new HashMap<String, Object>();
 
@@ -134,7 +113,7 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties
             for (final Attribute attribute : recordDefinition.getAttributes()) {
               final String fieldName = attribute.getName();
               if (fieldName.equals(columnName)
-                  && !fieldName.equals(idFieldName)) {
+                && !fieldName.equals(idFieldName)) {
                 attribute.setCodeTable(codeTable);
               }
             }
@@ -624,7 +603,7 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties
           + " does not have a primary key");
       } else if (values.size() != idAttributeNames.size()) {
         throw new IllegalArgumentException(id + " not a valid id for "
-            + typePath + " requires " + idAttributeNames);
+          + typePath + " requires " + idAttributeNames);
       } else {
         final Query query = new Query(recordDefinition);
         for (int i = 0; i < idAttributeNames.size(); i++) {

@@ -9,8 +9,8 @@ import javax.annotation.PostConstruct;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractRecordIoFactory;
 import com.revolsys.data.io.AbstractRecordStore;
+import com.revolsys.data.io.RecordIoFactories;
 import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
@@ -128,7 +128,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       final File file = new File(subDirectory, recordDefinition.getTypeName()
         + "." + getFileExtension());
       final Resource resource = new FileSystemResource(file);
-      writer = AbstractRecordIoFactory.recordWriter(recordDefinition, resource);
+      writer = RecordIoFactories.recordWriter(recordDefinition, resource);
       if (writer instanceof ObjectWithProperties) {
         final ObjectWithProperties properties = writer;
         properties.setProperties(getProperties());

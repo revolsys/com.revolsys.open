@@ -26,8 +26,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.undo.UndoableEdit;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.awt.WebColors;
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -167,6 +165,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public MapPanel(final Project project) {
     super(new BorderLayout());
     this.project = project;
+
     this.baseMapLayers = project.getBaseMapLayers();
     project.setProperty(MAP_PANEL, this);
     this.layeredPane = new JLayeredPane();
@@ -178,6 +177,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     add(this.layeredPane, BorderLayout.CENTER);
 
     this.viewport = new ComponentViewport2D(project, this.layeredPane);
+    final BoundingBox boundingBox = project.getViewBoundingBox();
+    if (boundingBox != null && !boundingBox.isEmpty()) {
+      this.zoomHistory.add(boundingBox);
+    }
     Property.addListener(this.viewport, this);
 
     createScales();
@@ -201,8 +204,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     addToolBar();
 
     addStatusBar();
-
-    zoomToWorld();
 
     this.fileDropListener = new FileDropTargetListener(this);
     this.undoManager.addKeyMap(this);
@@ -322,9 +323,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addUndoButtons() {
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canUndo");
+        "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canRedo");
+        "canRedo");
 
     this.toolBar.addButton("undo", "Undo", "arrow_undo", canUndo,
       this.undoManager, "undo");
@@ -627,7 +628,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {
         if (this.baseMapOverlay != null
-          && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
+            && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
           final Layer layer = (Layer)event.getNewValue();
           if (layer != null && layer.isVisible()) {
             this.baseMapOverlay.setLayer(layer);
@@ -655,6 +656,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public synchronized void setBoundingBox(final BoundingBox boundingBox) {
     if (!this.settingBoundingBox) {
+      System.out.println("V:" + boundingBox);
       this.settingBoundingBox = true;
       try {
         final BoundingBox oldBoundingBox = getBoundingBox();
@@ -822,11 +824,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final PopupMenu menu = new PopupMenu();
     final MenuFactory factory = menu.getMenu();
     factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
-      "addZoomBookmark");
+        "addZoomBookmark");
 
     final Project project = getProject();
     for (final Entry<String, BoundingBox> entry : project.getZoomBookmarks()
-      .entrySet()) {
+        .entrySet()) {
       final String name = entry.getKey();
       final BoundingBox boundingBox = entry.getValue();
       factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier",

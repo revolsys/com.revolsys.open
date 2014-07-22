@@ -36,9 +36,6 @@ import com.revolsys.util.ExceptionUtil;
 
 public class Project extends LayerGroup {
 
-  private static WeakReference<Project> project = new WeakReference<Project>(
-    null);
-
   public static Project get() {
     return Project.project.get();
   }
@@ -47,13 +44,16 @@ public class Project extends LayerGroup {
     Project.project = new WeakReference<Project>(project);
   }
 
+  private static WeakReference<Project> project = new WeakReference<Project>(
+      null);
+
   private LayerGroup baseMapLayers = new LayerGroup("Base Maps");
 
   private RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
-    "Project");
+      "Project");
 
   private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry(
-    "Project");
+      "Project");
 
   private BoundingBox initialBoundingBox;
 
@@ -69,7 +69,7 @@ public class Project extends LayerGroup {
 
   public Project(final String name) {
     super(name);
-    baseMapLayers.setLayerGroup(this);
+    this.baseMapLayers.setLayerGroup(this);
     setGeometryFactory(GeometryFactory.worldMercator());
   }
 
@@ -88,16 +88,16 @@ public class Project extends LayerGroup {
 
   public void addZoomBookmark(final String name, final BoundingBox boundingBox) {
     if (name != null && boundingBox != null) {
-      zoomBookmarks.put(name, boundingBox);
+      this.zoomBookmarks.put(name, boundingBox);
     }
   }
 
   @Override
   public void delete() {
     super.delete();
-    baseMapLayers = null;
-    viewBoundingBox = null;
-    zoomBookmarks = null;
+    this.baseMapLayers = null;
+    this.viewBoundingBox = null;
+    this.zoomBookmarks = null;
   }
 
   @Override
@@ -119,11 +119,7 @@ public class Project extends LayerGroup {
   }
 
   public LayerGroup getBaseMapLayers() {
-    return baseMapLayers;
-  }
-
-  public RecordStoreConnectionRegistry getRecordStores() {
-    return recordStores;
+    return this.baseMapLayers;
   }
 
   @Override
@@ -140,7 +136,7 @@ public class Project extends LayerGroup {
   }
 
   public FolderConnectionRegistry getFolderConnections() {
-    return folderConnections;
+    return this.folderConnections;
   }
 
   @Override
@@ -149,14 +145,14 @@ public class Project extends LayerGroup {
   }
 
   public BoundingBox getInitialBoundingBox() {
-    return initialBoundingBox;
+    return this.initialBoundingBox;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <V extends Layer> V getLayer(final String name) {
     if (name.equals("Base Maps")) {
-      return (V)baseMapLayers;
+      return (V)this.baseMapLayers;
     } else {
       return (V)super.getLayer(name);
     }
@@ -168,8 +164,8 @@ public class Project extends LayerGroup {
   }
 
   public File getProjectDirectory() {
-    if (resource instanceof FileSystemResource) {
-      final FileSystemResource fileResource = (FileSystemResource)resource;
+    if (this.resource instanceof FileSystemResource) {
+      final FileSystemResource fileResource = (FileSystemResource)this.resource;
       final File directory = fileResource.getFile();
       if (!directory.exists()) {
         directory.mkdirs();
@@ -181,27 +177,31 @@ public class Project extends LayerGroup {
     return null;
   }
 
+  public RecordStoreConnectionRegistry getRecordStores() {
+    return this.recordStores;
+  }
+
   public BoundingBox getViewBoundingBox() {
-    return viewBoundingBox;
+    return this.viewBoundingBox;
   }
 
   public Map<String, BoundingBox> getZoomBookmarks() {
-    return zoomBookmarks;
+    return this.zoomBookmarks;
   }
 
   protected void readBaseMapsLayers(final Resource resource) {
     final Resource baseMapsResource = SpringUtil.getResource(resource,
-      "Base Maps");
+        "Base Maps");
     final Resource layerGroupResource = SpringUtil.getResource(
       baseMapsResource, "rgLayerGroup.rgobject");
     if (layerGroupResource.exists()) {
       final Resource oldResource = SpringUtil.setBaseResource(baseMapsResource);
       try {
         final Map<String, Object> properties = JsonMapIoFactory.toMap(layerGroupResource);
-        baseMapLayers.loadLayers(properties);
+        this.baseMapLayers.loadLayers(properties);
         boolean hasVisible = false;
-        if (baseMapLayers != null) {
-          for (final Layer layer : baseMapLayers) {
+        if (this.baseMapLayers != null) {
+          for (final Layer layer : this.baseMapLayers) {
             if (hasVisible) {
               layer.setVisible(false);
             } else {
@@ -217,7 +217,7 @@ public class Project extends LayerGroup {
 
   protected void readLayers(final Resource resource) {
     final Resource layerGroupResource = SpringUtil.getResource(resource,
-      "rgLayerGroup.rgobject");
+        "rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       LoggerFactory.getLogger(getClass()).error(
         "File not found: " + layerGroupResource);
@@ -239,37 +239,40 @@ public class Project extends LayerGroup {
     this.resource = resource;
     if (resource.exists()) {
       setEventsEnabled(false);
-      final Resource layersDir = SpringUtil.getResource(resource, "Layers");
-      readProperties(layersDir);
-      final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry.getForThread();
       try {
-        final Resource recordStoresDirectory = SpringUtil.getResource(resource,
-          "Data Stores");
+        final Resource layersDir = SpringUtil.getResource(resource, "Layers");
+        readProperties(layersDir);
+        final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry.getForThread();
+        try {
+          final Resource recordStoresDirectory = SpringUtil.getResource(
+            resource, "Data Stores");
 
-        final boolean readOnly = isReadOnly();
-        final RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
-          "Project", recordStoresDirectory, readOnly);
-        setRecordStores(recordStores);
-        RecordStoreConnectionRegistry.setForThread(recordStores);
+          final boolean readOnly = isReadOnly();
+          final RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
+            "Project", recordStoresDirectory, readOnly);
+          setRecordStores(recordStores);
+          RecordStoreConnectionRegistry.setForThread(recordStores);
 
-        final Resource folderConnectionsDirectory = SpringUtil.getResource(
-          resource, "Folder Connections");
-        folderConnections = new FolderConnectionRegistry("Project",
-          folderConnectionsDirectory, readOnly);
+          final Resource folderConnectionsDirectory = SpringUtil.getResource(
+            resource, "Folder Connections");
+          this.folderConnections = new FolderConnectionRegistry("Project",
+            folderConnectionsDirectory, readOnly);
 
-        readLayers(layersDir);
+          readLayers(layersDir);
 
-        readBaseMapsLayers(resource);
+          readBaseMapsLayers(resource);
+        } finally {
+          RecordStoreConnectionRegistry.setForThread(oldRecordStoreConnections);
+        }
       } finally {
         setEventsEnabled(true);
-        RecordStoreConnectionRegistry.setForThread(oldRecordStoreConnections);
       }
     }
   }
 
   protected void readProperties(final Resource resource) {
     final Resource layerGroupResource = SpringUtil.getResource(resource,
-      "rgLayerGroup.rgobject");
+        "rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       LoggerFactory.getLogger(getClass()).error(
         "File not found: " + layerGroupResource);
@@ -289,7 +292,7 @@ public class Project extends LayerGroup {
 
   public void removeZoomBookmark(final String name) {
     if (name != null) {
-      zoomBookmarks.remove(name);
+      this.zoomBookmarks.remove(name);
     }
   }
 
@@ -318,9 +321,9 @@ public class Project extends LayerGroup {
         final MapPanel mapPanel = MapPanel.get(this);
         final JLabel message = new JLabel(
           "<html><body><p><b>The following layers have un-saved changes.</b></p>"
-            + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
-            + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-            + "</li></ul></body></html>");
+              + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
+              + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
+              + "</li></ul></body></html>");
 
         final int option = JOptionPane.showConfirmDialog(mapPanel, message,
           "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION,
@@ -341,9 +344,9 @@ public class Project extends LayerGroup {
           } else {
             final JLabel message2 = new JLabel(
               "<html><body><p><b>The following layers could not be saved.</b></p>"
-                + "<p><b>Do you want to ignore these changes and continue?</b></p><ul><li>"
-                + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-                + "</li></ul></body></html>");
+                  + "<p><b>Do you want to ignore these changes and continue?</b></p><ul><li>"
+                  + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
+                  + "</li></ul></body></html>");
 
             final int option2 = JOptionPane.showConfirmDialog(mapPanel,
               message2, "Ignore Changes", JOptionPane.OK_CANCEL_OPTION,
@@ -365,7 +368,7 @@ public class Project extends LayerGroup {
     } else {
       final MapPanel mapPanel = MapPanel.get(this);
       final JLabel message = new JLabel(
-        "<html><body><p><b>Save changes to project?</b></p></body></html>");
+          "<html><body><p><b>Save changes to project?</b></p></body></html>");
 
       final int option = JOptionPane.showConfirmDialog(mapPanel, message,
         "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION,
@@ -380,7 +383,7 @@ public class Project extends LayerGroup {
         } else {
           final JLabel message2 = new JLabel(
             "<html><body><p>Saving project failed.</b></p>"
-              + "<p><b>Do you want to ignore any changes and continue?</b></p></body></html>");
+                + "<p><b>Do you want to ignore any changes and continue?</b></p></body></html>");
 
           final int option2 = JOptionPane.showConfirmDialog(mapPanel, message2,
             "Ignore Changes", JOptionPane.OK_CANCEL_OPTION,
@@ -401,10 +404,6 @@ public class Project extends LayerGroup {
       result = saveSettingsWithPrompt();
     }
     return result;
-  }
-
-  public void setRecordStores(final RecordStoreConnectionRegistry recordStores) {
-    this.recordStores = recordStores;
   }
 
   public void setFolderConnections(
@@ -433,7 +432,7 @@ public class Project extends LayerGroup {
       if (value != null) {
         final BoundingBox viewBoundingBox = BoundingBoxDoubleGf.create(value.toString());
         if (!BoundingBoxUtil.isEmpty(viewBoundingBox)) {
-          initialBoundingBox = viewBoundingBox;
+          this.initialBoundingBox = viewBoundingBox;
           setGeometryFactory(viewBoundingBox.getGeometryFactory());
           setViewBoundingBox(viewBoundingBox);
         }
@@ -441,6 +440,10 @@ public class Project extends LayerGroup {
     } else {
       super.setProperty(name, value);
     }
+  }
+
+  public void setRecordStores(final RecordStoreConnectionRegistry recordStores) {
+    this.recordStores = recordStores;
   }
 
   public void setSrid(final Number srid) {
@@ -468,8 +471,10 @@ public class Project extends LayerGroup {
         viewBoundingBox = viewBoundingBox.expand(0, (minDimension - height) / 2);
       }
       this.viewBoundingBox = viewBoundingBox;
-      getPropertyChangeSupport().firePropertyChange("viewBoundingBox",
-        oldValue, viewBoundingBox);
+      if (isEventsEnabled()) {
+        System.out.println("P:" + viewBoundingBox);
+      }
+      firePropertyChange("viewBoundingBox", oldValue, viewBoundingBox);
     }
   }
 

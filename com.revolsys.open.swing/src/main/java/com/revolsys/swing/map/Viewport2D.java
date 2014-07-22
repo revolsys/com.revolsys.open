@@ -82,7 +82,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   }
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
-      .geometry();
+    .geometry();
 
   private double pixelsPerXUnit;
 
@@ -95,9 +95,9 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   /** The current bounding box of the project. */
   private BoundingBox boundingBox = new BoundingBoxDoubleGf();
 
-  private GeometryFactory geometryFactory = GeometryFactory.floating3(3005);
+  private GeometryFactory geometryFactory = GeometryFactory.floating3(3857);
 
-  private GeometryFactory geometryFactory2d = GeometryFactory.floating(3005, 2);
+  private GeometryFactory geometryFactory2d = GeometryFactory.floating(3857, 2);
 
   private Reference<Project> project;
 
@@ -125,17 +125,30 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   }
 
   public Viewport2D(final Project project) {
-    this.project = new WeakReference<Project>(project);
-    setGeometryFactory(project.getGeometryFactory());
+    this(project, 0, 0, project.getViewBoundingBox());
   }
 
   public Viewport2D(final Project project, final int width, final int height,
-    final BoundingBox boundingBox) {
-    this(project);
+    BoundingBox boundingBox) {
+    this.project = new WeakReference<Project>(project);
     this.viewWidth = width;
     this.viewHeight = height;
+    GeometryFactory geometryFactory;
+    if (boundingBox == null) {
+      geometryFactory = GeometryFactory.worldMercator();
+      boundingBox = geometryFactory.getCoordinateSystem().getAreaBoundingBox();
+    } else {
+      geometryFactory = boundingBox.getGeometryFactory();
+      if (geometryFactory == null) {
+        geometryFactory = GeometryFactory.worldMercator();
+      }
+      if (boundingBox.isEmpty()) {
+        boundingBox = geometryFactory.getCoordinateSystem()
+          .getAreaBoundingBox();
+      }
+    }
+    setGeometryFactory(geometryFactory);
     setBoundingBox(boundingBox);
-    setGeometryFactory(boundingBox.getGeometryFactory());
   }
 
   public AffineTransform createModelToScreenTransform(
@@ -473,10 +486,10 @@ public class Viewport2D implements PropertyChangeSupportProxy {
           final Measurable<Length> viewWidthLength = getViewWidthLength();
           final Measurable<Length> modelWidthLength = newBoundingBox.getWidthLength();
           unitsPerPixel = modelWidthLength.doubleValue(SI.METRE)
-              / viewWidthPixels;
+            / viewWidthPixels;
           double scale = getScale(viewWidthLength, modelWidthLength);
           if (!this.scales.isEmpty() && viewWidthPixels > 0
-              && viewHeightPixels > 0) {
+            && viewHeightPixels > 0) {
             final double minScale = this.scales.get(this.scales.size() - 1);
             final double maxScale = this.scales.get(0);
             if (scale < minScale) {
@@ -628,7 +641,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double... viewCoordinates) {
     final double[] coordinates = toModelCoordinates(viewCoordinates);
     if (Double.isInfinite(coordinates[0]) || Double.isInfinite(coordinates[1])
-        || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
+      || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
       return geometryFactory.point();
     } else {
       final Point point = this.geometryFactory2d.point(coordinates);
