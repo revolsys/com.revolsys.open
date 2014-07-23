@@ -19,6 +19,8 @@ public interface GeoReferencedImage extends MapSerializer,
 
   void cancelChanges();
 
+  void deleteTiePoint(MappedLocation tiePoint);
+
   void drawImage(Graphics2D graphics, BoundingBox viewBoundingBox,
     int viewWidth, int viewHeight, boolean useTransform);
 
@@ -62,6 +64,8 @@ public interface GeoReferencedImage extends MapSerializer,
   boolean hasGeometryFactory();
 
   boolean isHasChanages();
+
+  boolean isHasTransform();
 
   boolean saveChanges();
 

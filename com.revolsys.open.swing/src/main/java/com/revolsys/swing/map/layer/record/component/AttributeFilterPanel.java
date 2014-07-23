@@ -51,6 +51,7 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.QueryWhereConditionField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
@@ -224,7 +225,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
     return this.tableModel.getFilter();
   }
 
-  public AbstractRecordLayer getLayer() {
+  public AbstractLayer getLayer() {
     return this.layer;
   }
 

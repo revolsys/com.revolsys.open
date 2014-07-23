@@ -79,8 +79,8 @@ public class TiePointsPanel extends TablePanel {
   }
 
   public void deleteTiePoint() {
-    final MappedLocation object = getEventRowObject();
-    getTiePoints().remove(object);
+    final MappedLocation tiePoint = getEventRowObject();
+    this.layer.deleteTiePoint(tiePoint);
   }
 
   protected MappedLocation getEventRowObject() {
@@ -95,7 +95,7 @@ public class TiePointsPanel extends TablePanel {
   }
 
   public GeoReferencedImageLayer getLayer() {
-    return layer;
+    return this.layer;
   }
 
   public List<MappedLocation> getTiePoints() {
@@ -104,15 +104,15 @@ public class TiePointsPanel extends TablePanel {
 
   public void zoomToTiePoint() {
     final MappedLocation object = getEventRowObject();
-    final GeoReferencedImage image = layer.getImage();
+    final GeoReferencedImage image = this.layer.getImage();
     final Geometry geometry = object.getSourceToTargetLine(image,
-      layer.getBoundingBox(), !layer.isShowOriginalImage());
+      this.layer.getBoundingBox(), !this.layer.isShowOriginalImage());
     if (geometry != null) {
       final Project project = Project.get();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()
-        .convert(geometryFactory)
-        .expand(200);
+          .convert(geometryFactory)
+          .expand(200);
       project.setViewBoundingBox(boundingBox);
 
     }

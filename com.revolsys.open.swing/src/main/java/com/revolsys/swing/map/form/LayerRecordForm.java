@@ -83,6 +83,7 @@ import com.revolsys.swing.field.ObjectLabelField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.ProjectFrame;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerAttributesTableModel;
@@ -440,7 +441,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     }
   }
 
-  public ToolBar addToolBar(final AbstractRecordLayer layer) {
+  public ToolBar addToolBar(final AbstractLayer layer) {
     this.toolBar = new ToolBar();
     add(this.toolBar, BorderLayout.NORTH);
     final RecordDefinition recordDefinition = getRecordDefinition();
@@ -620,7 +621,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
       parent.remove(this);
     }
 
-    final AbstractRecordLayer layer = getLayer();
+    final AbstractLayer layer = getLayer();
     if (layer != null) {
       this.layer = null;
       if (this.allAttributes != null) {
@@ -982,7 +983,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   public void pasteValues(final Map<String, Object> map) {
-    final AbstractRecordLayer layer = getLayer();
+    final AbstractLayer layer = getLayer();
     if (layer != null) {
       final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
           map);
@@ -1004,7 +1005,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    final AbstractRecordLayer layer = getLayer();
+    final AbstractLayer layer = getLayer();
     if (layer != null) {
       final LayerRecord record = getRecord();
       if (record != null) {

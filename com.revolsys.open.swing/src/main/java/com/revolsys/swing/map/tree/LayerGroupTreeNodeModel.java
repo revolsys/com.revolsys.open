@@ -48,7 +48,7 @@ AbstractObjectTreeNodeModel<LayerGroup, Layer> {
     if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
       final Transferable transferable = support.getTransferable();
       final List<File> files = (List<File>)transferable.getTransferData(DataFlavor.javaFileListFlavor);
-      group.openFiles(files);
+      group.openFiles(index, files);
       return true;
     } else {
       return super.dndImportData(support, group, index);

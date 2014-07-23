@@ -17,7 +17,7 @@ import com.revolsys.swing.map.tree.renderer.LayerGroupTreeCellRenderer;
 import com.revolsys.swing.tree.model.node.AbstractObjectTreeNodeModel;
 
 public class ProjectTreeNodeModel extends
-AbstractObjectTreeNodeModel<Project, Layer> {
+  AbstractObjectTreeNodeModel<Project, Layer> {
 
   public ProjectTreeNodeModel() {
     setSupportedClasses(Project.class);
@@ -47,7 +47,7 @@ AbstractObjectTreeNodeModel<Project, Layer> {
     if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
       final Transferable transferable = support.getTransferable();
       final List<File> files = (List<File>)transferable.getTransferData(DataFlavor.javaFileListFlavor);
-      project.openFiles(files);
+      project.openFiles(index, files);
       return true;
     } else {
       return super.dndImportData(support, project, index);

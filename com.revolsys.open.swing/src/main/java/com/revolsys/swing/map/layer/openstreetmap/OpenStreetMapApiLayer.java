@@ -17,13 +17,14 @@ import com.revolsys.io.openstreetmap.model.OsmElement;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.MathUtil;
 
 public class OpenStreetMapApiLayer extends AbstractRecordLayer {
 
-  public static AbstractRecordLayer create(final Map<String, Object> properties) {
+  public static AbstractLayer create(final Map<String, Object> properties) {
     return new OpenStreetMapApiLayer(properties);
   }
 

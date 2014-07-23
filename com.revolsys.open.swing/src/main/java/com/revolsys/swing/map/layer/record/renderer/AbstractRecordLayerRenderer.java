@@ -22,6 +22,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
@@ -91,7 +92,7 @@ public abstract class AbstractRecordLayerRenderer extends
   }
 
   public static AbstractRecordLayerRenderer getRenderer(
-    final AbstractRecordLayer layer, final LayerRenderer<?> parent,
+    final AbstractLayer layer, final LayerRenderer<?> parent,
     final Map<String, Object> style) {
     final String type = (String)style.remove("type");
     final Constructor<? extends AbstractRecordLayerRenderer> constructor = RENDERER_CONSTRUCTORS.get(type);
@@ -111,7 +112,7 @@ public abstract class AbstractRecordLayerRenderer extends
   }
 
   public static LayerRenderer<AbstractRecordLayer> getRenderer(
-    final AbstractRecordLayer layer, final Map<String, Object> style) {
+    final AbstractLayer layer, final Map<String, Object> style) {
     return getRenderer(layer, null, style);
   }
 
@@ -212,7 +213,7 @@ public abstract class AbstractRecordLayerRenderer extends
   }
 
   public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractRecordLayer layer,
+    final BoundingBox visibleArea, final AbstractLayer layer,
     final LayerRecord record) {
   }
 
@@ -237,7 +238,7 @@ public abstract class AbstractRecordLayerRenderer extends
   }
 
   public void renderSelectedRecord(final Viewport2D viewport,
-    final AbstractRecordLayer layer, final LayerRecord record) {
+    final AbstractLayer layer, final LayerRecord record) {
     final BoundingBox boundingBox = viewport.getBoundingBox();
     if (isVisible(record)) {
       try {
@@ -247,7 +248,7 @@ public abstract class AbstractRecordLayerRenderer extends
     }
   }
 
-  protected void replace(final AbstractRecordLayer layer,
+  protected void replace(final AbstractLayer layer,
     final AbstractMultipleRenderer parent,
     final AbstractMultipleRenderer newRenderer) {
     if (parent == null) {
@@ -298,7 +299,7 @@ public abstract class AbstractRecordLayerRenderer extends
     return map;
   }
 
-  protected void wrap(final AbstractRecordLayer layer,
+  protected void wrap(final AbstractLayer layer,
     final AbstractMultipleRenderer parent,
     final AbstractMultipleRenderer newRenderer) {
     newRenderer.addRenderer(this.clone());

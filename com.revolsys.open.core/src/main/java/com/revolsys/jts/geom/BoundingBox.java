@@ -24,7 +24,7 @@ public interface BoundingBox {
    * lies wholely inside this <code>BoundingBox</code> (inclusive of the boundary).
    *
    *@param  other the <code>BoundingBox</code> to check
-   *@return true if this <code>BoundingBox</code> covers the <code>other</code> 
+   *@return true if this <code>BoundingBox</code> covers the <code>other</code>
    */
   boolean covers(BoundingBox other);
 
@@ -74,13 +74,15 @@ public interface BoundingBox {
 
   BoundingBox expandToInclude(BoundingBox boundingBox);
 
-  BoundingBox expandToInclude(Record record);
+  BoundingBox expandToInclude(double... coordinates);
 
   BoundingBox expandToInclude(Geometry geometry);
 
+  BoundingBox expandToInclude(Record record);
+
   /**
    * Gets the area of this envelope.
-   * 
+   *
    * @return the area of the envelope
    * @return 0.0 if the envelope is null
    */
@@ -102,6 +104,12 @@ public interface BoundingBox {
 
   CoordinateSystem getCoordinateSystem();
 
+  /**
+   * maxX,minY
+   * minX,minY
+   * minX,maxY
+   * maxX,maxY
+   */
   Point getCornerPoint(int i);
 
   LineString getCornerPoints();
@@ -228,7 +236,7 @@ public interface BoundingBox {
 
   /**
    * Creates a {@link Geometry} with the same extent as the given envelope.
-   * The Geometry returned is guaranteed to be valid.  
+   * The Geometry returned is guaranteed to be valid.
    * To provide this behaviour, the following cases occur:
    * <p>
    * If the <code>BoundingBoxDoubleGf</code> is:
@@ -239,9 +247,9 @@ public interface BoundingBox {
    * <li>a rectangle : returns a {@link Polygon}> whose points are (minx, miny),
    *  (minx, maxy), (maxx, maxy), (maxx, miny), (minx, miny).
    * </ul>
-   * 
+   *
    *@param  envelope the <code>BoundingBoxDoubleGf</code> to convert
-   *@return an empty <code>Point</code> (for null <code>BoundingBoxDoubleGf</code>s), 
+   *@return an empty <code>Point</code> (for null <code>BoundingBoxDoubleGf</code>s),
    *  a <code>Point</code> (when min x = max x and min y = max y) or a
    *      <code>Polygon</code> (in all other cases)
    */

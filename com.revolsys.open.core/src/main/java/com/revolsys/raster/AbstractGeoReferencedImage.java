@@ -52,7 +52,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractGeoReferencedImage extends
-  AbstractPropertyChangeObject implements GeoReferencedImage {
+AbstractPropertyChangeObject implements GeoReferencedImage {
 
   private static double[] calculateLSM(final BoundingBox boundingBox,
     final int imageWidth, final int imageHeight,
@@ -114,7 +114,7 @@ public abstract class AbstractGeoReferencedImage extends
 
     NodeList lst;
     final Element node = (Element)r.getImageMetadata(0).getAsTree(
-        "javax_imageio_1.0");
+      "javax_imageio_1.0");
     lst = node.getElementsByTagName("HorizontalPixelSize");
     if (lst != null && lst.getLength() == 1) {
       hdpi = (int)(mm2inch / Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
@@ -203,12 +203,19 @@ public abstract class AbstractGeoReferencedImage extends
   }
 
   @Override
+  public void deleteTiePoint(final MappedLocation tiePoint) {
+    if (this.tiePoints.remove(tiePoint)) {
+      this.hasChanges = true;
+    }
+  }
+
+  @Override
   public void drawImage(final Graphics2D graphics,
     final BoundingBox viewBoundingBox, final int viewWidth,
     final int viewHeight, final boolean useTransform) {
     final BoundingBox imageBoundingBox = getBoundingBox();
     if (viewBoundingBox.intersects(imageBoundingBox) && viewWidth > 0
-      && viewHeight > 0) {
+        && viewHeight > 0) {
       final RenderedImage renderedImage = getRenderedImage();
       drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth,
         viewHeight, useTransform);
@@ -216,7 +223,7 @@ public abstract class AbstractGeoReferencedImage extends
   }
 
   public void drawRenderedImage(final RenderedImage renderedImage,
-    final BoundingBox imageBoundingBox, final Graphics2D graphics,
+    BoundingBox imageBoundingBox, final Graphics2D graphics,
     final BoundingBox viewBoundingBox, final int viewWidth,
     final boolean useTransform) {
     if (renderedImage != null) {
@@ -224,6 +231,7 @@ public abstract class AbstractGeoReferencedImage extends
       final int imageHeight = renderedImage.getHeight();
       if (imageWidth > 0 && imageHeight > 0) {
 
+        imageBoundingBox = imageBoundingBox.convert(viewBoundingBox.getGeometryFactory());
         final AffineTransform transform = graphics.getTransform();
         try {
           final double scaleFactor = viewWidth / viewBoundingBox.getWidth();
@@ -245,7 +253,7 @@ public abstract class AbstractGeoReferencedImage extends
             * scaleFactor);
 
           if (imageScreenWidth > 0 && imageScreenWidth < 10000
-            && imageScreenHeight > 0 && imageScreenHeight < 10000) {
+              && imageScreenHeight > 0 && imageScreenHeight < 10000) {
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
               RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             if (imageScreenWidth > 0 && imageScreenHeight > 0) {
@@ -274,7 +282,6 @@ public abstract class AbstractGeoReferencedImage extends
             }
           }
         } catch (final Throwable e) {
-          e.printStackTrace();
         } finally {
           graphics.setTransform(transform);
         }
@@ -292,23 +299,31 @@ public abstract class AbstractGeoReferencedImage extends
 
   @Override
   public AffineTransform getAffineTransformation(final BoundingBox boundingBox) {
-    final List<MappedLocation> mappings = getTiePoints();
-    if (mappings.size() < 3) {
+    final List<MappedLocation> mappings = new ArrayList<>(getTiePoints());
+    final int count = mappings.size();
+    final int imageWidth = getImageWidth();
+    final int imageHeight = getImageHeight();
+    if (count == 1) {
+      final MappedLocation tiePoint = mappings.get(0);
+      final Point sourcePixel = tiePoint.getSourcePixel();
+      final Point targetPixel = tiePoint.getTargetPixel(boundingBox,
+        imageWidth, imageHeight);
+      final double translateX = targetPixel.getX() - sourcePixel.getX();
+      final double translateY = sourcePixel.getY() - targetPixel.getY();
+      return new AffineTransform(1, 0, 0, 1, translateX, translateY);
+    } else if (count < 3) {
       return new AffineTransform();
-    } else {
-      final int imageWidth = getImageWidth();
-      final int imageHeight = getImageHeight();
-      final double[] affineTransformMatrix = calculateLSM(boundingBox,
-        imageWidth, imageHeight, mappings);
-      final double translateX = affineTransformMatrix[2];
-      final double translateY = affineTransformMatrix[5];
-      final double scaleX = affineTransformMatrix[0];
-      final double scaleY = affineTransformMatrix[4];
-      final double shearX = affineTransformMatrix[1];
-      final double shearY = affineTransformMatrix[3];
-      return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX,
-        translateY);
     }
+    final double[] affineTransformMatrix = calculateLSM(boundingBox,
+      imageWidth, imageHeight, mappings);
+    final double translateX = affineTransformMatrix[2];
+    final double translateY = affineTransformMatrix[5];
+    final double scaleX = affineTransformMatrix[0];
+    final double scaleY = affineTransformMatrix[4];
+    final double shearX = affineTransformMatrix[1];
+    final double shearY = affineTransformMatrix[3];
+    return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX,
+      translateY);
   }
 
   @Override
@@ -506,6 +521,16 @@ public abstract class AbstractGeoReferencedImage extends
     return this.hasChanges;
   }
 
+  @Override
+  public boolean isHasTransform() {
+    final int count = getTiePoints().size();
+    if (count > 2 || count == 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   protected void loadAuxXmlFile(final long modifiedTime) {
     final Resource resource = getImageResource();
 
@@ -531,7 +556,7 @@ public abstract class AbstractGeoReferencedImage extends
               spatialReference, "LatestWKID");
             if (sridElement == null) {
               sridElement = DomUtil.getFirstChildElement(spatialReference,
-                "WKID");
+                  "WKID");
             }
             if (sridElement != null) {
               srid = DomUtil.getInteger(sridElement);
@@ -553,13 +578,13 @@ public abstract class AbstractGeoReferencedImage extends
           setGeometryFactory(geometryFactory);
 
           final List<Double> sourceControlPoints = DomUtil.getDoubleList(doc,
-            "SourceGCPs");
+              "SourceGCPs");
           final List<Double> targetControlPoints = DomUtil.getDoubleList(doc,
-            "TargetGCPs");
+              "TargetGCPs");
           if (sourceControlPoints.size() > 0 && targetControlPoints.size() > 0) {
             final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
             for (int i = 0; i < sourceControlPoints.size()
-              && i < targetControlPoints.size(); i += 2) {
+                && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
               final Point sourcePixel = new PointDouble(imageX, imageY);
@@ -721,6 +746,7 @@ public abstract class AbstractGeoReferencedImage extends
           ((MappedLocation)newValue).addListener(this);
         }
       }
+      setHasChanges(true);
     } else if (source instanceof MappedLocation) {
       setHasChanges(true);
     }
@@ -731,7 +757,7 @@ public abstract class AbstractGeoReferencedImage extends
   public boolean saveChanges() {
     try {
       final Resource rgResource = SpringUtil.addExtension(this.imageResource,
-        "rgobject");
+          "rgobject");
       MapObjectFactoryRegistry.write(rgResource, this);
       setHasChanges(false);
       return true;

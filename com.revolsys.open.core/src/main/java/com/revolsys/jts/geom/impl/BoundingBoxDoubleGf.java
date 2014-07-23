@@ -662,6 +662,24 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
+  public BoundingBox expandToInclude(final double... coordinates) {
+    if (coordinates == null || coordinates.length < 2) {
+      return this;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (isEmpty()) {
+        return new BoundingBoxDoubleGf(geometryFactory, coordinates.length,
+          coordinates);
+      } else {
+        final double[] bounds = getBounds();
+        final int axisCount = getAxisCount();
+        BoundingBoxUtil.expand(bounds, axisCount, coordinates);
+        return new BoundingBoxDoubleGf(geometryFactory, axisCount, bounds);
+      }
+    }
+  }
+
+  @Override
   public BoundingBox expandToInclude(final Geometry geometry) {
     if (geometry == null || geometry.isEmpty()) {
       return this;
@@ -792,6 +810,12 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     }
   }
 
+  /**
+   * maxX,minY
+   * minX,minY
+   * minX,maxY
+   * maxX,maxY
+   */
   @Override
   public Point getCornerPoint(int index) {
     if (isEmpty()) {

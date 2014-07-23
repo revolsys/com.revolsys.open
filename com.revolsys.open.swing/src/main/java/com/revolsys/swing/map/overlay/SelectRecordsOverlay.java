@@ -32,6 +32,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -136,7 +137,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     Invoke.background("Select records", this, methodName, boundingBox);
   }
 
-  protected boolean isSelectable(final AbstractRecordLayer recordLayer) {
+  protected boolean isSelectable(final AbstractLayer recordLayer) {
     return recordLayer.isSelectable();
   }
 

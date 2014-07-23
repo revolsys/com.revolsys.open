@@ -16,7 +16,6 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
@@ -117,10 +116,8 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {
       if (pageInfo != null) {
-        Charset charset = mediaType.getCharSet();
-        if (charset == null) {
-          charset = FileUtil.UTF8;
-        }
+        final Charset charset = HttpServletUtils.setContentTypeWithCharset(
+          outputMessage, mediaType);
 
         final HttpServletRequest request = HttpServletUtils.getRequest();
 
@@ -136,9 +133,6 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
         }
 
         final boolean showTitle = !"false".equalsIgnoreCase(request.getParameter("showTitle"));
-
-        final HttpHeaders headers = outputMessage.getHeaders();
-        headers.setContentType(mediaType);
 
         final OutputStream out = outputMessage.getBody();
         if (APPLICATION_VND_SUN_WADL_XML.equals(mediaType)) {

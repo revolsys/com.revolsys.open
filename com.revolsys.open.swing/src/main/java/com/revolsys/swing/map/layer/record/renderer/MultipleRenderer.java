@@ -11,6 +11,7 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -45,7 +46,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
   // Needed for filter styles
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractRecordLayer layer,
+    final BoundingBox visibleArea, final AbstractLayer layer,
     final LayerRecord record) {
     if (isVisible(record)) {
       for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
@@ -88,7 +89,7 @@ public class MultipleRenderer extends AbstractMultipleRenderer {
 
   @Override
   public void renderSelectedRecord(final Viewport2D viewport,
-    final AbstractRecordLayer layer, final LayerRecord object) {
+    final AbstractLayer layer, final LayerRecord object) {
     if (isVisible(object)) {
       for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
         final long scale = (long)viewport.getScale();

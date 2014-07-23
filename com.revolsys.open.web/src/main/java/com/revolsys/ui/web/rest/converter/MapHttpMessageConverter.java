@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.MapWriter;
@@ -56,15 +55,12 @@ public class MapHttpMessageConverter extends AbstractHttpMessageConverter<Map> {
     final HttpOutputMessage outputMessage) throws IOException,
     HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {
-      Charset charset = mediaType.getCharSet();
-      if (charset == null) {
-        charset = FileUtil.UTF8;
-      }
-      outputMessage.getHeaders().setContentType(mediaType);
+      final Charset charset = HttpServletUtils.setContentTypeWithCharset(
+        outputMessage, mediaType);
       final OutputStream body = outputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"
         + mediaType.getSubtype();
-      final MapWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
+      final MapWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
         MapWriterFactory.class, mediaTypeString);
       final MapWriter writer = writerFactory.getMapWriter(body, charset);
       writer.setProperty(IoConstants.INDENT, true);

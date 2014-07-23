@@ -282,8 +282,6 @@ RecordFactory, AddGeometryCompleteAction {
 
   private boolean snapToAllLayers = false;
 
-  private Object sync = new Object();
-
   private boolean useFieldTitles = false;
 
   private Set<String> userReadOnlyFieldNames = new LinkedHashSet<String>();
@@ -1366,10 +1364,6 @@ RecordFactory, AddGeometryCompleteAction {
 
   public Collection<String> getSnapLayerPaths() {
     return getProperty("snapLayers", Collections.<String> emptyList());
-  }
-
-  public Object getSync() {
-    return this.sync;
   }
 
   public String getTypePath() {

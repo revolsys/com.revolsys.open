@@ -4,6 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import bibliothek.gui.dock.common.event.CDockableStateListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
+import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
@@ -22,6 +24,7 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
@@ -32,6 +35,7 @@ import com.revolsys.raster.MappedLocation;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -61,31 +65,33 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   static {
     final MenuFactory menu = ObjectTreeModel.getMenu(GeoReferencedImageLayer.class);
-    menu.addGroup(1, "edit");
+    menu.addGroup(0, "table");
+    menu.addGroup(2, "edit");
 
     final EnableCheck readonly = new TreeItemPropertyEnableCheck("readOnly",
       false);
     final EnableCheck editable = new TreeItemPropertyEnableCheck("editable");
     final EnableCheck showOriginalImage = new TreeItemPropertyEnableCheck(
-        "showOriginalImage");
+      "showOriginalImage");
+    final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
+    final EnableCheck hasTransform = new TreeItemPropertyEnableCheck(
+      "hasTransform");
+
+    menu.addMenuItem("table", TreeItemRunnable.createAction("View Tie-Points",
+      "table_go", "showTiePointsTable"));
 
     menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
       "pencil", readonly, "toggleEditable"), editable);
-
-    final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Save Changes",
       "map_save", hasChanges, "saveChanges"));
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Cancel Changes",
-      "map_cancel", "cancelChanges"));
+      "map_cancel", hasChanges, "cancelChanges"));
 
-    menu.addMenuItem("edit", TreeItemRunnable.createAction("View Tie-Points",
-      "table_go", "showTiePointsTable"));
-
-    menu.addCheckboxMenuItem("edit",
-      TreeItemRunnable.createAction("Show Original Image", (String)null,
-        editable, "toggleShowOriginalImage"), showOriginalImage);
+    menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction(
+      "Show Original Image", (String)null, new AndEnableCheck(editable,
+        hasTransform), "toggleShowOriginalImage"), showOriginalImage);
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction("Fit to Screen",
       "arrow_out", editable, "fitToViewport"));
@@ -97,7 +103,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   private String url;
 
-  private boolean showOriginalImage = true;
+  private boolean showOriginalImage = false;
 
   public GeoReferencedImageLayer(final Map<String, Object> properties) {
     super(properties);
@@ -121,8 +127,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
       final GeoReferencedImageFactory factory = IoFactoryRegistry.getInstance()
-          .getFactoryByFileExtension(GeoReferencedImageFactory.class,
-            fileNameExtension);
+        .getFactoryByFileExtension(GeoReferencedImageFactory.class,
+          fileNameExtension);
       if (factory != null) {
         SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
       }
@@ -167,6 +173,15 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     return propertiesPanel;
   }
 
+  public void deleteTiePoint(final MappedLocation tiePoint) {
+    if (isEditable()) {
+      this.image.deleteTiePoint(tiePoint);
+    } else {
+      LoggerFactory.getLogger("Cannot delete tie-point. Layer " + getClass())
+        .error(getPath() + " is not editable");
+    }
+  }
+
   @Override
   protected boolean doInitialize() {
     final String url = getProperty("url");
@@ -177,7 +192,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       return true;
     } else {
       LoggerFactory.getLogger(getClass()).error(
-          "Layer definition does not contain a 'url' property");
+        "Layer definition does not contain a 'url' property");
       return false;
     }
   }
@@ -226,9 +241,15 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     if (image == null) {
       return new BoundingBoxDoubleGf();
     } else {
-      final BoundingBox boundingBox = image.getBoundingBox();
+      BoundingBox boundingBox = image.getBoundingBox();
       if (boundingBox.isEmpty()) {
-        return fitToViewport();
+        final boolean hasChanges = isHasChanges();
+        boundingBox = fitToViewport();
+        if (hasChanges) {
+          saveChanges();
+        } else {
+          cancelChanges();
+        }
       }
       return boundingBox;
     }
@@ -265,13 +286,67 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     }
   }
 
+  public boolean isHasTransform() {
+    if (this.image == null) {
+      return false;
+    } else {
+      return this.image.isHasTransform();
+    }
+  }
+
   public boolean isShowOriginalImage() {
-    return this.showOriginalImage;
+    return this.image.isHasTransform() && this.showOriginalImage;
+  }
+
+  @Override
+  public boolean isVisible() {
+    return super.isVisible() || isEditable();
   }
 
   public void setBoundingBox(final BoundingBox boundingBox) {
     if (this.image != null) {
       this.image.setBoundingBox(boundingBox);
+    }
+  }
+
+  @Override
+  public void setEditable(final boolean editable) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.background("Set editable", this, "setEditable", editable);
+    } else {
+      synchronized (getSync()) {
+        if (editable) {
+          setShowOriginalImage(true);
+        } else {
+          firePropertyChange("preEditable", false, true);
+          if (isHasChanges()) {
+            final Integer result = InvokeMethodCallable.invokeAndWait(
+              JOptionPane.class,
+              "showConfirmDialog",
+              JOptionPane.getRootFrame(),
+              "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
+              "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
+
+            if (result == JOptionPane.YES_OPTION) {
+              if (!saveChanges()) {
+                setVisible(true);
+                return;
+              }
+            } else if (result == JOptionPane.NO_OPTION) {
+              cancelChanges();
+            } else {
+              setVisible(true);
+              // Don't allow state change if cancelled
+              return;
+            }
+
+          }
+        }
+        super.setEditable(editable);
+        if (editable == false) {
+          setShowOriginalImage(false);
+        }
+      }
     }
   }
 
@@ -336,8 +411,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
                 final boolean visible = dockable.isVisible();
                 if (!visible) {
                   dockable.getControl()
-                  .getOwner()
-                  .remove((SingleCDockable)dockable);
+                    .getOwner()
+                    .remove((SingleCDockable)dockable);
                   setProperty("TableView", null);
                 }
               }
@@ -354,15 +429,9 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     }
   }
 
-  public Point sourcePixelToTargetPoint(final MappedLocation tiePoint) {
-    final Point sourcePixel = tiePoint.getSourcePixel();
-    return sourcePixelToTargetPoint(sourcePixel);
-  }
-
-  public Point sourcePixelToTargetPoint(final Point sourcePixel) {
-    final BoundingBox boundingBox = getBoundingBox();
-    final double[] coordinates = sourcePixel.getCoordinates();
-    if (!isShowOriginalImage()) {
+  public Point sourcePixelToTargetPoint(final BoundingBox boundingBox,
+    final boolean useTransform, final double... coordinates) {
+    if (useTransform) {
       final AffineTransform transform = this.image.getAffineTransformation(boundingBox);
       transform.transform(coordinates, 0, coordinates, 0, 1);
     }
@@ -381,6 +450,18 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
     final Point imagePoint = geometryFactory.point(modelX, modelY);
     return imagePoint;
+  }
+
+  public Point sourcePixelToTargetPoint(final MappedLocation tiePoint) {
+    final Point sourcePixel = tiePoint.getSourcePixel();
+    return sourcePixelToTargetPoint(sourcePixel);
+  }
+
+  public Point sourcePixelToTargetPoint(final Point sourcePixel) {
+    final BoundingBox boundingBox = getBoundingBox();
+    final double[] coordinates = sourcePixel.getCoordinates();
+    final boolean useTransform = !isShowOriginalImage();
+    return sourcePixelToTargetPoint(boundingBox, useTransform, coordinates);
   }
 
   public Point targetPointToSourcePixel(Point targetPoint) {
@@ -426,17 +507,35 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     map.remove("selectSupported");
     map.remove("editable");
     map.remove("TableView");
+    map.remove("showOriginalImage");
+    map.remove("imageSettings");
     MapSerializerUtil.add(map, "url", this.url);
-    MapSerializerUtil.add(map, "showOriginalImage", this.showOriginalImage);
-
-    final Map<String, Object> imageSettings;
-    if (this.image == null) {
-      imageSettings = getProperty("imageSettings");
-    } else {
-      imageSettings = this.image.toMap();
-    }
-    MapSerializerUtil.add(map, "imageSettings", imageSettings);
-
     return map;
+  }
+
+  @Override
+  public void zoomToLayer() {
+    final Project project = getProject();
+    final GeometryFactory geometryFactory = project.getGeometryFactory();
+    final BoundingBox layerBoundingBox = getBoundingBox();
+    BoundingBox boundingBox = layerBoundingBox;
+    final AffineTransform transform = this.image.getAffineTransformation(layerBoundingBox);
+    if (!transform.isIdentity()) {
+      final GeoReferencedImage image = getImage();
+
+      final double width = image.getImageWidth() - 1;
+      final double height = image.getImageHeight() - 1;
+      final double[] targetCoordinates = MappedLocation.toModelCoordinates(
+        image, layerBoundingBox, true, 0, height, width, height, width, 0, 0,
+        0, 0, height);
+      final LineString line = layerBoundingBox.getGeometryFactory().lineString(
+        2, targetCoordinates);
+      boundingBox = boundingBox.expandToInclude(line);
+    }
+    boundingBox = boundingBox.convert(geometryFactory)
+      .expandPercent(0.1)
+      .clipToCoordinateSystem();
+
+    project.setViewBoundingBox(boundingBox);
   }
 }

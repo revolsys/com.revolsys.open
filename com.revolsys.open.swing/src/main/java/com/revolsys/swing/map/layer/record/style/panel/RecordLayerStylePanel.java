@@ -18,9 +18,9 @@ import javax.swing.tree.TreePath;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.tree.BaseLayerRendererTreeNodeModel;
 import com.revolsys.swing.map.tree.MultipleLayerRendererTreeNodeModel;
 import com.revolsys.swing.tree.ObjectTree;
@@ -38,13 +38,13 @@ public class RecordLayerStylePanel extends ValueField implements MouseListener,
 
   private final ObjectTree tree;
 
-  private final AbstractRecordLayer layer;
+  private final AbstractLayer layer;
 
   private final List<LayerRenderer<? extends Layer>> renderers = new PropertyChangeArrayList<LayerRenderer<? extends Layer>>();
 
   private final LayerRenderer<? extends Layer> rootRenderer;
 
-  public RecordLayerStylePanel(final AbstractRecordLayer layer) {
+  public RecordLayerStylePanel(final AbstractLayer layer) {
     this.layer = layer;
     setLayout(new BorderLayout());
     final JLabel instructions = new JLabel(

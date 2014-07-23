@@ -2,17 +2,14 @@ package com.revolsys.ui.web.rest.converter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
-import com.revolsys.io.FileUtil;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
@@ -32,13 +29,7 @@ public class ElementHttpMessageConverter extends
     HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {
       if (element != null) {
-        Charset charset = mediaType.getCharSet();
-        if (charset == null) {
-          charset = FileUtil.UTF8;
-        }
-
-        final HttpHeaders headers = outputMessage.getHeaders();
-        headers.setContentType(mediaType);
+        HttpServletUtils.setContentTypeWithCharset(outputMessage, mediaType);
 
         final OutputStream out = outputMessage.getBody();
         if (MediaType.TEXT_HTML.equals(mediaType)

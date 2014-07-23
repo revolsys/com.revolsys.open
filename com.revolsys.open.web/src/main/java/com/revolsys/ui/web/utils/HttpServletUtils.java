@@ -1,17 +1,23 @@
 package com.revolsys.ui.web.utils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.MediaType;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.io.FileUtil;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.util.Property;
 
@@ -227,6 +233,25 @@ public final class HttpServletUtils {
   public static void setAttribute(final String name, final Object value) {
     final HttpServletRequest request = getRequest();
     request.setAttribute(name, value);
+  }
+
+  public static Charset setContentTypeWithCharset(final HttpHeaders headers,
+    MediaType mediaType) {
+    Charset charset = mediaType.getCharSet();
+    if (charset == null) {
+      charset = FileUtil.UTF8;
+      final Map<String, String> params = Collections.singletonMap("charset",
+          "utf-8");
+      mediaType = new MediaType(mediaType, params);
+    }
+    headers.setContentType(mediaType);
+    return charset;
+  }
+
+  public static Charset setContentTypeWithCharset(
+    final HttpOutputMessage outputMessage, final MediaType mediaType) {
+    final HttpHeaders headers = outputMessage.getHeaders();
+    return setContentTypeWithCharset(headers, mediaType);
   }
 
   public static void setPathVariable(final String name, final Object value) {

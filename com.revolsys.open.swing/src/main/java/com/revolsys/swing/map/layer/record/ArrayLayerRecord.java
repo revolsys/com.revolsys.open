@@ -16,6 +16,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.util.Property;
 
 public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
@@ -76,7 +77,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   public void firePropertyChange(final String attributeName,
     final Object oldValue, final Object newValue) {
-    final AbstractRecordLayer layer = getLayer();
+    final AbstractLayer layer = getLayer();
     if (layer.isEventsEnabled()) {
       final PropertyChangeEvent event = new PropertyChangeEvent(this,
         attributeName, oldValue, newValue);

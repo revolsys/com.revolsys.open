@@ -77,6 +77,9 @@ public class AbstractOverlay extends JComponent implements
   public static final GeometryStyle XOR_LINE_STYLE = GeometryStyle.line(
     new Color(0, 0, 255), 2);
 
+  public static final Cursor CURSOR_NODE_ADD = SilkIconLoader.getCursor(
+      "cursor_node_add", 8, 7);
+
   private GeometryFactory geometryFactory;
 
   private final int hotspotPixels = 6;

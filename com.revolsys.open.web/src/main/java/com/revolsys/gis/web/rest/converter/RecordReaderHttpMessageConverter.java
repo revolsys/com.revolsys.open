@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,7 +20,6 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.io.RecordReaderFactory;
 import com.revolsys.data.io.RecordWriterFactory;
@@ -33,13 +31,14 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.kml.Kml22Constants;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
-import com.revolsys.jts.geom.Geometry;
 
 public class RecordReaderHttpMessageConverter extends
-  AbstractHttpMessageConverter<RecordReader> {
+AbstractHttpMessageConverter<RecordReader> {
 
   private List<String> requestAttributeNames = Arrays.asList(
     IoConstants.SINGLE_OBJECT_PROPERTY, Kml22Constants.STYLE_URL_PROPERTY,
@@ -54,18 +53,17 @@ public class RecordReaderHttpMessageConverter extends
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
   public RecordReaderHttpMessageConverter() {
-    super(RecordReader.class, IoFactoryRegistry.getInstance()
-      .getMediaTypes(RecordReaderFactory.class),
-      IoFactoryRegistry.getInstance().getMediaTypes(
-        RecordWriterFactory.class));
+    super(RecordReader.class, IoFactoryRegistry.getInstance().getMediaTypes(
+      RecordReaderFactory.class), IoFactoryRegistry.getInstance()
+      .getMediaTypes(RecordWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public List<String> getRequestAttributeNames() {
-    return requestAttributeNames;
+    return this.requestAttributeNames;
   }
 
   @Override
@@ -81,17 +79,17 @@ public class RecordReaderHttpMessageConverter extends
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"
-        + mediaType.getSubtype();
-      final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByMediaType(
+          + mediaType.getSubtype();
+      final RecordReaderFactory readerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
         RecordReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format"
-          + mediaType);
+            + mediaType);
       } else {
         final Reader<Record> reader = readerFactory.createRecordReader(new InputStreamResource(
           "recordInput", body));
 
-        GeometryFactory factory = geometryFactory;
+        GeometryFactory factory = this.geometryFactory;
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {
@@ -125,23 +123,17 @@ public class RecordReaderHttpMessageConverter extends
         actualMediaType = mediaType;
       }
       if (actualMediaType != null) {
-        Charset charset = actualMediaType.getCharSet();
-        if (charset == null) {
-          charset = FileUtil.UTF8;
-          actualMediaType = new MediaType(actualMediaType,
-            Collections.singletonMap("charset", charset.name()));
-        }
+        final Charset charset = HttpServletUtils.setContentTypeWithCharset(
+          outputMessage, actualMediaType);
         final String mediaTypeString = actualMediaType.getType() + "/"
-          + actualMediaType.getSubtype();
-        final RecordWriterFactory writerFactory = ioFactoryRegistry.getFactoryByMediaType(
+            + actualMediaType.getSubtype();
+        final RecordWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
           RecordWriterFactory.class, mediaTypeString);
         if (writerFactory == null) {
           throw new IllegalArgumentException("Media type " + actualMediaType
             + " not supported");
         } else {
           final RecordDefinition recordDefinition = reader.getRecordDefinition();
-          final HttpHeaders headers = outputMessage.getHeaders();
-          headers.setContentType(actualMediaType);
           final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
           String baseName = (String)requestAttributes.getAttribute(
             "contentDispositionFileName", RequestAttributes.SCOPE_REQUEST);
@@ -154,9 +146,10 @@ public class RecordReaderHttpMessageConverter extends
             contentDisposition = "attachment";
           }
           final String fileName = baseName + "."
-            + writerFactory.getFileExtension(mediaTypeString);
+              + writerFactory.getFileExtension(mediaTypeString);
+          final HttpHeaders headers = outputMessage.getHeaders();
           headers.set("Content-Disposition", contentDisposition + "; filename="
-            + fileName);
+              + fileName);
 
           final OutputStream body = outputMessage.getBody();
           final Writer<Record> writer = writerFactory.createRecordWriter(
@@ -177,7 +170,7 @@ public class RecordReaderHttpMessageConverter extends
             final Object value = requestAttributes.getAttribute(attributeName,
               RequestAttributes.SCOPE_REQUEST);
             if (value != null && attributeName.startsWith("java:")
-              || requestAttributeNames.contains(attributeName)) {
+                || this.requestAttributeNames.contains(attributeName)) {
               writer.setProperty(attributeName, value);
             }
           }

@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.data.io.RecordIoFactories;
@@ -45,18 +44,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerGroup extends AbstractLayer implements List<Layer>,
-  Parent<Layer> {
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "layerGroup", "Layer Group", LayerGroup.class, "create");
-
-  static {
-    final MenuFactory menu = ObjectTreeModel.getMenu(LayerGroup.class);
-    menu.addGroup(0, "group");
-    menu.addMenuItem("group",
-      TreeItemRunnable.createAction("Add Group", "folder_add", "addLayerGroup"));
-    menu.addMenuItem("group", new AddFileLayerAction());
-  }
+Parent<Layer> {
 
   public static LayerGroup create(final Map<String, Object> properties) {
     final LayerGroup layerGroup = new LayerGroup();
@@ -91,6 +79,17 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
       }
     }
     return null;
+  }
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "layerGroup", "Layer Group", LayerGroup.class, "create");
+
+  static {
+    final MenuFactory menu = ObjectTreeModel.getMenu(LayerGroup.class);
+    menu.addGroup(0, "group");
+    menu.addMenuItem("group",
+      TreeItemRunnable.createAction("Add Group", "folder_add", "addLayerGroup"));
+    menu.addMenuItem("group", new AddFileLayerAction());
   }
 
   private List<Layer> layers = new ArrayList<Layer>();
@@ -288,7 +287,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
         layer.delete();
       }
       super.delete();
-      layers.clear();
+      this.layers.clear();
     }
   }
 
@@ -469,7 +468,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
   }
 
   public boolean hasLayerWithSameName(final Layer layer, final String name) {
-    for (final Layer otherLayer : layers) {
+    for (final Layer otherLayer : this.layers) {
       if (layer != otherLayer) {
         final String layerName = otherLayer.getName();
         if (name.equals(layerName)) {
@@ -576,7 +575,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
           } else if (object != null) {
             LoggerFactory.getLogger(LayerGroup.class).error(
               "Unexpected object type " + object.getClass() + " in "
-                + childResource);
+                  + childResource);
           }
         } else {
           LoggerFactory.getLogger(LayerGroup.class).error(
@@ -596,6 +595,44 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     }
   }
 
+  public int openFile(final int index, final File file) {
+    final String extension = FileUtil.getFileNameExtension(file);
+    if ("rgobject".equals(extension)) {
+      loadLayer(file);
+      // TODO index
+      return index;
+    } else {
+      final URL url = FileUtil.toUrl(file);
+      return openFile(index, url);
+    }
+  }
+
+  public int openFile(int index, final URL url) {
+    final String urlString = url.toString();
+    final Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("url", urlString);
+    String name = FileUtil.getFileName(urlString);
+    name = FileUtil.fromSafeName(name);
+    properties.put("name", name);
+    Layer layer = null;
+    if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(urlString)) {
+      layer = new GeoReferencedImageLayer(properties);
+    } else if (RecordIoFactories.hasRecordReaderFactory(urlString)) {
+      final FileRecordLayer recordLayer = new FileRecordLayer(properties);
+      final GeometryStyleRenderer renderer = recordLayer.getRenderer();
+      renderer.setStyle(GeometryStyle.createStyle());
+      layer = recordLayer;
+    }
+    if (layer != null) {
+      if (index == -1) {
+        add(layer);
+      } else {
+        add(index++, layer);
+      }
+    }
+    return index;
+  }
+
   public void openFile(final URL url) {
     final String urlString = url.toString();
     final Map<String, Object> properties = new HashMap<String, Object>();
@@ -607,12 +644,17 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
       final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
         properties);
       add(layer);
-      layer.setEditable(true);
     } else if (RecordIoFactories.hasRecordReaderFactory(urlString)) {
       final FileRecordLayer layer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = layer.getRenderer();
       renderer.setStyle(GeometryStyle.createStyle());
       add(layer);
+    }
+  }
+
+  public void openFiles(int index, final List<File> files) {
+    for (final File file : files) {
+      index = openFile(index, file);
     }
   }
 

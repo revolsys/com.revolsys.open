@@ -31,6 +31,7 @@ import com.revolsys.swing.field.SearchField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.list.BaseListModel;
 import com.revolsys.swing.list.filter.StringContainsRowFilter;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.toolbar.ToolBar;
 
@@ -102,7 +103,7 @@ public class SnapLayersPanel extends ValueField implements ActionListener,
       .getDescenants(AbstractRecordLayer.class);
 
     layerPathsModel = new BaseListModel<String>();
-    for (final AbstractRecordLayer recordLayer : recordLayers) {
+    for (final AbstractLayer recordLayer : recordLayers) {
       final String layerPath = recordLayer.getPath();
       layerPathsModel.add(layerPath);
     }

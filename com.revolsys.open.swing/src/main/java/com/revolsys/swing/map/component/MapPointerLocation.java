@@ -14,9 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
-import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.MapPanel;
@@ -25,11 +23,11 @@ import com.revolsys.util.Property;
 
 public class MapPointerLocation extends JLabel implements MouseMotionListener,
   PropertyChangeListener {
-  private static final long serialVersionUID = 1L;
-
   private static NumberFormat getFormat() {
     return new DecimalFormat("############.############");
   }
+
+  private static final long serialVersionUID = 1L;
 
   private final Viewport2D viewport;
 
@@ -85,23 +83,20 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
     }
   }
 
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    double scaleFactor;
-    CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+  public void setGeometryFactory(GeometryFactory geometryFactory) {
+    geometryFactory = geometryFactory.convertAxisCount(2);
 
-    if (this.geographics) {
-      if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-        final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-        coordinateSystem = projectedCoordinateSystem.getGeographicCoordinateSystem();
+    if (this.geographics || geometryFactory.isGeographics()) {
+      if (geometryFactory.isProjected()) {
+        geometryFactory = geometryFactory.getGeographicGeometryFactory();
       }
-      scaleFactor = 10000000;
+      geometryFactory = geometryFactory.convertScales(10000000);
     } else {
-      scaleFactor = 1000;
+      geometryFactory = geometryFactory.convertScales(1000);
     }
-    final int srid = coordinateSystem.getId();
-    this.geometryFactory = geometryFactory.convertAxisCount(2).convertScales(
-      scaleFactor);
-    this.setToolTipText(coordinateSystem.getName());
+    final int srid = geometryFactory.getSrid();
+    this.geometryFactory = geometryFactory;
+    this.setToolTipText(geometryFactory.getCoordinateSystem().getName());
     this.title = String.valueOf(srid);
 
   }

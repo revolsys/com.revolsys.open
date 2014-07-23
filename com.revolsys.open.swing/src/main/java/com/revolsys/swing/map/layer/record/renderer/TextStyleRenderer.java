@@ -40,6 +40,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -403,7 +404,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
 
   @Override
   public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractRecordLayer layer,
+    final BoundingBox visibleArea, final AbstractLayer layer,
     final LayerRecord object) {
     final Geometry geometry = object.getGeometryValue();
     viewport.drawText(object, geometry, this.style);

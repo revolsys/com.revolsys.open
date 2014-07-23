@@ -52,6 +52,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.transaction.Propagation;
@@ -62,7 +63,7 @@ import com.revolsys.util.Property;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
 
-  public static AbstractRecordLayer create(final Map<String, Object> properties) {
+  public static AbstractLayer create(final Map<String, Object> properties) {
     return new RecordStoreLayer(properties);
   }
 
