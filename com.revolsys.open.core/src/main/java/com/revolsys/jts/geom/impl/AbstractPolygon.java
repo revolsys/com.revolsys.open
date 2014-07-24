@@ -33,6 +33,7 @@
 package com.revolsys.jts.geom.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,12 +57,12 @@ import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
  * Represents a polygon with linear edges, which may include holes.
- * The outer boundary (shell) 
+ * The outer boundary (shell)
  * and inner boundaries (holes) of the polygon are represented by {@link LinearRing}s.
  * The boundary rings of the polygon may have any orientation.
  * Polygons are closed, simple geometries by definition.
  * <p>
- * The polygon model conforms to the assertions specified in the 
+ * The polygon model conforms to the assertions specified in the
  * <A HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple Features
  * Specification for SQL</A>.
  * <p>
@@ -72,8 +73,8 @@ import com.revolsys.jts.geom.vertex.Vertex;
  * (i.e. are closed and do not self-intersect)
  * <li>holes touch the shell or another hole at at most one point
  * (which implies that the rings of the shell and holes must not cross)
- * <li>the interior of the polygon is connected,  
- * or equivalently no sequence of touching holes 
+ * <li>the interior of the polygon is connected,
+ * or equivalently no sequence of touching holes
  * makes the interior of the polygon disconnected
  * (i.e. effectively split the polygon into two pieces).
  * </ul>
@@ -81,9 +82,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *@version 1.7
  */
 public abstract class AbstractPolygon extends AbstractGeometry implements
-  Polygon {
-  private static final long serialVersionUID = -3494792200821764533L;
-
+Polygon {
   /**
    *  Returns the minimum coordinate, using the usual lexicographic comparison.
    *
@@ -130,7 +129,43 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
     return geometryFactory.linearRing(axisCount, coordinates);
   }
 
+  private static final long serialVersionUID = -3494792200821764533L;
+
   public AbstractPolygon() {
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V appendVertex(final Point newPoint,
+    final int... geometryId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (geometryId.length == 1) {
+      if (isEmpty()) {
+        throw new IllegalArgumentException(
+            "Cannot move vertex for empty Polygon");
+      } else {
+        final int ringIndex = geometryId[0];
+        final int ringCount = getRingCount();
+        if (ringIndex >= 0 && ringIndex < ringCount) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+
+          final LinearRing ring = getRing(ringIndex);
+          final LinearRing newRing = ring.appendVertex(newPoint);
+          final List<LinearRing> rings = new ArrayList<>(getRings());
+          rings.set(ringIndex, newRing);
+          return (V)geometryFactory.polygon(rings);
+        } else {
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not "
+                + ringIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Geometry id's for Polygons must have length 1. "
+            + Arrays.toString(geometryId));
+    }
   }
 
   /**
@@ -177,6 +212,38 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
       rings.add(newRing);
     }
     return (V)geometryFactory.polygon(rings);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V deleteVertex(final int... vertexId) {
+    if (vertexId.length == 2) {
+      if (isEmpty()) {
+        throw new IllegalArgumentException(
+            "Cannot move vertex for empty Polygon");
+      } else {
+        final int ringIndex = vertexId[0];
+        final int vertexIndex = vertexId[1];
+        final int ringCount = getRingCount();
+        if (ringIndex >= 0 && ringIndex < ringCount) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+
+          final LinearRing ring = getRing(ringIndex);
+          final LinearRing newRing = ring.deleteVertex(vertexIndex);
+          final List<LinearRing> rings = new ArrayList<>(getRings());
+          rings.set(ringIndex, newRing);
+          return (V)geometryFactory.polygon(rings);
+        } else {
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not "
+                + ringIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Vertex id's for Polygons must have length 2. "
+            + Arrays.toString(vertexId));
+    }
   }
 
   @Override
@@ -420,6 +487,41 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V insertVertex(final Point newPoint,
+    final int... vertexId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (vertexId.length == 2) {
+      if (isEmpty()) {
+        throw new IllegalArgumentException(
+            "Cannot move vertex for empty Polygon");
+      } else {
+        final int ringIndex = vertexId[0];
+        final int vertexIndex = vertexId[1];
+        final int ringCount = getRingCount();
+        if (ringIndex >= 0 && ringIndex < ringCount) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+
+          final LinearRing ring = getRing(ringIndex);
+          final LinearRing newRing = ring.insertVertex(newPoint, vertexIndex);
+          final List<LinearRing> rings = new ArrayList<>(getRings());
+          rings.set(ringIndex, newRing);
+          return (V)geometryFactory.polygon(rings);
+        } else {
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not "
+                + ringIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Vertex id's for Polygons must have length 2. "
+            + Arrays.toString(vertexId));
+    }
+  }
+
   @Override
   public boolean intersects(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
@@ -499,6 +601,41 @@ public abstract class AbstractPolygon extends AbstractGeometry implements
       }
       final GeometryFactory geometryFactory = getGeometryFactory();
       return geometryFactory.polygon(rings);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V moveVertex(final Point newPoint,
+    final int... vertexId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (vertexId.length == 2) {
+      if (isEmpty()) {
+        throw new IllegalArgumentException(
+            "Cannot move vertex for empty Polygon");
+      } else {
+        final int ringIndex = vertexId[0];
+        final int vertexIndex = vertexId[1];
+        final int ringCount = getRingCount();
+        if (ringIndex >= 0 && ringIndex < ringCount) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+
+          final LinearRing ring = getRing(ringIndex);
+          final LinearRing newRing = ring.moveVertex(newPoint, vertexIndex);
+          final List<LinearRing> rings = new ArrayList<>(getRings());
+          rings.set(ringIndex, newRing);
+          return (V)geometryFactory.polygon(rings);
+        } else {
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not "
+                + ringIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Vertex id's for Polygons must have length 2. "
+            + Arrays.toString(vertexId));
     }
   }
 

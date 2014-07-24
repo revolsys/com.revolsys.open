@@ -33,6 +33,7 @@
 package com.revolsys.jts.geom.prep;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.jts.geom.BoundingBox;
@@ -49,7 +50,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
  * to the equivalent {@link Geometry} methods.
  * This class may be used as a "no-op" class for Geometry types
  * which do not have a corresponding {@link PreparedGeometry} implementation.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -62,36 +63,36 @@ public class PreparedGeometryCollection extends AbstractGeometryCollection {
 
   @Override
   public BoundingBox getBoundingBox() {
-    return geometryCollection.getBoundingBox();
+    return this.geometryCollection.getBoundingBox();
   }
 
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    return geometryCollection.getGeometries();
+    return this.geometryCollection.getGeometries();
   }
 
   @Override
   public <V extends Geometry> V getGeometry(final int partIndex) {
-    return geometryCollection.getGeometry(partIndex);
+    return this.geometryCollection.getGeometry(partIndex);
   }
 
   @Override
   public int getGeometryCount() {
-    return geometryCollection.getGeometryCount();
+    return this.geometryCollection.getGeometryCount();
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryCollection.getGeometryFactory();
+    return this.geometryCollection.getGeometryFactory();
   }
 
   /**
    * Gets the list of representative points for this geometry.
    * One vertex is included for every component of the geometry
    * (i.e. including one for every ring of polygonal geometries).
-   * 
+   *
    * Do not modify the returned list!
-   * 
+   *
    * @return a List of Coordinate
    */
   public List<Point> getRepresentativePoints() {
@@ -100,6 +101,43 @@ public class PreparedGeometryCollection extends AbstractGeometryCollection {
       points.add(vertex.cloneCoordinates());
     }
     return points;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V moveVertex(final Point newPoint,
+    final int... vertexId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (vertexId.length > 1) {
+      if (isEmpty()) {
+        throw new IllegalArgumentException(
+            "Cannot move vertex for empty MultiPoint");
+      } else {
+        final int partIndex = vertexId[0];
+        final int partCount = getGeometryCount();
+        if (partIndex >= 0 && partIndex < partCount) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+
+          final int[] subId = new int[vertexId.length - 1];
+          System.arraycopy(vertexId, 1, subId, 0, subId.length);
+          final Geometry geometry = getGeometry(partIndex);
+          final Geometry newGeometry = geometry.moveVertex(newPoint, subId);
+
+          final List<Geometry> geometries = new ArrayList<>(getGeometries());
+          geometries.set(partIndex, newGeometry);
+          return (V)geometryFactory.geometryCollection(geometries);
+        } else {
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not "
+                + partIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Vertex id's for GeometryCollection must have length > 1. "
+            + Arrays.toString(vertexId));
+    }
   }
 
   @Override

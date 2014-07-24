@@ -1,22 +1,64 @@
 package com.revolsys.gis.algorithm.index;
 
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
 import com.revolsys.collection.Visitor;
+import com.revolsys.data.equals.GeometryEqualsExact3d;
+import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
-  private PointQuadTreeNode<T> root;
+  public static PointQuadTree<int[]> getInstance(final Geometry geometry) {
+    if (geometry == null || geometry.isEmpty()) {
+      return new PointQuadTree<int[]>();
+    } else {
+      final Reference<PointQuadTree<int[]>> reference = GeometryProperties.getGeometryProperty(
+        geometry, PointQuadTree.POINT_QUAD_TREE);
+      PointQuadTree<int[]> index;
+      if (reference == null) {
+        index = null;
+      } else {
+        index = reference.get();
+      }
+      if (index == null) {
+
+        final GeometryFactory geometryFactory = geometry.getGeometryFactory();
+        index = new PointQuadTree<int[]>(geometryFactory);
+        for (final Vertex vertex : geometry.vertices()) {
+          final double x = vertex.getX();
+          final double y = vertex.getY();
+          final int[] vertexId = vertex.getVertexId();
+          index.put(x, y, vertexId);
+        }
+        GeometryProperties.setGeometryProperty(geometry,
+          PointQuadTree.POINT_QUAD_TREE,
+          new SoftReference<PointQuadTree<int[]>>(index));
+      }
+      return index;
+    }
+  }
+
+  private static final String POINT_QUAD_TREE = "PointQuadTree";
+
+  static {
+    GeometryEqualsExact3d.addExclude(POINT_QUAD_TREE);
+  }
 
   private GeometryFactory geometryFactory;
+
+  private PointQuadTreeNode<T> root;
 
   public PointQuadTree() {
   }
@@ -26,18 +68,19 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   public boolean contains(final Point point) {
-    if (root == null) {
+    if (this.root == null) {
       return false;
     } else {
-      return root.contains(point);
+      return this.root.contains(point);
     }
   }
 
   public List<Entry<Point, T>> findEntriesWithinDistance(final Point from,
     final Point to, final double maxDistance) {
-    final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(geometryFactory, from, to);
+    final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(
+      this.geometryFactory, from, to);
     final List<Entry<Point, T>> entries = new ArrayList<Entry<Point, T>>();
-    root.findEntriesWithin(entries, boundingBox);
+    this.root.findEntriesWithin(entries, boundingBox);
     for (final Iterator<Entry<Point, T>> iterator = entries.iterator(); iterator.hasNext();) {
       final Entry<Point, T> entry = iterator.next();
       final Point coordinates = entry.getKey();
@@ -51,12 +94,12 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   public List<T> findWithin(BoundingBox boundingBox) {
-    if (geometryFactory != null) {
-      boundingBox = boundingBox.convert(geometryFactory);
+    if (this.geometryFactory != null) {
+      boundingBox = boundingBox.convert(this.geometryFactory);
     }
     final List<T> results = new ArrayList<T>();
-    if (root != null) {
-      root.findWithin(results, boundingBox);
+    if (this.root != null) {
+      this.root.findWithin(results, boundingBox);
     }
     return results;
   }
@@ -67,8 +110,8 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     BoundingBox envelope = new BoundingBoxDoubleGf(2, x, y);
     envelope = envelope.expand(maxDistance);
     final List<T> results = new ArrayList<T>();
-    if (root != null) {
-      root.findWithin(results, x, y, maxDistance, envelope);
+    if (this.root != null) {
+      this.root.findWithin(results, x, y, maxDistance, envelope);
     }
     return results;
   }
@@ -87,10 +130,10 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   public void put(final double x, final double y, final T value) {
     final PointQuadTreeNode<T> node = new PointQuadTreeNode<T>(value, x, y);
-    if (root == null) {
-      root = node;
+    if (this.root == null) {
+      this.root = node;
     } else {
-      root.put(x, y, node);
+      this.root.put(x, y, node);
     }
   }
 
@@ -104,10 +147,10 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   public boolean remove(final double x, final double y, final T value) {
-    if (root == null) {
+    if (this.root == null) {
       return false;
     } else {
-      root = root.remove(x, y, value);
+      this.root = this.root.remove(x, y, value);
       // TODO change so it returns if the item was removed
       return true;
     }
@@ -123,15 +166,15 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   @Override
   public void visit(final com.revolsys.jts.geom.BoundingBox envelope,
     final Visitor<T> visitor) {
-    if (root != null) {
-      root.visit(envelope, visitor);
+    if (this.root != null) {
+      this.root.visit(envelope, visitor);
     }
   }
 
   @Override
   public void visit(final Visitor<T> visitor) {
-    if (root != null) {
-      root.visit(visitor);
+    if (this.root != null) {
+      this.root.visit(visitor);
     }
   }
 }

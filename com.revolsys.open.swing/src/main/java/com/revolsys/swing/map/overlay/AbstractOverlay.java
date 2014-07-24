@@ -35,7 +35,6 @@ import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.quadtree.GeometrySegmentQuadTree;
 import com.revolsys.gis.algorithm.index.quadtree.GeometryVertexQuadTree;
-import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -263,7 +262,7 @@ MouseWheelListener, KeyListener {
     final Geometry convertedGeometry = geometry.copy(viewportGeometryFactory);
 
     final double maxDistance = getMaxDistance(boundingBox);
-    final GeometrySegmentQuadTree lineSegments = GeometryEditUtil.getGeometrySegmentIndex(convertedGeometry);
+    final GeometrySegmentQuadTree lineSegments = GeometrySegmentQuadTree.getGeometrySegmentIndex(convertedGeometry);
     final Point point = boundingBox.getCentre();
     double closestDistance = Double.MAX_VALUE;
     final List<Segment> segments = lineSegments.query(boundingBox,
@@ -288,7 +287,7 @@ MouseWheelListener, KeyListener {
   protected CloseLocation findCloseVertexLocation(
     final AbstractRecordLayer layer, final LayerRecord object,
     final Geometry geometry, final BoundingBox boundingBox) {
-    final GeometryVertexQuadTree index = GeometryEditUtil.getGeometryVertexIndex(geometry);
+    final GeometryVertexQuadTree index = GeometryVertexQuadTree.getGeometryVertexIndex(geometry);
     if (index != null) {
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
       Vertex closeVertex = null;

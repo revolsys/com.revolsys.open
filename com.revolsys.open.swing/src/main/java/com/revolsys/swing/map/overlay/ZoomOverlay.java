@@ -114,7 +114,7 @@ public class ZoomOverlay extends AbstractOverlay {
         if (SwingUtilities.isLeftMouseButton(event)) {
           numSteps = -1;
         } else if (SwingUtilities.isRightMouseButton(event)
-          && !SwingUtil.isControlDown(event)) {
+            && !SwingUtil.isControlDown(event)) {
           numSteps = 1;
         }
         if (numSteps != 0) {
@@ -196,8 +196,8 @@ public class ZoomOverlay extends AbstractOverlay {
       g.setColor(Color.DARK_GRAY);
       g.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE,
         BasicStroke.JOIN_MITER, 2, new float[] {
-          6, 6
-        }, 0f));
+        6, 6
+      }, 0f));
       g.draw(this.zoomBox);
       g.setPaint(TRANS_BG);
       g.fill(this.zoomBox);
@@ -256,11 +256,11 @@ public class ZoomOverlay extends AbstractOverlay {
 
     boolean pan = false;
     if (SwingUtilities.isMiddleMouseButton(event)
-      && !SwingUtil.isModifierKeyDown(event)) {
+        && !SwingUtil.isModifierKeyDown(event)) {
       this.prePanAction = getOverlayAction();
       clearOverlayAction(this.prePanAction);
       pan = true;
-    } else if (SwingUtilities.isLeftMouseButton(event)) {
+    } else if (!hasOverlayAction() && SwingUtilities.isLeftMouseButton(event)) {
       pan = true;
     }
     if (pan) {
@@ -297,8 +297,8 @@ public class ZoomOverlay extends AbstractOverlay {
 
   public void setZoomBoxCursor(final InputEvent event) {
     if (isOverlayAction(ACTION_ZOOM_BOX) || !hasOverlayAction()
-      && SwingUtil.isShiftDown(event) && !SwingUtil.isAltDown(event)
-      && !SwingUtil.isControlOrMetaDown(event)) {
+        && SwingUtil.isShiftDown(event) && !SwingUtil.isAltDown(event)
+        && !SwingUtil.isControlOrMetaDown(event)) {
       setMapCursor(CURSOR_ZOOM_BOX);
     } else {
       clearMapCursor(CURSOR_ZOOM_BOX);
@@ -329,7 +329,7 @@ public class ZoomOverlay extends AbstractOverlay {
 
   public boolean zoomBoxFinish(final MouseEvent event) {
     if (SwingUtilities.isLeftMouseButton(event)
-      && clearOverlayAction(ACTION_ZOOM_BOX)) {
+        && clearOverlayAction(ACTION_ZOOM_BOX)) {
       // Convert first point to envelope top left in map coords.
       final int minX = (int)this.zoomBox.getMinX();
       final int minY = (int)this.zoomBox.getMinY();

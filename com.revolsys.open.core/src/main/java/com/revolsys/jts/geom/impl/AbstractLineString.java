@@ -76,7 +76,7 @@ import com.revolsys.util.MathUtil;
  * <p>
  * A linestring must have either 0 or 2 or more points. If these conditions are
  * not met, the constructors throw an {@link IllegalArgumentException}
- * 
+ *
  * @version 1.7
  */
 public abstract class AbstractLineString extends AbstractGeometry implements
@@ -84,10 +84,42 @@ public abstract class AbstractLineString extends AbstractGeometry implements
 
   private static final long serialVersionUID = 3110669828065365560L;
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V appendVertex(Point newPoint,
+    final int... geometryId) {
+    if (geometryId.length == 0) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (newPoint == null || newPoint.isEmpty()) {
+        return (V)this;
+      } else if (isEmpty()) {
+        return newPoint.convert(geometryFactory);
+      } else {
+        newPoint = newPoint.convert(geometryFactory);
+        final int vertexCount = getVertexCount();
+        final double[] coordinates = getCoordinates();
+        final int axisCount = getAxisCount();
+        final double[] newCoordinates = new double[axisCount
+          * (vertexCount + 1)];
+
+        final int length = vertexCount * axisCount;
+        System.arraycopy(coordinates, 0, newCoordinates, 0, length);
+        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount,
+          vertexCount, newPoint);
+
+        return (V)geometryFactory.lineString(axisCount, newCoordinates);
+      }
+    } else {
+      throw new IllegalArgumentException("Geometry id's for "
+        + getGeometryType() + " must have length 0. "
+        + Arrays.toString(geometryId));
+    }
+  }
+
   /**
    * Creates and returns a full copy of this {@link LineString} object.
    * (including all coordinates contained by it).
-   * 
+   *
    * @return a clone of this instance
    */
   @Override
@@ -160,6 +192,51 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       final double[] coordinates = convertCoordinates(geometryFactory);
       final int axisCount = getAxisCount();
       return (V)geometryFactory.lineString(axisCount, coordinates);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V deleteVertex(final int... vertexId) {
+    if (vertexId.length == 1) {
+      final int vertexIndex = vertexId[0];
+      return (V)deleteVertex(vertexIndex);
+    } else {
+      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
+        + " must have length 1. " + Arrays.toString(vertexId));
+    }
+  }
+
+  public LineString deleteVertex(final int vertexIndex) {
+    if (isEmpty()) {
+      throw new IllegalArgumentException(
+        "Cannot delete vertex for empty LineString");
+    } else {
+      final int vertexCount = getVertexCount();
+      if (vertexCount <= 2) {
+        throw new IllegalArgumentException(
+          "LineString must have a minimum of 2 vertices");
+      } else if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+
+        final double[] coordinates = getCoordinates();
+        final int axisCount = getAxisCount();
+        final double[] newCoordinates = new double[axisCount
+          * (vertexCount - 1)];
+        final int beforeLength = vertexIndex * axisCount;
+        if (vertexIndex > 0) {
+          System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
+        }
+        final int sourceIndex = (vertexIndex + 1) * axisCount;
+        final int length = (vertexCount - vertexIndex - 1) * axisCount;
+        System.arraycopy(coordinates, sourceIndex, newCoordinates,
+          beforeLength, length);
+
+        return geometryFactory.lineString(axisCount, newCoordinates);
+      } else {
+        throw new IllegalArgumentException(
+          "Vertex index must be between 0 and " + vertexCount);
+      }
     }
   }
 
@@ -295,7 +372,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   /**
    * Gets the boundary of this geometry. The boundary of a lineal geometry is
    * always a zero-dimensional geometry (which may be empty).
-   * 
+   *
    * @return the boundary geometry
    * @see Geometry#getBoundary
    */
@@ -340,7 +417,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
 
   /**
    * Returns the length of this <code>LineString</code>
-   * 
+   *
    * @return the length of the linestring
    */
   @Override
@@ -368,6 +445,10 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   @Override
   public double getM(final int vertexIndex) {
     return getCoordinate(vertexIndex, 3);
+  }
+
+  public int getMinVertexCount() {
+    return 2;
   }
 
   @Override
@@ -473,6 +554,47 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       }
     }
     return false;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V insertVertex(Point newPoint,
+    final int... vertexId) {
+    if (vertexId.length == 1) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (newPoint == null || newPoint.isEmpty()) {
+        return (V)this;
+      } else if (isEmpty()) {
+        return newPoint.convert(geometryFactory);
+      } else {
+        newPoint = newPoint.convert(geometryFactory);
+        final int vertexCount = getVertexCount();
+        final double[] coordinates = getCoordinates();
+        final int axisCount = getAxisCount();
+        final double[] newCoordinates = new double[axisCount
+          * (vertexCount + 1)];
+
+        final int vertexIndex = vertexId[0];
+
+        final int beforeLength = vertexIndex * axisCount;
+        System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
+
+        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount,
+          vertexIndex, newPoint);
+
+        final int afterSourceIndex = vertexIndex * axisCount;
+        final int afterNewIndex = (vertexIndex + 1) * axisCount;
+        final int afterLength = (vertexCount - vertexIndex) * axisCount;
+        System.arraycopy(coordinates, afterSourceIndex, newCoordinates,
+          afterNewIndex, afterLength);
+
+        return (V)geometryFactory.lineString(axisCount, newCoordinates);
+      }
+    } else {
+      throw new IllegalArgumentException("Geometry id's for "
+        + getGeometryType() + " must have length 1. "
+        + Arrays.toString(vertexId));
+    }
   }
 
   @Override
@@ -716,6 +838,44 @@ public abstract class AbstractLineString extends AbstractGeometry implements
     return coordinates;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V moveVertex(final Point newPoint,
+    final int... vertexId) {
+    if (vertexId.length == 1) {
+      final int vertexIndex = vertexId[0];
+      return (V)moveVertex(newPoint, vertexIndex);
+    } else {
+      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
+        + " must have length 1. " + Arrays.toString(vertexId));
+    }
+  }
+
+  @Override
+  public LineString moveVertex(Point newPoint, final int vertexIndex) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return this;
+    } else if (isEmpty()) {
+      throw new IllegalArgumentException(
+        "Cannot move vertex for empty LineString");
+    } else {
+      final int vertexCount = getVertexCount();
+      if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        newPoint = newPoint.convert(geometryFactory);
+
+        final double[] coordinates = getCoordinates();
+        final int axisCount = getAxisCount();
+        CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex,
+          newPoint);
+        return geometryFactory.lineString(axisCount, coordinates);
+      } else {
+        throw new IllegalArgumentException(
+          "Vertex index must be between 0 and " + vertexCount);
+      }
+    }
+  }
+
   /**
    * Normalizes a LineString. A normalized linestring has the first point which
    * is not equal to it's reflected point less than the reflected point.
@@ -768,7 +928,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   /**
    * Creates a {@link LineString} whose coordinates are in the reverse order of
    * this objects
-   * 
+   *
    * @return a {@link LineString} with coordinates in the reverse order
    */
   @Override

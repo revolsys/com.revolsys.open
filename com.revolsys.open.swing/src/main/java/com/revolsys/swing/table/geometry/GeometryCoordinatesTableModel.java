@@ -5,32 +5,46 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.table.TablePanel;
 
 public class GeometryCoordinatesTableModel extends AbstractTableModel {
-  private static final long serialVersionUID = 1L;
-
   public static int[] getEventRowObject(final TablePanel panel) {
     final GeometryCoordinatesTableModel model = panel.getTableModel();
     final int row = panel.getEventRow();
     final int[] object = model.getVertexIndex(row);
     return object;
   }
+
+  public static Map<int[], Point> getIndexOfVertices(final Geometry geometry) {
+    final Map<int[], Point> pointIndexes = new LinkedHashMap<int[], Point>();
+    if (geometry == null || geometry.isEmpty()) {
+    } else {
+      for (final Vertex vertex : geometry.vertices()) {
+        final int[] vertexId = vertex.getVertexId();
+        final Vertex clone = vertex.clone();
+        pointIndexes.put(vertexId, clone);
+      }
+    }
+    return pointIndexes;
+  }
+
+  private static final long serialVersionUID = 1L;
 
   private List<String> axisNames = Arrays.asList("#", "X", "Y", "Z", "M");
 
@@ -60,6 +74,10 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   public GeometryCoordinatesTableModel(final Geometry geometry) {
     setGeometry(geometry);
+  }
+
+  public int getAxisCount() {
+    return this.axisCount;
   }
 
   @Override
@@ -92,10 +110,6 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   public Geometry getGeometry() {
     return this.geometry;
-  }
-
-  public int getAxisCount() {
-    return this.axisCount;
   }
 
   public int getNumIndexItems() {
@@ -150,7 +164,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
       this.vertexIndexMap = Collections.emptyMap();
       this.vertexIndices = Collections.emptyList();
     } else {
-      this.vertexIndexMap = GeometryEditUtil.getIndexOfVertices(geometry);
+      this.vertexIndexMap = getIndexOfVertices(geometry);
       this.vertexIndices = new ArrayList<int[]>(this.vertexIndexMap.keySet());
     }
     this.axisCount = this.geometryFactory.getAxisCount();

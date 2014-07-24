@@ -33,6 +33,7 @@
 package com.revolsys.jts.geom.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -55,13 +56,48 @@ import com.revolsys.jts.geom.vertex.Vertex;
 /**
  * Models a collection of {@link Geometry}s of
  * arbitrary type and dimension.
- * 
+ *
  *
  *@version 1.7
  */
 public abstract class AbstractGeometryCollection extends AbstractGeometry
   implements GeometryCollection {
   private static final long serialVersionUID = -8159852648192400768L;
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V appendVertex(final Point newPoint,
+    final int... geometryId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (geometryId.length > 1) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (isEmpty()) {
+        return newPoint.copy(geometryFactory);
+      } else {
+        final int partIndex = geometryId[0];
+        final int partCount = getGeometryCount();
+        if (partIndex >= 0 && partIndex < partCount) {
+          final int[] subId = new int[geometryId.length - 1];
+          System.arraycopy(geometryId, 1, subId, 0, subId.length);
+          final Geometry geometry = getGeometry(partIndex);
+          final Geometry newGeometry = geometry.appendVertex(newPoint, subId);
+
+          final List<Geometry> geometries = new ArrayList<>(getGeometries());
+          geometries.set(partIndex, newGeometry);
+          return (V)geometryFactory.geometryCollection(geometries);
+        } else {
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not "
+              + partIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Vertex id's for GeometryCollection must have length > 1. "
+          + Arrays.toString(geometryId));
+    }
+  }
 
   /**
    * Creates and returns a full copy of this {@link GeometryCollection} object.
@@ -99,6 +135,40 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
       geometries.add(geometry.copy(geometryFactory));
     }
     return (V)geometryFactory.geometryCollection(geometries);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V deleteVertex(final int... vertexId) {
+    if (vertexId.length > 1) {
+      if (isEmpty()) {
+        throw new IllegalArgumentException(
+          "Cannot delete vertex for empty MultiPoint");
+      } else {
+        final int partIndex = vertexId[0];
+        final int partCount = getGeometryCount();
+        if (partIndex >= 0 && partIndex < partCount) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+
+          final int[] subId = new int[vertexId.length - 1];
+          System.arraycopy(vertexId, 1, subId, 0, subId.length);
+          final Geometry geometry = getGeometry(partIndex);
+          final Geometry newGeometry = geometry.deleteVertex(subId);
+
+          final List<Geometry> geometries = new ArrayList<>(getGeometries());
+          geometries.set(partIndex, newGeometry);
+          return (V)geometryFactory.geometryCollection(geometries);
+        } else {
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not "
+              + partIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Vertex id's for GeometryCollection must have length > 1. "
+          + Arrays.toString(vertexId));
+    }
   }
 
   @Override
@@ -247,6 +317,40 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
     return numPoints;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V insertVertex(final Point newPoint,
+    final int... vertexId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (vertexId.length > 1) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (isEmpty()) {
+        return newPoint.convert(geometryFactory);
+      } else {
+        final int partIndex = vertexId[0];
+        final int partCount = getGeometryCount();
+        if (partIndex >= 0 && partIndex < partCount) {
+          final int[] subId = new int[vertexId.length - 1];
+          System.arraycopy(vertexId, 1, subId, 0, subId.length);
+          final Geometry geometry = getGeometry(partIndex);
+          final Geometry newGeometry = geometry.moveVertex(newPoint, subId);
+
+          final List<Geometry> geometries = new ArrayList<>(getGeometries());
+          geometries.set(partIndex, newGeometry);
+          return (V)geometryFactory.geometryCollection(geometries);
+        } else {
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not "
+              + partIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
+        + " must have length > 1. " + Arrays.toString(vertexId));
+    }
+  }
+
   @Override
   public boolean intersects(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
@@ -292,6 +396,42 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
       }
       final GeometryFactory geometryFactory = getGeometryFactory();
       return geometryFactory.geometryCollection(parts);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V moveVertex(final Point newPoint,
+    final int... vertexId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (vertexId.length > 1) {
+      if (isEmpty()) {
+        throw new IllegalArgumentException("Cannot move vertex for empty "
+          + getGeometryType());
+      } else {
+        final int partIndex = vertexId[0];
+        final int partCount = getGeometryCount();
+        if (partIndex >= 0 && partIndex < partCount) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+
+          final int[] subId = new int[vertexId.length - 1];
+          System.arraycopy(vertexId, 1, subId, 0, subId.length);
+          final Geometry geometry = getGeometry(partIndex);
+          final Geometry newGeometry = geometry.moveVertex(newPoint, subId);
+
+          final List<Geometry> geometries = new ArrayList<>(getGeometries());
+          geometries.set(partIndex, newGeometry);
+          return (V)geometryFactory.geometryCollection(geometries);
+        } else {
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not "
+              + partIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
+        + " must have length > 1. " + Arrays.toString(vertexId));
     }
   }
 

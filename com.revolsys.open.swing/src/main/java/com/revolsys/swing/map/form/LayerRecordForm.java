@@ -55,7 +55,6 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.VerticalLayout;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -106,7 +105,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerRecordForm extends JPanel implements PropertyChangeListener,
-CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
+  CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public static final String FLIP_FIELDS_ICON = "flip_fields";
 
@@ -212,9 +211,10 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   public void actionAddCancel() {
+    setRecord(null);
     final AbstractRecordLayer layer = getLayer();
-    final LayerRecord object = getRecord();
-    layer.deleteRecords(object);
+    final LayerRecord record = getRecord();
+    layer.deleteRecords(record);
     this.record = null;
     closeWindow();
   }
@@ -280,8 +280,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (field instanceof ComboBox) {
       final ComboBox comboBox = (ComboBox)field;
       comboBox.getEditor()
-      .getEditorComponent()
-      .addFocusListener(new WeakFocusListener(this));
+        .getEditorComponent()
+        .addFocusListener(new WeakFocusListener(this));
     } else {
       ((JComponent)field).addFocusListener(new WeakFocusListener(this));
     }
@@ -413,7 +413,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     final JScrollPane scrollPane = addTab("All Fields", table);
     int maxHeight = 500;
     for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
-        .getScreenDevices()) {
+      .getScreenDevices()) {
       final GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
       final Rectangle bounds = graphicsConfiguration.getBounds();
 
@@ -478,12 +478,12 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
     }
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canUndo");
+      "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canRedo");
+      "canRedo");
 
     final EnableCheck modifiedOrDeleted = new ObjectPropertyEnableCheck(this,
-        "modifiedOrDeleted");
+      "modifiedOrDeleted");
 
     this.toolBar.addButton("changes", "Revert Record", "arrow_revert",
       modifiedOrDeleted, this, "revertChanges");
@@ -507,9 +507,9 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (hasGeometry) {
       final DataType geometryDataType = geometryAttribute.getType();
       if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition)
-            .hasDirectionalAttributes()) {
+          .hasDirectionalAttributes()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME,
             FLIP_RECORD_ICON, editable, this, "flipRecordOrientation");
           this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME,
@@ -714,18 +714,6 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     return string;
   }
 
-  public RecordStore getRecordStore() {
-    if (this.recordStore == null) {
-      if (this.recordDefinition == null) {
-        return null;
-      } else {
-        return this.recordDefinition.getRecordStore();
-      }
-    } else {
-      return this.recordStore;
-    }
-  }
-
   public Color getErrorForegroundColor() {
     return WebColors.Red;
   }
@@ -737,7 +725,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
       if (field == null) {
         final boolean enabled = !this.readOnlyFieldNames.contains(fieldName);
         try {
-          field = SwingUtil.createField(this.recordDefinition, fieldName, enabled);
+          field = SwingUtil.createField(this.recordDefinition, fieldName,
+            enabled);
           addField(fieldName, field);
         } catch (final IllegalArgumentException e) {
         }
@@ -821,10 +810,6 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     return this.layer;
   }
 
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
-  }
-
   public <T> T getOriginalValue(final String fieldName) {
     final LayerRecord object = getRecord();
     return object.getOriginalValue(fieldName);
@@ -841,6 +826,22 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public LayerRecord getRecord() {
     return this.record;
+  }
+
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
+  }
+
+  public RecordStore getRecordStore() {
+    if (this.recordStore == null) {
+      if (this.recordDefinition == null) {
+        return null;
+      } else {
+        return this.recordDefinition.getRecordStore();
+      }
+    } else {
+      return this.recordStore;
+    }
   }
 
   public Set<String> getRequiredFieldNames() {
@@ -986,7 +987,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     final AbstractLayer layer = getLayer();
     if (layer != null) {
       final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-          map);
+        map);
       final Collection<String> ignorePasteFields = layer.getProperty("ignorePasteFields");
       if (ignorePasteFields != null) {
         newValues.keySet().removeAll(ignorePasteFields);
@@ -1077,10 +1078,6 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (this.addOkButton != null) {
       this.addOkButton.setEnabled(enabled);
     }
-  }
-
-  protected void setRecordStore(final RecordStore recordStore) {
-    this.recordStore = recordStore;
   }
 
   public void setEditable(final boolean editable) {
@@ -1193,7 +1190,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     this.fieldValues.put(fieldName, value);
     final JComponent field = (JComponent)getField(fieldName);
     if (oldValue == null & value != null
-        || !EqualsRegistry.equal(value, oldValue)) {
+      || !EqualsRegistry.equal(value, oldValue)) {
       changed = true;
     }
     final Object objectValue = this.record.getValue(fieldName);
@@ -1211,22 +1208,6 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
           fieldsToValidate.add(fieldName);
         }
       }
-    }
-  }
-
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.recordDefinition = recordDefinition;
-    setRecordStore(recordDefinition.getRecordStore());
-    final String idAttributeName = recordDefinition.getIdAttributeName();
-    if (Property.hasValue(idAttributeName)) {
-      this.readOnlyFieldNames.add(idAttributeName);
-    }
-    for (final Attribute attribute : recordDefinition.getAttributes()) {
-      if (attribute.isRequired()) {
-        final String name = attribute.getName();
-        addRequiredFieldNames(name);
-      }
-
     }
   }
 
@@ -1251,6 +1232,26 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
       setFieldValidationEnabled(validate);
       this.undoManager.setEventsEnabled(undo);
     }
+  }
+
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
+    setRecordStore(recordDefinition.getRecordStore());
+    final String idAttributeName = recordDefinition.getIdAttributeName();
+    if (Property.hasValue(idAttributeName)) {
+      this.readOnlyFieldNames.add(idAttributeName);
+    }
+    for (final Attribute attribute : recordDefinition.getAttributes()) {
+      if (attribute.isRequired()) {
+        final String name = attribute.getName();
+        addRequiredFieldNames(name);
+      }
+
+    }
+  }
+
+  protected void setRecordStore(final RecordStore recordStore) {
+    this.recordStore = recordStore;
   }
 
   public void setRequiredFieldNames(final Collection<String> requiredFieldNames) {
@@ -1313,7 +1314,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
       this, "actionAddCancel");
     buttons.add(addCancelButton);
     this.addOkButton = InvokeMethodAction.createButton("OK", this,
-        "actionAddOk");
+      "actionAddOk");
     buttons.add(this.addOkButton);
 
     dialog.pack();

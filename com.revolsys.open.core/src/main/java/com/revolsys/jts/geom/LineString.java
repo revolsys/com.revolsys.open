@@ -38,15 +38,15 @@ import java.util.List;
  *  Models an OGC-style <code>LineString</code>.
  *  A LineString consists of a sequence of two or more vertices,
  *  along with all points along the linearly-interpolated curves
- *  (line segments) between each 
+ *  (line segments) between each
  *  pair of consecutive vertices.
  *  Consecutive vertices may be equal.
- *  The line segments in the line may intersect each other (in other words, 
+ *  The line segments in the line may intersect each other (in other words,
  *  the linestring may "curl back" in itself and self-intersect.
- *  Linestrings with exactly two identical points are invalid. 
- *  <p> 
- * A linestring must have either 0 or 2 or more points.  
- * If these conditions are not met, the constructors throw 
+ *  Linestrings with exactly two identical points are invalid.
+ *  <p>
+ * A linestring must have either 0 or 2 or more points.
+ * If these conditions are not met, the constructors throw
  * an {@link IllegalArgumentException}
  *
  *@version 1.7
@@ -116,7 +116,7 @@ public interface LineString extends Lineal {
    * reversed and joined before the start of line1. If the two lines touch only
    * at their end coordinates, the line2 will be reversed and joined after the
    * end of line1.
-   * 
+   *
    * @param line1 The first line.
    * @param line2 The second line.
    * @return The new line string
@@ -127,6 +127,8 @@ public interface LineString extends Lineal {
 
   @Override
   LineString move(final double... deltas);
+
+  LineString moveVertex(Point newPoint, int vertexIndex);
 
   /**
    * Normalizes a LineString.  A normalized linestring

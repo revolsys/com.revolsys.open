@@ -44,7 +44,6 @@ import com.revolsys.gis.graph.visitor.EdgeWithinDistance;
 import com.revolsys.gis.graph.visitor.NodeWithinBoundingBoxVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
 import com.revolsys.gis.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
-import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.gis.jts.LineStringUtil;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
@@ -65,10 +64,6 @@ import com.revolsys.visitor.CreateListVisitor;
 
 public class Graph<T> {
 
-  private static final AtomicInteger GRAPH_IDS = new AtomicInteger();
-
-  private static Map<Integer, WeakReference<Graph<?>>> graphs = new HashMap<Integer, WeakReference<Graph<?>>>();
-
   @SuppressWarnings("unchecked")
   public static <V> Graph<V> getGraph(final int id) {
     final WeakReference<Graph<?>> reference = graphs.get(id);
@@ -84,6 +79,10 @@ public class Graph<T> {
       }
     }
   }
+
+  private static final AtomicInteger GRAPH_IDS = new AtomicInteger();
+
+  private static Map<Integer, WeakReference<Graph<?>>> graphs = new HashMap<Integer, WeakReference<Graph<?>>>();
 
   private final int id = GRAPH_IDS.incrementAndGet();
 
@@ -128,14 +127,14 @@ public class Graph<T> {
   }
 
   protected Graph(final boolean storeLines) {
-    graphs.put(id, new WeakReference<Graph<?>>(this));
+    graphs.put(this.id, new WeakReference<Graph<?>>(this));
     if (!storeLines) {
-      edgeLinesById = null;
+      this.edgeLinesById = null;
     }
   }
 
   public void add(final NodeEventListener<T> listener) {
-    nodeListeners.add(listener);
+    this.nodeListeners.add(listener);
   }
 
   public Edge<T> addEdge(final T object, final LineString line) {
@@ -147,7 +146,7 @@ public class Graph<T> {
 
   /**
    * Actually add the edge.
-   * 
+   *
    * @param object
    * @param line
    * @param from
@@ -156,36 +155,36 @@ public class Graph<T> {
    */
   protected Edge<T> addEdge(final T object, final LineString line,
     final Point from, final Point to) {
-    if (inMemory && getEdgeCount() >= maxEdgesInMemory) {
-      edgeAttributesById = BPlusTreeMap.createIntSeralizableTempDisk(edgeAttributesById);
+    if (this.inMemory && getEdgeCount() >= this.maxEdgesInMemory) {
+      this.edgeAttributesById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgeAttributesById);
       // TODO edgIds
       // TODO edgeIndex
-      edgeLinesById = BPlusTreeMap.createIntSeralizableTempDisk(edgeLinesById);
-      edgeObjectsById = BPlusTreeMap.createIntSeralizableTempDisk(edgeObjectsById);
-      edgesById = BPlusTreeMap.createIntSeralizableTempDisk(edgesById);
+      this.edgeLinesById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgeLinesById);
+      this.edgeObjectsById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgeObjectsById);
+      this.edgesById = BPlusTreeMap.createIntSeralizableTempDisk(this.edgesById);
 
       // TODO nodeIndex
-      nodeAttributesById = BPlusTreeMap.createIntSeralizableTempDisk(nodeAttributesById);
-      nodesById = BPlusTreeMap.createIntSeralizableTempDisk(nodesById);
-      nodesIdsByCoordinates = BPlusTreeMap.createTempDisk(
-        nodesIdsByCoordinates, new SerializablePageValueManager<Point>(),
+      this.nodeAttributesById = BPlusTreeMap.createIntSeralizableTempDisk(this.nodeAttributesById);
+      this.nodesById = BPlusTreeMap.createIntSeralizableTempDisk(this.nodesById);
+      this.nodesIdsByCoordinates = BPlusTreeMap.createTempDisk(
+        this.nodesIdsByCoordinates, new SerializablePageValueManager<Point>(),
         PageValueManager.INT);
-      inMemory = false;
+      this.inMemory = false;
     }
     final Node<T> fromNode = getNode(from);
     final Node<T> toNode = getNode(to);
-    final int edgeId = ++nextEdgeId;
+    final int edgeId = ++this.nextEdgeId;
     final Edge<T> edge = new Edge<T>(edgeId, this, fromNode, toNode);
-    if (edgeLinesById != null) {
-      edgeLinesById.put(edgeId, line);
+    if (this.edgeLinesById != null) {
+      this.edgeLinesById.put(edgeId, line);
     }
-    edgeObjectsById.put(edgeId, object);
-    edgesById.put(edgeId, edge);
-    edgeIds.put(edge, edgeId);
-    if (edgeIndex != null) {
-      edgeIndex.add(edge);
+    this.edgeObjectsById.put(edgeId, object);
+    this.edgesById.put(edgeId, edge);
+    this.edgeIds.put(edge, edgeId);
+    if (this.edgeIndex != null) {
+      this.edgeIndex.add(edge);
     }
-    edgeListeners.edgeEvent(edge, null, EdgeEvent.EDGE_ADDED, null);
+    this.edgeListeners.edgeEvent(edge, null, EdgeEvent.EDGE_ADDED, null);
     return edge;
   }
 
@@ -194,12 +193,12 @@ public class Graph<T> {
   }
 
   public void addEdgeListener(final EdgeEventListener<T> listener) {
-    edgeListeners.add(listener);
+    this.edgeListeners.add(listener);
   }
 
   /**
    * Clone the object, setting the line property to the new value.
-   * 
+   *
    * @param object The object to clone.
    * @param line The line.
    * @return The new object.
@@ -221,28 +220,27 @@ public class Graph<T> {
 
   @PreDestroy
   public void close() {
-    edgeAttributesById.clear();
-    edgeIds.clear();
+    this.edgeAttributesById.clear();
+    this.edgeIds.clear();
     // TODO edgeIndex
-    edgeLinesById.clear();
-    edgeObjectsById.clear();
-    edgesById.clear();
+    this.edgeLinesById.clear();
+    this.edgeObjectsById.clear();
+    this.edgesById.clear();
 
     // TODO nodeIndex.clear();
-    nodeAttributesById.clear();
-    nodesIdsByCoordinates.clear();
+    this.nodeAttributesById.clear();
+    this.nodesIdsByCoordinates.clear();
   }
 
   public boolean contains(final Edge<T> edge) {
     if (edge.getGraph() == this) {
       final int id = edge.getId();
-      return edgesById.containsKey(id);
+      return this.edgesById.containsKey(id);
     }
     return false;
   }
 
-  public Edge<T> createEdge(
-    final GeometryFactory geometryFactory,
+  public Edge<T> createEdge(final GeometryFactory geometryFactory,
     final T object, final LineString points) {
     final LineString newLine = geometryFactory.lineString(points);
     final T newObject = clone(object, newLine);
@@ -278,12 +276,12 @@ public class Graph<T> {
   /**
    * Find the node by point coordinates returning the node if it exists, null
    * otherwise.
-   * 
+   *
    * @param point The point coordinates to find the node for.
    * @return The nod or null if not found.
    */
   public Node<T> findNode(final Point point) {
-    final Integer nodeId = nodesIdsByCoordinates.get(point);
+    final Integer nodeId = this.nodesIdsByCoordinates.get(point);
     if (nodeId == null) {
       return null;
     } else {
@@ -298,7 +296,7 @@ public class Graph<T> {
 
   /**
    * Find all the nodes <= the distance of the edge, that are "on" the line.
-   * 
+   *
    * @param edge The edge.
    * @param distance The distance.
    * @return The nodes
@@ -320,7 +318,7 @@ public class Graph<T> {
 
   /**
    * Find the nodes <= the distance of the specified geometry.
-   * 
+   *
    * @param geometry The geometry.
    * @param distance The distance.
    * @return The list of nodes.
@@ -343,7 +341,7 @@ public class Graph<T> {
 
   /**
    * Find all the nodes <= the distance of the node.
-   * 
+   *
    * @param node The node.
    * @param distance The distance.
    * @return The nodes.
@@ -355,7 +353,7 @@ public class Graph<T> {
 
   /**
    * Find the nodes <= the distance of the specified point coordinates.
-   * 
+   *
    * @param point The point coordinates.
    * @param distance The distance.
    * @return The list of nodes.
@@ -397,12 +395,12 @@ public class Graph<T> {
   }
 
   public Edge<T> getEdge(final int edgeId) {
-    return edgesById.get(edgeId);
+    return this.edgesById.get(edgeId);
   }
 
   @SuppressWarnings("unchecked")
   protected <V> V getEdgeAttribute(final int edgeId, final String name) {
-    final Map<String, Object> edgeAttributes = edgeAttributesById.get(edgeId);
+    final Map<String, Object> edgeAttributes = this.edgeAttributesById.get(edgeId);
     if (edgeAttributes == null) {
       return null;
     } else {
@@ -417,7 +415,7 @@ public class Graph<T> {
   }
 
   protected Map<String, Object> getEdgeAttributes(final int edgeId) {
-    final Map<String, Object> edgeAttributes = edgeAttributesById.get(edgeId);
+    final Map<String, Object> edgeAttributes = this.edgeAttributesById.get(edgeId);
     if (edgeAttributes == null) {
       return Collections.emptyMap();
     } else {
@@ -426,11 +424,11 @@ public class Graph<T> {
   }
 
   public int getEdgeCount() {
-    return edgesById.size();
+    return this.edgesById.size();
   }
 
   public Collection<Integer> getEdgeIds() {
-    return edgesById.keySet();
+    return this.edgesById.keySet();
   }
 
   public int[] getEdgeIds(final Collection<Edge<T>> edges) {
@@ -444,27 +442,29 @@ public class Graph<T> {
   }
 
   public IdObjectIndex<Edge<T>> getEdgeIndex() {
-    if (edgeIndex == null) {
-      edgeIndex = new EdgeQuadTree<T>(this);
+    if (this.edgeIndex == null) {
+      this.edgeIndex = new EdgeQuadTree<T>(this);
     }
-    return edgeIndex;
+    return this.edgeIndex;
   }
 
   public LineString getEdgeLine(final int edgeId) {
-    return edgeLinesById.get(edgeId);
+    return this.edgeLinesById.get(edgeId);
   }
 
   public List<LineString> getEdgeLines() {
-    final List<Integer> edgeIds = new ArrayList<Integer>(edgesById.keySet());
+    final List<Integer> edgeIds = new ArrayList<Integer>(
+        this.edgesById.keySet());
     return new EdgeLineList(this, edgeIds);
   }
 
   public T getEdgeObject(final int edgeId) {
-    return edgeObjectsById.get(edgeId);
+    return this.edgeObjectsById.get(edgeId);
   }
 
   public List<Edge<T>> getEdges() {
-    final List<Integer> edgeIds = new ArrayList<Integer>(edgesById.keySet());
+    final List<Integer> edgeIds = new ArrayList<Integer>(
+        this.edgesById.keySet());
     return new EdgeList<T>(this, edgeIds);
   }
 
@@ -566,45 +566,45 @@ public class Graph<T> {
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public int getId() {
-    return id;
+    return this.id;
   }
 
   public int getMaxEdgesInMemory() {
-    return maxEdgesInMemory;
+    return this.maxEdgesInMemory;
   }
 
   public Node<T> getNode(final int nodeId) {
-    return nodesById.get(nodeId);
+    return this.nodesById.get(nodeId);
   }
 
   /**
    * Get the node by point coordinates, creating one if it did not exist.
-   * 
+   *
    * @param point The point coordinates to get the node for.
    * @return The node.
    */
   public Node<T> getNode(final Point point) {
     Node<T> node = findNode(point);
     if (node == null) {
-      final int nodeId = ++nextNodeId;
+      final int nodeId = ++this.nextNodeId;
       node = new Node<T>(nodeId, this, point);
-      nodesIdsByCoordinates.put(new PointDouble(node, 2), nodeId);
-      nodesById.put(nodeId, node);
-      if (nodeIndex != null) {
-        nodeIndex.add(node);
+      this.nodesIdsByCoordinates.put(new PointDouble(node, 2), nodeId);
+      this.nodesById.put(nodeId, node);
+      if (this.nodeIndex != null) {
+        this.nodeIndex.add(node);
       }
-      nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_ADDED, null);
+      this.nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_ADDED, null);
     }
     return node;
   }
 
   @SuppressWarnings("unchecked")
   protected <V> V getNodeAttribute(final int nodeId, final String name) {
-    final Map<String, Object> nodeAttributes = nodeAttributesById.get(nodeId);
+    final Map<String, Object> nodeAttributes = this.nodeAttributesById.get(nodeId);
     if (nodeAttributes == null) {
       return null;
     } else {
@@ -619,7 +619,7 @@ public class Graph<T> {
   }
 
   protected Map<String, Object> getNodeAttributes(final int nodeId) {
-    final Map<String, Object> nodeAttributes = nodeAttributesById.get(nodeId);
+    final Map<String, Object> nodeAttributes = this.nodeAttributesById.get(nodeId);
     if (nodeAttributes == null) {
       return Collections.emptyMap();
     } else {
@@ -628,19 +628,19 @@ public class Graph<T> {
   }
 
   public Collection<Integer> getNodeIds() {
-    return nodesById.keySet();
+    return this.nodesById.keySet();
   }
 
   public IdObjectIndex<Node<T>> getNodeIndex() {
-    if (nodeIndex == null) {
-      nodeIndex = new NodeQuadTree<T>(this);
+    if (this.nodeIndex == null) {
+      this.nodeIndex = new NodeQuadTree<T>(this);
     }
-    return nodeIndex;
+    return this.nodeIndex;
   }
 
   public List<Node<T>> getNodes() {
     final List<Integer> nodeIds = new ArrayList<Integer>(
-      nodesIdsByCoordinates.values());
+      this.nodesIdsByCoordinates.values());
     return new NodeList<T>(this, nodeIds);
   }
 
@@ -717,12 +717,12 @@ public class Graph<T> {
   }
 
   public GeometryFactory getPrecisionModel() {
-    return precisionModel;
+    return this.precisionModel;
   }
 
   /**
    * Get the type name for the edge.
-   * 
+   *
    * @param edge The edge.
    * @return The type name.
    */
@@ -758,7 +758,7 @@ public class Graph<T> {
 
   /**
    * Merge the two edges at the node.
-   * 
+   *
    * @param node
    * @param edge1
    * @param edge2
@@ -790,7 +790,7 @@ public class Graph<T> {
   /**
    * Merge the two edges into a single edge, removing the old edges and node if
    * required from the graph and adding a new edge to the graph.
-   * 
+   *
    * @param reversedEdges The list of edges that need to be reversed.
    * @param node The node to remove.
    * @param edge1 The first edge to merge.
@@ -945,24 +945,24 @@ public class Graph<T> {
 
   public void remove(final Edge<T> edge) {
     if (!edge.isRemoved()) {
-      edgeListeners.edgeEvent(edge, null, EdgeEvent.EDGE_REMOVED, null);
+      this.edgeListeners.edgeEvent(edge, null, EdgeEvent.EDGE_REMOVED, null);
       final int edgeId = edge.getId();
-      edgeIds.remove(edge);
-      edgesById.remove(edgeId);
-      edgeAttributesById.remove(edgeId);
-      if (edgeLinesById != null) {
-        edgeLinesById.remove(edgeId);
+      this.edgeIds.remove(edge);
+      this.edgesById.remove(edgeId);
+      this.edgeAttributesById.remove(edgeId);
+      if (this.edgeLinesById != null) {
+        this.edgeLinesById.remove(edgeId);
       }
-      edgeObjectsById.remove(edgeId);
-      if (edgeIndex != null) {
-        edgeIndex.remove(edge);
+      this.edgeObjectsById.remove(edgeId);
+      if (this.edgeIndex != null) {
+        this.edgeIndex.remove(edge);
       }
       edge.removeInternal();
     }
   }
 
   public void remove(final EdgeEventListener<T> listener) {
-    edgeListeners.remove(listener);
+    this.edgeListeners.remove(listener);
   }
 
   public void remove(final Node<T> node) {
@@ -971,13 +971,14 @@ public class Graph<T> {
       for (final Edge<T> edge : edges) {
         remove(edge);
       }
-      nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_REMOVED, null);
+      this.nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_REMOVED,
+        null);
       final int nodeId = node.getId();
-      nodesById.remove(nodeId);
-      nodeAttributesById.remove(nodeId);
-      nodesIdsByCoordinates.remove(node);
-      if (nodeIndex != null) {
-        nodeIndex.remove(node);
+      this.nodesById.remove(nodeId);
+      this.nodeAttributesById.remove(nodeId);
+      this.nodesIdsByCoordinates.remove(node);
+      if (this.nodeIndex != null) {
+        this.nodeIndex.remove(node);
       }
 
       node.remove();
@@ -985,7 +986,7 @@ public class Graph<T> {
   }
 
   public void remove(final NodeEventListener<T> listener) {
-    nodeListeners.remove(listener);
+    this.nodeListeners.remove(listener);
   }
 
   public List<Edge<T>> replaceEdge(final Edge<T> edge, final Geometry lines) {
@@ -1036,20 +1037,20 @@ public class Graph<T> {
 
   protected void setEdgeAttribute(final int edgeId, final String name,
     final Object value) {
-    Map<String, Object> attributes = edgeAttributesById.get(edgeId);
+    Map<String, Object> attributes = this.edgeAttributesById.get(edgeId);
     if (attributes == null) {
       attributes = new HashMap<String, Object>();
-      edgeAttributesById.put(edgeId, attributes);
+      this.edgeAttributesById.put(edgeId, attributes);
     }
     attributes.put(name, value);
   }
 
   protected void setEdgeAttributes(final int edgeId,
     final Map<String, Object> attributes) {
-    Map<String, Object> edgeAttributes = edgeAttributesById.get(edgeId);
+    Map<String, Object> edgeAttributes = this.edgeAttributesById.get(edgeId);
     if (edgeAttributes == null) {
       edgeAttributes = new HashMap<String, Object>();
-      edgeAttributesById.put(edgeId, edgeAttributes);
+      this.edgeAttributesById.put(edgeId, edgeAttributes);
     }
     edgeAttributes.putAll(attributes);
   }
@@ -1065,20 +1066,20 @@ public class Graph<T> {
 
   protected void setNodeAttribute(final int edgeId, final String name,
     final Object value) {
-    Map<String, Object> nodeAttributes = nodeAttributesById.get(edgeId);
+    Map<String, Object> nodeAttributes = this.nodeAttributesById.get(edgeId);
     if (nodeAttributes == null) {
       nodeAttributes = new HashMap<String, Object>();
-      nodeAttributesById.put(edgeId, nodeAttributes);
+      this.nodeAttributesById.put(edgeId, nodeAttributes);
     }
     nodeAttributes.put(name, value);
   }
 
   protected void setNodeAttributes(final int edgeId,
     final Map<String, Object> attributes) {
-    Map<String, Object> nodeAttributes = nodeAttributesById.get(edgeId);
+    Map<String, Object> nodeAttributes = this.nodeAttributesById.get(edgeId);
     if (nodeAttributes == null) {
       nodeAttributes = new HashMap<String, Object>();
-      nodeAttributesById.put(edgeId, nodeAttributes);
+      this.nodeAttributesById.put(edgeId, nodeAttributes);
     }
     nodeAttributes.putAll(attributes);
   }
@@ -1276,8 +1277,7 @@ public class Graph<T> {
             if (CoordinatesUtil.isAcute(c1, c0, point)) {
               lines = LineStringUtil.split(line, 0, point);
             } else if (edge.getFromNode().getDegree() == 1) {
-              final LineString newLine = GeometryEditUtil.insertVertex(line, 0,
-                point);
+              final LineString newLine = line.insertVertex(point, 0);
               lines = Collections.singletonList(newLine);
             } else {
               return Collections.singletonList(edge);
@@ -1299,8 +1299,8 @@ public class Graph<T> {
             if (CoordinatesUtil.isAcute(cn1, cn, point)) {
               lines = LineStringUtil.split(line, segmentIndex, point);
             } else if (edge.getToNode().getDegree() == 1) {
-              final LineString newLine = GeometryEditUtil.insertVertex(line,
-                line.getVertexCount(), point);
+              final LineString newLine = line.insertVertex(point,
+                line.getVertexCount());
               lines = Collections.singletonList(newLine);
             } else {
               return Collections.singletonList(edge);
@@ -1352,7 +1352,7 @@ public class Graph<T> {
         }
       }
     };
-    edgeListeners.add(listener);
+    this.edgeListeners.add(listener);
     try {
       while (!edges.isEmpty()) {
         final Edge<T> edge = edges.remove(0);
@@ -1363,7 +1363,7 @@ public class Graph<T> {
         }
       }
     } finally {
-      edgeListeners.remove(listener);
+      this.edgeListeners.remove(listener);
     }
   }
 
@@ -1425,7 +1425,7 @@ public class Graph<T> {
         }
       }
     };
-    nodeListeners.add(listener);
+    this.nodeListeners.add(listener);
     try {
       while (!nodes.isEmpty()) {
         final Node<T> node = nodes.remove(0);
@@ -1436,7 +1436,7 @@ public class Graph<T> {
         }
       }
     } finally {
-      nodeListeners.remove(listener);
+      this.nodeListeners.remove(listener);
     }
   }
 

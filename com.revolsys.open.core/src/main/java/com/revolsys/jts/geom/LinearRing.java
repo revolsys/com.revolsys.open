@@ -40,9 +40,9 @@ package com.revolsys.jts.geom;
  * and the interior of the ring must not self-intersect.
  * Either orientation of the ring is allowed.
  * <p>
- * A ring must have either 0 or 4 or more points.  
+ * A ring must have either 0 or 4 or more points.
  * The first and last points must be equal (in 2D).
- * If these conditions are not met, the constructors throw 
+ * If these conditions are not met, the constructors throw
  * an {@link IllegalArgumentException}
  *
  * @version 1.7
@@ -60,7 +60,8 @@ public interface LinearRing extends LineString {
   @Override
   LinearRing move(double... deltas);
 
+  LinearRing moveVertex(Point newPoint, int vertexIndex);
+
   @Override
   LinearRing reverse();
-
 }

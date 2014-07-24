@@ -33,6 +33,7 @@
 package com.revolsys.jts.geom.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,6 +46,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.MultiPolygon;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.segment.MultiPolygonSegment;
 import com.revolsys.jts.geom.segment.Segment;
@@ -54,12 +56,12 @@ import com.revolsys.jts.geom.vertex.Vertex;
 /**
  * Models a collection of {@link Polygon}s.
  * <p>
- * As per the OGC SFS specification, 
- * the Polygons in a MultiPolygon may not overlap, 
+ * As per the OGC SFS specification,
+ * the Polygons in a MultiPolygon may not overlap,
  * and may only touch at single points.
  * This allows the topological point-set semantics
  * to be well-defined.
- *  
+ *
  *
  *@version 1.7
  */
@@ -181,6 +183,43 @@ public abstract class AbstractMultiPolygon extends AbstractGeometryCollection
   @Override
   protected boolean isEquivalentClass(final Geometry other) {
     return other instanceof MultiPolygon;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V moveVertex(final Point newPoint,
+    final int... vertexId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (vertexId.length == 3) {
+      if (isEmpty()) {
+        throw new IllegalArgumentException(
+            "Cannot move vertex for empty MultiPolygon");
+      } else {
+        final int partIndex = vertexId[0];
+        final int ringIndex = vertexId[1];
+        final int vertexIndex = vertexId[2];
+        final int partCount = getGeometryCount();
+        if (partIndex >= 0 && partIndex < partCount) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+
+          final Polygon polygon = getPolygon(partIndex);
+          final Polygon newPolygon = polygon.moveVertex(newPoint, ringIndex,
+            vertexIndex);
+          final List<Polygon> polygons = new ArrayList<>(getPolygons());
+          polygons.set(partIndex, newPolygon);
+          return (V)geometryFactory.multiPolygon(polygons);
+        } else {
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not "
+                + partIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Vertex id's for MultiPolygons must have length 3. "
+            + Arrays.toString(vertexId));
+    }
   }
 
   @Override

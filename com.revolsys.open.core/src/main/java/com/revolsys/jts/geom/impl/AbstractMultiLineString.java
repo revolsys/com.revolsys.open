@@ -33,6 +33,7 @@
 package com.revolsys.jts.geom.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +48,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.MultiLineStringSegment;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.MultiLineStringVertex;
@@ -105,7 +107,7 @@ public abstract class AbstractMultiLineString extends
    */
   @Override
   public Geometry getBoundary() {
-    return (new BoundaryOp(this)).getBoundary();
+    return new BoundaryOp(this).getBoundary();
   }
 
   @Override
@@ -118,14 +120,14 @@ public abstract class AbstractMultiLineString extends
 
   @Override
   public BoundingBox getBoundingBox() {
-    if (boundingBox == null) {
+    if (this.boundingBox == null) {
       if (isEmpty()) {
-        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
+        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
-        boundingBox = computeBoundingBox();
+        this.boundingBox = computeBoundingBox();
       }
     }
-    return boundingBox;
+    return this.boundingBox;
   }
 
   @Override
@@ -175,7 +177,7 @@ public abstract class AbstractMultiLineString extends
    */
   @Override
   public Object getUserData() {
-    return userData;
+    return this.userData;
   }
 
   @Override
@@ -213,6 +215,41 @@ public abstract class AbstractMultiLineString extends
   @Override
   protected boolean isEquivalentClass(final Geometry other) {
     return other instanceof MultiLineString;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V moveVertex(final Point newPoint,
+    final int... vertexId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (vertexId.length == 2) {
+      if (isEmpty()) {
+        throw new IllegalArgumentException(
+            "Cannot move vertex for empty MultiLineString");
+      } else {
+        final int partIndex = vertexId[0];
+        final int vertexIndex = vertexId[1];
+        final int partCount = getGeometryCount();
+        if (partIndex >= 0 && partIndex < partCount) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+
+          final LineString line = getLineString(partIndex);
+          final LineString newLine = line.moveVertex(newPoint, vertexIndex);
+          final List<LineString> lines = new ArrayList<>(getLineStrings());
+          lines.set(partIndex, newLine);
+          return (V)geometryFactory.multiLineString(lines);
+        } else {
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not "
+                + partIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Vertex id's for MultiLineStrings must have length 2. "
+            + Arrays.toString(vertexId));
+    }
   }
 
   @Override

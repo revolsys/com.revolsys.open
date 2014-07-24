@@ -63,7 +63,7 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *
  * <H3>Overlay Methods</H3>
  *
- * The overlay methods 
+ * The overlay methods
  * return the most specific class possible to represent the result. If the
  * result is homogeneous, a <code>Point</code>, <code>LineString</code>, or
  * <code>Polygon</code> will be returned if the result contains a single
@@ -123,50 +123,50 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *  report the location of the collapse. <P>
  *
  * <h3>Geometry Equality</h3>
- * 
- * There are two ways of comparing geometries for equality: 
+ *
+ * There are two ways of comparing geometries for equality:
  * <b>structural equality</b> and <b>topological equality</b>.
- * 
+ *
  * <h4>Structural Equality</h4>
  *
- * Structural Equality is provided by the 
- * {@link #equals(2,Geometry)} method.  
+ * Structural Equality is provided by the
+ * {@link #equals(2,Geometry)} method.
  * This implements a comparison based on exact, structural pointwise
- * equality. 
- * The {@link #equals(Object)} is a synonym for this method, 
+ * equality.
+ * The {@link #equals(Object)} is a synonym for this method,
  * to provide structural equality semantics for
  * use in Java collections.
  * It is important to note that structural pointwise equality
  * is easily affected by things like
  * ring order and component order.  In many situations
  * it will be desirable to normalize geometries before
- * comparing them (using the {@link #norm()} 
+ * comparing them (using the {@link #norm()}
  * or {@link #normalize()} methods).
  * {@link #equalsNorm(Geometry)} is provided
  * as a convenience method to compute equality over
  * normalized geometries, but it is expensive to use.
  * Finally, {@link #equalsExact(Geometry, double)}
  * allows using a tolerance value for point comparison.
- * 
- * 
+ *
+ *
  * <h4>Topological Equality</h4>
- * 
- * Topological Equality is provided by the 
- * {@link #equalsTopo(Geometry)} method. 
+ *
+ * Topological Equality is provided by the
+ * {@link #equalsTopo(Geometry)} method.
  * It implements the SFS definition of point-set equality
  * defined in terms of the DE-9IM matrix.
  * To support the SFS naming convention, the method
- * {@link #equals(Geometry)} is also provided as a synonym.  
+ * {@link #equals(Geometry)} is also provided as a synonym.
  * However, due to the potential for confusion with {@link #equals(Object)}
  * its use is discouraged.
  * <p>
- * Since {@link #equals(Object)} and {@link #hashCode()} are overridden, 
+ * Since {@link #equals(Object)} and {@link #hashCode()} are overridden,
  * Geometries can be used effectively in Java collections.
  *
  *@version 1.7
  */
 public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
-  DataTypeProxy {
+DataTypeProxy {
   List<String> sortedGeometryTypes = Collections.unmodifiableList(Arrays.asList(
     "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
     "Polygon", "MultiPolygon", "GeometryCollection"));
@@ -182,63 +182,65 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
 
   int M = 3;
 
+  <V extends Geometry> V appendVertex(Point newPoint, int... geometryId);
+
   /**
    * Computes a buffer area around this geometry having the given width. The
    * buffer of a Geometry is the Minkowski sum or difference of the geometry
    * with a disc of radius <code>abs(distance)</code>.
-   * <p> 
-   * Mathematically-exact buffer area boundaries can contain circular arcs. 
+   * <p>
+   * Mathematically-exact buffer area boundaries can contain circular arcs.
    * To represent these arcs using linear geometry they must be approximated with line segments.
-   * The buffer geometry is constructed using 8 segments per quadrant to approximate 
+   * The buffer geometry is constructed using 8 segments per quadrant to approximate
    * the circular arcs.
    * The end cap style is <code>CAP_ROUND</code>.
    * <p>
    * The buffer operation always returns a polygonal result. The negative or
    * zero-distance buffer of lines and points is always an empty {@link Polygon}.
    * This is also the result for the buffers of degenerate (zero-area) polygons.
-   * 
+   *
    * @param distance
    *          the width of the buffer (may be positive, negative or 0)
    * @return a polygonal geometry representing the buffer region (which may be
    *         empty)
-   * 
+   *
    * @throws TopologyException
    *           if a robustness error occurs
-   * 
+   *
    * @see #buffer(double, int)
    * @see #buffer(double, int, int)
    */
   Geometry buffer(final double distance);
 
   /**
-  * Computes a buffer area around this geometry having the given width and with
-  * a specified accuracy of approximation for circular arcs.
-  * <p>
-  * Mathematically-exact buffer area boundaries can contain circular arcs. 
-  * To represent these arcs
-  * using linear geometry they must be approximated with line segments. The
-  * <code>quadrantSegments</code> argument allows controlling the accuracy of
-  * the approximation by specifying the number of line segments used to
-  * represent a quadrant of a circle
-  * <p>
-  * The buffer operation always returns a polygonal result. The negative or
-  * zero-distance buffer of lines and points is always an empty {@link Polygon}.
-  * This is also the result for the buffers of degenerate (zero-area) polygons.
-  * 
-  * @param distance
-  *          the width of the buffer (may be positive, negative or 0)
-  * @param quadrantSegments
-  *          the number of line segments used to represent a quadrant of a
-  *          circle
-  * @return a polygonal geometry representing the buffer region (which may be
-  *         empty)
-  * 
-  * @throws TopologyException
-  *           if a robustness error occurs
-  * 
-  * @see #buffer(double)
-  * @see #buffer(double, int, int)
-  */
+   * Computes a buffer area around this geometry having the given width and with
+   * a specified accuracy of approximation for circular arcs.
+   * <p>
+   * Mathematically-exact buffer area boundaries can contain circular arcs.
+   * To represent these arcs
+   * using linear geometry they must be approximated with line segments. The
+   * <code>quadrantSegments</code> argument allows controlling the accuracy of
+   * the approximation by specifying the number of line segments used to
+   * represent a quadrant of a circle
+   * <p>
+   * The buffer operation always returns a polygonal result. The negative or
+   * zero-distance buffer of lines and points is always an empty {@link Polygon}.
+   * This is also the result for the buffers of degenerate (zero-area) polygons.
+   *
+   * @param distance
+   *          the width of the buffer (may be positive, negative or 0)
+   * @param quadrantSegments
+   *          the number of line segments used to represent a quadrant of a
+   *          circle
+   * @return a polygonal geometry representing the buffer region (which may be
+   *         empty)
+   *
+   * @throws TopologyException
+   *           if a robustness error occurs
+   *
+   * @see #buffer(double)
+   * @see #buffer(double, int, int)
+   */
   Geometry buffer(final double distance, final int quadrantSegments);
 
   /**
@@ -289,31 +291,31 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   Geometry clone();
 
   /**
-  *  Returns whether this <code>Geometry</code> is greater than, equal to,
-  *  or less than another <code>Geometry</code>. <P>
-  *
-  *  If their classes are different, they are compared using the following
-  *  ordering:
-  *  <UL>
-  *    <LI> Point (lowest)
-  *    <LI> MultiPoint
-  *    <LI> LineString
-  *    <LI> LinearRing
-  *    <LI> MultiLineString
-  *    <LI> Polygon
-  *    <LI> MultiPolygon
-  *    <LI> GeometryCollection (highest)
-  *  </UL>
-  *  If the two <code>Geometry</code>s have the same class, their first
-  *  elements are compared. If those are the same, the second elements are
-  *  compared, etc.
-  *
-  *@param  other  a <code>Geometry</code> with which to compare this <code>Geometry</code>
-  *@return    a positive number, 0, or a negative number, depending on whether
-  *      this object is greater than, equal to, or less than <code>o</code>, as
-  *      defined in "Normal Form For Geometry" in the JTS Technical
-  *      Specifications
-  */
+   *  Returns whether this <code>Geometry</code> is greater than, equal to,
+   *  or less than another <code>Geometry</code>. <P>
+   *
+   *  If their classes are different, they are compared using the following
+   *  ordering:
+   *  <UL>
+   *    <LI> Point (lowest)
+   *    <LI> MultiPoint
+   *    <LI> LineString
+   *    <LI> LinearRing
+   *    <LI> MultiLineString
+   *    <LI> Polygon
+   *    <LI> MultiPolygon
+   *    <LI> GeometryCollection (highest)
+   *  </UL>
+   *  If the two <code>Geometry</code>s have the same class, their first
+   *  elements are compared. If those are the same, the second elements are
+   *  compared, etc.
+   *
+   *@param  other  a <code>Geometry</code> with which to compare this <code>Geometry</code>
+   *@return    a positive number, 0, or a negative number, depending on whether
+   *      this object is greater than, equal to, or less than <code>o</code>, as
+   *      defined in "Normal Form For Geometry" in the JTS Technical
+   *      Specifications
+   */
   @Override
   int compareTo(final Object other);
 
@@ -327,7 +329,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * <ul>
    * <li>Every point of the other geometry is a point of this geometry,
    * and the interiors of the two geometries have at least one point in common.
-   * <li>The DE-9IM Intersection Matrix for the two geometries matches 
+   * <li>The DE-9IM Intersection Matrix for the two geometries matches
    * the pattern
    * <code>[T*****FF*]</code>
    * <li><code>g.within(this) = true</code>
@@ -337,7 +339,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * contain their boundary".  In other words, if a geometry A is a subset of
    * the points in the boundary of a geometry B, <code>B.contains(A) = false</code>.
    * (As a concrete example, take A to be a LineString which lies in the boundary of a Polygon B.)
-   * For a predicate with similar behaviour but avoiding 
+   * For a predicate with similar behaviour but avoiding
    * this subtle limitation, see {@link #covers}.
    *
    *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
@@ -354,7 +356,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * Convert the geometry to the requried geometry factory. Projecting to the required
    * coordinate system and applying the precision model. If the geometry factory is
    * the same as this geometries factory then the geometry will be returned.
-   * 
+   *
    * @author Paul Austin <paul.austin@revolsys.com>
    * @param geometryFactory The geometry factory to convert the geometry to.
    * @return The converted geometry
@@ -399,7 +401,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   /**
    * Create a copy of the geometry io the requried geometry factory. Projecting to the required
    * coordinate system and applying the precision model.
-   * 
+   *
    * @author Paul Austin <paul.austin@revolsys.com>
    * @param geometryFactory The geometry factory to convert the geometry to.
    * @return The converted geometry
@@ -446,7 +448,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * <li>Every point of the other geometry is a point of this geometry.
    * <li>The DE-9IM Intersection Matrix for the two geometries matches
    * at least one of the following patterns:
-   *  <ul> 
+   *  <ul>
    *   <li><code>[T*****FF*]</code>
    *   <li><code>[*T****FF*]</code>
    *   <li><code>[***T**FF*]</code>
@@ -499,10 +501,12 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    */
   boolean crosses(final Geometry geometry);
 
+  <V extends Geometry> V deleteVertex(int... vertexId);
+
   /**
    * Computes a <code>Geometry</code> representing the closure of the point-set
-   * of the points contained in this <code>Geometry</code> that are not contained in 
-   * the <code>other</code> Geometry. 
+   * of the points contained in this <code>Geometry</code> that are not contained in
+   * the <code>other</code> Geometry.
    * <p>
    * If the result is empty, it is an atomic geometry
    * with the dimension of the left-hand input.
@@ -524,7 +528,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * The <code>disjoint</code> predicate has the following equivalent definitions:
    * <ul>
    * <li>The two geometries have no point in common
-   * <li>The DE-9IM Intersection Matrix for the two geometries matches 
+   * <li>The DE-9IM Intersection Matrix for the two geometries matches
    * <code>[FF*FF****]</code>
    * <li><code>! g.intersects(this) = true</code>
    * <br>(<code>disjoint</code> is the inverse of <code>intersects</code>)
@@ -552,15 +556,15 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   boolean equal(final Point a, final Point b, final double tolerance);
 
   /**
-  * Tests whether this geometry is 
-  * topologically equal to the argument geometry.
+   * Tests whether this geometry is
+   * topologically equal to the argument geometry.
    * <p>
    * This method is included for backward compatibility reasons.
    * It has been superseded by the {@link #equalsTopo(Geometry)} method,
    * which has been named to clearly denote its functionality.
    * <p>
-   * This method should NOT be confused with the method 
-   * {@link #equals(Object)}, which implements 
+   * This method should NOT be confused with the method
+   * {@link #equals(Object)}, which implements
    * an exact equality comparison.
    *
    *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
@@ -575,27 +579,27 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   /**
    * Tests whether this geometry is structurally and numerically equal
    * to a given <code>Object</code>.
-   * If the argument <code>Object</code> is not a <code>Geometry</code>, 
+   * If the argument <code>Object</code> is not a <code>Geometry</code>,
    * the result is <code>false</code>.
    * Otherwise, the result is computed using
    * {@link #equals(2,Geometry)}.
    * <p>
    * This method is provided to fulfill the Java contract
-   * for value-based object equality. 
-   * In conjunction with {@link #hashCode()} 
-   * it provides semantics which are most useful 
+   * for value-based object equality.
+   * In conjunction with {@link #hashCode()}
+   * it provides semantics which are most useful
    * for using
    * <code>Geometry</code>s as keys and values in Java collections.
    * <p>
    * Note that to produce the expected result the input geometries
-   * should be in normal form.  It is the caller's 
+   * should be in normal form.  It is the caller's
    * responsibility to perform this where required
    * (using {@link Geometry#norm()
    * or {@link #normalize()} as appropriate).
-   * 
+   *
    * @param other the Object to compare
-   * @return true if this geometry is exactly equal to the argument 
-   * 
+   * @return true if this geometry is exactly equal to the argument
+   *
    * @see #equals(2,Geometry)
    * @see #hashCode()
    * @see #norm()
@@ -617,7 +621,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * within the given tolerance distance, in exactly the same order.
    * </ul>
    * This method does <i>not</i>
-   * test the values of the <code>GeometryFactory</code>, the <code>SRID</code>, 
+   * test the values of the <code>GeometryFactory</code>, the <code>SRID</code>,
    * or the <code>userData</code> fields.
    * <p>
    * To properly test equality between different geometries,
@@ -628,7 +632,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    *   are considered equal
    * @return <code>true</code> if this and the other <code>Geometry</code>
    *   have identical structure and point values, up to the distance tolerance.
-   *   
+   *
    * @see #equals(2,Geometry)
    * @see #normalize()
    * @see #norm()
@@ -642,11 +646,11 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * versions of both geometries before computing
    * {@link #equals(2,Geometry)}.
    * <p>
-   * This method is relatively expensive to compute.  
-   * For maximum performance, the client 
+   * This method is relatively expensive to compute.
+   * For maximum performance, the client
    * should instead perform normalization on the individual geometries
    * at an appropriate point during processing.
-   * 
+   *
    * @param g a Geometry
    * @return true if the input geometries are exactly equal in their normalized form
    */
@@ -661,20 +665,20 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * <li>The two geometries have at least one point in common,
    * and no point of either geometry lies in the exterior of the other geometry.
    * <li>The DE-9IM Intersection Matrix for the two geometries matches
-   * the pattern <code>T*F**FFF*</code> 
+   * the pattern <code>T*F**FFF*</code>
    * <pre>
    * T*F
    * **F
    * FF*
    * </pre>
    * </ul>
-   * <b>Note</b> that this method computes <b>topologically equality</b>. 
+   * <b>Note</b> that this method computes <b>topologically equality</b>.
    * For structural equality, see {@link #equals(2,Geometry)}.
    *
    *@param g the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return <code>true</code> if the two <code>Geometry</code>s are topologically equal
    *
-   *@see #equals(2,Geometry) 
+   *@see #equals(2,Geometry)
    */
   boolean equalsTopo(final Geometry geometry);
 
@@ -715,13 +719,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   int getBoundaryDimension();
 
   /**
-   * Gets an {@link BoundingBoxDoubleGf} containing 
+   * Gets an {@link BoundingBoxDoubleGf} containing
    * the minimum and maximum x and y values in this <code>Geometry</code>.
-   * If the geometry is empty, an empty <code>BoundingBoxDoubleGf</code> 
+   * If the geometry is empty, an empty <code>BoundingBoxDoubleGf</code>
    * is returned.
    * <p>
    * The returned object is a copy of the one maintained internally,
-   * to avoid aliasing issues.  
+   * to avoid aliasing issues.
    * For best performance, clients which access this
    * envelope frequently should cache the return value.
    *
@@ -746,7 +750,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   int getClassSortIndex();
 
   /**
-   * 
+   *
    * @author Paul Austin <paul.austin@revolsys.com>
    * @return
    */
@@ -754,37 +758,37 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
 
   /**
    * Returns the dimension of this geometry.
-   * The dimension of a geometry is is the topological 
+   * The dimension of a geometry is is the topological
    * dimension of its embedding in the 2-D Euclidean plane.
    * In the JTS spatial model, dimension values are in the set {0,1,2}.
    * <p>
-   * Note that this is a different concept to the dimension of 
-   * the vertex {@link Coordinates}s.  
+   * Note that this is a different concept to the dimension of
+   * the vertex {@link Coordinates}s.
    * The geometry dimension can never be greater than the coordinate dimension.
-   * For example, a 0-dimensional geometry (e.g. a Point) 
-   * may have a coordinate dimension of 3 (X,Y,Z). 
+   * For example, a 0-dimensional geometry (e.g. a Point)
+   * may have a coordinate dimension of 3 (X,Y,Z).
    *
    *@return the topological dimension of this geometry.
    */
   int getDimension();
 
   /**
-   *  Gets a Geometry representing the envelope (bounding box) of 
-   *  this <code>Geometry</code>. 
+   *  Gets a Geometry representing the envelope (bounding box) of
+   *  this <code>Geometry</code>.
    *  <p>
    *  If this <code>Geometry</code> is:
    *  <ul>
-   *  <li>empty, returns an empty <code>Point</code>. 
+   *  <li>empty, returns an empty <code>Point</code>.
    *  <li>a point, returns a <code>Point</code>.
-   *  <li>a line parallel to an axis, a two-vertex <code>LineString</code> 
+   *  <li>a line parallel to an axis, a two-vertex <code>LineString</code>
    *  <li>otherwise, returns a
-   *  <code>Polygon</code> whose vertices are (minx miny, maxx miny, 
+   *  <code>Polygon</code> whose vertices are (minx miny, maxx miny,
    *  maxx maxy, minx maxy, minx miny).
    *  </ul>
    *
    *@return a Geometry representing the envelope of this Geometry
-   *      
-   * @see GeometryFactory#toLineString(BoundingBoxDoubleGf) 
+   *
+   * @see GeometryFactory#toLineString(BoundingBoxDoubleGf)
    */
   Geometry getEnvelope();
 
@@ -806,7 +810,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
 
   /**
    * Differs from {@link #getGeometries(Class)} in that it will return matching {@link Polygon#rings()}
-   * 
+   *
    * @param geometryClass
    * @return
    */
@@ -826,7 +830,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * Gets the geometryFactory which contains the context in which this geometry was created.
    *
    * @return the geometryFactory for this geometry
-  * @author Paul Austin <paul.austin@revolsys.com>
+   * @author Paul Austin <paul.austin@revolsys.com>
    */
   GeometryFactory getGeometryFactory();
 
@@ -874,7 +878,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
 
   /**
    * <p>Get the {@link Segment} at the specified vertexId (see {@link Segment#getSegmentId()}).</p>
-   * 
+   *
    * @author Paul Austin <paul.austin@revolsys.com>
    * @param vertexId The id of the vertex.
    * @return The vertex or null if it does not exist.
@@ -906,7 +910,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
 
   /**
    * <p>Get the {@link Vertex} at the specified vertexId (see {@link Vertex#getVertexId()}).</p>
-   * 
+   *
    * @author Paul Austin <paul.austin@revolsys.com>
    * @param vertexId The id of the vertex.
    * @return The vertex or null if it does not exist.
@@ -924,11 +928,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
 
   /**
    * Gets a hash code for the Geometry.
-   * 
+   *
    * @return an integer value suitable for use as a hashcode
    */
   @Override
   int hashCode();
+
+  <V extends Geometry> V insertVertex(Point newPoint, int... vertexId);
 
   /**
    * Computes a <code>Geometry</code> representing the point-set which is
@@ -936,13 +942,13 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * <p>
    * The intersection of two geometries of different dimension produces a result
    * geometry of dimension less than or equal to the minimum dimension of the input
-   * geometries. 
+   * geometries.
    * The result geometry may be a heterogenous {@link GeometryCollection}.
    * If the result is empty, it is an atomic geometry
    * with the dimension of the lowest input dimension.
    * <p>
    * Intersection of {@link GeometryCollection}s is supported
-   * only for homogeneous collection types. 
+   * only for homogeneous collection types.
    * <p>
    * Non-empty heterogeneous {@link GeometryCollection} arguments are not supported.
    *
@@ -1039,6 +1045,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
 
   Geometry move(final double... deltas);
 
+  <V extends Geometry> V moveVertex(Point newPoint, int... vertexId);
+
   /**
    *  Converts this <code>Geometry</code> to <b>normal form</b> (or <b>
    *  canonical form</b> ). Normal form is a unique representation for <code>Geometry</code>
@@ -1049,7 +1057,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    *  form use the standard lexicographical ordering for coordinates. "Sorted in
    *  order of coordinates" means the obvious extension of this ordering to
    *  sequences of coordinates.
-    * 
+   *
    * @return a normalized copy of this geometry.
    * @see #normalize()
    */
@@ -1117,7 +1125,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   /**
    * Computes a new geometry which has all component coordinate sequences
    * in reverse order (opposite orientation) to this one.
-   * 
+   *
    * @return a reversed geometry
    */
   Geometry reverse();
@@ -1137,11 +1145,11 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   void setUserData(final Object userData);
 
   /**
-   * Computes a <coe>Geometry </code> representing the closure of the point-set 
-   * which is the union of the points in this <code>Geometry</code> which are not 
+   * Computes a <coe>Geometry </code> representing the closure of the point-set
+   * which is the union of the points in this <code>Geometry</code> which are not
    * contained in the <code>other</code> Geometry,
    * with the points in the <code>other</code> Geometry not contained in this
-   * <code>Geometry</code>. 
+   * <code>Geometry</code>.
    * If the result is empty, it is an atomic geometry
    * with the dimension of the highest input dimension.
    * <p>
@@ -1162,7 +1170,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * <p>
    * The <code>touches</code> predicate has the following equivalent definitions:
    * <ul>
-   * <li>The geometries have at least one point in common, 
+   * <li>The geometries have at least one point in common,
    * but their interiors do not intersect.
    * <li>The DE-9IM Intersection Matrix for the two geometries matches
    * at least one of the following patterns
@@ -1175,7 +1183,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * If both geometries have dimension 0, the predicate returns <code>false</code>,
    * since points have only interiors.
    * This predicate is symmetric.
-   * 
+   *
    *
    *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>
    *@return        <code>true</code> if the two <code>Geometry</code>s touch;
@@ -1194,36 +1202,36 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
   String toWkt();
 
   /**
-   * Computes the union of all the elements of this geometry. 
+   * Computes the union of all the elements of this geometry.
    * <p>
    * This method supports
-   * {@link GeometryCollection}s 
+   * {@link GeometryCollection}s
    * (which the other overlay operations currently do not).
    * <p>
    * The result obeys the following contract:
    * <ul>
    * <li>Unioning a set of {@link LineString}s has the effect of fully noding
    * and dissolving the linework.
-   * <li>Unioning a set of {@link Polygon}s always 
+   * <li>Unioning a set of {@link Polygon}s always
    * returns a {@link Polygonal} geometry (unlike {@link #union(Geometry)},
    * which may return geometries of lower dimension if a topology collapse occurred).
    * </ul>
-   * 
+   *
    * @return the union geometry
-     * @throws TopologyException if a robustness error occurs
-   * 
+   * @throws TopologyException if a robustness error occurs
+   *
    * @see UnaryUnionOp
    */
   Geometry union();
 
   /**
-   * Computes a <code>Geometry</code> representing the point-set 
+   * Computes a <code>Geometry</code> representing the point-set
    * which is contained in both this
    * <code>Geometry</code> and the <code>other</code> Geometry.
    * <p>
    * The union of two geometries of different dimension produces a result
    * geometry of dimension equal to the maximum dimension of the input
-   * geometries. 
+   * geometries.
    * The result geometry may be a heterogenous
    * {@link GeometryCollection}.
    * If the result is empty, it is an atomic geometry
@@ -1234,12 +1242,12 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * "noding" means that there will be a node or endpoint in the result for
    * every endpoint or line segment crossing in the input. "Dissolving" means
    * that any duplicate (i.e. coincident) line segments or portions of line
-   * segments will be reduced to a single line segment in the result. 
+   * segments will be reduced to a single line segment in the result.
    * If <b>merged</b> linework is required, the {@link LineMerger}
    * class can be used.
    * <p>
    * Non-empty {@link GeometryCollection} arguments are not supported.
-   * 
+   *
    * @param other
    *          the <code>Geometry</code> with which to compute the union
    * @return a point-set combining the points of this <code>Geometry</code> and the
@@ -1257,10 +1265,10 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * efficiency the {@link Vertex} returned is the same instance for each call to next
    * on the iterator. If the vertex is required to track the previous vertex then the
    * {@link Vertex#clone()} method must be called to get a copy of the vertex.</p>
-   * 
+   *
    * <p>The {@link Iterable#iterator()} method always returns the same {@link Iterator} instance.
    * Therefore that method should not be called more than once.</p>
-   * 
+   *
    * @author Paul Austin <paul.austin@revolsys.com>
    * @return The iterator over the vertices of the geometry.
    */
@@ -1274,7 +1282,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * <ul>
    * <li>Every point of this geometry is a point of the other geometry,
    * and the interiors of the two geometries have at least one point in common.
-   * <li>The DE-9IM Intersection Matrix for the two geometries matches 
+   * <li>The DE-9IM Intersection Matrix for the two geometries matches
    * <code>[T*F**F***]</code>
    * <li><code>g.contains(this) = true</code>
    * <br>(<code>within</code> is the converse of {@link #contains})
@@ -1284,7 +1292,7 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
    * In other words, if a geometry A is a subset of
    * the points in the boundary of a geomtry B, <code>A.within(B) = false</code>
    * (As a concrete example, take A to be a LineString which lies in the boundary of a Polygon B.)
-   * For a predicate with similar behaviour but avoiding 
+   * For a predicate with similar behaviour but avoiding
    * this subtle limitation, see {@link #coveredBy}.
    *
    *@param  g  the <code>Geometry</code> with which to compare this <code>Geometry</code>

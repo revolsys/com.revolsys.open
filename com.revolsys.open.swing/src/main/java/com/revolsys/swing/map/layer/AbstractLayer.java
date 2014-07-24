@@ -68,7 +68,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
-  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
+implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   static {
@@ -77,7 +77,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final EnableCheck exists = new TreeItemPropertyEnableCheck("exists");
 
     final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
-      "hasGeometry");
+        "hasGeometry");
     menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Layer",
       "magnifier", new AndEnableCheck(exists, hasGeometry), "zoomToLayer"));
 
@@ -180,18 +180,18 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       } else {
         extentPanel.add(new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
-            + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-            + boundingBox.getMaximum(1)
-            + "</td><td>&nbsp;</td></tr><tr>"
-            + "<td><b>Left</b>: "
-            + boundingBox.getMinimum(0)
-            + "</td><td>&nbsp;</td><td>&nbsp;</td>"
-            + "<td><b>Right</b>: "
-            + boundingBox.getMaximum(0)
-            + "</td></tr>"
-            + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-            + boundingBox.getMinimum(1) + "</td><td>&nbsp;</td></tr><tr>"
-            + "</tr></table></html>"));
+              + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+              + boundingBox.getMaximum(1)
+              + "</td><td>&nbsp;</td></tr><tr>"
+              + "<td><b>Left</b>: "
+              + boundingBox.getMinimum(0)
+              + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+              + "<td><b>Right</b>: "
+              + boundingBox.getMaximum(0)
+              + "</td></tr>"
+              + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+              + boundingBox.getMinimum(1) + "</td><td>&nbsp;</td></tr><tr>"
+              + "</tr></table></html>"));
 
       }
       GroupLayoutUtil.makeColumns(extentPanel, 1, true);
@@ -566,7 +566,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         setExists(exists);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to initialize layer: "
-          + getPath(), e);
+            + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -640,12 +640,12 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public boolean isSelectable() {
     return isExists() && isVisible()
-      && (isSelectSupported() && this.selectable || isEditable());
+        && (isSelectSupported() && this.selectable || isEditable());
   }
 
   @Override
   public boolean isSelectable(final double scale) {
-    return isVisible(scale) && isSelectable();
+    return isSelectable() && isVisible(scale);
   }
 
   @Override
@@ -662,7 +662,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public boolean isVisible(final double scale) {
     if (isExists() && isVisible()) {
       final long longScale = (long)scale;
-      if (getMinimumScale() >= longScale && longScale >= getMaximumScale()) {
+      final long minimumScale = getMinimumScale();
+      final long maximumScale = getMaximumScale();
+      if (minimumScale >= longScale && longScale >= maximumScale) {
         return true;
       }
     }
@@ -753,12 +755,18 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
-  public void setMaximumScale(final long maximumScale) {
+  public void setMaximumScale(long maximumScale) {
+    if (maximumScale < 0) {
+      maximumScale = 0;
+    }
     this.maximumScale = maximumScale;
   }
 
   @Override
-  public void setMinimumScale(final long minimumScale) {
+  public void setMinimumScale(long minimumScale) {
+    if (minimumScale <= 0) {
+      minimumScale = Long.MAX_VALUE;
+    }
     this.minimumScale = minimumScale;
   }
 
@@ -967,8 +975,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
     final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-      .expandPercent(0.1)
-      .clipToCoordinateSystem();
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
 
     project.setViewBoundingBox(boundingBox);
   }

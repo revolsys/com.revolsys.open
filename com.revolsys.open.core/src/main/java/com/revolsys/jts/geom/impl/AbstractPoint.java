@@ -32,6 +32,8 @@
  */
 package com.revolsys.jts.geom.impl;
 
+import java.util.Arrays;
+
 import com.revolsys.data.equals.NumberEquals;
 import com.revolsys.data.io.IteratorReader;
 import com.revolsys.data.types.DataType;
@@ -57,10 +59,10 @@ import com.revolsys.util.MathUtil;
  *
  * A <code>Point</code> is topologically valid if and only if:
  * <ul>
- * <li>the coordinate which defines it (if any) is a valid coordinate 
+ * <li>the coordinate which defines it (if any) is a valid coordinate
  * (i.e does not have an <code>NaN</code> X or Y ordinate)
  * </ul>
- * 
+ *
  *@version 1.7
  */
 public abstract class AbstractPoint extends AbstractGeometry implements Point {
@@ -73,6 +75,22 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
     final double x2 = other.getX();
     final double y2 = other.getY();
     return Angle.angle2d(x1, x2, y1, y2);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V appendVertex(final Point newPoint,
+    final int... geometryId) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (isEmpty()) {
+      return newPoint.convert(geometryFactory);
+    } else if (newPoint.isEmpty()) {
+      return (V)this;
+    } else {
+      return (V)geometryFactory.lineString(this, newPoint);
+    }
   }
 
   /**
@@ -163,7 +181,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   /**
    * Copy the coordinates in this point to the coordinates array parameter and convert them to the geometry factory.
-   * 
+   *
    * @param geometryFactory
    * @param coordinates
    */
@@ -198,6 +216,13 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V deleteVertex(final int... vertexId) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (V)geometryFactory.point();
+  }
+
   @Override
   public double distance(final double x, final double y) {
     final double x1 = this.getX();
@@ -214,7 +239,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
 
   /**
    * Computes the 3-dimensional Euclidean distance to another location.
-   * 
+   *
    * @param c a coordinate
    * @return the 3-dimensional Euclidean distance between the locations
    */
@@ -429,6 +454,31 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
     return result;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V insertVertex(final Point newPoint,
+    final int... vertexId) {
+    if (vertexId.length == 1) {
+      final int vertexIndex = vertexId[0];
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (newPoint == null || newPoint.isEmpty()) {
+        return (V)this;
+      } else if (isEmpty()) {
+        return newPoint.convert(geometryFactory);
+      } else if (newPoint.isEmpty()) {
+        return (V)this;
+      } else if (vertexIndex == 0) {
+        return (V)geometryFactory.lineString(newPoint, this);
+      } else {
+        return (V)geometryFactory.lineString(this, newPoint);
+      }
+    } else {
+      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
+        + " must have length 1. " + Arrays.toString(vertexId));
+    }
+
+  }
+
   @Override
   public boolean intersects(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
@@ -481,6 +531,18 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
         coordinates[axisIndex] += deltas[axisIndex];
       }
       return geometryFactory.point(coordinates);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V moveVertex(final Point newPoint,
+    final int... vertexId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return newPoint.copy(geometryFactory);
     }
   }
 

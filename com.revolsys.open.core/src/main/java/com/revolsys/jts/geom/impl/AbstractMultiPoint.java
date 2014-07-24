@@ -1,6 +1,7 @@
 package com.revolsys.jts.geom.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -124,6 +125,39 @@ public abstract class AbstractMultiPoint extends AbstractGeometryCollection
   @Override
   public boolean isValid() {
     return true;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V moveVertex(Point newPoint,
+    final int... vertexId) {
+    if (newPoint == null || newPoint.isEmpty()) {
+      return (V)this;
+    } else if (vertexId.length == 1) {
+      if (isEmpty()) {
+        throw new IllegalArgumentException(
+          "Cannot move vertex for empty MultiPoint");
+      } else {
+        final int partIndex = vertexId[0];
+        final int partCount = getGeometryCount();
+        if (partIndex >= 0 && partIndex < partCount) {
+          final GeometryFactory geometryFactory = getGeometryFactory();
+
+          newPoint = newPoint.copy(geometryFactory);
+          final List<Point> points = new ArrayList<>(getPoints());
+          points.set(partIndex, newPoint);
+          return (V)geometryFactory.multiPoint(points);
+        } else {
+          throw new IllegalArgumentException(
+            "Part index must be between 0 and " + partCount + " not "
+              + partIndex);
+        }
+      }
+    } else {
+      throw new IllegalArgumentException(
+        "Vertex id's for MultiPoint must have length 1. "
+          + Arrays.toString(vertexId));
+    }
   }
 
   @Override

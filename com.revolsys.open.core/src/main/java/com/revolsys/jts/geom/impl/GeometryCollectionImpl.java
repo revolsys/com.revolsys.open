@@ -45,7 +45,7 @@ import com.revolsys.jts.geom.prep.PreparedGeometryCollection;
 /**
  * Models a collection of {@link Geometry}s of
  * arbitrary type and dimension.
- * 
+ *
  *
  *@version 1.7
  */
@@ -107,57 +107,57 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
   @Override
   public GeometryCollectionImpl clone() {
     final GeometryCollectionImpl gc = (GeometryCollectionImpl)super.clone();
-    gc.geometries = new Geometry[geometries.length];
-    for (int i = 0; i < geometries.length; i++) {
-      gc.geometries[i] = geometries[i].clone();
+    gc.geometries = new Geometry[this.geometries.length];
+    for (int i = 0; i < this.geometries.length; i++) {
+      gc.geometries[i] = this.geometries[i].clone();
     }
     return gc;
   }
 
   @Override
   public BoundingBox getBoundingBox() {
-    if (boundingBox == null) {
+    if (this.boundingBox == null) {
       if (isEmpty()) {
-        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
+        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
-        boundingBox = computeBoundingBox();
+        this.boundingBox = computeBoundingBox();
       }
     }
-    return boundingBox;
+    return this.boundingBox;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (geometries == null) {
+    if (this.geometries == null) {
       return new ArrayList<V>();
     } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(geometries));
+      return (List<V>)new ArrayList<>(Arrays.asList(this.geometries));
     }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (geometries == null) {
+    if (this.geometries == null) {
       return null;
     } else {
-      return (V)geometries[n];
+      return (V)this.geometries[n];
     }
   }
 
   @Override
   public int getGeometryCount() {
-    if (geometries == null) {
+    if (this.geometries == null) {
       return 0;
     } else {
-      return geometries.length;
+      return this.geometries.length;
     }
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   /**
@@ -167,12 +167,12 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
    */
   @Override
   public Object getUserData() {
-    return userData;
+    return this.userData;
   }
 
   @Override
   public boolean isEmpty() {
-    return geometries == null;
+    return this.geometries == null;
   }
 
   @Override
