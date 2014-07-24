@@ -1,5 +1,8 @@
 package com.revolsys.swing.map.layer.raster;
 
+import java.awt.Dimension;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,6 +15,7 @@ import com.revolsys.raster.GeoReferencedImage;
 import com.revolsys.raster.MappedLocation;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
+import com.revolsys.swing.field.Slider;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.BaseJxTable;
@@ -23,8 +27,10 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.ObjectTree;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.util.Property;
 
-public class TiePointsPanel extends TablePanel {
+public class TiePointsPanel extends TablePanel implements
+  PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private static final List<String> COLUMN_NAMES = Arrays.asList(
@@ -34,6 +40,8 @@ public class TiePointsPanel extends TablePanel {
     "Source Pixel Y", "Target Point X", "Target Point Y");
 
   private final GeoReferencedImageLayer layer;
+
+  private final Slider opacityField;
 
   public TiePointsPanel(final GeoReferencedImageLayer layer) {
     super(new ObjectListTable(layer.getImage().getTiePoints(), COLUMN_NAMES,
@@ -76,6 +84,15 @@ public class TiePointsPanel extends TablePanel {
     toolBar.addButton("edit", "Fit to Screen", "arrow_out",
       editableEnableCheck, layer, "fitToViewport");
 
+    this.opacityField = new Slider("opacity", 0, 256, layer.getOpacity());
+    this.opacityField.setMajorTickSpacing(64);
+    this.opacityField.setMinorTickSpacing(16);
+    this.opacityField.setPaintTicks(true);
+    this.opacityField.addPropertyChangeListener(this);
+    this.opacityField.setMaximumSize(new Dimension(100, 25));
+
+    toolBar.addComponent("edit", this.opacityField);
+    Property.addListener(layer, "opacity", this);
   }
 
   public void deleteTiePoint() {
@@ -102,6 +119,27 @@ public class TiePointsPanel extends TablePanel {
     return getImage().getTiePoints();
   }
 
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    final String propertyName = event.getPropertyName();
+    if ("opacity".equals(propertyName)) {
+      final Integer opacity = (Integer)event.getNewValue();
+      if (opacity != null) {
+        if (event.getSource() == this.opacityField) {
+          this.layer.setOpacity(opacity);
+        } else {
+          this.opacityField.setValue(opacity);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void removeNotify() {
+    super.removeNotify();
+    Property.removeListener(this.layer, "opacity", this);
+  }
+
   public void zoomToTiePoint() {
     final MappedLocation object = getEventRowObject();
     final GeoReferencedImage image = this.layer.getImage();
@@ -111,8 +149,8 @@ public class TiePointsPanel extends TablePanel {
       final Project project = Project.get();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()
-          .convert(geometryFactory)
-          .expand(200);
+        .convert(geometryFactory)
+        .expand(200);
       project.setViewBoundingBox(boundingBox);
 
     }

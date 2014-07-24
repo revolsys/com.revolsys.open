@@ -12,7 +12,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 
 public class GeoReferencedImageLayerRenderer extends
-  AbstractLayerRenderer<GeoReferencedImageLayer> {
+AbstractLayerRenderer<GeoReferencedImageLayer> {
 
   public static void render(final Viewport2D viewport,
     final Graphics2D graphics, final GeoReferencedImage image,
@@ -60,7 +60,8 @@ public class GeoReferencedImageLayerRenderer extends
           }
           final Graphics2D graphics = viewport.getGraphics();
           if (graphics != null) {
-            renderAlpha(graphics, viewport, image, 1.0, true);
+            renderAlpha(graphics, viewport, image, layer.getOpacity() / 255.0,
+              true);
           }
         }
       }

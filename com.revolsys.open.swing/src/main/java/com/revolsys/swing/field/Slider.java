@@ -4,69 +4,75 @@ import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import javax.swing.BoundedRangeModel;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
-
-import org.jdesktop.swingx.JXTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.swing.listener.WeakFocusListener;
-import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
-public class TextField extends JXTextField implements Field, FocusListener {
+public class Slider extends JSlider implements Field, FocusListener,
+  ChangeListener {
+
   public static final Color DEFAULT_BACKGROUND = new JTextField().getBackground();
 
   public static final Color DEFAULT_FOREGROUND = new JTextField().getForeground();
 
   public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
 
-  private static final long serialVersionUID = 1L;
-
   private String errorMessage;
 
-  private final String fieldName;
+  private String fieldName;
 
-  private String fieldValue;
+  private int fieldValue;
 
   private String originalToolTip;
 
   private final CascadingUndoManager undoManager = new CascadingUndoManager();
 
-  public TextField(final int columns) {
-    this("text");
-    setColumns(columns);
+  public Slider(final String fieldName) {
+    super();
+    setFieldName(fieldName);
+    addChangeListener(this);
   }
 
-  public TextField(final String fieldName) {
-    this(fieldName, "");
+  public Slider(final String fieldName, final BoundedRangeModel brm) {
+    super(brm);
+    setFieldName(fieldName);
+    addChangeListener(this);
   }
 
-  public TextField(final String fieldName, final int columns) {
-    this(fieldName);
-    setColumns(columns);
+  public Slider(final String fieldName, final int orientation) {
+    super(orientation);
+    setFieldName(fieldName);
+    addChangeListener(this);
   }
 
-  public TextField(final String fieldName, final Object fieldValue) {
-    setDocument(new PropertyChangeDocument(this));
-    if (Property.hasValue(fieldName)) {
-      this.fieldName = fieldName;
-    } else {
-      this.fieldName = "fieldValue";
-    }
-    this.fieldValue = StringConverterRegistry.toString(fieldValue);
-    setText(this.fieldValue);
-    addFocusListener(new WeakFocusListener(this));
-    this.undoManager.addKeyMap(this);
-    PopupMenu.getPopupMenuFactory(this);
+  public Slider(final String fieldName, final int min, final int max) {
+    super(min, max);
+    setFieldName(fieldName);
+    addChangeListener(this);
   }
 
-  public TextField(final String fieldName, final Object fieldValue,
-    final int columns) {
-    this(fieldName, fieldValue);
-    setColumns(columns);
+  public Slider(final String fieldName, final int min, final int max,
+    final int value) {
+    super(min, max, value);
+    setFieldName(fieldName);
+    addChangeListener(this);
+    this.fieldValue = value;
+  }
+
+  public Slider(final String fieldName, final int orientation, final int min,
+    final int max, final int value) {
+    super(orientation, min, max, value);
+    setFieldName(fieldName);
+    addChangeListener(this);
+    this.fieldValue = value;
   }
 
   @Override
@@ -81,8 +87,8 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public void focusLost(final FocusEvent e) {
-    final String text = getText();
-    setFieldValue(text);
+    final int value = getValue();
+    setFieldValue(value);
   }
 
   protected String getDisplayText(final Object value) {
@@ -102,7 +108,8 @@ public class TextField extends JXTextField implements Field, FocusListener {
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
-    return (T)getText();
+    final Integer value = getValue();
+    return (T)value;
   }
 
   @Override
@@ -130,10 +137,16 @@ public class TextField extends JXTextField implements Field, FocusListener {
   public void setFieldInvalid(final String message,
     final Color foregroundColor, final Color backgroundColor) {
     setForeground(foregroundColor);
-    setSelectedTextColor(foregroundColor);
     setBackground(backgroundColor);
     this.errorMessage = message;
     super.setToolTipText(this.errorMessage);
+  }
+
+  private void setFieldName(final String fieldName) {
+    this.fieldName = fieldName;
+    if (Property.hasValue(fieldName)) {
+      setToolTipText(CaseConverter.toCapitalizedWords(fieldName));
+    }
   }
 
   @Override
@@ -144,7 +157,6 @@ public class TextField extends JXTextField implements Field, FocusListener {
   @Override
   public void setFieldValid() {
     setForeground(TextField.DEFAULT_FOREGROUND);
-    setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
     setBackground(TextField.DEFAULT_BACKGROUND);
     this.errorMessage = null;
     super.setToolTipText(this.originalToolTip);
@@ -152,26 +164,24 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public void setFieldValue(final Object value) {
-    final String newText = getDisplayText(value);
-    final String oldValue = this.fieldValue;
-    final String text = getText();
-    this.undoManager.discardAllEdits();
-    if (!EqualsRegistry.equal(text, newText)) {
-      if (newText == null) {
-        if (Property.hasValue(text)) {
-          setText("");
-        }
-      } else {
-        setText(newText);
-      }
+    if (value instanceof Number) {
+      final Number newNumber = (Number)value;
+      final int newValue = newNumber.intValue();
+      final int oldValue = this.fieldValue;
+      final int fieldValue = getValue();
       this.undoManager.discardAllEdits();
+      if (fieldValue != newValue) {
+        setValue(newValue);
+        this.undoManager.discardAllEdits();
+      }
+      if (oldValue != newValue) {
+        this.fieldValue = newValue;
+        firePropertyChange(this.getFieldName(), oldValue, newValue);
+        SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
+          oldValue, newValue);
+      }
     }
-    if (!EqualsRegistry.equal(oldValue, newText)) {
-      this.fieldValue = newText;
-      firePropertyChange(this.fieldName, oldValue, newText);
-      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
-        oldValue, newText);
-    }
+
   }
 
   @Override
@@ -188,12 +198,17 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   @Override
+  public void stateChanged(final ChangeEvent e) {
+    updateFieldValue();
+  }
+
+  @Override
   public String toString() {
     return getFieldName() + "=" + getFieldValue();
   }
 
   @Override
   public void updateFieldValue() {
-    setFieldValue(getText());
+    setFieldValue(getValue());
   }
 }

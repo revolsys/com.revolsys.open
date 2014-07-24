@@ -56,8 +56,8 @@ import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
 
 public class AbstractOverlay extends JComponent implements
-  PropertyChangeListener, MouseListener, MouseMotionListener,
-  MouseWheelListener, KeyListener {
+PropertyChangeListener, MouseListener, MouseMotionListener,
+MouseWheelListener, KeyListener {
   public static final Cursor CURSOR_LINE_ADD_NODE = SilkIconLoader.getCursor(
     "cursor_line_node_add", 8, 6);
 
@@ -78,7 +78,7 @@ public class AbstractOverlay extends JComponent implements
     new Color(0, 0, 255), 2);
 
   public static final Cursor CURSOR_NODE_ADD = SilkIconLoader.getCursor(
-      "cursor_node_add", 8, 7);
+    "cursor_node_add", 8, 7);
 
   private GeometryFactory geometryFactory;
 
@@ -134,9 +134,9 @@ public class AbstractOverlay extends JComponent implements
         text.append(typePath);
         text.append("</i></b>\n");
         text.append("<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">"
-          + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
-          + idAttributeName
-          + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th>POINT</th></tr></th><tbody>");
+            + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
+            + idAttributeName
+            + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th>POINT</th></tr></th><tbody>");
         for (final CloseLocation location : locations) {
           text.append("<tr style=\"border-bottom: solid black 1px\"><td style=\"border-right: solid black 1px\">");
           text.append(location.getId());
@@ -195,7 +195,7 @@ public class AbstractOverlay extends JComponent implements
 
   public void destroy() {
     this.map = null;
-    mouseOverLocations.clear();
+    this.mouseOverLocations.clear();
     this.project = null;
     this.snapEventPoint = null;
     this.snapPoint = null;
@@ -232,9 +232,9 @@ public class AbstractOverlay extends JComponent implements
     }
   }
 
-  protected CloseLocation findCloseLocation(
-    final AbstractRecordLayer layer, final LayerRecord object,
-    final Geometry geometry, final BoundingBox boundingBox) {
+  protected CloseLocation findCloseLocation(final AbstractRecordLayer layer,
+    final LayerRecord object, final Geometry geometry,
+    final BoundingBox boundingBox) {
     CloseLocation closeLocation = findCloseVertexLocation(layer, object,
       geometry, boundingBox);
     if (closeLocation == null) {
@@ -372,13 +372,21 @@ public class AbstractOverlay extends JComponent implements
   }
 
   public List<CloseLocation> getMouseOverLocations() {
-    return mouseOverLocations;
+    return this.mouseOverLocations;
   }
 
   protected Point getMousePoint() {
     final java.awt.Point mousePosition = getMap().getMapMousePosition();
     final Point mousePoint = getPoint(mousePosition);
     return mousePoint;
+  }
+
+  public String getOverlayAction() {
+    if (this.map == null) {
+      return null;
+    } else {
+      return this.map.getOverlayAction();
+    }
   }
 
   protected Point getPoint(final java.awt.Point eventPoint) {
@@ -406,15 +414,15 @@ public class AbstractOverlay extends JComponent implements
   }
 
   protected List<AbstractRecordLayer> getSnapLayers() {
-    return AbstractRecordLayer.getVisibleLayers(project);
+    return AbstractRecordLayer.getVisibleLayers(this.project);
   }
 
   public Point getSnapPoint() {
-    return snapPoint;
+    return this.snapPoint;
   }
 
   public Map<Point, Set<CloseLocation>> getSnapPointLocationMap() {
-    return snapPointLocationMap;
+    return this.snapPointLocationMap;
   }
 
   public Viewport2D getViewport() {
@@ -459,7 +467,7 @@ public class AbstractOverlay extends JComponent implements
     final BoundingBox boundingBox) {
 
     final java.awt.Point eventPoint = event.getPoint();
-    snapEventPoint = eventPoint;
+    this.snapEventPoint = eventPoint;
     new TreeMap<Point, List<CloseLocation>>();
     this.snapCentre = boundingBox.getCentre();
     final List<AbstractRecordLayer> layers = getSnapLayers();
@@ -479,7 +487,7 @@ public class AbstractOverlay extends JComponent implements
         }
       }
     }
-    snapPointIndex = 0;
+    this.snapPointIndex = 0;
     return setSnapLocations(snapLocations);
 
   }
@@ -584,11 +592,11 @@ public class AbstractOverlay extends JComponent implements
 
   protected boolean setSnapLocations(
     final Map<Point, Set<CloseLocation>> snapLocations) {
-    if (snapLocations != snapPointLocationMap) {
+    if (snapLocations != this.snapPointLocationMap) {
       this.snapPointLocationMap = snapLocations;
-      snapPoints.clear();
-      snapPoints.addAll(snapLocations.keySet());
-      Collections.sort(snapPoints, new Comparator<Point>() {
+      this.snapPoints.clear();
+      this.snapPoints.addAll(snapLocations.keySet());
+      Collections.sort(this.snapPoints, new Comparator<Point>() {
         @Override
         public int compare(final Point point1, final Point point2) {
           final Collection<CloseLocation> locations1 = snapLocations.get(point1);
@@ -602,8 +610,8 @@ public class AbstractOverlay extends JComponent implements
           } else if (hasVertex2) {
             return 0;
           }
-          final double distance1 = snapCentre.distance(point1);
-          final double distance2 = snapCentre.distance(point2);
+          final double distance1 = AbstractOverlay.this.snapCentre.distance(point1);
+          final double distance2 = AbstractOverlay.this.snapCentre.distance(point2);
           if (distance1 <= distance2) {
             return -1;
           } else {
@@ -625,18 +633,18 @@ public class AbstractOverlay extends JComponent implements
     if (this.snapPointLocationMap.isEmpty()) {
       this.snapCentre = null;
       this.snapPoint = null;
-      snapPoints.clear();
+      this.snapPoints.clear();
       if (!hasOverlayAction()) {
         clearMapCursor();
       }
       return false;
     } else {
 
-      this.snapPoint = snapPoints.get(snapPointIndex);
+      this.snapPoint = this.snapPoints.get(this.snapPointIndex);
 
       boolean nodeSnap = false;
       final StringBuffer text = new StringBuffer(
-        "<html><ol style=\"margin: 2px 2px 2px 15px\">");
+          "<html><ol style=\"margin: 2px 2px 2px 15px\">");
       int i = 0;
       for (final Point snapPoint : this.snapPoints) {
         if (this.snapPointIndex == i) {
@@ -650,7 +658,7 @@ public class AbstractOverlay extends JComponent implements
         text.append(")</b><ul style=\"margin: 2px 2px 2px 15px\">");
 
         final Map<String, Set<CloseLocation>> typeLocationsMap = new TreeMap<String, Set<CloseLocation>>();
-        for (final CloseLocation snapLocation : snapPointLocationMap.get(snapPoint)) {
+        for (final CloseLocation snapLocation : this.snapPointLocationMap.get(snapPoint)) {
           final String typePath = snapLocation.getTypePath();
           final String locationType = snapLocation.getType();
           if ("Point".equals(locationType) || "End-Vertex".equals(locationType)) {
@@ -671,7 +679,7 @@ public class AbstractOverlay extends JComponent implements
         text.append("</ul></li>");
       }
       text.append("</ol></html>");
-      getMap().setToolTipText(snapEventPoint, text);
+      getMap().setToolTipText(this.snapEventPoint, text);
 
       if (BooleanStringConverter.getBoolean(nodeSnap)) {
         setMapCursor(CURSOR_NODE_SNAP);

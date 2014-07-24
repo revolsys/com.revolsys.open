@@ -48,8 +48,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.MethodInvoker;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -578,6 +576,20 @@ public class SwingUtil {
     final int modifiers = event.getModifiers();
     return SwingUtilities.isLeftMouseButton(event)
       && InputEvent.BUTTON1_MASK == modifiers;
+  }
+
+  public static boolean isLeftButtonOnly(final MouseEvent event) {
+    final int modifiers = event.getModifiersEx();
+    if ((modifiers & InputEvent.BUTTON1_DOWN_MASK) == InputEvent.BUTTON1_DOWN_MASK) {
+      for (int button = 11; button <= 30; button++) {
+        final int mask = 1 << button;
+        if ((modifiers & mask) == mask) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   public static boolean isMetaDown(final InputEvent event) {

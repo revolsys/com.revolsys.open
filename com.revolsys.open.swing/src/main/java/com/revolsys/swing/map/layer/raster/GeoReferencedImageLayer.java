@@ -27,7 +27,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.jts.geom.impl.PointDouble2D;
 import com.revolsys.raster.AbstractGeoReferencedImageFactory;
 import com.revolsys.raster.GeoReferencedImage;
 import com.revolsys.raster.GeoReferencedImageFactory;
@@ -50,6 +50,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class GeoReferencedImageLayer extends AbstractLayer {
@@ -104,6 +105,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   private String url;
 
   private boolean showOriginalImage = false;
+
+  private int opacity = 255;
 
   public GeoReferencedImageLayer(final Map<String, Object> properties) {
     super(properties);
@@ -277,6 +280,10 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     return this.image;
   }
 
+  public int getOpacity() {
+    return this.opacity;
+  }
+
   @Override
   public boolean isHasChanges() {
     if (this.image == null) {
@@ -363,6 +370,17 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       Property.addListener(image, this);
     }
     firePropertyChange("image", old, this.image);
+  }
+
+  public void setOpacity(int opacity) {
+    final int oldValue = this.opacity;
+    if (opacity < 0) {
+      opacity = 0;
+    } else if (opacity > 255) {
+      opacity = 255;
+    }
+    this.opacity = opacity;
+    firePropertyChange("opacity", oldValue, opacity);
   }
 
   public void setShowOriginalImage(final boolean showOriginalImage) {
@@ -492,7 +510,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       } catch (final NoninvertibleTransformException e) {
       }
     }
-    return new PointDouble(coordinates);
+    return new PointDouble2D(MathUtil.makePrecise(1, coordinates[0]),
+      MathUtil.makePrecise(1, coordinates[1]));
   }
 
   public void toggleShowOriginalImage() {
@@ -510,6 +529,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     map.remove("showOriginalImage");
     map.remove("imageSettings");
     MapSerializerUtil.add(map, "url", this.url);
+    MapSerializerUtil.add(map, "opacity", this.opacity, 1);
     return map;
   }
 
