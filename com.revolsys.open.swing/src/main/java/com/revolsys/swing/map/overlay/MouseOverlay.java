@@ -3,6 +3,8 @@ package com.revolsys.swing.map.overlay;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Window;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -15,13 +17,14 @@ import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.swing.SwingUtil;
 
 public class MouseOverlay extends JComponent implements MouseListener,
-  MouseMotionListener, MouseWheelListener, KeyListener {
+MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
   private static final long serialVersionUID = 1L;
 
   public MouseOverlay(final JLayeredPane pane) {
@@ -31,6 +34,35 @@ public class MouseOverlay extends JComponent implements MouseListener,
     addMouseMotionListener(this);
     addMouseWheelListener(this);
     addKeyListener(this);
+    addFocusListener(this);
+  }
+
+  @Override
+  public void focusGained(final FocusEvent e) {
+    if (e.getComponent() == this
+        && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
+    } else {
+      for (final Component overlay : getOverlays()) {
+        if (overlay instanceof FocusListener) {
+          final FocusListener listener = (FocusListener)overlay;
+          listener.focusGained(e);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void focusLost(final FocusEvent e) {
+    if (e.getComponent() == this
+        && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
+    } else {
+      for (final Component overlay : getOverlays()) {
+        if (overlay instanceof FocusListener) {
+          final FocusListener listener = (FocusListener)overlay;
+          listener.focusLost(e);
+        }
+      }
+    }
   }
 
   private List<Component> getOverlays() {

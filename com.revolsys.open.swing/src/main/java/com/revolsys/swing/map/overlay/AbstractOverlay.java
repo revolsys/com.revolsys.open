@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -55,8 +57,8 @@ import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
 
 public class AbstractOverlay extends JComponent implements
-PropertyChangeListener, MouseListener, MouseMotionListener,
-MouseWheelListener, KeyListener {
+  PropertyChangeListener, MouseListener, MouseMotionListener,
+  MouseWheelListener, KeyListener, FocusListener {
   public static final Cursor CURSOR_LINE_ADD_NODE = SilkIconLoader.getCursor(
     "cursor_line_node_add", 8, 6);
 
@@ -133,9 +135,9 @@ MouseWheelListener, KeyListener {
         text.append(typePath);
         text.append("</i></b>\n");
         text.append("<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">"
-            + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
-            + idAttributeName
-            + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th>POINT</th></tr></th><tbody>");
+          + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
+          + idAttributeName
+          + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th>POINT</th></tr></th><tbody>");
         for (final CloseLocation location : locations) {
           text.append("<tr style=\"border-bottom: solid black 1px\"><td style=\"border-right: solid black 1px\">");
           text.append(location.getId());
@@ -285,7 +287,7 @@ MouseWheelListener, KeyListener {
   }
 
   protected CloseLocation findCloseVertexLocation(
-    final AbstractRecordLayer layer, final LayerRecord object,
+    final AbstractRecordLayer layer, final LayerRecord record,
     final Geometry geometry, final BoundingBox boundingBox) {
     final GeometryVertexQuadTree index = GeometryVertexQuadTree.getGeometryVertexIndex(geometry);
     if (index != null) {
@@ -306,10 +308,18 @@ MouseWheelListener, KeyListener {
         }
       }
       if (closeVertex != null) {
-        return new CloseLocation(layer, object, closeVertex);
+        return new CloseLocation(layer, record, closeVertex);
       }
     }
     return null;
+  }
+
+  @Override
+  public void focusGained(final FocusEvent e) {
+  }
+
+  @Override
+  public void focusLost(final FocusEvent e) {
   }
 
   protected double getDistance(final MouseEvent event) {

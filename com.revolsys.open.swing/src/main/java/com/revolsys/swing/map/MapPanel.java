@@ -27,6 +27,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.BoundingBox;
@@ -83,6 +84,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       }
     }
   }
+
+  private Component visibleOverlay;
 
   private static final long serialVersionUID = 1L;
 
@@ -383,7 +386,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public boolean clearOverlayAction(final String overlayAction) {
-    if (this.overlayAction == overlayAction) {
+    if (EqualsRegistry.equal(this.overlayAction, overlayAction)) {
       this.overlayAction = null;
       this.overlayActionLabel.setText("");
       this.overlayActionLabel.setVisible(false);
@@ -394,6 +397,20 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public void clearToolTipText() {
     this.toolTipOverlay.clearText();
+  }
+
+  public void clearVisibleOverlay(final Component overlay) {
+    if (this.visibleOverlay == overlay) {
+      try {
+        for (final Component component : this.layeredPane.getComponents()) {
+          if (component != this.mouseOverlay) {
+            component.setVisible(true);
+          }
+        }
+      } finally {
+        this.visibleOverlay = null;
+      }
+    }
   }
 
   public void clearZoomHistory() {
@@ -789,6 +806,17 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       final double oldUnitsPerPixel = getUnitsPerPixel();
       if (!MathUtil.precisionEqual(unitsPerPixel, oldUnitsPerPixel, 10000000.0)) {
         setScale(scale);
+      }
+    }
+  }
+
+  public void setVisibleOverlay(final JComponent overlay) {
+    if (this.visibleOverlay == null) {
+      this.visibleOverlay = overlay;
+      for (final Component component : this.layeredPane.getComponents()) {
+        if (component != overlay && component != this.mouseOverlay) {
+          component.setVisible(false);
+        }
       }
     }
   }

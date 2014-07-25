@@ -405,12 +405,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
     if (isEmpty()) {
       return null;
     } else {
-      if (vertexId.length == 1) {
-        if (vertexId[0] == 0) {
-          return new PointVertex(this, vertexId);
-        }
-      }
-      return null;
+      return new PointVertex(this);
     }
   }
 

@@ -309,14 +309,21 @@ LinearRing {
           "Cannot move vertex for empty LinearRing");
     } else {
       final int vertexCount = getVertexCount();
+
       if (vertexIndex >= 0 && vertexIndex < vertexCount) {
         final GeometryFactory geometryFactory = getGeometryFactory();
         newPoint = newPoint.convert(geometryFactory);
-
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
-        CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex,
-          newPoint);
+        if (vertexIndex == 0 || vertexIndex == vertexCount - 1) {
+          CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0,
+            newPoint);
+          CoordinatesListUtil.setCoordinates(coordinates, axisCount,
+            vertexCount - 1, newPoint);
+        } else {
+          CoordinatesListUtil.setCoordinates(coordinates, axisCount,
+            vertexIndex, newPoint);
+        }
         return geometryFactory.linearRing(axisCount, coordinates);
       } else {
         throw new IllegalArgumentException(

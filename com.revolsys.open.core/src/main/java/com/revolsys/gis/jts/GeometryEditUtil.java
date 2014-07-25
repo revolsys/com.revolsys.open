@@ -3,7 +3,6 @@ package com.revolsys.gis.jts;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
@@ -55,22 +54,6 @@ public class GeometryEditUtil {
       }
     }
     return false;
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <G extends Geometry> G moveVertexIfEqual(final G geometry,
-    final Point originalLocation, final Point newLocation,
-    final int... vertexId) {
-    final Point coordinates = geometry.getVertex(vertexId);
-    CoordinatesUtil.setElevation(newLocation, originalLocation);
-    if (coordinates.equals(2, originalLocation)) {
-      final Point newCoordinates = CoordinatesUtil.setElevation(newLocation,
-        originalLocation);
-      return (G)geometry.moveVertex(newCoordinates, vertexId);
-    } else {
-      return geometry;
-    }
-
   }
 
   public static int[] setVertexIndex(final int[] index, final int vertexIndex) {

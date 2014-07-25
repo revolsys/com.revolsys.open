@@ -7,6 +7,7 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -29,40 +30,94 @@ import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.util.OS;
 
 public class ZoomOverlay extends AbstractOverlay {
+  private static final String ACTION_PAN = "pan";
+
+  private static final String ACTION_ZOOM_BOX = "zoomBox";
+
   private static final Cursor CURSOR_PAN = new Cursor(Cursor.HAND_CURSOR);
+
+  private static final Cursor CURSOR_ZOOM_BOX = SilkIconLoader.getCursor(
+    "cursor_zoom_box", 9, 9);
 
   private static final long serialVersionUID = 1L;
 
   private static final Color TRANS_BG = new Color(0, 0, 0, 30);
-
-  private java.awt.Point zoomBoxFirstPoint;
-
-  private java.awt.Point panFirstPoint;
-
-  private Rectangle2D zoomBox;
-
-  private boolean panning;
-
-  private BufferedImage panImage;
 
   static {
     PreferencesDialog.get().addPreference("Zoom", "com.revolsys.gis",
       "/com/revolsys/gis/zoom", "wheelForwardsZoomIn", Boolean.class, true);
   }
 
-  private static final Cursor CURSOR_ZOOM_BOX = SilkIconLoader.getCursor(
-    "cursor_zoom_box", 9, 9);
+  private java.awt.Point panFromPoint;
+
+  private BufferedImage panImage;
 
   private int panModifiers;
 
-  private static final String ACTION_ZOOM_BOX = "zoomBox";
+  private boolean panning;
 
-  private static final String ACTION_PAN = "pan";
+  private java.awt.Point panToPoint;
 
   private String prePanAction;
 
+  private Cursor prePanCursor;
+
+  private Rectangle2D zoomBox;
+
+  private java.awt.Point zoomBoxFirstPoint;
+
   public ZoomOverlay(final MapPanel map) {
     super(map);
+  }
+
+  protected void cancelPan() {
+    try {
+      clearMapCursor(CURSOR_PAN);
+      clearOverlayAction(ACTION_PAN);
+      if (this.prePanAction != null) {
+        setOverlayAction(this.prePanAction);
+      }
+      if (this.prePanCursor != null) {
+        setMapCursor(this.prePanCursor);
+      }
+    } finally {
+      getMap().clearVisibleOverlay(this);
+      this.panning = false;
+      this.panFromPoint = null;
+      this.panImage = null;
+      this.panToPoint = null;
+      this.prePanAction = null;
+      this.prePanCursor = null;
+    }
+  }
+
+  protected void cancelZoomBox(final KeyEvent event) {
+    this.zoomBox = null;
+    this.zoomBoxFirstPoint = null;
+    if (isOverlayAction(ACTION_ZOOM_BOX)) {
+      if (event == null || !event.isShiftDown()) {
+        clearOverlayAction(ACTION_ZOOM_BOX);
+        clearMapCursor(CURSOR_ZOOM_BOX);
+      }
+    }
+  }
+
+  @Override
+  public void focusGained(final FocusEvent e) {
+    if (isOverlayAction(ACTION_ZOOM_BOX)) {
+      setMapCursor(null);
+      setMapCursor(CURSOR_ZOOM_BOX);
+    }
+    if (isOverlayAction(ACTION_PAN)) {
+      setMapCursor(null);
+      setMapCursor(CURSOR_PAN);
+    }
+  }
+
+  @Override
+  public void focusLost(final FocusEvent e) {
+    cancelZoomBox(null);
+    cancelPan();
   }
 
   public boolean isWheelForwardsZoomIn() {
@@ -79,25 +134,24 @@ public class ZoomOverlay extends AbstractOverlay {
   public void keyPressed(final KeyEvent event) {
     final int keyCode = event.getKeyCode();
     if (keyCode == KeyEvent.VK_ESCAPE) {
-      this.panning = false;
-      this.panFirstPoint = null;
-      this.panImage = null;
-      if (clearOverlayAction(ACTION_ZOOM_BOX)) {
-        this.zoomBox = null;
-        this.zoomBoxFirstPoint = null;
-        setZoomBoxCursor(event);
-      }
+      cancelPan();
+      cancelZoomBox(event);
       repaint();
     } else if (keyCode == KeyEvent.VK_SHIFT) {
-      if (!hasOverlayAction()) {
-        setZoomBoxCursor(event);
+      if (setOverlayAction(ACTION_ZOOM_BOX)) {
+        setMapCursor(CURSOR_ZOOM_BOX);
       }
     }
   }
 
   @Override
   public void keyReleased(final KeyEvent event) {
-    setZoomBoxCursor(event);
+    if (isOverlayAction(ACTION_ZOOM_BOX)) {
+      if (this.zoomBoxFirstPoint == null && !event.isShiftDown()) {
+        clearOverlayAction(ACTION_ZOOM_BOX);
+        clearMapCursor(CURSOR_ZOOM_BOX);
+      }
+    }
   }
 
   @Override
@@ -155,8 +209,9 @@ public class ZoomOverlay extends AbstractOverlay {
 
   @Override
   public void mousePressed(final MouseEvent event) {
+    clearOverlayAction(ACTION_PAN);
     if (zoomBoxStart(event)) {
-    } else if (panStart(event)) {
+    } else if (panStart(event, false)) {
     }
   }
 
@@ -202,21 +257,22 @@ public class ZoomOverlay extends AbstractOverlay {
       g.setPaint(TRANS_BG);
       g.fill(this.zoomBox);
     }
-  }
-
-  public boolean panDrag(final MouseEvent event) {
-    if (this.panning || panStart(event)) {
-      final java.awt.Point p = event.getPoint();
-      final int dx = (int)(p.getX() - this.panFirstPoint.getX());
-      final int dy = (int)(p.getY() - this.panFirstPoint.getY());
-
+    if (this.panFromPoint != null && this.panToPoint != null) {
+      final int dx = (int)(this.panToPoint.getX() - this.panFromPoint.getX());
+      final int dy = (int)(this.panToPoint.getY() - this.panFromPoint.getY());
       final Container parent = getParent();
-      final Graphics2D graphics = getGraphics();
       final int width = getViewport().getViewWidthPixels();
       final int height = getViewport().getViewHeightPixels();
       graphics.setColor(Color.WHITE);
       graphics.fillRect(0, 0, width, height);
       graphics.drawImage(this.panImage, dx, dy, parent);
+    }
+  }
+
+  public boolean panDrag(final MouseEvent event) {
+    if (this.panning || panStart(event, true)) {
+      this.panToPoint = event.getPoint();
+      repaint();
       event.consume();
       return true;
     }
@@ -226,10 +282,8 @@ public class ZoomOverlay extends AbstractOverlay {
   public boolean panFinish(final MouseEvent event) {
     if (event.getModifiers() == this.panModifiers) {
       if (clearOverlayAction(ACTION_PAN) && this.panning) {
-        setOverlayAction(this.prePanAction);
-        this.prePanAction = null;
         final java.awt.Point point = event.getPoint();
-        final Point fromPoint = getViewport().toModelPoint(this.panFirstPoint);
+        final Point fromPoint = getViewport().toModelPoint(this.panFromPoint);
         final Point toPoint = getViewport().toModelPoint(point);
 
         final double deltaX = fromPoint.getX() - toPoint.getX();
@@ -239,12 +293,7 @@ public class ZoomOverlay extends AbstractOverlay {
         final BoundingBox newBoundingBox = boundingBox.move(deltaX, deltaY);
         getMap().setBoundingBox(newBoundingBox);
 
-        this.panFirstPoint = null;
-        this.panning = false;
-        this.panModifiers = 0;
-        clearMapCursor(CURSOR_PAN);
-        this.panImage = null;
-        getParent().repaint();
+        cancelPan();
         event.consume();
         return true;
       }
@@ -252,15 +301,14 @@ public class ZoomOverlay extends AbstractOverlay {
     return false;
   }
 
-  public boolean panStart(final MouseEvent event) {
-
+  public boolean panStart(final MouseEvent event, final boolean drag) {
     boolean pan = false;
-    if (SwingUtilities.isMiddleMouseButton(event)
-        && !SwingUtil.isModifierKeyDown(event)) {
+    if (SwingUtilities.isMiddleMouseButton(event)) {
       this.prePanAction = getOverlayAction();
       clearOverlayAction(this.prePanAction);
       pan = true;
-    } else if (!hasOverlayAction() && SwingUtilities.isLeftMouseButton(event)) {
+    } else if (!drag && !hasOverlayAction()
+        && SwingUtilities.isLeftMouseButton(event)) {
       pan = true;
     }
     if (pan) {
@@ -286,8 +334,10 @@ public class ZoomOverlay extends AbstractOverlay {
           }
           this.panning = true;
           setMapCursor(CURSOR_PAN);
-          this.panFirstPoint = event.getPoint();
+          this.panFromPoint = event.getPoint();
+          this.panToPoint = this.panFromPoint;
           event.consume();
+          getMap().setVisibleOverlay(this);
         }
         return true;
       }
