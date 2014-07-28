@@ -57,13 +57,16 @@ import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
 
 public class AbstractOverlay extends JComponent implements
-  PropertyChangeListener, MouseListener, MouseMotionListener,
-  MouseWheelListener, KeyListener, FocusListener {
+PropertyChangeListener, MouseListener, MouseMotionListener,
+MouseWheelListener, KeyListener, FocusListener {
   public static final Cursor CURSOR_LINE_ADD_NODE = SilkIconLoader.getCursor(
     "cursor_line_node_add", 8, 6);
 
   public static final Cursor CURSOR_LINE_SNAP = SilkIconLoader.getCursor(
     "cursor_line_snap", 8, 4);
+
+  public static final Cursor CURSOR_NODE_ADD = SilkIconLoader.getCursor(
+    "cursor_node_add", 8, 7);
 
   public static final Cursor CURSOR_NODE_EDIT = SilkIconLoader.getCursor(
     "cursor_node_edit", 8, 7);
@@ -71,15 +74,14 @@ public class AbstractOverlay extends JComponent implements
   public static final Cursor CURSOR_NODE_SNAP = SilkIconLoader.getCursor(
     "cursor_node_snap", 8, 7);
 
-  private static final VertexIndexComparator VERTEX_INDEX_COMPARATOR = new VertexIndexComparator();
+  public static final Cursor DEFAULT_CURSOR = Cursor.getDefaultCursor();
 
   private static final long serialVersionUID = 1L;
 
+  private static final VertexIndexComparator VERTEX_INDEX_COMPARATOR = new VertexIndexComparator();
+
   public static final GeometryStyle XOR_LINE_STYLE = GeometryStyle.line(
     new Color(0, 0, 255), 2);
-
-  public static final Cursor CURSOR_NODE_ADD = SilkIconLoader.getCursor(
-    "cursor_node_add", 8, 7);
 
   private GeometryFactory geometryFactory;
 
@@ -91,6 +93,8 @@ public class AbstractOverlay extends JComponent implements
 
   private Project project;
 
+  private Point snapCentre;
+
   private java.awt.Point snapEventPoint;
 
   private Point snapPoint;
@@ -99,13 +103,11 @@ public class AbstractOverlay extends JComponent implements
 
   private Map<Point, Set<CloseLocation>> snapPointLocationMap = Collections.emptyMap();
 
+  private final List<Point> snapPoints = new ArrayList<Point>();
+
   private Viewport2D viewport;
 
   private Geometry xorGeometry;
-
-  private Point snapCentre;
-
-  private final List<Point> snapPoints = new ArrayList<Point>();
 
   protected AbstractOverlay(final MapPanel map) {
     this.map = map;
@@ -113,6 +115,13 @@ public class AbstractOverlay extends JComponent implements
     this.project = map.getProject();
 
     map.addMapOverlay(this);
+  }
+
+  public void addOverlayActionOverride(final String overlayAction,
+    final String... overrideOverlayActions) {
+    if (this.map != null) {
+      this.map.addOverlayActionOverride(overlayAction, overrideOverlayActions);
+    }
   }
 
   protected void addUndo(final UndoableEdit edit) {
@@ -135,9 +144,9 @@ public class AbstractOverlay extends JComponent implements
         text.append(typePath);
         text.append("</i></b>\n");
         text.append("<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">"
-          + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
-          + idAttributeName
-          + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th>POINT</th></tr></th><tbody>");
+            + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
+            + idAttributeName
+            + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th>POINT</th></tr></th><tbody>");
         for (final CloseLocation location : locations) {
           text.append("<tr style=\"border-bottom: solid black 1px\"><td style=\"border-right: solid black 1px\">");
           text.append(location.getId());
@@ -151,6 +160,15 @@ public class AbstractOverlay extends JComponent implements
       }
       text.append("</div>");
     }
+  }
+
+  public boolean canOverrideOverlayAction(final String newAction) {
+    if (this.map == null) {
+      return false;
+    } else {
+      return this.map.canOverrideOverlayAction(newAction);
+    }
+
   }
 
   protected void clearMapCursor() {
@@ -180,7 +198,6 @@ public class AbstractOverlay extends JComponent implements
     } else {
       return this.map.clearOverlayAction(overlayAction);
     }
-
   }
 
   protected void clearUndoHistory() {
@@ -385,8 +402,9 @@ public class AbstractOverlay extends JComponent implements
   }
 
   protected Point getMousePoint() {
-    final java.awt.Point mousePosition = getMap().getMapMousePosition();
-    final Point mousePoint = getPoint(mousePosition);
+    final MapPanel map = getMap();
+    final java.awt.Point mousePosition = map.getMapMousePosition();
+    final Point mousePoint = getPoint(mousePosition.x, mousePosition.y);
     return mousePoint;
   }
 
@@ -398,23 +416,27 @@ public class AbstractOverlay extends JComponent implements
     }
   }
 
-  protected Point getPoint(final java.awt.Point eventPoint) {
-    if (eventPoint == null) {
-      return null;
+  protected Cursor getOverlayActionCursor(final String name) {
+    if (this.map == null) {
+      return DEFAULT_CURSOR;
     } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      final Point point = this.viewport.toModelPointRounded(geometryFactory,
-        eventPoint);
-      return point;
+      return this.map.getOverlayActionCursor(name);
     }
+  }
+
+  protected Point getPoint(final int x, final int y) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point point = this.viewport.toModelPointRounded(geometryFactory, x, y);
+    return point;
   }
 
   protected Point getPoint(final MouseEvent event) {
     if (event == null) {
       return null;
     } else {
-      final java.awt.Point eventPoint = event.getPoint();
-      return getPoint(eventPoint);
+      final int x = event.getX();
+      final int y = event.getY();
+      return getPoint(x, y);
     }
   }
 
@@ -595,7 +617,14 @@ public class AbstractOverlay extends JComponent implements
     if (this.map == null) {
       return false;
     } else {
-      return this.map.setOverlayAction(overlayAction);
+      final boolean set = this.map.setOverlayAction(overlayAction);
+      return set;
+    }
+  }
+
+  protected void setOverlayActionCursor(final String name, final Cursor cursor) {
+    if (this.map != null) {
+      this.map.setOverlayActionCursor(name, cursor);
     }
   }
 
@@ -653,7 +682,7 @@ public class AbstractOverlay extends JComponent implements
 
       boolean nodeSnap = false;
       final StringBuffer text = new StringBuffer(
-          "<html><ol style=\"margin: 2px 2px 2px 15px\">");
+        "<html><ol style=\"margin: 2px 2px 2px 15px\">");
       int i = 0;
       for (final Point snapPoint : this.snapPoints) {
         if (this.snapPointIndex == i) {

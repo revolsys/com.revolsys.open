@@ -3,6 +3,7 @@ package com.revolsys.swing.map;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.geom.Point2D;
@@ -11,9 +12,12 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -68,6 +72,7 @@ import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -85,15 +90,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
-  private Component visibleOverlay;
-
-  private static final long serialVersionUID = 1L;
-
-  public static final List<Long> SCALES = Arrays.asList(500000000L, 250000000L,
-    100000000L, 50000000L, 25000000L, 10000000L, 5000000L, 2500000L, 1000000L,
-    500000L, 250000L, 100000L, 50000L, 25000L, 10000L, 5000L, 2500L, 1000L,
-    500L, 250L, 100L, 50L, 25L, 10L, 5L);
-
   public static final BoundingBox BC_ENVELOPE = new BoundingBoxDoubleGf(
     GeometryFactory.fixed(3005, 1000.0), 2, 25000, 340000, 1900000, 1750000);
 
@@ -103,63 +99,79 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public static final String MAP_TABLE_WORKING_AREA = "mapTablesCWorkingArea";
 
-  private String overlayAction;
+  public static final List<Long> SCALES = Arrays.asList(500000000L, 250000000L,
+    100000000L, 50000000L, 25000000L, 10000000L, 5000000L, 2500000L, 1000000L,
+    500000L, 250000L, 100000L, 50000L, 25000L, 10000L, 5000L, 2500L, 1000L,
+    500L, 250L, 100L, 50L, 25L, 10L, 5L);
 
-  private List<Long> scales = new ArrayList<Long>();
+  private static final long serialVersionUID = 1L;
+
+  private ComboBox baseMapLayerField;
 
   private LayerGroup baseMapLayers;
 
   private LayerRendererOverlay baseMapOverlay;
 
+  private FileDropTargetListener fileDropListener;
+
   private final JLayeredPane layeredPane;
 
   private LayerRendererOverlay layerOverlay;
 
+  private BasePanel leftStatusBar = new BasePanel(new FlowLayout(
+    FlowLayout.LEFT));
+
   private MouseOverlay mouseOverlay;
+
+  private final LinkedList<String> overlayActionStack = new LinkedList<>();
+
+  private final LinkedList<Cursor> overlayActionCursorStack = new LinkedList<>();
+
+  /** Map from an overlay action (current) to the overlay actions that can override it (new). */
+  private final Map<String, Set<String>> overlayActionOverrides = new HashMap<String, Set<String>>();
+
+  private JLabel overlayActionLabel;
 
   private int overlayIndex = 1;
 
+  private SwingWorkerProgressBar progressBar;
+
   private Project project;
-
-  private double scale = 500000000;
-
-  private final UndoManager undoManager = new UndoManager();
-
-  private BasePanel leftStatusBar = new BasePanel(new FlowLayout(
-    FlowLayout.LEFT));
 
   private BasePanel rightStatusBar = new BasePanel(new FlowLayout(
     FlowLayout.RIGHT));
 
-  private final ToolBar toolBar = new ToolBar();
+  private double scale = 500000000;
 
-  private Viewport2D viewport;
+  private List<Long> scales = new ArrayList<Long>();
 
-  private final LinkedList<BoundingBox> zoomHistory = new LinkedList<BoundingBox>();
-
-  private int zoomHistoryIndex = -1;
-
-  private FileDropTargetListener fileDropListener;
-
-  private boolean updateZoomHistory = true;
-
-  private ToolTipOverlay toolTipOverlay;
-
-  private SwingWorkerProgressBar progressBar;
-
-  private JButton zoomBookmarkButton;
-
-  private JPanel statusBarPanel;
+  private SelectMapCoordinateSystem selectCoordinateSystem;
 
   private boolean settingBoundingBox = false;
 
   private boolean settingScale;
 
-  private ComboBox baseMapLayerField;
+  private JPanel statusBarPanel;
 
-  private JLabel overlayActionLabel;
+  private final ToolBar toolBar = new ToolBar();
 
-  private SelectMapCoordinateSystem selectCoordinateSystem;
+  private ToolTipOverlay toolTipOverlay;
+
+  private final UndoManager undoManager = new UndoManager();
+
+  private boolean updateZoomHistory = true;
+
+  private Viewport2D viewport;
+
+  private Component visibleOverlay;
+
+  private JButton zoomBookmarkButton;
+
+  private final LinkedList<BoundingBox> zoomHistory = new LinkedList<BoundingBox>();
+
+  private int zoomHistoryIndex = -1;
+
+  private final Map<String, Cursor> overlayActionCursors = new HashMap<>();
 
   public MapPanel() {
     this(new Project());
@@ -281,6 +293,14 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.toolTipOverlay = new ToolTipOverlay(this);
   }
 
+  public void addOverlayActionOverride(final String overlayAction,
+    final String... overrideOverlayActions) {
+    for (final String overrideOverlayAction : overrideOverlayActions) {
+      CollectionUtil.addToSet(this.overlayActionOverrides, overlayAction,
+        overrideOverlayAction);
+    }
+  }
+
   private void addPointerLocation(final boolean geographics) {
     final MapPointerLocation location = new MapPointerLocation(this,
       geographics);
@@ -385,14 +405,54 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.toolBar.addComponent("zoom", new SelectMapUnitsPerPixel(this));
   }
 
-  public boolean clearOverlayAction(final String overlayAction) {
-    if (EqualsRegistry.equal(this.overlayAction, overlayAction)) {
-      this.overlayAction = null;
-      this.overlayActionLabel.setText("");
-      this.overlayActionLabel.setVisible(false);
+  public boolean canOverrideOverlayAction(final String newAction) {
+    final String currentAction = getOverlayAction();
+    if (currentAction == null) {
       return true;
+    } else {
+      final Set<String> overrideActions = this.overlayActionOverrides.get(currentAction);
+      if (overrideActions == null) {
+        return false;
+      } else {
+        return overrideActions.contains(newAction);
+      }
     }
-    return false;
+  }
+
+  public boolean canOverrideOverlayAction(final String newAction,
+    final String currentAction) {
+    if (currentAction == null) {
+      return true;
+    } else {
+      final Set<String> overrideActions = this.overlayActionOverrides.get(currentAction);
+      if (overrideActions == null) {
+        return false;
+      } else {
+        return overrideActions.contains(newAction);
+      }
+    }
+  }
+
+  public boolean clearOverlayAction(final String overlayAction) {
+    if (overlayAction == null) {
+      return false;
+    } else if (isOverlayAction(overlayAction)) {
+      this.overlayActionCursorStack.pop();
+      this.overlayActionStack.pop();
+      if (hasOverlayAction()) {
+        final Cursor cursor = this.overlayActionCursorStack.peek();
+        super.setCursor(cursor);
+        final String previousAction = this.overlayActionStack.peek();
+        this.overlayActionLabel.setText(CaseConverter.toCapitalizedWords(previousAction));
+      } else {
+        this.overlayActionLabel.setText("");
+        this.overlayActionLabel.setVisible(false);
+        super.setCursor(AbstractOverlay.DEFAULT_CURSOR);
+      }
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public void clearToolTipText() {
@@ -538,7 +598,16 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public String getOverlayAction() {
-    return this.overlayAction;
+    if (this.overlayActionStack == null) {
+      return null;
+    } else {
+      return this.overlayActionStack.peek();
+    }
+  }
+
+  public Cursor getOverlayActionCursor(final String name) {
+    return CollectionUtil.get(this.overlayActionCursors, name,
+      AbstractOverlay.DEFAULT_CURSOR);
   }
 
   public SwingWorkerProgressBar getProgressBar() {
@@ -606,7 +675,20 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public boolean hasOverlayAction() {
-    return this.overlayAction != null;
+    return !this.overlayActionStack.isEmpty();
+  }
+
+  public boolean isOverlayAction(final String overlayAction) {
+    if (overlayAction == null) {
+      return false;
+    } else {
+      final String oldAction = getOverlayAction();
+      if (oldAction == null) {
+        return false;
+      } else {
+        return overlayAction.equals(oldAction);
+      }
+    }
   }
 
   public boolean isZoomNextEnabled() {
@@ -728,6 +810,17 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
+  @Override
+  public void setCursor(Cursor cursor) {
+    if (cursor == null) {
+      cursor = AbstractOverlay.DEFAULT_CURSOR;
+    }
+    super.setCursor(cursor);
+    if (!this.overlayActionCursorStack.isEmpty()) {
+      this.overlayActionCursorStack.set(0, cursor);
+    }
+  }
+
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     final GeometryFactory oldValue = getGeometryFactory();
     if (geometryFactory != oldValue) {
@@ -747,17 +840,26 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public boolean setOverlayAction(final String overlayAction) {
-    if (this.overlayAction == null) {
-      this.overlayAction = overlayAction;
-      if (overlayAction == null) {
-        this.overlayActionLabel.setText("");
-        this.overlayActionLabel.setVisible(false);
-      } else {
-        this.overlayActionLabel.setText(CaseConverter.toCapitalizedWords(overlayAction));
-        this.overlayActionLabel.setVisible(true);
-      }
+    final String oldAction = getOverlayAction();
+    if (overlayAction == null) {
+      return false;
+    } else if (EqualsRegistry.equal(oldAction, overlayAction)) {
+      return true;
+    } else if (canOverrideOverlayAction(overlayAction, oldAction)) {
+      final Cursor cursor = getOverlayActionCursor(overlayAction);
+      this.overlayActionCursorStack.push(cursor);
+      super.setCursor(cursor);
+      this.overlayActionStack.push(overlayAction);
+      this.overlayActionLabel.setText(CaseConverter.toCapitalizedWords(overlayAction));
+      this.overlayActionLabel.setVisible(true);
+      return true;
+    } else {
+      return false;
     }
-    return this.overlayAction == overlayAction;
+  }
+
+  public void setOverlayActionCursor(final String name, final Cursor cursor) {
+    this.overlayActionCursors.put(name, cursor);
   }
 
   public synchronized void setScale(double scale) {

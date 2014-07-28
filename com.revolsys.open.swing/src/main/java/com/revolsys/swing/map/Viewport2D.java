@@ -25,7 +25,6 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -82,7 +81,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   }
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
-    .geometry();
+      .geometry();
 
   private double pixelsPerXUnit;
 
@@ -144,7 +143,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
       }
       if (boundingBox.isEmpty()) {
         boundingBox = geometryFactory.getCoordinateSystem()
-          .getAreaBoundingBox();
+            .getAreaBoundingBox();
       }
     }
     setGeometryFactory(geometryFactory);
@@ -313,13 +312,10 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   public GeometryFactory getRoundedGeometryFactory(
     GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    if (coordinateSystem instanceof ProjectedCoordinateSystem) {
+    if (geometryFactory.isProjected()) {
       final double resolution = getUnitsPerPixel();
       if (resolution > 2) {
-        final int srid = geometryFactory.getSrid();
-        final int axisCount = geometryFactory.getAxisCount();
-        geometryFactory = GeometryFactory.fixed(srid, axisCount, 1.0, 1.0);
+        geometryFactory = geometryFactory.convertScales(1.0);
       }
     }
     return geometryFactory;
@@ -486,10 +482,10 @@ public class Viewport2D implements PropertyChangeSupportProxy {
           final Measurable<Length> viewWidthLength = getViewWidthLength();
           final Measurable<Length> modelWidthLength = newBoundingBox.getWidthLength();
           unitsPerPixel = modelWidthLength.doubleValue(SI.METRE)
-            / viewWidthPixels;
+              / viewWidthPixels;
           double scale = getScale(viewWidthLength, modelWidthLength);
           if (!this.scales.isEmpty() && viewWidthPixels > 0
-            && viewHeightPixels > 0) {
+              && viewHeightPixels > 0) {
             final double minScale = this.scales.get(this.scales.size() - 1);
             final double maxScale = this.scales.get(0);
             if (scale < minScale) {
@@ -641,7 +637,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double... viewCoordinates) {
     final double[] coordinates = toModelCoordinates(viewCoordinates);
     if (Double.isInfinite(coordinates[0]) || Double.isInfinite(coordinates[1])
-      || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
+        || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
       return geometryFactory.point();
     } else {
       final Point point = this.geometryFactory2d.point(coordinates);
@@ -669,9 +665,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   }
 
   public Point toModelPointRounded(GeometryFactory geometryFactory,
-    final java.awt.Point point) {
-    final double x = point.getX();
-    final double y = point.getY();
+    final int x, final int y) {
     geometryFactory = getRoundedGeometryFactory(geometryFactory);
     return toModelPoint(geometryFactory, x, y);
   }

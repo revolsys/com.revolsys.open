@@ -128,9 +128,13 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       useTransform, sourcePixel.getX(),
       image.getImageHeight() - sourcePixel.getY());
     final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-    final Point targetPoint = getTargetPoint();
-    return geometryFactory.lineString(2, sourcePoint[0], sourcePoint[1],
-      targetPoint.getX(), targetPoint.getY());
+    final double sourceX = sourcePoint[0];
+    final double sourceY = sourcePoint[1];
+
+    final Point targetPoint = getTargetPoint().convert(geometryFactory);
+    final double targetX = targetPoint.getX();
+    final double targetY = targetPoint.getY();
+    return geometryFactory.lineString(2, sourceX, sourceY, targetX, targetY);
   }
 
   public Point getTargetPixel(final BoundingBox boundingBox,
