@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,15 +22,27 @@ import javax.swing.SwingUtilities;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.Viewport2D;
 
 public class MouseOverlay extends JComponent implements MouseListener,
 MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
+
   private static final long serialVersionUID = 1L;
 
-  public MouseOverlay(final JLayeredPane pane) {
+  private static int x;
+
+  private static int y;
+
+  private final Viewport2D viewport;
+
+  public MouseOverlay(final MapPanel mapPanel, final JLayeredPane layeredPane) {
+    this.viewport = mapPanel.getViewport();
     setFocusable(true);
-    pane.add(this, new Integer(Integer.MAX_VALUE));
+    layeredPane.add(this, new Integer(Integer.MAX_VALUE));
     addMouseListener(this);
     addMouseMotionListener(this);
     addMouseWheelListener(this);
@@ -63,6 +76,28 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
         }
       }
     }
+  }
+
+  public Point getEventPoint() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point point = this.viewport.toModelPointRounded(geometryFactory, x, y);
+    return point;
+  }
+
+  public Point2D getEventPosition() {
+    return new java.awt.Point(x, y);
+  }
+
+  public int getEventX() {
+    return x;
+  }
+
+  public int getEventY() {
+    return y;
+  }
+
+  private GeometryFactory getGeometryFactory() {
+    return this.viewport.getGeometryFactory();
   }
 
   private List<Component> getOverlays() {
@@ -120,6 +155,7 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
+    updateEventPoint(e);
     requestFocusInWindow();
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
@@ -134,6 +170,7 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
+    updateEventPoint(e);
     requestFocusInWindow();
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseMotionListener) {
@@ -148,6 +185,7 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   @Override
   public void mouseEntered(final MouseEvent e) {
+    updateEventPoint(e);
     requestFocusInWindow();
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
@@ -162,6 +200,7 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   @Override
   public void mouseExited(final MouseEvent e) {
+    updateEventPoint(e);
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
@@ -175,6 +214,7 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   @Override
   public void mouseMoved(final MouseEvent event) {
+    updateEventPoint(event);
     try {
       requestFocusInWindow();
       for (final Component overlay : getOverlays()) {
@@ -193,6 +233,7 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   @Override
   public void mousePressed(final MouseEvent e) {
+    updateEventPoint(e);
     final Window window = SwingUtil.getWindowAncestor(this);
     window.setAlwaysOnTop(true);
     window.toFront();
@@ -214,6 +255,7 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
+    updateEventPoint(e);
     requestFocusInWindow();
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
@@ -228,6 +270,7 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
+    updateEventPoint(e);
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseWheelListener) {
         final MouseWheelListener listener = (MouseWheelListener)overlay;
@@ -237,6 +280,11 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
         }
       }
     }
+  }
+
+  private void updateEventPoint(final MouseEvent e) {
+    x = e.getX();
+    y = e.getY();
   }
 
 }

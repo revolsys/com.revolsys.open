@@ -33,8 +33,8 @@ import com.revolsys.util.OS;
 public class ZoomOverlay extends AbstractOverlay {
   public static final BasicStroke ZOOM_BOX_STROKE = new BasicStroke(2,
     BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 2, new float[] {
-    6, 6
-  }, 0f);
+      6, 6
+    }, 0f);
 
   public static final String ACTION_PAN = "pan";
 
@@ -131,7 +131,7 @@ public class ZoomOverlay extends AbstractOverlay {
         int numSteps = 0;
 
         if (button == MouseEvent.BUTTON1 && !hasOverlayAction()
-            || button == MouseEvent.BUTTON2) {
+          || button == MouseEvent.BUTTON2) {
           // Left or middle button, zoom in
           numSteps = -1;
         } else if (button == MouseEvent.BUTTON3) {
@@ -286,7 +286,8 @@ public class ZoomOverlay extends AbstractOverlay {
       if (SwingUtilities.isMiddleMouseButton(event)) {
         pan = true;
         this.panButton = MouseEvent.BUTTON2;
-      } else if (!drag && SwingUtilities.isLeftMouseButton(event)) {
+      } else if (!drag && SwingUtilities.isLeftMouseButton(event)
+        && !hasOverlayAction()) {
         if (event.getModifiersEx() == MouseEvent.BUTTON1_DOWN_MASK) {
           pan = true;
           this.panButton = MouseEvent.BUTTON1;
@@ -346,7 +347,7 @@ public class ZoomOverlay extends AbstractOverlay {
 
   protected boolean zoomBoxFinish(final MouseEvent event) {
     if (event.getButton() == MouseEvent.BUTTON1
-        && clearOverlayAction(ACTION_ZOOM_BOX)) {
+      && clearOverlayAction(ACTION_ZOOM_BOX)) {
       final Viewport2D viewport = getViewport();
 
       // Convert first point to envelope top left in map coords.
@@ -388,7 +389,7 @@ public class ZoomOverlay extends AbstractOverlay {
 
   protected boolean zoomBoxStart(final MouseEvent event) {
     if (isOverlayAction(ACTION_ZOOM_BOX)
-        && event.getButton() == MouseEvent.BUTTON1) {
+      && event.getButton() == MouseEvent.BUTTON1) {
       this.zoomBoxX1 = this.zoomBoxX2 = event.getX();
       this.zoomBoxY1 = this.zoomBoxY2 = event.getY();
       return true;

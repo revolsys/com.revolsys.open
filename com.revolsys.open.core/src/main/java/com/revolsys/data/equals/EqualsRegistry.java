@@ -78,6 +78,7 @@ public class EqualsRegistry implements Equals<Object> {
         final Equals<Object> equals = getEquals(object1.getClass());
         return equals.equals(object1, object2, exclude);
       } catch (final ClassCastException e) {
+        e.printStackTrace();
         return false;
       }
     }
@@ -88,7 +89,7 @@ public class EqualsRegistry implements Equals<Object> {
       return EqualsInstance.DEFAULT_EQUALS;
     } else {
       @SuppressWarnings("unchecked")
-      Equals<Object> equals = (Equals<Object>)classEqualsMap.get(clazz);
+      Equals<Object> equals = (Equals<Object>)this.classEqualsMap.get(clazz);
       if (equals == null) {
         final Class<?>[] interfaces = clazz.getInterfaces();
         if (interfaces != null) {
@@ -107,7 +108,7 @@ public class EqualsRegistry implements Equals<Object> {
   }
 
   public void register(final Class<?> clazz, final Equals<?> equals) {
-    classEqualsMap.put(clazz, equals);
+    this.classEqualsMap.put(clazz, equals);
     equals.setEqualsRegistry(this);
   }
 

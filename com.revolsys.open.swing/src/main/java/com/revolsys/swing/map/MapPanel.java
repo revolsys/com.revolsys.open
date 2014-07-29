@@ -288,7 +288,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     new ZoomOverlay(this);
     new SelectRecordsOverlay(this);
     new EditGeometryOverlay(this);
-    this.mouseOverlay = new MouseOverlay(this.layeredPane);
+    this.mouseOverlay = new MouseOverlay(this, this.layeredPane);
     new EditGeoReferencedImageOverlay(this);
     this.toolTipOverlay = new ToolTipOverlay(this);
   }
@@ -347,9 +347,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addUndoButtons() {
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canUndo");
+      "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canRedo");
+      "canRedo");
 
     this.toolBar.addButton("undo", "Undo", "arrow_undo", canUndo,
       this.undoManager, "undo");
@@ -407,7 +407,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public boolean canOverrideOverlayAction(final String newAction) {
     final String currentAction = getOverlayAction();
-    if (currentAction == null) {
+    if (newAction == null) {
+      return false;
+    } else if (currentAction == null) {
+      return true;
+    } else if (currentAction.equals(newAction)) {
       return true;
     } else {
       final Set<String> overrideActions = this.overlayActionOverrides.get(currentAction);
@@ -560,15 +564,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public JPanel getLeftStatusBar() {
     return this.leftStatusBar;
-  }
-
-  public java.awt.Point getMapMousePosition() {
-    final java.awt.Point mousePosition = this.layeredPane.getMousePosition();
-    if (mousePosition != null) {
-      mousePosition.x -= this.layeredPane.getInsets().left;
-      mousePosition.y -= this.layeredPane.getInsets().top;
-    }
-    return mousePosition;
   }
 
   @SuppressWarnings("unchecked")
@@ -728,7 +723,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {
         if (this.baseMapOverlay != null
-            && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
+          && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
           final Layer layer = (Layer)event.getNewValue();
           if (layer != null && layer.isVisible()) {
             this.baseMapOverlay.setLayer(layer);
@@ -954,11 +949,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final PopupMenu menu = new PopupMenu();
     final MenuFactory factory = menu.getMenu();
     factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
-        "addZoomBookmark");
+      "addZoomBookmark");
 
     final Project project = getProject();
     for (final Entry<String, BoundingBox> entry : project.getZoomBookmarks()
-        .entrySet()) {
+      .entrySet()) {
       final String name = entry.getKey();
       final BoundingBox boundingBox = entry.getValue();
       factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier",

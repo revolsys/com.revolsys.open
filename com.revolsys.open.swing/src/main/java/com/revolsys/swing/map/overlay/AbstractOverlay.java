@@ -34,10 +34,10 @@ import javax.swing.JComponent;
 import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.converter.string.BooleanStringConverter;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.quadtree.GeometrySegmentQuadTree;
 import com.revolsys.gis.algorithm.index.quadtree.GeometryVertexQuadTree;
-import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -55,10 +55,11 @@ import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.MathUtil;
 
 public class AbstractOverlay extends JComponent implements
-PropertyChangeListener, MouseListener, MouseMotionListener,
-MouseWheelListener, KeyListener, FocusListener {
+  PropertyChangeListener, MouseListener, MouseMotionListener,
+  MouseWheelListener, KeyListener, FocusListener {
   public static final Cursor CURSOR_LINE_ADD_NODE = SilkIconLoader.getCursor(
     "cursor_line_node_add", 8, 6);
 
@@ -88,8 +89,6 @@ MouseWheelListener, KeyListener, FocusListener {
   private final int hotspotPixels = 6;
 
   private MapPanel map;
-
-  private List<CloseLocation> mouseOverLocations = Collections.emptyList();
 
   private Project project;
 
@@ -144,22 +143,38 @@ MouseWheelListener, KeyListener, FocusListener {
         text.append(typePath);
         text.append("</i></b>\n");
         text.append("<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">"
-            + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
-            + idAttributeName
-            + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th>POINT</th></tr></th><tbody>");
+          + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
+          + idAttributeName
+          + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th style=\"border-right: solid black 1px\">SRID</th><th>POINT</th></tr></th><tbody>");
         for (final CloseLocation location : locations) {
           text.append("<tr style=\"border-bottom: solid black 1px\"><td style=\"border-right: solid black 1px\">");
           text.append(location.getId());
           text.append("</td><td style=\"border-right: solid black 1px\">");
           text.append(location.getIndexString());
-          text.append("</td></td>");
-          text.append(location.getPoint());
+          text.append("</td><td style=\"border-right: solid black 1px\">");
+          final Point point = location.getPoint();
+          text.append(point.getSrid());
+          text.append("</td><td>");
+          appendPoint(text, point);
           text.append("</td></tr>");
         }
         text.append("</tbody></table>");
       }
       text.append("</div>");
     }
+  }
+
+  protected void appendPoint(final StringBuffer text, final Point point) {
+    final double unitsPerPixel = getViewport().getUnitsPerPixel();
+    double scale = getGeometryFactory().getScaleXY();
+    if (getGeometryFactory().isProjected()) {
+      if (unitsPerPixel > 2) {
+        scale = 1.0;
+      }
+    }
+    text.append(MathUtil.toString(MathUtil.makePrecise(scale, point.getX())));
+    text.append(",");
+    text.append(MathUtil.toString(MathUtil.makePrecise(scale, point.getY())));
   }
 
   public boolean canOverrideOverlayAction(final String newAction) {
@@ -182,22 +197,18 @@ MouseWheelListener, KeyListener, FocusListener {
     }
   }
 
-  public void clearMouseOverGeometry() {
-    if (!hasOverlayAction()) {
-      clearMapCursor();
-    }
-    this.mouseOverLocations = Collections.emptyList();
-    this.snapPointLocationMap = Collections.emptyMap();
-    this.snapPoint = null;
-    this.snapEventPoint = null;
-  }
-
   public boolean clearOverlayAction(final String overlayAction) {
     if (this.map == null) {
       return false;
     } else {
       return this.map.clearOverlayAction(overlayAction);
     }
+  }
+
+  protected void clearSnapLocations() {
+    this.snapPointLocationMap = Collections.emptyMap();
+    this.snapPoint = null;
+    this.snapEventPoint = null;
   }
 
   protected void clearUndoHistory() {
@@ -213,7 +224,6 @@ MouseWheelListener, KeyListener, FocusListener {
 
   public void destroy() {
     this.map = null;
-    this.mouseOverLocations.clear();
     this.project = null;
     this.snapEventPoint = null;
     this.snapPoint = null;
@@ -251,30 +261,30 @@ MouseWheelListener, KeyListener, FocusListener {
   }
 
   protected CloseLocation findCloseLocation(final AbstractRecordLayer layer,
-    final LayerRecord object, final Geometry geometry,
+    final LayerRecord record, final Geometry geometry,
     final BoundingBox boundingBox) {
-    CloseLocation closeLocation = findCloseVertexLocation(layer, object,
+    CloseLocation closeLocation = findCloseVertexLocation(layer, record,
       geometry, boundingBox);
     if (closeLocation == null) {
-      closeLocation = findCloseSegmentLocation(layer, object, geometry,
+      closeLocation = findCloseSegmentLocation(layer, record, geometry,
         boundingBox);
     }
     return closeLocation;
   }
 
-  protected CloseLocation findCloseLocation(final LayerRecord object,
+  protected CloseLocation findCloseLocation(final LayerRecord record,
     final BoundingBox boundingBox) {
-    if (object.isGeometryEditable()) {
-      final AbstractRecordLayer layer = object.getLayer();
-      final Geometry geometryValue = object.getGeometryValue();
-      return findCloseLocation(layer, object, geometryValue, boundingBox);
+    if (record.isGeometryEditable()) {
+      final AbstractRecordLayer layer = record.getLayer();
+      final Geometry geometry = record.getGeometryValue();
+      return findCloseLocation(layer, record, geometry, boundingBox);
 
     }
     return null;
   }
 
   private CloseLocation findCloseSegmentLocation(
-    final AbstractRecordLayer layer, final LayerRecord object,
+    final AbstractRecordLayer layer, final LayerRecord record,
     final Geometry geometry, final BoundingBox boundingBox) {
 
     final GeometryFactory viewportGeometryFactory = getViewport().getGeometryFactory();
@@ -298,7 +308,9 @@ MouseWheelListener, KeyListener, FocusListener {
       final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
       final GeometryFactory geometryFactory = layer.getGeometryFactory();
       final Point closePoint = pointOnLine.convert(geometryFactory);
-      return new CloseLocation(layer, object, closestSegment, closePoint);
+      final int[] segmentId = closestSegment.getSegmentId();
+      final Segment segment = geometry.getSegment(segmentId);
+      return new CloseLocation(layer, record, segment, closePoint);
     }
     return null;
   }
@@ -317,7 +329,7 @@ MouseWheelListener, KeyListener, FocusListener {
       double minDistance = Double.MAX_VALUE;
       for (final Vertex vertex : closeVertices) {
         if (vertex != null) {
-          final double distance = ((Point)vertex.copy(geometryFactory)).distance(centre);
+          final double distance = ((Point)vertex.convert(geometryFactory)).distance(centre);
           if (distance < minDistance) {
             minDistance = distance;
             closeVertex = vertex;
@@ -351,11 +363,25 @@ MouseWheelListener, KeyListener, FocusListener {
     return p1.distance(p2);
   }
 
+  protected Point getEventPoint() {
+    final MouseOverlay mouseOverlay = this.map.getMouseOverlay();
+    return mouseOverlay.getEventPoint();
+  }
+
+  protected Point2D getEventPosition() {
+    final MouseOverlay mouseOverlay = this.map.getMouseOverlay();
+    return mouseOverlay.getEventPosition();
+  }
+
   protected GeometryFactory getGeometryFactory() {
-    if (this.geometryFactory == null) {
-      return this.project.getGeometryFactory();
+    GeometryFactory geometryFactory = this.geometryFactory;
+    if (geometryFactory == null) {
+      geometryFactory = this.project.getGeometryFactory();
+      if (geometryFactory == null) {
+        geometryFactory = getViewportGeometryFactory();
+      }
     }
-    return this.geometryFactory;
+    return geometryFactory;
   }
 
   @Override
@@ -395,17 +421,6 @@ MouseWheelListener, KeyListener, FocusListener {
 
   private double getMaxDistance(final BoundingBox boundingBox) {
     return Math.max(boundingBox.getWidth() / 2, boundingBox.getHeight()) / 2;
-  }
-
-  public List<CloseLocation> getMouseOverLocations() {
-    return this.mouseOverLocations;
-  }
-
-  protected Point getMousePoint() {
-    final MapPanel map = getMap();
-    final java.awt.Point mousePosition = map.getMapMousePosition();
-    final Point mousePoint = getPoint(mousePosition.x, mousePosition.y);
-    return mousePoint;
   }
 
   public String getOverlayAction() {
@@ -473,15 +488,6 @@ MouseWheelListener, KeyListener, FocusListener {
     return point;
   }
 
-  protected Point getViewportPoint(final MouseEvent event) {
-    if (event == null) {
-      return null;
-    } else {
-      final java.awt.Point eventPoint = event.getPoint();
-      return getViewportPoint(eventPoint);
-    }
-  }
-
   public Geometry getXorGeometry() {
     return this.xorGeometry;
   }
@@ -498,6 +504,7 @@ MouseWheelListener, KeyListener, FocusListener {
     final BoundingBox boundingBox) {
 
     final java.awt.Point eventPoint = event.getPoint();
+
     this.snapEventPoint = eventPoint;
     new TreeMap<Point, List<CloseLocation>>();
     this.snapCentre = boundingBox.getCentre();
@@ -505,10 +512,10 @@ MouseWheelListener, KeyListener, FocusListener {
     final Map<Point, Set<CloseLocation>> snapLocations = new HashMap<Point, Set<CloseLocation>>();
     this.snapPoint = null;
     for (final AbstractRecordLayer layer : layers) {
-      final List<LayerRecord> objects = layer.queryBackground(boundingBox);
-      for (final LayerRecord object : objects) {
-        if (layer.isVisible(object)) {
-          final CloseLocation closeLocation = findCloseLocation(object,
+      final List<LayerRecord> records = layer.queryBackground(boundingBox);
+      for (final LayerRecord record : records) {
+        if (layer.isVisible(record)) {
+          final CloseLocation closeLocation = findCloseLocation(record,
             boundingBox);
           if (closeLocation != null) {
             final Point closePoint = closeLocation.getPoint();
@@ -518,7 +525,6 @@ MouseWheelListener, KeyListener, FocusListener {
         }
       }
     }
-    this.snapPointIndex = 0;
     return setSnapLocations(snapLocations);
 
   }
@@ -589,27 +595,16 @@ MouseWheelListener, KeyListener, FocusListener {
   }
 
   protected void setGeometryFactory(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
+    if (geometryFactory == null) {
+      this.geometryFactory = getViewportGeometryFactory();
+    } else {
+      this.geometryFactory = geometryFactory;
+    }
   }
 
   protected void setMapCursor(final Cursor cursor) {
     if (this.map != null) {
       this.map.setCursor(cursor);
-    }
-  }
-
-  protected boolean setMouseOverLocations(final java.awt.Point eventPoint,
-    final List<CloseLocation> mouseOverLocations) {
-    this.mouseOverLocations = mouseOverLocations;
-    if (this.mouseOverLocations.isEmpty()) {
-      if (!hasOverlayAction()) {
-        clearMapCursor();
-      }
-      return false;
-    } else {
-      this.snapPoint = null;
-      setXorGeometry(null);
-      return true;
     }
   }
 
@@ -630,69 +625,94 @@ MouseWheelListener, KeyListener, FocusListener {
 
   protected boolean setSnapLocations(
     final Map<Point, Set<CloseLocation>> snapLocations) {
-    if (snapLocations != this.snapPointLocationMap) {
-      this.snapPointLocationMap = snapLocations;
-      this.snapPoints.clear();
-      this.snapPoints.addAll(snapLocations.keySet());
-      Collections.sort(this.snapPoints, new Comparator<Point>() {
-        @Override
-        public int compare(final Point point1, final Point point2) {
-          final Collection<CloseLocation> locations1 = snapLocations.get(point1);
-          final Collection<CloseLocation> locations2 = snapLocations.get(point2);
-          final boolean hasVertex1 = hasVertex(locations1);
-          final boolean hasVertex2 = hasVertex(locations2);
-          if (hasVertex1) {
-            if (!hasVertex2) {
-              return -1;
-            }
-          } else if (hasVertex2) {
-            return 0;
-          }
-          final double distance1 = AbstractOverlay.this.snapCentre.distance(point1);
-          final double distance2 = AbstractOverlay.this.snapCentre.distance(point2);
-          if (distance1 <= distance2) {
-            return -1;
-          } else {
-            return 0;
-          }
+    if (snapLocations.isEmpty()) {
+      if (!this.snapPointLocationMap.isEmpty()) {
+        this.snapCentre = null;
+        this.snapPoint = null;
+        this.snapPointLocationMap = snapLocations;
+        this.snapPoints.clear();
+        if (!hasOverlayAction()) {
+          clearMapCursor();
         }
-
-        private boolean hasVertex(final Collection<CloseLocation> locations) {
-          for (final CloseLocation location : locations) {
-            if (location.getVertex() != null) {
-              return true;
-            }
-          }
-          return false;
-        }
-      });
-
-    }
-    if (this.snapPointLocationMap.isEmpty()) {
-      this.snapCentre = null;
-      this.snapPoint = null;
-      this.snapPoints.clear();
-      if (!hasOverlayAction()) {
-        clearMapCursor();
+        this.map.clearToolTipText();
       }
       return false;
     } else {
+      if (!EqualsRegistry.equal(snapLocations, this.snapPointLocationMap)) {
+        this.snapPointIndex = 1;
+        this.snapPointLocationMap = snapLocations;
+        this.snapPoints.clear();
+        this.snapPoints.addAll(snapLocations.keySet());
+        Collections.sort(this.snapPoints, new Comparator<Point>() {
+          @Override
+          public int compare(final Point point1, final Point point2) {
+            final Collection<CloseLocation> locations1 = snapLocations.get(point1);
+            final Collection<CloseLocation> locations2 = snapLocations.get(point2);
+            final boolean hasVertex1 = hasVertex(locations1);
+            final boolean hasVertex2 = hasVertex(locations2);
+            if (hasVertex1) {
+              if (!hasVertex2) {
+                return -1;
+              }
+            } else if (hasVertex2) {
+              return 0;
+            }
+            final double distance1 = AbstractOverlay.this.snapCentre.distance(point1);
+            final double distance2 = AbstractOverlay.this.snapCentre.distance(point2);
+            if (distance1 <= distance2) {
+              return -1;
+            } else {
+              return 0;
+            }
+          }
 
-      this.snapPoint = this.snapPoints.get(this.snapPointIndex);
+          private boolean hasVertex(final Collection<CloseLocation> locations) {
+            for (final CloseLocation location : locations) {
+              if (location.getVertex() != null) {
+                return true;
+              }
+            }
+            return false;
+          }
+        });
+      }
+      final MapPanel map = getMap();
+      if (this.snapPointIndex == 0) {
+        this.snapPoint = getEventPoint();
+      } else {
+        this.snapPoint = this.snapPoints.get(this.snapPointIndex - 1);
+      }
 
       boolean nodeSnap = false;
       final StringBuffer text = new StringBuffer(
-        "<html><ol style=\"margin: 2px 2px 2px 15px\">");
-      int i = 0;
+        "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
+      text.append("<li style=\"padding: 2px; margin:1px;");
+      if (0 == this.snapPointIndex) {
+        text.append("border: 2px solid maroon");
+      } else {
+        text.append("border: 2px solid #FFFF332");
+      }
+
+      text.append("\">Not snaped: ");
+      final Point mousePoint = getEventPoint();
+      appendPoint(text, mousePoint);
+      text.append(" (");
+      text.append(mousePoint.getSrid());
+      text.append(")</li>");
+      int i = 1;
       for (final Point snapPoint : this.snapPoints) {
-        if (this.snapPointIndex == i) {
-          text.append("<li style=\"border: 3px solid maroon; padding: 2px\">");
+        text.append("<li style=\"padding: 2px; margin:1px;");
+        if (i == this.snapPointIndex) {
+          text.append("border: 2px solid maroon");
         } else {
-          text.append("<li style=\"padding: 3px\">");
+          text.append("border: 2px solid #FFFF332");
         }
+
         i++;
-        text.append("<b>Snap to (");
-        text.append(WktWriter.toString(snapPoint, true));
+        text.append("\"><b>Snap: ");
+        appendPoint(text, snapPoint);
+        text.append(" (");
+        text.append(snapPoint.getSrid());
         text.append(")</b><ul style=\"margin: 2px 2px 2px 15px\">");
 
         final Map<String, Set<CloseLocation>> typeLocationsMap = new TreeMap<String, Set<CloseLocation>>();
@@ -717,7 +737,7 @@ MouseWheelListener, KeyListener, FocusListener {
         text.append("</ul></li>");
       }
       text.append("</ol></html>");
-      getMap().setToolTipText(this.snapEventPoint, text);
+      map.setToolTipText(this.snapEventPoint, text);
 
       if (BooleanStringConverter.getBoolean(nodeSnap)) {
         setMapCursor(CURSOR_NODE_SNAP);

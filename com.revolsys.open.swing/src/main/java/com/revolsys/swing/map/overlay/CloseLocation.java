@@ -4,6 +4,7 @@ import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.jts.GeometryEditUtil;
+import com.revolsys.gis.util.Debug;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -17,7 +18,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
 
   private final AbstractRecordLayer layer;
 
-  private final LayerRecord object;
+  private final LayerRecord record;
 
   private Vertex vertex;
 
@@ -28,7 +29,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
   public CloseLocation(final AbstractRecordLayer layer,
     final LayerRecord object, final Segment segment, final Point point) {
     this.layer = layer;
-    this.object = object;
+    this.record = object;
     this.segment = segment;
     this.point = point;
   }
@@ -36,7 +37,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
   public CloseLocation(final AbstractRecordLayer layer,
     final LayerRecord object, final Vertex vertex) {
     this.layer = layer;
-    this.object = object;
+    this.record = object;
     this.vertex = vertex;
     this.point = vertex;
   }
@@ -44,6 +45,27 @@ public class CloseLocation implements Comparable<CloseLocation> {
   @Override
   public int compareTo(final CloseLocation location) {
     return 0;
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof CloseLocation) {
+      final CloseLocation location = (CloseLocation)other;
+      final LayerRecord record1 = getRecord();
+      final LayerRecord record2 = location.getRecord();
+      if (record1 == null) {
+        return record2 == null;
+      } else if (record2 == null) {
+        return false;
+      } else if (record2.isSame(record1)) {
+        if (location.getPoint().equals(getPoint())) {
+          return true;
+        }
+      } else {
+        Debug.noOp();
+      }
+    }
+    return false;
   }
 
   public <G extends Geometry> G getGeometry() {
@@ -60,8 +82,8 @@ public class CloseLocation implements Comparable<CloseLocation> {
 
   public Object getId() {
     Identifier id = null;
-    if (this.object != null) {
-      id = this.object.getIdentifier();
+    if (this.record != null) {
+      id = this.record.getIdentifier();
     }
     if (id == null) {
       id = SingleIdentifier.create("NEW");
@@ -87,16 +109,16 @@ public class CloseLocation implements Comparable<CloseLocation> {
     return this.layer;
   }
 
-  public RecordDefinition getRecordDefinition() {
-    return this.layer.getRecordDefinition();
-  }
-
-  public LayerRecord getObject() {
-    return this.object;
-  }
-
   public Point getPoint() {
     return this.point;
+  }
+
+  public LayerRecord getRecord() {
+    return this.record;
+  }
+
+  public RecordDefinition getRecordDefinition() {
+    return this.layer.getRecordDefinition();
   }
 
   public Segment getSegment() {
@@ -138,6 +160,11 @@ public class CloseLocation implements Comparable<CloseLocation> {
     } else {
       return this.vertex.getVertexId();
     }
+  }
+
+  @Override
+  public int hashCode() {
+    return this.point.hashCode();
   }
 
   @Override
