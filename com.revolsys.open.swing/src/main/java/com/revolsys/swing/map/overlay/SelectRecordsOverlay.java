@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -45,8 +46,8 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   protected static final BasicStroke BOX_STROKE = new BasicStroke(2,
     BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 2, new float[] {
-      6, 6
-    }, 0f);
+    6, 6
+  }, 0f);
 
   private static final Color COLOR_BOX = WebColors.Green;
 
@@ -66,12 +67,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     WebColors.Black, WebColors.Yellow);
 
   private static final Set<String> REDRAW_PROPERTY_NAMES = new HashSet<>(
-    Arrays.asList("refresh", "viewBoundingBox", "unitsPerPixel", "scale"));
+      Arrays.asList("refresh", "viewBoundingBox", "unitsPerPixel", "scale"));
 
   private static final Set<String> REDRAW_REPAINT_PROPERTY_NAMES = new HashSet<>(
-    Arrays.asList("layers", "selectable", "visible", "editable",
-      "recordsChanged", "updateRecord", "hasSelectedRecords",
-      "hasHighlightedRecords"));
+      Arrays.asList("layers", "selectable", "visible", "editable",
+        "recordsChanged", "updateRecord", "hasSelectedRecords",
+          "hasHighlightedRecords"));
 
   public static final SelectedRecordsRenderer SELECT_RENDERER = new SelectedRecordsRenderer(
     WebColors.Black, WebColors.Lime);
@@ -91,8 +92,6 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private double selectBoxY2 = -1;
 
   private int selectBoxButton;
-
-  private Cursor selectCursor;
 
   private BufferedImage selectImage;
 
@@ -236,7 +235,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           setMapCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
           try (
-            final ImageViewport imageViewport = new ImageViewport(viewport)) {
+              final ImageViewport imageViewport = new ImageViewport(viewport)) {
             paintSelected(imageViewport, layerGroup);
             paintHighlighted(imageViewport, layerGroup);
             this.selectImage = imageViewport.getImage();
@@ -249,7 +248,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       }
     }
     if (this.selectImage != null) {
-      graphics.drawImage(this.selectImage, 0, 0, null);
+      graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+        RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      graphics.drawRenderedImage(this.selectImage, null);
     }
     paintSelectBox(graphics);
   }
@@ -409,7 +410,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private boolean selectBoxStart(final MouseEvent event) {
     if (isOverlayAction(ACTION_SELECT_RECORDS)
-      && SwingUtil.isLeftButtonOnly(event)) {
+        && SwingUtil.isLeftButtonOnly(event)) {
       this.selectBoxButton = event.getButton();
       final Point point = getPoint(event);
       this.selectBoxX1 = this.selectBoxX2 = point.getX();
@@ -451,7 +452,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     Cursor cursor = null;
     if (event != null) {
       final boolean selectBox = SwingUtil.isControlOrMetaDown(event)
-          || this.selectBoxX1 != -1;
+        || this.selectBoxX1 != -1;
       if (SwingUtil.isShiftDown(event)) {
         if (selectBox) {
           cursor = CURSOR_SELECT_BOX_ADD;

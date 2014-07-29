@@ -154,8 +154,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           point = geometry.getCentroid().copy(geometryFactory);
           if (!viewport.getBoundingBox().covers(point)) {
             final Geometry clippedGeometry = viewport.getBoundingBox()
-              .toPolygon()
-              .intersection(geometry);
+                .toPolygon()
+                .intersection(geometry);
             if (!clippedGeometry.isEmpty()) {
               double maxArea = 0;
               double maxLength = 0;
@@ -210,7 +210,10 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
         final Paint paint = graphics.getPaint();
         final Composite composite = graphics.getComposite();
         try {
-          graphics.setBackground(Color.BLACK);
+          graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_ON);
+          graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
           style.setTextStyle(viewport, graphics);
 
           final double x = point.getX();
@@ -248,7 +251,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           final int ascent = fontMetrics.getAscent();
           final int leading = fontMetrics.getLeading();
           final double maxHeight = lines.length * (ascent + descent)
-            + (lines.length - 1) * leading;
+              + (lines.length - 1) * leading;
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
           } else if ("middle".equals(verticalAlignment)) {
@@ -320,19 +323,9 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
               graphics.fill(box);
             }
 
-            if (textBoxOpacity > 0 && textBoxOpacity < 255) {
-              graphics.setComposite(AlphaComposite.SrcOut);
-            } else {
-              graphics.setComposite(AlphaComposite.SrcOver);
-            }
-
             final double textHaloRadius = Viewport2D.toDisplayValue(viewport,
               style.getTextHaloRadius());
             if (textHaloRadius > 0) {
-              graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-              graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
               final Stroke savedStroke = graphics.getStroke();
               final Stroke outlineStroke = new BasicStroke(
                 (float)(textHaloRadius + 1), BasicStroke.CAP_BUTT,
@@ -348,12 +341,18 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
               graphics.setStroke(savedStroke);
             }
 
-            graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-              RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-              RenderingHints.VALUE_ANTIALIAS_ON);
             graphics.setColor(style.getTextFill());
-            graphics.drawString(line, (float)0, (float)0);
+            if (textBoxOpacity > 0 && textBoxOpacity < 255) {
+              graphics.setComposite(AlphaComposite.SrcOut);
+              graphics.drawString(line, (float)0, (float)0);
+              graphics.setComposite(AlphaComposite.DstOver);
+              graphics.drawString(line, (float)0, (float)0);
+
+            } else {
+              graphics.setComposite(AlphaComposite.SrcOver);
+              graphics.drawString(line, (float)0, (float)0);
+            }
+
             graphics.setTransform(lineTransform);
             graphics.translate(0, leading + descent);
           }

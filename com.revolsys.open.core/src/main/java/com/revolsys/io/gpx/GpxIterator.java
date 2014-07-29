@@ -81,8 +81,7 @@ public class GpxIterator implements RecordIterator {
   }
 
   public GpxIterator(final Resource resource,
-    final RecordFactory recordFactory, final String path)
-    throws IOException {
+    final RecordFactory recordFactory, final String path) throws IOException {
     this(StaxUtils.createXmlReader(resource));
     this.recordFactory = recordFactory;
     this.typePath = path;
@@ -133,7 +132,7 @@ public class GpxIterator implements RecordIterator {
       do {
         this.currentRecord = parseRecord();
       } while (this.currentRecord != null
-          && this.typePath != null
+        && this.typePath != null
         && !this.currentRecord.getRecordDefinition()
           .getPath()
           .equals(this.typePath));
@@ -210,30 +209,6 @@ public class GpxIterator implements RecordIterator {
   // return attribute;
   // }
 
-  private Record parseRecord() throws XMLStreamException {
-    if (!this.objects.isEmpty()) {
-      return this.objects.remove();
-    } else {
-      if (this.in.getEventType() != XMLStreamConstants.START_ELEMENT) {
-        StaxUtils.skipToStartElement(this.in);
-      }
-      while (this.in.getEventType() == XMLStreamConstants.START_ELEMENT) {
-        final QName name = this.in.getName();
-        if (name.equals(GpxConstants.WAYPOINT_ELEMENT)) {
-          return parseWaypoint();
-        } else if (name.equals(GpxConstants.TRACK_ELEMENT)) {
-          return parseTrack();
-        } else if (name.equals(GpxConstants.ROUTE_ELEMENT)) {
-          return parseRoute();
-        } else {
-          StaxUtils.skipSubTree(this.in);
-          this.in.nextTag();
-        }
-      }
-      return null;
-    }
-  }
-
   protected Record parsePoint(final String featureType, final double index)
     throws XMLStreamException {
     final Record record = this.recordFactory.createRecord(GpxConstants.GPX_TYPE);
@@ -266,6 +241,30 @@ public class GpxIterator implements RecordIterator {
     return record;
   }
 
+  private Record parseRecord() throws XMLStreamException {
+    if (!this.objects.isEmpty()) {
+      return this.objects.remove();
+    } else {
+      if (this.in.getEventType() != XMLStreamConstants.START_ELEMENT) {
+        StaxUtils.skipToStartElement(this.in);
+      }
+      while (this.in.getEventType() == XMLStreamConstants.START_ELEMENT) {
+        final QName name = this.in.getName();
+        if (name.equals(GpxConstants.WAYPOINT_ELEMENT)) {
+          return parseWaypoint();
+        } else if (name.equals(GpxConstants.TRACK_ELEMENT)) {
+          return parseTrack();
+        } else if (name.equals(GpxConstants.ROUTE_ELEMENT)) {
+          return parseRoute();
+        } else {
+          StaxUtils.skipSubTree(this.in);
+          this.in.nextTag();
+        }
+      }
+      return null;
+    }
+  }
+
   private Record parseRoute() throws XMLStreamException {
     this.index++;
     final Record record = this.recordFactory.createRecord(GpxConstants.GPX_TYPE);
@@ -279,7 +278,7 @@ public class GpxIterator implements RecordIterator {
         StaxUtils.skipSubTree(this.in);
       } else if (this.in.getName().equals(GpxConstants.ROUTE_POINT_ELEMENT)) {
         final double pointIndex = this.index + (pointObjects.size() + 1.0)
-            / 10000;
+          / 10000;
         final Record pointObject = parseRoutPoint(pointIndex);
         pointObjects.add(pointObject);
         final Point point = pointObject.getGeometryValue();
@@ -325,7 +324,7 @@ public class GpxIterator implements RecordIterator {
         StaxUtils.skipSubTree(this.in);
       } else if (this.in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
         final LineString line = parseTrackSegment();
-        if (line.getVertexCount() > 1) {
+        if (line != null && line.getVertexCount() > 1) {
           lines.add(line);
           if (line.getAxisCount() > axisCount) {
             axisCount = line.getAxisCount();
@@ -393,8 +392,12 @@ public class GpxIterator implements RecordIterator {
       final int pointAxisCount = parseTrackPoint(coordinates);
       axisCount = Math.max(axisCount, pointAxisCount);
     }
-    return this.geometryFactory.convertAxisCount(axisCount).lineString(
-      axisCount, MathUtil.toDoubleArray(coordinates));
+    if (coordinates.size() == axisCount) {
+      return null;
+    } else {
+      return this.geometryFactory.convertAxisCount(axisCount).lineString(
+        axisCount, MathUtil.toDoubleArray(coordinates));
+    }
   }
 
   private Record parseWaypoint() throws XMLStreamException {

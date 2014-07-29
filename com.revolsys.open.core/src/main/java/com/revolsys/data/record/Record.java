@@ -10,7 +10,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 
 public interface Record extends Map<String, Object>, Comparable<Record>,
-  Identifiable {
+Identifiable {
   /**
    * Create a clone of the data object.
    *
@@ -108,6 +108,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>,
    * @return True if the Record has an attribute with the specified name.
    */
   boolean hasAttribute(CharSequence name);
+
+  boolean hasValue(CharSequence name);
 
   boolean isModified();
 
