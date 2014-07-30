@@ -29,7 +29,10 @@ AbstractWriter<Map<String, ? extends Object>> implements MapWriter {
   }
 
   public void setIndent(final boolean indent) {
-    setProperty(IoConstants.INDENT, Boolean.valueOf(indent));
+    final boolean oldValue = getProperty(IoConstants.INDENT, false);
+    if (indent != oldValue) {
+      setProperty(IoConstants.INDENT, Boolean.valueOf(indent));
+    }
   }
 
   @Override
@@ -41,6 +44,9 @@ AbstractWriter<Map<String, ? extends Object>> implements MapWriter {
   }
 
   public void setWriteNulls(final boolean writeNulls) {
-    setProperty(IoConstants.WRITE_NULLS, Boolean.valueOf(writeNulls));
+    final boolean oldValue = getProperty(IoConstants.INDENT, false);
+    if (oldValue != writeNulls) {
+      setProperty(IoConstants.WRITE_NULLS, Boolean.valueOf(writeNulls));
+    }
   }
 }
