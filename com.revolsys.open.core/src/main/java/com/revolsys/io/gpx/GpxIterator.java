@@ -28,9 +28,9 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.StaxUtils;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.DateUtil;
@@ -318,25 +318,23 @@ public class GpxIterator implements RecordIterator {
     record.setValue("index", this.index);
     record.setValue("feature_type", "trk");
     int axisCount = 2;
-    final List<LineString> lines = new ArrayList<>();
+    final List<Geometry> parts = new ArrayList<>();
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (this.in.getName().equals(GpxConstants.EXTENSION_ELEMENT)) {
         StaxUtils.skipSubTree(this.in);
       } else if (this.in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
-        final LineString line = parseTrackSegment();
-        if (line != null && line.getVertexCount() > 1) {
-          lines.add(line);
-          if (line.getAxisCount() > axisCount) {
-            axisCount = line.getAxisCount();
-          }
+        final Geometry part = parseTrackSegment();
+        parts.add(part);
+        if (part.getAxisCount() > axisCount) {
+          axisCount = part.getAxisCount();
         }
       } else {
         parseAttribute(record);
       }
     }
-    final MultiLineString multiLine = this.geometryFactory.convertAxisCount(
-      axisCount).multiLineString(lines);
-    record.setGeometryValue(multiLine);
+    final Geometry geometry = this.geometryFactory.convertAxisCount(axisCount)
+      .geometry(parts);
+    record.setGeometryValue(geometry);
     return record;
   }
 
@@ -385,7 +383,7 @@ public class GpxIterator implements RecordIterator {
     return axisCount;
   }
 
-  private LineString parseTrackSegment() throws XMLStreamException {
+  private Geometry parseTrackSegment() throws XMLStreamException {
     final List<Double> coordinates = new ArrayList<Double>();
     int axisCount = 2;
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
@@ -393,7 +391,8 @@ public class GpxIterator implements RecordIterator {
       axisCount = Math.max(axisCount, pointAxisCount);
     }
     if (coordinates.size() == axisCount) {
-      return null;
+      return this.geometryFactory.convertAxisCount(axisCount).point(
+        MathUtil.toDoubleArray(coordinates));
     } else {
       return this.geometryFactory.convertAxisCount(axisCount).lineString(
         axisCount, MathUtil.toDoubleArray(coordinates));

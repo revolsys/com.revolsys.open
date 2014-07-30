@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.PreDestroy;
 
@@ -23,7 +22,7 @@ import com.revolsys.gis.esri.gdb.file.capi.type.OidAttribute;
 import com.revolsys.io.AbstractRecordWriter;
 
 public class FileGdbWriter extends AbstractRecordWriter {
-  private Map<String, Table> tables = new HashMap<String, Table>();
+  private Map<String, Table> tables = new HashMap<>();
 
   private CapiFileGdbRecordStore recordStore;
 
@@ -33,22 +32,32 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   @Override
   @PreDestroy
-  public void close() {
+  public synchronized void close() {
     try {
       if (this.recordStore != null) {
-        for (final Entry<String, Table> entry : this.tables.entrySet()) {
-          final Table table = entry.getValue();
+        for (final String typePath : this.tables.keySet()) {
           try {
-            this.recordStore.freeWriteLock(table);
+            this.recordStore.closeTable(typePath);
           } catch (final Throwable e) {
             LoggerFactory.getLogger(FileGdbWriter.class).error(
-              "Unable to close table", e);
+              "Unable to close table:" + typePath, e);
           }
         }
       }
     } finally {
       this.tables = null;
       this.recordStore = null;
+    }
+  }
+
+  public synchronized void closeTable(final String typeName) {
+    if (this.tables != null) {
+      synchronized (this.tables) {
+        final Table table = this.tables.remove(typeName);
+        if (table != null) {
+          this.recordStore.closeTable(typeName);
+        }
+      }
     }
   }
 
@@ -82,7 +91,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
       table = this.recordStore.getTable(typePath);
       if (table != null) {
         this.tables.put(typePath, table);
-        this.recordStore.setWriteLock(table);
+        this.recordStore.setWriteLock(typePath);
       }
     }
     return table;
@@ -138,6 +147,10 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   }
 
+  public synchronized void openTable(final String typePath) {
+    getTable(typePath);
+  }
+
   private void update(final Record object) {
     final Object objectId = object.getValue("OBJECTID");
     if (objectId == null) {
@@ -191,7 +204,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public void write(final Record object) {
+  public synchronized void write(final Record object) {
     try {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
       final RecordStore recordStore = recordDefinition.getRecordStore();

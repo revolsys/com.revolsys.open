@@ -39,8 +39,8 @@ public class WriterProcess extends BaseInProcess<Record> {
   }
 
   @Override
-  protected void process(final Channel<Record> in, final Record object) {
-    writer.write(object);
+  protected void process(final Channel<Record> in, final Record record) {
+    writer.write(record);
   }
 
   public void setWriter(final Writer<Record> writer) {

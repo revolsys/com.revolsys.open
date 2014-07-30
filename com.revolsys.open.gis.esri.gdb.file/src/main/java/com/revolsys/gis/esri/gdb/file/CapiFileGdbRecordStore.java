@@ -68,6 +68,7 @@ import com.revolsys.gis.esri.gdb.file.capi.type.OidAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.ShortAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.StringAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.XmlAttribute;
+import com.revolsys.gis.util.Debug;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
@@ -99,7 +100,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class CapiFileGdbRecordStore extends AbstractRecordStore implements
-  FileGdbRecordStore {
+FileGdbRecordStore {
   private static void addFieldTypeAttributeConstructor(
     final FieldType fieldType,
     final Class<? extends AbstractFileGdbAttribute> attributeClass) {
@@ -188,13 +189,19 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
 
   private Resource template;
 
-  private final Map<String, Table> tablesToClose = new HashMap<String, Table>();
+  private final Map<String, Table> tablesToClose = new HashMap<>();
 
-  private final Set<EnumRows> enumRowsToClose = new HashSet<EnumRows>();
+  private final Set<String> lockedTables = new HashSet<>();
+
+  private final Map<String, Integer> tableReferenceCounts = new HashMap<>();
+
+  private final Set<EnumRows> enumRowsToClose = new HashSet<>();
 
   private boolean initialized;
 
   private boolean loadOnly;
+
+  private boolean closed;
 
   protected CapiFileGdbRecordStore(final File file) {
     this.fileName = file.getAbsolutePath();
@@ -205,8 +212,8 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
   public void addChildSchema(final String path) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (this.geodatabase != null) {
-          final VectorOfWString childDatasets = this.geodatabase.getChildDatasets(
+        if (!isClosed()) {
+          final VectorOfWString childDatasets = getGeodatabase().getChildDatasets(
             path, "Feature Dataset");
           for (int i = 0; i < childDatasets.size(); i++) {
             final String childPath = childDatasets.get(i);
@@ -242,8 +249,9 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
   private void addTableMetaData(final String schemaName, final String path) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (this.geodatabase != null) {
-          final String tableDefinition = this.geodatabase.getTableDefinition(path);
+        if (!isClosed()) {
+          final String tableDefinition = getGeodatabase().getTableDefinition(
+            path);
           final RecordDefinition recordDefinition = getRecordDefinition(
             schemaName, path, tableDefinition);
           addMetaData(recordDefinition);
@@ -256,8 +264,8 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
     final String domainDefinition = EsriGdbXmlSerializer.toString(domain);
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (this.geodatabase != null) {
-          this.geodatabase.alterDomain(domainDefinition);
+        if (!isClosed()) {
+          getGeodatabase().alterDomain(domainDefinition);
         }
       }
     }
@@ -451,38 +459,59 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
 
   public void closeTable(final String typePath) {
     synchronized (this.apiSync) {
-      synchronized (API_SYNC) {
+      int count = CollectionUtil.getInteger(this.tableReferenceCounts,
+        typePath, 0);
+      count--;
+      if (count <= 0) {
+        this.tableReferenceCounts.remove(typePath);
         final Table table = this.tablesToClose.remove(typePath);
-        if (table != null) {
-          closeTable(table);
-        }
+        closeTable(typePath, table);
+      } else {
+        this.tableReferenceCounts.put(typePath, count);
       }
     }
   }
 
-  private void closeTable(final Table table) {
-    try {
-      if (this.geodatabase != null) {
-        freeWriteLock(table);
-        this.geodatabase.closeTable(table);
+  private void closeTable(final String typePath, final Table table) {
+    synchronized (API_SYNC) {
+      if (table != null) {
+        try {
+          if (!isClosed()) {
+            table.setLoadOnlyMode(false);
+            if (this.lockedTables.remove(typePath)) {
+              table.freeWriteLock();
+            }
+            getGeodatabase().closeTable(table);
+          }
+        } catch (final Throwable e) {
+          LoggerFactory.getLogger(getClass()).error(
+            "Cannot close Table " + typePath, e);
+        } finally {
+          this.tablesToClose.remove(typePath);
+          this.tableReferenceCounts.remove(typePath);
+          try {
+            table.delete();
+          } catch (final Throwable t) {
+          }
+        }
       }
-    } catch (final Throwable e) {
-    } finally {
-      try {
-        table.delete();
-      } catch (final Throwable t) {
+      if (this.tablesToClose.isEmpty() && this.geodatabase != null) {
+        try {
+          Debug.println("Close " + this.fileName);
+          EsriFileGdb.CloseGeodatabase(this.geodatabase);
+        } finally {
+          this.geodatabase = null;
+        }
       }
     }
   }
 
   protected void closeTables() {
     synchronized (this.apiSync) {
-      for (final Iterator<Entry<String, Table>> iterator = this.tablesToClose.entrySet()
-          .iterator(); iterator.hasNext();) {
-        final Entry<String, Table> entry = iterator.next();
+      for (final Entry<String, Table> entry : this.tablesToClose.entrySet()) {
+        final String typePath = entry.getKey();
         final Table table = entry.getValue();
-        closeTable(table);
-        iterator.remove();
+        closeTable(typePath, table);
       }
       this.tablesToClose.clear();
     }
@@ -490,13 +519,13 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
 
   public synchronized void createDomain(final Domain domain) {
     synchronized (this.apiSync) {
-      if (this.geodatabase != null) {
+      if (!isClosed()) {
         final String domainName = domain.getDomainName();
         if (!this.domainColumNames.containsKey(domainName)) {
           synchronized (API_SYNC) {
             final String domainDef = EsriGdbXmlSerializer.toString(domain);
             try {
-              this.geodatabase.createDomain(domainDef);
+              getGeodatabase().createDomain(domainDef);
             } catch (final Exception e) {
               LOG.debug(domainDef);
               LOG.error("Unable to create domain", e);
@@ -531,7 +560,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
       if (!orderBy.isEmpty()) {
         LoggerFactory.getLogger(getClass()).error(
           "Unable to sort on " + recordDefinition.getPath() + " "
-            + orderBy.keySet()
+              + orderBy.keySet()
               + " as the ESRI library can't sort with a bounding box query");
       }
       sql = whereClause;
@@ -634,7 +663,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
   private RecordStoreSchema createSchema(final DETable table) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (this.geodatabase == null) {
+        if (isClosed()) {
           return null;
         } else {
           final String catalogPath = table.getParentCatalogPath();
@@ -643,7 +672,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
             final String path = dataset.getCatalogPath();
             final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
             try {
-              this.geodatabase.createFeatureDataset(datasetDefinition);
+              getGeodatabase().createFeatureDataset(datasetDefinition);
               addFeatureDatasetSchema(path);
             } catch (final Throwable t) {
               if (LOG.isDebugEnabled()) {
@@ -659,11 +688,11 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
     }
   }
 
-  public void createSchema(final String schemaName,
+  private void createSchema(final String schemaName,
     final GeometryFactory geometryFactory) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (this.geodatabase != null) {
+        if (!isClosed()) {
           final SpatialReference spatialReference = getSpatialReference(geometryFactory);
           final List<DEFeatureDataset> datasets = EsriXmlRecordMetaDataUtil.createDEFeatureDatasets(
             schemaName.replaceAll("/", ""), spatialReference);
@@ -671,7 +700,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
             final String path = dataset.getCatalogPath();
             final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
             try {
-              this.geodatabase.createFeatureDataset(datasetDefinition);
+              getGeodatabase().createFeatureDataset(datasetDefinition);
               addFeatureDatasetSchema(path);
             } catch (final Throwable t) {
               if (LOG.isDebugEnabled()) {
@@ -689,7 +718,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
   protected RecordDefinitionImpl createTable(final DETable deTable) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (this.geodatabase == null) {
+        if (isClosed()) {
           return null;
         } else {
           String schemaPath = deTable.getParentCatalogPath();
@@ -727,16 +756,12 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
           }
           final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
           try {
-            final Table table = this.geodatabase.createTable(tableDefinition,
+            final Table table = getGeodatabase().createTable(tableDefinition,
               schemaPath);
             final RecordDefinitionImpl recordDefinition = getRecordDefinition(
               schemaName, schemaPath, tableDefinition);
             addMetaData(recordDefinition);
-            if (this.loadOnly) {
-              table.setWriteLock();
-              table.setLoadOnlyMode(this.loadOnly);
-            }
-            this.tablesToClose.put(recordDefinition.getPath(), table);
+            getGeodatabase().closeTable(table);
             return recordDefinition;
 
           } catch (final Throwable t) {
@@ -770,7 +795,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
   }
 
   @Override
-  public Writer<Record> createWriter() {
+  public FileGdbWriter createWriter() {
     return new FileGdbWriter(this);
   }
 
@@ -791,6 +816,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
       if (isOpen(table)) {
         table.setLoadOnlyMode(false);
         table.deleteRow(row);
+        table.setLoadOnlyMode(true);
       }
     }
   }
@@ -812,36 +838,36 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
   }
 
   public void doClose() {
-    try {
-      synchronized (this.apiSync) {
-        synchronized (API_SYNC) {
-          if (this.geodatabase != null) {
-            closeEnumRows();
-            closeTables();
-            try {
-              EsriFileGdb.CloseGeodatabase(this.geodatabase);
-            } finally {
-              this.geodatabase = null;
+    synchronized (this.apiSync) {
+      synchronized (API_SYNC) {
+        try {
+          if (!isClosed()) {
+            if (this.geodatabase != null) {
+              final Writer<Record> writer = getSharedAttribute("writer");
+              if (writer != null) {
+                writer.close();
+                setSharedAttribute("writer", null);
+              }
+              closeEnumRows();
+              closeTables();
+              try {
+                EsriFileGdb.CloseGeodatabase(this.geodatabase);
+              } finally {
+                this.geodatabase = null;
+              }
             }
           }
+        } finally {
+          this.closed = true;
+          super.close();
         }
       }
-    } finally {
-      super.close();
     }
   }
 
   @Override
   protected void finalize() throws Throwable {
     super.finalize();
-  }
-
-  protected void freeWriteLock(final Table table) {
-    synchronized (this.apiSync) {
-      if (isOpen(table)) {
-        table.freeWriteLock();
-      }
-    }
   }
 
   public String getDefaultSchema() {
@@ -854,6 +880,22 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
 
   public String getFileName() {
     return this.fileName;
+  }
+
+  private Geodatabase getGeodatabase() {
+    if (isClosed()) {
+      return null;
+    } else {
+      synchronized (this.apiSync) {
+        if (this.geodatabase == null) {
+          synchronized (API_SYNC) {
+            Debug.println("Open " + this.fileName);
+            this.geodatabase = EsriFileGdb.openGeodatabase(this.fileName);
+          }
+        }
+        return this.geodatabase;
+      }
+    }
   }
 
   @Override
@@ -1019,7 +1061,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
   protected Table getTable(final String typePath) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (this.geodatabase == null || getRecordDefinition(typePath) == null) {
+        if (isClosed() || getRecordDefinition(typePath) == null) {
           return null;
         } else {
           final String path = typePath.replaceAll("/", "\\\\");
@@ -1027,9 +1069,20 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
 
             Table table = this.tablesToClose.get(typePath);
             if (table == null) {
-              table = this.geodatabase.openTable(path);
+              table = getGeodatabase().openTable(path);
               table.setLoadOnlyMode(this.loadOnly);
               this.tablesToClose.put(typePath, table);
+            }
+            if (table != null) {
+              int count = CollectionUtil.getInteger(this.tableReferenceCounts,
+                typePath, 0);
+              count++;
+              this.tableReferenceCounts.put(typePath, count);
+            }
+
+            try {
+              throw new RuntimeException();
+            } catch (final Throwable e) {
             }
             return table;
           } catch (final RuntimeException e) {
@@ -1054,9 +1107,9 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
   }
 
   @Override
-  public Writer<Record> getWriter() {
+  public FileGdbWriter getWriter() {
     synchronized (this.apiSync) {
-      Writer<Record> writer = getSharedAttribute("writer");
+      FileGdbWriter writer = getSharedAttribute("writer");
       if (writer == null) {
         writer = createWriter();
         setSharedAttribute("writer", writer);
@@ -1102,7 +1155,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
                     } catch (final Throwable e) {
                       throw new IllegalArgumentException(
                         "Unable to copy template ESRI geodatabase "
-                          + this.template, e);
+                            + this.template, e);
                     }
                     this.geodatabase = EsriFileGdb.openGeodatabase(this.fileName);
                   }
@@ -1136,6 +1189,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
             }
           } catch (final Throwable e) {
             this.geodatabase = null;
+            this.closed = true;
             ExceptionUtil.throwUncheckedException(e);
           }
         }
@@ -1156,6 +1210,10 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
         table.insertRow(row);
       }
     }
+  }
+
+  public boolean isClosed() {
+    return this.closed;
   }
 
   public boolean isCreateMissingRecordStore() {
@@ -1221,8 +1279,9 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
   protected void loadDomain(final String domainName) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (this.geodatabase != null) {
-          final String domainDef = this.geodatabase.getDomainDefinition(domainName);
+        if (!isClosed()) {
+          final String domainDef = getGeodatabase().getDomainDefinition(
+            domainName);
           final Domain domain = EsriGdbXmlParser.parse(domainDef);
           if (domain instanceof CodedValueDomain) {
             final CodedValueDomain codedValueDomain = (CodedValueDomain)domain;
@@ -1246,9 +1305,9 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
     final String schemaName, final String path, final String datasetType) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
-        if (this.geodatabase != null) {
+        if (!isClosed()) {
           try {
-            final VectorOfWString childFeatureClasses = this.geodatabase.getChildDatasets(
+            final VectorOfWString childFeatureClasses = getGeodatabase().getChildDatasets(
               path, datasetType);
             for (int i = 0; i < childFeatureClasses.size(); i++) {
               final String childPath = childFeatureClasses.get(i);
@@ -1276,13 +1335,13 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
           loadSchemaRecordDefinitions(recordDefinitionMap, schemaName, "\\",
               "Feature Class");
           loadSchemaRecordDefinitions(recordDefinitionMap, schemaName, "\\",
-            "Table");
+              "Table");
         }
         final String path = schemaName.replaceAll("/", "\\\\");
         loadSchemaRecordDefinitions(recordDefinitionMap, schemaName, path,
             "Feature Class");
         loadSchemaRecordDefinitions(recordDefinitionMap, schemaName, path,
-          "Table");
+            "Table");
       }
     }
   }
@@ -1292,6 +1351,10 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
     synchronized (this.apiSync) {
       addSchema(new RecordStoreSchema(this, this.defaultSchema));
       addChildSchema("\\");
+      if (!this.defaultSchema.equals("/")
+          && !schemaMap.containsKey(this.defaultSchema)) {
+        createSchema(this.defaultSchema, getGeometryFactory());
+      }
     }
   }
 
@@ -1307,7 +1370,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
 
   public EnumRows query(final String sql, final boolean recycling) {
     synchronized (this.apiSync) {
-      final Geodatabase geodatabase = this.geodatabase;
+      final Geodatabase geodatabase = getGeodatabase();
       if (geodatabase == null) {
         return null;
       } else {
@@ -1407,7 +1470,10 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
     synchronized (this.apiSync) {
       final boolean oldLoadOnly = isLoadOnly(typePath);
       if (oldLoadOnly != loadOnly) {
-        getTable(typePath).setLoadOnlyMode(loadOnly);
+        final Table table = this.tablesToClose.get(typePath);
+        if (table != null) {
+          table.setLoadOnlyMode(loadOnly);
+        }
       }
       if (loadOnly) {
         if (!oldLoadOnly) {
@@ -1431,11 +1497,13 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
     this.template = template;
   }
 
-  protected void setWriteLock(final Table table) {
+  protected void setWriteLock(final String typePath) {
     synchronized (this.apiSync) {
-      if (isOpen(table)) {
-        table.setWriteLock();
+      final Table table = this.tablesToClose.get(typePath);
+      if (table != null) {
         table.setLoadOnlyMode(true);
+        this.lockedTables.add(typePath);
+        table.setWriteLock();
       }
     }
   }
@@ -1457,6 +1525,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
       if (isOpen(table)) {
         table.setLoadOnlyMode(false);
         table.updateRow(row);
+        table.setLoadOnlyMode(true);
       }
     }
   }

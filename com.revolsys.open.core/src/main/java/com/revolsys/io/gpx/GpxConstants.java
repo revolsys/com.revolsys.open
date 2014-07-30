@@ -9,6 +9,14 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public final class GpxConstants {
 
+  private static void addAttribute(final String name, final DataType type,
+    final boolean required) {
+    GPX_TYPE.addAttribute(name, type, required);
+    GPX_WAYPOINT.addAttribute(name, type, required);
+    GPX_TRACK.addAttribute(name, type, required);
+    GPX_ROUTE.addAttribute(name, type, required);
+  }
+
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
 
   public static final String GPX_NS = "gpx";
@@ -24,21 +32,21 @@ public final class GpxConstants {
   public static final QName ELEVATION_ELEMENT = new QName(GPX_NS_URI, "ele");
 
   public static final QName EXTENSION_ELEMENT = new QName(GPX_NS_URI,
-    "extensions");
+      "extensions");
 
   public static final QName GPX_ELEMENT = new QName(GPX_NS_URI, "gpx");
 
   public static final RecordDefinitionImpl GPX_TYPE = new RecordDefinitionImpl(
-    "gpx");
+      "gpx");
 
   public static final RecordDefinitionImpl GPX_WAYPOINT = new RecordDefinitionImpl(
-    "/gpx/waypoint");
+      "/gpx/waypoint");
 
   public static final RecordDefinitionImpl GPX_TRACK = new RecordDefinitionImpl(
-    "/gpx/track");
+      "/gpx/track");
 
   public static final RecordDefinitionImpl GPX_ROUTE = new RecordDefinitionImpl(
-    "/gpx/route");
+      "/gpx/route");
 
   public static final QName LAT_ATTRIBUTE = new QName(null, "lat");
 
@@ -61,7 +69,7 @@ public final class GpxConstants {
   public static final QName TRACK_POINT_ELEMENT = new QName(GPX_NS_URI, "trkpt");
 
   public static final QName TRACK_SEGMENT_ELEMENT = new QName(GPX_NS_URI,
-    "trkseg");
+      "trkseg");
 
   public static final QName TYPE_ELEMENT = new QName(GPX_NS_URI, "type");
 
@@ -99,18 +107,10 @@ public final class GpxConstants {
     GPX_TYPE.setGeometryFactory(GEOMETRY_FACTORY);
     GPX_WAYPOINT.addAttribute("geometry", DataTypes.POINT, true);
     GPX_WAYPOINT.setGeometryFactory(GEOMETRY_FACTORY);
-    GPX_TRACK.addAttribute("geometry", DataTypes.MULTI_LINE_STRING, true);
+    GPX_TRACK.addAttribute("geometry", DataTypes.GEOMETRY, true);
     GPX_TRACK.setGeometryFactory(GEOMETRY_FACTORY);
     GPX_ROUTE.addAttribute("geometry", DataTypes.LINE_STRING, true);
     GPX_ROUTE.setGeometryFactory(GEOMETRY_FACTORY);
-  }
-
-  private static void addAttribute(final String name, final DataType type,
-    final boolean required) {
-    GPX_TYPE.addAttribute(name, type, required);
-    GPX_WAYPOINT.addAttribute(name, type, required);
-    GPX_TRACK.addAttribute(name, type, required);
-    GPX_ROUTE.addAttribute(name, type, required);
   }
 
   private GpxConstants() {

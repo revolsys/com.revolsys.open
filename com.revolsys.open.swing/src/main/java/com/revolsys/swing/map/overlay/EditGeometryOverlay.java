@@ -663,17 +663,18 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
   }
 
   protected void modeAddGeometryClear() {
-    clearOverlayAction(ACTION_ADD_GEOMETRY);
-    this.addCompleteAction = null;
-    this.addGeometry = null;
-    this.addGeometryDataType = null;
-    this.addGeometryPartDataType = null;
-    this.addGeometryPartIndex = null;
-    this.addLayer = null;
-    setGeometryFactory(null);
-    clearMouseOverLocations();
-    setXorGeometry(null);
-    repaint();
+    if (clearOverlayAction(ACTION_ADD_GEOMETRY) || !hasOverlayAction()) {
+      this.addCompleteAction = null;
+      this.addGeometry = null;
+      this.addGeometryDataType = null;
+      this.addGeometryPartDataType = null;
+      this.addGeometryPartIndex = null;
+      this.addLayer = null;
+      setGeometryFactory(null);
+      clearMouseOverLocations();
+      setXorGeometry(null);
+      repaint();
+    }
   }
 
   protected boolean modeAddGeometryClick(final MouseEvent event) {
@@ -814,7 +815,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
   }
 
   protected boolean modeAddGeometryMove(final MouseEvent event) {
-    if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
+    if (isOverlayAction(ACTION_ADD_GEOMETRY) && this.addGeometry != null) {
       final BoundingBox boundingBox = getHotspotBoundingBox(event);
       Point point = getPoint(event);
       // TODO make work with multi-part

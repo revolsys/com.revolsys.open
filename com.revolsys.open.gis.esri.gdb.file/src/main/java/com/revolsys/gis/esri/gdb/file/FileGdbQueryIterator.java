@@ -2,6 +2,8 @@ package com.revolsys.gis.esri.gdb.file;
 
 import java.util.NoSuchElementException;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
@@ -88,7 +90,10 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     if (this.recordStore != null) {
       try {
         this.recordStore.closeEnumRows(this.rows);
+        this.recordStore.closeTable(this.typePath);
       } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Error closing query: " + this.typePath);
       } finally {
         this.boundingBox = null;
         this.recordStore = null;
