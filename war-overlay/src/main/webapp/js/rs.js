@@ -219,20 +219,22 @@ $(document).ready(
       title : 'Confirm Delete',
       message : 'Are you sure you want to delete this record?'
     });
-    $(':file').jfilestyle({});
-    $(':file').each(function() {
-      var jfile = $(this);
-      var button = $('<label/>', {
-        click: function() {
-          jfile.jfilestyle('clear');
-          return false;
-        }
+    if (jQuery().jfilestyle) {
+      $(':file').jfilestyle({});
+      $(':file').each(function() {
+        var jfile = $(this);
+        var button = $('<label/>', {
+          click: function() {
+            jfile.jfilestyle('clear');
+            return false;
+          }
+        });
+        button.append('<i class="icon-remove-sign" />');
+        button.append('<span>Clear</span>');
+        $(this).next('div.jquery-filestyle').append(button);
       });
-      button.append('<i class="icon-remove-sign" />');
-      button.append('<span>Clear</span>');
-      $(this).next('div.jquery-filestyle').append(button);
-    });
-    $('div.jquery-filestyle label').button();
+      $('div.jquery-filestyle label').button();
+    }
     refreshButtons($(document));
     $('div.collapsibleBox').each(function() {
       var active;
