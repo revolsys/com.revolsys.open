@@ -26,6 +26,7 @@ import com.revolsys.beans.NonWeakListener;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.beans.WeakPropertyChangeListener;
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.Record;
 import com.revolsys.io.ObjectWithProperties;
 
@@ -308,7 +309,29 @@ public final class Property {
       return (V)ExceptionUtil.throwCauseException(e);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to invoke "
-          + toString(object, methodName, parameterArray), e);
+        + toString(object, methodName, parameterArray), e);
+    }
+  }
+
+  public static boolean isChanged(final Object oldValue, final Object newValue) {
+    final boolean oldHasValue = Property.hasValue(oldValue);
+    final boolean newHasValue = Property.hasValue(newValue);
+    if (oldHasValue) {
+      if (newHasValue) {
+        if (EqualsRegistry.equal(oldValue, newValue)) {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    } else {
+      if (newHasValue) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
@@ -320,6 +343,28 @@ public final class Property {
       return !Property.hasValue(charSequence);
     } else {
       return false;
+    }
+  }
+
+  public static boolean isEqualTrim(final String oldValue, final String newValue) {
+    final boolean oldHasValue = Property.hasValue(oldValue);
+    final boolean newHasValue = Property.hasValue(newValue);
+    if (oldHasValue) {
+      if (newHasValue) {
+        if (EqualsRegistry.equal(oldValue.trim(), newValue.trim())) {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    } else {
+      if (newHasValue) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
@@ -405,7 +450,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-                || listenerReference == propertyChangeListener) {
+              || listenerReference == propertyChangeListener) {
               propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
             }
           }
@@ -420,7 +465,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-                || listenerReference == propertyChangeListener) {
+              || listenerReference == propertyChangeListener) {
               component.removePropertyChangeListener(propertyChangeListener);
             }
           }
@@ -443,7 +488,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-                || listenerReference == propertyChangeListener) {
+              || listenerReference == propertyChangeListener) {
               propertyChangeSupport.removePropertyChangeListener(propertyName,
                 propertyChangeListener);
             }
@@ -460,7 +505,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-                || listenerReference == propertyChangeListener) {
+              || listenerReference == propertyChangeListener) {
               component.removePropertyChangeListener(propertyName,
                 propertyChangeListener);
             }
@@ -480,7 +525,7 @@ public final class Property {
           set(object, propertyName, value);
         } catch (final Throwable e) {
           ExceptionUtil.log(Property.class, "Unable to set property "
-              + propertyName, e);
+            + propertyName, e);
         }
       }
     }

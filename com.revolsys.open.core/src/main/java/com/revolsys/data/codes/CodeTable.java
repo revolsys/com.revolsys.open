@@ -18,15 +18,17 @@ public interface CodeTable extends Cloneable {
 
   String getIdAttributeName();
 
+  Identifier getIdExact(final Object... values);
+
   Map<String, ? extends Object> getMap(final Identifier id);
 
   String getName();
 
   JComponent getSwingEditor();
 
-  <V> V getValue(final Object id);
-
   <V> V getValue(final Identifier id);
+
+  <V> V getValue(final Object id);
 
   List<String> getValueAttributeNames();
 

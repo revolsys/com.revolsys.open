@@ -47,14 +47,14 @@ public class CodedValueDomain extends Domain implements CodeTable {
     switch (getFieldType()) {
       case esriFieldTypeInteger:
         id = (int)++this.maxId;
-      break;
+        break;
       case esriFieldTypeSmallInteger:
         id = (short)++this.maxId;
-      break;
+        break;
 
       default:
         throw new RuntimeException("Cannot generate code for field type "
-          + getFieldType());
+            + getFieldType());
     }
     addCodedValue(id, name);
     return SingleIdentifier.create(id);
@@ -110,13 +110,18 @@ public class CodedValueDomain extends Domain implements CodeTable {
       }
     } else {
       throw new IllegalArgumentException("Expecting only a single value "
-        + values);
+          + values);
     }
   }
 
   @Override
   public String getIdAttributeName() {
     return getDomainName() + "_ID";
+  }
+
+  @Override
+  public Identifier getIdExact(final Object... values) {
+    return getId(values);
   }
 
   @Override
@@ -140,11 +145,6 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   @Override
-  public <V> V getValue(final Object id) {
-    return getValue(SingleIdentifier.create(id));
-  }
-
-  @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Identifier id) {
     final List<Object> values = getValues(id);
@@ -154,6 +154,11 @@ public class CodedValueDomain extends Domain implements CodeTable {
       final Object value = values.get(0);
       return (V)value;
     }
+  }
+
+  @Override
+  public <V> V getValue(final Object id) {
+    return getValue(SingleIdentifier.create(id));
   }
 
   @Override

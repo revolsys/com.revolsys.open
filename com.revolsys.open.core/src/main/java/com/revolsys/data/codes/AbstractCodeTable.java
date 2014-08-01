@@ -121,7 +121,6 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
     return Collections.unmodifiableMap(this.idValueCache);
   }
 
-  @SuppressWarnings("unchecked")
   public Identifier getId(final List<Object> values) {
     return getId(values, true);
   }
@@ -186,6 +185,30 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
       id = this.valueIdCache.get(normalizedValues);
     }
     return id;
+  }
+
+  public Identifier getIdExact(final List<Object> values) {
+    return getIdExact(values, true);
+  }
+
+  public Identifier getIdExact(final List<Object> values,
+    final boolean loadValues) {
+    Identifier id = this.valueIdCache.get(values);
+    if (id == null && loadValues) {
+      synchronized (this) {
+        id = loadId(values, true);
+        if (id != null && !this.idValueCache.containsKey(id)) {
+          addValue(id, values);
+        }
+      }
+    }
+    return id;
+  }
+
+  @Override
+  public Identifier getIdExact(final Object... values) {
+    final List<Object> valueList = Arrays.asList(values);
+    return getIdExact(valueList);
   }
 
   @Override

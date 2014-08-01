@@ -89,6 +89,11 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
+  public Identifier getIdExact(final Object... values) {
+    return getId(values);
+  }
+
+  @Override
   public Map<String, ? extends Object> getMap(final Identifier id) {
     return this.domain.getMap(id);
   }
@@ -104,14 +109,14 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public <V> V getValue(final Object id) {
-    return getValue(SingleIdentifier.create(id));
-  }
-
-  @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Identifier id) {
     return (V)this.domain.getValue(id);
+  }
+
+  @Override
+  public <V> V getValue(final Object id) {
+    return getValue(SingleIdentifier.create(id));
   }
 
   @Override

@@ -34,7 +34,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecord extends AbstractMap<String, Object>
-  implements Record, Cloneable {
+implements Record, Cloneable {
 
   /**
    * Create a clone of the object.
@@ -346,7 +346,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
     } catch (final NullPointerException e) {
       LoggerFactory.getLogger(getClass()).warn(
         "Attribute " + this.getRecordDefinition().getPath() + "." + name
-          + " does not exist");
+        + " does not exist");
       return null;
     }
   }
@@ -367,7 +367,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
             return null;
           } else if (i + 1 < propertyPath.length) {
             final CodeTable codeTable = this.getRecordDefinition()
-              .getCodeTableByColumn(propertyName);
+                .getCodeTableByColumn(propertyName);
             if (codeTable != null) {
               propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
             }
@@ -386,7 +386,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
           return null;
         } else if (i + 1 < propertyPath.length) {
           final CodeTable codeTable = this.getRecordDefinition()
-            .getCodeTableByColumn(propertyName);
+              .getCodeTableByColumn(propertyName);
           if (codeTable != null) {
             propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
           }
@@ -439,6 +439,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
     return this.getRecordDefinition().hasAttribute(name);
   }
 
+  @Override
   public boolean hasValue(final CharSequence name) {
     final Object value = getValue(name);
     return Property.hasValue(value);
@@ -500,13 +501,13 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   public void setIdValue(final Object id) {
     final int index = this.getRecordDefinition().getIdAttributeIndex();
     if (this.getState() == RecordState.New
-      || this.getState() == RecordState.Initalizing) {
+        || this.getState() == RecordState.Initalizing) {
       setValue(index, id);
     } else {
       final Object oldId = getValue(index);
       if (oldId != null && !EqualsRegistry.equal(id, oldId)) {
         throw new IllegalStateException(
-          "Cannot change the ID on a persisted object");
+            "Cannot change the ID on a persisted object");
       }
     }
   }
@@ -534,12 +535,12 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
         final Object objectValue = getValue(key);
         if (objectValue == null) {
           final DataType attributeType = this.getRecordDefinition()
-            .getAttributeType(key);
+              .getAttributeType(key);
           if (attributeType != null) {
             if (attributeType.getJavaClass() == Record.class) {
               final String typePath = attributeType.getName();
               final RecordDefinitionFactory recordDefinitionFactory = this.getRecordDefinition()
-                .getRecordDefinitionFactory();
+                  .getRecordDefinitionFactory();
               final RecordDefinition subMetaData = recordDefinitionFactory.getRecordDefinition(typePath);
               final RecordFactory recordFactory = subMetaData.getRecordFactory();
               final Record subObject = recordFactory.createRecord(subMetaData);
@@ -580,16 +581,16 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
       codeTableValueName = name.substring(dotIndex + 1);
     }
     final CodeTable codeTable = this.getRecordDefinition()
-      .getCodeTableByColumn(codeTableAttributeName);
+        .getCodeTableByColumn(codeTableAttributeName);
     if (codeTable == null) {
       if (dotIndex != -1) {
         LoggerFactory.getLogger(getClass()).debug(
           "Cannot get code table for " + this.getRecordDefinition().getPath()
-            + "." + name);
+          + "." + name);
         return;
       }
       setValue(name, value);
-    } else if (!Property.hasValue(value.toString())) {
+    } else if (!Property.hasValue(value)) {
       setValue(codeTableAttributeName, null);
     } else {
       Object targetValue;
@@ -630,7 +631,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   public void setValues(final Map<String, ? extends Object> values) {
     if (values != null) {
       for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
-        values).entrySet()) {
+          values).entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValue(name, value);
@@ -664,7 +665,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   public void setValuesByPath(final Map<String, ? extends Object> values) {
     if (values != null) {
       for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
-        values).entrySet()) {
+          values).entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValueByPath(name, value);
@@ -686,9 +687,9 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
       final Object value = getValue(i);
       if (value != null) {
         s.append(this.getRecordDefinition().getAttributeName(i))
-          .append('=')
-          .append(value)
-          .append('\n');
+        .append('=')
+        .append(value)
+        .append('\n');
       }
     }
     s.append(')');
@@ -700,10 +701,10 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
     switch (this.getState()) {
       case Persisted:
         this.setState(RecordState.Modified);
-      break;
+        break;
       case Deleted:
         throw new IllegalStateException(
-          "Cannot modify an object which has been deleted");
+            "Cannot modify an object which has been deleted");
     }
   }
 

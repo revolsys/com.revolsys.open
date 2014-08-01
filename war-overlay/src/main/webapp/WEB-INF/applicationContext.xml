@@ -9,5 +9,5 @@
   "
 >
   <import
-    resource="classpath:com/revolsys/parallel/attributes.sf.xml" />
+    resource="classpath:com/revolsys/ui/web/attributes.sf.xml" />
 </beans>
