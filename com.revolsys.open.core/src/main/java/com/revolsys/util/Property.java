@@ -13,6 +13,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -283,12 +284,23 @@ public final class Property {
     }
   }
 
+  public static boolean hasValue(final Collection<?> collection) {
+    if (collection == null || collection.isEmpty()) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   public static boolean hasValue(final Object value) {
     if (value == null) {
       return false;
     } else if (value instanceof CharSequence) {
       final CharSequence string = (CharSequence)value;
       return hasText(string);
+    } else if (value instanceof Collection<?>) {
+      final Collection<?> collection = (Collection<?>)value;
+      return !collection.isEmpty();
     } else {
       return true;
     }
@@ -352,18 +364,18 @@ public final class Property {
     if (oldHasValue) {
       if (newHasValue) {
         if (EqualsRegistry.equal(oldValue.trim(), newValue.trim())) {
-          return false;
-        } else {
           return true;
+        } else {
+          return false;
         }
       } else {
-        return true;
+        return false;
       }
     } else {
       if (newHasValue) {
-        return true;
-      } else {
         return false;
+      } else {
+        return true;
       }
     }
   }

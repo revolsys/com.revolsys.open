@@ -16,7 +16,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class CodeTableComboBoxModel extends AbstractListModel<Object> implements
-ComboBoxModel<Object>, PropertyChangeListener, Closeable {
+  ComboBoxModel<Object>, PropertyChangeListener, Closeable {
   public static ComboBox create(final String fieldName,
     final CodeTable codeTable, final boolean allowNull) {
     final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable,
@@ -67,7 +67,7 @@ ComboBoxModel<Object>, PropertyChangeListener, Closeable {
       }
       index--;
     }
-    if (index < getSize()) {
+    if (index >= 0 && index < getSize()) {
       final Map<Identifier, List<Object>> codes = this.codeTable.getCodes();
       final Set<Identifier> keys = codes.keySet();
       return CollectionUtil.get(keys, index);
@@ -109,7 +109,7 @@ ComboBoxModel<Object>, PropertyChangeListener, Closeable {
   @Override
   public void setSelectedItem(final Object item) {
     if (this.selectedItem != null && !this.selectedItem.equals(item)
-        || this.selectedItem == null && item != null) {
+      || this.selectedItem == null && item != null) {
       this.selectedItem = item;
       fireContentsChanged(this, -1, -1);
     }

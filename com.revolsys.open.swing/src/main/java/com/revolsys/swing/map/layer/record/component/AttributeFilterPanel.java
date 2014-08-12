@@ -24,7 +24,6 @@ import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.JXSearchField;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -45,10 +44,10 @@ import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.ComboBox;
-import com.revolsys.swing.field.RecordStoreQueryTextField;
 import com.revolsys.swing.field.DateField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.QueryWhereConditionField;
+import com.revolsys.swing.field.RecordStoreQueryTextField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -60,7 +59,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class AttributeFilterPanel extends JComponent implements ActionListener,
-ItemListener, DocumentListener, PropertyChangeListener {
+  ItemListener, DocumentListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -454,7 +453,6 @@ ItemListener, DocumentListener, PropertyChangeListener {
       addListeners(searchField);
       if (this.searchField instanceof RecordStoreQueryTextField) {
         final RecordStoreQueryTextField recordStoreSearchTextField = (RecordStoreQueryTextField)this.searchField;
-        recordStoreSearchTextField.setMaxResults(100);
         recordStoreSearchTextField.setPreferredSize(new Dimension(200, 22));
         recordStoreSearchTextField.setBelow(true);
       } else if (this.searchField instanceof JXSearchField) {
@@ -481,7 +479,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
       ComboBox operatorField;
       if (this.codeTable != null
-          && !searchFieldName.equals(recordDefinition.getIdAttributeName())) {
+        && !searchFieldName.equals(recordDefinition.getIdAttributeName())) {
         operatorField = this.codeTableOperatorField;
       } else if (Number.class.isAssignableFrom(attributeClass)) {
         operatorField = this.numericOperatorField;

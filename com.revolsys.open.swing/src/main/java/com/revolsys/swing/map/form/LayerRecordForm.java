@@ -105,7 +105,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerRecordForm extends JPanel implements PropertyChangeListener,
-CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
+  CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public static final String FLIP_FIELDS_ICON = "flip_fields";
 
@@ -122,7 +122,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   private static final long serialVersionUID = 1L;
 
   private JButton addOkButton = InvokeMethodAction.createButton("OK", this,
-    "actionAddOk");
+      "actionAddOk");
 
   private RecordLayerAttributesTableModel allAttributes;
 
@@ -212,11 +212,10 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   public void actionAddCancel() {
-    setRecord(null);
     final AbstractRecordLayer layer = getLayer();
     final LayerRecord record = getRecord();
+    setRecord(null);
     layer.deleteRecords(record);
-    this.record = null;
     closeWindow();
   }
 
@@ -281,8 +280,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (field instanceof ComboBox) {
       final ComboBox comboBox = (ComboBox)field;
       comboBox.getEditor()
-      .getEditorComponent()
-      .addFocusListener(new WeakFocusListener(this));
+        .getEditorComponent()
+        .addFocusListener(new WeakFocusListener(this));
     } else {
       ((JComponent)field).addFocusListener(new WeakFocusListener(this));
     }
@@ -414,7 +413,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     final JScrollPane scrollPane = addTab("All Fields", table);
     int maxHeight = 500;
     for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
-        .getScreenDevices()) {
+      .getScreenDevices()) {
       final GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
       final Rectangle bounds = graphicsConfiguration.getBounds();
 
@@ -479,12 +478,12 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
     }
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canUndo");
+      "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canRedo");
+      "canRedo");
 
     final EnableCheck modifiedOrDeleted = new ObjectPropertyEnableCheck(this,
-        "modifiedOrDeleted");
+      "modifiedOrDeleted");
 
     this.toolBar.addButton("changes", "Revert Record", "arrow_revert",
       modifiedOrDeleted, this, "revertChanges");
@@ -508,9 +507,9 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (hasGeometry) {
       final DataType geometryDataType = geometryAttribute.getType();
       if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition)
-            .hasDirectionalAttributes()) {
+          .hasDirectionalAttributes()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME,
             FLIP_RECORD_ICON, editable, this, "flipRecordOrientation");
           this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME,
@@ -1001,7 +1000,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     final AbstractLayer layer = getLayer();
     if (layer != null) {
       final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-          map);
+        map);
       final Collection<String> ignorePasteFields = layer.getProperty("ignorePasteFields");
       if (ignorePasteFields != null) {
         newValues.keySet().removeAll(ignorePasteFields);
@@ -1240,13 +1239,13 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     setReadOnlyFieldNames(Arrays.asList(readOnlyFieldNames));
   }
 
-  public void setRecord(final LayerRecord object) {
+  public void setRecord(final LayerRecord record) {
     final boolean undo = this.undoManager.setEventsEnabled(false);
     final boolean validate = setFieldValidationEnabled(false);
     try {
-      this.record = object;
-      this.allAttributes.setObject(object);
-      setValues(object);
+      this.record = record;
+      this.allAttributes.setObject(record);
+      setValues(record);
       this.undoManager.discardAllEdits();
     } finally {
       setFieldValidationEnabled(validate);

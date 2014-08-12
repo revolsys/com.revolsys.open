@@ -57,14 +57,22 @@ public abstract class AbstractIdentifier implements Identifier {
     if (other == this) {
       return true;
     } else if (other instanceof Identifier) {
-      final Identifier recordIdentifier = (Identifier)other;
       final List<Object> values = getValues();
+      final Identifier recordIdentifier = (Identifier)other;
       final List<Object> otherValues = recordIdentifier.getValues();
       if (EqualsRegistry.equal(values, otherValues)) {
         return true;
+      } else {
+        return false;
+      }
+    } else {
+      final List<Object> values = getValues();
+      if (values.size() == 1) {
+        return values.get(0).equals(other);
+      } else {
+        return false;
       }
     }
-    return false;
   }
 
   @Override
@@ -111,19 +119,19 @@ public abstract class AbstractIdentifier implements Identifier {
 
   @Override
   public int hashCode() {
-    int hashCode = 1;
-    for (final Object value : getValues()) {
-      hashCode *= 31;
-      if (value != null) {
-        hashCode += value.hashCode();
+    final List<Object> values = getValues();
+    if (values.size() == 1) {
+      return values.get(0).hashCode();
+    } else {
+      int hashCode = 1;
+      for (final Object value : values) {
+        hashCode *= 31;
+        if (value != null) {
+          hashCode += value.hashCode();
+        }
       }
+      return hashCode;
     }
-    return hashCode;
-  }
-
-  @Override
-  public void setIdentifier(final Record record) {
-    setIdentifier(record, record.getRecordDefinition().getAttributeNames());
   }
 
   @Override
@@ -146,6 +154,11 @@ public abstract class AbstractIdentifier implements Identifier {
   public void setIdentifier(final Map<String, Object> record,
     final String... attributeNames) {
     setIdentifier(record, Arrays.asList(attributeNames));
+  }
+
+  @Override
+  public void setIdentifier(final Record record) {
+    setIdentifier(record, record.getRecordDefinition().getAttributeNames());
   }
 
   @Override

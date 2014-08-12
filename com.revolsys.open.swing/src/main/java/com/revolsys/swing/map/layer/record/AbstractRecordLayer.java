@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
@@ -166,6 +167,8 @@ RecordFactory, AddGeometryCompleteAction {
     return layers;
   }
 
+  public static final String ALL = "ALL";
+
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
 
   private static AtomicInteger formCount = new AtomicInteger();
@@ -258,9 +261,7 @@ RecordFactory, AddGeometryCompleteAction {
 
   private boolean canEditRecords = true;
 
-  private List<String> columnNameOrder = Collections.emptyList();
-
-  private List<String> columnNames = Collections.emptyList();
+  private List<String> fieldNames = Collections.emptyList();
 
   private Object editSync;
 
@@ -285,6 +286,10 @@ RecordFactory, AddGeometryCompleteAction {
   private boolean useFieldTitles = false;
 
   private Set<String> userReadOnlyFieldNames = new LinkedHashSet<String>();
+
+  private Map<String, List<String>> fieldNamesSets = new LinkedHashMap<>();
+
+  private String fieldNamesSetName = ALL;
 
   public AbstractRecordLayer() {
     this("");
@@ -551,8 +556,8 @@ RecordFactory, AddGeometryCompleteAction {
   public AbstractRecordLayer clone() {
     final AbstractRecordLayer clone = (AbstractRecordLayer)super.clone();
     clone.cacheIdToRecordMap = new HashMap<>();
-    clone.columnNameOrder = new ArrayList<>(this.columnNameOrder);
-    clone.columnNames = new ArrayList<>(this.columnNames);
+    clone.fieldNames = new ArrayList<>(this.fieldNames);
+    clone.fieldNamesSets = new HashMap<>(this.fieldNamesSets);
     clone.formRecords = new LinkedList<>();
     clone.formComponents = new LinkedList<>();
     clone.formWindows = new LinkedList<>();
@@ -563,7 +568,7 @@ RecordFactory, AddGeometryCompleteAction {
     clone.sync = new Object();
     clone.editSync = new Object();
     clone.userReadOnlyFieldNames = new LinkedHashSet<>(
-      this.userReadOnlyFieldNames);
+        this.userReadOnlyFieldNames);
 
     return clone;
   }
@@ -725,7 +730,7 @@ RecordFactory, AddGeometryCompleteAction {
         }
       }
     }
-    this.columnNameOrder.clear();
+    this.fieldNamesSets.clear();
     this.formRecords.clear();
     this.formComponents.clear();
     this.formWindows.clear();
@@ -1013,21 +1018,6 @@ RecordFactory, AddGeometryCompleteAction {
     return Collections.<Class<?>> singleton(AbstractRecordLayerRenderer.class);
   }
 
-  public List<String> getColumnNames() {
-    synchronized (this) {
-      if (this.columnNames == null) {
-        final Set<String> columnNames = new LinkedHashSet<String>(
-            this.columnNameOrder);
-        final RecordDefinition recordDefinition = getRecordDefinition();
-        final List<String> attributeNames = recordDefinition.getAttributeNames();
-        columnNames.addAll(attributeNames);
-        this.columnNames = new ArrayList<String>(columnNames);
-        updateColumnNames();
-      }
-    }
-    return this.columnNames;
-  }
-
   public CoordinateSystem getCoordinateSystem() {
     return getGeometryFactory().getCoordinateSystem();
   }
@@ -1045,6 +1035,27 @@ RecordFactory, AddGeometryCompleteAction {
       this.editSync = new Object();
     }
     return this.editSync;
+  }
+
+  public List<String> getFieldNames() {
+    return this.fieldNames;
+  }
+
+  public List<String> getFieldNamesSet() {
+    final List<String> fieldNames = this.fieldNamesSets.get(this.fieldNamesSetName);
+    if (Property.hasValue(fieldNames)) {
+      return fieldNames;
+    } else {
+      return getFieldNames();
+    }
+  }
+
+  public String getFieldNamesSetName() {
+    return this.fieldNamesSetName;
+  }
+
+  public Map<String, List<String>> getFieldNamesSets() {
+    return this.fieldNamesSets;
   }
 
   public String getFieldTitle(final String fieldName) {
@@ -2072,15 +2083,6 @@ RecordFactory, AddGeometryCompleteAction {
       isCanEditRecords());
   }
 
-  public void setColumnNameOrder(final Collection<String> columnNameOrder) {
-    this.columnNameOrder = new ArrayList<String>(columnNameOrder);
-  }
-
-  public void setColumnNames(final Collection<String> columnNames) {
-    this.columnNames = new ArrayList<String>(columnNames);
-    updateColumnNames();
-  }
-
   @Override
   public void setEditable(final boolean editable) {
     if (SwingUtilities.isEventDispatchThread()) {
@@ -2114,6 +2116,31 @@ RecordFactory, AddGeometryCompleteAction {
         setCanAddRecords(this.canAddRecords);
         setCanDeleteRecords(this.canDeleteRecords);
         setCanEditRecords(this.canEditRecords);
+      }
+    }
+  }
+
+  public void setFieldNamesSetName(final String fieldNamesSetName) {
+    this.fieldNamesSetName = fieldNamesSetName;
+  }
+
+  public void setFieldNamesSets(
+    final Map<String, Collection<String>> fieldNamesSets) {
+    this.fieldNamesSets.clear();
+    for (final Entry<String, Collection<String>> entry : fieldNamesSets.entrySet()) {
+      final String name = entry.getKey();
+      if (Property.hasValue(name)) {
+        final Collection<String> names = entry.getValue();
+        if (Property.hasValue(names)) {
+          final List<String> fieldNames = new ArrayList<>(names);
+          if (ALL.equalsIgnoreCase(name)) {
+            if (Property.hasValue(this.fieldNames)) {
+              fieldNames.addAll(this.fieldNames);
+              fieldNames.retainAll(this.fieldNames);
+            }
+          }
+          this.fieldNamesSets.put(name, fieldNames);
+        }
       }
     }
   }
@@ -2200,7 +2227,15 @@ RecordFactory, AddGeometryCompleteAction {
         setSelectSupported(false);
         setRenderer(null);
       }
-      updateColumnNames();
+      this.fieldNames = recordDefinition.getAttributeNames();
+      final List<String> allFieldNames = this.fieldNamesSets.get(ALL);
+      if (Property.hasValue(allFieldNames)) {
+        allFieldNames.addAll(this.fieldNames);
+        allFieldNames.retainAll(this.fieldNames);
+        this.fieldNamesSets.put(ALL, allFieldNames);
+      } else {
+        this.fieldNamesSets.put(ALL, this.fieldNames);
+      }
       if (this.query == null) {
         setQuery(null);
       }
@@ -2537,7 +2572,7 @@ RecordFactory, AddGeometryCompleteAction {
       MapSerializerUtil.add(map, "canEditRecords", this.canEditRecords);
       MapSerializerUtil.add(map, "snapToAllLayers", this.snapToAllLayers);
     }
-    MapSerializerUtil.add(map, "columnNameOrder", this.columnNameOrder);
+    MapSerializerUtil.add(map, "fieldNamesSetName", this.fieldNamesSetName, ALL);
     MapSerializerUtil.add(map, "useFieldTitles", this.useFieldTitles);
     map.remove("TableView");
     return map;
@@ -2580,13 +2615,6 @@ RecordFactory, AddGeometryCompleteAction {
 
   public void unSelectRecords(final LayerRecord... records) {
     unSelectRecords(Arrays.asList(records));
-  }
-
-  protected void updateColumnNames() {
-    if (this.columnNames != null && this.recordDefinition != null) {
-      final List<String> attributeNames = this.recordDefinition.getAttributeNames();
-      this.columnNames.retainAll(attributeNames);
-    }
   }
 
   protected void updateRecordState(final LayerRecord record) {

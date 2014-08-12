@@ -196,10 +196,8 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
     Identifier id = this.valueIdCache.get(values);
     if (id == null && loadValues) {
       synchronized (this) {
-        id = loadId(values, true);
-        if (id != null && !this.idValueCache.containsKey(id)) {
-          addValue(id, values);
-        }
+        id = loadId(values, false);
+        return this.valueIdCache.get(values);
       }
     }
     return id;
@@ -284,7 +282,12 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
 
   protected List<Object> getValueById(Object id) {
     if (this.valueIdCache.containsKey(Collections.singletonList(id))) {
-      return Collections.singletonList(id);
+      if (id instanceof SingleIdentifier) {
+        final SingleIdentifier identifier = (SingleIdentifier)id;
+        return Collections.singletonList(identifier.getValue(0));
+      } else {
+        return Collections.singletonList(id);
+      }
     } else {
       List<Object> values = this.idValueCache.get(id);
       if (values == null) {

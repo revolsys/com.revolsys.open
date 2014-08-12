@@ -46,7 +46,7 @@ SortableTableModel, ListSelectionListener {
 
   public MergedRecordsTableModel(final AbstractRecordLayer layer,
     final Record mergedRecord, final Collection<LayerRecord> records) {
-    super(layer.getRecordDefinition(), records, layer.getColumnNames());
+    super(layer.getRecordDefinition(), records, layer.getFieldNames());
     this.layer = layer;
     setAttributesOffset(1);
     this.mergedRecord = mergedRecord;

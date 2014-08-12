@@ -26,7 +26,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
 
 public class CodeTableProperty extends AbstractCodeTable implements
-  RecordDefinitionProperty {
+RecordDefinitionProperty {
 
   public static final CodeTableProperty getProperty(
     final RecordDefinition recordDefinition) {
@@ -35,7 +35,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   private static final ArrayList<String> DEFAULT_ATTRIBUTE_NAMES = new ArrayList<String>(
-    Arrays.asList("VALUE"));
+      Arrays.asList("VALUE"));
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
 
@@ -79,7 +79,12 @@ public class CodeTableProperty extends AbstractCodeTable implements
     final List<Object> values = new ArrayList<Object>();
     for (final String attributeName : this.valueAttributeNames) {
       final Object value = code.getValue(attributeName);
-      values.add(value);
+      if (value instanceof SingleIdentifier) {
+        final SingleIdentifier identifier = (SingleIdentifier)value;
+        values.add(identifier.getValue(0));
+      } else {
+        values.add(value);
+      }
     }
     addValue(id, values);
   }
@@ -158,10 +163,6 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return this.creationTimestampAttributeName;
   }
 
-  public RecordStore getRecordStore() {
-    return this.recordStore;
-  }
-
   @Override
   public String getIdAttributeName() {
     if (Property.hasValue(this.idAttributeName)) {
@@ -206,6 +207,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
   @Override
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
+  }
+
+  public RecordStore getRecordStore() {
+    return this.recordStore;
   }
 
   public String getTypeName() {
@@ -258,13 +263,12 @@ public class CodeTableProperty extends AbstractCodeTable implements
             query.addOrderBy(order, true);
           }
           try (
-            Reader<Record> reader = this.recordStore.query(query)) {
+              Reader<Record> reader = this.recordStore.query(query)) {
             final List<Record> codes = reader.read();
             this.recordStore.getStatistics()
-              .getStatistics("query")
-              .add(this.typePath, -codes.size());
-            Collections.sort(codes, new RecordAttributeComparator(
-              this.orderBy));
+            .getStatistics("query")
+            .add(this.typePath, -codes.size());
+            Collections.sort(codes, new RecordAttributeComparator(this.orderBy));
             addValues(codes);
           }
           Property.firePropertyChange(this, "valuesChanged", false, true);
@@ -307,8 +311,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
       try {
         final List<Record> codes = reader.read();
         this.recordStore.getStatistics()
-          .getStatistics("query")
-          .add(this.typePath, -codes.size());
+        .getStatistics("query")
+        .add(this.typePath, -codes.size());
         addValues(codes);
         id = getIdByValue(values);
         Property.firePropertyChange(this, "valuesChanged", false, true);

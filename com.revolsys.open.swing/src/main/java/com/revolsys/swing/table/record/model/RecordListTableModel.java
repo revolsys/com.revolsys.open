@@ -24,17 +24,16 @@ import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.util.Reorderable;
 
 public class RecordListTableModel extends RecordRowTableModel implements
-  Reorderable {
-  private static final long serialVersionUID = 1L;
-
+Reorderable {
   public static TablePanel createPanel(final AbstractRecordLayer layer) {
-    return createPanel(layer.getRecordDefinition(), new ArrayList<LayerRecord>(),
-      layer.getColumnNames());
+    return createPanel(layer.getRecordDefinition(),
+      new ArrayList<LayerRecord>(), layer.getFieldNamesSet());
   }
 
   public static TablePanel createPanel(final AbstractRecordLayer layer,
     final Collection<LayerRecord> objects) {
-    return createPanel(layer.getRecordDefinition(), objects, layer.getColumnNames());
+    return createPanel(layer.getRecordDefinition(), objects,
+      layer.getFieldNames());
   }
 
   public static TablePanel createPanel(final RecordDefinition recordDefinition,
@@ -51,11 +50,12 @@ public class RecordListTableModel extends RecordRowTableModel implements
     return createPanel(recordDefinition, objects, Arrays.asList(attributeNames));
   }
 
+  private static final long serialVersionUID = 1L;
+
   private final List<LayerRecord> records = new ArrayList<LayerRecord>();
 
   public RecordListTableModel(final RecordDefinition recordDefinition,
-    final Collection<LayerRecord> objects,
-    final Collection<String> columnNames) {
+    final Collection<LayerRecord> objects, final Collection<String> columnNames) {
     super(recordDefinition, columnNames);
     if (objects != null) {
       this.records.addAll(objects);

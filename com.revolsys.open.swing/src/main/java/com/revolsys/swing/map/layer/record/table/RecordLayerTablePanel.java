@@ -46,7 +46,7 @@ import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.Property;
 
 public class RecordLayerTablePanel extends TablePanel implements
-  PropertyChangeListener {
+PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   public static final String FILTER_GEOMETRY = "filter_geometry";
@@ -65,20 +65,20 @@ public class RecordLayerTablePanel extends TablePanel implements
     final RecordLayerTable table) {
     super(table);
     this.layer = layer;
-    tableCellEditor = table.getTableCellEditor();
-    tableCellEditor.setPopupMenu(getMenu());
+    this.tableCellEditor = table.getTableCellEditor();
+    this.tableCellEditor.setPopupMenu(getMenu());
     table.getTableCellEditor().addMouseListener(this);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     this.tableModel = getTableModel();
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     final boolean hasGeometry = recordDefinition.getGeometryAttributeIndex() != -1;
     final EnableCheck deletableEnableCheck = new RecordRowPropertyEnableCheck(
-      "deletable");
+        "deletable");
 
     final EnableCheck modifiedEnableCheck = new RecordRowPropertyEnableCheck(
-      "modified");
+        "modified");
     final EnableCheck deletedEnableCheck = new RecordRowPropertyEnableCheck(
-      "deleted");
+        "deleted");
     final EnableCheck notEnableCheck = new RecordRowPropertyEnableCheck(
       "deleted", false);
     final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(
@@ -108,15 +108,15 @@ public class RecordLayerTablePanel extends TablePanel implements
     menu.addMenuItemTitleIcon("record", "Delete Record", "table_row_delete",
       deletableEnableCheck, this, "deleteRecord");
 
-    menu.addMenuItem("record", RecordRowRunnable.createAction(
-      "Revert Record", "arrow_revert", modifiedOrDeleted, "revertChanges"));
+    menu.addMenuItem("record", RecordRowRunnable.createAction("Revert Record",
+      "arrow_revert", modifiedOrDeleted, "revertChanges"));
 
     menu.addMenuItem("record", RecordRowRunnable.createAction(
       "Revert Empty Fields", "field_empty_revert", modifiedEnableCheck,
-      "revertEmptyFields"));
+        "revertEmptyFields"));
 
     menu.addMenuItemTitleIcon("dnd", "Copy Record", "page_copy", this,
-      "copyRecord");
+        "copyRecord");
 
     menu.addMenuItemTitleIcon("dataTransfer", "Cut Field Value", "cut",
       cellEditingEnableCheck, this, "cutFieldValue");
@@ -132,23 +132,21 @@ public class RecordLayerTablePanel extends TablePanel implements
 
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
       final DataType geometryDataType = recordDefinition.getGeometryAttribute()
-        .getType();
+          .getType();
       if (geometryDataType == DataTypes.LINE_STRING
-        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition)
-          .hasDirectionalAttributes()) {
+            .hasDirectionalAttributes()) {
           editMenu.addMenuItemTitleIcon("geometry",
-            LayerRecordForm.FLIP_RECORD_NAME,
-            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, this,
-            "flipRecordOrientation");
+            LayerRecordForm.FLIP_RECORD_NAME, LayerRecordForm.FLIP_RECORD_ICON,
+            editableEnableCheck, this, "flipRecordOrientation");
           editMenu.addMenuItemTitleIcon("geometry",
             LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
-            LayerRecordForm.FLIP_LINE_ORIENTATION_ICON,
-            editableEnableCheck, this, "flipLineOrientation");
+            LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck,
+            this, "flipLineOrientation");
           editMenu.addMenuItemTitleIcon("geometry",
-            LayerRecordForm.FLIP_FIELDS_NAME,
-            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, this,
-            "flipFields");
+            LayerRecordForm.FLIP_FIELDS_NAME, LayerRecordForm.FLIP_FIELDS_ICON,
+            editableEnableCheck, this, "flipFields");
         } else {
           editMenu.addMenuItemTitleIcon("geometry", "Flip Line Orientation",
             "flip_line", editableEnableCheck, this, "flipLineOrientation");
@@ -170,7 +168,7 @@ public class RecordLayerTablePanel extends TablePanel implements
     toolBar.addComponent("count", new TableRowCount(this.tableModel));
 
     toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this,
-      "refresh");
+        "refresh");
 
     final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
       this);
@@ -179,8 +177,8 @@ public class RecordLayerTablePanel extends TablePanel implements
     toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
       attributeFilterPanel, "showAdvancedFilter");
 
-    final EnableCheck hasFilter = new ObjectPropertyEnableCheck(tableModel,
-      "hasFilter");
+    final EnableCheck hasFilter = new ObjectPropertyEnableCheck(
+      this.tableModel, "hasFilter");
 
     toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter,
       attributeFilterPanel, "clear");
@@ -189,8 +187,7 @@ public class RecordLayerTablePanel extends TablePanel implements
 
     final JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(
       FILTER_ATTRIBUTE, -1, "Show All Records", "table_filter",
-      this.tableModel, "setAttributeFilterMode",
-      RecordLayerTableModel.MODE_ALL);
+      this.tableModel, "setAttributeFilterMode", RecordLayerTableModel.MODE_ALL);
     clearFilter.doClick();
 
     toolBar.addToggleButton(FILTER_ATTRIBUTE, -1, "Show Only Changed Records",
@@ -221,7 +218,7 @@ public class RecordLayerTablePanel extends TablePanel implements
 
   public void copyFieldValue() {
     if (isEditingCurrentCell()) {
-      final JComponent editorComponent = tableCellEditor.getEditorComponent();
+      final JComponent editorComponent = this.tableCellEditor.getEditorComponent();
       SwingUtil.dndCopy(editorComponent);
     } else {
       final RecordRowTableModel model = getTableModel();
@@ -242,7 +239,7 @@ public class RecordLayerTablePanel extends TablePanel implements
 
   public void cutFieldValue() {
     if (isEditingCurrentCell()) {
-      final JComponent editorComponent = tableCellEditor.getEditorComponent();
+      final JComponent editorComponent = this.tableCellEditor.getEditorComponent();
       SwingUtil.dndCut(editorComponent);
     }
   }
@@ -277,7 +274,7 @@ public class RecordLayerTablePanel extends TablePanel implements
   }
 
   public Collection<? extends String> getColumnNames() {
-    return layer.getColumnNames();
+    return this.layer.getFieldNamesSet();
   }
 
   protected LayerRecord getEventRowObject() {
@@ -306,14 +303,14 @@ public class RecordLayerTablePanel extends TablePanel implements
   public void mouseClicked(final MouseEvent e) {
     super.mouseClicked(e);
     if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-      tableCellEditor.stopCellEditing();
+      this.tableCellEditor.stopCellEditing();
       editRecord();
     }
   }
 
   public void pasteFieldValue() {
     if (isEditingCurrentCell()) {
-      final JComponent editorComponent = tableCellEditor.getEditorComponent();
+      final JComponent editorComponent = this.tableCellEditor.getEditorComponent();
       SwingUtil.dndPaste(editorComponent);
     }
   }
@@ -360,8 +357,8 @@ public class RecordLayerTablePanel extends TablePanel implements
     if (geometry != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()
-        .convert(geometryFactory)
-        .expandPercent(0.1);
+          .convert(geometryFactory)
+          .expandPercent(0.1);
       project.setViewBoundingBox(boundingBox);
     }
   }

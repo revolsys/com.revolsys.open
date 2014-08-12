@@ -39,7 +39,7 @@ public class TextNameField extends ValueField {
     add(new JScrollPane(textNameField), BorderLayout.NORTH);
 
     final ArrayList<String> fieldNames = new ArrayList<String>(
-      layer.getColumnNames());
+      layer.getFieldNames());
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     fieldNames.remove(recordDefinition.getGeometryAttributeName());
     final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(

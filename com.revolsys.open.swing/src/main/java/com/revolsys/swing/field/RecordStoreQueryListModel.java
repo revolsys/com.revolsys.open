@@ -37,7 +37,7 @@ public class RecordStoreQueryListModel implements ListModel {
 
   private String searchText = "";
 
-  private int maxResults = 10;
+  private int maxResults = Integer.MAX_VALUE;
 
   public RecordStoreQueryListModel(final RecordStore recordStore,
     final String displayAttributeName, final List<Query> queries) {
@@ -90,43 +90,47 @@ public class RecordStoreQueryListModel implements ListModel {
   }
 
   protected List<Record> getObjects(final String searchParam) {
-    final Map<String, Record> allObjects = new TreeMap<String, Record>();
-    for (Query query : this.queries) {
-      if (allObjects.size() < this.maxResults) {
-        query = query.clone();
-        query.addOrderBy(this.displayAttributeName, true);
-        final Condition whereCondition = query.getWhereCondition();
-        if (whereCondition instanceof BinaryCondition) {
-          final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
-          if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
-            final String likeString = "%"
-                + searchParam.toUpperCase().replaceAll("[^A-Z0-9 ]", "%") + "%";
-            Q.setValue(0, binaryCondition, likeString);
-          } else {
-            Q.setValue(0, binaryCondition, searchParam);
-          }
-        }
-        query.setLimit(this.maxResults);
-        final Reader<Record> reader = this.recordStore.query(query);
-        try {
-          final List<Record> objects = reader.read();
-          for (final Record object : objects) {
-            if (allObjects.size() < this.maxResults) {
-              final String key = object.getString(this.displayAttributeName);
-              if (!allObjects.containsKey(key)) {
-                if (searchParam.equals(key)) {
-                  this.selectedItem = object;
-                }
-                allObjects.put(key, object);
-              }
+    if (Property.hasValue(searchParam) && searchParam.length() >= 2) {
+      final Map<String, Record> allObjects = new TreeMap<String, Record>();
+      for (Query query : this.queries) {
+        if (allObjects.size() < this.maxResults) {
+          query = query.clone();
+          query.addOrderBy(this.displayAttributeName, true);
+          final Condition whereCondition = query.getWhereCondition();
+          if (whereCondition instanceof BinaryCondition) {
+            final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
+            if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
+              final String likeString = "%"
+                  + searchParam.toUpperCase().replaceAll("[^A-Z0-9 ]", "%") + "%";
+              Q.setValue(0, binaryCondition, likeString);
+            } else {
+              Q.setValue(0, binaryCondition, searchParam);
             }
           }
-        } finally {
-          reader.close();
+          query.setLimit(this.maxResults);
+          final Reader<Record> reader = this.recordStore.query(query);
+          try {
+            final List<Record> objects = reader.read();
+            for (final Record object : objects) {
+              if (allObjects.size() < this.maxResults) {
+                final String key = object.getString(this.displayAttributeName);
+                if (!allObjects.containsKey(key)) {
+                  if (searchParam.equals(key)) {
+                    this.selectedItem = object;
+                  }
+                  allObjects.put(key, object);
+                }
+              }
+            }
+          } finally {
+            reader.close();
+          }
         }
       }
+      return new ArrayList<Record>(allObjects.values());
+    } else {
+      return Collections.emptyList();
     }
-    return new ArrayList<Record>(allObjects.values());
   }
 
   public String getSearchText() {
