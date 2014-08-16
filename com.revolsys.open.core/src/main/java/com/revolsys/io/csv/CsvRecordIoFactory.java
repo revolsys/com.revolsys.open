@@ -21,8 +21,8 @@ import com.revolsys.io.DirectoryRecordStore;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
-public class CsvRecordIoFactory extends AbstractRecordIoFactory
-  implements RecordStoreFactory {
+public class CsvRecordIoFactory extends AbstractRecordIoFactory implements
+  RecordStoreFactory {
   public CsvRecordIoFactory() {
     super(CsvConstants.DESCRIPTION, false, true, true);
     addMediaTypeAndFileExtension(CsvConstants.MEDIA_TYPE,
@@ -53,7 +53,7 @@ public class CsvRecordIoFactory extends AbstractRecordIoFactory
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream,
       charset);
 
-    return new CsvRecordWriter(recordDefinition, writer);
+    return new CsvRecordWriter(recordDefinition, writer, true);
   }
 
   @Override

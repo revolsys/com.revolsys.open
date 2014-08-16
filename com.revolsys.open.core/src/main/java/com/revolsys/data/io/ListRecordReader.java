@@ -3,6 +3,7 @@ package com.revolsys.data.io;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractReader;
 
 public class ListRecordReader extends AbstractReader<Record> implements
-  RecordReader {
+RecordReader {
   private RecordDefinition recordDefinition;
 
   private List<Record> objects = new ArrayList<Record>();
@@ -29,18 +30,18 @@ public class ListRecordReader extends AbstractReader<Record> implements
 
   @Override
   public void close() {
-    recordDefinition = null;
-    objects = null;
+    this.recordDefinition = null;
+    this.objects = Collections.emptyList();
   }
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    return recordDefinition;
+    return this.recordDefinition;
   }
 
   @Override
   public Iterator<Record> iterator() {
-    return objects.iterator();
+    return this.objects.iterator();
   }
 
   @Override

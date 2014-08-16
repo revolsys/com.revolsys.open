@@ -2,9 +2,14 @@ package com.revolsys.swing.field;
 
 import java.awt.Color;
 
+import javax.swing.ImageIcon;
+
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.undo.UndoManager;
 
 public interface Field {
+
+  public static final ImageIcon ERROR_ICON = SilkIconLoader.getIcon("exclamation");
 
   void firePropertyChange(String propertyName, Object oldValue, Object newValue);
 

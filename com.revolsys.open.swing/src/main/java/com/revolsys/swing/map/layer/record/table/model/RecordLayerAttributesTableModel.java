@@ -16,11 +16,11 @@ import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.util.Property;
 
 public class RecordLayerAttributesTableModel extends
-  AbstractSingleRecordTableModel implements PropertyChangeListener {
+AbstractSingleRecordTableModel implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
-  private LayerRecord object;
+  private LayerRecord record;
 
   private final AbstractRecordLayer layer;
 
@@ -30,7 +30,7 @@ public class RecordLayerAttributesTableModel extends
     super(form.getRecordDefinition(), true);
     this.form = new WeakReference<>(form);
     this.layer = form.getLayer();
-    this.object = form.getRecord();
+    this.record = form.getRecord();
     Property.addListener(this.layer, this);
   }
 
@@ -50,29 +50,29 @@ public class RecordLayerAttributesTableModel extends
 
   @Override
   public String getFieldTitle(final String fieldName) {
-    return layer.getFieldTitle(fieldName);
-  }
-
-  public LayerRecord getObject() {
-    return this.object;
+    return this.layer.getFieldTitle(fieldName);
   }
 
   @Override
-  public Object getObjectValue(final int rowIndex) {
-    if (this.object == null) {
+  public Object getObjectValue(final int rowIndex, int columnIndex) {
+    if (this.record == null) {
       return null;
     } else {
-      return this.object.getValue(rowIndex);
+      return this.record.getValue(rowIndex);
     }
+  }
+
+  public LayerRecord getRecord() {
+    return this.record;
   }
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    if (this.object == null) {
+    if (this.record == null) {
       return null;
     } else if (columnIndex == 3) {
       final String attributeName = getFieldName(rowIndex);
-      return this.object.getOriginalValue(attributeName);
+      return this.record.getOriginalValue(attributeName);
     } else {
       return super.getValueAt(rowIndex, columnIndex);
     }
@@ -88,7 +88,7 @@ public class RecordLayerAttributesTableModel extends
         if (idAttribute != null) {
           final String idAttributeName = idAttribute.getName();
           if (attributeName.equals(idAttributeName)) {
-            if (object.getState() == RecordState.New) {
+            if (this.record.getState() == RecordState.New) {
               if (!Number.class.isAssignableFrom(idAttribute.getTypeClass())) {
                 return true;
               }
@@ -96,7 +96,8 @@ public class RecordLayerAttributesTableModel extends
             return false;
           }
         }
-        if (recordDefinition.getGeometryAttributeNames().contains(attributeName)) {
+        if (recordDefinition.getGeometryAttributeNames()
+          .contains(attributeName)) {
           return false;
         } else {
           return this.form.get().isEditable(attributeName);
@@ -111,15 +112,15 @@ public class RecordLayerAttributesTableModel extends
 
   public boolean isModified(final int rowIndex) {
     final String attributeName = getFieldName(rowIndex);
-    final Object originalValue = this.object.getOriginalValue(attributeName);
-    final Object value = this.object.getValue(attributeName);
+    final Object originalValue = this.record.getOriginalValue(attributeName);
+    final Object value = this.record.getValue(attributeName);
     return !EqualsRegistry.equal(originalValue, value);
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
-    if (source == this.object) {
+    if (source == this.record) {
       final String propertyName = event.getPropertyName();
       final RecordDefinition recordDefinition = getRecordDefinition();
       final int index = recordDefinition.getAttributeIndex(propertyName);
@@ -136,14 +137,14 @@ public class RecordLayerAttributesTableModel extends
     Property.removeListener(this.layer, this);
   }
 
-  public void setObject(final LayerRecord object) {
-    this.object = object;
-  }
-
   @Override
   protected Object setObjectValue(final int rowIndex, final Object value) {
-    final Object oldValue = this.object.getValue(rowIndex);
-    this.object.setValue(rowIndex, value);
+    final Object oldValue = this.record.getValue(rowIndex);
+    this.record.setValue(rowIndex, value);
     return oldValue;
+  }
+
+  public void setRecord(final LayerRecord record) {
+    this.record = record;
   }
 }

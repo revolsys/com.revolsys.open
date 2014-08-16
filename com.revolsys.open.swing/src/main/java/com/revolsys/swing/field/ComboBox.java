@@ -19,22 +19,12 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
-import com.revolsys.util.Property;
 
 public class ComboBox extends JComboBox implements Field {
   private static final long serialVersionUID = 1L;
 
-  private String fieldName;
-
-  private Object fieldValue;
-
-  private String errorMessage;
-
-  private String originalToolTip;
-
-  private final CascadingUndoManager undoManager = new CascadingUndoManager();
+  private final FieldSupport support;
 
   public ComboBox() {
     this("fieldValue", null);
@@ -65,6 +55,8 @@ public class ComboBox extends JComboBox implements Field {
       final ListCellRenderer renderer = (ListCellRenderer)converter;
       setRenderer(renderer);
     }
+    final JComponent editorComponent = (JComponent)getEditor().getEditorComponent();
+    this.support = new FieldSupport(this, editorComponent, "fieldValue", null);
   }
 
   public ComboBox(final ObjectToStringConverter converter,
@@ -88,7 +80,11 @@ public class ComboBox extends JComboBox implements Field {
     if (renderer != null) {
       setRenderer(renderer);
     }
-    this.fieldName = fieldName;
+    if (converter != null) {
+      AutoCompleteDecorator.decorate(this, converter);
+    }
+    final JComponent editorComponent = (JComponent)getEditor().getEditorComponent();
+    this.support = new FieldSupport(this, editorComponent, fieldName, null);
     addActionListener(new ActionListener() {
 
       @Override
@@ -97,10 +93,6 @@ public class ComboBox extends JComboBox implements Field {
         setFieldValue(selectedItem);
       }
     });
-    if (converter != null) {
-      AutoCompleteDecorator.decorate(this, converter);
-    }
-    this.undoManager.addKeyMap(getEditor().getEditorComponent());
   }
 
   @Override
@@ -120,12 +112,12 @@ public class ComboBox extends JComboBox implements Field {
 
   @Override
   public String getFieldName() {
-    return this.fieldName;
+    return this.support.getName();
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return this.errorMessage;
+    return this.support.getErrorMessage();
   }
 
   @SuppressWarnings("unchecked")
@@ -162,12 +154,7 @@ public class ComboBox extends JComboBox implements Field {
   @Override
   public void setFieldInvalid(final String message,
     final Color foregroundColor, final Color backgroundColor) {
-    final ComboBoxEditor editor = getEditor();
-    final Component component = editor.getEditorComponent();
-    component.setForeground(foregroundColor);
-    component.setBackground(backgroundColor);
-    this.errorMessage = message;
-    setFieldToolTip(this.errorMessage);
+    this.support.setFieldInvalid(message, foregroundColor, backgroundColor);
   }
 
   @Override
@@ -179,39 +166,27 @@ public class ComboBox extends JComboBox implements Field {
 
   @Override
   public void setFieldValid() {
-    final ComboBoxEditor editor = getEditor();
-    final JComponent component = (JComponent)editor.getEditorComponent();
-    component.setForeground(TextField.DEFAULT_FOREGROUND);
-    component.setBackground(TextField.DEFAULT_BACKGROUND);
-    this.errorMessage = null;
-    setFieldToolTip(this.originalToolTip);
+    this.support.setFieldValid();
   }
 
   @Override
   public synchronized void setFieldValue(final Object value) {
-    final Object oldValue = this.fieldValue;
     if (!EqualsRegistry.equal(getSelectedItem(), value)) {
       setSelectedItem(value);
     }
-    if (!EqualsRegistry.equal(oldValue, value)) {
-      this.fieldValue = value;
-      firePropertyChange(this.fieldName, oldValue, value);
-      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
-        oldValue, value);
-    }
+    this.support.setValue(value);
   }
 
   @Override
   public void setToolTipText(final String text) {
-    this.originalToolTip = text;
-    if (!Property.hasValue(this.errorMessage)) {
+    if (this.support.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }
 
   @Override
   public void setUndoManager(final UndoManager undoManager) {
-    this.undoManager.setParent(undoManager);
+    this.support.setUndoManager(undoManager);
   }
 
   @Override

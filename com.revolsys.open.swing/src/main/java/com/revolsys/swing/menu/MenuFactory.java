@@ -227,12 +227,6 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     return menu;
   }
 
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
-
   public InvokeMethodAction createMenuItem(final String name,
     final String title, final Icon icon, final EnableCheck enableCheck,
     final Object object, final String methodName, final Object... parameters) {
@@ -240,6 +234,27 @@ public class MenuFactory extends AbstractObjectWithProperties implements
       object, methodName, parameters);
     action.setEnableCheck(enableCheck);
     return action;
+  }
+
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
+
+  public MenuFactory getFactory(final String name) {
+    for (final List<ComponentFactory<?>> group : this.groups.values()) {
+      for (final ComponentFactory<?> factory : group) {
+        if (factory instanceof MenuFactory) {
+          final MenuFactory menuFactory = (MenuFactory)factory;
+          final String factoryName = menuFactory.getName();
+          if (name.equals(factoryName)) {
+            return menuFactory;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   public List<ComponentFactory<?>> getGroup(final String groupName) {
@@ -261,7 +276,7 @@ public class MenuFactory extends AbstractObjectWithProperties implements
 
   public int getItemCount() {
     int count = 0;
-    for (final List<ComponentFactory<?>> factories : groups.values()) {
+    for (final List<ComponentFactory<?>> factories : this.groups.values()) {
       count += factories.size();
     }
     return count;

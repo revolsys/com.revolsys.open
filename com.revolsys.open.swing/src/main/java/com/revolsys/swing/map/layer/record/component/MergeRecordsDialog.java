@@ -116,7 +116,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
     final JXPanel panel = new JXPanel(new BorderLayout());
     panel.setScrollableWidthHint(ScrollableSizeHint.FIT);
-    panel.setScrollableHeightHint(ScrollableSizeHint.VERTICAL_STRETCH);
+    panel.setScrollableHeightHint(ScrollableSizeHint.PREFERRED_STRETCH);
     panel.setOpaque(false);
     add(new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
       JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
@@ -231,7 +231,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
   public void setMergedRecords(String errorMessage,
     final Map<Record, Set<LayerRecord>> mergedRecords) {
     final Set<Record> unMergeableRecords = new HashSet<Record>(
-        this.mergeableToOiginalRecordMap.keySet());
+      this.mergeableToOiginalRecordMap.keySet());
     unMergeableRecords.removeAll(mergedRecords.keySet());
     if (!mergedRecords.isEmpty()) {
       int i = 0;
@@ -263,7 +263,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
         errorMessage = "The following records could not be merged and will not be modified.";
       }
       final JLabel unMergeLabel = new JLabel("<html><p style=\"color:red\">"
-          + errorMessage + "</p></html>");
+        + errorMessage + "</p></html>");
       panel.add(unMergeLabel, BorderLayout.NORTH);
       panel.add(tablePanel, BorderLayout.SOUTH);
       SwingUtil.setTitledBorder(panel, unMergeableRecords.size()

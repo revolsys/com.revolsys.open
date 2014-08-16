@@ -340,12 +340,13 @@ implements Record, Cloneable {
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Object> T getValue(final CharSequence name) {
+    RecordDefinition recordDefinition = this.getRecordDefinition();
     try {
-      final int index = this.getRecordDefinition().getAttributeIndex(name);
+      final int index = recordDefinition.getAttributeIndex(name);
       return (T)getValue(index);
     } catch (final NullPointerException e) {
       LoggerFactory.getLogger(getClass()).warn(
-        "Attribute " + this.getRecordDefinition().getPath() + "." + name
+        "Attribute " + recordDefinition.getPath() + "." + name
         + " does not exist");
       return null;
     }

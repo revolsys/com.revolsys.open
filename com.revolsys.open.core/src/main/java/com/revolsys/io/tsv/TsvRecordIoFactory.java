@@ -39,6 +39,6 @@ public class TsvRecordIoFactory extends AbstractRecordIoFactory {
       charset);
 
     return new CsvRecordWriter(recordDefinition, writer,
-      TsvConstants.FIELD_SEPARATOR, true);
+      TsvConstants.FIELD_SEPARATOR, true, true);
   }
 }

@@ -1666,7 +1666,8 @@ RecordFactory, AddGeometryCompleteAction {
     }
   }
 
-  public void pasteRecords() {
+  public List<LayerRecord> pasteRecords() {
+    final List<LayerRecord> newRecords = new ArrayList<LayerRecord>();
     final boolean eventsEnabled = setEventsEnabled(false);
     try {
       RecordReader reader = ClipboardUtil.getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
@@ -1682,7 +1683,6 @@ RecordFactory, AddGeometryCompleteAction {
           }
         }
       }
-      final List<LayerRecord> newRecords = new ArrayList<LayerRecord>();
       final List<Record> regectedRecords = new ArrayList<Record>();
       if (reader != null) {
         final RecordDefinition recordDefinition = getRecordDefinition();
@@ -1694,10 +1694,7 @@ RecordFactory, AddGeometryCompleteAction {
           geometryDataType = geometryAttribute.getType();
           layerGeometryClass = geometryDataType.getJavaClass();
         }
-        Collection<String> ignorePasteFields = getProperty("ignorePasteFields");
-        if (ignorePasteFields == null) {
-          ignorePasteFields = Collections.emptySet();
-        }
+        Collection<String> ignorePasteFields = getIgnorePasteFields();
         for (final Record sourceRecord : reader) {
           final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
               sourceRecord);
@@ -1738,6 +1735,7 @@ RecordFactory, AddGeometryCompleteAction {
           if (newRecord == null) {
             regectedRecords.add(sourceRecord);
           } else {
+            recordPasted(newRecord);
             newRecords.add(newRecord);
           }
         }
@@ -1745,9 +1743,17 @@ RecordFactory, AddGeometryCompleteAction {
     } finally {
       setEventsEnabled(eventsEnabled);
     }
-    final List<LayerRecord> newRecords = getNewRecords();
     firePropertyChange("recordsInserted", null, newRecords);
     addSelectedRecords(newRecords);
+    return newRecords;
+  }
+
+  protected Collection<String> getIgnorePasteFields() {
+    Collection<String> ignorePasteFields = getProperty("ignorePasteFields");
+    if (ignorePasteFields == null) {
+      ignorePasteFields = Collections.emptySet();
+    }
+    return ignorePasteFields;
   }
 
   protected void postSaveChanges(final RecordState originalState,
@@ -1865,6 +1871,9 @@ RecordFactory, AddGeometryCompleteAction {
     } else {
       return Collections.emptyList();
     }
+  }
+
+  protected void recordPasted(final LayerRecord newRecord) {
   }
 
   protected void removeForm(final LayerRecord record) {

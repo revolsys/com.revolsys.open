@@ -119,19 +119,20 @@ public abstract class AbstractIdentifier implements Identifier {
 
   @Override
   public int hashCode() {
+    int hashCode;
     final List<Object> values = getValues();
     if (values.size() == 1) {
-      return values.get(0).hashCode();
+      hashCode = values.get(0).hashCode();
     } else {
-      int hashCode = 1;
+      hashCode = 1;
       for (final Object value : values) {
         hashCode *= 31;
         if (value != null) {
           hashCode += value.hashCode();
         }
       }
-      return hashCode;
     }
+    return hashCode;
   }
 
   @Override

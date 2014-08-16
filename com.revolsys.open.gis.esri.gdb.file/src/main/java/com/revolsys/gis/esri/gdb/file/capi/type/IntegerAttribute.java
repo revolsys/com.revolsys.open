@@ -28,7 +28,8 @@ public class IntegerAttribute extends AbstractFileGdbAttribute {
       return null;
     } else {
       synchronized (recordStore) {
-        return row.getInteger(name);
+        final Integer number = row.getInteger(name);
+        return number;
       }
     }
   }

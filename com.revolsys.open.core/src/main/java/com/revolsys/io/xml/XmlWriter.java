@@ -608,6 +608,10 @@ public class XmlWriter extends Writer {
     }
   }
 
+  public void endTag(final String localPart) {
+    endTag(new QName(localPart));
+  }
+
   public void endTagLn(final QName element) {
     endTag(element);
     newLine();
@@ -937,6 +941,10 @@ public class XmlWriter extends Writer {
     this.out.write('<');
     writeName(element, false);
     this.elementHasContent = false;
+  }
+
+  public void startTag(final String localPart) {
+    startTag(new QName(localPart));
   }
 
   /**

@@ -202,7 +202,8 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
           final String attributeName = getFieldName(rowIndex, columnIndex);
           if (attributeName != null) {
             if (!isReadOnly(attributeName)) {
-              final Class<?> attributeClass = getRecordDefinition().getAttributeClass(
+              RecordDefinition recordDefinition = getRecordDefinition();
+              final Class<?> attributeClass = recordDefinition.getAttributeClass(
                 attributeName);
               if (!Geometry.class.isAssignableFrom(attributeClass)) {
                 return true;

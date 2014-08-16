@@ -7,8 +7,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +17,8 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
-import com.revolsys.ui.web.utils.HttpServletUtils;
+import com.revolsys.ui.web.utils.HttpSavedRequestAndResponse;
+import com.revolsys.util.WrappedException;
 
 public class TransactionFilter extends GenericFilterBean {
   private static final Logger log = LoggerFactory.getLogger(TransactionFilter.class);
@@ -28,67 +27,37 @@ public class TransactionFilter extends GenericFilterBean {
 
   @Override
   public void destroy() {
-    applicationContext = null;
+    this.applicationContext = null;
   }
 
   @Override
   public void doFilter(final ServletRequest servletRequest,
     final ServletResponse servletResponse, final FilterChain filterChain)
-    throws IOException, ServletException {
-    final HttpServletRequest request = (HttpServletRequest)servletRequest;
-    final HttpServletResponse response = (HttpServletResponse)servletResponse;
-    final HttpServletRequest savedRequest = HttpServletUtils.getRequest();
-    final HttpServletResponse savedResponse = HttpServletUtils.getResponse();
-
-    try {
-      HttpServletUtils.setRequestAndResponse(request, response);
-      final AbstractPlatformTransactionManager transactionManager = (AbstractPlatformTransactionManager)applicationContext.getBean("transactionManager");
-      if (transactionManager == null) {
-        filterChain.doFilter(request, response);
-      } else {
-        try (
-          Transaction transaction = new Transaction(transactionManager,
-            Propagation.REQUIRED)) {
-          try {
-            filterChain.doFilter(request, response);
-          } catch (final ServletException e) {
-            HttpServletLogUtil.logRequestException(log, request, e);
-            transaction.setRollbackOnly();
-            throw e;
-          } catch (final IOException e) {
-            HttpServletLogUtil.logRequestException(log, request, e);
-            transaction.setRollbackOnly();
-            throw e;
-          } catch (final Throwable e) {
-            HttpServletLogUtil.logRequestException(log, request, e);
-            throw transaction.setRollbackOnly(e);
-          }
-        } catch (final ServletException e) {
-          HttpServletLogUtil.logRequestException(log, request, e);
-          throw e;
-        } catch (final IOException e) {
-          HttpServletLogUtil.logRequestException(log, request, e);
-          throw e;
-        } catch (final RuntimeException e) {
-          HttpServletLogUtil.logRequestException(log, request, e);
-          throw e;
-        } catch (final Error e) {
-          HttpServletLogUtil.logRequestException(log, request, e);
-          throw e;
-        }
+        throws IOException, ServletException {
+    final AbstractPlatformTransactionManager transactionManager = (AbstractPlatformTransactionManager)this.applicationContext.getBean("transactionManager");
+    try (
+        HttpSavedRequestAndResponse saved = new HttpSavedRequestAndResponse(
+          servletRequest, servletResponse);
+        Transaction transaction = new Transaction(transactionManager,
+          Propagation.REQUIRED);) {
+      try {
+        filterChain.doFilter(servletRequest, servletResponse);
+      } catch (final Throwable e) {
+        transaction.setRollbackOnly();
+        throw e;
       }
-    } finally {
-      if (savedRequest == null) {
-        HttpServletUtils.clearRequestAndResponse();
-      } else {
-        HttpServletUtils.setRequestAndResponse(savedRequest, savedResponse);
-      }
+    } catch (IOException | ServletException | Error | RuntimeException e) {
+      HttpServletLogUtil.logRequestException(log, e);
+      throw e;
+    } catch (final Throwable e) {
+      HttpServletLogUtil.logRequestException(log, e);
+      throw new WrappedException(e);
     }
   }
 
   @Override
   protected void initFilterBean() throws ServletException {
     final ServletContext servletContext = getServletContext();
-    applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+    this.applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
   }
 }

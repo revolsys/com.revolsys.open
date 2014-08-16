@@ -26,7 +26,7 @@ public class RecordMapTableModel extends AbstractSingleRecordTableModel {
   }
 
   @Override
-  public Object getObjectValue(final int attributeIndex) {
+  public Object getObjectValue(final int attributeIndex, int columnIndex) {
     final String name = getFieldName(attributeIndex);
     return this.values.get(name);
   }

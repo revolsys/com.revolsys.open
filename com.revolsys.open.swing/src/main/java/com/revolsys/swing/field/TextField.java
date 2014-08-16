@@ -12,7 +12,6 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
-import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
@@ -25,15 +24,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   private static final long serialVersionUID = 1L;
 
-  private String errorMessage;
-
-  private final String fieldName;
-
-  private String fieldValue;
-
-  private String originalToolTip;
-
-  private final CascadingUndoManager undoManager = new CascadingUndoManager();
+  private final FieldSupport support;
 
   public TextField(final int columns) {
     this("text");
@@ -49,17 +40,15 @@ public class TextField extends JXTextField implements Field, FocusListener {
     setColumns(columns);
   }
 
-  public TextField(final String fieldName, final Object fieldValue) {
+  public TextField(String fieldName, final Object fieldValue) {
     setDocument(new PropertyChangeDocument(this));
-    if (Property.hasValue(fieldName)) {
-      this.fieldName = fieldName;
-    } else {
-      this.fieldName = "fieldValue";
+    if (!Property.hasValue(fieldName)) {
+      fieldName = "fieldValue";
     }
-    this.fieldValue = StringConverterRegistry.toString(fieldValue);
-    setText(this.fieldValue);
+    final String text = StringConverterRegistry.toString(fieldValue);
+    this.support = new FieldSupport(this, fieldName, text);
+    setText(text);
     addFocusListener(new WeakFocusListener(this));
-    this.undoManager.addKeyMap(this);
     PopupMenu.getPopupMenuFactory(this);
   }
 
@@ -91,18 +80,19 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public String getFieldName() {
-    return this.fieldName;
+    return this.support.getName();
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return this.errorMessage;
+    return this.support.getErrorMessage();
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
-    return (T)getText();
+    final String text = getText();
+    return (T)text;
   }
 
   @Override
@@ -129,11 +119,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
   @Override
   public void setFieldInvalid(final String message,
     final Color foregroundColor, final Color backgroundColor) {
-    setForeground(foregroundColor);
-    setSelectedTextColor(foregroundColor);
-    setBackground(backgroundColor);
-    this.errorMessage = message;
-    super.setToolTipText(this.errorMessage);
+    this.support.setFieldInvalid(message, foregroundColor, backgroundColor);
   }
 
   @Override
@@ -143,19 +129,14 @@ public class TextField extends JXTextField implements Field, FocusListener {
 
   @Override
   public void setFieldValid() {
-    setForeground(TextField.DEFAULT_FOREGROUND);
-    setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
-    setBackground(TextField.DEFAULT_BACKGROUND);
-    this.errorMessage = null;
-    super.setToolTipText(this.originalToolTip);
+    this.support.setFieldValid();
   }
 
   @Override
   public void setFieldValue(final Object value) {
     final String newText = getDisplayText(value);
-    final String oldValue = this.fieldValue;
     final String text = getText();
-    this.undoManager.discardAllEdits();
+    this.support.discardAllEdits();
     if (!EqualsRegistry.equal(text, newText)) {
       if (newText == null) {
         if (Property.hasValue(text)) {
@@ -164,27 +145,21 @@ public class TextField extends JXTextField implements Field, FocusListener {
       } else {
         setText(newText);
       }
-      this.undoManager.discardAllEdits();
+      this.support.discardAllEdits();
     }
-    if (!EqualsRegistry.equal(oldValue, newText)) {
-      this.fieldValue = newText;
-      firePropertyChange(this.fieldName, oldValue, newText);
-      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
-        oldValue, newText);
-    }
+    this.support.setValue(newText);
   }
 
   @Override
   public void setToolTipText(final String text) {
-    this.originalToolTip = text;
-    if (!Property.hasValue(this.errorMessage)) {
+    if (this.support.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }
 
   @Override
   public void setUndoManager(final UndoManager undoManager) {
-    this.undoManager.setParent(undoManager);
+    this.support.setUndoManager(undoManager);
   }
 
   @Override

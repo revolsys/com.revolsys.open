@@ -31,7 +31,7 @@ public class BasePanel extends JXPanel {
   public BasePanel(final LayoutManager layout, final boolean isDoubleBuffered) {
     super(layout, isDoubleBuffered);
     setScrollableWidthHint(ScrollableSizeHint.FIT);
-    setScrollableHeightHint(ScrollableSizeHint.VERTICAL_STRETCH);
+    setScrollableHeightHint(ScrollableSizeHint.PREFERRED_STRETCH);
     setOpaque(false);
   }
 

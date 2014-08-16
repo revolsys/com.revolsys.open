@@ -12,12 +12,6 @@ import com.revolsys.swing.table.record.renderer.SingleRecordTableCellRenderer;
 
 public abstract class AbstractSingleRecordTableModel extends
   AbstractRecordTableModel {
-  private static final long serialVersionUID = 1L;
-
-  private static final String[] COLUMN_NAMES = {
-    "#", "Name", "Value"
-  };
-
   public static BaseJxTable createTable(
     final AbstractSingleRecordTableModel model) {
     final BaseJxTable table = new BaseJxTable(model);
@@ -26,8 +20,7 @@ public abstract class AbstractSingleRecordTableModel extends
     table.setAutoCreateColumnsFromModel(false);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     final SingleRecordTableCellRenderer cellRenderer = new SingleRecordTableCellRenderer();
-    final RecordTableCellEditor cellEditor = new RecordTableCellEditor(
-      table);
+    final RecordTableCellEditor cellEditor = new RecordTableCellEditor(table);
 
     final RecordDefinition recordDefinition = model.getRecordDefinition();
 
@@ -70,8 +63,14 @@ public abstract class AbstractSingleRecordTableModel extends
     return table;
   }
 
-  public AbstractSingleRecordTableModel(final RecordDefinition recordDefinition,
-    final boolean editable) {
+  private static final long serialVersionUID = 1L;
+
+  private static final String[] COLUMN_NAMES = {
+    "#", "Name", "Value"
+  };
+
+  public AbstractSingleRecordTableModel(
+    final RecordDefinition recordDefinition, final boolean editable) {
     super(recordDefinition);
     setEditable(editable);
   }
@@ -96,7 +95,8 @@ public abstract class AbstractSingleRecordTableModel extends
     return recordDefinition.getAttributeTitle(fieldName);
   }
 
-  public abstract Object getObjectValue(final int attributeIndex);
+  public abstract Object getObjectValue(final int attributeIndex,
+    int columnIndex);
 
   @Override
   public int getRowCount() {
@@ -115,7 +115,7 @@ public abstract class AbstractSingleRecordTableModel extends
         final String title = getFieldTitle(fieldName);
         return title;
       case 2:
-        return getObjectValue(rowIndex);
+        return getObjectValue(rowIndex, columnIndex);
       default:
         return null;
     }
@@ -159,13 +159,13 @@ public abstract class AbstractSingleRecordTableModel extends
     return setObjectValue(attributeIndex, objectValue);
   }
 
+  protected abstract Object setObjectValue(final int attributeIndex,
+    final Object value);
+
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     super.setRecordDefinition(recordDefinition);
   }
-
-  protected abstract Object setObjectValue(final int attributeIndex,
-    final Object value);
 
   @Override
   public void setValueAt(final Object value, final int rowIndex,

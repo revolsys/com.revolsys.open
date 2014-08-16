@@ -4,7 +4,6 @@ import java.awt.Component;
 
 import javax.swing.BorderFactory;
 
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -22,7 +21,7 @@ public class MergedRecordPredicate implements HighlightPredicate {
     final MergedRecordsTableModel model = table.getTableModel();
     final MergedRecordPredicate predicate = new MergedRecordPredicate(model);
     final Highlighter colors = new ColorHighlighter(predicate,
-      ColorUtil.setAlpha(WebColors.Green, 64), WebColors.Black,
+      WebColors.setAlpha(WebColors.Green, 64), WebColors.Black,
       WebColors.Green, WebColors.White);
     table.addHighlighter(colors);
     table.addHighlighter(new BorderHighlighter(predicate,

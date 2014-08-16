@@ -3,12 +3,12 @@ package com.revolsys.swing.map.layer.record.table.predicate;
 import java.awt.Color;
 import java.awt.Component;
 
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.data.record.Record;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
@@ -23,7 +23,7 @@ public class ErrorPredicate implements HighlightPredicate {
 
   public static Highlighter getHighlighter(final RecordRowTableModel model) {
     final ErrorPredicate predicate = new ErrorPredicate(model);
-    return new ColorHighlighter(predicate, ColorUtil.setAlpha(Color.RED, 64),
+    return new ColorHighlighter(predicate, WebColors.setAlpha(Color.RED, 64),
       Color.RED, Color.RED, Color.YELLOW);
   }
 
@@ -41,7 +41,7 @@ public class ErrorPredicate implements HighlightPredicate {
       final Record record = this.model.getRecord(rowIndex);
       if (record != null) {
         final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
-        final String attributeName = model.getFieldName(columnIndex);
+        final String attributeName = this.model.getFieldName(columnIndex);
         if (!record.isValid(attributeName)) {
           return true;
         }

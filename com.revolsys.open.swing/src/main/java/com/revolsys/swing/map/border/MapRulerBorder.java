@@ -36,11 +36,41 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 
 public class MapRulerBorder extends AbstractBorder implements
-  PropertyChangeListener {
+PropertyChangeListener {
+  public static <U extends Quantity> List<Unit<U>> createSteps(
+    final Unit<U>... steps) {
+    final List<Unit<U>> stepList = new ArrayList<Unit<U>>();
+    for (final Unit<U> step : steps) {
+      stepList.add(step);
+    }
+    return stepList;
+  }
+
+  /**
+   * Create a list of steps in measurable units from the double array.
+   *
+   * @param <U> The type of unit (e.g. {@link Angle} or {@link Length}).
+   * @param unit The unit of measure.
+   * @param steps The list of steps.
+   * @return The list of step measures.
+   */
+  public static <U extends Quantity> List<Unit<U>> createSteps(
+    final Unit<U> unit, final double... steps) {
+    final List<Unit<U>> stepList = new ArrayList<Unit<U>>();
+    for (final double step : steps) {
+      if (step == 1) {
+        stepList.add(unit);
+      } else {
+        stepList.add(unit.times(step));
+      }
+    }
+    return stepList;
+  }
+
   private final int rulerSize = 25;
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -3070841484052913548L;
 
@@ -66,36 +96,6 @@ public class MapRulerBorder extends AbstractBorder implements
     NonSI.FOOT.times(1000000), NonSI.FOOT.times(100000),
     NonSI.FOOT.times(10000), NonSI.FOOT.times(1000), NonSI.FOOT.times(100),
     NonSI.FOOT.times(10), NonSI.FOOT);
-
-  public static <U extends Quantity> List<Unit<U>> createSteps(
-    final Unit<U>... steps) {
-    final List<Unit<U>> stepList = new ArrayList<Unit<U>>();
-    for (final Unit<U> step : steps) {
-      stepList.add(step);
-    }
-    return stepList;
-  }
-
-  /**
-   * Create a list of steps in measurable units from the double array.
-   * 
-   * @param <U> The type of unit (e.g. {@link Angle} or {@link Length}).
-   * @param unit The unit of measure.
-   * @param steps The list of steps.
-   * @return The list of step measures.
-   */
-  public static <U extends Quantity> List<Unit<U>> createSteps(
-    final Unit<U> unit, final double... steps) {
-    final List<Unit<U>> stepList = new ArrayList<Unit<U>>();
-    for (final double step : steps) {
-      if (step == 1) {
-        stepList.add(unit);
-      } else {
-        stepList.add(unit.times(step));
-      }
-    }
-    return stepList;
-  }
 
   private final Viewport2D viewport;
 
@@ -155,8 +155,8 @@ public class MapRulerBorder extends AbstractBorder implements
       this.rulerSize);
   }
 
-  /** 
-   * Reinitialize the insets parameter with this Border's current Insets. 
+  /**
+   * Reinitialize the insets parameter with this Border's current Insets.
    * @param c the component for which this border insets value applies
    * @param insets the object to be reinitialized
    */
@@ -258,8 +258,8 @@ public class MapRulerBorder extends AbstractBorder implements
         textY = this.rulerSize - 3;
         y0 = boundingBox.getMinY();
       }
-      line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x1, y0,
-        x2, y0);
+      line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x1,
+        y0, x2, y0);
 
       line = line.convert(this.rulerGeometryFactory);
 
@@ -365,8 +365,8 @@ public class MapRulerBorder extends AbstractBorder implements
         textX = this.rulerSize - 3;
         x0 = boundingBox.getMaxX();
       }
-      line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x0, y1,
-        x0, y2);
+      line = new LineSegmentDoubleGF(boundingBox.getGeometryFactory(), 2, x0,
+        y1, x0, y2);
 
       line = line.convert(this.rulerGeometryFactory);
 

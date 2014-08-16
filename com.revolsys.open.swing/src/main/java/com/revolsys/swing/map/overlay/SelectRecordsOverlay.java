@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jdesktop.swingx.color.ColorUtil;
-
 import com.revolsys.awt.WebColors;
 import com.revolsys.data.record.Record;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
@@ -46,12 +44,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   protected static final BasicStroke BOX_STROKE = new BasicStroke(2,
     BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 2, new float[] {
-    6, 6
-  }, 0f);
+      6, 6
+    }, 0f);
 
   private static final Color COLOR_BOX = WebColors.Green;
 
-  private static final Color COLOR_BOX_TRANSPARENT = ColorUtil.setAlpha(
+  private static final Color COLOR_BOX_TRANSPARENT = WebColors.setAlpha(
     COLOR_BOX, 127);
 
   private static final Cursor CURSOR_SELECT_BOX = SilkIconLoader.getCursor(
@@ -67,12 +65,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     WebColors.Black, WebColors.Yellow);
 
   private static final Set<String> REDRAW_PROPERTY_NAMES = new HashSet<>(
-      Arrays.asList("refresh", "viewBoundingBox", "unitsPerPixel", "scale"));
+    Arrays.asList("refresh", "viewBoundingBox", "unitsPerPixel", "scale"));
 
   private static final Set<String> REDRAW_REPAINT_PROPERTY_NAMES = new HashSet<>(
-      Arrays.asList("layers", "selectable", "visible", "editable",
-        "recordsChanged", "updateRecord", "hasSelectedRecords",
-          "hasHighlightedRecords"));
+    Arrays.asList("layers", "selectable", "visible", "editable",
+      "recordsChanged", "updateRecord", "hasSelectedRecords",
+      "hasHighlightedRecords"));
 
   public static final SelectedRecordsRenderer SELECT_RENDERER = new SelectedRecordsRenderer(
     WebColors.Black, WebColors.Lime);
@@ -235,7 +233,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           setMapCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
           try (
-              final ImageViewport imageViewport = new ImageViewport(viewport)) {
+            final ImageViewport imageViewport = new ImageViewport(viewport)) {
             paintSelected(imageViewport, layerGroup);
             paintHighlighted(imageViewport, layerGroup);
             this.selectImage = imageViewport.getImage();
@@ -410,7 +408,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private boolean selectBoxStart(final MouseEvent event) {
     if (isOverlayAction(ACTION_SELECT_RECORDS)
-        && SwingUtil.isLeftButtonOnly(event)) {
+      && SwingUtil.isLeftButtonOnly(event)) {
       this.selectBoxButton = event.getButton();
       final Point point = getPoint(event);
       this.selectBoxX1 = this.selectBoxX2 = point.getX();
@@ -452,7 +450,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     Cursor cursor = null;
     if (event != null) {
       final boolean selectBox = SwingUtil.isControlOrMetaDown(event)
-        || this.selectBoxX1 != -1;
+          || this.selectBoxX1 != -1;
       if (SwingUtil.isShiftDown(event)) {
         if (selectBox) {
           cursor = CURSOR_SELECT_BOX_ADD;

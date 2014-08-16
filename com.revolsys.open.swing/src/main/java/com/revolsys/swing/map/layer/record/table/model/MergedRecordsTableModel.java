@@ -111,14 +111,13 @@ SortableTableModel, ListSelectionListener {
     final int columnIndex) {
     final Map<String, Object> record = getRecord(rowIndex);
     if (record != null) {
-      final String name = getColumnName(columnIndex);
+      final String name = getFieldName(columnIndex);
       record.put(name, value);
     }
   }
 
   @Override
   public void valueChanged(final ListSelectionEvent event) {
-
     final RecordRowTable table = getTable();
     final ListSelectionModel selectionModel = table.getSelectionModel();
     final int rowCount = super.getRowCount();

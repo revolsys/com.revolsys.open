@@ -589,11 +589,11 @@ public final class CollectionUtil {
                 }
               }
             }
-            break;
+          break;
 
           default:
             buffer.append(c);
-            break;
+          break;
         }
       }
       return buffer.toString();
@@ -609,7 +609,7 @@ public final class CollectionUtil {
       if (collection == null) {
         return false;
       } else {
-        return collection.contains(key);
+        return collection.contains(value);
       }
     }
   }
@@ -617,7 +617,7 @@ public final class CollectionUtil {
   public static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
     final Map<K, V> map) {
     final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(
-        map);
+      map);
     final Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
     sortedMap.putAll(map);
     return new LinkedHashMap<K, V>(sortedMap);

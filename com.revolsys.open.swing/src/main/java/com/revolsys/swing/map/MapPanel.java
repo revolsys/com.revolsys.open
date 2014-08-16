@@ -202,7 +202,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     createScales();
     this.viewport.setScales(getScales());
 
-    this.layeredPane.setBorder(new MapRulerBorder(this.viewport));
+    MapRulerBorder border = new MapRulerBorder(this.viewport);
+    this.layeredPane.setBorder(border);
 
     this.baseMapOverlay = new LayerRendererOverlay(this);
     this.baseMapOverlay.setLayer(NullLayer.INSTANCE);

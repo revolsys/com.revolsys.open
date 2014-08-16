@@ -21,17 +21,21 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   private final boolean useQuotes;
 
+  private final boolean ewkt;
+
   public CsvRecordWriter(final RecordDefinition recordDefinition,
-    final Writer out) {
-    this(recordDefinition, out, CsvConstants.FIELD_SEPARATOR, true);
+    final Writer out, final boolean ewkt) {
+    this(recordDefinition, out, CsvConstants.FIELD_SEPARATOR, true, ewkt);
 
   }
 
   public CsvRecordWriter(final RecordDefinition recordDefinition,
-    final Writer out, final char fieldSeparator, final boolean useQuotes) {
+    final Writer out, final char fieldSeparator, final boolean useQuotes,
+    final boolean ewkt) {
     this.recordDefinition = recordDefinition;
     this.out = new PrintWriter(out);
     this.useQuotes = useQuotes;
+    this.ewkt = ewkt;
     for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
       if (i > 0) {
         this.out.print(fieldSeparator);
@@ -81,7 +85,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         @SuppressWarnings("unchecked")
         final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
         final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-            .getConverter(dataTypeClass);
+          .getConverter(dataTypeClass);
         if (converter == null) {
           string(value);
         } else {

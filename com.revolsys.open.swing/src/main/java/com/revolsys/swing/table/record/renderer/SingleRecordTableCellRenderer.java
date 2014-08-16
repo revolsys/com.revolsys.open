@@ -47,10 +47,11 @@ public class SingleRecordTableCellRenderer implements TableCellRenderer {
     JComponent component = null;
     final String name = model.getFieldName(rowIndex, columnIndex);
     final boolean required = recordDefinition.isAttributeRequired(name);
+    this.valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
     if (columnIndex == 0) {
-      this.valueComponent.setText(String.valueOf(rowIndex));
-      valueComponent.setHorizontalAlignment(SwingConstants.RIGHT);
-      valueComponent.setHorizontalTextPosition(SwingConstants.RIGHT);
+      this.valueComponent.setText(String.valueOf(rowIndex + 1));
+      this.valueComponent.setHorizontalAlignment(SwingConstants.RIGHT);
+      this.valueComponent.setHorizontalTextPosition(SwingConstants.RIGHT);
       component = this.valueComponent;
     } else if (columnIndex == 1) {
       final String title = model.getFieldTitle(name);
@@ -60,15 +61,15 @@ public class SingleRecordTableCellRenderer implements TableCellRenderer {
       final String text = model.toDisplayValue(rowIndex, rowIndex, value);
       this.valueComponent.setText(text);
       if (BigDecimalStringConverter.isNumber(text)) {
-        valueComponent.setHorizontalAlignment(SwingConstants.RIGHT);
-        valueComponent.setHorizontalTextPosition(SwingConstants.RIGHT);
+        this.valueComponent.setHorizontalAlignment(SwingConstants.RIGHT);
+        this.valueComponent.setHorizontalTextPosition(SwingConstants.RIGHT);
       } else {
-        valueComponent.setHorizontalAlignment(SwingConstants.LEFT);
-        valueComponent.setHorizontalTextPosition(SwingConstants.LEFT);
+        this.valueComponent.setHorizontalAlignment(SwingConstants.LEFT);
+        this.valueComponent.setHorizontalTextPosition(SwingConstants.LEFT);
       }
       component = this.valueComponent;
     }
-    if (required && model.getObjectValue(rowIndex) == null) {
+    if (required && model.getObjectValue(rowIndex, columnIndex) == null) {
       component.setBackground(new Color(255, 0, 0, 100));
       component.setForeground(table.getForeground());
     }

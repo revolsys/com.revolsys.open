@@ -9,8 +9,6 @@ import com.revolsys.util.ExceptionUtil;
 
 public class Transaction implements AutoCloseable {
 
-  private static ThreadLocal<Transaction> currentTransaction = new ThreadLocal<>();
-
   public static Transaction getCurrentTransaction() {
     return currentTransaction.get();
   }
@@ -53,7 +51,7 @@ public class Transaction implements AutoCloseable {
   public static DefaultTransactionStatus transactionStatus(
     final PlatformTransactionManager transactionManager,
     final Propagation propagation) {
-    if (propagation == null) {
+    if (propagation == null || transactionManager == null) {
       return null;
     } else {
       final DefaultTransactionDefinition transactionDefinition = transactionDefinition(propagation);
@@ -70,6 +68,8 @@ public class Transaction implements AutoCloseable {
       return (DefaultTransactionStatus)transactionManager.getTransaction(transactionDefinition);
     }
   }
+
+  private static ThreadLocal<Transaction> currentTransaction = new ThreadLocal<>();
 
   private Transaction previousTransaction;
 
@@ -108,20 +108,20 @@ public class Transaction implements AutoCloseable {
   @Override
   public void close() throws RuntimeException {
     commit();
-    currentTransaction.set(previousTransaction);
+    currentTransaction.set(this.previousTransaction);
     this.transactionManager = null;
     this.previousTransaction = null;
     this.transactionStatus = null;
   }
 
   protected void commit() {
-    if (transactionManager != null && transactionStatus != null) {
-      if (!transactionStatus.isCompleted()) {
-        if (transactionStatus.isRollbackOnly()) {
+    if (this.transactionManager != null && this.transactionStatus != null) {
+      if (!this.transactionStatus.isCompleted()) {
+        if (this.transactionStatus.isRollbackOnly()) {
           rollback();
         } else {
           try {
-            transactionManager.commit(transactionStatus);
+            this.transactionManager.commit(this.transactionStatus);
           } catch (final Throwable e) {
             ExceptionUtil.throwUncheckedException(e);
           }
@@ -131,26 +131,26 @@ public class Transaction implements AutoCloseable {
   }
 
   public PlatformTransactionManager getTransactionManager() {
-    return transactionManager;
+    return this.transactionManager;
   }
 
   public DefaultTransactionStatus getTransactionStatus() {
-    return transactionStatus;
+    return this.transactionStatus;
   }
 
   public boolean isRollbackOnly() {
-    return transactionStatus.isRollbackOnly();
+    return this.transactionStatus.isRollbackOnly();
   }
 
   protected void rollback() {
-    if (transactionManager != null && transactionStatus != null) {
-      transactionManager.rollback(transactionStatus);
+    if (this.transactionManager != null && this.transactionStatus != null) {
+      this.transactionManager.rollback(this.transactionStatus);
     }
   }
 
   public void setRollbackOnly() {
-    if (transactionStatus != null) {
-      transactionStatus.setRollbackOnly();
+    if (this.transactionStatus != null) {
+      this.transactionStatus.setRollbackOnly();
     }
   }
 

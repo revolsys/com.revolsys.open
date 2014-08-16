@@ -6,7 +6,6 @@ import java.awt.Component;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -34,9 +33,9 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
     final HighlightPredicate predicate) {
 
     table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
-      predicate, HighlightPredicate.EVEN), ColorUtil.setAlpha(
-      WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
-      Color.WHITE));
+      predicate, HighlightPredicate.EVEN), WebColors.setAlpha(
+        WebColors.YellowGreen, 127), WebColors.Black, WebColors.LimeGreen,
+        Color.WHITE));
 
     table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
       predicate, HighlightPredicate.ODD), WebColors.YellowGreen,

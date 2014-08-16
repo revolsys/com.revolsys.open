@@ -8,7 +8,6 @@ import java.lang.ref.WeakReference;
 import javax.swing.JComponent;
 
 import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.color.ColorUtil;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -31,8 +30,8 @@ public class FormAllFieldsErrorPredicate implements HighlightPredicate {
     final HighlightPredicate predicate) {
 
     table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
-      predicate, HighlightPredicate.EVEN), ColorUtil.setAlpha(
-      WebColors.LightCoral, 127), WebColors.Black, WebColors.Red, Color.WHITE));
+      predicate, HighlightPredicate.EVEN), WebColors.setAlpha(
+        WebColors.LightCoral, 127), WebColors.Black, WebColors.Red, Color.WHITE));
 
     table.addHighlighter(new ColorHighlighter(new AndHighlightPredicate(
       predicate, HighlightPredicate.ODD), WebColors.LightCoral,
@@ -54,7 +53,7 @@ public class FormAllFieldsErrorPredicate implements HighlightPredicate {
     final ComponentAdapter adapter) {
     try {
       final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-      final String fieldName = model.getFieldName(rowIndex);
+      final String fieldName = this.model.getFieldName(rowIndex);
       if (fieldName != null) {
         final LayerRecordForm form = this.form.get();
         if (!form.isFieldValid(fieldName)) {

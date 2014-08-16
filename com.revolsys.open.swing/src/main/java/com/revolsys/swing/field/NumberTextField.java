@@ -6,25 +6,24 @@ import java.awt.event.FocusListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jdesktop.swingx.JXTextField;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.types.DataType;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
 public class NumberTextField extends JXTextField implements Field,
-DocumentListener, FocusListener {
+  DocumentListener, FocusListener {
 
   public static Number createMaximumValue(final DataType dataType,
     final int length, final int scale) {
@@ -129,8 +128,6 @@ DocumentListener, FocusListener {
 
   private final DataType dataType;
 
-  private String fieldValidationMessage;
-
   private final int length;
 
   private final int scale;
@@ -141,21 +138,7 @@ DocumentListener, FocusListener {
 
   private boolean fieldValid = true;
 
-  private final String fieldName;
-
-  public static final Color DEFAULT_SELECTED_FOREGROUND = new JTextField().getSelectedTextColor();
-
-  public static final Color DEFAULT_BACKGROUND = new JTextField().getBackground();
-
-  public static final Color DEFAULT_FOREGROUND = new JTextField().getForeground();
-
-  private String errorMessage;
-
-  private String originalToolTip;
-
-  private final CascadingUndoManager undoManager = new CascadingUndoManager();
-
-  private Object fieldValue;
+  private final FieldSupport support;
 
   public NumberTextField(final DataType dataType, final int length) {
     this(dataType, length, 0);
@@ -178,15 +161,13 @@ DocumentListener, FocusListener {
       length, scale));
   }
 
-  public NumberTextField(final String fieldName, final DataType dataType,
+  public NumberTextField(String fieldName, final DataType dataType,
     final int length, final int scale, final Number minimumValue,
     final Number maximumValue) {
-    if (Property.hasValue(fieldName)) {
-      this.fieldName = fieldName;
-    } else {
-      this.fieldName = "fieldValue";
+    if (!Property.hasValue(fieldName)) {
+      fieldName = "fieldValue";
     }
-
+    this.support = new FieldSupport(this, fieldName, null);
     this.dataType = dataType;
     this.length = length;
     this.scale = scale;
@@ -197,7 +178,6 @@ DocumentListener, FocusListener {
     getDocument().addDocumentListener(this);
     addFocusListener(new WeakFocusListener(this));
     PopupMenu.getPopupMenuFactory(this);
-    this.undoManager.addKeyMap(this);
   }
 
   @Override
@@ -213,29 +193,28 @@ DocumentListener, FocusListener {
 
   @Override
   public void focusGained(final FocusEvent e) {
-    this.undoManager.discardAllEdits();
+    this.support.discardAllEdits();
   }
 
   @Override
   public void focusLost(final FocusEvent e) {
     updateFieldValue();
-    this.undoManager.discardAllEdits();
+    this.support.discardAllEdits();
   }
 
   @Override
   public String getFieldName() {
-    return this.fieldName;
+    return this.support.getName();
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return this.fieldValidationMessage;
+    return this.support.getErrorMessage();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public <V> V getFieldValue() {
-    return (V)this.fieldValue;
+    return this.support.getValue();
   }
 
   public int getLength() {
@@ -285,7 +264,7 @@ DocumentListener, FocusListener {
   @Override
   public void setFieldBackgroundColor(Color color) {
     if (color == null) {
-      color = DEFAULT_BACKGROUND;
+      color = this.support.getOriginalBackgroundColor();
     }
     setBackground(color);
   }
@@ -293,7 +272,7 @@ DocumentListener, FocusListener {
   @Override
   public void setFieldForegroundColor(Color color) {
     if (color == null) {
-      color = DEFAULT_FOREGROUND;
+      color = this.support.getOriginalForegroundColor();
     }
     setForeground(color);
   }
@@ -301,11 +280,7 @@ DocumentListener, FocusListener {
   @Override
   public void setFieldInvalid(final String message,
     final Color foregroundColor, final Color backgroundColor) {
-    setForeground(foregroundColor);
-    setSelectedTextColor(foregroundColor);
-    setBackground(backgroundColor);
-    this.errorMessage = message;
-    super.setToolTipText(this.errorMessage);
+    this.support.setFieldInvalid(message, foregroundColor, backgroundColor);
   }
 
   @Override
@@ -315,11 +290,7 @@ DocumentListener, FocusListener {
 
   @Override
   public void setFieldValid() {
-    setForeground(TextField.DEFAULT_FOREGROUND);
-    setSelectedTextColor(TextField.DEFAULT_SELECTED_FOREGROUND);
-    setBackground(TextField.DEFAULT_BACKGROUND);
-    this.errorMessage = null;
-    super.setToolTipText(this.originalToolTip);
+    this.support.setFieldValid();
   }
 
   @Override
@@ -329,8 +300,8 @@ DocumentListener, FocusListener {
     }
     if (SwingUtilities.isEventDispatchThread()) {
       final Object newValue = getTypedValue(value);
-      if (!EqualsRegistry.equal(this.fieldValue, newValue)) {
-        this.undoManager.discardAllEdits();
+      final Object oldValue = getFieldValue();
+      if (!EqualsRegistry.equal(oldValue, newValue)) {
         String newText = StringConverterRegistry.toString(newValue);
         if (newValue == null) {
           newText = "";
@@ -346,12 +317,8 @@ DocumentListener, FocusListener {
         if (!EqualsRegistry.equal(newText, getText())) {
           setText(newText);
         }
-        final Object oldValue = this.fieldValue;
-        this.fieldValue = newValue;
         validateField();
-        firePropertyChange(this.fieldName, oldValue, this.fieldValue);
-        SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
-          oldValue, this.fieldValue);
+        this.support.setValue(newValue);
       }
     } else {
       Invoke.later(this, "setFieldValue", value);
@@ -376,15 +343,14 @@ DocumentListener, FocusListener {
 
   @Override
   public void setToolTipText(final String text) {
-    this.originalToolTip = text;
-    if (!Property.hasValue(this.errorMessage)) {
+    if (this.support.setOriginalTooltipText(text)) {
       super.setToolTipText(text);
     }
   }
 
   @Override
   public void setUndoManager(final UndoManager undoManager) {
-    this.undoManager.setParent(undoManager);
+    this.support.setUndoManager(undoManager);
   }
 
   @Override
@@ -400,8 +366,8 @@ DocumentListener, FocusListener {
 
   private void validateField() {
     final boolean oldValid = this.fieldValid;
-    boolean valid = true;
     final String text = getText();
+    String message = null;
     if (Property.hasValue(text)) {
       try {
         BigDecimal number = new BigDecimal(text.trim());
@@ -409,36 +375,34 @@ DocumentListener, FocusListener {
           number = number.setScale(this.scale);
         }
         if (number.scale() > this.scale) {
-          this.fieldValidationMessage = "Number of decimal places must be < "
-              + this.scale;
-          valid = false;
+          message = "Number of decimal places must be < " + this.scale;
         } else if (this.minimumValue != null
-            && this.minimumValue.compareTo(number) > 0) {
-          this.fieldValidationMessage = "Value must be >= " + this.minimumValue;
-          valid = false;
+          && this.minimumValue.compareTo(number) > 0) {
+          message = "Value must be >= " + this.minimumValue;
         } else if (this.maximumValue != null
-            && this.maximumValue.compareTo(number) < 0) {
-          this.fieldValidationMessage = "Value must be <= " + this.maximumValue;
-          valid = false;
+          && this.maximumValue.compareTo(number) < 0) {
+          message = "Value must be <= " + this.maximumValue;
         } else {
           // number = number.setScale(scale);
           // final String newText = number.toPlainString();
           // if (!newText.equals(text)) {
           // setText(newText);
           // }
-          this.fieldValidationMessage = "";
+          message = null;
         }
       } catch (final Throwable t) {
-        this.fieldValidationMessage = t.getMessage();
-        valid = false;
+        message = "Not a valid number";
       }
-    } else {
-      this.fieldValidationMessage = "";
     }
-
+    final boolean valid = !Property.hasValue(message);
     if (valid != oldValid) {
       this.fieldValid = valid;
       firePropertyChange("fieldValid", oldValid, this.fieldValid);
+    }
+    if (valid) {
+      this.support.setFieldValid();
+    } else {
+      this.support.setFieldInvalid(message, WebColors.Red, WebColors.Pink);
     }
   }
 }

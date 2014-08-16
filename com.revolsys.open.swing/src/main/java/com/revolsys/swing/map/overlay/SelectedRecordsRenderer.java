@@ -6,8 +6,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.util.List;
 
-import org.jdesktop.swingx.color.ColorUtil;
-
 import com.revolsys.awt.WebColors;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -78,36 +76,36 @@ public class SelectedRecordsRenderer {
   public SelectedRecordsRenderer(final Color outlineColor,
     final Color selectColor) {
 
-    final Color selectColorTransparent = ColorUtil.setAlpha(selectColor, 127);
-    final Color outlineColorTransparent = ColorUtil.setAlpha(outlineColor, 127);
+    final Color selectColorTransparent = WebColors.setAlpha(selectColor, 127);
+    final Color outlineColorTransparent = WebColors.setAlpha(outlineColor, 127);
 
-    erroStyle = MarkerStyle.marker("ellipse", 7, WebColors.Yellow, 1,
+    this.erroStyle = MarkerStyle.marker("ellipse", 7, WebColors.Yellow, 1,
       WebColors.Red);
 
-    highlightStyle = GeometryStyle.polygon(selectColor, 3,
+    this.highlightStyle = GeometryStyle.polygon(selectColor, 3,
       selectColorTransparent);
-    MarkerStyle.setMarker(highlightStyle, "ellipse", 6,
+    MarkerStyle.setMarker(this.highlightStyle, "ellipse", 6,
       outlineColorTransparent, 1, selectColorTransparent);
 
-    outlineStyle = GeometryStyle.line(outlineColor);
-    MarkerStyle.setMarker(outlineStyle, "ellipse", 6, outlineColorTransparent,
-      1, selectColorTransparent);
+    this.outlineStyle = GeometryStyle.line(outlineColor);
+    MarkerStyle.setMarker(this.outlineStyle, "ellipse", 6,
+      outlineColorTransparent, 1, selectColorTransparent);
 
-    vertexStyle = MarkerStyle.marker(vertexShape(), 9, outlineColor, 1,
+    this.vertexStyle = MarkerStyle.marker(vertexShape(), 9, outlineColor, 1,
       selectColor);
-    vertexStyle.setMarkerOrientationType("auto");
+    this.vertexStyle.setMarkerOrientationType("auto");
 
-    firstVertexStyle = MarkerStyle.marker(firstVertexShape(), 9, outlineColor,
-      1, selectColor);
-    firstVertexStyle.setMarkerOrientationType("auto");
-    firstVertexStyle.setMarkerPlacement("point(0)");
-    firstVertexStyle.setMarkerHorizontalAlignment("center");
+    this.firstVertexStyle = MarkerStyle.marker(firstVertexShape(), 9,
+      outlineColor, 1, selectColor);
+    this.firstVertexStyle.setMarkerOrientationType("auto");
+    this.firstVertexStyle.setMarkerPlacement("point(0)");
+    this.firstVertexStyle.setMarkerHorizontalAlignment("center");
 
-    lastVertexStyle = MarkerStyle.marker(lastVertexShape(), 9, outlineColor, 1,
-      selectColor);
-    lastVertexStyle.setMarkerOrientationType("auto");
-    lastVertexStyle.setMarkerPlacement("point(n)");
-    lastVertexStyle.setMarkerHorizontalAlignment("right");
+    this.lastVertexStyle = MarkerStyle.marker(lastVertexShape(), 9,
+      outlineColor, 1, selectColor);
+    this.lastVertexStyle.setMarkerOrientationType("auto");
+    this.lastVertexStyle.setMarkerPlacement("point(n)");
+    this.lastVertexStyle.setMarkerHorizontalAlignment("right");
 
   }
 
@@ -125,15 +123,15 @@ public class SelectedRecordsRenderer {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = viewport.getGeometry(geometry);
       GeometryStyleRenderer.renderGeometry(viewport, graphics, geometry,
-        highlightStyle);
+        this.highlightStyle);
       GeometryStyleRenderer.renderOutline(viewport, graphics, geometry,
-        outlineStyle);
+        this.outlineStyle);
 
       if (!geometry.isEmpty()) {
         final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
         for (final LineString line : lines) {
           MarkerStyleRenderer.renderMarkers(viewport, graphics, line,
-            firstVertexStyle, lastVertexStyle, vertexStyle);
+            this.firstVertexStyle, this.lastVertexStyle, this.vertexStyle);
         }
       }
 
@@ -145,14 +143,14 @@ public class SelectedRecordsRenderer {
             for (final Point coordinates : simpleOp.getNonSimplePoints()) {
               final Point point = viewportGeometryFactory.point(coordinates);
               MarkerStyleRenderer.renderMarker(viewport, graphics, point,
-                erroStyle);
+                this.erroStyle);
             }
           }
         } else {
           for (final TopologyValidationError error : validOp.getErrors()) {
             final Point point = viewportGeometryFactory.point(error.getCoordinate());
             MarkerStyleRenderer.renderMarker(viewport, graphics, point,
-              erroStyle);
+              this.erroStyle);
           }
         }
       } catch (final Throwable e) {

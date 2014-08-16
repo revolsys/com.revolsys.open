@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 
+import com.revolsys.ui.web.utils.HttpServletUtils;
+
 public final class HttpServletLogUtil {
   public static void logRequestException(final Logger log,
     final HttpServletRequest request, final Throwable exception) {
@@ -16,7 +18,7 @@ public final class HttpServletLogUtil {
     final HttpServletRequest request, final Throwable exception,
     final String[] headerNames) {
     if (!(exception instanceof IOException)
-      && !exception.getMessage().contains("Broken pipe")) {
+        && !exception.getMessage().contains("Broken pipe")) {
       if (request.getAttribute("LogException") != exception) {
         final StringBuffer text = new StringBuffer();
         final String message = exception.getMessage();
@@ -56,6 +58,12 @@ public final class HttpServletLogUtil {
         request.setAttribute("LogException", exception);
       }
     }
+  }
+
+  public static void logRequestException(final Logger log,
+    final Throwable exception) {
+    final HttpServletRequest request = HttpServletUtils.getRequest();
+    logRequestException(log, request, exception, null);
   }
 
   private HttpServletLogUtil() {

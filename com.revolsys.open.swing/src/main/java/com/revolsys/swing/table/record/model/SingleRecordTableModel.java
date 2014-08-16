@@ -33,7 +33,7 @@ public class SingleRecordTableModel extends
   }
 
   @Override
-  public Object getObjectValue(final int rowIndex) {
+  public Object getObjectValue(final int rowIndex, int columnIndex) {
     if (this.object == null) {
       return "\u2026";
     } else {
