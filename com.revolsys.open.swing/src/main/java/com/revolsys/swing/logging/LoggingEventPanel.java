@@ -19,7 +19,6 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.SwingUtil;
@@ -31,8 +30,6 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
 public class LoggingEventPanel extends JPanel {
-
-  private static final long serialVersionUID = 1L;
 
   public static void showDialog(final Component component,
     final Class<?> category, final String message, final Throwable e) {
@@ -60,6 +57,8 @@ public class LoggingEventPanel extends JPanel {
     dialog.pack();
     dialog.setVisible(true);
   }
+
+  private static final long serialVersionUID = 1L;
 
   public LoggingEventPanel(final LoggingEvent event) {
     setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -90,7 +89,7 @@ public class LoggingEventPanel extends JPanel {
     GroupLayoutUtil.makeColumns(this, 2, true);
   }
 
-  private void addField(final String fieldName, final Object value) {
+  private void addField(final String fieldName, Object value) {
     addLabel(fieldName);
 
     String stringValue = StringConverterRegistry.toString(value);
@@ -98,6 +97,9 @@ public class LoggingEventPanel extends JPanel {
       stringValue = "-";
     }
     if (fieldName.equals("message")) {
+      if (!Property.hasValue(value)) {
+        value = "";
+      }
       final TextArea textArea = SwingUtil.createTextArea(
         Math.min(20, value.toString().split("\n").length), 80);
       textArea.setEditable(false);

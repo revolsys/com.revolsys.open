@@ -1,3 +1,35 @@
+/*
+ * The JTS Topology Suite is a collection of Java classes that
+ * implement the fundamental operations required to validate a given
+ * geo-spatial data set to a known topological specification.
+ *
+ * Copyright (C) 2001 Vivid Solutions
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For more information, contact:
+ *
+ *     Vivid Solutions
+ *     Suite #1A
+ *     2328 Government Street
+ *     Victoria BC  V8T 5G5
+ *     Canada
+ *
+ *     (250)385-6040
+ *     www.vividsolutions.com
+ */
 package com.revolsys.io.wkt;
 
 import java.io.PrintWriter;
@@ -14,7 +46,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.util.MathUtil;
 
-public class WktWriter {
+public class EWktWriter {
 
   public static void append(final StringBuffer wkt, final int axisCount,
     final Point point) {
@@ -33,6 +65,11 @@ public class WktWriter {
     for (final Point point : points) {
       axisCount = Math.max(axisCount, point.getAxisCount());
     }
+    if (axisCount > 3) {
+      wkt.append(" ZM");
+    } else if (axisCount > 2) {
+      wkt.append(" Z");
+    }
     boolean first = true;
     for (final Point point : points) {
       if (first) {
@@ -48,6 +85,11 @@ public class WktWriter {
   public static void appendPoint(final StringBuffer wkt, final Point point) {
     wkt.append("POINT");
     final int axisCount = point.getAxisCount();
+    if (axisCount > 3) {
+      wkt.append(" ZM");
+    } else if (axisCount > 2) {
+      wkt.append(" Z");
+    }
     append(wkt, axisCount, point);
     wkt.append(")");
   }
@@ -84,9 +126,23 @@ public class WktWriter {
   public static String toString(final Geometry geometry) {
     final StringWriter out = new StringWriter();
     final PrintWriter writer = new PrintWriter(out);
+    final int srid = geometry.getSrid();
+    if (srid > 0) {
+      writer.print("SRID=");
+      writer.print(srid);
+      writer.print(';');
+    }
     write(writer, geometry);
     writer.flush();
     return out.toString();
+  }
+
+  public static String toString(final Geometry geometry, final boolean ewkt) {
+    if (ewkt) {
+      return toString(geometry);
+    } else {
+      return WktWriter.toString(geometry);
+    }
   }
 
   public static void write(final PrintWriter out, final Geometry geometry) {
@@ -117,7 +173,7 @@ public class WktWriter {
         write(out, geometryCollection);
       } else {
         throw new IllegalArgumentException("Unknown geometry type"
-          + geometry.getClass());
+            + geometry.getClass());
       }
     }
   }
@@ -151,7 +207,7 @@ public class WktWriter {
         write(out, geometryCollection, axisCount);
       } else {
         throw new IllegalArgumentException("Unknown geometry type"
-          + geometry.getClass());
+            + geometry.getClass());
       }
     }
   }
@@ -327,6 +383,14 @@ public class WktWriter {
     }
   }
 
+  private static void writeAxis(final PrintWriter out, final int axisCount) {
+    if (axisCount > 3) {
+      out.print(" ZM");
+    } else if (axisCount > 2) {
+      out.print(" Z");
+    }
+  }
+
   public static void writeCoordinates(final PrintWriter out,
     final LineString coordinates, final int axisCount) {
     out.print('(');
@@ -350,6 +414,7 @@ public class WktWriter {
   private static void writeGeometryType(final PrintWriter out,
     final String geometryType, final int axisCount) {
     out.print(geometryType);
+    writeAxis(out, axisCount);
   }
 
   private static void writeOrdinate(final PrintWriter out,

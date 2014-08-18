@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.algorithm.distance;
 
-import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.io.wkt.EWktWriter;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 
@@ -121,6 +121,6 @@ public class PointPairDistance {
 
   @Override
   public String toString() {
-    return WktWriter.lineString(pt[0], pt[1]);
+    return EWktWriter.lineString(pt[0], pt[1]);
   }
 }

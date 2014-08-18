@@ -32,7 +32,7 @@
  */
 package com.revolsys.jtstest.geomop;
 
-import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.io.wkt.EWktWriter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
@@ -198,7 +198,7 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
   private void reportError(final String msg, final Point loc) {
     String locStr = "";
     if (loc != null) {
-      locStr = " at " + WktWriter.point(loc);
+      locStr = " at " + EWktWriter.point(loc);
     }
     // System.out.println(msg);
     throw new RuntimeException(msg + locStr);

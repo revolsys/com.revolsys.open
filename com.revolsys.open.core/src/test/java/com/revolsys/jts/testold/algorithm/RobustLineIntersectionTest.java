@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.io.wkt.EWktWriter;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Geometry;
@@ -158,8 +158,8 @@ public class RobustLineIntersectionTest extends TestCase {
     final double distanceTolerance) {
     final boolean isEqual = equals(expectedPt, actualPt, distanceTolerance);
     assertTrue(
-      "Int Pts not equal - " + "expected " + WktWriter.point(expectedPt)
-        + " VS " + "actual " + WktWriter.point(actualPt), isEqual);
+      "Int Pts not equal - " + "expected " + EWktWriter.point(expectedPt)
+        + " VS " + "actual " + EWktWriter.point(actualPt), isEqual);
   }
 
   /**

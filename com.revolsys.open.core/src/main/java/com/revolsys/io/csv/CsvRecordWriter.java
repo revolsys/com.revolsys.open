@@ -10,6 +10,8 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.wkt.EWktWriter;
+import com.revolsys.jts.geom.Geometry;
 
 public class CsvRecordWriter extends AbstractRecordWriter {
   private final char fieldSeparator = ',';
@@ -78,14 +80,18 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         this.out.print(this.fieldSeparator);
       }
       final Object value = object.getValue(i);
-      if (value != null) {
+      if (value instanceof Geometry) {
+        final Geometry geometry = (Geometry)value;
+        final String text = EWktWriter.toString(geometry, this.ewkt);
+        string(text);
+      } else if (value != null) {
         final String name = this.recordDefinition.getAttributeName(i);
         final DataType dataType = this.recordDefinition.getAttributeType(name);
 
         @SuppressWarnings("unchecked")
         final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
         final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-          .getConverter(dataTypeClass);
+            .getConverter(dataTypeClass);
         if (converter == null) {
           string(value);
         } else {

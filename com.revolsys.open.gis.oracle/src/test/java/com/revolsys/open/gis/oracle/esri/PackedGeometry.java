@@ -12,9 +12,6 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class PackedGeometry {
-  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
-    3005, 1.0, 1.0);
-
   public static void checkGeometry(final Geometry geometry) {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
     final Double xOffset = 0.0;
@@ -61,4 +58,7 @@ public class PackedGeometry {
     checkGeometry("MULTIPOLYGON Z(((100 100 1,100 200 2,200 200 3,200 100 4,100 100 5),(50 50 1,50 70 2,70 70 3,70 50 4,50 50 5)),((300 300 1,300 400 2,400 400 3,400 300 4,300 300 5)))");
     // checkGeometry("MULTILINESTRING Z((100 200 3,110 220 13),(400 500 6,410 520 16))");
   }
+
+  public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(
+    3005, 1.0, 1.0);
 }

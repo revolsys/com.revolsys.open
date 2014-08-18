@@ -42,7 +42,7 @@ import com.revolsys.data.equals.NumberEquals;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.io.wkt.EWktWriter;
 import com.revolsys.jts.algorithm.Centroid;
 import com.revolsys.jts.algorithm.ConvexHull;
 import com.revolsys.jts.algorithm.InteriorPointArea;
@@ -1787,7 +1787,7 @@ public abstract class AbstractGeometry implements Geometry {
    */
   @Override
   public String toWkt() {
-    return WktWriter.toString(this, true);
+    return EWktWriter.toString(this, true);
   }
 
   /**

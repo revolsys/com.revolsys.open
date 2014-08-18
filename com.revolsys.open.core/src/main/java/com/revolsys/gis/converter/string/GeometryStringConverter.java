@@ -2,7 +2,7 @@ package com.revolsys.gis.converter.string;
 
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.io.wkt.WktParser;
-import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.io.wkt.EWktWriter;
 import com.revolsys.jts.geom.Geometry;
 
 public class GeometryStringConverter implements StringConverter<Geometry> {
@@ -39,7 +39,7 @@ public class GeometryStringConverter implements StringConverter<Geometry> {
       return null;
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
-      return WktWriter.toString(geometry, true);
+      return EWktWriter.toString(geometry, true);
     } else {
       return value.toString();
     }

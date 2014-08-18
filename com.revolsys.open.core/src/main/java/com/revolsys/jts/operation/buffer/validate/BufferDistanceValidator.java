@@ -35,7 +35,7 @@ package com.revolsys.jts.operation.buffer.validate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.io.wkt.EWktWriter;
 import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -127,7 +127,7 @@ public class BufferDistanceValidator {
       errorLocation = pts[1];
       errorIndicator = input.getGeometryFactory().lineString(pts);
       errMsg = "Distance between buffer curve and input is too large " + "("
-        + maxDistanceFound + " at " + WktWriter.lineString(pts[0], pts[1])
+        + maxDistanceFound + " at " + EWktWriter.lineString(pts[0], pts[1])
         + ")";
     }
   }
@@ -150,7 +150,7 @@ public class BufferDistanceValidator {
       errorLocation = distOp.nearestPoints()[1];
       errorIndicator = g1.getGeometryFactory().lineString(pts);
       errMsg = "Distance between buffer curve and input is too small " + "("
-        + minDistanceFound + " at " + WktWriter.lineString(pts[0], pts[1])
+        + minDistanceFound + " at " + EWktWriter.lineString(pts[0], pts[1])
         + " )";
     }
   }

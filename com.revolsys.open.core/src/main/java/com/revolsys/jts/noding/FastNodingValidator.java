@@ -35,7 +35,7 @@ package com.revolsys.jts.noding;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.io.wkt.EWktWriter;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Point;
@@ -133,8 +133,8 @@ public class FastNodingValidator {
 
     final Point[] intSegs = segInt.getIntersectionSegments();
     return "found non-noded intersection between "
-      + WktWriter.lineString(intSegs[0], intSegs[1]) + " and "
-      + WktWriter.lineString(intSegs[2], intSegs[3]);
+      + EWktWriter.lineString(intSegs[0], intSegs[1]) + " and "
+      + EWktWriter.lineString(intSegs[2], intSegs[3]);
   }
 
   public List getIntersections() {

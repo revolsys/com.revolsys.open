@@ -17,20 +17,22 @@ public class BaseInOutProcess<I, O> extends AbstractInOutProcess<I, O> {
 
   @Override
   protected final void run(final Channel<I> in, final Channel<O> out) {
-    running = true;
-    try {
-      preRun(in, out);
-      while (running) {
-        final I object = in.read();
-        if (object != null) {
-          process(in, out, object);
-        }
-      }
-    } finally {
+    if (in != null && out != null) {
+      this.running = true;
       try {
-        postRun(in, out);
+        preRun(in, out);
+        while (this.running) {
+          final I object = in.read();
+          if (object != null) {
+            process(in, out, object);
+          }
+        }
       } finally {
-        running = false;
+        try {
+          postRun(in, out);
+        } finally {
+          this.running = false;
+        }
       }
     }
   }

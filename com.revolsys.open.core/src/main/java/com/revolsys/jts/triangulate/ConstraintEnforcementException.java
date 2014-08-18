@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.triangulate;
 
-import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.io.wkt.EWktWriter;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 
@@ -49,7 +49,7 @@ public class ConstraintEnforcementException extends RuntimeException {
 
   private static String msgWithCoord(final String msg, final Point pt) {
     if (pt != null) {
-      return msg + " [ " + WktWriter.point(pt) + " ]";
+      return msg + " [ " + EWktWriter.point(pt) + " ]";
     }
     return msg;
   }

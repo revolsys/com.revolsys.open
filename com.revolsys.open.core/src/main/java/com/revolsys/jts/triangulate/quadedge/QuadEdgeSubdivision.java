@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
-import com.revolsys.io.wkt.WktWriter;
+import com.revolsys.io.wkt.EWktWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.CoordinateList;
 import com.revolsys.jts.geom.Geometry;
@@ -121,10 +121,10 @@ public class QuadEdgeSubdivision {
     private void checkTriangleSize(final Point[] pts) {
       String loc = "";
       if (pts.length >= 2) {
-        loc = WktWriter.lineString(pts[0], pts[1]);
+        loc = EWktWriter.lineString(pts[0], pts[1]);
       } else {
         if (pts.length >= 1) {
-          loc = WktWriter.point(pts[0]);
+          loc = EWktWriter.point(pts[0]);
         }
       }
       // Assert.isTrue(pts.length == 4,

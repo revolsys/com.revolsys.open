@@ -364,7 +364,7 @@ public class XmlWriter extends Writer {
   private void checkNotFinished() {
     if (this.documentFinished) {
       throw new IllegalStateException(
-          "Cannot write to a document after it has been finished");
+        "Cannot write to a document after it has been finished");
     }
   }
 
@@ -378,7 +378,7 @@ public class XmlWriter extends Writer {
     checkNotFinished();
     if (!this.writingStartTag) {
       throw new IllegalStateException(
-          "A start tag must be open to write an attribute");
+        "A start tag must be open to write an attribute");
     }
   }
 
@@ -393,11 +393,11 @@ public class XmlWriter extends Writer {
     checkNotFinished();
     if (this.elementsStarted) {
       throw new IllegalStateException(
-          "Cannot create doc type after elements have been created");
+        "Cannot create doc type after elements have been created");
     }
     if (this.docTypeWritten) {
       throw new IllegalStateException(
-          "A document can only have one DOCTYPE declaration");
+        "A document can only have one DOCTYPE declaration");
     }
   }
 
@@ -412,11 +412,11 @@ public class XmlWriter extends Writer {
     checkNotFinished();
     if (!this.canWriteXmlDeclaration) {
       throw new IllegalStateException(
-          "An XML declaration must be the first item in a document");
+        "An XML declaration must be the first item in a document");
     }
     if (this.xmlDeclarationWritten) {
       throw new IllegalStateException(
-          "A document can only have one XML declaration");
+        "A document can only have one XML declaration");
     }
   }
 
@@ -534,6 +534,10 @@ public class XmlWriter extends Writer {
       text(content.toString());
     }
     endTag(element);
+  }
+
+  public void element(final String local, final Object content) {
+    element(new QName(local), content);
   }
 
   /**
@@ -782,7 +786,7 @@ public class XmlWriter extends Writer {
     if (!this.endingDocument) {
       final TagConfiguration tag = this.elementStack.removeFirst();
       final Iterator<String> namespaceUris = tag.getAttributeDefinedNamespaces()
-          .iterator();
+        .iterator();
       while (namespaceUris.hasNext()) {
         final String namespaceUri = namespaceUris.next();
         this.namespacePrefixMap.remove(namespaceUri);
@@ -1151,32 +1155,32 @@ public class XmlWriter extends Writer {
       switch (ch) {
         case '&':
           escapeString = "&amp;";
-          break;
+        break;
         case '<':
           escapeString = "&lt;";
-          break;
+        break;
         case '>':
           escapeString = "&gt;";
-          break;
+        break;
         case '"':
           escapeString = "&quot;";
-          break;
+        break;
         case 9:
           escapeString = "&#9;";
-          break;
+        break;
         case 10:
           escapeString = "&#10;";
-          break;
+        break;
         case 13:
           escapeString = "&#13;";
-          break;
+        break;
         default:
           // Reject all other control characters
           if (ch < 32) {
             throw new IllegalStateException("character " + Integer.toString(ch)
               + " is not allowed in output");
           }
-          break;
+        break;
       }
       if (escapeString != null) {
         if (i > index) {
@@ -1223,25 +1227,25 @@ public class XmlWriter extends Writer {
       switch (ch) {
         case '&':
           escapeString = "&amp;";
-          break;
+        break;
         case '<':
           escapeString = "&lt;";
-          break;
+        break;
         case '>':
           escapeString = "&gt;";
-          break;
+        break;
         case 9:
         case 10:
         case 13:
-          // Accept these control characters
-          break;
+        // Accept these control characters
+        break;
         default:
           // Reject all other control characters
           if (ch < 32) {
             throw new IllegalStateException("character " + Integer.toString(ch)
               + " is not allowed in output");
           }
-          break;
+        break;
       }
       if (escapeString != null) {
         if (i > index) {
