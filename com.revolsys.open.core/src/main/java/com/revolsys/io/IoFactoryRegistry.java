@@ -53,17 +53,17 @@ public class IoFactoryRegistry {
 
   private static IoFactoryRegistry instance = new IoFactoryRegistry();
 
-  private final Map<Class<? extends IoFactory>, Set<String>> classFileExtensions = new HashMap<Class<? extends IoFactory>, Set<String>>();
+  private final Map<Class<? extends IoFactory>, Set<String>> classFileExtensions = new HashMap<>();
 
-  private final Map<Class<? extends IoFactory>, Set<IoFactory>> classFactories = new HashMap<Class<? extends IoFactory>, Set<IoFactory>>();
+  private final Map<Class<? extends IoFactory>, Set<IoFactory>> classFactories = new HashMap<>();
 
-  private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByFileExtension = new HashMap<Class<? extends IoFactory>, Map<String, IoFactory>>();
+  private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByFileExtension = new HashMap<>();
 
-  private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByMediaType = new HashMap<Class<? extends IoFactory>, Map<String, IoFactory>>();
+  private final Map<Class<? extends IoFactory>, Map<String, IoFactory>> classFactoriesByMediaType = new HashMap<>();
 
-  private final Set<IoFactory> factories = new HashSet<IoFactory>();
+  private final Set<IoFactory> factories = new HashSet<>();
 
-  private final Map<String, String> extensionMimeTypeMap = new HashMap<String, String>();
+  private final Map<String, String> extensionMimeTypeMap = new HashMap<>();
 
   public IoFactoryRegistry() {
     synchronized (IoFactoryRegistry.class) {
@@ -109,6 +109,7 @@ public class IoFactoryRegistry {
 
   public synchronized void addFactory(final IoFactory factory) {
     if (this.factories.add(factory)) {
+      factory.init();
       final Class<? extends IoFactory> factoryClass = factory.getClass();
       addFactory(factory, factoryClass);
     }

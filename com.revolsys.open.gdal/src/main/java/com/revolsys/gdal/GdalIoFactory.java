@@ -37,6 +37,10 @@ public class GdalIoFactory implements IoFactory {
   }
 
   @Override
+  public void init() {
+  }
+
+  @Override
   public boolean isAvailable() {
     return false;
   }

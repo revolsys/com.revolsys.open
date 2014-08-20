@@ -23,11 +23,9 @@ public class SingleRecordTableCellRenderer implements TableCellRenderer {
   private final JLabel labelComponent = new JLabel();
 
   public SingleRecordTableCellRenderer() {
-    this.labelComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
     this.labelComponent.setFont(SwingUtil.BOLD_FONT);
     this.labelComponent.setOpaque(true);
 
-    this.valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
     this.valueComponent.setFont(SwingUtil.FONT);
     this.valueComponent.setOpaque(true);
   }
@@ -56,6 +54,7 @@ public class SingleRecordTableCellRenderer implements TableCellRenderer {
     } else if (columnIndex == 1) {
       final String title = model.getFieldTitle(name);
       this.labelComponent.setText(title);
+      this.labelComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
       component = this.labelComponent;
     } else {
       final String text = model.toDisplayValue(rowIndex, rowIndex, value);

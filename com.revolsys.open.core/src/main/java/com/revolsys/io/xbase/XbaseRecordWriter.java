@@ -30,6 +30,25 @@ import com.revolsys.util.DateUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
+/**
+ * <p>Xbase attributes suffer a number of limitations:</p>
+ *
+ * <ul>
+ *   <li>Field names can only be up to 10 characters long. If required names will be truncated to 10 character.
+ *   Duplicate field names will have a sequential number appended to avoid duplicates. Name may be
+ *   truncated again to fit the sequential number.</li>
+ *   <li>Only Boolean, Number, String and Date (YYYYMMDD) field types are supported. Other types will be converted to strings.</li>
+ *   <li>String can have a maximum length of 254 characters. If length &lt; 1 then length of 254 will be used. Strings will be silently truncated to 254 characters. Strings are left aligned in the field and padded with spaces instead of a null terminator.</li>
+ *   <li>boolean fields have length 1 and scale 0.</li>
+ *   <li>byte fields have length 3 and scale 0.</li>
+ *   <li>short fields have length 5 and scale 0.</li>
+ *   <li>int fields have length 10 and scale 0.</li>
+ *   <li>long and BigInteger fields have length 18 and scale 0.</li>
+ *   <li>float, double, Number fields can have a maximum length of 18 characters. If length &lt; 1 then length of 18 will be used.
+ *   If scale is &lt; 0 scale of 3 is used. Scale must be &lt;= 15. Scale must be &lt;= length -3 to allow for '-' sign and digit and a '.'.
+ *   <b>NOTE: For floating point numbers an explicit length and scale is recommended.</b></li>
+ * <ul>
+ */
 public class XbaseRecordWriter extends AbstractRecordWriter {
   private static final Logger log = Logger.getLogger(XbaseRecordWriter.class);
 
@@ -60,58 +79,57 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
   }
 
   protected int addDbaseField(final String fullName, final DataType dataType,
-    final Class<?> typeJavaClass, final int length, final int scale) {
-    FieldDefinition field = null;
-    if (dataType == DataTypes.DECIMAL) {
-      if (length > 18) {
-        throw new IllegalArgumentException("Length  must be less < 18 for "
-          + fullName);
-      }
-      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, length,
-        scale);
-    } else if (typeJavaClass == String.class) {
-      if (length > 254 || length <= 0) {
-        field = addFieldDefinition(fullName, FieldDefinition.CHARACTER_TYPE,
-          254);
-      } else {
-        field = addFieldDefinition(fullName, FieldDefinition.CHARACTER_TYPE,
-          length);
-      }
-    } else if (typeJavaClass == Boolean.class) {
-      field = addFieldDefinition(fullName, FieldDefinition.LOGICAL_TYPE, 1);
-    } else if (typeJavaClass == Date.class) {
-      field = addFieldDefinition(fullName, FieldDefinition.DATE_TYPE, 8);
-    } else if (typeJavaClass == BigDecimal.class) {
-      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, length,
-        scale);
-    } else if (typeJavaClass == BigInteger.class) {
-      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 18);
-    } else if (typeJavaClass == Float.class) {
-      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 18);
-    } else if (typeJavaClass == Double.class) {
-      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 18);
-    } else if (typeJavaClass == Byte.class) {
-      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 3);
-    } else if (typeJavaClass == Short.class) {
-      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 5);
+    final Class<?> typeJavaClass, int length, final int scale) {
+    char type = FieldDefinition.NUMBER_TYPE;
+    if (typeJavaClass == Boolean.class) {
+      type = FieldDefinition.LOGICAL_TYPE;
+    } else if (Date.class.isAssignableFrom(typeJavaClass)) {
+      type = FieldDefinition.DATE_TYPE;
+    } else if (typeJavaClass == Long.class || typeJavaClass == BigInteger.class) {
+      length = 18;
     } else if (typeJavaClass == Integer.class) {
-      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 10);
-    } else if (typeJavaClass == Long.class) {
-      field = addFieldDefinition(fullName, FieldDefinition.NUMBER_TYPE, 18);
+      length = 10;
+    } else if (typeJavaClass == Short.class) {
+      length = 5;
+    } else if (typeJavaClass == Byte.class) {
+      length = 5;
+    } else if (Number.class.isAssignableFrom(typeJavaClass)) {
     } else {
-      log.warn("Writing " + typeJavaClass + " is not supported");
-      field = addFieldDefinition(fullName, FieldDefinition.OBJECT_TYPE, 0);
+      type = FieldDefinition.CHARACTER_TYPE;
     }
+    final FieldDefinition field = addFieldDefinition(fullName, type, length,
+      scale);
     return field.getLength();
   }
 
   protected FieldDefinition addFieldDefinition(final String fullName,
-    final char type, final int length) {
-    return addFieldDefinition(fullName, type, length, 0);
-  }
-
-  protected FieldDefinition addFieldDefinition(final String fullName,
-    final char type, final int length, final int decimalPlaces) {
+    final char type, int length, int scale) {
+    if (type == FieldDefinition.NUMBER_TYPE) {
+      if (length < 1) {
+        length = 18;
+      } else {
+        length = Math.min(18, length);
+      }
+      if (scale < 0) {
+        scale = 3;
+      }
+      scale = Math.min(15, scale);
+      scale = Math.min(length - 3, scale);
+      scale = Math.max(0, scale);
+    } else {
+      if (type == FieldDefinition.CHARACTER_TYPE) {
+        if (length < 1) {
+          length = 254;
+        } else {
+          length = Math.min(254, length);
+        }
+      } else if (type == FieldDefinition.LOGICAL_TYPE) {
+        length = 1;
+      } else if (type == FieldDefinition.DATE_TYPE) {
+        length = 8;
+      }
+      scale = 0;
+    }
     String name = this.shortNames.get(fullName);
     if (name == null) {
       name = fullName.toUpperCase();
@@ -127,7 +145,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
     }
 
     final FieldDefinition field = new FieldDefinition(name, fullName, type,
-      length, decimalPlaces);
+      length, scale);
     this.fieldNames.add(name);
     this.fields.add(field);
     return field;
@@ -257,7 +275,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
   }
 
   protected boolean writeField(final Record object, final FieldDefinition field)
-      throws IOException {
+    throws IOException {
     if (this.out == null) {
       return true;
     } else {

@@ -28,7 +28,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class CsvRecordIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
 
   private final char fieldSeparator;
 
@@ -76,7 +76,8 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
     this.fieldSeparator = fieldSeparator;
   }
 
-  private void createMetaData(final String[] fieldNames) throws IOException {
+  private void createRecordDefinition(final String[] fieldNames)
+      throws IOException {
     final List<Attribute> attributes = new ArrayList<Attribute>();
     Attribute geometryAttribute = null;
     for (final String name : fieldNames) {
@@ -113,8 +114,18 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
       geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
         this.geometryFactory);
     }
-    final String filename = FileUtil.getBaseName(this.resource.getFilename());
-    this.recordDefinition = new RecordDefinitionImpl(filename, getProperties(),
+    String typePath = getProperty("typePath");
+    if (!Property.hasValue(typePath)) {
+      typePath = "/" + FileUtil.getBaseName(this.resource.getFilename());
+      String schemaPath = getProperty("schemaPath");
+      if (Property.hasValue(schemaPath)) {
+        if (!schemaPath.startsWith("/")) {
+          schemaPath = "/" + schemaPath;
+        }
+        typePath = schemaPath + typePath;
+      }
+    }
+    this.recordDefinition = new RecordDefinitionImpl(typePath, getProperties(),
       attributes);
   }
 
@@ -153,9 +164,10 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
       this.in = new BufferedReader(
         FileUtil.createUtf8Reader(this.resource.getInputStream()));
       final String[] line = readNextRecord();
-      createMetaData(line);
+      createRecordDefinition(line);
     } catch (final IOException e) {
       ExceptionUtil.log(getClass(), "Unable to open " + this.resource, e);
+    } catch (final NoSuchElementException e) {
     }
   }
 
@@ -180,11 +192,16 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
    * @throws IOException if bad things happen during the read
    */
   private String getNextLine() throws IOException {
-    final String nextLine = this.in.readLine();
-    if (nextLine == null) {
+    final BufferedReader in = this.in;
+    if (in == null) {
       throw new NoSuchElementException();
+    } else {
+      final String nextLine = this.in.readLine();
+      if (nextLine == null) {
+        throw new NoSuchElementException();
+      }
+      return nextLine;
     }
-    return nextLine;
   }
 
   @Override

@@ -94,7 +94,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         return super.addDbaseField(name, DataTypes.STRING, String.class, 254, 0);
       } else {
         this.hasGeometry = true;
-        addFieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0);
+        addFieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0, 0);
         return 0;
       }
     } else {
@@ -161,7 +161,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
         if (!hasField(this.geometryPropertyName)) {
           addFieldDefinition(this.geometryPropertyName,
-            FieldDefinition.OBJECT_TYPE, 0);
+            FieldDefinition.OBJECT_TYPE, 0, 0);
         }
 
         final Resource indexResource = SpringUtil.getResourceWithExtension(

@@ -14,5 +14,7 @@ public interface IoFactory {
 
   String getName();
 
+  void init();
+
   boolean isAvailable();
 }

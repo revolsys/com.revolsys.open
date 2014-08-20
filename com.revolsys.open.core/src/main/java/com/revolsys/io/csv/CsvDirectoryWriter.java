@@ -33,6 +33,7 @@ public class CsvDirectoryWriter extends AbstractRecordWriter {
   @Override
   public void close() {
     for (final CsvRecordWriter writer : this.writers.values()) {
+      writer.flush();
       FileUtil.closeSilent(writer);
     }
     this.writers.clear();

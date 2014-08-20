@@ -160,11 +160,8 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     final Condition whereCondition = getWhereCondition();
     if (whereCondition == null) {
       setWhereCondition(condition);
-    } else {
-      final Condition[] conditions = {
-        whereCondition, condition
-      };
-      setWhereCondition(new And(conditions));
+    } else if (condition != null) {
+      setWhereCondition(new And(whereCondition, condition));
     }
   }
 
@@ -233,6 +230,14 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   public String getTypeNameAlias() {
     return this.typePathAlias;
+  }
+
+  public String getWhere() {
+    if (this.whereCondition == null) {
+      return null;
+    } else {
+      return this.whereCondition.toFormattedString();
+    }
   }
 
   public Condition getWhereCondition() {
@@ -310,8 +315,10 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     this.typePathAlias = typePathAlias;
   }
 
-  public void setWhere(final String whereCondition) {
-    setWhereCondition(Q.sql(whereCondition));
+  public void setWhere(final String where) {
+    final Condition whereCondition = QueryValue.parseWhere(
+      this.recordDefinition, where);
+    setWhereCondition(whereCondition);
   }
 
   public void setWhereCondition(final Condition whereCondition) {

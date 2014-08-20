@@ -46,6 +46,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
 public abstract class QueryValue implements Cloneable {
   public static <V extends QueryValue> List<V> cloneQueryValues(
@@ -110,24 +111,30 @@ public abstract class QueryValue implements Cloneable {
 
   public static Condition parseWhere(final RecordDefinition recordDefinition,
     final String whereClause) {
-    try {
-      final SQLParser sqlParser = new SQLParser();
-      final StatementNode statement = sqlParser.parseStatement("SELECT * FROM "
-          + recordDefinition.getTypeName() + " WHERE " + whereClause);
-      if (statement instanceof CursorNode) {
-        final CursorNode selectStatement = (CursorNode)statement;
-        final ResultSetNode resultSetNode = selectStatement.getResultSetNode();
-        if (resultSetNode instanceof SelectNode) {
-          final SelectNode selectNode = (SelectNode)resultSetNode;
-          final ValueNode where = selectNode.getWhereClause();
-          final Condition condition = toQueryValue(recordDefinition, where);
-          return condition;
+    if (recordDefinition == null) {
+      return Q.sql(whereClause);
+    } else if (Property.hasValue(whereClause)) {
+      try {
+        final SQLParser sqlParser = new SQLParser();
+        final StatementNode statement = sqlParser.parseStatement("SELECT * FROM "
+            + recordDefinition.getTypeName() + " WHERE " + whereClause);
+        if (statement instanceof CursorNode) {
+          final CursorNode selectStatement = (CursorNode)statement;
+          final ResultSetNode resultSetNode = selectStatement.getResultSetNode();
+          if (resultSetNode instanceof SelectNode) {
+            final SelectNode selectNode = (SelectNode)resultSetNode;
+            final ValueNode where = selectNode.getWhereClause();
+            final Condition condition = toQueryValue(recordDefinition, where);
+            return condition;
+          }
         }
+        return null;
+      } catch (final Throwable e) {
+        throw new IllegalArgumentException("Invalid where clause: "
+            + whereClause, e);
       }
+    } else {
       return null;
-    } catch (final Throwable e) {
-      throw new IllegalArgumentException(
-        "Invalid where clause: " + whereClause, e);
     }
   }
 
@@ -165,8 +172,10 @@ public abstract class QueryValue implements Cloneable {
       final String operator = binaryOperatorNode.getOperator().toUpperCase();
       final ValueNode leftValueNode = binaryOperatorNode.getLeftOperand();
       final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
-      final Condition leftCondition = toQueryValue(recordDefinition, leftValueNode);
-      final Condition rightCondition = toQueryValue(recordDefinition, rightValueNode);
+      final Condition leftCondition = toQueryValue(recordDefinition,
+        leftValueNode);
+      final Condition rightCondition = toQueryValue(recordDefinition,
+        rightValueNode);
       if ("AND".equals(operator)) {
         return (V)new And(leftCondition, rightCondition);
       } else if ("OR".equals(operator)) {
@@ -181,8 +190,10 @@ public abstract class QueryValue implements Cloneable {
       final ValueNode leftValueNode = binaryOperatorNode.getLeftOperand();
       final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
       if (SUPPORTED_BINARY_OPERATORS.contains(operator.toUpperCase())) {
-        final QueryValue leftCondition = toQueryValue(recordDefinition, leftValueNode);
-        QueryValue rightCondition = toQueryValue(recordDefinition, rightValueNode);
+        final QueryValue leftCondition = toQueryValue(recordDefinition,
+          leftValueNode);
+        QueryValue rightCondition = toQueryValue(recordDefinition,
+          rightValueNode);
 
         if (leftCondition instanceof Column) {
           if (rightCondition instanceof Value) {
@@ -196,7 +207,8 @@ public abstract class QueryValue implements Cloneable {
                   + operator + " use IS NULL or IS NOT NULL instead.");
             } else {
               final CodeTable codeTable = recordDefinition.getCodeTableByColumn(name);
-              if (codeTable == null || attribute == recordDefinition.getIdAttribute()) {
+              if (codeTable == null
+                  || attribute == recordDefinition.getIdAttribute()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
                   final Object convertedValue = StringConverterRegistry.toObject(
@@ -258,8 +270,10 @@ public abstract class QueryValue implements Cloneable {
       final LikeEscapeOperatorNode likeEscapeOperatorNode = (LikeEscapeOperatorNode)expression;
       final ValueNode leftValueNode = likeEscapeOperatorNode.getReceiver();
       final ValueNode rightValueNode = likeEscapeOperatorNode.getLeftOperand();
-      final QueryValue leftCondition = toQueryValue(recordDefinition, leftValueNode);
-      final QueryValue rightCondition = toQueryValue(recordDefinition, rightValueNode);
+      final QueryValue leftCondition = toQueryValue(recordDefinition,
+        leftValueNode);
+      final QueryValue rightCondition = toQueryValue(recordDefinition,
+        rightValueNode);
       return (V)new ILike(leftCondition, rightCondition);
     } else if (expression instanceof NotNode) {
       final NotNode notNode = (NotNode)expression;
@@ -269,12 +283,14 @@ public abstract class QueryValue implements Cloneable {
     } else if (expression instanceof InListOperatorNode) {
       final InListOperatorNode inListOperatorNode = (InListOperatorNode)expression;
       final ValueNode leftOperand = inListOperatorNode.getLeftOperand();
-      final QueryValue leftCondition = toQueryValue(recordDefinition, leftOperand);
+      final QueryValue leftCondition = toQueryValue(recordDefinition,
+        leftOperand);
 
       final List<QueryValue> conditions = new ArrayList<QueryValue>();
       final RowConstructorNode itemsList = inListOperatorNode.getRightOperandList();
       for (final ValueNode itemValueNode : itemsList.getNodeList()) {
-        final QueryValue itemCondition = toQueryValue(recordDefinition, itemValueNode);
+        final QueryValue itemCondition = toQueryValue(recordDefinition,
+          itemValueNode);
         conditions.add(itemCondition);
       }
       return (V)new In(leftCondition, new CollectionValue(conditions));

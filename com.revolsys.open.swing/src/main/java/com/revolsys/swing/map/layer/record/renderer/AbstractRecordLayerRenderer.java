@@ -285,7 +285,7 @@ public abstract class AbstractRecordLayerRenderer extends
         final AbstractRecordLayer layer = getLayer();
         this.filter = new SqlLayerFilter(layer, query);
       } else {
-        this.filter = new AcceptAllFilter<Record>();
+        this.filter = new AcceptAllFilter<>();
       }
     }
   }

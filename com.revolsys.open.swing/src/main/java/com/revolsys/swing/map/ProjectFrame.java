@@ -56,7 +56,6 @@ import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.WindowManager;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
@@ -225,9 +224,9 @@ public class ProjectFrame extends BaseFrame {
     return this.mapPanel;
   }
 
-  protected void addMenu(final JMenuBar menuBar, final MenuFactory menu) {
-    final JMenu fileMenu = menu.createComponent();
-    menuBar.add(fileMenu);
+  protected void addMenu(final JMenuBar menuBar, final MenuFactory menuFactory) {
+    final JMenu menu = menuFactory.createComponent();
+    menuBar.add(menu, menuBar.getMenuCount() - 1);
   }
 
   protected DefaultSingleCDockable addTableOfContents() {
@@ -275,10 +274,9 @@ public class ProjectFrame extends BaseFrame {
     addTableWorkingArea();
   }
 
+  @Override
   protected JMenuBar createMenuBar() {
-    final JMenuBar menuBar = new JMenuBar();
-    setJMenuBar(menuBar);
-
+    final JMenuBar menuBar = super.createMenuBar();
     addMenu(menuBar, createMenuFile());
 
     final MenuFactory tools = createMenuTools();
@@ -288,7 +286,6 @@ public class ProjectFrame extends BaseFrame {
         PreferencesDialog.get(), "showPanel");
     }
     addMenu(menuBar, tools);
-    WindowManager.addMenu(menuBar);
     return menuBar;
   }
 

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 public abstract class AbstractIoFactory implements IoFactory {
 
   private final List<String> fileExtensions = new ArrayList<String>();
@@ -35,23 +37,23 @@ public abstract class AbstractIoFactory implements IoFactory {
     set.add(value);
   }
 
-  public void addMediaType(final String mediaType) {
-    mediaTypes.add(mediaType);
+  protected void addMediaType(final String mediaType) {
+    this.mediaTypes.add(mediaType);
   }
 
   protected void addMediaTypeAndFileExtension(final String mediaType,
     final String fileExtension) {
     addMediaType(mediaType);
-    fileExtensions.add(fileExtension);
-    add(mediaTypeToFileExtension, mediaType, fileExtension);
-    add(mediaTypeToFileExtension, fileExtension, fileExtension);
-    add(fileExtensionToMediaType, fileExtension, mediaType);
-    add(fileExtensionToMediaType, mediaType, mediaType);
+    this.fileExtensions.add(fileExtension);
+    add(this.mediaTypeToFileExtension, mediaType, fileExtension);
+    add(this.mediaTypeToFileExtension, fileExtension, fileExtension);
+    add(this.fileExtensionToMediaType, fileExtension, mediaType);
+    add(this.fileExtensionToMediaType, mediaType, mediaType);
   }
 
   @Override
   public String getFileExtension(final String mediaType) {
-    final Set<String> fileExtensions = mediaTypeToFileExtension.get(mediaType);
+    final Set<String> fileExtensions = this.mediaTypeToFileExtension.get(mediaType);
     if (fileExtensions == null) {
       return null;
     } else {
@@ -67,12 +69,12 @@ public abstract class AbstractIoFactory implements IoFactory {
 
   @Override
   public List<String> getFileExtensions() {
-    return fileExtensions;
+    return this.fileExtensions;
   }
 
   @Override
   public String getMediaType(final String fileExtension) {
-    final Set<String> mediaTypes = fileExtensionToMediaType.get(fileExtension);
+    final Set<String> mediaTypes = this.fileExtensionToMediaType.get(fileExtension);
     if (mediaTypes == null) {
       return null;
     } else {
@@ -88,12 +90,16 @@ public abstract class AbstractIoFactory implements IoFactory {
 
   @Override
   public Set<String> getMediaTypes() {
-    return mediaTypes;
+    return this.mediaTypes;
   }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
+  }
+
+  @PostConstruct
+  public void init() {
   }
 
   @Override

@@ -1,7 +1,9 @@
 package com.revolsys.data.io;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.core.io.Resource;
@@ -12,10 +14,12 @@ import com.revolsys.data.record.RecordFactory;
 import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
 import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.Reader;
+import com.revolsys.io.directory.DirectoryRecordStore;
+import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractRecordAndGeometryReaderFactory extends
-  AbstractGeometryReaderFactory implements RecordReaderFactory,
-  MapReaderFactory {
+AbstractGeometryReaderFactory implements RecordReaderFactory,
+MapReaderFactory, RecordStoreFactory {
 
   private final ArrayRecordFactory recordFactory = new ArrayRecordFactory();
 
@@ -23,27 +27,23 @@ public abstract class AbstractRecordAndGeometryReaderFactory extends
 
   private boolean customAttributionSupported = true;
 
+  private final List<String> urlPatterns = new ArrayList<>();
+
   public AbstractRecordAndGeometryReaderFactory(final String name,
     final boolean binary) {
     super(name, binary);
   }
 
-  /**
-   * Create a reader for the resource using the ({@link ArrayRecordFactory}
-   * ).
-   * 
-   * @param file The file to read.
-   * @return The reader for the file.
-   */
   @Override
-  public RecordReader createRecordReader(final Resource resource) {
-    return createRecordReader(resource, recordFactory);
-
+  protected void addMediaTypeAndFileExtension(final String mediaType,
+    final String fileExtension) {
+    super.addMediaTypeAndFileExtension(mediaType, fileExtension);
+    this.urlPatterns.add("(.+)[\\?|&]format=" + fileExtension + "(&.+)?");
   }
 
   /**
    * Create a directory reader using the ({@link ArrayRecordFactory}).
-   * 
+   *
    * @return The reader.
    */
   @Override
@@ -56,26 +56,26 @@ public abstract class AbstractRecordAndGeometryReaderFactory extends
   /**
    * Create a reader for the directory using the ({@link ArrayRecordFactory}
    * ).
-   * 
+   *
    * @param directory The directory to read.
    * @return The reader for the file.
    */
   @Override
   public Reader<Record> createDirectoryRecordReader(final File directory) {
-    return createDirectoryRecordReader(directory, recordFactory);
+    return createDirectoryRecordReader(directory, this.recordFactory);
   }
 
   /**
    * Create a reader for the directory using the specified data object
    * recordFactory.
-   * 
+   *
    * @param directory directory file to read.
    * @param recordFactory The recordFactory used to create data objects.
    * @return The reader for the file.
    */
   @Override
-  public Reader<Record> createDirectoryRecordReader(
-    final File directory, final RecordFactory recordFactory) {
+  public Reader<Record> createDirectoryRecordReader(final File directory,
+    final RecordFactory recordFactory) {
     final RecordDirectoryReader directoryReader = new RecordDirectoryReader();
     directoryReader.setFileExtensions(getFileExtensions());
     directoryReader.setDirectory(directory);
@@ -101,14 +101,54 @@ public abstract class AbstractRecordAndGeometryReaderFactory extends
     return reader;
   }
 
+  /**
+   * Create a reader for the resource using the ({@link ArrayRecordFactory}
+   * ).
+   *
+   * @param file The file to read.
+   * @return The reader for the file.
+   */
+  @Override
+  public RecordReader createRecordReader(final Resource resource) {
+    return createRecordReader(resource, this.recordFactory);
+
+  }
+
+  @Override
+  public RecordStore createRecordStore(
+    final Map<String, ? extends Object> connectionProperties) {
+    final String url = (String)connectionProperties.get("url");
+    final Resource resource = SpringUtil.getResource(url);
+    final File directory = SpringUtil.getFile(resource);
+    final List<String> fileExtensions = getFileExtensions();
+    return new DirectoryRecordStore(directory, fileExtensions);
+  }
+
+  @Override
+  public Class<? extends RecordStore> getRecordStoreInterfaceClass(
+    final Map<String, ? extends Object> connectionProperties) {
+    return RecordStore.class;
+  }
+
+  @Override
+  public List<String> getUrlPatterns() {
+    return this.urlPatterns;
+  }
+
+  @Override
+  public void init() {
+    super.init();
+    RecordStoreFactoryRegistry.register(this);
+  }
+
   @Override
   public boolean isCustomAttributionSupported() {
-    return customAttributionSupported;
+    return this.customAttributionSupported;
   }
 
   @Override
   public boolean isSingleFile() {
-    return singleFile;
+    return this.singleFile;
   }
 
   protected void setCustomAttributionSupported(

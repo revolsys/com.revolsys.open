@@ -154,7 +154,7 @@ public final class FileUtil {
    * @throws IOException If an I/O error occurs.
    */
   public static long copy(final File file, final OutputStream out)
-      throws IOException {
+    throws IOException {
     final FileInputStream in = new FileInputStream(file);
     try {
       return copy(in, out);
@@ -211,7 +211,7 @@ public final class FileUtil {
    * @throws IOException if an i/o error
    */
   public static void copy(final InputStream zin, final File file, final long sz)
-      throws IOException {
+    throws IOException {
 
     ReadableByteChannel rc = null;
     FileOutputStream out = null;
@@ -630,8 +630,9 @@ public final class FileUtil {
     }
   }
 
-  public static File getFile(final URI uri) {
-    if ("folderconnection".equalsIgnoreCase(uri.getScheme())) {
+  public static File getFile(URI uri) {
+    final String scheme = uri.getScheme();
+    if ("folderconnection".equalsIgnoreCase(scheme)) {
       final String authority = uri.getAuthority();
       final String connectionName = UrlUtil.percentDecode(authority);
 
@@ -639,7 +640,7 @@ public final class FileUtil {
 
       File file = null;
       for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
-          .getConnectionRegistries()) {
+        .getConnectionRegistries()) {
         final FolderConnection connection = registry.getConnection(connectionName);
         if (connection != null) {
           final File directory = connection.getFile();
@@ -650,8 +651,14 @@ public final class FileUtil {
         }
       }
       return file;
-    } else {
+    } else if ("file".equalsIgnoreCase(scheme)) {
+      try {
+        uri = new URI(scheme, uri.getPath(), null);
+      } catch (final URISyntaxException e) {
+      }
       return getFile(new File(uri));
+    } else {
+      throw new IllegalArgumentException("file URL expected: " + uri);
     }
   }
 
@@ -943,8 +950,8 @@ public final class FileUtil {
     for (int i = 0; i < len; i++) {
       final char ch = host.charAt(i);
       if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0'
-        && ch <= '9' || ch == '-' || ch == ',' || ch == '.' || ch == '_'
-        || ch == '~' || ch == ' ') {
+          && ch <= '9' || ch == '-' || ch == ',' || ch == '.' || ch == '_'
+          || ch == '~' || ch == ' ') {
         encoded.append(ch);
       } else {
         encoded.append('%');

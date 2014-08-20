@@ -9,13 +9,13 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.AbstractRecordAndGeometryIoFactory;
 import com.revolsys.data.io.RecordReader;
-import com.revolsys.data.io.ZipRecordReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 import com.revolsys.io.ZipWriter;
+import com.revolsys.io.zip.ZipRecordReader;
 
 public class ShapefileZipIoFactory extends
 AbstractRecordAndGeometryIoFactory {

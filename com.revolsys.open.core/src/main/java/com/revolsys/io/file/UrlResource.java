@@ -29,7 +29,7 @@ public class UrlResource extends org.springframework.core.io.UrlResource {
 
   @Override
   public Resource createRelative(String relativePath)
-    throws MalformedURLException {
+      throws MalformedURLException {
     try {
       if (relativePath.startsWith("/")) {
         relativePath = relativePath.substring(1);
@@ -39,7 +39,7 @@ public class UrlResource extends org.springframework.core.io.UrlResource {
       return new UrlResource(relativeUrl);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to create relative URL "
-        + this + " " + relativePath, e);
+          + this + " " + relativePath, e);
     }
   }
 
@@ -64,10 +64,11 @@ public class UrlResource extends org.springframework.core.io.UrlResource {
   @Override
   public File getFile() throws IOException {
     final URL url = getURL();
+    final File file = FileUtil.getFile(url);
     if (isFolderConnection()) {
-      return FileUtil.getFile(url);
+      return file;
     } else {
-      return super.getFile();
+      return file;
     }
   }
 

@@ -19,14 +19,14 @@ import com.revolsys.swing.map.layer.MapTile;
 
 public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
 
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "arcgisServerRest", "Arc GIS Server REST", ArcGisServerRestLayer.class,
-    "create");
-
   public static ArcGisServerRestLayer create(
     final Map<String, Object> properties) {
     return new ArcGisServerRestLayer(properties);
   }
+
+  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
+    "arcgisServerRest", "Arc GIS Server REST", ArcGisServerRestLayer.class,
+      "create");
 
   private MapServer mapServer;
 
@@ -43,12 +43,12 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
 
   @Override
   protected boolean doInitialize() {
-    synchronized (initSync) {
-      if (mapServer == null) {
+    synchronized (this.initSync) {
+      if (this.mapServer == null) {
         this.url = getProperty("url");
         try {
-          this.mapServer = ArcGisServerRestClient.getMapServer(url);
-          if (mapServer == null) {
+          this.mapServer = ArcGisServerRestClient.getMapServer(this.url);
+          if (this.mapServer == null) {
             return false;
           } else {
             final TileInfo tileInfo = this.mapServer.getTileInfo();
@@ -57,12 +57,18 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
           }
         } catch (final Throwable e) {
           throw new RuntimeException("Error connecting to ArcGIS rest server "
-            + url, e);
+              + this.url, e);
         }
       } else {
         return true;
       }
     }
+  }
+
+  @Override
+  public void doRefresh() {
+    doInitialize();
+    super.doRefresh();
   }
 
   @Override
@@ -131,12 +137,6 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
       final int zoomLevel = mapServer.getZoomLevel(metresPerPixel);
       return mapServer.getResolution(zoomLevel);
     }
-  }
-
-  @Override
-  public void refresh() {
-    doInitialize();
-    super.refresh();
   }
 
   @Override

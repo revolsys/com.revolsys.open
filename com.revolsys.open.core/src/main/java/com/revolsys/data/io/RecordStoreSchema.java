@@ -33,7 +33,7 @@ public class RecordStoreSchema extends AbstractObjectWithProperties {
     this.path = path;
   }
 
-  public void addMetaData(final RecordDefinition recordDefinition) {
+  public void addRecordDefinition(final RecordDefinition recordDefinition) {
     addMetaData(recordDefinition.getPath(), recordDefinition);
   }
 

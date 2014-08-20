@@ -164,7 +164,80 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     }
   }
 
-  protected JPanel addPropertiesTabCoordinateSystem(
+  public int addRenderer(final LayerRenderer<?> child) {
+    return addRenderer(child, 1);
+  }
+
+  public int addRenderer(final LayerRenderer<?> child, final int index) {
+    setRenderer(child);
+    return 0;
+  }
+
+  public boolean canSaveSettings(final File directory) {
+    if (directory != null) {
+      final Logger log = LoggerFactory.getLogger(getClass());
+      if (!directory.exists()) {
+        log.error("Unable to save layer " + getPath()
+          + " directory does not exist " + directory);
+      } else if (!directory.isDirectory()) {
+        log.error("Unable to save layer " + getPath()
+          + " file is not a directory " + directory);
+      } else if (!directory.canWrite()) {
+        log.error("Unable to save layer " + getPath()
+          + " directory is not writable " + directory);
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  protected boolean checkShowProperties() {
+    boolean show = true;
+    synchronized (this) {
+      if (BooleanStringConverter.getBoolean(getProperty("INTERNAL_PROPERTIES_VISIBLE"))) {
+        show = false;
+      } else {
+        setProperty("INTERNAL_PROPERTIES_VISIBLE", true);
+      }
+    }
+    return show;
+  }
+
+  @Override
+  public AbstractLayer clone() {
+    try {
+      final AbstractLayer clone = (AbstractLayer)super.clone();
+      clone.beanPropertyListener = new BeanPropertyListener(clone);
+      clone.eventsEnabled = new ThreadLocal<>();
+      clone.id = this.id = ID_GEN.incrementAndGet();
+      clone.initialized = false;
+      clone.layerGroup = null;
+      clone.propertyChangeSupport = new PropertyChangeSupport(clone);
+      if (clone.renderer != null) {
+        clone.renderer = clone.renderer.clone();
+      }
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
+  }
+
+  @Override
+  public int compareTo(final Layer layer) {
+    return getName().compareTo(layer.getName());
+  }
+
+  @Override
+  public TabbedValuePanel createPropertiesPanel() {
+    final TabbedValuePanel tabPanel = new TabbedValuePanel("Layer " + this
+      + " Properties", this);
+    createPropertiesTabGeneral(tabPanel);
+    createPropertiesTabCoordinateSystem(tabPanel);
+    return tabPanel;
+  }
+
+  protected JPanel createPropertiesTabCoordinateSystem(
     final TabbedValuePanel tabPanel) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
@@ -246,21 +319,21 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     return null;
   }
 
-  protected JPanel addPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
+  protected BasePanel createPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
     final BasePanel generalPanel = new BasePanel(new VerticalLayout(5));
     generalPanel.setScrollableHeightHint(ScrollableSizeHint.FIT);
 
     tabPanel.addTab("General", generalPanel);
 
-    addPropertiesTabGeneralPanelGeneral(generalPanel);
-    final ValueField sourcePanel = addPropertiesTabGeneralPanelSource(generalPanel);
+    createPropertiesTabGeneralPanelGeneral(generalPanel);
+    final ValueField sourcePanel = createPropertiesTabGeneralPanelSource(generalPanel);
     if (sourcePanel.getComponentCount() == 0) {
       generalPanel.remove(sourcePanel);
     }
     return generalPanel;
   }
 
-  protected ValueField addPropertiesTabGeneralPanelGeneral(
+  protected ValueField createPropertiesTabGeneralPanelGeneral(
     final BasePanel parent) {
     final ValueField panel = new ValueField(this);
     SwingUtil.setTitledBorder(panel, "General");
@@ -276,85 +349,13 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     return panel;
   }
 
-  protected ValueField addPropertiesTabGeneralPanelSource(final BasePanel parent) {
+  protected ValueField createPropertiesTabGeneralPanelSource(
+    final BasePanel parent) {
     final ValueField panel = new ValueField(this);
     SwingUtil.setTitledBorder(panel, "Source");
 
     parent.add(panel);
     return panel;
-  }
-
-  public int addRenderer(final LayerRenderer<?> child) {
-    return addRenderer(child, 1);
-  }
-
-  public int addRenderer(final LayerRenderer<?> child, final int index) {
-    setRenderer(child);
-    return 0;
-  }
-
-  public boolean canSaveSettings(final File directory) {
-    if (directory != null) {
-      final Logger log = LoggerFactory.getLogger(getClass());
-      if (!directory.exists()) {
-        log.error("Unable to save layer " + getPath()
-          + " directory does not exist " + directory);
-      } else if (!directory.isDirectory()) {
-        log.error("Unable to save layer " + getPath()
-          + " file is not a directory " + directory);
-      } else if (!directory.canWrite()) {
-        log.error("Unable to save layer " + getPath()
-          + " directory is not writable " + directory);
-      } else {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  protected boolean checkShowProperties() {
-    boolean show = true;
-    synchronized (this) {
-      if (BooleanStringConverter.getBoolean(getProperty("INTERNAL_PROPERTIES_VISIBLE"))) {
-        show = false;
-      } else {
-        setProperty("INTERNAL_PROPERTIES_VISIBLE", true);
-      }
-    }
-    return show;
-  }
-
-  @Override
-  public AbstractLayer clone() {
-    try {
-      final AbstractLayer clone = (AbstractLayer)super.clone();
-      clone.beanPropertyListener = new BeanPropertyListener(clone);
-      clone.eventsEnabled = new ThreadLocal<>();
-      clone.id = this.id = ID_GEN.incrementAndGet();
-      clone.initialized = false;
-      clone.layerGroup = null;
-      clone.propertyChangeSupport = new PropertyChangeSupport(clone);
-      if (clone.renderer != null) {
-        clone.renderer = clone.renderer.clone();
-      }
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      return null;
-    }
-  }
-
-  @Override
-  public int compareTo(final Layer layer) {
-    return getName().compareTo(layer.getName());
-  }
-
-  @Override
-  public TabbedValuePanel createPropertiesPanel() {
-    final TabbedValuePanel tabPanel = new TabbedValuePanel("Layer " + this
-      + " Properties", this);
-    addPropertiesTabGeneral(tabPanel);
-    addPropertiesTabCoordinateSystem(tabPanel);
-    return tabPanel;
   }
 
   @Override
@@ -392,6 +393,9 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     return true;
   }
 
+  protected void doRefresh() {
+  }
+
   protected boolean doSaveChanges() {
     return true;
   }
@@ -417,6 +421,10 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
       this.propertyChangeSupport.firePropertyChange(propertyName, oldValue,
         newValue);
     }
+  }
+
+  public PropertyChangeListener getBeanPropertyListener() {
+    return this.beanPropertyListener;
   }
 
   @Override
@@ -680,6 +688,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
 
   @Override
   public void refresh() {
+    doRefresh();
     firePropertyChange("refresh", false, true);
   }
 

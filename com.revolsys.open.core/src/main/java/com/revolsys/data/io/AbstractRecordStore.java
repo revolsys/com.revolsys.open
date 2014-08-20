@@ -134,7 +134,7 @@ implements RecordStore {
     final String typePath = recordDefinition.getPath();
     final String schemaName = PathUtil.getPath(typePath);
     final RecordStoreSchema schema = getSchema(schemaName);
-    schema.addMetaData(recordDefinition);
+    schema.addRecordDefinition(recordDefinition);
     final String idFieldName = recordDefinition.getIdAttributeName();
     for (final Attribute attribute : recordDefinition.getAttributes()) {
       final String fieldName = attribute.getName();

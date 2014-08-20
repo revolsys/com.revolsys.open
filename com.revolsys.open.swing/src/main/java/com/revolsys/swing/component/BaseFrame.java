@@ -6,6 +6,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 
 import com.revolsys.swing.WindowManager;
 
@@ -32,6 +33,13 @@ public class BaseFrame extends JFrame implements WindowListener {
     init();
   }
 
+  protected JMenuBar createMenuBar() {
+    final JMenuBar menuBar = new JMenuBar();
+    setJMenuBar(menuBar);
+    WindowManager.addMenu(menuBar);
+    return menuBar;
+  }
+
   @Override
   public void dispose() {
     removeWindowListener(this);
@@ -42,6 +50,7 @@ public class BaseFrame extends JFrame implements WindowListener {
   private void init() {
     setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     addWindowListener(this);
+    createMenuBar();
   }
 
   @Override

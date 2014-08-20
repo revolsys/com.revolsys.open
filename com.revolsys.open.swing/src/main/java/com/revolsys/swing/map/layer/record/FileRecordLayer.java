@@ -51,8 +51,8 @@ public class FileRecordLayer extends ListRecordLayer {
   }
 
   @Override
-  protected ValueField addPropertiesTabGeneralPanelSource(final BasePanel parent) {
-    final ValueField panel = super.addPropertiesTabGeneralPanelSource(parent);
+  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
 
     final String url = getUrl();
     if (url.startsWith("file:")) {

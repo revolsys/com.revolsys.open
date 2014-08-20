@@ -75,7 +75,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       "dataStore", "Data Store", RecordStoreLayer.class, "create"));
   }
 
-  private BoundingBox boundingBox = new BoundingBoxDoubleGf();
+  private BoundingBox loadedBoundingBox = new BoundingBoxDoubleGf();
 
   /**
    * Caches of sets of {@link Record#getIdentifier()} for different purposes (e.g. selected records, deleted records).
@@ -113,8 +113,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected ValueField addPropertiesTabGeneralPanelSource(final BasePanel parent) {
-    final ValueField panel = super.addPropertiesTabGeneralPanelSource(parent);
+  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
     final Map<String, String> connectionProperties = getProperty("connection");
     String connectionName = null;
     String url = null;
@@ -246,7 +246,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     synchronized (getSync()) {
       if (loadedBoundingBox == this.loadingBoundingBox) {
         firePropertyChange("loaded", false, true);
-        this.boundingBox = this.loadingBoundingBox;
+        this.loadedBoundingBox = this.loadingBoundingBox;
         this.loadingBoundingBox = new BoundingBoxDoubleGf();
         this.loadingWorker = null;
       }
@@ -299,7 +299,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       this.recordStore = null;
     }
     final SwingWorker<List<LayerRecord>, Void> loadingWorker = this.loadingWorker;
-    this.boundingBox = new BoundingBoxDoubleGf();
+    this.loadedBoundingBox = new BoundingBoxDoubleGf();
     this.recordIdToRecordMap.clear();
     this.loadingBoundingBox = new BoundingBoxDoubleGf();
     this.loadingWorker = null;
@@ -360,7 +360,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     try {
       final GeometryFactory geometryFactory = getGeometryFactory();
       final BoundingBox queryBoundingBox = boundingBox.convert(geometryFactory);
-      if (this.boundingBox.covers(queryBoundingBox)) {
+      if (this.loadedBoundingBox.covers(queryBoundingBox)) {
         return (List)getIndex().queryIntersects(queryBoundingBox);
       } else {
         final List<LayerRecord> records = getRecordsFromRecordStore(queryBoundingBox);
@@ -428,7 +428,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     } else {
       synchronized (getSync()) {
         final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
-        if (!this.boundingBox.covers(boundingBox)
+        if (!this.loadedBoundingBox.covers(boundingBox)
           && !this.loadingBoundingBox.covers(boundingBox)) {
           if (this.loadingWorker != null) {
             this.loadingWorker.cancel(true);
@@ -452,6 +452,26 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       }
       return records;
     }
+  }
+
+  @Override
+  protected void doRefresh() {
+    synchronized (getSync()) {
+      if (this.loadingWorker != null) {
+        this.loadingWorker.cancel(true);
+      }
+      this.loadedBoundingBox = new BoundingBoxDoubleGf();
+      this.loadingBoundingBox = this.loadedBoundingBox;
+      setIndexRecords(null);
+      cleanCachedRecords();
+    }
+    final RecordStore recordStore = getRecordStore();
+    final String typePath = getTypePath();
+    final CodeTable codeTable = recordStore.getCodeTable(typePath);
+    if (codeTable != null) {
+      codeTable.refresh();
+    }
+    super.doRefresh();
   }
 
   @Override
@@ -638,7 +658,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     BoundingBox loadedBoundingBox;
     RecordQuadTree index;
     synchronized (getSync()) {
-      loadedBoundingBox = this.boundingBox;
+      loadedBoundingBox = this.loadedBoundingBox;
       index = getIndex();
     }
     List<LayerRecord> queryRecords;
@@ -754,27 +774,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     final RecordDefinition recordDefinition = getRecordDefinition();
     final Query query = Query.and(recordDefinition, filter);
     return query(query);
-  }
-
-  @Override
-  public void refresh() {
-    super.refresh();
-    synchronized (getSync()) {
-      if (this.loadingWorker != null) {
-        this.loadingWorker.cancel(true);
-      }
-      this.boundingBox = new BoundingBoxDoubleGf();
-      this.loadingBoundingBox = this.boundingBox;
-      setIndexRecords(null);
-      cleanCachedRecords();
-    }
-    final RecordStore recordStore = getRecordStore();
-    final String typePath = getTypePath();
-    final CodeTable codeTable = recordStore.getCodeTable(typePath);
-    if (codeTable != null) {
-      codeTable.refresh();
-    }
-    fireRecordsChanged();
   }
 
   @Override

@@ -9,6 +9,7 @@ import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.util.Property;
 
 public class Q {
 
@@ -353,7 +354,7 @@ public class Q {
       left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "", "g");
     }
     final String right = "%"
-      + StringConverterRegistry.toString(value)
+        + StringConverterRegistry.toString(value)
         .toUpperCase()
         .replaceAll("[^A-Z0-9]", "") + "%";
     return Q.like(left, right);
@@ -425,7 +426,11 @@ public class Q {
   }
 
   public static SqlCondition sql(final String sql) {
-    return new SqlCondition(sql);
+    if (Property.hasValue(sql)) {
+      return new SqlCondition(sql);
+    } else {
+      return null;
+    }
   }
 
   public static SqlCondition sql(final String sql, final Object... parameters) {

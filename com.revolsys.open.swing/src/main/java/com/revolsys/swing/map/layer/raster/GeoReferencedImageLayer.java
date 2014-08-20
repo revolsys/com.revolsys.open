@@ -120,8 +120,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   }
 
   @Override
-  protected ValueField addPropertiesTabGeneralPanelSource(final BasePanel parent) {
-    final ValueField panel = super.addPropertiesTabGeneralPanelSource(parent);
+  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
+    final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
 
     if (this.url.startsWith("file:")) {
       final String fileName = this.url.replaceFirst("file:(//)?", "");

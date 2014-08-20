@@ -89,9 +89,11 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
+import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.RecordReaderTransferable;
 import com.revolsys.swing.dnd.transferable.StringTransferable;
+import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.form.SnapLayersPanel;
@@ -106,6 +108,7 @@ import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MultipleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.swing.map.layer.record.style.panel.QueryFilterField;
 import com.revolsys.swing.map.layer.record.style.panel.RecordLayerStylePanel;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
@@ -129,7 +132,7 @@ import com.revolsys.util.Label;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayer extends AbstractLayer implements
-RecordFactory, AddGeometryCompleteAction {
+  RecordFactory, AddGeometryCompleteAction {
 
   public static void addVisibleLayers(final List<AbstractRecordLayer> layers,
     final LayerGroup group) {
@@ -186,9 +189,9 @@ RecordFactory, AddGeometryCompleteAction {
       "table_go", exists, "showRecordsTable"));
 
     final EnableCheck hasSelectedRecords = new TreeItemPropertyEnableCheck(
-        "hasSelectedRecords");
+      "hasSelectedRecords");
     final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
-        "hasGeometry");
+      "hasGeometry");
     menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Selected",
       "magnifier_zoom_selected", new AndEnableCheck(exists, hasGeometry,
         hasSelectedRecords), "zoomToSelected"));
@@ -199,9 +202,9 @@ RecordFactory, AddGeometryCompleteAction {
     final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
     final EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddRecords");
     final EnableCheck canDelete = new TreeItemPropertyEnableCheck(
-        "canDeleteRecords");
+      "canDeleteRecords");
     final EnableCheck canMergeRecords = new TreeItemPropertyEnableCheck(
-        "canMergeRecords");
+      "canMergeRecords");
     final EnableCheck canPaste = new TreeItemPropertyEnableCheck("canPaste");
 
     menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
@@ -222,18 +225,18 @@ RecordFactory, AddGeometryCompleteAction {
 
     menu.addMenuItem("edit", TreeItemRunnable.createAction(
       "Merge Selected Records", "shape_group", canMergeRecords,
-        "mergeSelectedRecords"));
+      "mergeSelectedRecords"));
 
     menu.addMenuItem("dnd", TreeItemRunnable.createAction(
       "Copy Selected Records", "page_copy", hasSelectedRecords,
-        "copySelectedRecords"));
+      "copySelectedRecords"));
 
     menu.addMenuItem("dnd", TreeItemRunnable.createAction("Paste New Records",
       "paste_plain", new AndEnableCheck(canAdd, canPaste), "pasteRecords"));
 
     menu.addMenuItem("layer", 0, TreeItemRunnable.createAction("Layer Style",
       "palette", new AndEnableCheck(exists, hasGeometry), "showProperties",
-        "Style"));
+      "Style"));
 
     menu.addMenuItem("edit", 0, TreeItemRunnable.createAction("Export Records",
       "disk", new AndEnableCheck(exists, hasSelectedRecords), "exportRecords"));
@@ -275,7 +278,7 @@ RecordFactory, AddGeometryCompleteAction {
 
   private Set<AbstractProxyLayerRecord> proxyRecords = MapBackedSet.mapBackedSet(new WeakHashMap<AbstractProxyLayerRecord, Object>());
 
-  private Query query;
+  private Query query = new Query();
 
   private RecordDefinition recordDefinition;
 
@@ -515,9 +518,9 @@ RecordFactory, AddGeometryCompleteAction {
       if (!cancelled) {
         JOptionPane.showMessageDialog(MapPanel.get(this),
           "<html><p>There was an error cancelling changes for one or more records.</p>"
-              + "<p>" + getPath() + "</p>"
-              + "<p>Check the logging panel for details.</html>",
-              "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
+            + "<p>" + getPath() + "</p>"
+            + "<p>Check the logging panel for details.</html>",
+          "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
       }
 
     }
@@ -568,7 +571,7 @@ RecordFactory, AddGeometryCompleteAction {
     clone.sync = new Object();
     clone.editSync = new Object();
     clone.userReadOnlyFieldNames = new LinkedHashSet<>(
-        this.userReadOnlyFieldNames);
+      this.userReadOnlyFieldNames);
 
     return clone;
   }
@@ -665,6 +668,31 @@ RecordFactory, AddGeometryCompleteAction {
     }
   }
 
+  @Override
+  protected BasePanel createPropertiesTabGeneral(final TabbedValuePanel tabPanel) {
+    final BasePanel generalPanel = super.createPropertiesTabGeneral(tabPanel);
+    createPropertiesTabGeneralPanelFilter(generalPanel);
+    return generalPanel;
+  }
+
+  protected ValueField createPropertiesTabGeneralPanelFilter(
+    final BasePanel parent) {
+
+    final ValueField filterPanel = new ValueField(this);
+    SwingUtil.setTitledBorder(filterPanel, "Filter");
+
+    final QueryFilterField field = new QueryFilterField(this, "where",
+      getWhere());
+    SwingUtil.addLabel(filterPanel, "Filter");
+    filterPanel.add(field);
+    Property.addListener(field, "where", getBeanPropertyListener());
+
+    GroupLayoutUtil.makeColumns(filterPanel, 2, true);
+
+    parent.add(filterPanel);
+    return filterPanel;
+  }
+
   public UndoableEdit createPropertyEdit(final LayerRecord record,
     final String propertyName, final Object oldValue, final Object newValue) {
     return new SetObjectProperty(record, propertyName, oldValue, newValue);
@@ -701,7 +729,7 @@ RecordFactory, AddGeometryCompleteAction {
       return new ArrayLayerRecord(this);
     } else {
       throw new IllegalArgumentException("Cannot create records for "
-          + recordDefinition);
+        + recordDefinition);
     }
   }
 
@@ -822,6 +850,12 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   @Override
+  protected void doRefresh() {
+    setIndexRecords(null);
+    fireRecordsChanged();
+  }
+
+  @Override
   protected boolean doSaveChanges() {
     if (isExists()) {
       boolean saved = true;
@@ -857,8 +891,8 @@ RecordFactory, AddGeometryCompleteAction {
     if (!records.isEmpty()) {
       try {
         try (
-            GpxWriter writer = new GpxWriter(new File("/Users/paustin/Desktop/"
-                + getName() + ".gpx"))) {
+          GpxWriter writer = new GpxWriter(new File("/Users/paustin/Desktop/"
+            + getName() + ".gpx"))) {
           for (final LayerRecord record : records) {
             writer.write(record);
           }
@@ -1111,6 +1145,14 @@ RecordFactory, AddGeometryCompleteAction {
     return getRecordDefinition().getIdAttributeName();
   }
 
+  protected Collection<String> getIgnorePasteFields() {
+    Collection<String> ignorePasteFields = getProperty("ignorePasteFields");
+    if (ignorePasteFields == null) {
+      ignorePasteFields = Collections.emptySet();
+    }
+    return ignorePasteFields;
+  }
+
   public RecordQuadTree getIndex() {
     return this.index;
   }
@@ -1250,9 +1292,9 @@ RecordFactory, AddGeometryCompleteAction {
                       JOptionPane.showMessageDialog(
                         parentComponent,
                         "Clipboard should contain a record with a "
-                            + geometryDataType + " not a "
-                            + sourceGeometry.getGeometryType() + ".",
-                            "Paste Geometry", JOptionPane.ERROR_MESSAGE);
+                          + geometryDataType + " not a "
+                          + sourceGeometry.getGeometryType() + ".",
+                        "Paste Geometry", JOptionPane.ERROR_MESSAGE);
                     }
                     return null;
                   }
@@ -1299,11 +1341,7 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public Query getQuery() {
-    if (this.query == null) {
-      return null;
-    } else {
-      return this.query.clone();
-    }
+    return this.query.clone();
   }
 
   public LayerRecord getRecord(final int row) {
@@ -1390,6 +1428,14 @@ RecordFactory, AddGeometryCompleteAction {
     return Collections.unmodifiableSet(this.userReadOnlyFieldNames);
   }
 
+  public String getWhere() {
+    return this.query.getWhere();
+  }
+
+  public Condition getWhereCondition() {
+    return this.query.getWhereCondition();
+  }
+
   public boolean hasGeometryAttribute() {
     return getRecordDefinition().getGeometryAttribute() != null;
   }
@@ -1470,24 +1516,24 @@ RecordFactory, AddGeometryCompleteAction {
       return saved;
     } catch (final Throwable e) {
       ExceptionUtil.log(getClass(), "Unable to save changes for record:\n"
-          + record, e);
+        + record, e);
       return false;
     }
   }
 
   public boolean isCanAddRecords() {
     return !super.isReadOnly() && isEditable() && this.canAddRecords
-        && hasPermission("INSERT");
+      && hasPermission("INSERT");
   }
 
   public boolean isCanDeleteRecords() {
     return !super.isReadOnly() && isEditable() && this.canDeleteRecords
-        && hasPermission("DELETE");
+      && hasPermission("DELETE");
   }
 
   public boolean isCanEditRecords() {
     return !super.isReadOnly() && isEditable() && this.canEditRecords
-        && hasPermission("UPDATE");
+      && hasPermission("UPDATE");
   }
 
   public boolean isCanMergeRecords() {
@@ -1499,7 +1545,7 @@ RecordFactory, AddGeometryCompleteAction {
             if (getMergeableSelectedRecords().size() > 1) {
               return true;
             }
-          } // TODO allow merging other type
+          }
         }
       }
     }
@@ -1508,7 +1554,7 @@ RecordFactory, AddGeometryCompleteAction {
 
   public boolean isCanPaste() {
     return ClipboardUtil.isDataFlavorAvailable(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR)
-        || ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor);
+      || ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor);
   }
 
   @Override
@@ -1595,7 +1641,7 @@ RecordFactory, AddGeometryCompleteAction {
 
   protected boolean isPostSaveRemoveCacheId(final Label cacheId) {
     if (cacheId == this.cacheIdDeleted || cacheId == this.cacheIdNew
-        || cacheId == this.cacheIdModified) {
+      || cacheId == this.cacheIdModified) {
       return true;
     } else {
       return false;
@@ -1694,10 +1740,10 @@ RecordFactory, AddGeometryCompleteAction {
           geometryDataType = geometryAttribute.getType();
           layerGeometryClass = geometryDataType.getJavaClass();
         }
-        Collection<String> ignorePasteFields = getIgnorePasteFields();
+        final Collection<String> ignorePasteFields = getIgnorePasteFields();
         for (final Record sourceRecord : reader) {
           final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-              sourceRecord);
+            sourceRecord);
 
           Geometry sourceGeometry = sourceRecord.getGeometryValue();
           for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator.hasNext();) {
@@ -1746,14 +1792,6 @@ RecordFactory, AddGeometryCompleteAction {
     firePropertyChange("recordsInserted", null, newRecords);
     addSelectedRecords(newRecords);
     return newRecords;
-  }
-
-  protected Collection<String> getIgnorePasteFields() {
-    Collection<String> ignorePasteFields = getProperty("ignorePasteFields");
-    if (ignorePasteFields == null) {
-      ignorePasteFields = Collections.emptySet();
-    }
-    return ignorePasteFields;
   }
 
   protected void postSaveChanges(final RecordState originalState,
@@ -1970,7 +2008,7 @@ RecordFactory, AddGeometryCompleteAction {
     synchronized (getSync()) {
       if (isLayerRecord(record)) {
         for (final Label cacheId : new ArrayList<>(
-            this.cacheIdToRecordMap.keySet())) {
+          this.cacheIdToRecordMap.keySet())) {
           removed |= removeRecordFromCache(cacheId, record);
         }
       }
@@ -2029,7 +2067,7 @@ RecordFactory, AddGeometryCompleteAction {
           saved &= doSaveChanges();
         } catch (final Throwable e) {
           ExceptionUtil.log(getClass(), "Unable to save changes for layer: "
-              + this, e);
+            + this, e);
           saved = false;
         } finally {
           setEventsEnabled(eventsEnabled);
@@ -2040,9 +2078,9 @@ RecordFactory, AddGeometryCompleteAction {
       if (!saved) {
         JOptionPane.showMessageDialog(MapPanel.get(this),
           "<html><p>There was an error saving changes for one or more records.</p>"
-              + "<p>" + getPath() + "</p>"
-              + "<p>Check the logging panel for details.</html>",
-              "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
+            + "<p>" + getPath() + "</p>"
+            + "<p>Check the logging panel for details.</html>",
+          "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
       }
       return saved;
     }
@@ -2060,9 +2098,9 @@ RecordFactory, AddGeometryCompleteAction {
         if (!saved) {
           JOptionPane.showMessageDialog(MapPanel.get(this),
             "<html><p>There was an error saving changes to the record.</p>"
-                + "<p>" + getPath() + "</p>"
-                + "<p>Check the logging panel for details.</html>",
-                "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
+              + "<p>" + getPath() + "</p>"
+              + "<p>Check the logging panel for details.</html>",
+            "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
         }
         return saved;
       } finally {
@@ -2212,19 +2250,14 @@ RecordFactory, AddGeometryCompleteAction {
     }
   }
 
-  public void setQuery(final Query query) {
-    final Query oldValue = this.query;
+  public void setQuery(Query query) {
+    final Query oldQuery = this.query;
     if (query == null) {
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      if (recordDefinition == null) {
-        this.query = null;
-      } else {
-        this.query = new Query(recordDefinition);
-      }
-    } else {
-      this.query = query;
+      query = this.query.clone();
+      query.setWhereCondition(query.getWhereCondition());
     }
-    firePropertyChange("query", oldValue, this.query);
+    this.query = query;
+    firePropertyChange("query", oldQuery, this.query);
   }
 
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
@@ -2245,9 +2278,7 @@ RecordFactory, AddGeometryCompleteAction {
       } else {
         this.fieldNamesSets.put(ALL, this.fieldNames);
       }
-      if (this.query == null) {
-        setQuery(null);
-      }
+      this.query.setRecordDefinition(recordDefinition);
     }
   }
 
@@ -2329,7 +2360,19 @@ RecordFactory, AddGeometryCompleteAction {
   public void setUserReadOnlyFieldNames(
     final Collection<String> userReadOnlyFieldNames) {
     this.userReadOnlyFieldNames = new LinkedHashSet<String>(
-        userReadOnlyFieldNames);
+      userReadOnlyFieldNames);
+  }
+
+  public void setWhere(final String where) {
+    final Query query = this.query.clone();
+    query.setWhere(where);
+    setQuery(query);
+  }
+
+  public void setWhereCondition(final Condition whereCondition) {
+    final Query query = this.query.clone();
+    query.setWhereCondition(whereCondition);
+    setQuery(query);
   }
 
   public LayerRecord showAddForm(final Map<String, Object> parameters) {
@@ -2346,7 +2389,7 @@ RecordFactory, AddGeometryCompleteAction {
       final Window window = SwingUtil.getActiveWindow();
       JOptionPane.showMessageDialog(window,
         "Adding records is not enabled for the " + getPath()
-        + " layer. If possible make the layer editable", "Cannot Add Record",
+          + " layer. If possible make the layer editable", "Cannot Add Record",
         JOptionPane.ERROR_MESSAGE);
       return null;
     }
@@ -2471,8 +2514,8 @@ RecordFactory, AddGeometryCompleteAction {
                 final boolean visible = dockable.isVisible();
                 if (!visible) {
                   dockable.getControl()
-                  .getOwner()
-                  .remove((SingleCDockable)dockable);
+                    .getOwner()
+                    .remove((SingleCDockable)dockable);
                   setProperty("TableView", null);
                 }
               }
@@ -2651,9 +2694,9 @@ RecordFactory, AddGeometryCompleteAction {
       final Project project = getProject();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()
-          .convert(geometryFactory)
-          .expandPercent(0.1)
-          .clipToCoordinateSystem();
+        .convert(geometryFactory)
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
 
       project.setViewBoundingBox(boundingBox);
     }

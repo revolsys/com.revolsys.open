@@ -11,22 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
 import com.revolsys.swing.action.InvokeMethodAction;
 
 public class WindowManager implements WindowFocusListener {
-
-  private static final JMenu menu = new JMenu("Window");
-
-  private static final List<Window> windows = new ArrayList<Window>();
-
-  private static final Map<Window, JCheckBoxMenuItem> windowMenuItemMap = new HashMap<Window, JCheckBoxMenuItem>();
-
-  private static final WindowManager INSTANCE = new WindowManager();
-
-  private static Window currentWindow;
 
   public static void addMenu(final JMenuBar menuBar) {
     menuBar.add(menu);
@@ -46,12 +37,12 @@ public class WindowManager implements WindowFocusListener {
         title = window.getName();
       }
       final JCheckBoxMenuItem menuItem = InvokeMethodAction.createCheckBoxMenuItem(
-        title, window, "requestFocusInWindow");
+        title, WindowManager.class, "requestFocus", window);
       menuItem.setSelected(true);
       menu.add(menuItem);
       windowMenuItemMap.put(window, menuItem);
       window.addWindowFocusListener(INSTANCE);
-      window.requestFocusInWindow();
+      window.requestFocus();
     }
   }
 
@@ -66,13 +57,41 @@ public class WindowManager implements WindowFocusListener {
     }
   }
 
+  public static void requestFocus(final Window window) {
+    if (window != null) {
+      window.requestFocus();
+      final JCheckBoxMenuItem menuItem = windowMenuItemMap.get(window);
+      if (menuItem != null) {
+        menuItem.setSelected(true);
+      }
+    }
+  }
+
+  private static final JMenu menu = new JMenu("Window");
+
+  private static final List<Window> windows = new ArrayList<>();
+
+  private static final Map<Window, JCheckBoxMenuItem> windowMenuItemMap = new HashMap<Window, JCheckBoxMenuItem>();
+
+  private static final WindowManager INSTANCE = new WindowManager();
+
+  private static Window currentWindow;
+
   private WindowManager() {
-    // menu.addSeparator();
   }
 
   @Override
   public void windowGainedFocus(final WindowEvent e) {
     final Window window = e.getWindow();
+    if (window instanceof JFrame) {
+      final JFrame frame = (JFrame)window;
+      JMenuBar menuBar = frame.getJMenuBar();
+      if (menuBar == null) {
+        menuBar = new JMenuBar();
+        frame.setJMenuBar(menuBar);
+      }
+      addMenu(menuBar);
+    }
     final JCheckBoxMenuItem menuItem = windowMenuItemMap.get(window);
     if (menuItem != null) {
       menuItem.setSelected(true);
@@ -83,6 +102,7 @@ public class WindowManager implements WindowFocusListener {
   @Override
   public void windowLostFocus(final WindowEvent e) {
     final Window window = e.getWindow();
+
     final JCheckBoxMenuItem menuItem = windowMenuItemMap.get(window);
     if (menuItem != null) {
       menuItem.setSelected(false);

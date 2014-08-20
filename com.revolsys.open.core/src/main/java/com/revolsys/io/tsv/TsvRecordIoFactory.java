@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractRecordIoFactory;
+import com.revolsys.data.io.AbstractRecordAndGeometryIoFactory;
 import com.revolsys.data.io.RecordIteratorReader;
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
@@ -16,9 +16,9 @@ import com.revolsys.io.Writer;
 import com.revolsys.io.csv.CsvRecordIterator;
 import com.revolsys.io.csv.CsvRecordWriter;
 
-public class TsvRecordIoFactory extends AbstractRecordIoFactory {
+public class TsvRecordIoFactory extends AbstractRecordAndGeometryIoFactory {
   public TsvRecordIoFactory() {
-    super(TsvConstants.DESCRIPTION, false, true, true);
+    super(TsvConstants.DESCRIPTION, false, true);
     addMediaTypeAndFileExtension(TsvConstants.MEDIA_TYPE,
       TsvConstants.FILE_EXTENSION);
   }

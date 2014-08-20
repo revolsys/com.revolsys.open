@@ -1,4 +1,4 @@
-package com.revolsys.data.io;
+package com.revolsys.io.zip;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,6 +6,9 @@ import java.io.IOException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.data.io.DelegatingReader;
+import com.revolsys.data.io.RecordIoFactories;
+import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
