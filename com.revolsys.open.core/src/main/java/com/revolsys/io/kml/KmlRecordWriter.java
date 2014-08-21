@@ -115,7 +115,7 @@ Kml22Constants {
     }
     if (name == null && idIndex != -1) {
       final Object id = object.getValue(idIndex);
-      final String typeName = recordDefinition.getTypeName();
+      final String typeName = recordDefinition.getName();
       name = typeName + " " + id;
     }
     if (name != null) {

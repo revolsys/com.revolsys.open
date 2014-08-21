@@ -2,8 +2,6 @@ package com.revolsys.data.record.schema;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,8 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.WeakCache;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.io.RecordStore;
-import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
@@ -30,8 +26,6 @@ import com.revolsys.data.record.property.AttributeProperties;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
 import com.revolsys.data.record.property.ValueMetaDataProperty;
 import com.revolsys.data.types.DataType;
-import com.revolsys.io.AbstractObjectWithProperties;
-import com.revolsys.io.PathUtil;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
@@ -42,8 +36,8 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 
-public class RecordDefinitionImpl extends AbstractObjectWithProperties implements
-RecordDefinition, Cloneable {
+public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
+implements RecordDefinition {
   public static RecordDefinitionImpl create(final Map<String, Object> properties) {
     return new RecordDefinitionImpl(properties);
   }
@@ -63,8 +57,8 @@ RecordDefinition, Cloneable {
   private static final Map<Integer, RecordDefinitionImpl> METADATA_CACHE = new WeakCache<Integer, RecordDefinitionImpl>();
 
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "dataRecordDefinition", "Data Record Definition", RecordDefinitionImpl.class,
-      "create");
+    "dataRecordDefinition", "Data Record Definition",
+    RecordDefinitionImpl.class, "create");
 
   private final Map<String, Integer> attributeIdMap = new HashMap<String, Integer>();
 
@@ -79,8 +73,6 @@ RecordDefinition, Cloneable {
   private RecordFactory recordFactory = new ArrayRecordFactory();
 
   private RecordDefinitionFactory recordDefinitionFactory;
-
-  private Reference<RecordStore> recordStore;
 
   private Map<String, Object> defaultValues = new HashMap<String, Object>();
 
@@ -102,36 +94,13 @@ RecordDefinition, Cloneable {
 
   private final Integer instanceId = INSTANCE_IDS.getAndIncrement();
 
-  /** The path of the data type. */
-  private String path;
-
   private final Map<String, Collection<Object>> restrictions = new HashMap<String, Collection<Object>>();
-
-  private RecordStoreSchema schema;
 
   private final List<RecordDefinition> superClasses = new ArrayList<RecordDefinition>();
 
   private String description;
 
   public RecordDefinitionImpl() {
-  }
-
-  public RecordDefinitionImpl(final RecordStore recordStore,
-    final RecordStoreSchema schema, final RecordDefinition recordDefinition) {
-    this(recordDefinition);
-    this.recordStore = new WeakReference<RecordStore>(recordStore);
-    this.recordFactory = recordStore.getRecordFactory();
-    this.schema = schema;
-    METADATA_CACHE.put(this.instanceId, this);
-  }
-
-  public RecordDefinitionImpl(final RecordStore recordStore,
-    final RecordStoreSchema schema, final String typePath) {
-    this(typePath);
-    this.recordStore = new WeakReference<RecordStore>(recordStore);
-    this.recordFactory = recordStore.getRecordFactory();
-    this.schema = schema;
-    METADATA_CACHE.put(this.instanceId, this);
   }
 
   @SuppressWarnings("unchecked")
@@ -156,32 +125,62 @@ RecordDefinition, Cloneable {
   }
 
   public RecordDefinitionImpl(final RecordDefinition recordDefinition) {
-    this(recordDefinition.getPath(), recordDefinition.getProperties(), recordDefinition.getAttributes());
+    this(recordDefinition.getPath(), recordDefinition.getProperties(),
+      recordDefinition.getAttributes());
     setIdAttributeIndex(recordDefinition.getIdAttributeIndex());
     METADATA_CACHE.put(this.instanceId, this);
   }
 
-  public RecordDefinitionImpl(final String name) {
-    this.path = name;
+  public RecordDefinitionImpl(final RecordStoreSchema schema,
+    final RecordDefinition recordDefinition) {
+    this(schema, recordDefinition.getPath());
+    for (final Attribute attribute : recordDefinition.getAttributes()) {
+      addAttribute(attribute.clone());
+    }
+    cloneProperties(recordDefinition.getProperties());
+  }
+
+  public RecordDefinitionImpl(final RecordStoreSchema schema, final String path) {
+    super(schema, path);
+    final RecordStore recordStore = getRecordStore();
+    if (recordStore != null) {
+      this.recordFactory = recordStore.getRecordFactory();
+    }
     METADATA_CACHE.put(this.instanceId, this);
   }
 
-  public RecordDefinitionImpl(final String name, final Attribute... attributes) {
-    this(name, null, attributes);
-  }
-
-  public RecordDefinitionImpl(final String name, final List<Attribute> attributes) {
-    this(name, null, attributes);
-  }
-
-  public RecordDefinitionImpl(final String name, final Map<String, Object> properties,
-    final Attribute... attributes) {
-    this(name, properties, Arrays.asList(attributes));
-  }
-
-  public RecordDefinitionImpl(final String name, final Map<String, Object> properties,
+  public RecordDefinitionImpl(final RecordStoreSchema schema,
+    final String path, final Map<String, Object> properties,
     final List<Attribute> attributes) {
-    this.path = name;
+    this(schema, path);
+    for (final Attribute attribute : attributes) {
+      addAttribute(attribute.clone());
+    }
+    cloneProperties(properties);
+  }
+
+  public RecordDefinitionImpl(final String path) {
+    super(path);
+    METADATA_CACHE.put(this.instanceId, this);
+  }
+
+  public RecordDefinitionImpl(final String path, final Attribute... attributes) {
+    this(path, null, attributes);
+  }
+
+  public RecordDefinitionImpl(final String path,
+    final List<Attribute> attributes) {
+    this(path, null, attributes);
+  }
+
+  public RecordDefinitionImpl(final String path,
+    final Map<String, Object> properties, final Attribute... attributes) {
+    this(path, properties, Arrays.asList(attributes));
+  }
+
+  public RecordDefinitionImpl(final String path,
+    final Map<String, Object> properties, final List<Attribute> attributes) {
+    super(path);
     for (final Attribute attribute : attributes) {
       addAttribute(attribute.clone());
     }
@@ -271,15 +270,6 @@ RecordDefinition, Cloneable {
     }
   }
 
-  @Override
-  public RecordDefinitionImpl clone() {
-    final RecordDefinitionImpl clone = new RecordDefinitionImpl(this.path, getProperties(),
-      this.attributes);
-    clone.setIdAttributeIndex(this.idAttributeIndex);
-    clone.setProperties(getProperties());
-    return clone;
-  }
-
   public void cloneProperties(final Map<String, Object> properties) {
     if (properties != null) {
       for (final Entry<String, Object> property : properties.entrySet()) {
@@ -293,20 +283,6 @@ RecordDefinition, Cloneable {
           setProperty(propertyName, property);
         }
       }
-    }
-  }
-
-  @Override
-  public int compareTo(final RecordDefinition other) {
-    final String otherPath = other.getPath();
-    if (otherPath == this.path) {
-      return 0;
-    } else if (this.path == null) {
-      return 1;
-    } else if (otherPath == null) {
-      return -1;
-    } else {
-      return this.path.compareTo(otherPath);
     }
   }
 
@@ -342,20 +318,13 @@ RecordDefinition, Cloneable {
     this.codeTableByColumnMap.clear();
     this.recordFactory = null;
     this.recordDefinitionFactory = new RecordDefinitionFactoryImpl();
-    this.recordStore = null;
     this.defaultValues.clear();
     this.description = "";
     this.geometryAttributeIndex = -1;
     this.geometryAttributeIndexes.clear();
     this.geometryAttributeNames.clear();
     this.restrictions.clear();
-    this.schema = new RecordStoreSchema();
     this.superClasses.clear();
-  }
-
-  @Override
-  public boolean equals(final Object other) {
-    return other == this;
   }
 
   @Override
@@ -505,30 +474,6 @@ RecordDefinition, Cloneable {
   }
 
   @Override
-  public RecordFactory getRecordFactory() {
-    return this.recordFactory;
-  }
-
-  @Override
-  public RecordDefinitionFactory getRecordDefinitionFactory() {
-    if (this.recordDefinitionFactory == null) {
-      final RecordStore recordStore = getRecordStore();
-      return recordStore;
-    } else {
-      return this.recordDefinitionFactory;
-    }
-  }
-
-  @Override
-  public RecordStore getRecordStore() {
-    if (this.recordStore == null) {
-      return null;
-    } else {
-      return this.recordStore.get();
-    }
-  }
-
-  @Override
   public Object getDefaultValue(final String attributeName) {
     return this.defaultValues.get(attributeName);
   }
@@ -622,36 +567,28 @@ RecordDefinition, Cloneable {
   }
 
   @Override
-  public String getPath() {
-    return this.path;
+  public RecordDefinitionFactory getRecordDefinitionFactory() {
+    if (this.recordDefinitionFactory == null) {
+      final RecordStore recordStore = getRecordStore();
+      return recordStore;
+    } else {
+      return this.recordDefinitionFactory;
+    }
+  }
+
+  @Override
+  public RecordFactory getRecordFactory() {
+    return this.recordFactory;
   }
 
   public Map<String, Collection<Object>> getRestrictions() {
     return this.restrictions;
   }
 
-  public RecordStoreSchema getSchema() {
-    return this.schema;
-  }
-
-  @Override
-  public String getTypeName() {
-    return PathUtil.getName(this.path);
-  }
-
   @Override
   public boolean hasAttribute(final CharSequence name) {
     final String lowerName = name.toString().toLowerCase();
     return this.attributeMap.containsKey(lowerName);
-  }
-
-  @Override
-  public int hashCode() {
-    if (this.path == null) {
-      return super.hashCode();
-    } else {
-      return this.path.hashCode();
-    }
   }
 
   @Override
@@ -688,6 +625,14 @@ RecordDefinition, Cloneable {
     METADATA_CACHE.put(this.instanceId, this);
   }
 
+  public RecordDefinitionImpl rename(final String path) {
+    final RecordDefinitionImpl clone = new RecordDefinitionImpl(path,
+      getProperties(), this.attributes);
+    clone.setIdAttributeIndex(this.idAttributeIndex);
+    clone.setProperties(getProperties());
+    return clone;
+  }
+
   public void replaceAttribute(final Attribute attribute,
     final Attribute newAttribute) {
     final String name = attribute.getName();
@@ -706,11 +651,6 @@ RecordDefinition, Cloneable {
   public void setCodeTableByColumnMap(
     final Map<String, CodeTable> codeTableByColumnMap) {
     this.codeTableByColumnMap = codeTableByColumnMap;
-  }
-
-  public void setRecordDefinitionFactory(
-    final RecordDefinitionFactory recordDefinitionFactory) {
-    this.recordDefinitionFactory = recordDefinitionFactory;
   }
 
   @Override
@@ -791,11 +731,6 @@ RecordDefinition, Cloneable {
   }
 
   @Override
-  public void setName(final String path) {
-    this.path = path;
-  }
-
-  @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     if (properties != null) {
       for (final Entry<String, ? extends Object> entry : properties.entrySet()) {
@@ -819,6 +754,11 @@ RecordDefinition, Cloneable {
 
   }
 
+  public void setRecordDefinitionFactory(
+    final RecordDefinitionFactory recordDefinitionFactory) {
+    this.recordDefinitionFactory = recordDefinitionFactory;
+  }
+
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
@@ -832,8 +772,4 @@ RecordDefinition, Cloneable {
     return map;
   }
 
-  @Override
-  public String toString() {
-    return this.path.toString();
-  }
 }

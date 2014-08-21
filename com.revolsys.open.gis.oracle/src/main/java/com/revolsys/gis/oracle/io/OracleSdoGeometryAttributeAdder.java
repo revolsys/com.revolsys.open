@@ -16,10 +16,10 @@ import oracle.sql.STRUCT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.record.property.AttributeProperties;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.PathUtil;

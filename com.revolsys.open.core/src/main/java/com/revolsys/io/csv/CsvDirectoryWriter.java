@@ -73,7 +73,7 @@ public class CsvDirectoryWriter extends AbstractRecordWriter {
         this.writers.put(recordDefinition, writer);
         this.recordDefinitionMap.put(path, recordDefinition);
         final File vrtFile = new File(this.directory, path.toString() + ".vrt");
-        final String typeName = recordDefinition.getTypeName();
+        final String typeName = recordDefinition.getName();
         OgrVrtWriter.write(vrtFile, recordDefinition, typeName + ".csv");
 
       } catch (final IOException e) {

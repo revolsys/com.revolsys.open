@@ -11,6 +11,7 @@ import org.springframework.core.io.Resource;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
 import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.Reader;

@@ -120,7 +120,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
     }
     QName qualifiedName = this.recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (qualifiedName == null) {
-      qualifiedName = new QName(this.recordDefinition.getTypeName());
+      qualifiedName = new QName(this.recordDefinition.getName());
     }
 
     this.out.startTag(qualifiedName);

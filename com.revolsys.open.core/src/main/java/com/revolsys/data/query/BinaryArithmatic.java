@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.RecordStore;
+import com.revolsys.data.record.schema.RecordStore;
 
 public abstract class BinaryArithmatic extends QueryValue {
 

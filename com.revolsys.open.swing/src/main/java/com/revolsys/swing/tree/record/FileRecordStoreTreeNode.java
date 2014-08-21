@@ -3,7 +3,6 @@ package com.revolsys.swing.tree.record;
 import java.awt.TextField;
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +13,9 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.tree.TreeNode;
 
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.RecordStoreConnectionMapProxy;
 import com.revolsys.data.io.RecordStoreProxy;
-import com.revolsys.data.io.RecordStoreSchema;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.datastore.RecordStoreConnectionManager;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
@@ -97,16 +95,9 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
 
   @Override
   protected List<TreeNode> doLoadChildren() {
-    final List<TreeNode> children = new ArrayList<TreeNode>();
     final RecordStore recordStore = getRecordStore();
-    for (final RecordStoreSchema schema : recordStore.getSchemas()) {
-      final String schemaPath = schema.getPath();
-
-      final RecordStoreSchemaTreeNode schemaNode = new RecordStoreSchemaTreeNode(
-        this, schemaPath);
-      children.add(schemaNode);
-    }
-    return children;
+    return RecordStoreConnectionTreeNode.getChildren(this,
+      getRecordStoreConnectionMap(), recordStore);
   }
 
   @Override

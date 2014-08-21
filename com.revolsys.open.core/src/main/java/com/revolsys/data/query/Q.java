@@ -6,9 +6,9 @@ import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public class Q {

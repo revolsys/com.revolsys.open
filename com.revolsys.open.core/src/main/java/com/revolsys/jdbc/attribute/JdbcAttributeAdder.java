@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
 
 public class JdbcAttributeAdder {

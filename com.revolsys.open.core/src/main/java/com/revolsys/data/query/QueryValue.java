@@ -36,13 +36,13 @@ import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.functions.EnvelopeIntersects;
 import com.revolsys.data.query.functions.Function;
 import com.revolsys.data.query.functions.GetMapValue;
 import com.revolsys.data.query.functions.WithinDistance;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.ExceptionUtil;
@@ -117,7 +117,7 @@ public abstract class QueryValue implements Cloneable {
       try {
         final SQLParser sqlParser = new SQLParser();
         final StatementNode statement = sqlParser.parseStatement("SELECT * FROM "
-            + recordDefinition.getTypeName() + " WHERE " + whereClause);
+            + recordDefinition.getName() + " WHERE " + whereClause);
         if (statement instanceof CursorNode) {
           final CursorNode selectStatement = (CursorNode)statement;
           final ResultSetNode resultSetNode = selectStatement.getResultSetNode();

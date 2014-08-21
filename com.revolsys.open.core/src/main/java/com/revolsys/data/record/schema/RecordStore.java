@@ -1,4 +1,4 @@
-package com.revolsys.data.io;
+package com.revolsys.data.record.schema;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,18 +13,16 @@ import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 
-public interface RecordStore extends RecordDefinitionFactory,
-AutoCloseable {
+public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
   void addCodeTable(CodeTable codeTable);
 
   void addCodeTables(Collection<CodeTable> codeTables);
@@ -57,9 +55,9 @@ AutoCloseable {
 
   Writer<Record> createWriter();
 
-  void delete(Record object);
-
   int delete(Query query);
+
+  void delete(Record object);
 
   void deleteAll(Collection<Record> objects);
 
@@ -69,7 +67,7 @@ AutoCloseable {
 
   Map<String, CodeTable> getCodeTableByColumnMap();
 
-  RecordFactory getRecordFactory();
+  GeometryFactory getGeometryFactory();
 
   String getLabel();
 
@@ -83,6 +81,10 @@ AutoCloseable {
    */
   @Override
   RecordDefinition getRecordDefinition(String typePath);
+
+  RecordFactory getRecordFactory();
+
+  RecordStoreSchema getRootSchema();
 
   int getRowCount(Query query);
 
@@ -129,9 +131,9 @@ AutoCloseable {
 
   boolean isEditable(String typePath);
 
-  Record load(String typePath, Object... id);
-
   Record load(String typePath, Identifier id);
+
+  Record load(String typePath, Object... id);
 
   Record lock(String typePath, Object id);
 
@@ -145,11 +147,11 @@ AutoCloseable {
 
   Record queryFirst(Query query);
 
-  void setRecordFactory(RecordFactory recordFactory);
-
   void setLabel(String label);
 
   void setLogCounts(boolean logCounts);
+
+  void setRecordFactory(RecordFactory recordFactory);
 
   void update(Record object);
 

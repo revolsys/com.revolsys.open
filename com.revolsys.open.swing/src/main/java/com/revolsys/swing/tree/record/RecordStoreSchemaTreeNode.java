@@ -1,6 +1,5 @@
 package com.revolsys.swing.tree.record;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -8,12 +7,10 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.tree.TreeNode;
 
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.RecordStoreConnectionMapProxy;
 import com.revolsys.data.io.RecordStoreProxy;
-import com.revolsys.data.io.RecordStoreSchema;
-import com.revolsys.data.record.schema.Attribute;
-import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.PathUtil;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
@@ -24,11 +21,14 @@ RecordStoreConnectionMapProxy {
 
   public static final ImageIcon ICON_SCHEMA = SilkIconLoader.getIcon("folder_table");
 
+  private final Map<String, Object> connectionMap;
+
   private final String schemaPath;
 
   public RecordStoreSchemaTreeNode(final TreeNode parent,
-    final String schemaPath) {
+    final Map<String, Object> connectionMap, final String schemaPath) {
     super(parent, schemaPath);
+    this.connectionMap = connectionMap;
     setType("Data Store RecordDefinition");
     setAllowsChildren(true);
     setIcon(ICON_SCHEMA);
@@ -43,25 +43,9 @@ RecordStoreConnectionMapProxy {
 
   @Override
   protected List<TreeNode> doLoadChildren() {
-    final List<TreeNode> children = new ArrayList<TreeNode>();
-    final RecordStore recordStore = getRecordStore();
-    if (recordStore != null) {
-      final RecordStoreSchema schema = recordStore.getSchema(this.schemaPath);
-      if (schema != null) {
-        for (final RecordDefinition recordDefinition : schema.getTypes()) {
-          final String typeName = recordDefinition.getPath();
-          String geometryType = null;
-          final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-          if (geometryAttribute != null) {
-            geometryType = geometryAttribute.getType().toString();
-          }
-          final RecordStoreTableTreeNode tableNode = new RecordStoreTableTreeNode(
-            this, typeName, geometryType);
-          children.add(tableNode);
-        }
-      }
-    }
-    return children;
+    final RecordStoreSchema schema = getSchema();
+    return RecordStoreConnectionTreeNode.getChildren(this, this.connectionMap,
+      schema);
   }
 
   public RecordStore getRecordStore() {
@@ -82,6 +66,16 @@ RecordStoreConnectionMapProxy {
       return proxy.getRecordStoreConnectionMap();
     } else {
       return Collections.emptyMap();
+    }
+  }
+
+  public RecordStoreSchema getSchema() {
+    final RecordStore recordStore = getRecordStore();
+    if (recordStore == null) {
+      return null;
+    } else {
+      final RecordStoreSchema schema = recordStore.getSchema(this.schemaPath);
+      return schema;
     }
   }
 

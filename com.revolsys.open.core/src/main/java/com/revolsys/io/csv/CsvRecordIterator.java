@@ -18,6 +18,7 @@ import com.revolsys.data.record.property.AttributeProperties;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.FileUtil;
@@ -114,6 +115,7 @@ RecordIterator {
       geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
         this.geometryFactory);
     }
+    final RecordStoreSchema schema = getProperty("schema");
     String typePath = getProperty("typePath");
     if (!Property.hasValue(typePath)) {
       typePath = "/" + FileUtil.getBaseName(this.resource.getFilename());
@@ -125,8 +127,8 @@ RecordIterator {
         typePath = schemaPath + typePath;
       }
     }
-    this.recordDefinition = new RecordDefinitionImpl(typePath, getProperties(),
-      attributes);
+    this.recordDefinition = new RecordDefinitionImpl(schema, typePath,
+      getProperties(), attributes);
   }
 
   /**

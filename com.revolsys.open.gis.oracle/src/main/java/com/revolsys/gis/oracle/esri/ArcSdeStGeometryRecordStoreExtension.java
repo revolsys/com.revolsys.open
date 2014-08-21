@@ -8,10 +8,10 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.RecordStoreExtension;
-import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.gis.oracle.io.OracleRecordStore;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
@@ -137,7 +137,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements
   @Override
   public void postProcess(final RecordStoreSchema schema) {
     final String schemaName = schema.getName();
-    for (final RecordDefinition recordDefinition : schema.getTypes()) {
+    for (final RecordDefinition recordDefinition : schema.getRecordDefinitions()) {
       final String typePath = recordDefinition.getPath();
       final Integer registrationId = JdbcAttributeAdder.getTableProperty(
         schema, typePath, ArcSdeConstants.REGISTRATION_ID);

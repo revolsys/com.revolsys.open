@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.jts.geom.BoundingBox;
 
 public class RecordStoreCache {

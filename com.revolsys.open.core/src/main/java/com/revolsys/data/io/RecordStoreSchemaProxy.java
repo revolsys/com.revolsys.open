@@ -1,26 +1,27 @@
 package com.revolsys.data.io;
 
+import com.revolsys.data.record.schema.AbstractRecordStore;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
+import com.revolsys.data.record.schema.RecordStoreSchema;
 
 public class RecordStoreSchemaProxy extends RecordStoreSchema {
   private final RecordStoreSchema schema;
 
-  public RecordStoreSchemaProxy(
-    final AbstractRecordStore recordStore, final String name,
+  public RecordStoreSchemaProxy(final String path,
     final RecordStoreSchema schema) {
-    super(recordStore, name);
+    super((AbstractRecordStore)schema.getRecordStore(), path);
     this.schema = schema;
   }
 
   @Override
-  public synchronized RecordDefinition findMetaData(final String typePath) {
-    RecordDefinition recordDefinition = super.findMetaData(typePath);
+  public synchronized RecordDefinition findRecordDefinition(
+    final String typePath) {
+    RecordDefinition recordDefinition = super.findRecordDefinition(typePath);
     if (recordDefinition == null) {
-      recordDefinition = schema.findMetaData(typePath);
+      recordDefinition = this.schema.findRecordDefinition(typePath);
       if (recordDefinition != null) {
-        recordDefinition = new RecordDefinitionImpl(getRecordStore(), this,
-          recordDefinition);
+        recordDefinition = new RecordDefinitionImpl(this, recordDefinition);
         addMetaData(typePath, recordDefinition);
       }
     }
@@ -29,12 +30,11 @@ public class RecordStoreSchemaProxy extends RecordStoreSchema {
 
   @Override
   public synchronized RecordDefinition getRecordDefinition(final String typePath) {
-    RecordDefinition recordDefinition = findMetaData(typePath);
+    RecordDefinition recordDefinition = findRecordDefinition(typePath);
     if (recordDefinition == null) {
-      recordDefinition = schema.getRecordDefinition(typePath);
+      recordDefinition = this.schema.getRecordDefinition(typePath);
       if (recordDefinition != null) {
-        recordDefinition = new RecordDefinitionImpl(getRecordStore(), this,
-          recordDefinition);
+        recordDefinition = new RecordDefinitionImpl(this, recordDefinition);
         addMetaData(typePath, recordDefinition);
       }
     }

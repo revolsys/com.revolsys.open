@@ -5,10 +5,10 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.parallel.process.AbstractProcess;

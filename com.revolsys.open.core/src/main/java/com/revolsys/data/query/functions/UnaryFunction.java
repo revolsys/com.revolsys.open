@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.record.schema.RecordStore;
 
 public abstract class UnaryFunction extends QueryValue {
 

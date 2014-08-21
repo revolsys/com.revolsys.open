@@ -57,7 +57,6 @@ import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.io.ListRecordReader;
 import com.revolsys.data.io.RecordIoFactories;
 import com.revolsys.data.io.RecordReader;
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.ArrayRecord;
@@ -67,6 +66,7 @@ import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.filter.Filter;
@@ -311,7 +311,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public AbstractRecordLayer(final RecordDefinition recordDefinition) {
-    this(recordDefinition.getTypeName());
+    this(recordDefinition.getName());
     setRecordDefinition(recordDefinition);
   }
 

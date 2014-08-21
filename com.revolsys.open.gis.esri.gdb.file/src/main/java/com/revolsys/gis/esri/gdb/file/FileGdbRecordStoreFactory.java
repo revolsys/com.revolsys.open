@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.RecordStoreFactory;
 import com.revolsys.data.io.RecordStoreFactoryRegistry;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.CollectionUtil;
 

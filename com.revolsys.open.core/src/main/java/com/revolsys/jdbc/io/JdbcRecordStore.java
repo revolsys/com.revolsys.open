@@ -5,9 +5,9 @@ import java.sql.ResultSetMetaData;
 
 import javax.sql.DataSource;
 
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.RecordStoreQueryReader;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.io.Statistics;
 
 public interface JdbcRecordStore extends RecordStore {

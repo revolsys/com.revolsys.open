@@ -760,7 +760,7 @@ public final class FileUtil {
   }
 
   public static List<String> getFileNames(final File directory,
-    final ExtensionFilenameFilter filter) {
+    final FilenameFilter filter) {
     final List<String> names = new ArrayList<String>();
     final File[] files = directory.listFiles(filter);
     if (files != null) {
@@ -774,13 +774,12 @@ public final class FileUtil {
 
   public static List<String> getFileNamesByExtension(final File directory,
     final String extension) {
-    final ExtensionFilenameFilter filter = new ExtensionFilenameFilter(
-      extension);
+    final FilenameFilter filter = new ExtensionFilenameFilter(extension);
     return getFileNames(directory, filter);
   }
 
   public static List<File> getFiles(final File directory,
-    final ExtensionFilenameFilter filter) {
+    final FilenameFilter filter) {
     if (directory.isDirectory()) {
       final File[] files = directory.listFiles(filter);
       if (files == null) {
@@ -994,12 +993,12 @@ public final class FileUtil {
   /** The file path separator for Windows based systems. */
   public static final char WINDOWS_FILE_SEPARATOR = '\\';
 
-  public static final ExtensionFilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
+  public static final FilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
     Arrays.asList(new String[] {
       "gif", "jpg", "png", "tif", "tiff", "bmp"
     }));
 
-  public static final ExtensionFilenameFilter VIDEO_FILENAME_FILTER = new ExtensionFilenameFilter(
+  public static final FilenameFilter VIDEO_FILENAME_FILTER = new ExtensionFilenameFilter(
     Arrays.asList(new String[] {
       "avi", "wmv", "flv", "mpg"
     }));

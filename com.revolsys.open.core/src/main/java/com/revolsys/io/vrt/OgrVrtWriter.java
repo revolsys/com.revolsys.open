@@ -25,7 +25,7 @@ public class OgrVrtWriter {
       writer.startDocument("UTF-8", "1.0");
       writer.startTag("OGRVRTDataSource");
       writer.startTag("OGRVRTLayer");
-      final String typeName = recordDefinition.getTypeName();
+      final String typeName = recordDefinition.getName();
       writer.attribute("name", typeName);
       writer.startTag("SrcDataSource");
       writer.attribute("relativeToVRT", "1");

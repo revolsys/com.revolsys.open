@@ -8,18 +8,145 @@ import com.revolsys.util.Property;
 
 public final class PathUtil {
 
-  public static String getName(String path) {
+  public static String clean(final String path) {
     if (path == null) {
       return null;
     } else {
-      path = path.replaceAll("/+", "/");
-      path = path.replaceAll("/$", "");
-
-      if (!path.startsWith("/")) {
-        path = "/" + path;
+      final StringBuilder builder = new StringBuilder(path.length());
+      boolean slash = true;
+      builder.append('/');
+      int startIndex;
+      for (startIndex = 0; startIndex < path.length(); startIndex++) {
+        final char c = path.charAt(startIndex);
+        if (!Character.isWhitespace(c)) {
+          break;
+        }
       }
-      final int index = path.lastIndexOf('/');
-      return path.substring(index + 1);
+      for (int i = startIndex; i < path.length(); i++) {
+        final char c = path.charAt(i);
+        switch (c) {
+          case '/':
+          case '\\':
+            if (!slash) {
+              builder.append('/');
+              slash = true;
+            }
+          break;
+
+          default:
+            builder.append(c);
+            slash = false;
+          break;
+        }
+
+      }
+      for (int length = builder.length(); length > 1; length = builder.length()) {
+        final char c = builder.charAt(length - 1);
+        if (c == '/' || Character.isWhitespace(c)) {
+          builder.deleteCharAt(length - 1);
+        } else {
+          break;
+        }
+      }
+      return builder.toString();
+    }
+  }
+
+  public static String cleanUpper(final String path) {
+    if (path != null) {
+      final String cleanedPath = clean(path);
+      return cleanedPath.toUpperCase();
+    } else {
+      return null;
+    }
+  }
+
+  public static String getChildName(String parentPath, String childPath) {
+    if (parentPath != null && childPath != null) {
+      parentPath = cleanUpper(parentPath);
+      childPath = clean(childPath);
+      final String upperChild = childPath.toUpperCase();
+      if (upperChild.length() > parentPath.length()) {
+        if (parentPath.length() == 1) {
+          final int nextIndex = childPath.indexOf('/', 1);
+          if (nextIndex == -1) {
+            return childPath.substring(1);
+          } else {
+            return childPath.substring(1, nextIndex);
+          }
+        } else if (childPath.charAt(parentPath.length()) == '/') {
+          if (upperChild.startsWith(parentPath)) {
+            final int nextIndex = childPath.indexOf('/',
+              parentPath.length() + 1);
+            if (nextIndex == -1) {
+              return childPath.substring(parentPath.length() + 1);
+            } else {
+              return childPath.substring(parentPath.length() + 1, nextIndex);
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  public static String getChildPath(String parentPath, String childPath) {
+    if (parentPath != null && childPath != null) {
+      parentPath = cleanUpper(parentPath);
+      childPath = clean(childPath);
+      final String upperChild = childPath.toUpperCase();
+      if (upperChild.length() > parentPath.length()) {
+        if (parentPath.length() == 1) {
+          final int nextIndex = childPath.indexOf('/', 1);
+          if (nextIndex == -1) {
+            return childPath.substring(0);
+          } else {
+            return childPath.substring(0, nextIndex);
+          }
+        } else if (childPath.charAt(parentPath.length()) == '/') {
+          if (upperChild.startsWith(parentPath)) {
+            final int nextIndex = childPath.indexOf('/',
+              parentPath.length() + 1);
+            if (nextIndex == -1) {
+              return childPath.substring(0);
+            } else {
+              return childPath.substring(0, nextIndex);
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  public static String getName(final String path) {
+    if (path == null) {
+      return null;
+    } else {
+      final StringBuilder name = new StringBuilder();
+      int startIndex = path.length();
+      while (startIndex > 0) {
+        final char c = path.charAt(startIndex - 1);
+        if (c == '/' || c == '\\' || Character.isWhitespace(c)) {
+          startIndex--;
+        } else {
+          break;
+        }
+      }
+      while (startIndex > 1) {
+        final char c = path.charAt(startIndex - 1);
+        if (c == '/' || c == '\\') {
+          break;
+        } else {
+          name.append(c);
+          startIndex--;
+        }
+      }
+      if (name.length() == 0) {
+        return "/";
+      } else {
+        return name.reverse().toString();
+      }
     }
   }
 
@@ -27,17 +154,13 @@ public final class PathUtil {
     if (path == null) {
       return null;
     } else {
-      path = path.replaceAll("/+", "/");
-      path = path.replaceAll("/$", "");
+      path = clean(path);
 
-      if (!path.startsWith("/")) {
-        path = "/" + path;
-      }
-      final int index = path.lastIndexOf('/') - 1;
-      if (index < 0) {
+      final int index = path.lastIndexOf('/');
+      if (index <= 0) {
         return "/";
       } else {
-        return path.substring(0, index + 1);
+        return path.substring(0, index);
       }
     }
   }
@@ -50,6 +173,40 @@ public final class PathUtil {
     } else {
       return Arrays.asList(path.replaceAll("^/*", "").split("/+"));
     }
+  }
+
+  public static boolean isAncestor(String parentPath, String childPath) {
+    if (parentPath != null && childPath != null) {
+      parentPath = cleanUpper(parentPath);
+      childPath = cleanUpper(childPath);
+      if (childPath.length() > parentPath.length()) {
+        if (parentPath.length() == 1
+          || childPath.charAt(parentPath.length()) == '/') {
+          if (childPath.startsWith(parentPath)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  public static boolean isParent(String parentPath, String childPath) {
+    if (parentPath != null && childPath != null) {
+      parentPath = cleanUpper(parentPath);
+      childPath = cleanUpper(childPath);
+      if (childPath.length() > parentPath.length()) {
+        if (parentPath.length() == 1
+          || childPath.charAt(parentPath.length()) == '/') {
+          if (childPath.startsWith(parentPath)) {
+            if (childPath.indexOf('/', parentPath.length() + 1) == -1) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
   }
 
   public static String toPath(final String... parts) {
@@ -67,7 +224,7 @@ public final class PathUtil {
           }
         }
       }
-      return path.toString();
+      return path.toString().replaceAll("/+", "/");
     }
   }
 

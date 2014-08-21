@@ -18,7 +18,7 @@ import oracle.jdbc.pool.OracleDataSource;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.io.RecordStore;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.jdbc.io.JdbcRecordStore;

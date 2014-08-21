@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.tree.TreeNode;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.PathUtil;
@@ -19,6 +20,20 @@ import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 import com.revolsys.util.CaseConverter;
 
 public class RecordStoreTableTreeNode extends LazyLoadTreeNode {
+
+  public static void addLayer() {
+    final RecordStoreTableTreeNode node = BaseTree.getMouseClickItem();
+    final String typePath = node.getTypePath();
+    final Map<String, Object> connection = node.getConnectionMap();
+    final Map<String, Object> layerConfig = new LinkedHashMap<String, Object>();
+    layerConfig.put("type", "recordStore");
+    layerConfig.put("name", node.getName());
+    layerConfig.put("connection", connection);
+    layerConfig.put("typePath", typePath);
+    final AbstractLayer layer = RecordStoreLayer.create(layerConfig);
+    Project.get().add(layer);
+    // TODO different layer groups?
+  }
 
   public static final ImageIcon ICON_TABLE = SilkIconLoader.getIcon("table");
 
@@ -38,25 +53,13 @@ public class RecordStoreTableTreeNode extends LazyLoadTreeNode {
 
   }
 
-  public static void addLayer() {
-    final RecordStoreTableTreeNode node = BaseTree.getMouseClickItem();
-    final String typePath = node.getTypePath();
-    final RecordStoreSchemaTreeNode schemaNode = node.getParentNode();
-    final Map<String, Object> connection = schemaNode.getRecordStoreConnectionMap();
-    final Map<String, Object> layerConfig = new LinkedHashMap<String, Object>();
-    layerConfig.put("type", "recordStore");
-    layerConfig.put("name", node.getName());
-    layerConfig.put("connection", connection);
-    layerConfig.put("typePath", typePath);
-    final AbstractLayer layer = RecordStoreLayer.create(layerConfig);
-    Project.get().add(layer);
-    // TODO different layer groups?
-  }
+  private final Map<String, Object> connectionMap;
 
-  public RecordStoreTableTreeNode(
-    final RecordStoreSchemaTreeNode parent, final String typePath,
+  public RecordStoreTableTreeNode(final TreeNode parent,
+    final Map<String, Object> connectionMap, final String typePath,
     final String geometryType) {
     super(parent, typePath);
+    this.connectionMap = connectionMap;
     if (geometryType == null) {
       setType("Data Table");
     } else {
@@ -74,6 +77,10 @@ public class RecordStoreTableTreeNode extends LazyLoadTreeNode {
       icon = ICON_TABLE;
     }
     setIcon(icon);
+  }
+
+  public Map<String, Object> getConnectionMap() {
+    return this.connectionMap;
   }
 
   @Override

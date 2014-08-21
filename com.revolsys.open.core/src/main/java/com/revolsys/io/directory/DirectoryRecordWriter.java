@@ -103,7 +103,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
   }
 
   private String getFileName(final RecordDefinition recordDefinition) {
-    return recordDefinition.getTypeName();
+    return recordDefinition.getName();
   }
 
   public String getNameSuffix() {

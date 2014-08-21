@@ -13,6 +13,7 @@ import com.revolsys.data.query.Query;
 import com.revolsys.data.query.SqlCondition;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.AbstractRecordStore;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;

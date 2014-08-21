@@ -1,7 +1,7 @@
 package com.revolsys.gis.esri.gdb.file;
 
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStore;
 
 public interface FileGdbRecordStore extends RecordStore {
 

@@ -403,7 +403,9 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
       if (simple) {
         this.whereLabel.setVisible(false);
         this.nameField.setVisible(true);
-        this.operatorField.setVisible(true);
+        if (this.operatorField != null) {
+          this.operatorField.setVisible(true);
+        }
         this.searchFieldPanel.setVisible(true);
       } else {
         String filterText = filter.toString();
@@ -502,34 +504,38 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
   }
 
   private boolean setSearchOperator(final String searchOperator) {
-    final Object currentSearchOperator = this.operatorField.getSelectedItem();
-    if (!EqualsRegistry.equal(searchOperator, currentSearchOperator)) {
-      this.operatorField.setSelectedItem(searchOperator);
-    }
-    if (this.operatorField.getSelectedIndex() < 0) {
+    if (this.operatorField == null) {
       return false;
     } else {
-      JComponent searchField = null;
-      if ("Like".equals(searchOperator)) {
-        this.codeTable = null;
-        searchField = this.searchTextField;
-      } else if ("IS NULL".equals(searchOperator)) {
-        if (!this.settingFilter) {
-          setFilter(Q.isNull(this.attribute));
-        }
-        this.codeTable = null;
-      } else if ("IS NOT NULL".equals(searchOperator)) {
-        if (!this.settingFilter) {
-          setFilter(Q.isNotNull(this.attribute));
-        }
-        this.codeTable = null;
-      } else {
-        searchField = QueryWhereConditionField.createSearchField(
-          this.attribute, this.codeTable);
+      final Object currentSearchOperator = this.operatorField.getSelectedItem();
+      if (!EqualsRegistry.equal(searchOperator, currentSearchOperator)) {
+        this.operatorField.setSelectedItem(searchOperator);
       }
+      if (this.operatorField.getSelectedIndex() < 0) {
+        return false;
+      } else {
+        JComponent searchField = null;
+        if ("Like".equals(searchOperator)) {
+          this.codeTable = null;
+          searchField = this.searchTextField;
+        } else if ("IS NULL".equals(searchOperator)) {
+          if (!this.settingFilter) {
+            setFilter(Q.isNull(this.attribute));
+          }
+          this.codeTable = null;
+        } else if ("IS NOT NULL".equals(searchOperator)) {
+          if (!this.settingFilter) {
+            setFilter(Q.isNotNull(this.attribute));
+          }
+          this.codeTable = null;
+        } else {
+          searchField = QueryWhereConditionField.createSearchField(
+            this.attribute, this.codeTable);
+        }
 
-      setSearchField(searchField);
-      return true;
+        setSearchField(searchField);
+        return true;
+      }
     }
   }
 

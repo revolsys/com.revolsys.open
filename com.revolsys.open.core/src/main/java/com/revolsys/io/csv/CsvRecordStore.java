@@ -1,14 +1,13 @@
 package com.revolsys.io.csv;
 
 import java.io.File;
-import java.util.Map;
 
-import com.revolsys.data.io.AbstractRecordStore;
-import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.AbstractRecordStore;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
@@ -21,14 +20,14 @@ public class CsvRecordStore extends AbstractRecordStore {
   public CsvRecordStore(final File directory) {
     this.directory = directory;
     directory.mkdirs();
-    writer = new CsvDirectoryWriter(directory);
+    this.writer = new CsvDirectoryWriter(directory);
   }
 
   @Override
   public void close() {
     super.close();
-    FileUtil.closeSilent(writer);
-    writer = null;
+    FileUtil.closeSilent(this.writer);
+    this.writer = null;
   }
 
   @Override
@@ -44,38 +43,31 @@ public class CsvRecordStore extends AbstractRecordStore {
 
   @Override
   public Writer<Record> createWriter() {
-    return writer;
+    return this.writer;
   }
 
   @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
-    return writer.getRecordDefinition(typePath);
+    return this.writer.getRecordDefinition(typePath);
   }
 
   @Override
   public int getRowCount(final Query query) {
-    // TODO Auto-generated method stub
     return 0;
   }
 
   @Override
   public void insert(final Record record) {
-    writer.write(record);
+    this.writer.write(record);
   }
 
   @Override
-  protected void loadSchemaRecordDefinitions(
-    final RecordStoreSchema schema,
-    final Map<String, RecordDefinition> recordDefinitionMap) {
-  }
-
-  @Override
-  protected void loadSchemas(final Map<String, RecordStoreSchema> schemaMap) {
+  protected void refreshSchema(final RecordStoreSchema schema) {
   }
 
   @Override
   public String toString() {
-    return directory.toString();
+    return this.directory.toString();
   }
 
 }

@@ -5,9 +5,9 @@ import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStore;
 
 public class Column extends QueryValue {
 

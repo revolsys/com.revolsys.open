@@ -31,8 +31,7 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class ArcSdeBinaryGeometryQueryIterator extends
-  AbstractIterator<Record> {
+public class ArcSdeBinaryGeometryQueryIterator extends AbstractIterator<Record> {
 
   private SeConnection connection;
 
@@ -69,11 +68,11 @@ public class ArcSdeBinaryGeometryQueryIterator extends
   @Override
   @PreDestroy
   public void doClose() {
-    if (sdeUtil != null) {
+    if (this.sdeUtil != null) {
       try {
-        this.seQuery = sdeUtil.close(seQuery);
+        this.seQuery = this.sdeUtil.close(this.seQuery);
       } finally {
-        this.connection = sdeUtil.close(connection);
+        this.connection = this.sdeUtil.close(this.connection);
       }
     }
     this.sdeUtil = null;
@@ -98,7 +97,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
       }
     }
     if (this.recordDefinition != null) {
-      tableName = sdeUtil.getTableName(this.recordDefinition);
+      tableName = this.sdeUtil.getTableName(this.recordDefinition);
     }
     try {
 
@@ -122,13 +121,13 @@ public class ArcSdeBinaryGeometryQueryIterator extends
         }
       }
 
-      connection = this.sdeUtil.createSeConnection();
+      this.connection = this.sdeUtil.createSeConnection();
       final SeSqlConstruct sqlConstruct = new SeSqlConstruct(tableName);
       final String[] columnNames = attributeNames.toArray(new String[0]);
-      this.seQuery = new SeQuery(connection, columnNames, sqlConstruct);
+      this.seQuery = new SeQuery(this.connection, columnNames, sqlConstruct);
       BoundingBox boundingBox = QueryValue.getBoundingBox(this.query);
       if (boundingBox != null) {
-        final SeLayer layer = new SeLayer(connection, tableName,
+        final SeLayer layer = new SeLayer(this.connection, tableName,
           this.recordDefinition.getGeometryAttributeName());
 
         final GeometryFactory geometryFactory = this.recordDefinition.getGeometryFactory();
@@ -138,7 +137,8 @@ public class ArcSdeBinaryGeometryQueryIterator extends
         final SeShape shape = new SeShape(layer.getCoordRef());
         shape.generateRectangle(envelope);
         final SeShapeFilter filter = new SeShapeFilter(tableName,
-          this.recordDefinition.getGeometryAttributeName(), shape, SeFilter.METHOD_ENVP);
+          this.recordDefinition.getGeometryAttributeName(), shape,
+          SeFilter.METHOD_ENVP);
         this.seQuery.setSpatialConstraints(SeQuery.SE_SPATIAL_FIRST, false,
           new SeFilter[] {
             filter
@@ -151,21 +151,13 @@ public class ArcSdeBinaryGeometryQueryIterator extends
 
       final String typePath = this.query.getTypeNameAlias();
       if (typePath != null) {
-        final RecordDefinitionImpl newMetaData = ((RecordDefinitionImpl)this.recordDefinition).clone();
-        newMetaData.setName(typePath);
+        final RecordDefinitionImpl newMetaData = ((RecordDefinitionImpl)this.recordDefinition).rename(typePath);
         this.recordDefinition = newMetaData;
       }
     } catch (final SeException e) {
-      this.seQuery = sdeUtil.close(seQuery);
+      this.seQuery = this.sdeUtil.close(this.seQuery);
       throw new RuntimeException("Error performing query", e);
     }
-  }
-
-  public RecordDefinition getRecordDefinition() {
-    if (this.recordDefinition == null) {
-      hasNext();
-    }
-    return this.recordDefinition;
   }
 
   @Override
@@ -174,7 +166,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends
       if (this.seQuery != null) {
         final SeRow row = this.seQuery.fetch();
         if (row != null) {
-          final Record object = getNextRecord(recordDefinition, row);
+          final Record object = getNextRecord(this.recordDefinition, row);
           if (this.statistics != null) {
             this.statistics.add(object);
           }
@@ -201,12 +193,19 @@ public class ArcSdeBinaryGeometryQueryIterator extends
     if (object != null) {
       object.setState(RecordState.Initalizing);
       for (int columnIndex = 0; columnIndex < this.attributes.size(); columnIndex++) {
-        sdeUtil.setValueFromRow(object, row, columnIndex);
+        this.sdeUtil.setValueFromRow(object, row, columnIndex);
       }
       object.setState(RecordState.Persisted);
       this.recordStore.addStatistic("query", object);
     }
     return object;
+  }
+
+  public RecordDefinition getRecordDefinition() {
+    if (this.recordDefinition == null) {
+      hasNext();
+    }
+    return this.recordDefinition;
   }
 
 }

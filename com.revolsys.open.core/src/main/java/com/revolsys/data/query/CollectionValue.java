@@ -10,9 +10,9 @@ import java.util.Map;
 import com.ctc.wstx.util.ExceptionUtil;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.util.CollectionUtil;
 

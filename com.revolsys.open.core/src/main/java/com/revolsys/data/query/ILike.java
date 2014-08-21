@@ -3,7 +3,7 @@ package com.revolsys.data.query;
 import java.util.Map;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.RecordStore;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public class ILike extends BinaryCondition {

@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
 // TODO accept (how?)

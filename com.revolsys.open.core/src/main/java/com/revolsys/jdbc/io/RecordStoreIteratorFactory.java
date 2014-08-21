@@ -5,9 +5,9 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public class RecordStoreIteratorFactory {

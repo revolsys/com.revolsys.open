@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.io.RecordStoreFactoryRegistry;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.JavaBeanUtil;

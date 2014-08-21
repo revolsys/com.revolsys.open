@@ -9,11 +9,11 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;

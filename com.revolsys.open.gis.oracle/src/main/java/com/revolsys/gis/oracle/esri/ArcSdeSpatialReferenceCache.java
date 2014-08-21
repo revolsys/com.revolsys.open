@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.data.io.RecordStoreSchema;
+import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.WktCsParser;

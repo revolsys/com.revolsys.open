@@ -7,10 +7,10 @@ import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.jts.geom.Geometry;
 
 public class WithinDistance extends Condition {

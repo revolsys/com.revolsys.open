@@ -16,12 +16,12 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.property.GlobalIdProperty;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.jdbc.JdbcUtils;

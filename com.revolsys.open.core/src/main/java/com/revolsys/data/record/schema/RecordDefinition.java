@@ -24,19 +24,16 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.io.RecordStore;
+import com.revolsys.data.io.RecordStoreSchemaElement;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.types.DataType;
-import com.revolsys.io.ObjectWithProperties;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public interface RecordDefinition extends ObjectWithProperties,
-  Comparable<RecordDefinition>, MapSerializer {
+public interface RecordDefinition extends RecordStoreSchemaElement,
+  MapSerializer {
   void addDefaultValue(String attributeName, Object defaultValue);
-
-  RecordDefinition clone();
 
   Record createRecord();
 
@@ -187,21 +184,9 @@ public interface RecordDefinition extends ObjectWithProperties,
 
   int getInstanceId();
 
-  /**
-   * Get the name of the object type. Names are described using a path (e.g.
-   * /SCHEMA/TABLE).
-   *
-   * @return The name.
-   */
-  String getPath();
-
   RecordDefinitionFactory getRecordDefinitionFactory();
 
   RecordFactory getRecordFactory();
-
-  RecordStore getRecordStore();
-
-  String getTypeName();
 
   /**
    * Check to see if the type has the specified attribute name.
@@ -226,12 +211,4 @@ public interface RecordDefinition extends ObjectWithProperties,
   void setDefaultValues(Map<String, ? extends Object> defaultValues);
 
   void setGeometryFactory(com.revolsys.jts.geom.GeometryFactory geometryFactory);
-
-  /**
-   * Set the name of the object type. Names are described using a (e.g.
-   * /SCHEMA/TABLE).
-   *
-   * @param name The name.
-   */
-  void setName(String name);
 }

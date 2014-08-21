@@ -1,4 +1,4 @@
-package com.revolsys.data.io;
+package com.revolsys.data.record.schema;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -26,6 +25,8 @@ import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.codes.CodeTableProperty;
 import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.io.RecordStoreExtension;
+import com.revolsys.data.io.RecordStoreQueryReader;
 import com.revolsys.data.query.Q;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
@@ -33,9 +34,6 @@ import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
-import com.revolsys.data.record.schema.Attribute;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractObjectWithProperties;
@@ -64,7 +62,7 @@ implements RecordStore {
 
   private String label;
 
-  private Map<String, RecordStoreSchema> schemaMap = new TreeMap<String, RecordStoreSchema>();
+  private final RecordStoreSchema rootSchema = new RecordStoreSchema(this);
 
   private List<RecordDefinitionProperty> commonMetaDataProperties = new ArrayList<RecordDefinitionProperty>();
 
@@ -108,12 +106,12 @@ implements RecordStore {
       this.columnToTableMap.put(columnName, codeTable);
       for (final RecordStoreSchema schema : getSchemas()) {
         if (schema.isInitialized()) {
-          for (final RecordDefinition recordDefinition : schema.getTypes()) {
+          for (final RecordDefinition recordDefinition : schema.getRecordDefinitions()) {
             final String idFieldName = recordDefinition.getIdAttributeName();
             for (final Attribute attribute : recordDefinition.getAttributes()) {
               final String fieldName = attribute.getName();
               if (fieldName.equals(columnName)
-                && !fieldName.equals(idFieldName)) {
+                  && !fieldName.equals(idFieldName)) {
                 attribute.setCodeTable(codeTable);
               }
             }
@@ -130,7 +128,7 @@ implements RecordStore {
     }
   }
 
-  protected void addMetaData(final RecordDefinition recordDefinition) {
+  protected void addRecordDefinition(final RecordDefinition recordDefinition) {
     final String typePath = recordDefinition.getPath();
     final String schemaName = PathUtil.getPath(typePath);
     final RecordStoreSchema schema = getSchema(schemaName);
@@ -170,10 +168,6 @@ implements RecordStore {
     }
   }
 
-  protected void addSchema(final RecordStoreSchema schema) {
-    this.schemaMap.put(schema.getPath(), schema);
-  }
-
   @Override
   public void addStatistic(final String statisticName, final Record object) {
     if (this.statistics != null) {
@@ -203,12 +197,7 @@ implements RecordStore {
       if (this.statistics != null) {
         this.statistics.disconnect();
       }
-      if (this.schemaMap != null) {
-        for (final RecordStoreSchema schema : this.schemaMap.values()) {
-          schema.close();
-        }
-        this.schemaMap.clear();
-      }
+      getRootSchema().close();
     } finally {
       this.codeTableColumNames.clear();
       this.columnToTableMap.clear();
@@ -218,7 +207,6 @@ implements RecordStore {
       this.recordStoreExtensions.clear();
       this.iteratorFactory = null;
       this.label = "deleted";
-      this.schemaMap.clear();
       this.statistics.clear();
       this.typeMetaDataProperties.clear();
     }
@@ -376,7 +364,7 @@ implements RecordStore {
     if (schema == null) {
       return null;
     } else {
-      return schema.findMetaData(typePath);
+      return schema.findRecordDefinition(typePath);
     }
   }
 
@@ -412,6 +400,7 @@ implements RecordStore {
     return this.connectionProperties;
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
@@ -453,35 +442,20 @@ implements RecordStore {
     return this.recordStoreExtensions;
   }
 
-  @Override
-  public RecordStoreSchema getSchema(String schemaName) {
-    if (schemaName == null || this.schemaMap == null) {
-      return null;
-    } else {
-      synchronized (this.schemaMap) {
-        if (this.schemaMap.isEmpty()) {
-          loadSchemas(this.schemaMap);
-        }
-        if (!schemaName.startsWith("/")) {
-          schemaName = "/" + schemaName;
-        }
-        return this.schemaMap.get(schemaName.toUpperCase());
-      }
-    }
+  public RecordStoreSchema getRootSchema() {
+    return this.rootSchema;
   }
 
-  public Map<String, RecordStoreSchema> getSchemaMap() {
-    return this.schemaMap;
+  @Override
+  public RecordStoreSchema getSchema(final String path) {
+    final RecordStoreSchema rootSchema = getRootSchema();
+    return rootSchema.getSchema(path);
   }
 
   @Override
   public List<RecordStoreSchema> getSchemas() {
-    synchronized (this.schemaMap) {
-      if (this.schemaMap.isEmpty()) {
-        loadSchemas(this.schemaMap);
-      }
-      return new ArrayList<RecordStoreSchema>(this.schemaMap.values());
-    }
+    final RecordStoreSchema rootSchema = getRootSchema();
+    return rootSchema.getSchemas();
   }
 
   @SuppressWarnings("unchecked")
@@ -603,7 +577,7 @@ implements RecordStore {
           + " does not have a primary key");
       } else if (values.size() != idAttributeNames.size()) {
         throw new IllegalArgumentException(id + " not a valid id for "
-          + typePath + " requires " + idAttributeNames);
+            + typePath + " requires " + idAttributeNames);
       } else {
         final Query query = new Query(recordDefinition);
         for (int i = 0; i < idAttributeNames.size(); i++) {
@@ -643,11 +617,6 @@ implements RecordStore {
     }
   }
 
-  protected abstract void loadSchemaRecordDefinitions(RecordStoreSchema schema,
-    Map<String, RecordDefinition> recordDefinitionMap);
-
-  protected abstract void loadSchemas(Map<String, RecordStoreSchema> schemaMap);
-
   @Override
   public Record lock(final String typePath, final Object id) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
@@ -676,14 +645,12 @@ implements RecordStore {
   @Override
   public Reader<Record> query(final List<?> queries) {
     final List<Query> queryObjects = new ArrayList<Query>();
-    for (final Object object : queries) {
-      if (object instanceof Query) {
-        final Query query = (Query)object;
+    for (final Object queryObject : queries) {
+      if (queryObject instanceof Query) {
+        final Query query = (Query)queryObject;
         queryObjects.add(query);
-        // System.out.println(query.getTypeName() + " "
-        // + query.getWhereCondition());
       } else {
-        final Query query = new Query(object.toString());
+        final Query query = new Query(queryObject.toString());
         queryObjects.add(query);
       }
     }
@@ -732,13 +699,15 @@ implements RecordStore {
   protected void refreshMetaData(final String schemaName) {
     final RecordStoreSchema schema = getSchema(schemaName);
     if (schema != null) {
-      schema.refreshMetaData();
+      schema.refresh();
     }
   }
 
   protected void refreshSchema() {
-    this.schemaMap.clear();
+    getRootSchema().refresh();
   }
+
+  protected abstract void refreshSchema(RecordStoreSchema schema);
 
   public void setCodeTableColumNames(
     final Map<String, List<String>> domainColumNames) {
@@ -778,10 +747,6 @@ implements RecordStore {
   @Override
   public void setRecordFactory(final RecordFactory recordFactory) {
     this.recordFactory = recordFactory;
-  }
-
-  public void setSchemaMap(final Map<String, RecordStoreSchema> schemaMap) {
-    this.schemaMap = new RecordStoreSchemaMapProxy(this, schemaMap);
   }
 
   protected void setSharedAttribute(final String name, final Object value) {

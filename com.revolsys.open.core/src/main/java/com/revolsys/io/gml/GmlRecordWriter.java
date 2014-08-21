@@ -48,7 +48,7 @@ GmlConstants {
     this.out = new XmlWriter(out);
     this.qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (this.qualifiedName == null) {
-      this.qualifiedName = new QName(recordDefinition.getTypeName());
+      this.qualifiedName = new QName(recordDefinition.getName());
     }
     this.namespaceUri = this.qualifiedName.getNamespaceURI();
     this.out.setPrefix(this.qualifiedName);

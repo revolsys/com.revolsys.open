@@ -402,7 +402,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     this.out.startTag(DATASET_DATA);
     this.out.attribute(XsiConstants.TYPE, DATASET_DATA_TABLE_DATA);
 
-    this.out.element(DATASET_NAME, this.recordDefinition.getTypeName());
+    this.out.element(DATASET_NAME, this.recordDefinition.getName());
     this.out.element(DATASET_TYPE, this.datasetType);
 
     this.out.startTag(DATA);

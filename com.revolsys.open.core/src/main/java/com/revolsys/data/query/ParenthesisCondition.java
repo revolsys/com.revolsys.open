@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.RecordStore;
+import com.revolsys.data.record.schema.RecordStore;
 
 public class ParenthesisCondition extends Condition {
 

@@ -7,8 +7,8 @@ import java.util.Set;
 
 import oracle.sql.SQLName;
 
-import com.revolsys.data.io.RecordStore;
-import com.revolsys.data.io.RecordStoreSchema;
+import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.oracle.io.OracleRecordStore;

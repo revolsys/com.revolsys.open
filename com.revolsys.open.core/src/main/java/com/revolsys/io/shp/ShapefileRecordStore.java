@@ -1,14 +1,13 @@
 package com.revolsys.io.shp;
 
 import java.io.File;
-import java.util.Map;
 
-import com.revolsys.data.io.AbstractRecordStore;
-import com.revolsys.data.io.RecordStoreSchema;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.AbstractRecordStore;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
@@ -21,15 +20,15 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   public ShapefileRecordStore(final File directory) {
     this.directory = directory;
     directory.mkdirs();
-    writer = new ShapefileDirectoryWriter(directory);
-    writer.setLogCounts(false);
+    this.writer = new ShapefileDirectoryWriter(directory);
+    this.writer.setLogCounts(false);
   }
 
   @Override
   public void close() {
     super.close();
-    FileUtil.closeSilent(writer);
-    writer = null;
+    FileUtil.closeSilent(this.writer);
+    this.writer = null;
   }
 
   @Override
@@ -45,12 +44,12 @@ public class ShapefileRecordStore extends AbstractRecordStore {
 
   @Override
   public Writer<Record> createWriter() {
-    return writer;
+    return this.writer;
   }
 
   @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
-    return writer.getRecordDefinition(typePath);
+    return this.writer.getRecordDefinition(typePath);
   }
 
   @Override
@@ -61,17 +60,11 @@ public class ShapefileRecordStore extends AbstractRecordStore {
 
   @Override
   public void insert(final Record record) {
-    writer.write(record);
+    this.writer.write(record);
   }
 
   @Override
-  protected void loadSchemaRecordDefinitions(
-    final RecordStoreSchema schema,
-    final Map<String, RecordDefinition> recordDefinitionMap) {
-  }
-
-  @Override
-  protected void loadSchemas(final Map<String, RecordStoreSchema> schemaMap) {
+  protected void refreshSchema(final RecordStoreSchema schema) {
   }
 
 }

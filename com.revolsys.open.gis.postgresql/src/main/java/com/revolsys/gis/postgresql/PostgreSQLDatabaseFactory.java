@@ -15,7 +15,7 @@ import org.postgresql.ds.PGPoolingDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.RecordStore;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.util.JavaBeanUtil;

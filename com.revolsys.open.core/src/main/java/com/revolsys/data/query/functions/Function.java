@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.RecordStore;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.util.CollectionUtil;
 
 public class Function extends QueryValue {

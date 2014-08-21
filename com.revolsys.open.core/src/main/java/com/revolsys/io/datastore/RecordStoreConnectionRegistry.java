@@ -7,7 +7,7 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.RecordStore;
+import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;

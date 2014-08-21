@@ -228,8 +228,7 @@ RecordIterator {
 
       final String typePath = this.query.getTypeNameAlias();
       if (typePath != null) {
-        final RecordDefinitionImpl newMetaData = ((RecordDefinitionImpl)this.recordDefinition).clone();
-        newMetaData.setName(typePath);
+        final RecordDefinitionImpl newMetaData = ((RecordDefinitionImpl)this.recordDefinition).rename(typePath);
         this.recordDefinition = newMetaData;
       }
     } catch (final SQLException e) {

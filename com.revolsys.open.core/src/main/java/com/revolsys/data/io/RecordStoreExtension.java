@@ -2,6 +2,9 @@ package com.revolsys.data.io;
 
 import java.util.Map;
 
+import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.data.record.schema.RecordStoreSchema;
+
 public interface RecordStoreExtension {
 
   public abstract void initialize(RecordStore recordStore,
