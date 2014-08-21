@@ -32,7 +32,7 @@ import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class XbaseIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
   public static final char CHARACTER_TYPE = 'C';
 
   private static final Map<Character, DataType> DATA_TYPES = new HashMap<Character, DataType>();
@@ -94,17 +94,17 @@ public class XbaseIterator extends AbstractIterator<Record> implements
 
   public XbaseIterator(final Resource resource,
     final RecordFactory recordFactory) throws IOException {
-    this.typeName = "/" + typeName;
+    this.typeName = "/" + this.typeName;
     this.resource = resource;
 
     this.recordFactory = recordFactory;
     final Resource codePageResource = SpringUtil.getResourceWithExtension(
       resource, "cpg");
     if (!(codePageResource instanceof NonExistingResource)
-      && codePageResource.exists()) {
+        && codePageResource.exists()) {
       final String charsetName = SpringUtil.getContents(codePageResource);
       try {
-        charset = Charset.forName(charsetName);
+        this.charset = Charset.forName(charsetName);
       } catch (final Exception e) {
         LoggerFactory.getLogger(getClass()).debug(
           "Charset " + charsetName + " not supported for " + resource, e);
@@ -112,26 +112,25 @@ public class XbaseIterator extends AbstractIterator<Record> implements
     }
   }
 
-  public XbaseIterator(final Resource in,
-    final RecordFactory recordFactory, final Runnable initCallback)
-    throws IOException {
+  public XbaseIterator(final Resource in, final RecordFactory recordFactory,
+    final Runnable initCallback) throws IOException {
     this(in, recordFactory);
     this.initCallback = initCallback;
   }
 
   @Override
   protected void doClose() {
-    if (closeFile) {
+    if (this.closeFile) {
       forceClose();
     }
   }
 
   @Override
   protected void doInit() {
-    if (in == null) {
+    if (this.in == null) {
       try {
         try {
-          final File file = SpringUtil.getFile(resource);
+          final File file = SpringUtil.getFile(this.resource);
           final Boolean memoryMapped = getProperty("memoryMapped");
           if (Boolean.TRUE == memoryMapped) {
             this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
@@ -140,15 +139,15 @@ public class XbaseIterator extends AbstractIterator<Record> implements
             this.in = new LittleEndianRandomAccessFile(file, "r");
           }
         } catch (final IllegalArgumentException e) {
-          this.in = new EndianInputStream(resource.getInputStream());
+          this.in = new EndianInputStream(this.resource.getInputStream());
         } catch (final FileNotFoundException e) {
-          this.in = new EndianInputStream(resource.getInputStream());
+          this.in = new EndianInputStream(this.resource.getInputStream());
         }
         loadHeader();
         readMetaData();
-        recordBuffer = new byte[recordSize];
-        if (initCallback != null) {
-          initCallback.run();
+        this.recordBuffer = new byte[this.recordSize];
+        if (this.initCallback != null) {
+          this.initCallback.run();
         }
       } catch (final IOException e) {
         throw new RuntimeException("Error initializing mappedFile ", e);
@@ -157,17 +156,17 @@ public class XbaseIterator extends AbstractIterator<Record> implements
   }
 
   public void forceClose() {
-    FileUtil.closeSilent(in);
-    recordFactory = null;
-    in = null;
-    initCallback = null;
-    recordDefinition = null;
-    recordBuffer = null;
-    resource = null;
+    FileUtil.closeSilent(this.in);
+    this.recordFactory = null;
+    this.in = null;
+    this.initCallback = null;
+    this.recordDefinition = null;
+    this.recordBuffer = null;
+    this.resource = null;
   }
 
   private Boolean getBoolean(final int startIndex) {
-    final char c = (char)recordBuffer[startIndex];
+    final char c = (char)this.recordBuffer[startIndex];
     switch (c) {
       case 't':
       case 'T':
@@ -190,16 +189,17 @@ public class XbaseIterator extends AbstractIterator<Record> implements
     if (dateString.trim().length() == 0 || dateString.equals("0")) {
       return null;
     } else {
-      return new java.sql.Date(DateUtil.getDate("yyyyMMdd", dateString).getTime());
+      return new java.sql.Date(DateUtil.getDate("yyyyMMdd", dateString)
+        .getTime());
     }
   }
 
   public int getDeletedCount() {
-    return deletedCount;
+    return this.deletedCount;
   }
 
   private Object getMemo(final int startIndex, final int len)
-    throws IOException {
+      throws IOException {
     return null;
     /*
      * String memoIndexString = new String(record, startIndex, len).trim(); if
@@ -219,27 +219,22 @@ public class XbaseIterator extends AbstractIterator<Record> implements
   }
 
   @Override
-  public RecordDefinitionImpl getRecordDefinition() {
-    return recordDefinition;
-  }
-
-  @Override
   protected Record getNext() {
     try {
       Record object = null;
-      deletedCount = currentDeletedCount;
-      currentDeletedCount = 0;
+      this.deletedCount = this.currentDeletedCount;
+      this.currentDeletedCount = 0;
       int deleteFlag = ' ';
       do {
-        deleteFlag = in.read();
+        deleteFlag = this.in.read();
         if (deleteFlag == -1) {
           throw new NoSuchElementException();
         } else if (deleteFlag == ' ') {
           object = loadRecord();
         } else if (deleteFlag != 0x1A) {
-          currentDeletedCount++;
-          in.read(recordBuffer);
-          position++;
+          this.currentDeletedCount++;
+          this.in.read(this.recordBuffer);
+          this.position++;
         }
       } while (deleteFlag == '*');
       if (object == null) {
@@ -265,35 +260,60 @@ public class XbaseIterator extends AbstractIterator<Record> implements
   }
 
   public int getNumRecords() {
-    return numRecords;
+    return this.numRecords;
   }
 
   public int getPosition() {
-    return position;
+    return this.position;
+  }
+
+  @Override
+  public RecordDefinitionImpl getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   private String getString(final int startIndex, final int len) {
-    final String text = new String(recordBuffer, startIndex, len, charset);
+    final String text = new String(this.recordBuffer, startIndex, len,
+      this.charset);
     return text.trim();
   }
 
   public String getTypeName() {
-    return typeName;
+    return this.typeName;
   }
 
   public boolean isCloseFile() {
-    return closeFile;
+    return this.closeFile;
+  }
+
+  /**
+   * Load the header record from the shape mappedFile.
+   *
+   * @throws IOException If an I/O error occurs.
+   */
+  @SuppressWarnings("unused")
+  private void loadHeader() throws IOException {
+    final int version = this.in.read();
+    final int y = this.in.read();
+    final int m = this.in.read();
+    final int d = this.in.read();
+    // properties.put(new QName("date"), new Date(y, m - 1, d));
+    this.numRecords = this.in.readLEInt();
+    final short headerSize = this.in.readLEShort();
+
+    this.recordSize = (short)(this.in.readLEShort() - 1);
+    this.in.skipBytes(20);
   }
 
   protected Record loadRecord() throws IOException {
-    if (in.read(recordBuffer) != recordBuffer.length) {
+    if (this.in.read(this.recordBuffer) != this.recordBuffer.length) {
       throw new IllegalStateException("Unexpected end of mappedFile");
     }
-    final Record object = recordFactory.createRecord(recordDefinition);
+    final Record object = this.recordFactory.createRecord(this.recordDefinition);
     int startIndex = 0;
-    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
-      int len = recordDefinition.getAttributeLength(i);
-      final DataType type = recordDefinition.getAttributeType(i);
+    for (int i = 0; i < this.recordDefinition.getAttributeCount(); i++) {
+      int len = this.recordDefinition.getAttributeLength(i);
+      final DataType type = this.recordDefinition.getAttributeType(i);
       Object value = null;
 
       if (type == DataTypes.STRING) {
@@ -316,28 +336,9 @@ public class XbaseIterator extends AbstractIterator<Record> implements
     return object;
   }
 
-  /**
-   * Load the header record from the shape mappedFile.
-   * 
-   * @throws IOException If an I/O error occurs.
-   */
-  @SuppressWarnings("unused")
-  private void loadHeader() throws IOException {
-    final int version = in.read();
-    final int y = in.read();
-    final int m = in.read();
-    final int d = in.read();
-    // properties.put(new QName("date"), new Date(y, m - 1, d));
-    numRecords = in.readLEInt();
-    final short headerSize = in.readLEShort();
-
-    this.recordSize = (short)(in.readLEShort() - 1);
-    in.skipBytes(20);
-  }
-
   private void readMetaData() throws IOException {
-    recordDefinition = new RecordDefinitionImpl(typeName);
-    int b = in.read();
+    this.recordDefinition = new RecordDefinitionImpl(this.typeName);
+    int b = this.in.read();
     while (b != 0x0D) {
       final StringBuffer fieldName = new StringBuffer();
       boolean endOfName = false;
@@ -349,25 +350,26 @@ public class XbaseIterator extends AbstractIterator<Record> implements
           endOfName = true;
         }
         if (i != 10) {
-          b = in.read();
+          b = this.in.read();
         }
       }
-      final char fieldType = (char)in.read();
-      in.skipBytes(4);
-      int length = in.read();
-      final int decimalCount = in.read();
-      in.skipBytes(14);
-      b = in.read();
+      final char fieldType = (char)this.in.read();
+      this.in.skipBytes(4);
+      int length = this.in.read();
+      final int decimalCount = this.in.read();
+      System.out.println(fieldName + " " + length);
+      this.in.skipBytes(14);
+      b = this.in.read();
       final DataType dataType = DATA_TYPES.get(fieldType);
       if (fieldType == MEMO_TYPE) {
         length = Integer.MAX_VALUE;
       }
-      recordDefinition.addAttribute(fieldName.toString(), dataType, length,
-        decimalCount, false);
+      this.recordDefinition.addAttribute(fieldName.toString(), dataType,
+        length, decimalCount, false);
     }
-    if (mappedFile) {
-      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
-      firstIndex = file.getFilePointer();
+    if (this.mappedFile) {
+      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)this.in;
+      this.firstIndex = file.getFilePointer();
     }
   }
 
@@ -381,20 +383,21 @@ public class XbaseIterator extends AbstractIterator<Record> implements
   }
 
   public void setPosition(final int position) {
-    if (mappedFile) {
-      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)in;
+    if (this.mappedFile) {
+      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)this.in;
       this.position = position;
       try {
-        final long offset = firstIndex + (long)(recordSize + 1) * position;
+        final long offset = this.firstIndex + (long)(this.recordSize + 1)
+          * position;
         file.seek(offset);
         setLoadNext(true);
       } catch (final IOException e) {
-        throw new RuntimeException("Unable to seek to " + firstIndex, e);
+        throw new RuntimeException("Unable to seek to " + this.firstIndex, e);
       }
 
     } else {
       throw new UnsupportedOperationException(
-        "The position can only be set on files");
+          "The position can only be set on files");
     }
   }
 
@@ -404,10 +407,10 @@ public class XbaseIterator extends AbstractIterator<Record> implements
 
   @Override
   public String toString() {
-    if (resource == null) {
+    if (this.resource == null) {
       return super.toString();
     } else {
-      return resource.toString();
+      return this.resource.toString();
     }
   }
 
