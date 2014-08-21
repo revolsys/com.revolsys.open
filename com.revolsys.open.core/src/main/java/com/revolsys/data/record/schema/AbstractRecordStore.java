@@ -64,9 +64,9 @@ implements RecordStore {
 
   private final RecordStoreSchema rootSchema = new RecordStoreSchema(this);
 
-  private List<RecordDefinitionProperty> commonMetaDataProperties = new ArrayList<RecordDefinitionProperty>();
+  private List<RecordDefinitionProperty> commonRecordDefinitionProperties = new ArrayList<RecordDefinitionProperty>();
 
-  private final Map<String, Map<String, Object>> typeMetaDataProperties = new HashMap<String, Map<String, Object>>();
+  private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<String, Map<String, Object>>();
 
   private final StatisticsMap statistics = new StatisticsMap();
 
@@ -145,14 +145,14 @@ implements RecordStore {
     }
   }
 
-  protected void addMetaDataProperties(
+  protected void addRecordDefinitionProperties(
     final RecordDefinitionImpl recordDefinition) {
     final String typePath = recordDefinition.getPath();
-    for (final RecordDefinitionProperty property : this.commonMetaDataProperties) {
+    for (final RecordDefinitionProperty property : this.commonRecordDefinitionProperties) {
       final RecordDefinitionProperty clonedProperty = property.clone();
       clonedProperty.setRecordDefinition(recordDefinition);
     }
-    final Map<String, Object> properties = this.typeMetaDataProperties.get(typePath);
+    final Map<String, Object> properties = this.typeRecordDefinitionProperties.get(typePath);
     recordDefinition.setProperties(properties);
   }
 
@@ -201,14 +201,14 @@ implements RecordStore {
     } finally {
       this.codeTableColumNames.clear();
       this.columnToTableMap.clear();
-      this.commonMetaDataProperties.clear();
+      this.commonRecordDefinitionProperties.clear();
       this.connectionProperties.clear();
       this.recordFactory = null;
       this.recordStoreExtensions.clear();
       this.iteratorFactory = null;
       this.label = "deleted";
       this.statistics.clear();
-      this.typeMetaDataProperties.clear();
+      this.typeRecordDefinitionProperties.clear();
     }
   }
 
@@ -227,8 +227,8 @@ implements RecordStore {
   }
 
   @Override
-  public Record create(final RecordDefinition objectMetaData) {
-    final RecordDefinition recordDefinition = getRecordDefinition(objectMetaData);
+  public Record create(final RecordDefinition objectRecordDefinition) {
+    final RecordDefinition recordDefinition = getRecordDefinition(objectRecordDefinition);
     final RecordFactory recordFactory = this.recordFactory;
     if (recordDefinition == null || recordFactory == null) {
       return null;
@@ -358,7 +358,7 @@ implements RecordStore {
     }
   }
 
-  protected RecordDefinition findMetaData(final String typePath) {
+  protected RecordDefinition findRecordDefinition(final String typePath) {
     final String schemaName = Path.getPath(typePath);
     final RecordStoreSchema schema = getSchema(schemaName);
     if (schema == null) {
@@ -416,8 +416,8 @@ implements RecordStore {
 
   @Override
   public RecordDefinition getRecordDefinition(
-    final RecordDefinition objectMetaData) {
-    final String typePath = objectMetaData.getPath();
+    final RecordDefinition objectRecordDefinition) {
+    final String typePath = objectRecordDefinition.getPath();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     return recordDefinition;
   }
@@ -442,6 +442,7 @@ implements RecordStore {
     return this.recordStoreExtensions;
   }
 
+  @Override
   public RecordStoreSchema getRootSchema() {
     return this.rootSchema;
   }
@@ -696,27 +697,27 @@ implements RecordStore {
     }
   }
 
-  protected void refreshMetaData(final String schemaName) {
-    final RecordStoreSchema schema = getSchema(schemaName);
-    if (schema != null) {
-      schema.refresh();
-    }
-  }
-
   protected void refreshSchema() {
     getRootSchema().refresh();
   }
 
   protected abstract void refreshSchema(RecordStoreSchema schema);
 
+  protected void refreshSchema(final String schemaName) {
+    final RecordStoreSchema schema = getSchema(schemaName);
+    if (schema != null) {
+      schema.refresh();
+    }
+  }
+
   public void setCodeTableColumNames(
     final Map<String, List<String>> domainColumNames) {
     this.codeTableColumNames = domainColumNames;
   }
 
-  public void setCommonMetaDataProperties(
-    final List<RecordDefinitionProperty> commonMetaDataProperties) {
-    this.commonMetaDataProperties = commonMetaDataProperties;
+  public void setCommonRecordDefinitionProperties(
+    final List<RecordDefinitionProperty> commonRecordDefinitionProperties) {
+    this.commonRecordDefinitionProperties = commonRecordDefinitionProperties;
   }
 
   protected void setConnectionProperties(
@@ -754,14 +755,14 @@ implements RecordStore {
     sharedAttributes.put(name, value);
   }
 
-  public void setTypeMetaDataProperties(
-    final Map<String, List<RecordDefinitionProperty>> typeMetaProperties) {
-    for (final Entry<String, List<RecordDefinitionProperty>> typeProperties : typeMetaProperties.entrySet()) {
+  public void setTypeRecordDefinitionProperties(
+    final Map<String, List<RecordDefinitionProperty>> typeRecordDefinitionProperties) {
+    for (final Entry<String, List<RecordDefinitionProperty>> typeProperties : typeRecordDefinitionProperties.entrySet()) {
       final String typePath = typeProperties.getKey();
-      Map<String, Object> currentProperties = this.typeMetaDataProperties.get(typePath);
+      Map<String, Object> currentProperties = this.typeRecordDefinitionProperties.get(typePath);
       if (currentProperties == null) {
         currentProperties = new LinkedHashMap<String, Object>();
-        this.typeMetaDataProperties.put(typePath, currentProperties);
+        this.typeRecordDefinitionProperties.put(typePath, currentProperties);
       }
       final List<RecordDefinitionProperty> properties = typeProperties.getValue();
       for (final RecordDefinitionProperty property : properties) {

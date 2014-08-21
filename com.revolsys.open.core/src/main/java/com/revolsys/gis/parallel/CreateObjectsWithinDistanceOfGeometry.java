@@ -24,7 +24,7 @@ import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.util.JexlUtil;
 
 public class CreateObjectsWithinDistanceOfGeometry extends
-BaseInOutProcess<Record, Record> {
+  BaseInOutProcess<Record, Record> {
 
   private Map<String, Object> attributes = new HashMap<String, Object>();
 
@@ -78,20 +78,20 @@ BaseInOutProcess<Record, Record> {
     Map<RecordDefinition, Geometry> recordDefinitionGeometries = this.recordDefinitionGeometryMap.get(recordDefinition);
     if (recordDefinitionGeometries == null) {
       recordDefinitionGeometries = new LinkedHashMap<RecordDefinition, Geometry>();
-      RecordDefinition newMetaData;
+      RecordDefinition newRecordDefinition;
       Geometry preparedGeometry;
       for (final Record record : this.geometryObjects) {
         Geometry geometry = record.getGeometryValue();
         if (geometry != null) {
           final JexlContext context = new HashMapContext();
           final Map<String, Object> vars = new HashMap<String, Object>(
-              this.attributes);
+            this.attributes);
           vars.putAll(record);
           vars.put("typePath", recordDefinition.getPath());
           context.setVars(vars);
           final String typePath = (String)JexlUtil.evaluateExpression(context,
             this.typePathTemplateExpression);
-          newMetaData = new RecordDefinitionImpl(typePath,
+          newRecordDefinition = new RecordDefinitionImpl(typePath,
             recordDefinition.getAttributes());
           if (this.distance > 0) {
             final BufferParameters parameters = new BufferParameters(1, 3, 2,
@@ -100,11 +100,12 @@ BaseInOutProcess<Record, Record> {
           }
           geometry = DouglasPeuckerSimplifier.simplify(geometry, 2D);
           preparedGeometry = geometry.prepare();
-          recordDefinitionGeometries.put(newMetaData, preparedGeometry);
+          recordDefinitionGeometries.put(newRecordDefinition, preparedGeometry);
         }
       }
 
-      this.recordDefinitionGeometryMap.put(recordDefinition, recordDefinitionGeometries);
+      this.recordDefinitionGeometryMap.put(recordDefinition,
+        recordDefinitionGeometries);
     }
     return recordDefinitionGeometries;
   }
@@ -140,11 +141,11 @@ BaseInOutProcess<Record, Record> {
     final Geometry geometryValue = object.getGeometryValue();
     final Map<RecordDefinition, Geometry> recordDefinitionGeometries = getRecordDefinitionGeometries(recordDefinition);
     for (final Entry<RecordDefinition, Geometry> recordDefinitionGeometry : recordDefinitionGeometries.entrySet()) {
-      final RecordDefinition newMetaData = recordDefinitionGeometry.getKey();
+      final RecordDefinition newRecordDefinition = recordDefinitionGeometry.getKey();
       final Geometry intersectsGeometry = recordDefinitionGeometry.getValue();
       if (intersectsGeometry.intersects(geometryValue)) {
-        final Record newObject = new ArrayRecord(newMetaData, object);
-        out.write(newObject);
+        final Record newRecord = new ArrayRecord(newRecordDefinition, object);
+        out.write(newRecord);
       }
     }
   }
@@ -173,9 +174,9 @@ BaseInOutProcess<Record, Record> {
         typePathTemplate, "%\\{([^\\}]+)\\}");
     } catch (final Exception e) {
       throw new IllegalArgumentException(new StringBuilder().append(
-          "Invalid type name template: ")
-          .append(typePathTemplate)
-          .toString(), e);
+        "Invalid type name template: ")
+        .append(typePathTemplate)
+        .toString(), e);
     }
   }
 

@@ -155,7 +155,7 @@ RecordIterator {
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    return OsmElement.META_DATA;
+    return OsmElement.RECORD_DEFINITION;
   }
 
   private String getString(final int stringId) {

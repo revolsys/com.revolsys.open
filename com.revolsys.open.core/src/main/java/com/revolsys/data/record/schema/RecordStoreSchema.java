@@ -12,7 +12,6 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.collection.EmptyReference;
 import com.revolsys.data.io.RecordStoreExtension;
-import com.revolsys.data.io.RecordStoreSchemaElement;
 import com.revolsys.io.Path;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.ExceptionUtil;
@@ -45,14 +44,14 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     this.recordStore = new EmptyReference<>();
   }
 
-  protected void addMetaData(final String typePath,
+  protected void addRecordDefinition(final String typePath,
     final RecordDefinition recordDefinition) {
     final Map<String, RecordDefinition> recordDefinitionCache = getRecordDefinitionsByPath();
     recordDefinitionCache.put(typePath.toUpperCase(), recordDefinition);
   }
 
   public void addRecordDefinition(final RecordDefinition recordDefinition) {
-    addMetaData(recordDefinition.getPath(), recordDefinition);
+    addRecordDefinition(recordDefinition.getPath(), recordDefinition);
   }
 
   protected void addSchemaElement(final RecordStoreSchemaElement element) {

@@ -85,7 +85,7 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    return OsmElement.META_DATA;
+    return OsmElement.RECORD_DEFINITION;
   }
 
   public String getServerUrl() {

@@ -67,7 +67,7 @@ import com.revolsys.spring.SpringUtil;
  * @see SaifWriter
  */
 public class SaifReader extends AbstractReader<Record> implements
-RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
+  RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
   /** The logging instance. */
   private static final Logger log = Logger.getLogger(SaifReader.class);
 
@@ -75,7 +75,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
   private Record currentRecord;
 
   /** The schema definition declared in the SAIF archive. */
-  private RecordDefinitionFactory declaredMetaDataFactory;
+  private RecordDefinitionFactory declaredRecordDefinitionFactory;
 
   /** List of type names to exclude from reading. */
   private final Set<String> excludeTypeNames = new LinkedHashSet<String>();
@@ -195,8 +195,8 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
    *
    * @return The schema definition.
    */
-  public RecordDefinitionFactory getDeclaredMetaDataFactory() {
-    return this.declaredMetaDataFactory;
+  public RecordDefinitionFactory getDeclaredRecordDefinitionFactory() {
+    return this.declaredRecordDefinitionFactory;
   }
 
   /**
@@ -234,7 +234,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
         loadGlobalMetadata();
       } catch (final IOException e) {
         throw new RuntimeException("Unable to load globmeta.osn: "
-            + e.getMessage());
+          + e.getMessage());
       }
     }
     return this.globalMetadata;
@@ -251,7 +251,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
         loadImportedObjects();
       } catch (final IOException e) {
         throw new RuntimeException("Unable to load imports.dir: "
-            + e.getMessage());
+          + e.getMessage());
       }
     }
     return this.importedObjects;
@@ -277,40 +277,26 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
         loadInternallyReferencedObjects();
       } catch (final IOException e) {
         throw new RuntimeException("Unable to load internal.dir: "
-            + e.getMessage());
+          + e.getMessage());
       }
     }
     return this.internallyReferencedObjects;
   }
 
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * Get the schema definition that will be set on each data object.
-   *
-   * @return The schema definition.
-   */
-  public RecordDefinitionFactory getRecordDefinitionFactory() {
-    return this.recordDefinitionFactory;
-  }
-
   private <D extends Record> OsnReader getOsnReader(
-    final RecordDefinitionFactory recordDefinitionFactory, final RecordFactory factory,
-    final String className) throws IOException {
+    final RecordDefinitionFactory recordDefinitionFactory,
+    final RecordFactory factory, final String className) throws IOException {
     String fileName = this.typePathFileNameMap.get(className);
     if (fileName == null) {
       fileName = Path.getName(className);
     }
     OsnReader reader;
     if (this.zipFile != null) {
-      reader = new OsnReader(recordDefinitionFactory, this.zipFile, fileName, this.srid);
+      reader = new OsnReader(recordDefinitionFactory, this.zipFile, fileName,
+        this.srid);
     } else {
-      reader = new OsnReader(recordDefinitionFactory, this.saifArchiveDirectory,
-        fileName, this.srid);
+      reader = new OsnReader(recordDefinitionFactory,
+        this.saifArchiveDirectory, fileName, this.srid);
     }
     reader.setFactory(factory);
     return reader;
@@ -328,8 +314,23 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
   }
 
   @Override
+  public RecordDefinition getRecordDefinition() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
     return this.recordDefinitionFactory.getRecordDefinition(typePath);
+  }
+
+  /**
+   * Get the schema definition that will be set on each data object.
+   *
+   * @return The schema definition.
+   */
+  public RecordDefinitionFactory getRecordDefinitionFactory() {
+    return this.recordDefinitionFactory;
   }
 
   public int getSrid() {
@@ -390,7 +391,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
   private void loadExportedObjects() throws IOException {
     final boolean setNames = this.includeTypeNames.isEmpty();
     final ClassPathResource resource = new ClassPathResource(
-        "com/revolsys/io/saif/saifzip.csn");
+      "com/revolsys/io/saif/saifzip.csn");
     final RecordDefinitionFactory schema = new SaifSchemaReader().loadSchema(resource);
     final OsnReader reader = getOsnReader(schema, this.factory, "/exports.dir");
     try {
@@ -412,7 +413,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
             }
 
             if (setNames && !fileName.equals("metdat00.osn")
-                && !fileName.equals("refsys00.osn")) {
+              && !fileName.equals("refsys00.osn")) {
               names.put(typePath.toString(), typePath);
             }
           }
@@ -522,12 +523,13 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
 
     final InputStream in = getInputStream("clasdefs.csn");
     try {
-      this.declaredMetaDataFactory = parser.loadSchema("clasdefs.csn", in);
+      this.declaredRecordDefinitionFactory = parser.loadSchema("clasdefs.csn",
+        in);
     } finally {
       FileUtil.closeSilent(in);
     }
     if (this.recordDefinitionFactory == null) {
-      setRecordDefinitionFactory(this.declaredMetaDataFactory);
+      setRecordDefinitionFactory(this.declaredRecordDefinitionFactory);
     }
   }
 
@@ -655,7 +657,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
   @Override
   public void remove() {
     throw new UnsupportedOperationException(
-        "Removing SAIF objects is not supported");
+      "Removing SAIF objects is not supported");
   }
 
   /**
@@ -663,9 +665,9 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
    *
    * @param declaredSchema The schema definition.
    */
-  public void setDeclaredMetaDataFactory(
-    final RecordDefinitionFactory declaredMetaDataFactory) {
-    this.declaredMetaDataFactory = declaredMetaDataFactory;
+  public void setDeclaredRecordDefinitionFactory(
+    final RecordDefinitionFactory declaredRecordDefinitionFactory) {
+    this.declaredRecordDefinitionFactory = declaredRecordDefinitionFactory;
   }
 
   /**
@@ -704,11 +706,12 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
    *
    * @param schema The schema definition.
    */
-  public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
+  public void setRecordDefinitionFactory(
+    final RecordDefinitionFactory recordDefinitionFactory) {
     if (recordDefinitionFactory != null) {
       this.recordDefinitionFactory = recordDefinitionFactory;
     } else {
-      this.recordDefinitionFactory = this.declaredMetaDataFactory;
+      this.recordDefinitionFactory = this.declaredRecordDefinitionFactory;
     }
 
   }

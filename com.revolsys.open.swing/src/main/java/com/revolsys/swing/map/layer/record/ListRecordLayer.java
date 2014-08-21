@@ -21,7 +21,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordListLayerTableModel
 
 public class ListRecordLayer extends AbstractRecordLayer {
 
-  public static RecordDefinitionImpl createMetaData(final String name,
+  public static RecordDefinitionImpl createRecordDefinition(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(name);
     recordDefinition.addAttribute("GEOMETRY", geometryType, true);
@@ -46,7 +46,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   public ListRecordLayer(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
     super(name);
-    final RecordDefinitionImpl recordDefinition = createMetaData(name,
+    final RecordDefinitionImpl recordDefinition = createRecordDefinition(name,
       geometryFactory, geometryType);
     setRecordDefinition(recordDefinition);
   }

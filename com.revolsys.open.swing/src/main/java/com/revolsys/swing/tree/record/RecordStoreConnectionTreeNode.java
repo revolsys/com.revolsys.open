@@ -11,11 +11,11 @@ import javax.swing.tree.TreeNode;
 
 import com.revolsys.data.io.RecordStoreConnectionMapProxy;
 import com.revolsys.data.io.RecordStoreProxy;
-import com.revolsys.data.io.RecordStoreSchemaElement;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
+import com.revolsys.data.record.schema.RecordStoreSchemaElement;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.datastore.RecordStoreConnection;
 import com.revolsys.swing.SwingUtil;

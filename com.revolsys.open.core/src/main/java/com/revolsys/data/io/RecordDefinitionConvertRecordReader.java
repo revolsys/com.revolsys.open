@@ -12,7 +12,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.Reader;
 
-public class MetaDataConvertRecordReader extends AbstractReader<Record>
+public class RecordDefinitionConvertRecordReader extends AbstractReader<Record>
 implements RecordReader, Iterator<Record> {
 
   private final RecordDefinition recordDefinition;
@@ -23,7 +23,7 @@ implements RecordReader, Iterator<Record> {
 
   private Iterator<Record> iterator;
 
-  public MetaDataConvertRecordReader(final RecordDefinition recordDefinition,
+  public RecordDefinitionConvertRecordReader(final RecordDefinition recordDefinition,
     final Reader<Record> reader) {
     this.recordDefinition = recordDefinition;
     this.reader = reader;

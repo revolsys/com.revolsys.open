@@ -170,7 +170,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public void writeGeometryMetaData(final RecordDefinition recordDefinition) {
+  public void writeGeometryRecordDefinition(final RecordDefinition recordDefinition) {
     final PrintWriter out = getOut();
     final String typePath = recordDefinition.getPath();
     final String schemaName = JdbcUtils.getSchemaName(typePath);

@@ -1,6 +1,7 @@
 package com.revolsys.data.record.property;
 
-public class ValueMetaDataProperty extends AbstractRecordDefinitionProperty {
+public class ValueRecordDefinitionProperty extends
+  AbstractRecordDefinitionProperty {
 
   private Object value;
 
@@ -8,11 +9,11 @@ public class ValueMetaDataProperty extends AbstractRecordDefinitionProperty {
 
   @Override
   public String getPropertyName() {
-    return propertyName;
+    return this.propertyName;
   }
 
   public Object getValue() {
-    return value;
+    return this.value;
   }
 
   public void setPropertyName(final String propertyName) {

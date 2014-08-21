@@ -228,8 +228,8 @@ RecordIterator {
 
       final String typePath = this.query.getTypeNameAlias();
       if (typePath != null) {
-        final RecordDefinitionImpl newMetaData = ((RecordDefinitionImpl)this.recordDefinition).rename(typePath);
-        this.recordDefinition = newMetaData;
+        final RecordDefinitionImpl newRecordDefinition = ((RecordDefinitionImpl)this.recordDefinition).rename(typePath);
+        this.recordDefinition = newRecordDefinition;
       }
     } catch (final SQLException e) {
       JdbcUtils.close(this.statement, this.resultSet);

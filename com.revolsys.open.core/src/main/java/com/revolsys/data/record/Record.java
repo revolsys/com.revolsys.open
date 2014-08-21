@@ -10,7 +10,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 
 public interface Record extends Map<String, Object>, Comparable<Record>,
-Identifiable {
+  Identifiable {
   /**
    * Create a clone of the data object.
    *
@@ -101,7 +101,7 @@ Identifiable {
   List<Object> getValues();
 
   /**
-   * Checks to see if the metadata for this Record has an attribute with the
+   * Checks to see if the definition for this Record has an attribute with the
    * specified name.
    *
    * @param name The name of the attribute.

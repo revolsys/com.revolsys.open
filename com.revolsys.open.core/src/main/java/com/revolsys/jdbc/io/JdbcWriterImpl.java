@@ -45,7 +45,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
 
   private String label;
 
-  private RecordDefinition lastMetaData;
+  private RecordDefinition lastRecordDefinition;
 
   private boolean quoteColumnNames = true;
 
@@ -260,9 +260,9 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
   }
 
   private void flushIfRequired(final RecordDefinition recordDefinition) {
-    if (this.flushBetweenTypes && recordDefinition != this.lastMetaData) {
+    if (this.flushBetweenTypes && recordDefinition != this.lastRecordDefinition) {
       flush();
-      this.lastMetaData = recordDefinition;
+      this.lastRecordDefinition = recordDefinition;
     }
   }
 

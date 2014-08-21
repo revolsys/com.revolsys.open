@@ -7,11 +7,11 @@ import java.util.Map;
 import com.revolsys.io.AbstractObjectWithProperties;
 
 public class RecordDefinitionFactoryImpl extends AbstractObjectWithProperties
-implements RecordDefinitionFactory {
+  implements RecordDefinitionFactory {
 
   private final Map<String, RecordDefinition> recordDefinitions = new LinkedHashMap<>();
 
-  public void addMetaData(final RecordDefinition recordDefinition) {
+  public void addRecordDefinition(final RecordDefinition recordDefinition) {
     if (recordDefinition != null) {
       final String path = recordDefinition.getPath();
       this.recordDefinitions.put(path, recordDefinition);

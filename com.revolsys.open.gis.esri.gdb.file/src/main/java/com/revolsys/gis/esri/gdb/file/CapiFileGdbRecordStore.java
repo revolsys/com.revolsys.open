@@ -25,7 +25,6 @@ import org.springframework.core.io.Resource;
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.io.RecordStoreSchemaElement;
 import com.revolsys.data.query.AbstractMultiCondition;
 import com.revolsys.data.query.BinaryCondition;
 import com.revolsys.data.query.CollectionValue;
@@ -47,6 +46,7 @@ import com.revolsys.data.record.schema.AbstractRecordStore;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStoreSchema;
+import com.revolsys.data.record.schema.RecordStoreSchemaElement;
 import com.revolsys.data.types.DataType;
 import com.revolsys.gis.esri.gdb.file.capi.FileGdbDomainCodeTable;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
@@ -81,7 +81,7 @@ import com.revolsys.io.esri.gdb.xml.model.DataElement;
 import com.revolsys.io.esri.gdb.xml.model.Domain;
 import com.revolsys.io.esri.gdb.xml.model.EsriGdbXmlParser;
 import com.revolsys.io.esri.gdb.xml.model.EsriGdbXmlSerializer;
-import com.revolsys.io.esri.gdb.xml.model.EsriXmlRecordMetaDataUtil;
+import com.revolsys.io.esri.gdb.xml.model.EsriXmlRecordDefinitionUtil;
 import com.revolsys.io.esri.gdb.xml.model.Field;
 import com.revolsys.io.esri.gdb.xml.model.Index;
 import com.revolsys.io.esri.gdb.xml.model.SpatialReference;
@@ -667,7 +667,7 @@ FileGdbRecordStore {
               "\\\\");
             if (!hasCatalogPath(childSchemaPath)) {
               if (spatialReference != null) {
-                final DEFeatureDataset dataset = EsriXmlRecordMetaDataUtil.createDEFeatureDataset(
+                final DEFeatureDataset dataset = EsriXmlRecordDefinitionUtil.createDEFeatureDataset(
                   newSchemaCatalogPath, spatialReference);
                 final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
                 try {
@@ -734,7 +734,7 @@ FileGdbRecordStore {
         final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
         final SpatialReference spatialReference = getSpatialReference(geometryFactory);
 
-        final DETable deTable = EsriXmlRecordMetaDataUtil.getDETable(
+        final DETable deTable = EsriXmlRecordDefinitionUtil.getDETable(
           recordDefinition, spatialReference);
         final RecordDefinitionImpl tableRecordDefinition = createTable(deTable);
         final String idAttributeName = recordDefinition.getIdAttributeName();
@@ -929,7 +929,7 @@ FileGdbRecordStore {
               }
             }
           }
-          addMetaDataProperties(recordDefinition);
+          addRecordDefinitionProperties(recordDefinition);
           if (recordDefinition.getIdAttributeIndex() == -1) {
             recordDefinition.setIdAttributeName(deTable.getOIDFieldName());
           }
@@ -1318,7 +1318,7 @@ FileGdbRecordStore {
             if (defaultSchema == null) {
               final SpatialReference spatialReference = getSpatialReference(getGeometryFactory());
               final String catalogPath = getCatalogPath(this.defaultSchemaPath);
-              final DEFeatureDataset dataset = EsriXmlRecordMetaDataUtil.createDEFeatureDataset(
+              final DEFeatureDataset dataset = EsriXmlRecordDefinitionUtil.createDEFeatureDataset(
                 catalogPath, spatialReference);
               final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
               try {

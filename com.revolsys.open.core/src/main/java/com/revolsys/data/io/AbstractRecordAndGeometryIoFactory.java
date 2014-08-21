@@ -33,7 +33,7 @@ AbstractRecordAndGeometryReaderFactory implements RecordWriterFactory,
 
   @Override
   public Writer<Geometry> createGeometryWriter(final Resource resource) {
-    final RecordDefinition recordDefinition = RecordUtil.createGeometryMetaData();
+    final RecordDefinition recordDefinition = RecordUtil.createGeometryRecordDefinition();
     final Writer<Record> recordWriter = createRecordWriter(recordDefinition,
       resource);
     return createGeometryWriter(recordWriter);
@@ -42,7 +42,7 @@ AbstractRecordAndGeometryReaderFactory implements RecordWriterFactory,
   @Override
   public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out) {
-    final RecordDefinition recordDefinition = RecordUtil.createGeometryMetaData();
+    final RecordDefinition recordDefinition = RecordUtil.createGeometryRecordDefinition();
     final Writer<Record> recordWriter = createRecordWriter(baseName,
       recordDefinition, out);
     return createGeometryWriter(recordWriter);
@@ -51,7 +51,7 @@ AbstractRecordAndGeometryReaderFactory implements RecordWriterFactory,
   @Override
   public Writer<Geometry> createGeometryWriter(final String baseName,
     final OutputStream out, final Charset charset) {
-    final RecordDefinition recordDefinition = RecordUtil.createGeometryMetaData();
+    final RecordDefinition recordDefinition = RecordUtil.createGeometryRecordDefinition();
     final Writer<Record> recordWriter = createRecordWriter(baseName,
       recordDefinition, out, charset);
     return createGeometryWriter(recordWriter);

@@ -69,17 +69,17 @@ public class BingClient {
   }
 
   public Map<String, Object> getImageryMetadata(final ImagerySet imagerySet) {
-    Map<String, Object> cachedMetaData = this.recordDefinitionCache.get(imagerySet);
-    if (cachedMetaData == null) {
+    Map<String, Object> cachedRecordDefinition = this.recordDefinitionCache.get(imagerySet);
+    if (cachedRecordDefinition == null) {
       final String url = getImageryMetadataUrl(imagerySet);
       try {
-        cachedMetaData = JsonMapIoFactory.toMap(new UrlResource(url));
-        this.recordDefinitionCache.put(imagerySet, cachedMetaData);
+        cachedRecordDefinition = JsonMapIoFactory.toMap(new UrlResource(url));
+        this.recordDefinitionCache.put(imagerySet, cachedRecordDefinition);
       } catch (final MalformedURLException e) {
         return Collections.emptyMap();
       }
     }
-    return cachedMetaData;
+    return cachedRecordDefinition;
   }
 
   public String getImageryMetadataUrl(ImagerySet imagerySet) {
@@ -187,13 +187,13 @@ public class BingClient {
       width = 350;
     } else if (width < 80 || width > 900) {
       throw new IllegalArgumentException("Width must be between 80-900 not "
-          + width);
+        + width);
     }
     if (height == null) {
       height = 350;
     } else if (height < 80 || height > 834) {
       throw new IllegalArgumentException("Height must be between 80-834 not "
-          + height);
+        + height);
     }
     final double centreX = minX + (maxX - minX) / 2;
     final double centreY = minY + (maxY - minY) / 2;
@@ -201,16 +201,16 @@ public class BingClient {
     parameters.put(
       "mapArea",
       StringConverterRegistry.toString(minY) + ","
-          + StringConverterRegistry.toString(minX) + ","
-          + StringConverterRegistry.toString(maxY) + ","
-          + StringConverterRegistry.toString(maxX));
+        + StringConverterRegistry.toString(minX) + ","
+        + StringConverterRegistry.toString(maxY) + ","
+        + StringConverterRegistry.toString(maxX));
     parameters.put("mapSize", width + "," + height);
     parameters.put("mapLayer", mapLayer);
     parameters.put("format", format);
 
     return UrlUtil.getUrl("http://dev.virtualearth.net/REST/v1/Imagery/Map/"
-        + imagerySet + "/" + StringConverterRegistry.toString(centreY) + ","
-        + StringConverterRegistry.toString(centreX), parameters);
+      + imagerySet + "/" + StringConverterRegistry.toString(centreY) + ","
+      + StringConverterRegistry.toString(centreX), parameters);
   }
 
   public String getQuadKey(final int zoomLevel, final int tileX, final int tileY) {

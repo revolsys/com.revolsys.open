@@ -29,7 +29,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class CsvRecordIterator extends AbstractIterator<Record> implements
-RecordIterator {
+  RecordIterator {
 
   private final char fieldSeparator;
 
@@ -47,10 +47,8 @@ RecordIterator {
 
   private RecordFactory recordFactory;
 
-  /** The reader to */
   private BufferedReader in;
 
-  /** The metadata for the data being read by this iterator. */
   private RecordDefinition recordDefinition;
 
   private Resource resource;
@@ -78,7 +76,7 @@ RecordIterator {
   }
 
   private void createRecordDefinition(final String[] fieldNames)
-      throws IOException {
+    throws IOException {
     final List<Attribute> attributes = new ArrayList<Attribute>();
     Attribute geometryAttribute = null;
     for (final String name : fieldNames) {
@@ -93,7 +91,7 @@ RecordIterator {
       attributes.add(attribute);
     }
     this.hasPointFields = Property.hasValue(this.pointXAttributeName)
-        && Property.hasValue(this.pointYAttributeName);
+      && Property.hasValue(this.pointYAttributeName);
     if (this.geometryColumnName != null || this.hasPointFields) {
       if (this.hasPointFields) {
         this.geometryType = DataTypes.POINT;
@@ -219,7 +217,7 @@ RecordIterator {
    * @throws IOException if bad things happen during the read
    */
   private String[] parseLine(final String nextLine, final boolean readLine)
-      throws IOException {
+    throws IOException {
     String line = nextLine;
     if (line.length() == 0) {
       return new String[0];
@@ -242,14 +240,14 @@ RecordIterator {
           if (c == CsvConstants.QUOTE_CHARACTER) {
             hadQuotes = true;
             if (inQuotes && line.length() > i + 1
-                && line.charAt(i + 1) == CsvConstants.QUOTE_CHARACTER) {
+              && line.charAt(i + 1) == CsvConstants.QUOTE_CHARACTER) {
               sb.append(line.charAt(i + 1));
               i++;
             } else {
               inQuotes = !inQuotes;
               if (i > 2 && line.charAt(i - 1) != this.fieldSeparator
-                  && line.length() > i + 1
-                  && line.charAt(i + 1) != this.fieldSeparator) {
+                && line.length() > i + 1
+                && line.charAt(i + 1) != this.fieldSeparator) {
                 sb.append(c);
               }
             }

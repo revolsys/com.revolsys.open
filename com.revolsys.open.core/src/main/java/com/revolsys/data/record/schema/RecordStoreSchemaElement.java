@@ -1,7 +1,5 @@
-package com.revolsys.data.io;
+package com.revolsys.data.record.schema;
 
-import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.io.ObjectWithProperties;
 
 public interface RecordStoreSchemaElement extends ObjectWithProperties,

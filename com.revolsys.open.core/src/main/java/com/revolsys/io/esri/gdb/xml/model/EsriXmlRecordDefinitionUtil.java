@@ -23,7 +23,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public class EsriXmlRecordMetaDataUtil implements EsriGeodatabaseXmlConstants {
+public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants {
   private static Field addField(final DETable table, final Attribute attribute) {
     final String fieldName = attribute.getName();
     final DataType dataType = attribute.getType();
@@ -387,7 +387,7 @@ public class EsriXmlRecordMetaDataUtil implements EsriGeodatabaseXmlConstants {
     return values;
   }
 
-  private static final String DE_TABLE_PROPERTY = EsriXmlRecordMetaDataUtil.class
+  private static final String DE_TABLE_PROPERTY = EsriXmlRecordDefinitionUtil.class
       + ".DETable";
 
   public static final EsriGeodatabaseXmlFieldTypeRegistry FIELD_TYPES = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;

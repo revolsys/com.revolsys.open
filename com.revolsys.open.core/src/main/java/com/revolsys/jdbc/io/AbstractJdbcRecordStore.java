@@ -500,7 +500,7 @@ implements JdbcRecordStore, RecordStoreExtension {
         addAttribute(resultSetMetaData, recordDefinition, name, i, null);
       }
 
-      addMetaDataProperties(recordDefinition);
+      addRecordDefinitionProperties(recordDefinition);
 
       return recordDefinition;
     } catch (final SQLException e) {
@@ -884,7 +884,7 @@ implements JdbcRecordStore, RecordStoreExtension {
       }
 
       for (final RecordDefinition recordDefinition : recordDefinitionMap.values()) {
-        addMetaDataProperties((RecordDefinitionImpl)recordDefinition);
+        addRecordDefinitionProperties((RecordDefinitionImpl)recordDefinition);
       }
     }
   }

@@ -32,7 +32,7 @@ import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class XbaseIterator extends AbstractIterator<Record> implements
-RecordIterator {
+  RecordIterator {
   public static final char CHARACTER_TYPE = 'C';
 
   private static final Map<Character, DataType> DATA_TYPES = new HashMap<Character, DataType>();
@@ -101,7 +101,7 @@ RecordIterator {
     final Resource codePageResource = SpringUtil.getResourceWithExtension(
       resource, "cpg");
     if (!(codePageResource instanceof NonExistingResource)
-        && codePageResource.exists()) {
+      && codePageResource.exists()) {
       final String charsetName = SpringUtil.getContents(codePageResource);
       try {
         this.charset = Charset.forName(charsetName);
@@ -144,7 +144,7 @@ RecordIterator {
           this.in = new EndianInputStream(this.resource.getInputStream());
         }
         loadHeader();
-        readMetaData();
+        readRecordDefinition();
         this.recordBuffer = new byte[this.recordSize];
         if (this.initCallback != null) {
           this.initCallback.run();
@@ -199,7 +199,7 @@ RecordIterator {
   }
 
   private Object getMemo(final int startIndex, final int len)
-      throws IOException {
+    throws IOException {
     return null;
     /*
      * String memoIndexString = new String(record, startIndex, len).trim(); if
@@ -336,7 +336,7 @@ RecordIterator {
     return object;
   }
 
-  private void readMetaData() throws IOException {
+  private void readRecordDefinition() throws IOException {
     this.recordDefinition = new RecordDefinitionImpl(this.typeName);
     int b = this.in.read();
     while (b != 0x0D) {
@@ -357,7 +357,6 @@ RecordIterator {
       this.in.skipBytes(4);
       int length = this.in.read();
       final int decimalCount = this.in.read();
-      System.out.println(fieldName + " " + length);
       this.in.skipBytes(14);
       b = this.in.read();
       final DataType dataType = DATA_TYPES.get(fieldType);
@@ -388,7 +387,7 @@ RecordIterator {
       this.position = position;
       try {
         final long offset = this.firstIndex + (long)(this.recordSize + 1)
-          * position;
+            * position;
         file.seek(offset);
         setLoadNext(true);
       } catch (final IOException e) {
@@ -397,7 +396,7 @@ RecordIterator {
 
     } else {
       throw new UnsupportedOperationException(
-          "The position can only be set on files");
+        "The position can only be set on files");
     }
   }
 

@@ -70,8 +70,8 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public Record create(final RecordDefinition objectMetaData) {
-    return this.recordStore.create(objectMetaData);
+  public Record create(final RecordDefinition recordDefinition) {
+    return this.recordStore.create(recordDefinition);
   }
 
   @Override
@@ -168,8 +168,8 @@ public class DelegatingRecordStore extends AbstractRecordStore {
 
   @Override
   public RecordDefinition getRecordDefinition(
-    final RecordDefinition objectMetaData) {
-    return this.recordStore.getRecordDefinition(objectMetaData);
+    final RecordDefinition recordDefinition) {
+    return this.recordStore.getRecordDefinition(recordDefinition);
   }
 
   @Override
@@ -318,9 +318,9 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void setCommonMetaDataProperties(
-    final List<RecordDefinitionProperty> commonMetaDataProperties) {
-    this.recordStore.setCommonMetaDataProperties(commonMetaDataProperties);
+  public void setCommonRecordDefinitionProperties(
+    final List<RecordDefinitionProperty> commonRecordDefinitionProperties) {
+    this.recordStore.setCommonRecordDefinitionProperties(commonRecordDefinitionProperties);
   }
 
   @Override
@@ -359,9 +359,9 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void setTypeMetaDataProperties(
-    final Map<String, List<RecordDefinitionProperty>> typeMetaProperties) {
-    this.recordStore.setTypeMetaDataProperties(typeMetaProperties);
+  public void setTypeRecordDefinitionProperties(
+    final Map<String, List<RecordDefinitionProperty>> typeRecordDefinitionProperties) {
+    this.recordStore.setTypeRecordDefinitionProperties(typeRecordDefinitionProperties);
   }
 
   @Override

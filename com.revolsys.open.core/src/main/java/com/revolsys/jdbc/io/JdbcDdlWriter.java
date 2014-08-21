@@ -83,24 +83,24 @@ public abstract class JdbcDdlWriter implements Cloneable {
 
   public void writeAddForeignKeyConstraint(
     final RecordDefinition recordDefinition, final String attributeName,
-    final RecordDefinition referencedMetaData) {
+    final RecordDefinition referencedRecordDefinition) {
     final String typePath = recordDefinition.getPath();
-    final String referencedTypeName = referencedMetaData.getPath();
-    final String referencedAttributeName = referencedMetaData.getIdAttributeName();
+    final String referencedTypeName = referencedRecordDefinition.getPath();
+    final String referencedAttributeName = referencedRecordDefinition.getIdAttributeName();
     final String constraintName = getTableAlias(recordDefinition) + "_"
-        + getTableAlias(referencedMetaData) + "_FK";
+        + getTableAlias(referencedRecordDefinition) + "_FK";
     writeAddForeignKeyConstraint(typePath, constraintName, attributeName,
       referencedTypeName, referencedAttributeName);
   }
 
   public void writeAddForeignKeyConstraint(
     final RecordDefinition recordDefinition, final String attributeName,
-    final String referenceTablePrefix, final RecordDefinition referencedMetaData) {
+    final String referenceTablePrefix, final RecordDefinition referencedRecordDefinition) {
     final String typePath = recordDefinition.getPath();
-    final String referencedTypeName = referencedMetaData.getPath();
-    final String referencedAttributeName = referencedMetaData.getIdAttributeName();
+    final String referencedTypeName = referencedRecordDefinition.getPath();
+    final String referencedAttributeName = referencedRecordDefinition.getIdAttributeName();
     final String constraintName = getTableAlias(recordDefinition) + "_"
-        + referenceTablePrefix + "_" + getTableAlias(referencedMetaData) + "_FK";
+        + referenceTablePrefix + "_" + getTableAlias(referencedRecordDefinition) + "_FK";
     writeAddForeignKeyConstraint(typePath, constraintName, attributeName,
       referencedTypeName, referencedAttributeName);
   }
@@ -186,7 +186,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
 
     writeAddPrimaryKeyConstraint(recordDefinition);
 
-    writeGeometryMetaData(recordDefinition);
+    writeGeometryRecordDefinition(recordDefinition);
 
     final Attribute idAttribute = recordDefinition.getIdAttribute();
     if (idAttribute != null) {
@@ -211,7 +211,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
     this.out.println(");");
   }
 
-  public abstract void writeGeometryMetaData(
+  public abstract void writeGeometryRecordDefinition(
     final RecordDefinition recordDefinition);
 
   public void writeGrant(final String typePath, final String username,

@@ -34,11 +34,11 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   @Override
   public Record create(final RecordDefinition recordDefinition) {
     final String typePath = recordDefinition.getPath();
-    final RecordDefinition savedMetaData = getRecordDefinition(typePath);
-    if (savedMetaData == null) {
+    final RecordDefinition savedRecordDefinition = getRecordDefinition(typePath);
+    if (savedRecordDefinition == null) {
       return new ArrayRecord(recordDefinition);
     } else {
-      return new ArrayRecord(savedMetaData);
+      return new ArrayRecord(savedRecordDefinition);
     }
   }
 

@@ -50,7 +50,7 @@ public final class RecordUtil {
     return newObject;
   }
 
-  public static RecordDefinition createGeometryMetaData() {
+  public static RecordDefinition createGeometryRecordDefinition() {
     final Attribute geometryAttribute = new Attribute("geometry",
       DataTypes.GEOMETRY, true);
     return new RecordDefinitionImpl("Feature", geometryAttribute);

@@ -27,14 +27,14 @@ import com.revolsys.spring.SpringUtil;
  * See the {@link AbstractDirectoryReader} class for examples on how to use
  * dataset readers.
  * </p>
- * 
+ *
  * @author Paul Austin
  * @see AbstractDirectoryReader
  */
 public class ShapefileDirectoryReader extends RecordDirectoryReader {
   private final Map<String, String> fileNameTypeMap = new HashMap<String, String>();
 
-  private Map<String, RecordDefinition> typeNameMetaDataMap = new HashMap<String, RecordDefinition>();
+  private Map<String, RecordDefinition> typeNameRecordDefinitionMap = new HashMap<String, RecordDefinition>();
 
   public ShapefileDirectoryReader() {
     setFileExtensions(ShapefileConstants.FILE_EXTENSION);
@@ -42,7 +42,7 @@ public class ShapefileDirectoryReader extends RecordDirectoryReader {
 
   /**
    * Construct a new ShapefileDirectoryReader.
-   * 
+   *
    * @param directory The containing the .shp files.
    */
   public ShapefileDirectoryReader(final File directory) {
@@ -57,8 +57,8 @@ public class ShapefileDirectoryReader extends RecordDirectoryReader {
       final ShapefileIterator iterator = new ShapefileIterator(resource,
         factory);
       final String baseName = SpringUtil.getBaseName(resource).toUpperCase();
-      iterator.setTypeName(fileNameTypeMap.get(baseName));
-      iterator.setRecordDefinition(typeNameMetaDataMap.get(iterator.getTypeName()));
+      iterator.setTypeName(this.fileNameTypeMap.get(baseName));
+      iterator.setRecordDefinition(this.typeNameRecordDefinitionMap.get(iterator.getTypeName()));
       return new RecordIteratorReader(iterator);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
@@ -66,11 +66,11 @@ public class ShapefileDirectoryReader extends RecordDirectoryReader {
   }
 
   public Map<String, String> getFileNameTypeMap() {
-    return fileNameTypeMap;
+    return this.fileNameTypeMap;
   }
 
-  public Map<String, RecordDefinition> getTypeNameMetaDataMap() {
-    return typeNameMetaDataMap;
+  public Map<String, RecordDefinition> getTypeNameRecordDefinitionMap() {
+    return this.typeNameRecordDefinitionMap;
   }
 
   public void setFileNameTypeMap(final Map<String, String> fileNameTypeMap) {
@@ -83,9 +83,9 @@ public class ShapefileDirectoryReader extends RecordDirectoryReader {
     setBaseFileNames(fileNameTypeMap.keySet());
   }
 
-  public void setTypeNameMetaDataMap(
-    final Map<String, RecordDefinition> typeNameMetaDataMap) {
-    this.typeNameMetaDataMap = typeNameMetaDataMap;
+  public void setTypeNameRecordDefinitionMap(
+    final Map<String, RecordDefinition> typeNameRecordDefinitionMap) {
+    this.typeNameRecordDefinitionMap = typeNameRecordDefinitionMap;
   }
 
 }

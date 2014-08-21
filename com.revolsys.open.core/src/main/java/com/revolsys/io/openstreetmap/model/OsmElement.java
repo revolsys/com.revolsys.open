@@ -17,7 +17,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.Property;
 
 public class OsmElement extends AbstractRecord implements OsmConstants {
-  public static final RecordDefinition META_DATA;
+  public static final RecordDefinition RECORD_DEFINITION;
 
   static {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
@@ -33,7 +33,7 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
     recordDefinition.addAttribute("geometry", DataTypes.GEOMETRY);
     recordDefinition.setGeometryAttributeName("geometry");
     recordDefinition.setGeometryFactory(WGS84_2D);
-    META_DATA = recordDefinition;
+    RECORD_DEFINITION = recordDefinition;
   }
 
   private long changeset = -1;
@@ -136,7 +136,7 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    return META_DATA;
+    return RECORD_DEFINITION;
   }
 
   @Override

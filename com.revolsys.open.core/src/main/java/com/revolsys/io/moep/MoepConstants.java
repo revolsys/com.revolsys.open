@@ -31,7 +31,7 @@ public final class MoepConstants {
 
   public static final String MAPSHEET_NAME = "MAPSHEET";
 
-  public static final RecordDefinition META_DATA;
+  public static final RecordDefinition RECORD_DEFINITION;
 
   public static final String ORIGINAL_FILE_TYPE = "FILE_TYPE";
 
@@ -56,10 +56,10 @@ public final class MoepConstants {
   public static final String TEXT_INDEX = "TEXT_INDEX";
 
   static {
-    META_DATA = createMetaData(TYPE_NAME);
+    RECORD_DEFINITION = createRecordDefinition(TYPE_NAME);
   }
 
-  public static RecordDefinitionImpl createMetaData(final String typePath) {
+  public static RecordDefinitionImpl createRecordDefinition(final String typePath) {
     final RecordDefinitionImpl type = new RecordDefinitionImpl(typePath);
     type.addAttribute(FEATURE_CODE, DataTypes.STRING, 10, true);
     type.addAttribute(MAPSHEET_NAME, DataTypes.STRING, 7, false);

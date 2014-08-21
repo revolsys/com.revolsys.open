@@ -193,7 +193,7 @@ public class MoepBinaryIterator extends AbstractObjectWithProperties implements
       final int extraParams = featureKey % 100 / 10;
       final int featureType = featureKey % 10;
       final byte numBytes = (byte)read();
-      final Record object = recordFactory.createRecord(MoepConstants.META_DATA);
+      final Record object = recordFactory.createRecord(MoepConstants.RECORD_DEFINITION);
       object.setValue(MoepConstants.MAPSHEET_NAME, mapsheet);
       object.setValue(MoepConstants.FEATURE_CODE, featureCode);
       object.setValue(MoepConstants.ORIGINAL_FILE_TYPE, originalFileType);

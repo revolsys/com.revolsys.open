@@ -51,7 +51,7 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   Transaction createTransaction(Propagation propagation);
 
-  Record createWithId(RecordDefinition objectMetaData);
+  Record createWithId(RecordDefinition recordDefinition);
 
   Writer<Record> createWriter();
 

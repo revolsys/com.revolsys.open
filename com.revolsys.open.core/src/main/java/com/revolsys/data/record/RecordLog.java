@@ -16,15 +16,6 @@ import com.revolsys.io.Writer;
 
 public class RecordLog {
 
-  public static RecordLog recordLog() {
-    RecordLog recordLog = getForThread();
-    if (recordLog == null) {
-      recordLog = new RecordLog();
-      ThreadSharedAttributes.setAttribute(KEY, recordLog);
-    }
-    return recordLog;
-  }
-
   public static void error(final Class<?> logCategory, final String message,
     final Record object) {
     final RecordLog recordLog = getForThread();
@@ -34,7 +25,8 @@ public class RecordLog {
     } else if (recordLog == null) {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.error(message + "\t" + recordDefinition.getPath() + object.getIdentifier());
+      log.error(message + "\t" + recordDefinition.getPath()
+        + object.getIdentifier());
     } else {
       recordLog.error(message, object);
     }
@@ -54,10 +46,20 @@ public class RecordLog {
     } else if (recordLog == null) {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.info(message + "\t" + recordDefinition.getPath() + object.getIdentifier());
+      log.info(message + "\t" + recordDefinition.getPath()
+        + object.getIdentifier());
     } else {
       recordLog.info(message, object);
     }
+  }
+
+  public static RecordLog recordLog() {
+    RecordLog recordLog = getForThread();
+    if (recordLog == null) {
+      recordLog = new RecordLog();
+      ThreadSharedAttributes.setAttribute(KEY, recordLog);
+    }
+    return recordLog;
   }
 
   public static void warn(final Class<?> logCategory, final String message,
@@ -69,7 +71,8 @@ public class RecordLog {
     } else if (recordLog == null) {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
       final Logger log = LoggerFactory.getLogger(logCategory);
-      log.warn(message + "\t" + recordDefinition.getPath() + object.getIdentifier());
+      log.warn(message + "\t" + recordDefinition.getPath()
+        + object.getIdentifier());
     } else {
       recordLog.warn(message, object);
     }
@@ -79,7 +82,7 @@ public class RecordLog {
 
   private Writer<Record> writer;
 
-  private final Map<RecordDefinition, RecordDefinitionImpl> logMetaDataMap = new HashMap<RecordDefinition, RecordDefinitionImpl>();
+  private final Map<RecordDefinition, RecordDefinitionImpl> logRecordDefinitionMap = new HashMap<RecordDefinition, RecordDefinitionImpl>();
 
   public RecordLog() {
   }
@@ -92,15 +95,16 @@ public class RecordLog {
     log("ERROR", message, object);
   }
 
-  private RecordDefinition getLogMetaData(final Record object) {
+  private RecordDefinition getLogRecordDefinition(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
-    final RecordDefinition logMetaData = getLogMetaData(recordDefinition);
-    return logMetaData;
+    final RecordDefinition logRecordDefinition = getLogRecordDefinition(recordDefinition);
+    return logRecordDefinition;
   }
 
-  private RecordDefinition getLogMetaData(final RecordDefinition recordDefinition) {
-    RecordDefinitionImpl logMetaData = this.logMetaDataMap.get(recordDefinition);
-    if (logMetaData == null) {
+  private RecordDefinition getLogRecordDefinition(
+    final RecordDefinition recordDefinition) {
+    RecordDefinitionImpl logRecordDefinition = this.logRecordDefinitionMap.get(recordDefinition);
+    if (logRecordDefinition == null) {
       final String path = recordDefinition.getPath();
       final String parentPath = Path.getPath(path);
       final String tableName = Path.getName(path);
@@ -111,17 +115,18 @@ public class RecordLog {
         logTableName = tableName + "_log";
       }
       final String logTypeName = Path.toPath(parentPath, logTableName);
-      logMetaData = new RecordDefinitionImpl(logTypeName);
-      logMetaData.addAttribute("LOGMESSAGE", DataTypes.STRING, 255, true);
-      logMetaData.addAttribute("LOGLEVEL", DataTypes.STRING, 10, true);
+      logRecordDefinition = new RecordDefinitionImpl(logTypeName);
+      logRecordDefinition.addAttribute("LOGMESSAGE", DataTypes.STRING, 255,
+        true);
+      logRecordDefinition.addAttribute("LOGLEVEL", DataTypes.STRING, 10, true);
       for (final Attribute attribute : recordDefinition.getAttributes()) {
         final Attribute logAttribute = new Attribute(attribute);
-        logMetaData.addAttribute(logAttribute);
+        logRecordDefinition.addAttribute(logAttribute);
 
       }
-      this.logMetaDataMap.put(recordDefinition, logMetaData);
+      this.logRecordDefinitionMap.put(recordDefinition, logRecordDefinition);
     }
-    return logMetaData;
+    return logRecordDefinition;
   }
 
   public Writer<Record> getWriter() {
@@ -135,8 +140,8 @@ public class RecordLog {
   private void log(final String logLevel, final Object message,
     final Record object) {
     if (this.writer != null) {
-      final RecordDefinition logMetaData = getLogMetaData(object);
-      final Record logObject = new ArrayRecord(logMetaData, object);
+      final RecordDefinition logRecordDefinition = getLogRecordDefinition(object);
+      final Record logObject = new ArrayRecord(logRecordDefinition, object);
       logObject.setValue("LOGMESSAGE", message);
       logObject.setValue("LOGLEVEL", logLevel);
       synchronized (this.writer) {

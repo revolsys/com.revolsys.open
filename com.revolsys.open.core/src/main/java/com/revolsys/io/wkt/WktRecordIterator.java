@@ -35,7 +35,7 @@ public class WktRecordIterator extends AbstractIterator<Record>
     this.factory = factory;
     this.in = new BufferedReader(
       FileUtil.createUtf8Reader(resource.getInputStream()));
-    this.recordDefinition = RecordUtil.createGeometryMetaData();
+    this.recordDefinition = RecordUtil.createGeometryRecordDefinition();
   }
 
   @Override

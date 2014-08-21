@@ -5,13 +5,13 @@
  * $Revision:265 $
 
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,6 +53,10 @@ import com.revolsys.io.saif.util.CsnIterator;
 
 public class SaifSchemaReader {
 
+  private static void addType(final String typePath, final DataType dataType) {
+    nameTypeMap.put(String.valueOf(typePath), dataType);
+  }
+
   private static final Map<String, DataType> nameTypeMap = new HashMap<String, DataType>();
 
   private static final String SPATIAL_OBJECT = "/SpatialObject";
@@ -83,11 +87,7 @@ public class SaifSchemaReader {
 
   }
 
-  private static void addType(final String typePath, final DataType dataType) {
-    nameTypeMap.put(String.valueOf(typePath), dataType);
-  }
-
-  private List<RecordDefinitionProperty> commonMetaDataProperties = new ArrayList<RecordDefinitionProperty>();
+  private List<RecordDefinitionProperty> commonRecordDefinitionProperties = new ArrayList<RecordDefinitionProperty>();
 
   private RecordDefinitionImpl currentClass;
 
@@ -98,7 +98,7 @@ public class SaifSchemaReader {
   private void addExportedObjects() {
     final RecordDefinitionImpl exportedObjectHandle = new RecordDefinitionImpl(
       "ExportedObjectHandle");
-    schema.addMetaData(exportedObjectHandle);
+    this.schema.addRecordDefinition(exportedObjectHandle);
     exportedObjectHandle.addAttribute("referenceID", DataTypes.STRING, true);
     exportedObjectHandle.addAttribute("type", DataTypes.STRING, true);
     exportedObjectHandle.addAttribute("offset", DataTypes.INTEGER, true);
@@ -135,8 +135,8 @@ public class SaifSchemaReader {
     }
   }
 
-  public void attributes(final RecordDefinition type,
-    final CsnIterator iterator) throws IOException {
+  public void attributes(final RecordDefinition type, final CsnIterator iterator)
+      throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_NAME
       || iterator.getNextEventType() == CsnIterator.OPTIONAL_ATTRIBUTE) {
       boolean required = true;
@@ -153,12 +153,12 @@ public class SaifSchemaReader {
               if (typePath.equals(SPATIAL_OBJECT)
                 || typePath.equals(TEXT_OR_SYMBOL_OBJECT)) {
                 dataType = DataTypes.GEOMETRY;
-                currentClass.setGeometryAttributeIndex(currentClass.getAttributeCount());
+                this.currentClass.setGeometryAttributeIndex(this.currentClass.getAttributeCount());
               } else if (dataType == null) {
                 dataType = new SimpleDataType(typePath, Record.class);
               }
 
-              currentClass.addAttribute(attributeName, dataType, required);
+              this.currentClass.addAttribute(attributeName, dataType, required);
 
             break;
             case CsnIterator.COLLECTION_ATTRIBUTE:
@@ -170,7 +170,7 @@ public class SaifSchemaReader {
                 if (contentDataType == null) {
                   contentDataType = DataTypes.DATA_OBJECT;
                 }
-                currentClass.addAttribute(attributeName,
+                this.currentClass.addAttribute(attributeName,
                   new CollectionDataType(collectionDataType.getName(),
                     collectionDataType.getJavaClass(), contentDataType),
                   required);
@@ -183,7 +183,7 @@ public class SaifSchemaReader {
               if (iterator.getEventType() == CsnIterator.STRING_ATTRIBUTE_LENGTH) {
                 length = iterator.getIntegerValue();
               }
-              currentClass.addAttribute(attributeName, DataTypes.STRING,
+              this.currentClass.addAttribute(attributeName, DataTypes.STRING,
                 length, required);
             break;
             default:
@@ -215,15 +215,15 @@ public class SaifSchemaReader {
       final String attributeName = iterator.getStringValue();
       if (iterator.next() == CsnIterator.VALUE) {
         final Object value = iterator.getValue();
-        currentClass.addDefaultValue(attributeName, value);
+        this.currentClass.addDefaultValue(attributeName, value);
       } else {
         throw new IllegalStateException("Expecting a value");
       }
     }
   }
 
-  public List<RecordDefinitionProperty> getCommonMetaDataProperties() {
-    return commonMetaDataProperties;
+  public List<RecordDefinitionProperty> getCommonRecordDefinitionProperties() {
+    return this.commonRecordDefinitionProperties;
   }
 
   private Object getDefinition(final CsnIterator iterator) throws IOException {
@@ -236,13 +236,13 @@ public class SaifSchemaReader {
             nameTypeMap.put(enumeration.getName(), enumeration);
             return enumeration;
           }
-          final RecordDefinition superClass = schema.getRecordDefinition(superClassName);
+          final RecordDefinition superClass = this.schema.getRecordDefinition(superClassName);
           if (superClass == null) {
             throw new IllegalStateException("Cannot find super class '"
               + superClassName + "'");
 
           }
-          currentSuperClasses.add(superClass);
+          this.currentSuperClasses.add(superClass);
         break;
         case CsnIterator.COMPONENT_NAME:
           final String componentName = iterator.getStringValue();
@@ -252,7 +252,7 @@ public class SaifSchemaReader {
                 RecordDefinition.class, CsnIterator.class
               });
             method.invoke(this, new Object[] {
-              currentClass, iterator
+              this.currentClass, iterator
             });
           } catch (final SecurityException e) {
             throw new IllegalStateException("Unknown component '"
@@ -278,35 +278,34 @@ public class SaifSchemaReader {
         break;
       }
     }
-    return currentClass;
+    return this.currentClass;
   }
 
   private RecordDefinitionFactory loadSchema(final CsnIterator iterator)
     throws IOException {
-    if (schema == null) {
-      schema = new RecordDefinitionFactoryImpl();
+    if (this.schema == null) {
+      this.schema = new RecordDefinitionFactoryImpl();
 
-      schema.addMetaData(new RecordDefinitionImpl("/AggregateType"));
-      schema.addMetaData(new RecordDefinitionImpl("/PrimitiveType"));
+      this.schema.addRecordDefinition(new RecordDefinitionImpl("/AggregateType"));
+      this.schema.addRecordDefinition(new RecordDefinitionImpl("/PrimitiveType"));
 
       addExportedObjects();
     }
     while (iterator.next() != CsnIterator.END_DOCUMENT) {
-      currentSuperClasses.clear();
-      currentClass = null;
+      this.currentSuperClasses.clear();
+      this.currentClass = null;
       final Object definition = getDefinition(iterator);
       if (definition instanceof RecordDefinition) {
         final RecordDefinitionImpl recordDefinition = (RecordDefinitionImpl)definition;
         setRecordDefinitionProperties(recordDefinition);
-        recordDefinition.setRecordDefinitionFactory(schema);
-        schema.addMetaData(recordDefinition);
+        recordDefinition.setRecordDefinitionFactory(this.schema);
+        this.schema.addRecordDefinition(recordDefinition);
       }
     }
-    return schema;
+    return this.schema;
   }
 
-  public RecordDefinitionFactory loadSchema(final File file)
-    throws IOException {
+  public RecordDefinitionFactory loadSchema(final File file) throws IOException {
     final CsnIterator iterator = new CsnIterator(file);
     return loadSchema(iterator);
   }
@@ -330,7 +329,7 @@ public class SaifSchemaReader {
         loadSchema(resource);
       }
     }
-    return schema;
+    return this.schema;
   }
 
   private DataType processEnumeration(final CsnIterator iterator)
@@ -362,8 +361,8 @@ public class SaifSchemaReader {
     return new EnumerationDataType(name, String.class, allowedValues);
   }
 
-  public void restricted(final RecordDefinition type,
-    final CsnIterator iterator) throws IOException {
+  public void restricted(final RecordDefinition type, final CsnIterator iterator)
+      throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_PATH) {
       iterator.next();
       String attributeName = iterator.getStringValue();
@@ -445,13 +444,14 @@ public class SaifSchemaReader {
     }
   }
 
-  public void setCommonMetaDataProperties(
-    final List<RecordDefinitionProperty> commonMetaDataProperties) {
-    this.commonMetaDataProperties = commonMetaDataProperties;
+  public void setCommonRecordDefinitionProperties(
+    final List<RecordDefinitionProperty> commonRecordDefinitionProperties) {
+    this.commonRecordDefinitionProperties = commonRecordDefinitionProperties;
   }
 
-  private void setRecordDefinitionProperties(final RecordDefinitionImpl recordDefinition) {
-    for (final RecordDefinitionProperty property : commonMetaDataProperties) {
+  private void setRecordDefinitionProperties(
+    final RecordDefinitionImpl recordDefinition) {
+    for (final RecordDefinitionProperty property : this.commonRecordDefinitionProperties) {
       final RecordDefinitionProperty clonedProperty = property.clone();
       clonedProperty.setRecordDefinition(recordDefinition);
     }
@@ -461,12 +461,12 @@ public class SaifSchemaReader {
     throws IOException {
     if (iterator.next() == CsnIterator.CLASS_NAME) {
       final String className = iterator.getPathValue();
-      currentClass = new RecordDefinitionImpl(className);
-      for (final RecordDefinition superClassDef : currentSuperClasses) {
-        addSuperClass(currentClass, superClassDef);
+      this.currentClass = new RecordDefinitionImpl(className);
+      for (final RecordDefinition superClassDef : this.currentSuperClasses) {
+        addSuperClass(this.currentClass, superClassDef);
       }
       // currentClass.setName(className);
-      schema.addMetaData(currentClass);
+      this.schema.addRecordDefinition(this.currentClass);
     }
   }
 }

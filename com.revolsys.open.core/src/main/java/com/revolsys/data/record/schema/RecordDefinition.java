@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.io.RecordStoreSchemaElement;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.types.DataType;

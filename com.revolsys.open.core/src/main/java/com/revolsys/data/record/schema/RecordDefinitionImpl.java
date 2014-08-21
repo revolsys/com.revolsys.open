@@ -24,7 +24,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.property.AttributeProperties;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
-import com.revolsys.data.record.property.ValueMetaDataProperty;
+import com.revolsys.data.record.property.ValueRecordDefinitionProperty;
 import com.revolsys.data.types.DataType;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
@@ -49,12 +49,12 @@ implements RecordDefinition {
   }
 
   public static RecordDefinition getRecordDefinition(final int instanceId) {
-    return METADATA_CACHE.get(instanceId);
+    return RECORD_DEFINITION_CACHE.get(instanceId);
   }
 
   private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
 
-  private static final Map<Integer, RecordDefinitionImpl> METADATA_CACHE = new WeakCache<Integer, RecordDefinitionImpl>();
+  private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakCache<Integer, RecordDefinitionImpl>();
 
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
     "dataRecordDefinition", "Data Record Definition",
@@ -128,7 +128,7 @@ implements RecordDefinition {
     this(recordDefinition.getPath(), recordDefinition.getProperties(),
       recordDefinition.getAttributes());
     setIdAttributeIndex(recordDefinition.getIdAttributeIndex());
-    METADATA_CACHE.put(this.instanceId, this);
+    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public RecordDefinitionImpl(final RecordStoreSchema schema,
@@ -146,7 +146,7 @@ implements RecordDefinition {
     if (recordStore != null) {
       this.recordFactory = recordStore.getRecordFactory();
     }
-    METADATA_CACHE.put(this.instanceId, this);
+    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public RecordDefinitionImpl(final RecordStoreSchema schema,
@@ -161,7 +161,7 @@ implements RecordDefinition {
 
   public RecordDefinitionImpl(final String path) {
     super(path);
-    METADATA_CACHE.put(this.instanceId, this);
+    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public RecordDefinitionImpl(final String path, final Attribute... attributes) {
@@ -185,7 +185,7 @@ implements RecordDefinition {
       addAttribute(attribute.clone());
     }
     cloneProperties(properties);
-    METADATA_CACHE.put(this.instanceId, this);
+    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public void addAttribute(final Attribute attribute) {
@@ -310,7 +310,7 @@ implements RecordDefinition {
   @PreDestroy
   public void destroy() {
     super.close();
-    METADATA_CACHE.remove(this.instanceId);
+    RECORD_DEFINITION_CACHE.remove(this.instanceId);
     this.attributeIdMap.clear();
     this.attributeMap.clear();
     this.attributeNames.clear();
@@ -622,7 +622,7 @@ implements RecordDefinition {
   private void readObject(final ObjectInputStream ois)
       throws ClassNotFoundException, IOException {
     ois.defaultReadObject();
-    METADATA_CACHE.put(this.instanceId, this);
+    RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public RecordDefinitionImpl rename(final String path) {
@@ -736,8 +736,8 @@ implements RecordDefinition {
       for (final Entry<String, ? extends Object> entry : properties.entrySet()) {
         final String key = entry.getKey();
         final Object value = entry.getValue();
-        if (value instanceof ValueMetaDataProperty) {
-          final ValueMetaDataProperty valueProperty = (ValueMetaDataProperty)value;
+        if (value instanceof ValueRecordDefinitionProperty) {
+          final ValueRecordDefinitionProperty valueProperty = (ValueRecordDefinitionProperty)value;
           final String propertyName = valueProperty.getPropertyName();
           final Object propertyValue = valueProperty.getValue();
           JavaBeanUtil.setProperty(this, propertyName, propertyValue);

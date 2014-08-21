@@ -22,8 +22,7 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
-public class RecordConverterProcess extends
-  BaseInOutProcess<Record, Record> {
+public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
   private static final Logger LOG = LoggerFactory.getLogger(RecordConverterProcess.class);
 
   private Converter<Record, Record> defaultConverter;
@@ -43,25 +42,25 @@ public class RecordConverterProcess extends
 
   public void addTypeConverter(final String typePath,
     final Converter<Record, Record> converter) {
-    typeConverterMap.put(typePath, converter);
+    this.typeConverterMap.put(typePath, converter);
   }
 
   public void addTypeFilterConverter(final String typePath,
     final FilterRecordConverter filterConverter) {
 
-    Collection<FilterRecordConverter> converters = typeFilterConverterMap.get(typePath);
+    Collection<FilterRecordConverter> converters = this.typeFilterConverterMap.get(typePath);
     if (converters == null) {
       converters = new ArrayList<FilterRecordConverter>();
-      typeFilterConverterMap.put(typePath, converters);
+      this.typeFilterConverterMap.put(typePath, converters);
     }
     converters.add(filterConverter);
   }
 
   protected Record convert(final Record source) {
     int matchCount = 0;
-    final RecordDefinition sourceMetaData = source.getRecordDefinition();
-    final String sourceTypeName = sourceMetaData.getPath();
-    final Collection<FilterRecordConverter> converters = typeFilterConverterMap.get(sourceTypeName);
+    final RecordDefinition sourceRecordDefinition = source.getRecordDefinition();
+    final String sourceTypeName = sourceRecordDefinition.getPath();
+    final Collection<FilterRecordConverter> converters = this.typeFilterConverterMap.get(sourceTypeName);
     Record target = null;
     if (converters != null && !converters.isEmpty()) {
       for (final FilterRecordConverter filterConverter : converters) {
@@ -77,14 +76,14 @@ public class RecordConverterProcess extends
       }
     }
     if (matchCount == 0) {
-      final Converter<Record, Record> typeConveter = typeConverterMap.get(sourceTypeName);
+      final Converter<Record, Record> typeConveter = this.typeConverterMap.get(sourceTypeName);
       if (typeConveter != null) {
         target = typeConveter.convert(source);
         return target;
-      } else if (defaultConverter == null) {
+      } else if (this.defaultConverter == null) {
         return convertObjectWithNoConverter(source);
       } else {
-        return defaultConverter.convert(source);
+        return this.defaultConverter.convert(source);
 
       }
     } else {
@@ -108,44 +107,42 @@ public class RecordConverterProcess extends
   }
 
   public Converter<Record, Record> getDefaultConverter() {
-    return defaultConverter;
+    return this.defaultConverter;
   }
 
   public Map<String, Collection<FilterRecordConverter>> getFilterTypeConverterMap() {
-    return typeFilterConverterMap;
+    return this.typeFilterConverterMap;
   }
 
   public Statistics getStatistics() {
-    return statistics;
+    return this.statistics;
   }
 
   public RecordDefinition getTargetRecordDefinition(final String typePath) {
-    return targetRecordDefinitionFactory.getRecordDefinition(typePath);
+    return this.targetRecordDefinitionFactory.getRecordDefinition(typePath);
   }
 
   public RecordDefinitionFactory getTargetRecordDefinitionFactory() {
-    return targetRecordDefinitionFactory;
+    return this.targetRecordDefinitionFactory;
   }
 
   public Map<String, Converter<Record, Record>> getTypeConverterMap() {
-    return typeConverterMap;
+    return this.typeConverterMap;
   }
 
   @Override
-  protected void postRun(final Channel<Record> in,
-    final Channel<Record> out) {
+  protected void postRun(final Channel<Record> in, final Channel<Record> out) {
     super.postRun(in, out);
-    statistics.disconnect();
+    this.statistics.disconnect();
     // ignoredStatistics.disconnect();
   }
 
   @Override
-  protected void preRun(final Channel<Record> in,
-    final Channel<Record> out) {
-    statistics.connect();
+  protected void preRun(final Channel<Record> in, final Channel<Record> out) {
+    this.statistics.connect();
     // ignoredStatistics.connect();
-    if (simpleMapping != null) {
-      for (final Entry<Object, Map<String, Object>> entry : simpleMapping.entrySet()) {
+    if (this.simpleMapping != null) {
+      for (final Entry<Object, Map<String, Object>> entry : this.simpleMapping.entrySet()) {
         final Object key = entry.getKey();
         String sourceTypeName;
         if (key instanceof String) {
@@ -174,15 +171,15 @@ public class RecordConverterProcess extends
   }
 
   @Override
-  protected void process(final Channel<Record> in,
-    final Channel<Record> out, final Record source) {
+  protected void process(final Channel<Record> in, final Channel<Record> out,
+    final Record source) {
     final Record target = convert(source);
     if (target == null) {
       // ignoredStatistics.add(source);
     } else {
       out.write(target);
       if (source != target) {
-        statistics.add(target);
+        this.statistics.add(target);
       }
     }
   }

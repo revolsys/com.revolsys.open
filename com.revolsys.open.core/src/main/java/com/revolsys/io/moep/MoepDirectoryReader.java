@@ -55,7 +55,7 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements
   @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
     if (typePath.equals(MoepConstants.TYPE_NAME)) {
-      return MoepConstants.META_DATA;
+      return MoepConstants.RECORD_DEFINITION;
     } else {
       return null;
     }

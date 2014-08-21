@@ -23,12 +23,12 @@ import com.revolsys.util.ObjectProcessor;
 /**
  * Find and remove nodes that have exactly two edges for each feature type with
  * the same attribution and have the same geometry across all feature types.
- * 
+ *
  * @author Paul Austin
  */
 public class RecordPseudoNodeRemovalVisitor extends
-  AbstractNodeListenerVisitor<Record> implements
-  FilterProxy<Node<Record>>, ObjectProcessor<RecordGraph> {
+AbstractNodeListenerVisitor<Record> implements FilterProxy<Node<Record>>,
+  ObjectProcessor<RecordGraph> {
 
   private Filter<Node<Record>> filter;
 
@@ -39,21 +39,21 @@ public class RecordPseudoNodeRemovalVisitor extends
 
   @PreDestroy
   public void destroy() {
-    if (mergedStatistics != null) {
-      mergedStatistics.disconnect();
+    if (this.mergedStatistics != null) {
+      this.mergedStatistics.disconnect();
     }
-    mergedStatistics = null;
+    this.mergedStatistics = null;
   }
 
   @Override
   public Filter<Node<Record>> getFilter() {
-    return filter;
+    return this.filter;
   }
 
   @PostConstruct
   public void init() {
-    mergedStatistics = new Statistics("Merged at psuedo node");
-    mergedStatistics.connect();
+    this.mergedStatistics = new Statistics("Merged at psuedo node");
+    this.mergedStatistics.connect();
   }
 
   private void mergeEdgePairs(final Node<Record> node,
@@ -64,7 +64,7 @@ public class RecordPseudoNodeRemovalVisitor extends
         final Edge<Record> edge2 = edgePair.getEdge2();
         final Record object = edge1.getObject();
         if (mergeEdges(node, edge1, edge2) != null) {
-          mergedStatistics.add(object);
+          this.mergedStatistics.add(object);
         }
       }
     }
@@ -86,8 +86,8 @@ public class RecordPseudoNodeRemovalVisitor extends
     return newEdge;
   }
 
-  protected Record mergeObjects(final Node<Record> node,
-    final Record object1, final Record object2) {
+  protected Record mergeObjects(final Node<Record> node, final Record object1,
+    final Record object2) {
     return DirectionalAttributes.merge(node, object1, object2);
   }
 
@@ -97,7 +97,7 @@ public class RecordPseudoNodeRemovalVisitor extends
   }
 
   private void processPseudoNodes(final Node<Record> node) {
-    for (final RecordDefinition recordDefinition : NodeAttributes.getEdgeMetaDatas(node)) {
+    for (final RecordDefinition recordDefinition : NodeAttributes.getEdgeRecordDefinitions(node)) {
       final PseudoNodeProperty property = PseudoNodeProperty.getProperty(recordDefinition);
 
       final PseudoNodeAttribute pseudoNodeAttribute = property.getAttribute(node);

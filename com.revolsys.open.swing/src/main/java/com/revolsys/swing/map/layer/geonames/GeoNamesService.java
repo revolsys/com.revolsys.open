@@ -18,50 +18,54 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.io.Path;
 import com.revolsys.io.json.JsonParser;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.util.UrlUtil;
 
 public class GeoNamesService {
-  public static final RecordDefinition NAME_METADATA;
+  public static final RecordDefinition NAME_RECORD_DEFINITION;
 
-  public static final RecordDefinition WIKIPEDIA_METADATA;
+  public static final RecordDefinition WIKIPEDIA_RECORD_DEFINITION;
 
   static {
-    final RecordDefinitionImpl meta = new RecordDefinitionImpl(
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
       Path.toPath("/geoname.org", "name"));
-    meta.addAttribute("geonameId", DataTypes.STRING, false);
-    meta.addAttribute("name", DataTypes.STRING, false);
-    meta.addAttribute("fcode", DataTypes.STRING, false);
-    meta.addAttribute("fcodeName", DataTypes.STRING, false);
-    meta.addAttribute("fcl", DataTypes.STRING, false);
-    meta.addAttribute("fclName", DataTypes.STRING, false);
-    meta.addAttribute("adminName1", DataTypes.STRING, false);
-    meta.addAttribute("adminName2", DataTypes.STRING, false);
-    meta.addAttribute("adminName3", DataTypes.STRING, false);
-    meta.addAttribute("adminName4", DataTypes.STRING, false);
-    meta.addAttribute("adminCode1", DataTypes.STRING, false);
-    meta.addAttribute("population", DataTypes.INTEGER, false);
-    meta.addAttribute("countryCode", DataTypes.STRING, false);
-    meta.addAttribute("countryName", DataTypes.STRING, false);
-    meta.addAttribute("timeZoneId", DataTypes.STRING, false);
-    meta.addAttribute("geometry", DataTypes.POINT, false);
-    NAME_METADATA = meta;
+    recordDefinition.addAttribute("geonameId", DataTypes.STRING, false);
+    recordDefinition.addAttribute("name", DataTypes.STRING, false);
+    recordDefinition.addAttribute("fcode", DataTypes.STRING, false);
+    recordDefinition.addAttribute("fcodeName", DataTypes.STRING, false);
+    recordDefinition.addAttribute("fcl", DataTypes.STRING, false);
+    recordDefinition.addAttribute("fclName", DataTypes.STRING, false);
+    recordDefinition.addAttribute("adminName1", DataTypes.STRING, false);
+    recordDefinition.addAttribute("adminName2", DataTypes.STRING, false);
+    recordDefinition.addAttribute("adminName3", DataTypes.STRING, false);
+    recordDefinition.addAttribute("adminName4", DataTypes.STRING, false);
+    recordDefinition.addAttribute("adminCode1", DataTypes.STRING, false);
+    recordDefinition.addAttribute("population", DataTypes.INTEGER, false);
+    recordDefinition.addAttribute("countryCode", DataTypes.STRING, false);
+    recordDefinition.addAttribute("countryName", DataTypes.STRING, false);
+    recordDefinition.addAttribute("timeZoneId", DataTypes.STRING, false);
+    recordDefinition.addAttribute("geometry", DataTypes.POINT, false);
+    NAME_RECORD_DEFINITION = recordDefinition;
 
-    final RecordDefinitionImpl wikipediaMetaData = new RecordDefinitionImpl(
+    final RecordDefinitionImpl wikipediaRecordDefinition = new RecordDefinitionImpl(
       Path.toPath("/geoname.org", "wikipedia"));
-    wikipediaMetaData.addAttribute("summary", DataTypes.STRING, false);
-    wikipediaMetaData.addAttribute("title", DataTypes.STRING, false);
-    wikipediaMetaData.addAttribute("wikipediaUrl", DataTypes.STRING, false);
-    wikipediaMetaData.addAttribute("countryCode", DataTypes.STRING, false);
-    wikipediaMetaData.addAttribute("feature", DataTypes.STRING, false);
-    wikipediaMetaData.addAttribute("thumbnailImg", DataTypes.STRING, false);
-    wikipediaMetaData.addAttribute("lang", DataTypes.STRING, false);
-    wikipediaMetaData.addAttribute("population", DataTypes.INTEGER, false);
-    wikipediaMetaData.addAttribute("geometry", DataTypes.POINT, false);
+    wikipediaRecordDefinition.addAttribute("summary", DataTypes.STRING, false);
+    wikipediaRecordDefinition.addAttribute("title", DataTypes.STRING, false);
+    wikipediaRecordDefinition.addAttribute("wikipediaUrl", DataTypes.STRING,
+      false);
+    wikipediaRecordDefinition.addAttribute("countryCode", DataTypes.STRING,
+      false);
+    wikipediaRecordDefinition.addAttribute("feature", DataTypes.STRING, false);
+    wikipediaRecordDefinition.addAttribute("thumbnailImg", DataTypes.STRING,
+      false);
+    wikipediaRecordDefinition.addAttribute("lang", DataTypes.STRING, false);
+    wikipediaRecordDefinition.addAttribute("population", DataTypes.INTEGER,
+      false);
+    wikipediaRecordDefinition.addAttribute("geometry", DataTypes.POINT, false);
 
-    WIKIPEDIA_METADATA = wikipediaMetaData;
+    WIKIPEDIA_RECORD_DEFINITION = wikipediaRecordDefinition;
   }
 
   private URL searchJsonUrl;
@@ -94,9 +98,9 @@ public class GeoNamesService {
     final double width = geographicBoundingBox.getWidth();
     final double diagonal = Math.sqrt(width * width + height * height);
     final double radiusKm = cs.getUnit()
-      .getConverterTo(SI.RADIAN)
-      .convert(diagonal)
-      * radius / 1000;
+        .getConverterTo(SI.RADIAN)
+        .convert(diagonal)
+        * radius / 1000;
 
     params.put("lat", geographicBoundingBox.getCentreY());
     params.put("lng", geographicBoundingBox.getCentreX());
@@ -107,10 +111,10 @@ public class GeoNamesService {
     try {
       final URL searchUrl = new URL(searchUrlString);
       final Map<String, Object> result = JsonParser.getMap(searchUrl.openStream());
-      return mapToObjects(NAME_METADATA, result);
+      return mapToObjects(NAME_RECORD_DEFINITION, result);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to connect to URL:"
-        + searchUrlString);
+          + searchUrlString);
     }
   }
 
@@ -128,10 +132,10 @@ public class GeoNamesService {
     try {
       final URL searchUrl = new URL(searchUrlString);
       final Map<String, Object> result = JsonParser.getMap(searchUrl.openStream());
-      return mapToObjects(WIKIPEDIA_METADATA, result);
+      return mapToObjects(WIKIPEDIA_RECORD_DEFINITION, result);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to connect to URL:"
-        + searchUrlString);
+          + searchUrlString);
     }
   }
 
@@ -169,8 +173,7 @@ public class GeoNamesService {
       } else {
         coordinate = new PointDouble(lon, lat, elevation.doubleValue());
       }
-      record.setGeometryValue(GeometryFactory.floating3()
-        .point(coordinate));
+      record.setGeometryValue(GeometryFactory.floating3().point(coordinate));
       results.add(record);
     }
     return results;
@@ -180,8 +183,7 @@ public class GeoNamesService {
     return searchByName(name, null);
   }
 
-  public List<Record> searchByName(final String name,
-    final String countryCode) {
+  public List<Record> searchByName(final String name, final String countryCode) {
     final Map<String, String> params = new HashMap<String, String>();
     params.put("name", name);
     params.put("style", "FULL");
@@ -190,10 +192,10 @@ public class GeoNamesService {
     try {
       final URL searchUrl = new URL(searchUrlString);
       final Map<String, Object> result = JsonParser.getMap(searchUrl.openStream());
-      return mapToObjects(NAME_METADATA, result);
+      return mapToObjects(NAME_RECORD_DEFINITION, result);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to connect to URL:"
-        + searchUrlString);
+          + searchUrlString);
     }
   }
 }

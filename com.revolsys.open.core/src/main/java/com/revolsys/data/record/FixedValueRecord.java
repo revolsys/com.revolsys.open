@@ -9,7 +9,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 public class FixedValueRecord extends BaseRecord {
   private static final long serialVersionUID = 1L;
 
-  private static final RecordDefinition META_DATA = new RecordDefinitionImpl();
+  private static final RecordDefinition RECORD_DEFINITION = new RecordDefinitionImpl();
 
   private final Object value;
 
@@ -20,7 +20,7 @@ public class FixedValueRecord extends BaseRecord {
   }
 
   public FixedValueRecord(final Object value) {
-    this(META_DATA, value);
+    this(RECORD_DEFINITION, value);
   }
 
   @Override

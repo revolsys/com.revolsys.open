@@ -22,7 +22,7 @@ public class NodeAttributes {
   protected static class Methods {
     public static Set<Double> edgeAngles(final Node<?> node) {
       final Set<Double> angles = new TreeSet<Double>(
-        new NumericComparator<Double>());
+          new NumericComparator<Double>());
       for (final Edge<?> edge : node.getInEdges()) {
         final double toAngle = edge.getToAngle();
         angles.add(toAngle);
@@ -51,7 +51,7 @@ public class NodeAttributes {
       return anglesByType;
     }
 
-    public static Set<RecordDefinition> edgeMetaDatas(final Node<?> node) {
+    public static Set<RecordDefinition> edgeRecordDefinitions(final Node<?> node) {
       final Set<RecordDefinition> recordDefinitions = new HashSet<RecordDefinition>();
       for (final Edge<?> edge : node.getEdges()) {
         final Object object = edge.getObject();
@@ -153,26 +153,12 @@ public class NodeAttributes {
     }
   }
 
-  private static String EDGE_ANGLES = "edgeAngles";
-
-  private static String EDGE_ANGLES_BY_TYPE = "edgeAnglesByType";
-
-  private static String EDGE_TYPE_NAMES = "edgeTypeNames";
-
-  private static String EDGE_META_DATAS = "edgeMetaDatas";
-
-  private static String EDGES_BY_LINE_AND_TYPE_NAME = "edgesByLineAndTypeName";
-
-  private static String EDGES_BY_TYPE = "edgesByType";
-
-  private static String EDGES_BY_TYPE_NAME_AND_LINE = "edgesByTypeNameAndLine";
-
   @SuppressWarnings("unchecked")
   private static <T, V> V getAttribute(final Node<T> node, final String name) {
     final String attributeName = NodeAttributes.class.getName() + "." + name;
     if (!node.hasAttribute(attributeName)) {
       final ObjectAttributeProxy<T, V> proxy = new InvokeMethodObjectAttributeProxy<T, V>(
-        Methods.class, name, Node.class);
+          Methods.class, name, Node.class);
       node.setAttribute(attributeName, proxy);
     }
     final V value = (V)node.getAttribute(attributeName);
@@ -194,15 +180,15 @@ public class NodeAttributes {
     return angles;
   }
 
-  public static Set<RecordDefinition> getEdgeMetaDatas(
+  public static Set<RecordDefinition> getEdgeRecordDefinitions(
     final Node<? extends Object> node) {
-    return getAttribute(node, EDGE_META_DATAS);
+    return getAttribute(node, EDGE_RECORD_DEFINITIONS);
   }
 
   /**
    * Get the map of edge angles, which contains a map of type names to the list
    * of edges with that angle and type name.
-   * 
+   *
    * @param <T>
    * @param node The node.
    * @return The map.
@@ -234,5 +220,19 @@ public class NodeAttributes {
   public static Set<String> getEdgeTypeNames(final Node<? extends Object> node) {
     return getAttribute(node, EDGE_TYPE_NAMES);
   }
+
+  private static String EDGE_ANGLES = "edgeAngles";
+
+  private static String EDGE_ANGLES_BY_TYPE = "edgeAnglesByType";
+
+  private static String EDGE_TYPE_NAMES = "edgeTypeNames";
+
+  private static String EDGE_RECORD_DEFINITIONS = "edgeRecordDefinitions";
+
+  private static String EDGES_BY_LINE_AND_TYPE_NAME = "edgesByLineAndTypeName";
+
+  private static String EDGES_BY_TYPE = "edgesByType";
+
+  private static String EDGES_BY_TYPE_NAME_AND_LINE = "edgesByTypeNameAndLine";
 
 }

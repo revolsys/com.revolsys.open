@@ -61,22 +61,22 @@ public class FileGdbWriter extends AbstractRecordWriter {
     }
   }
 
-  private void delete(final Record object) {
-    final RecordDefinition objectMetaData = object.getRecordDefinition();
-    final String typePath = objectMetaData.getPath();
+  private void delete(final Record record) {
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
+    final String typePath = recordDefinition.getPath();
     final Table table = getTable(typePath);
     final EnumRows rows = this.recordStore.search(table, "OBJECTID",
-      "OBJECTID=" + object.getValue("OBJECTID"), false);
+      "OBJECTID=" + record.getValue("OBJECTID"), false);
     if (rows != null) {
       try {
         final Row row = this.recordStore.nextRow(rows);
         if (row != null) {
           try {
             this.recordStore.deletedRow(table, row);
-            object.setState(RecordState.Deleted);
+            record.setState(RecordState.Deleted);
           } finally {
             this.recordStore.closeRow(row);
-            this.recordStore.addStatistic("Delete", object);
+            this.recordStore.addStatistic("Delete", record);
           }
         }
       } finally {
@@ -98,16 +98,16 @@ public class FileGdbWriter extends AbstractRecordWriter {
   }
 
   private void insert(final Record record) {
-    final RecordDefinition sourceMetaData = record.getRecordDefinition();
-    final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceMetaData);
-    final String typePath = sourceMetaData.getPath();
+    final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
+    final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
+    final String typePath = sourceRecordDefinition.getPath();
     for (final Attribute attribute : recordDefinition.getAttributes()) {
       final String name = attribute.getName();
       if (attribute.isRequired()) {
         final Object value = record.getValue(name);
         if (value == null && !(attribute instanceof OidAttribute)) {
           throw new IllegalArgumentException("Atribute " + typePath + "."
-              + name + " is required");
+            + name + " is required");
         }
       }
     }
@@ -156,9 +156,9 @@ public class FileGdbWriter extends AbstractRecordWriter {
     if (objectId == null) {
       insert(object);
     } else {
-      final RecordDefinition sourceMetaData = object.getRecordDefinition();
-      final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceMetaData);
-      final String typePath = sourceMetaData.getPath();
+      final RecordDefinition sourceRecordDefinition = object.getRecordDefinition();
+      final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
+      final String typePath = sourceRecordDefinition.getPath();
       final Table table = getTable(typePath);
       final EnumRows rows = this.recordStore.search(table, "OBJECTID",
         "OBJECTID=" + objectId, false);
@@ -183,7 +183,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
             } catch (final IllegalArgumentException e) {
               LoggerFactory.getLogger(FileGdbWriter.class).error(
                 "Unable to update row " + e.getMessage() + "\n"
-                    + object.toString(), e);
+                  + object.toString(), e);
             } catch (final RuntimeException e) {
               LoggerFactory.getLogger(FileGdbWriter.class).error(
                 "Unable to update row \n:" + object.toString());
@@ -212,16 +212,16 @@ public class FileGdbWriter extends AbstractRecordWriter {
         switch (object.getState()) {
           case New:
             insert(object);
-            break;
+          break;
           case Modified:
             update(object);
-            break;
+          break;
           case Persisted:
-            // No action required
-            break;
+          // No action required
+          break;
           case Deleted:
             delete(object);
-            break;
+          break;
           default:
             throw new IllegalStateException("State not known");
         }
