@@ -34,7 +34,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.data.types.DataType;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
@@ -52,7 +52,7 @@ public class AddDefaultValuesProcess extends
 
   private void addDefaultValues(final Map<String, Object> defaultValues,
     final RecordDefinition type) {
-    if (PathUtil.getPath(type.getPath()).equals(schemaName)) {
+    if (Path.getPath(type.getPath()).equals(schemaName)) {
       defaultValues.putAll(type.getDefaultValues());
     }
   }
@@ -99,7 +99,7 @@ public class AddDefaultValuesProcess extends
 
     boolean process = true;
     if (schemaName != null) {
-      if (!PathUtil.getPath(type.getPath()).equals(schemaName)) {
+      if (!Path.getPath(type.getPath()).equals(schemaName)) {
         process = false;
       }
     }

@@ -13,7 +13,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.io.esri.gdb.xml.model.enums.GeometryType;
@@ -183,7 +183,7 @@ public class EsriXmlRecordMetaDataUtil implements EsriGeodatabaseXmlConstants {
   public static DETable createDETable(final RecordDefinition recordDefinition,
     final SpatialReference spatialReference) {
     final String typePath = recordDefinition.getPath();
-    final String schemaPath = PathUtil.getPath(typePath)
+    final String schemaPath = Path.getPath(typePath)
         .replaceAll("/", "\\\\");
 
     return createDETable(schemaPath, recordDefinition, spatialReference);
@@ -227,7 +227,7 @@ public class EsriXmlRecordMetaDataUtil implements EsriGeodatabaseXmlConstants {
     }
 
     final String path = recordDefinition.getPath();
-    final String name = PathUtil.getName(path);
+    final String name = Path.getName(path);
     if (hasGeometry) {
       final DEFeatureClass featureClass = new DEFeatureClass();
       table = featureClass;
@@ -295,7 +295,7 @@ public class EsriXmlRecordMetaDataUtil implements EsriGeodatabaseXmlConstants {
     } else {
       tableName = domain.getName();
     }
-    final String typePath = PathUtil.toPath(schemaName, tableName);
+    final String typePath = Path.toPath(schemaName, tableName);
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
       typePath);
     final FieldType fieldType = domain.getFieldType();
@@ -326,7 +326,7 @@ public class EsriXmlRecordMetaDataUtil implements EsriGeodatabaseXmlConstants {
   public static RecordDefinition getRecordDefinition(final String schemaName,
     final DETable deTable, final boolean ignoreEsriFields) {
     final String tableName = deTable.getName();
-    final String typePath = PathUtil.toPath(schemaName, tableName);
+    final String typePath = Path.toPath(schemaName, tableName);
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
       typePath);
     final List<String> ignoreFieldNames = new ArrayList<String>();

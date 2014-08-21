@@ -13,7 +13,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.gis.oracle.io.OracleRecordStore;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -53,7 +53,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements
           final String tableName = resultSet.getString(1);
           final String columnName = resultSet.getString(2);
 
-          final String typePath = PathUtil.toPath(schemaName, tableName);
+          final String typePath = Path.toPath(schemaName, tableName);
 
           final int esriSrid = resultSet.getInt(3);
           JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
@@ -115,7 +115,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements
       resultSet = statement.executeQuery();
       while (resultSet.next()) {
         final String tableName = resultSet.getString(2);
-        final String typePath = PathUtil.toPath(schemaName, tableName)
+        final String typePath = Path.toPath(schemaName, tableName)
           .toUpperCase();
 
         final int registrationId = resultSet.getInt(1);

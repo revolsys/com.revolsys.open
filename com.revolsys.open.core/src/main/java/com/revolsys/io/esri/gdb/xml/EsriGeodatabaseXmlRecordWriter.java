@@ -18,7 +18,7 @@ import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.io.AbstractRecordWriter;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.io.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
 import com.revolsys.io.xml.XmlConstants;
@@ -157,7 +157,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     this.out.attribute(XsiConstants.TYPE, dataElementType);
 
     final String path = recordDefinition.getPath();
-    final String localName = PathUtil.getName(path);
+    final String localName = Path.getName(path);
     this.out.element(CATALOG_PATH, "/FC=" + localName);
     this.out.element(NAME, localName);
     this.out.element(METADATA_RETRIEVED, true);

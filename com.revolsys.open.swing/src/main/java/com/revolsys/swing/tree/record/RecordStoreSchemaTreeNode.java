@@ -12,7 +12,7 @@ import com.revolsys.data.io.RecordStoreProxy;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
@@ -34,7 +34,7 @@ RecordStoreConnectionMapProxy {
     setIcon(ICON_SCHEMA);
     setParent(parent);
     this.schemaPath = schemaPath;
-    String name = PathUtil.getName(schemaPath);
+    String name = Path.getName(schemaPath);
     if (!Property.hasValue(name)) {
       name = "/";
     }

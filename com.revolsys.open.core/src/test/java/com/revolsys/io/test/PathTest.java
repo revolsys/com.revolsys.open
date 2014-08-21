@@ -1,35 +1,38 @@
 package com.revolsys.io.test;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 
-public class PathUtilTest {
+public class PathTest {
 
   private void assertAncestor(final String parentPath, final String childPath,
     final boolean expected) {
-    final boolean ancestor = PathUtil.isAncestor(parentPath, childPath);
+    final boolean ancestor = Path.isAncestor(parentPath, childPath);
     Assert.assertEquals(expected, ancestor);
   }
 
   private void assertChildName(final String parentPath, final String childPath,
     final String expected) {
-    final String childName = PathUtil.getChildName(parentPath, childPath);
+    final String childName = Path.getChildName(parentPath, childPath);
     Assert.assertEquals(expected, childName);
   }
 
   private void assertChildPath(final String parentPath, final String childPath,
     final String expected) {
-    final String childName = PathUtil.getChildPath(parentPath, childPath);
+    final String childName = Path.getChildPath(parentPath, childPath);
     Assert.assertEquals(expected, childName);
   }
 
   private void assertClean(final String source, final String expected) {
-    final String cleaned = PathUtil.clean(source);
+    final String cleaned = Path.clean(source);
     Assert.assertEquals(expected, cleaned);
 
-    final String cleanedUpper = PathUtil.cleanUpper(source);
+    final String cleanedUpper = Path.cleanUpper(source);
     String expectedUpper;
     if (expected == null) {
       expectedUpper = null;
@@ -40,19 +43,24 @@ public class PathUtilTest {
   }
 
   private void assertName(final String source, final String expected) {
-    final String name = PathUtil.getName(source);
+    final String name = Path.getName(source);
     Assert.assertEquals(expected, name);
   }
 
   private void assertParent(final String parentPath, final String childPath,
     final boolean expected) {
-    final boolean parent = PathUtil.isParent(parentPath, childPath);
+    final boolean parent = Path.isParent(parentPath, childPath);
     Assert.assertEquals(expected, parent);
   }
 
   private void assertPath(final String source, final String expected) {
-    final String path = PathUtil.getPath(source);
+    final String path = Path.getPath(source);
     Assert.assertEquals(expected, path);
+  }
+
+  private void assertPaths(final String path, final String... expected) {
+    final List<String> paths = Path.getPaths(path);
+    Assert.assertEquals(Arrays.asList(expected), paths);
   }
 
   @Test
@@ -103,7 +111,7 @@ public class PathUtilTest {
     assertChildPath("/test", "/test/", null);
     assertChildPath("/", "", null);
     assertChildPath("/", "/", null);
-    assertChildPath("/", "/test", "test");
+    assertChildPath("/", "/test", "/test");
     assertChildPath("", "/", null);
     assertChildPath("/test", "/test/aaa", "/test/aaa");
     assertChildPath("/test/aaa", "/test/aaa", null);
@@ -169,5 +177,15 @@ public class PathUtilTest {
     assertPath("/test/", "/");
     assertPath("/test/aaa", "/test");
     assertPath("/test /\\a\\/bbbbb", "/test /a");
+  }
+
+  @Test
+  public void testPaths() {
+    assertPaths(null);
+    assertPaths("", "/");
+    assertPaths("/", "/");
+    assertPaths("/t", "/", "/t");
+    assertPaths("/test", "/", "/test");
+    assertPaths("/test/aaa", "/", "/test", "/test/aaa");
   }
 }

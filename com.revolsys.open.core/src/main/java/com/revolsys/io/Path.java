@@ -1,12 +1,13 @@
 package com.revolsys.io;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.util.Property;
 
-public final class PathUtil {
+public final class Path {
 
   public static String clean(final String path) {
     if (path == null) {
@@ -175,6 +176,30 @@ public final class PathUtil {
     }
   }
 
+  public static List<String> getPaths(String path) {
+    if (path == null) {
+      return Collections.emptyList();
+    } else {
+      path = clean(path);
+      if (path.length() == 1) {
+        return Collections.singletonList(path);
+      } else {
+        final List<String> paths = new ArrayList<>();
+        paths.add("/");
+        int startIndex = 1;
+        while (startIndex != -1) {
+          startIndex = path.indexOf('/', startIndex);
+          if (startIndex != -1) {
+            paths.add(path.substring(0, startIndex));
+            startIndex++;
+          }
+        }
+        paths.add(path);
+        return paths;
+      }
+    }
+  }
+
   public static boolean isAncestor(String parentPath, String childPath) {
     if (parentPath != null && childPath != null) {
       parentPath = cleanUpper(parentPath);
@@ -228,6 +253,6 @@ public final class PathUtil {
     }
   }
 
-  private PathUtil() {
+  private Path() {
   }
 }

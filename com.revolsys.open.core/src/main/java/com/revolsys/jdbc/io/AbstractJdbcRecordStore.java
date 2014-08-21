@@ -47,7 +47,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
@@ -339,7 +339,7 @@ implements JdbcRecordStore, RecordStoreExtension {
 
   public JdbcAttribute getAttribute(final String schemaName,
     final String tableName, final String columnName) {
-    final String typePath = PathUtil.toPath(schemaName, tableName);
+    final String typePath = Path.toPath(schemaName, tableName);
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null) {
       return null;
@@ -393,7 +393,7 @@ implements JdbcRecordStore, RecordStoreExtension {
 
   @Override
   public String getDatabaseQualifiedTableName(final String typePath) {
-    final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
+    final String schema = getDatabaseSchemaName(Path.getPath(typePath));
     final String tableName = getDatabaseTableName(typePath);
     return schema + "." + tableName;
   }
@@ -486,7 +486,7 @@ implements JdbcRecordStore, RecordStoreExtension {
   public RecordDefinition getRecordDefinition(final String typePath,
     final ResultSetMetaData resultSetMetaData) {
     try {
-      final String schemaName = PathUtil.getPath(typePath);
+      final String schemaName = Path.getPath(typePath);
       final RecordStoreSchema schema = getSchema(schemaName);
       final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
         schema, typePath);
@@ -830,7 +830,7 @@ implements JdbcRecordStore, RecordStoreExtension {
         final Set<String> tableNames = tablePermissionsMap.keySet();
         for (final String dbTableName : tableNames) {
           final String tableName = dbTableName.toUpperCase();
-          final String typePath = PathUtil.toPath(schemaName, tableName);
+          final String typePath = Path.toPath(schemaName, tableName);
           this.tableNameMap.put(typePath, dbTableName);
           final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
             schema, typePath);
@@ -848,7 +848,7 @@ implements JdbcRecordStore, RecordStoreExtension {
           while (columnsRs.next()) {
             final String tableName = columnsRs.getString("TABLE_NAME")
                 .toUpperCase();
-            final String typePath = PathUtil.toPath(schemaName, tableName);
+            final String typePath = Path.toPath(schemaName, tableName);
             final RecordDefinitionImpl recordDefinition = (RecordDefinitionImpl)recordDefinitionMap.get(typePath);
             if (recordDefinition != null) {
               final String dbColumnName = columnsRs.getString("COLUMN_NAME");

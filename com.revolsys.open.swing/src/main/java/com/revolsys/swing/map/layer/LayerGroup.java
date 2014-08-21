@@ -21,7 +21,7 @@ import org.springframework.core.io.Resource;
 import com.revolsys.collection.Parent;
 import com.revolsys.data.io.RecordIoFactories;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
@@ -53,7 +53,7 @@ Parent<Layer> {
   }
 
   private static Layer getLayer(LayerGroup group, final String name) {
-    for (final String path : PathUtil.getPathElements(PathUtil.getPath(name))) {
+    for (final String path : Path.getPathElements(Path.getPath(name))) {
       final Layer layer = getLayerByName(group, path);
       if (layer instanceof LayerGroup) {
         group = (LayerGroup)layer;
@@ -63,7 +63,7 @@ Parent<Layer> {
     }
 
     if (group != null) {
-      final String layerName = PathUtil.getName(name);
+      final String layerName = Path.getName(name);
 
       return getLayerByName(group, layerName);
     }

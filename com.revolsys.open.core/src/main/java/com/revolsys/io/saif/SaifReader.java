@@ -53,7 +53,7 @@ import com.revolsys.data.record.schema.RecordDefinitionFactoryImpl;
 import com.revolsys.gis.io.RecordIterator;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.saif.util.PathCache;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.spring.SpringUtil;
@@ -303,7 +303,7 @@ RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
     final String className) throws IOException {
     String fileName = this.typePathFileNameMap.get(className);
     if (fileName == null) {
-      fileName = PathUtil.getName(className);
+      fileName = Path.getName(className);
     }
     OsnReader reader;
     if (this.zipFile != null) {

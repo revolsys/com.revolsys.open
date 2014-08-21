@@ -12,7 +12,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.gml.type.GmlFieldType;
 import com.revolsys.io.gml.type.GmlFieldTypeRegistry;
 import com.revolsys.io.xml.XmlWriter;
@@ -114,8 +114,8 @@ GmlConstants {
     QName qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (qualifiedName == null) {
       final String typeName = recordDefinition.getPath();
-      final String path = PathUtil.getPath(typeName);
-      final String name = PathUtil.getName(typeName);
+      final String path = Path.getPath(typeName);
+      final String name = Path.getName(typeName);
       qualifiedName = new QName(path, name);
       recordDefinition.setProperty(RecordProperties.QUALIFIED_NAME,
         qualifiedName);

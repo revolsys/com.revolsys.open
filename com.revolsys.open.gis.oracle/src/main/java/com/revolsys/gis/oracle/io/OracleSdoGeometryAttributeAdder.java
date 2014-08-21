@@ -22,7 +22,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
@@ -195,7 +195,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
             while (resultSet.next()) {
               final String tableName = resultSet.getString(1);
               final String columnName = resultSet.getString(2);
-              final String typePath = PathUtil.toPath(schemaName, tableName);
+              final String typePath = Path.toPath(schemaName, tableName);
 
               int srid = resultSet.getInt(3);
               if (resultSet.wasNull() || srid < 0) {

@@ -33,7 +33,7 @@ import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.oracle.esri.ArcSdeBinaryGeometryRecordStoreExtension;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryAttribute;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryRecordStoreExtension;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
@@ -326,7 +326,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       return null;
     } else {
       final String typePath = recordDefinition.getPath();
-      final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
+      final String schema = getDatabaseSchemaName(Path.getPath(typePath));
       final String shortName = ShortNameProperty.getShortName(recordDefinition);
       final String sequenceName;
       if (Property.hasValue(shortName)) {

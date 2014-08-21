@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 import javax.swing.tree.TreeNode;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
@@ -69,7 +69,7 @@ public class RecordStoreTableTreeNode extends LazyLoadTreeNode {
     setAllowsChildren(false);
     setParent(parent);
 
-    final String name = PathUtil.getName(typePath);
+    final String name = Path.getName(typePath);
     setName(name);
 
     Icon icon = ICONS_GEOMETRY.get(geometryType);

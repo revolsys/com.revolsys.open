@@ -25,7 +25,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.io.ObjectWithProperties;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.Writer;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 import com.revolsys.spring.SpringUtil;
@@ -111,7 +111,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final RecordDefinition storeRecordDefinition = super.getRecordDefinition(recordDefinition);
     if (storeRecordDefinition == null && this.createMissingTables) {
       final String typePath = recordDefinition.getPath();
-      final String schemaName = PathUtil.getPath(typePath);
+      final String schemaName = Path.getPath(typePath);
       RecordStoreSchema schema = getSchema(schemaName);
       if (schema == null && this.createMissingTables) {
         schema = new RecordStoreSchema(getRootSchema(), schemaName);
@@ -176,7 +176,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final String typePath = recordDefinition.getPath();
     Writer<Record> writer = this.writers.get(typePath);
     if (writer == null) {
-      final String schemaName = PathUtil.getPath(typePath);
+      final String schemaName = Path.getPath(typePath);
       final File subDirectory = new File(getDirectory(), schemaName);
       final String fileExtension = getFileExtension();
       final File file = new File(subDirectory, recordDefinition.getName() + "."
@@ -206,7 +206,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final Resource resource) {
     try (
       RecordReader recordReader = RecordIoFactories.recordReader(resource)) {
-      final String typePath = PathUtil.toPath(schemaName,
+      final String typePath = Path.toPath(schemaName,
         SpringUtil.getBaseName(resource));
       recordReader.setProperty("schema", schema);
       recordReader.setProperty("typePath", typePath);

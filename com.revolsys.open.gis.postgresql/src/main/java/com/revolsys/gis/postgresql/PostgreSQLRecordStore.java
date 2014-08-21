@@ -20,7 +20,7 @@ import com.revolsys.data.record.property.ShortNameProperty;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
@@ -134,7 +134,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   public String getSequenceName(final RecordDefinition recordDefinition) {
     final String typePath = recordDefinition.getPath();
-    final String schema = getDatabaseSchemaName(PathUtil.getPath(typePath));
+    final String schema = getDatabaseSchemaName(Path.getPath(typePath));
     final String shortName = ShortNameProperty.getShortName(recordDefinition);
     final String sequenceName;
     if (Property.hasValue(shortName)) {

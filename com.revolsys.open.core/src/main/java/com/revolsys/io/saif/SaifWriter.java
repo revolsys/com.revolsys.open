@@ -44,7 +44,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.ZipUtil;
 import com.revolsys.io.saif.util.ObjectSetUtil;
 import com.revolsys.io.saif.util.OsnConverterRegistry;
@@ -197,8 +197,8 @@ public class SaifWriter extends AbstractRecordWriter {
       final String compositeType = (String)export.get("compositeType");
       final String referenceId = (String)export.get("referenceId");
       final String objectSubset = (String)export.get("objectSubset");
-      String compositeTypeName = PathUtil.getName(compositeType);
-      final String compositeNamespace = PathUtil.getPath(compositeType)
+      String compositeTypeName = Path.getName(compositeType);
+      final String compositeNamespace = Path.getPath(compositeType)
           .replaceAll("/", "");
       if (Property.hasValue(compositeNamespace)) {
         compositeTypeName += "::" + compositeNamespace;
@@ -315,7 +315,7 @@ public class SaifWriter extends AbstractRecordWriter {
   public String getObjectIdentifier(final String typePath) {
     String objectIdentifier = this.objectIdentifiers.get(typePath);
     if (objectIdentifier == null) {
-      objectIdentifier = PathUtil.getName(typePath);
+      objectIdentifier = Path.getName(typePath);
       this.objectIdentifiers.put(typePath, objectIdentifier);
     }
     return objectIdentifier;
@@ -347,7 +347,7 @@ public class SaifWriter extends AbstractRecordWriter {
   private String getObjectSubsetName(final String typePath) {
     String objectSubsetName = getObjectSetName(typePath);
     if (objectSubsetName == null) {
-      objectSubsetName = PathUtil.getName(typePath);
+      objectSubsetName = Path.getName(typePath);
       if (objectSubsetName.length() > 6) {
         objectSubsetName = objectSubsetName.substring(0, 6);
       }
@@ -403,12 +403,12 @@ public class SaifWriter extends AbstractRecordWriter {
           serializer = createSerializer("/ImportedObject", new File(
             this.tempDirectory, "imports.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
-        } else if (PathUtil.getName(typePath).endsWith(
+        } else if (Path.getName(typePath).endsWith(
             "InternallyReferencedObjects")) {
           serializer = createSerializer("/InternallyReferencedObject",
             new File(this.tempDirectory, "internal.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
-        } else if (PathUtil.getName(typePath).endsWith("GlobalMetadata")) {
+        } else if (Path.getName(typePath).endsWith("GlobalMetadata")) {
           serializer = createSerializer(GLOBAL_METADATA, new File(
             this.tempDirectory, "globmeta.osn"), Long.MAX_VALUE);
           addExport(typePath, typePath, "globmeta.osn");

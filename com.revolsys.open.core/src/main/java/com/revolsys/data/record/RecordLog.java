@@ -11,7 +11,7 @@ import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.Writer;
 
 public class RecordLog {
@@ -102,15 +102,15 @@ public class RecordLog {
     RecordDefinitionImpl logMetaData = this.logMetaDataMap.get(recordDefinition);
     if (logMetaData == null) {
       final String path = recordDefinition.getPath();
-      final String parentPath = PathUtil.getPath(path);
-      final String tableName = PathUtil.getName(path);
+      final String parentPath = Path.getPath(path);
+      final String tableName = Path.getName(path);
       final String logTableName;
       if (tableName.toUpperCase().equals(tableName)) {
         logTableName = tableName + "_LOG";
       } else {
         logTableName = tableName + "_log";
       }
-      final String logTypeName = PathUtil.toPath(parentPath, logTableName);
+      final String logTypeName = Path.toPath(parentPath, logTableName);
       logMetaData = new RecordDefinitionImpl(logTypeName);
       logMetaData.addAttribute("LOGMESSAGE", DataTypes.STRING, 255, true);
       logMetaData.addAttribute("LOGLEVEL", DataTypes.STRING, 10, true);

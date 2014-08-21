@@ -21,7 +21,7 @@ import com.revolsys.data.record.property.RecordDefinitionProperty;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
 
@@ -397,7 +397,7 @@ RecordDefinitionProperty {
         this.typePath = null;
       } else {
         this.typePath = recordDefinition.getPath();
-        setName(PathUtil.getName(this.typePath));
+        setName(Path.getName(this.typePath));
         this.recordStore = this.recordDefinition.getRecordStore();
         recordDefinition.setProperty(getPropertyName(), this);
         this.recordStore.addCodeTable(this);

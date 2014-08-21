@@ -6,7 +6,7 @@ import java.lang.ref.WeakReference;
 import com.revolsys.collection.EmptyReference;
 import com.revolsys.data.io.RecordStoreSchemaElement;
 import com.revolsys.io.AbstractObjectWithProperties;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordStoreSchemaElement extends
@@ -30,7 +30,7 @@ Comparable<RecordStoreSchemaElement> {
       throw new IllegalArgumentException("Path is required");
     }
 
-    String name = PathUtil.getName(path);
+    String name = Path.getName(path);
     if (!Property.hasValue(name)) {
       name = "/";
     }
@@ -40,7 +40,7 @@ Comparable<RecordStoreSchemaElement> {
       this.path = path;
     } else {
       this.schema = new WeakReference<>(schema);
-      this.path = PathUtil.toPath(schema.getPath(), name);
+      this.path = Path.toPath(schema.getPath(), name);
       schema.addSchemaElement(this);
     }
   }

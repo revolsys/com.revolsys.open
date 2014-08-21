@@ -35,7 +35,7 @@ import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.filter.Filter;
 import com.revolsys.gis.algorithm.index.RecordQuadTree;
 import com.revolsys.gis.io.Statistics;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.io.datastore.RecordStoreConnectionManager;
@@ -851,7 +851,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   public void setTypePath(final String typePath) {
     this.typePath = typePath;
     if (!Property.hasValue(getName())) {
-      setName(PathUtil.getName(typePath));
+      setName(Path.getName(typePath));
     }
     if (Property.hasValue(typePath)) {
       if (isExists()) {

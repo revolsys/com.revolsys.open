@@ -13,7 +13,7 @@ import javax.annotation.PreDestroy;
 import com.revolsys.collection.EmptyReference;
 import com.revolsys.data.io.RecordStoreExtension;
 import com.revolsys.data.io.RecordStoreSchemaElement;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.ExceptionUtil;
 
@@ -98,15 +98,15 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     } else {
       RecordStoreSchemaElement childElement = this.elementsByPath.get(path);
       if (childElement == null) {
-        path = PathUtil.cleanUpper(path);
+        path = Path.cleanUpper(path);
         if (equalPath(path)) {
           return (V)this;
         } else {
           final String schemaPath = getPath();
-          if (PathUtil.isAncestor(schemaPath, path)) {
+          if (Path.isAncestor(schemaPath, path)) {
             synchronized (this) {
               refreshIfNeeded();
-              final String childElementPath = PathUtil.getChildPath(schemaPath,
+              final String childElementPath = Path.getChildPath(schemaPath,
                 path);
               childElement = this.elementsByPath.get(childElementPath);
               if (childElement == null) {

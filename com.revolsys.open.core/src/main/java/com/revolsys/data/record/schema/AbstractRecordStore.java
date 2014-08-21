@@ -37,7 +37,7 @@ import com.revolsys.data.record.property.RecordDefinitionProperty;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractObjectWithProperties;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
@@ -130,7 +130,7 @@ implements RecordStore {
 
   protected void addRecordDefinition(final RecordDefinition recordDefinition) {
     final String typePath = recordDefinition.getPath();
-    final String schemaName = PathUtil.getPath(typePath);
+    final String schemaName = Path.getPath(typePath);
     final RecordStoreSchema schema = getSchema(schemaName);
     schema.addRecordDefinition(recordDefinition);
     final String idFieldName = recordDefinition.getIdAttributeName();
@@ -359,7 +359,7 @@ implements RecordStore {
   }
 
   protected RecordDefinition findMetaData(final String typePath) {
-    final String schemaName = PathUtil.getPath(typePath);
+    final String schemaName = Path.getPath(typePath);
     final RecordStoreSchema schema = getSchema(schemaName);
     if (schema == null) {
       return null;
@@ -424,7 +424,7 @@ implements RecordStore {
 
   @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
-    final String schemaName = PathUtil.getPath(typePath);
+    final String schemaName = Path.getPath(typePath);
     final RecordStoreSchema schema = getSchema(schemaName);
     if (schema == null) {
       return null;

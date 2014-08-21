@@ -70,7 +70,7 @@ import com.revolsys.gis.esri.gdb.file.capi.type.ShortAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.StringAttribute;
 import com.revolsys.gis.esri.gdb.file.capi.type.XmlAttribute;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.PathUtil;
+import com.revolsys.io.Path;
 import com.revolsys.io.Writer;
 import com.revolsys.io.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.io.esri.gdb.xml.model.CodedValueDomain;
@@ -140,7 +140,7 @@ FileGdbRecordStore {
 
   private Map<String, List<String>> domainColumNames = new HashMap<String, List<String>>();
 
-  private String defaultSchema = "/";
+  private String defaultSchemaPath = "/";
 
   private static final Logger LOG = LoggerFactory.getLogger(CapiFileGdbRecordStore.class);
 
@@ -220,14 +220,6 @@ FileGdbRecordStore {
         }
       }
     }
-  }
-
-  private RecordStoreSchema addFeatureDatasetSchema(final String catalogPath) {
-    final String schemaPath = toPath(catalogPath);
-    final RecordStoreSchema schema = new RecordStoreSchema(getRootSchema(),
-      schemaPath);
-    this.catalogPathByPath.put(schemaPath, catalogPath);
-    return schema;
   }
 
   private void addTableRecordDefinition(final String schemaName,
@@ -521,6 +513,15 @@ FileGdbRecordStore {
     }
   }
 
+  private RecordStoreSchema createFeatureDatasetSchema(
+    final RecordStoreSchema parentSchema, final String catalogPath) {
+    final String schemaPath = toPath(catalogPath);
+    final RecordStoreSchema schema = new RecordStoreSchema(parentSchema,
+      schemaPath);
+    this.catalogPathByPath.put(schemaPath, catalogPath);
+    return schema;
+  }
+
   @Override
   public AbstractIterator<Record> createIterator(final Query query,
     final Map<String, Object> properties) {
@@ -644,90 +645,58 @@ FileGdbRecordStore {
     }
   }
 
-  private RecordStoreSchema createSchema(final DETable table) {
-    synchronized (this.apiSync) {
-      synchronized (API_SYNC) {
-        if (isClosed()) {
-          return null;
-        } else {
-          final String catalogPath = table.getParentCatalogPath();
-          final List<DEFeatureDataset> datasets = EsriXmlRecordMetaDataUtil.createDEFeatureDatasets(table);
-          for (final DEFeatureDataset dataset : datasets) {
-            final String path = dataset.getCatalogPath();
-            final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
-            try {
-              getGeodatabase().createFeatureDataset(datasetDefinition);
-              addFeatureDatasetSchema(path);
-            } catch (final Throwable t) {
-              if (LOG.isDebugEnabled()) {
-                LOG.debug(datasetDefinition);
-              }
-              throw new RuntimeException("Unable to create feature dataset "
-                  + path, t);
-            }
-          }
-          return getSchema(toPath(catalogPath));
-        }
-      }
-    }
-  }
-
-  private void createSchema(final String schemaName,
-    final GeometryFactory geometryFactory) {
-    synchronized (this.apiSync) {
-      synchronized (API_SYNC) {
-        if (!isClosed()) {
-          final SpatialReference spatialReference = getSpatialReference(geometryFactory);
-          final List<DEFeatureDataset> datasets = EsriXmlRecordMetaDataUtil.createDEFeatureDatasets(
-            schemaName.replaceAll("/", ""), spatialReference);
-          for (final DEFeatureDataset dataset : datasets) {
-            final String path = dataset.getCatalogPath();
-            final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
-            try {
-              getGeodatabase().createFeatureDataset(datasetDefinition);
-              addFeatureDatasetSchema(path);
-            } catch (final Throwable t) {
-              if (LOG.isDebugEnabled()) {
-                LOG.debug(datasetDefinition);
-              }
-              throw new RuntimeException("Unable to create feature dataset "
-                  + path, t);
-            }
-          }
-        }
-      }
-    }
-  }
-
   protected RecordDefinitionImpl createTable(final DETable deTable) {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
         if (isClosed()) {
           return null;
         } else {
-          String schemaPath = deTable.getParentCatalogPath();
-          String schemaName = toPath(schemaPath);
-          RecordStoreSchema schema = getSchema(schemaName);
-          if (schema == null) {
-            if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
-              schema = createSchema(deTable);
-            } else {
-              schema = new RecordStoreSchema(getRootSchema(), schemaName);
+          String schemaCatalogPath = deTable.getParentCatalogPath();
+          SpatialReference spatialReference;
+          if (deTable instanceof DEFeatureClass) {
+            final DEFeatureClass featureClass = (DEFeatureClass)deTable;
+            spatialReference = featureClass.getSpatialReference();
+          } else {
+            spatialReference = null;
+          }
+          String schemaPath = toPath(schemaCatalogPath);
+          RecordStoreSchema schema = getRootSchema();
+          for (final String childSchemaPath : Path.getPaths(schemaPath)) {
+            final RecordStoreSchema childSchema = schema.getSchema(childSchemaPath);
+            final String newSchemaCatalogPath = childSchemaPath.replaceAll("/",
+              "\\\\");
+            if (!hasCatalogPath(childSchemaPath)) {
+              if (spatialReference != null) {
+                final DEFeatureDataset dataset = EsriXmlRecordMetaDataUtil.createDEFeatureDataset(
+                  newSchemaCatalogPath, spatialReference);
+                final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
+                try {
+                  final Geodatabase geodatabase = getGeodatabase();
+                  geodatabase.createFeatureDataset(datasetDefinition);
+                } catch (final Throwable t) {
+                  if (LOG.isDebugEnabled()) {
+                    LOG.debug(datasetDefinition);
+                  }
+                  throw new RuntimeException(
+                    "Unable to create feature dataset " + newSchemaCatalogPath,
+                    t);
+                }
+              }
             }
-          } else if (hasCatalogPath(schema)) {
-            if (schemaName.length() > 1 && deTable instanceof DEFeatureClass) {
-              createSchema(deTable);
+            if (childSchema == null) {
+              schema = createFeatureDatasetSchema(schema, newSchemaCatalogPath);
             }
           }
-          if (schemaName.equals(this.defaultSchema)) {
+
+          if (schemaPath.equals(this.defaultSchemaPath)) {
             if (!(deTable instanceof DEFeatureClass)) {
-              schemaPath = "\\";
+              schemaCatalogPath = "\\";
               // TODO clone
               deTable.setCatalogPath("\\" + deTable.getName());
 
             }
-          } else if (schemaName.equals("")) {
-            schemaName = this.defaultSchema;
+          } else if (schemaPath.equals("")) {
+            schemaPath = this.defaultSchemaPath;
           }
           for (final Field field : deTable.getFields()) {
             final String fieldName = field.getName();
@@ -740,9 +709,9 @@ FileGdbRecordStore {
           final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
           try {
             final Table table = getGeodatabase().createTable(tableDefinition,
-              schemaPath);
+              schemaCatalogPath);
             final RecordDefinitionImpl recordDefinition = getRecordDefinition(
-              schemaName, schemaPath, tableDefinition);
+              schemaPath, schemaCatalogPath, tableDefinition);
             addRecordDefinition(recordDefinition);
             getGeodatabase().closeTable(table);
             return recordDefinition;
@@ -855,6 +824,10 @@ FileGdbRecordStore {
 
   protected String getCatalogPath(final RecordStoreSchemaElement element) {
     final String path = element.getPath();
+    return getCatalogPath(path);
+  }
+
+  protected String getCatalogPath(final String path) {
     final String catalogPath = this.catalogPathByPath.get(path);
     if (Property.hasValue(catalogPath)) {
       return catalogPath;
@@ -864,7 +837,7 @@ FileGdbRecordStore {
   }
 
   public String getDefaultSchema() {
-    return this.defaultSchema;
+    return this.defaultSchemaPath;
   }
 
   public Map<String, List<String>> getDomainColumNames() {
@@ -894,6 +867,9 @@ FileGdbRecordStore {
   public RecordDefinition getRecordDefinition(
     final RecordDefinition sourceRecordDefinition) {
     synchronized (this.apiSync) {
+      if (getGeometryFactory() == null) {
+        setGeometryFactory(sourceRecordDefinition.getGeometryFactory());
+      }
       RecordDefinition recordDefinition = super.getRecordDefinition(sourceRecordDefinition);
       if (this.createMissingTables && recordDefinition == null) {
         recordDefinition = createTable(sourceRecordDefinition);
@@ -910,7 +886,7 @@ FileGdbRecordStore {
           final XmlProcessor parser = new EsriGdbXmlParser();
           final DETable deTable = parser.process(tableDefinition);
           final String tableName = deTable.getName();
-          final String typePath = PathUtil.toPath(schemaName, tableName);
+          final String typePath = Path.toPath(schemaName, tableName);
           final RecordStoreSchema schema = getSchema(schemaName);
           final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
             schema, typePath);
@@ -1109,10 +1085,9 @@ FileGdbRecordStore {
     }
   }
 
-  protected boolean hasCatalogPath(final RecordStoreSchemaElement element) {
-    final String path = element.getPath();
+  protected boolean hasCatalogPath(final String path) {
     final String catalogPath = this.catalogPathByPath.get(path);
-    return Property.hasValue(catalogPath);
+    return catalogPath != null;
   }
 
   @Override
@@ -1297,30 +1272,6 @@ FileGdbRecordStore {
     }
   }
 
-  public void loadSchemaRecordDefinitions(final String schemaPath,
-    final String catalogPath, final String datasetType) {
-    synchronized (this.apiSync) {
-      synchronized (API_SYNC) {
-        if (!isClosed()) {
-          try {
-            final VectorOfWString childFeatureClasses = getGeodatabase().getChildDatasets(
-              catalogPath, datasetType);
-            for (int i = 0; i < childFeatureClasses.size(); i++) {
-              final String childCatalogPath = childFeatureClasses.get(i);
-              addTableRecordDefinition(schemaPath, childCatalogPath);
-            }
-          } catch (final RuntimeException e) {
-            final String message = e.getMessage();
-            if (message == null
-                || !message.equals("-2147211775\tThe item was not found.")) {
-              throw e;
-            }
-          }
-        }
-      }
-    }
-  }
-
   protected Row nextRow(final EnumRows rows) {
     synchronized (this.apiSync) {
       if (isOpen(rows)) {
@@ -1353,30 +1304,69 @@ FileGdbRecordStore {
     synchronized (this.apiSync) {
       synchronized (API_SYNC) {
         if (!isClosed()) {
+          final String path = schema.getPath();
           final String schemaCatalogPath = getCatalogPath(schema);
           final Geodatabase geodatabase = getGeodatabase();
           final VectorOfWString childDatasets = geodatabase.getChildDatasets(
             schemaCatalogPath, "Feature Dataset");
           for (int i = 0; i < childDatasets.size(); i++) {
             final String childPath = childDatasets.get(i);
-            addFeatureDatasetSchema(childPath);
+            createFeatureDatasetSchema(schema, childPath);
           }
-          // if (schema == getRootSchema()) {
-          // new RecordStoreSchema(getRootSchema(), this.defaultSchema);
-          // addChildSchema("\\");
-          // if (!this.defaultSchema.equals("/")
-          // && !schemaMap.containsKey(this.defaultSchema)) {
-          // createSchema(this.defaultSchema, getGeometryFactory());
-          // }
-          // }
+          if (Path.isParent(path, this.defaultSchemaPath)) {
+            final RecordStoreSchema defaultSchema = schema.getSchema(this.defaultSchemaPath);
+            if (defaultSchema == null) {
+              final SpatialReference spatialReference = getSpatialReference(getGeometryFactory());
+              final String catalogPath = getCatalogPath(this.defaultSchemaPath);
+              final DEFeatureDataset dataset = EsriXmlRecordMetaDataUtil.createDEFeatureDataset(
+                catalogPath, spatialReference);
+              final String datasetDefinition = EsriGdbXmlSerializer.toString(dataset);
+              try {
+                getGeodatabase().createFeatureDataset(datasetDefinition);
+                createFeatureDatasetSchema(schema, catalogPath);
+              } catch (final Throwable t) {
+                if (LOG.isDebugEnabled()) {
+                  LOG.debug(datasetDefinition);
+                }
+                throw new RuntimeException("Unable to create feature dataset "
+                    + path, t);
+              }
+            }
+          }
+
           final String schemaPath = schema.getPath();
-          if (schema.equalPath(this.defaultSchema)) {
-            loadSchemaRecordDefinitions(schemaPath, "\\", "Feature Class");
-            loadSchemaRecordDefinitions(schemaPath, "\\", "Table");
+          if (schema.equalPath(this.defaultSchemaPath)) {
+            refreshSchemaRecordDefinitions(schemaPath, "\\", "Feature Class");
+            refreshSchemaRecordDefinitions(schemaPath, "\\", "Table");
           }
-          loadSchemaRecordDefinitions(schemaPath, schemaCatalogPath,
+          refreshSchemaRecordDefinitions(schemaPath, schemaCatalogPath,
               "Feature Class");
-          loadSchemaRecordDefinitions(schemaPath, schemaCatalogPath, "Table");
+          refreshSchemaRecordDefinitions(schemaPath, schemaCatalogPath, "Table");
+        }
+      }
+    }
+  }
+
+  private void refreshSchemaRecordDefinitions(final String schemaPath,
+    final String catalogPath, final String datasetType) {
+    synchronized (this.apiSync) {
+      synchronized (API_SYNC) {
+        if (!isClosed()) {
+          try {
+            final Geodatabase geodatabase = getGeodatabase();
+            final VectorOfWString childFeatureClasses = geodatabase.getChildDatasets(
+              catalogPath, datasetType);
+            for (int i = 0; i < childFeatureClasses.size(); i++) {
+              final String childCatalogPath = childFeatureClasses.get(i);
+              addTableRecordDefinition(schemaPath, childCatalogPath);
+            }
+          } catch (final RuntimeException e) {
+            final String message = e.getMessage();
+            if (message == null
+                || !message.equals("-2147211775\tThe item was not found.")) {
+              throw e;
+            }
+          }
         }
       }
     }
@@ -1433,15 +1423,10 @@ FileGdbRecordStore {
   public void setDefaultSchema(final String defaultSchema) {
     synchronized (this.apiSync) {
       if (Property.hasValue(defaultSchema)) {
-        if (!defaultSchema.startsWith("/")) {
-          this.defaultSchema = "/" + defaultSchema;
-        } else {
-          this.defaultSchema = defaultSchema;
-        }
+        this.defaultSchemaPath = Path.clean(defaultSchema);
       } else {
-        this.defaultSchema = "/";
+        this.defaultSchemaPath = "/";
       }
-      refreshSchema();
     }
   }
 
@@ -1506,7 +1491,7 @@ FileGdbRecordStore {
   }
 
   protected String toPath(final String catalogPath) {
-    return catalogPath.replaceAll("\\\\", "/");
+    return Path.clean(catalogPath);
   }
 
   @Override
