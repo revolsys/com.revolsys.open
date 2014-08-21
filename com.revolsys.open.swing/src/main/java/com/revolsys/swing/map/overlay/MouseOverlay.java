@@ -31,6 +31,10 @@ import com.revolsys.swing.map.Viewport2D;
 public class MouseOverlay extends JComponent implements MouseListener,
 MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
+  public static boolean isMouseInMap() {
+    return x != -1;
+  }
+
   private static final long serialVersionUID = 1L;
 
   private static int x;
@@ -200,7 +204,8 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    updateEventPoint(e);
+    x = -1;
+    y = -1;
     for (final Component overlay : getOverlays()) {
       if (overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;

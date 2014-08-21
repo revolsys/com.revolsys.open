@@ -529,6 +529,10 @@ MouseWheelListener, KeyListener, FocusListener {
 
   }
 
+  public boolean isMouseInMap() {
+    return MouseOverlay.isMouseInMap();
+  }
+
   public boolean isOverlayAction(final String overlayAction) {
     if (this.map == null) {
       return false;
