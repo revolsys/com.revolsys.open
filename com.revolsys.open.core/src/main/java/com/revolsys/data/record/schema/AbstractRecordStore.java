@@ -710,6 +710,16 @@ implements RecordStore {
     }
   }
 
+  protected void removeSchemaElement(final RecordStoreSchema schema,
+    final String path) {
+    schema.removeElement(path);
+  }
+
+  protected void replaceSchemaElement(final RecordStoreSchema schema,
+    final RecordStoreSchemaElement element) {
+    schema.replaceElement(element);
+  }
+
   public void setCodeTableColumNames(
     final Map<String, List<String>> domainColumNames) {
     this.codeTableColumNames = domainColumNames;

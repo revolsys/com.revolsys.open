@@ -19,9 +19,11 @@ import com.revolsys.data.record.schema.RecordStoreSchemaElement;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.datastore.RecordStoreConnection;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
+import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 
 public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements
@@ -52,6 +54,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
     final Map<String, Object> connectionMap, final RecordStoreSchema schema) {
     final List<TreeNode> children = new ArrayList<TreeNode>();
     if (schema != null) {
+      schema.refresh();
       for (final RecordStoreSchemaElement element : schema.getElements()) {
         final String path = element.getPath();
 
@@ -82,6 +85,11 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
   static {
     final TreeItemPropertyEnableCheck readOnly = new TreeItemPropertyEnableCheck(
       "readOnly", false);
+
+    final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
+      "arrow_refresh", "refresh");
+    MENU.addMenuItem("default", refresh);
+
     MENU.addMenuItemTitleIcon("default", "Delete Data Store Connection",
       "delete", readOnly, RecordStoreConnectionTreeNode.class,
         "deleteConnection");

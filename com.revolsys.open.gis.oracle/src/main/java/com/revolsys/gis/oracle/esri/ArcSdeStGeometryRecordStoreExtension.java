@@ -155,15 +155,13 @@ public class ArcSdeStGeometryRecordStoreExtension implements
     final RecordStore recordStore = schema.getRecordStore();
     final OracleRecordStore oracleRecordStore = (OracleRecordStore)recordStore;
     try {
-      final Connection connection = oracleRecordStore.getSqlConnection();
-      try {
+      try (
+        final Connection connection = oracleRecordStore.getJdbcConnection()) {
         final String schemaName = oracleRecordStore.getDatabaseSchemaName(schema);
         loadTableProperties(connection, schema, schemaName);
         loadColumnProperties(schema, schemaName, connection);
-      } finally {
-        oracleRecordStore.releaseSqlConnection(connection);
       }
-    } catch (final SQLException e) {
+    } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass()).error(
         "Unable to get ArcSDE metadata for schema " + schema.getName(), e);
     }

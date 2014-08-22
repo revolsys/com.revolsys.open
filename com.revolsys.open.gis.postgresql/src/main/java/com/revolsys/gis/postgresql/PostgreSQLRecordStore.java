@@ -1,6 +1,5 @@
 package com.revolsys.gis.postgresql;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -123,13 +122,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   @Override
   public Object getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT nextval(?)";
-    try {
-      return JdbcUtils.selectLong(getDataSource(), getConnection(), sql,
-        sequenceName);
-    } catch (final SQLException e) {
-      throw new IllegalArgumentException(
-        "Cannot create ID for " + sequenceName, e);
-    }
+    return JdbcUtils.selectLong(this, sql, sequenceName);
   }
 
   public String getSequenceName(final RecordDefinition recordDefinition) {
@@ -206,7 +199,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     addAttributeAdder("bool", new JdbcAttributeAdder(DataTypes.BOOLEAN));
 
     final JdbcAttributeAdder geometryAttributeAdder = new PostgreSQLGeometryAttributeAdder(
-      this, getDataSource());
+      this);
     addAttributeAdder("geometry", geometryAttributeAdder);
     setPrimaryKeySql("SELECT t.relname \"TABLE_NAME\", c.attname \"COLUMN_NAME\"" //
       + " FROM pg_namespace s" //

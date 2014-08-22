@@ -1,7 +1,6 @@
 package com.revolsys.jdbc.io;
 
 import java.sql.BatchUpdateException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
@@ -24,6 +23,8 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.io.StatisticsMap;
 import com.revolsys.io.AbstractRecordWriter;
+import com.revolsys.io.FileUtil;
+import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 import com.revolsys.transaction.Transaction;
@@ -33,9 +34,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
 
   private int batchSize = 1;
 
-  private Connection connection;
-
-  private DataSource dataSource;
+  private JdbcConnection connection;
 
   private JdbcRecordStore recordStore;
 
@@ -91,8 +90,15 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
     final StatisticsMap statistics) {
     this.recordStore = recordStore;
     this.statistics = statistics;
-    setConnection(recordStore.getConnection());
-    setDataSource(recordStore.getDataSource());
+    this.connection = recordStore.getJdbcConnection();
+    final DataSource dataSource = this.connection.getDataSource();
+    if (dataSource != null) {
+      try {
+        this.connection.setAutoCommit(false);
+      } catch (final SQLException e) {
+        throw new RuntimeException("Unable to create connection", e);
+      }
+    }
     statistics.connect();
   }
 
@@ -209,16 +215,16 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
         this.typeDeleteSqlMap = null;
         this.typeDeleteStatementMap = null;
         this.recordStore = null;
-        if (this.dataSource != null) {
+        if (this.connection != null) {
+          final DataSource dataSource = this.connection.getDataSource();
           try {
-            if (!Transaction.isHasCurrentTransaction()) {
+            if (dataSource != null && !Transaction.isHasCurrentTransaction()) {
               this.connection.commit();
             }
           } catch (final SQLException e) {
             throw new RuntimeException("Failed to commit data:", e);
           } finally {
-            JdbcUtils.release(this.connection, this.dataSource);
-            this.dataSource = null;
+            FileUtil.closeSilent(this.connection);
             this.connection = null;
           }
         }
@@ -268,10 +274,6 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
 
   public int getBatchSize() {
     return this.batchSize;
-  }
-
-  public DataSource getDataSource() {
-    return this.dataSource;
   }
 
   private String getDeleteSql(final RecordDefinition type) {
@@ -590,8 +592,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       this.typeCountMap.put(typePath, typeCount);
       statement.executeBatch();
     } catch (final SQLException e) {
-      throw JdbcUtils.getException(getDataSource(), this.connection,
-        "Process Batch", sql, e);
+      throw this.connection.getException("Process Batch", sql, e);
     } catch (final RuntimeException e) {
       LOG.error(sql, e);
       throw e;
@@ -602,20 +603,6 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
 
   public void setBatchSize(final int batchSize) {
     this.batchSize = batchSize;
-  }
-
-  public void setConnection(final Connection connection) {
-    this.connection = connection;
-  }
-
-  public void setDataSource(final DataSource dataSource) {
-    this.dataSource = dataSource;
-    try {
-      setConnection(JdbcUtils.getConnection(dataSource));
-      this.connection.setAutoCommit(false);
-    } catch (final SQLException e) {
-      throw new RuntimeException("Unable to create connection", e);
-    }
   }
 
   public void setFlushBetweenTypes(final boolean flushBetweenTypes) {

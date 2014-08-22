@@ -44,14 +44,14 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     this.recordStore = new EmptyReference<>();
   }
 
+  public void addRecordDefinition(final RecordDefinition recordDefinition) {
+    addRecordDefinition(recordDefinition.getPath(), recordDefinition);
+  }
+
   protected void addRecordDefinition(final String typePath,
     final RecordDefinition recordDefinition) {
     final Map<String, RecordDefinition> recordDefinitionCache = getRecordDefinitionsByPath();
     recordDefinitionCache.put(typePath.toUpperCase(), recordDefinition);
-  }
-
-  public void addRecordDefinition(final RecordDefinition recordDefinition) {
-    addRecordDefinition(recordDefinition.getPath(), recordDefinition);
   }
 
   protected void addSchemaElement(final RecordStoreSchemaElement element) {
@@ -202,7 +202,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
   public List<String> getTypeNames() {
     final Map<String, RecordDefinition> recordDefinitionCache = getRecordDefinitionsByPath();
-    return new ArrayList<String>(recordDefinitionCache.keySet());
+    return new ArrayList<>(recordDefinitionCache.keySet());
   }
 
   public boolean isInitialized() {
@@ -242,5 +242,16 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     if (!this.initialized) {
       refresh();
     }
+  }
+
+  protected void removeElement(final String path) {
+    this.elementsByPath.remove(path);
+    this.recordDefinitionsByPath.remove(path);
+    this.schemasByPath.remove(path);
+  }
+
+  public void replaceElement(final RecordStoreSchemaElement element) {
+    // TODO Auto-generated method stub
+
   }
 }

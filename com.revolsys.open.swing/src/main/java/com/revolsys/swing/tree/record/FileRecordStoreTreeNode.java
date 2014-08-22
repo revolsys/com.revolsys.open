@@ -20,15 +20,17 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.datastore.RecordStoreConnectionManager;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTree;
+import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.file.FileTreeNode;
 import com.revolsys.util.Property;
 
 public class FileRecordStoreTreeNode extends FileTreeNode implements
-  RecordStoreProxy, RecordStoreConnectionMapProxy {
+RecordStoreProxy, RecordStoreConnectionMapProxy {
   public static void addRecordStoreConnection() {
     final FileRecordStoreTreeNode node = BaseTree.getMouseClickItem();
     final File file = node.getUserData();
@@ -49,7 +51,7 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
 
     SwingUtil.addLabel(panel, "Folder Connections");
     final List<RecordStoreConnectionRegistry> registries = RecordStoreConnectionManager.get()
-      .getVisibleConnectionRegistries();
+        .getVisibleConnectionRegistries();
     final JComboBox registryField = new JComboBox(
       new Vector<RecordStoreConnectionRegistry>(registries));
 
@@ -80,9 +82,13 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
   private static final MenuFactory MENU = new MenuFactory();
 
   static {
+    final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
+      "arrow_refresh", "refresh");
+    MENU.addMenuItem("default", refresh);
+
     MENU.addMenuItemTitleIcon("default", "Add Data Store Connection",
       "link_add", null, FileRecordStoreTreeNode.class,
-      "addRecordStoreConnection");
+        "addRecordStoreConnection");
   }
 
   public FileRecordStoreTreeNode(final TreeNode parent, final File file) {

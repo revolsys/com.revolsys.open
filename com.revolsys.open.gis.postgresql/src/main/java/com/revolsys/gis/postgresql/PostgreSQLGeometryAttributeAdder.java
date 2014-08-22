@@ -1,10 +1,7 @@
 package com.revolsys.gis.postgresql;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,14 +33,11 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
     DATA_TYPE_MAP.put("MULTIPOLYGON", DataTypes.MULTI_POLYGON);
   }
 
-  private final DataSource dataSource;
-
   private final PostgreSQLRecordStore recordStore;
 
   public PostgreSQLGeometryAttributeAdder(
-    final PostgreSQLRecordStore recordStore, final DataSource dataSource) {
+    final PostgreSQLRecordStore recordStore) {
     this.recordStore = recordStore;
-    this.dataSource = dataSource;
   }
 
   @Override
@@ -64,14 +58,14 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       int axisCount = 3;
       try {
         final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where UPPER(F_TABLE_SCHEMA) = UPPER(?) AND UPPER(F_TABLE_NAME) = UPPER(?) AND UPPER(F_GEOMETRY_COLUMN) = UPPER(?)";
-        final Map<String, Object> values = JdbcUtils.selectMap(this.dataSource,
-          sql, owner, tableName, columnName);
+        final Map<String, Object> values = JdbcUtils.selectMap(
+          this.recordStore, sql, owner, tableName, columnName);
         srid = (Integer)values.get("srid");
         type = (String)values.get("type");
         axisCount = (Integer)values.get("coord_dimension");
       } catch (final IllegalArgumentException e) {
         LOG.warn("Cannot get geometry column metadata for " + typePath + "."
-            + columnName);
+          + columnName);
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
@@ -90,12 +84,9 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
       attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
         geometryFactory);
       return attribute;
-    } catch (final SQLException e) {
+    } catch (final Throwable e) {
       LOG.error("Attribute not registered in GEOMETRY_COLUMN table " + owner
         + "." + tableName + "." + name, e);
-      return null;
-    } catch (final Throwable e) {
-      LOG.error("Error registering attribute " + name, e);
       return null;
     }
   }

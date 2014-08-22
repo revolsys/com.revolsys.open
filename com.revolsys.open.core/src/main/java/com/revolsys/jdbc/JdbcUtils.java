@@ -227,6 +227,18 @@ public final class JdbcUtils {
     }
   }
 
+  public static int executeUpdate(final JdbcRecordStore recordStore,
+    final String sql, final Object... parameters) {
+    try (
+        final JdbcConnection connection = recordStore.getJdbcConnection()) {
+      try {
+        return executeUpdate(connection, sql, parameters);
+      } catch (final SQLException e) {
+        throw connection.getException("Update", sql, e);
+      }
+    }
+  }
+
   public static Connection getConnection(final DataSource dataSource) {
     return DataSourceUtils.getConnection(dataSource);
   }
@@ -366,10 +378,14 @@ public final class JdbcUtils {
     final String typePath) {
     if (recordStore instanceof JdbcRecordStore) {
       final JdbcRecordStore jdbcRecordStore = (JdbcRecordStore)recordStore;
-      final DataSource dataSource = jdbcRecordStore.getDataSource();
-      final String tableName = getQualifiedTableName(typePath);
-      final String sql = "LOCK TABLE " + tableName + " IN SHARE MODE";
-      executeUpdate(dataSource, sql);
+      try (
+          final JdbcConnection connection = jdbcRecordStore.getJdbcConnection()) {
+        final String tableName = getQualifiedTableName(typePath);
+        final String sql = "LOCK TABLE " + tableName + " IN SHARE MODE";
+        executeUpdate(connection, sql);
+      } catch (final SQLException e) {
+        throw new RuntimeException("Unable to lock table " + typePath, e);
+      }
     }
 
   }
@@ -476,6 +492,28 @@ public final class JdbcUtils {
 
   }
 
+  public static int selectInt(final JdbcRecordStore recordStore,
+    final String sql, final Object... parameters) {
+    try (
+        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      try (
+          final PreparedStatement statement = connection.prepareStatement(sql)) {
+        setParameters(statement, parameters);
+
+        try (
+            final ResultSet resultSet = statement.executeQuery()) {
+          if (resultSet.next()) {
+            return resultSet.getInt(1);
+          } else {
+            throw new IllegalArgumentException("Value not found");
+          }
+        }
+      } catch (final SQLException e) {
+        throw connection.getException("selectInt", sql, e);
+      }
+    }
+  }
+
   public static <T> List<T> selectList(final Connection connection,
     final String sql, final int columnIndex, final Object... parameters)
         throws SQLException {
@@ -539,6 +577,28 @@ public final class JdbcUtils {
     }
   }
 
+  public static long selectLong(final JdbcRecordStore recordStore,
+    final String sql, final Object... parameters) {
+    try (
+        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      try (
+          final PreparedStatement statement = connection.prepareStatement(sql)) {
+        setParameters(statement, parameters);
+
+        try (
+            final ResultSet resultSet = statement.executeQuery()) {
+          if (resultSet.next()) {
+            return resultSet.getLong(1);
+          } else {
+            throw new IllegalArgumentException("Value not found");
+          }
+        }
+      } catch (final SQLException e) {
+        throw connection.getException("selectInt", sql, e);
+      }
+    }
+  }
+
   public static Map<String, Object> selectMap(final Connection connection,
     final String sql, final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
@@ -570,23 +630,43 @@ public final class JdbcUtils {
     }
   }
 
+  public static Map<String, Object> selectMap(
+    final JdbcRecordStore recordStore, final String sql,
+    final Object... parameters) {
+    try (
+        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      try (
+          final PreparedStatement statement = connection.prepareStatement(sql)) {
+        setParameters(statement, parameters);
+
+        try (
+            final ResultSet resultSet = statement.executeQuery()) {
+          if (resultSet.next()) {
+            return readMap(resultSet);
+          } else {
+            throw new IllegalArgumentException("Value not found for " + sql
+              + " " + Arrays.asList(parameters));
+          }
+        }
+      } catch (final SQLException e) {
+        throw connection.getException(null, sql, e);
+      }
+    }
+  }
+
   public static String selectString(final Connection connection,
     final String sql, final Object... parameters) throws SQLException {
-    final PreparedStatement statement = connection.prepareStatement(sql);
-    try {
+    try (
+        final PreparedStatement statement = connection.prepareStatement(sql)) {
       setParameters(statement, parameters);
-      final ResultSet resultSet = statement.executeQuery();
-      try {
+      try (
+          final ResultSet resultSet = statement.executeQuery()) {
         if (resultSet.next()) {
           return resultSet.getString(1);
         } else {
           throw new IllegalArgumentException("Value not found");
         }
-      } finally {
-        close(resultSet);
       }
-    } finally {
-      close(statement);
     }
   }
 
@@ -607,6 +687,14 @@ public final class JdbcUtils {
       return selectString(connection, sql, parameters);
     } finally {
       release(connection, dataSource);
+    }
+  }
+
+  public static String selectString(final JdbcRecordStore recordStore,
+    final String sql, final Object... parameters) throws SQLException {
+    try (
+        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      return selectString(connection, sql, parameters);
     }
   }
 

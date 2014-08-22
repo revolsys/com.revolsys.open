@@ -1,6 +1,5 @@
 package com.revolsys.jdbc.io;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -11,7 +10,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
-import javax.sql.DataSource;
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.converter.string.BooleanStringConverter;
@@ -24,6 +22,8 @@ import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.gis.io.Statistics;
+import com.revolsys.io.FileUtil;
+import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcAttribute;
 
@@ -61,13 +61,11 @@ RecordIterator {
     return statement.executeQuery();
   }
 
-  private Connection connection;
+  private JdbcConnection connection;
 
   private final int currentQueryIndex = -1;
 
   private RecordFactory recordFactory;
-
-  private DataSource dataSource;
 
   private JdbcRecordStore recordStore;
 
@@ -90,21 +88,9 @@ RecordIterator {
   public JdbcQueryIterator(final JdbcRecordStore recordStore,
     final Query query, final Map<String, Object> properties) {
     super();
-    this.connection = recordStore.getConnection();
-    this.dataSource = recordStore.getDataSource();
 
-    if (this.dataSource != null) {
-      try {
-        this.connection = JdbcUtils.getConnection(this.dataSource);
-        boolean autoCommit = false;
-        if (BooleanStringConverter.getBoolean(properties.get("autoCommit"))) {
-          autoCommit = true;
-        }
-        this.connection.setAutoCommit(autoCommit);
-      } catch (final SQLException e) {
-        throw new IllegalArgumentException("Unable to create connection", e);
-      }
-    }
+    final boolean autoCommit = BooleanStringConverter.getBoolean(properties.get("autoCommit"));
+    this.connection = recordStore.getJdbcConnection(autoCommit);
     this.recordFactory = query.getProperty("recordFactory");
     if (this.recordFactory == null) {
       this.recordFactory = recordStore.getRecordFactory();
@@ -121,11 +107,10 @@ RecordIterator {
   @PreDestroy
   public void doClose() {
     JdbcUtils.close(this.statement, this.resultSet);
-    JdbcUtils.release(this.connection, this.dataSource);
+    FileUtil.closeSilent(this.connection);
     this.attributes = null;
     this.connection = null;
     this.recordFactory = null;
-    this.dataSource = null;
     this.recordStore = null;
     this.recordDefinition = null;
     this.queries = null;
@@ -233,8 +218,7 @@ RecordIterator {
       }
     } catch (final SQLException e) {
       JdbcUtils.close(this.statement, this.resultSet);
-      throw JdbcUtils.getException(this.dataSource, this.connection,
-        "Execute Query", sql, e);
+      throw this.connection.getException("Execute Query", sql, e);
     }
     return this.resultSet;
   }

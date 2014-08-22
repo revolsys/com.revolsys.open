@@ -13,6 +13,9 @@ import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.Path;
+import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
@@ -20,6 +23,14 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
 RecordStoreConnectionMapProxy {
 
   public static final ImageIcon ICON_SCHEMA = SilkIconLoader.getIcon("folder_table");
+
+  private static final MenuFactory MENU = new MenuFactory();
+
+  static {
+    final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
+      "arrow_refresh", "refresh");
+    MENU.addMenuItem("default", refresh);
+  }
 
   private final Map<String, Object> connectionMap;
 
@@ -46,6 +57,11 @@ RecordStoreConnectionMapProxy {
     final RecordStoreSchema schema = getSchema();
     return RecordStoreConnectionTreeNode.getChildren(this, this.connectionMap,
       schema);
+  }
+
+  @Override
+  public MenuFactory getMenu() {
+    return MENU;
   }
 
   public RecordStore getRecordStore() {

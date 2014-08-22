@@ -10,11 +10,10 @@ import java.util.Map;
 
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
-import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class ArcSdeSpatialReferenceCache {
 
@@ -28,8 +27,7 @@ public class ArcSdeSpatialReferenceCache {
     return spatialReferences;
   }
 
-  public static ArcSdeSpatialReferenceCache get(
-    final RecordStoreSchema schema) {
+  public static ArcSdeSpatialReferenceCache get(final RecordStoreSchema schema) {
     final AbstractJdbcRecordStore recordStore = (AbstractJdbcRecordStore)schema.getRecordStore();
     return get(recordStore);
 
@@ -70,15 +68,12 @@ public class ArcSdeSpatialReferenceCache {
   protected ArcSdeSpatialReference getSpatialReference(final String sql,
     final int esriSrid) {
     try {
-      final Connection connection = this.recordStore.getSqlConnection();
-      try {
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-        try {
-
-          statement = connection.prepareStatement(sql);
-          statement.setInt(1, esriSrid);
-          resultSet = statement.executeQuery();
+      try (
+          final Connection connection = this.recordStore.getJdbcConnection();
+          PreparedStatement statement = connection.prepareStatement(sql);) {
+        statement.setInt(1, esriSrid);
+        try (
+            ResultSet resultSet = statement.executeQuery()) {
           if (resultSet.next()) {
             final String name = resultSet.getString(2);
             final BigDecimal xOffset = resultSet.getBigDecimal(3);
@@ -96,8 +91,8 @@ public class ArcSdeSpatialReferenceCache {
               final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
               srid = esriCoordinateSystem.getId();
               if (srid <= 0) {
-                geometryFactory = GeometryFactory.fixed(coordinateSystem,
-                  3, scale.doubleValue(), zScale.doubleValue());
+                geometryFactory = GeometryFactory.fixed(coordinateSystem, 3,
+                  scale.doubleValue(), zScale.doubleValue());
               } else {
                 geometryFactory = GeometryFactory.fixed(srid, 3,
                   scale.doubleValue(), zScale.doubleValue());
@@ -123,11 +118,7 @@ public class ArcSdeSpatialReferenceCache {
             this.spatialReferences.put(esriSrid, spatialReference);
             return spatialReference;
           }
-        } finally {
-          JdbcUtils.close(statement, resultSet);
         }
-      } finally {
-        this.recordStore.releaseSqlConnection(connection);
       }
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to get srid " + esriSrid, e);

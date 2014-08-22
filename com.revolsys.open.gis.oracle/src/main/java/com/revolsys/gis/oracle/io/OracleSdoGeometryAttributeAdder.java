@@ -1,13 +1,10 @@
 package com.revolsys.gis.oracle.io;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.sql.DataSource;
 
 import oracle.sql.ARRAY;
 import oracle.sql.Datum;
@@ -23,12 +20,34 @@ import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.Path;
-import com.revolsys.jdbc.JdbcUtils;
+import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
+
+  private static void addGeometryType(final DataType dataType,
+    final String name, final Integer id) {
+    ID_TO_GEOMETRY_TYPE.put(id, name);
+    GEOMETRY_TYPE_TO_ID.put(name, id);
+    ID_TO_DATA_TYPE.put(id, dataType);
+    if (!DATA_TYPE_TO_2D_ID.containsKey(dataType)) {
+      DATA_TYPE_TO_2D_ID.put(dataType, id);
+    }
+  }
+
+  public static int getGeometryTypeId(final DataType dataType,
+    final int axisCount) {
+    final int id = DATA_TYPE_TO_2D_ID.get(dataType);
+    if (axisCount > 3) {
+      return 3000 + id;
+    } else if (axisCount > 2) {
+      return 1000 + id;
+    } else {
+      return id;
+    }
+  }
 
   private static final Map<DataType, Integer> DATA_TYPE_TO_2D_ID = new HashMap<DataType, Integer>();
 
@@ -89,36 +108,11 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   private static final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryAttributeAdder.class);
 
-  private static void addGeometryType(final DataType dataType,
-    final String name, final Integer id) {
-    ID_TO_GEOMETRY_TYPE.put(id, name);
-    GEOMETRY_TYPE_TO_ID.put(name, id);
-    ID_TO_DATA_TYPE.put(id, dataType);
-    if (!DATA_TYPE_TO_2D_ID.containsKey(dataType)) {
-      DATA_TYPE_TO_2D_ID.put(dataType, id);
-    }
-  }
-
-  public static int getGeometryTypeId(final DataType dataType,
-    final int axisCount) {
-    final int id = DATA_TYPE_TO_2D_ID.get(dataType);
-    if (axisCount > 3) {
-      return 3000 + id;
-    } else if (axisCount > 2) {
-      return 1000 + id;
-    } else {
-      return id;
-    }
-  }
-
-  private final DataSource dataSource;
-
   private final AbstractJdbcRecordStore recordStore;
 
   public OracleSdoGeometryAttributeAdder(
-    final AbstractJdbcRecordStore recordStore, final DataSource dataSource) {
+    final AbstractJdbcRecordStore recordStore) {
     this.recordStore = recordStore;
-    this.dataSource = dataSource;
   }
 
   @Override
@@ -162,7 +156,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   protected double getScale(final Datum[] values, final int axisIndex)
-    throws SQLException {
+      throws SQLException {
     if (axisIndex >= values.length) {
       return 0;
     } else {
@@ -179,72 +173,62 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
 
   @Override
   public void initialize(final RecordStoreSchema schema) {
-    try {
-      final Connection connection = JdbcUtils.getConnection(dataSource);
-      try {
-        final String schemaName = recordStore.getDatabaseSchemaName(schema);
-        final String sridSql = "select M.TABLE_NAME, M.COLUMN_NAME, M.SRID, M.DIMINFO, C.GEOMETRY_TYPE "
+    try (
+        final JdbcConnection connection = this.recordStore.getJdbcConnection()) {
+      final String schemaName = this.recordStore.getDatabaseSchemaName(schema);
+      final String sridSql = "select M.TABLE_NAME, M.COLUMN_NAME, M.SRID, M.DIMINFO, C.GEOMETRY_TYPE "
           + "from ALL_SDO_GEOM_METADATA M "
           + "LEFT OUTER JOIN ALL_GEOMETRY_COLUMNS C ON (M.OWNER = C.F_TABLE_SCHEMA AND M.TABLE_NAME = C.F_TABLE_NAME AND M.COLUMN_NAME = C.F_GEOMETRY_COLUMN) "
           + "where OWNER = ?";
-        final PreparedStatement statement = connection.prepareStatement(sridSql);
-        try {
-          statement.setString(1, schemaName);
-          final ResultSet resultSet = statement.executeQuery();
-          try {
-            while (resultSet.next()) {
-              final String tableName = resultSet.getString(1);
-              final String columnName = resultSet.getString(2);
-              final String typePath = Path.toPath(schemaName, tableName);
+      try (
+          final PreparedStatement statement = connection.prepareStatement(sridSql)) {
+        statement.setString(1, schemaName);
+        try (
+            final ResultSet resultSet = statement.executeQuery()) {
+          while (resultSet.next()) {
+            final String tableName = resultSet.getString(1);
+            final String columnName = resultSet.getString(2);
+            final String typePath = Path.toPath(schemaName, tableName);
 
-              int srid = resultSet.getInt(3);
-              if (resultSet.wasNull() || srid < 0) {
-                srid = 0;
-              }
-              final ARRAY dimInfo = (ARRAY)resultSet.getObject("DIMINFO");
-              int axisCount = dimInfo.length();
-              setColumnProperty(schema, typePath, columnName, NUM_AXIS,
-                axisCount);
-              if (axisCount < 2) {
-                axisCount = 2;
-              } else if (axisCount > 4) {
-                axisCount = 4;
-              }
-              final Datum[] values = dimInfo.getOracleArray();
-              final double scaleXy = getScale(values, 0);
-              final double scaleZ = getScale(values, 2);
-              final GeometryFactory geometryFactory = ((OracleRecordStore)recordStore).getGeometryFactory(
-                srid, axisCount, scaleXy, scaleZ);
-              setColumnProperty(schema, typePath, columnName, GEOMETRY_FACTORY,
-                geometryFactory);
-
-              setColumnProperty(schema, typePath, columnName, ORACLE_SRID, srid);
-
-              final int geometryType = resultSet.getInt(5);
-              DataType geometryDataType;
-              if (resultSet.wasNull()) {
-                geometryDataType = DataTypes.GEOMETRY;
-              } else {
-                geometryDataType = ID_TO_DATA_TYPE.get(geometryType);
-                if (geometryDataType == null) {
-                  geometryDataType = DataTypes.GEOMETRY;
-                }
-              }
-              setColumnProperty(schema, typePath, columnName, GEOMETRY_TYPE,
-                geometryDataType);
+            int srid = resultSet.getInt(3);
+            if (resultSet.wasNull() || srid < 0) {
+              srid = 0;
             }
-          } finally {
-            JdbcUtils.close(resultSet);
+            final ARRAY dimInfo = (ARRAY)resultSet.getObject("DIMINFO");
+            int axisCount = dimInfo.length();
+            setColumnProperty(schema, typePath, columnName, NUM_AXIS, axisCount);
+            if (axisCount < 2) {
+              axisCount = 2;
+            } else if (axisCount > 4) {
+              axisCount = 4;
+            }
+            final Datum[] values = dimInfo.getOracleArray();
+            final double scaleXy = getScale(values, 0);
+            final double scaleZ = getScale(values, 2);
+            final GeometryFactory geometryFactory = ((OracleRecordStore)this.recordStore).getGeometryFactory(
+              srid, axisCount, scaleXy, scaleZ);
+            setColumnProperty(schema, typePath, columnName, GEOMETRY_FACTORY,
+              geometryFactory);
+
+            setColumnProperty(schema, typePath, columnName, ORACLE_SRID, srid);
+
+            final int geometryType = resultSet.getInt(5);
+            DataType geometryDataType;
+            if (resultSet.wasNull()) {
+              geometryDataType = DataTypes.GEOMETRY;
+            } else {
+              geometryDataType = ID_TO_DATA_TYPE.get(geometryType);
+              if (geometryDataType == null) {
+                geometryDataType = DataTypes.GEOMETRY;
+              }
+            }
+            setColumnProperty(schema, typePath, columnName, GEOMETRY_TYPE,
+              geometryDataType);
           }
-        } finally {
-          JdbcUtils.close(statement);
         }
-      } finally {
-        JdbcUtils.release(connection, dataSource);
+      } catch (final SQLException e) {
+        LOG.error("Unable to initialize", e);
       }
-    } catch (final SQLException e) {
-      LOG.error("Unable to initialize", e);
     }
   }
-
 }

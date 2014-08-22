@@ -11,13 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.sql.DataSource;
-
 import org.apache.log4j.Logger;
 
 import com.revolsys.data.codes.AbstractCodeTable;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 
 @Deprecated
@@ -29,8 +28,6 @@ public class JdbcCodeTable extends AbstractCodeTable {
   private Map<String, String> auditColumns = Collections.emptyMap();
 
   private List<String> columnAliases = new ArrayList<String>();
-
-  private DataSource dataSource;
 
   private JdbcRecordStore recordStore;
 
@@ -112,13 +109,13 @@ public class JdbcCodeTable extends AbstractCodeTable {
   protected Identifier createId(final List<Object> values) {
     try {
       init();
-      final Connection connection = JdbcUtils.getConnection(this.dataSource);
-      try {
+      try (
+          final Connection connection = this.recordStore.getJdbcConnection()) {
         JdbcUtils.lockTable(connection, this.tableName);
         Object id = loadId(values, false);
         if (id == null) {
-          final PreparedStatement statement = connection.prepareStatement(this.insertSql);
-          try {
+          try (
+              final PreparedStatement statement = connection.prepareStatement(this.insertSql)) {
             id = this.recordStore.getNextPrimaryKey(this.sequenceName);
             int index = 1;
             index = JdbcUtils.setValue(statement, index, id);
@@ -131,22 +128,11 @@ public class JdbcCodeTable extends AbstractCodeTable {
             } else {
               return null;
             }
-          } finally {
-            JdbcUtils.close(statement);
           }
         } else {
           return SingleIdentifier.create(id);
         }
-
-      } finally {
-        try {
-          connection.commit();
-        } catch (final SQLException e) {
-          LOG.error(e.getMessage(), e);
-        }
-        JdbcUtils.release(connection, this.dataSource);
       }
-
     } catch (final SQLException e) {
       throw new RuntimeException(this.tableName + ": Unable to create ID for  "
           + values, e);
@@ -162,17 +148,13 @@ public class JdbcCodeTable extends AbstractCodeTable {
     return this.columnAliases;
   }
 
-  public DataSource getDataSource() {
-    return this.dataSource;
+  @Override
+  public String getIdAttributeName() {
+    return this.idColumn;
   }
 
   public JdbcRecordStore getRecordStore() {
     return this.recordStore;
-  }
-
-  @Override
-  public String getIdAttributeName() {
-    return this.idColumn;
   }
 
   public String getSequenceName() {
@@ -191,7 +173,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
     if (!this.initialized) {
 
       this.allSql = "SELECT " + this.idColumn + ", "
-        + toString(this.valueColumns) + " FROM " + this.tableName;
+          + toString(this.valueColumns) + " FROM " + this.tableName;
       this.valueByIdSql = "SELECT " + toString(this.valueColumns) + " FROM "
           + this.tableName + " WHERE " + this.idColumn + " = ?";
       this.idByValueSql = "SELECT " + this.idColumn + " FROM " + this.tableName
@@ -227,33 +209,22 @@ public class JdbcCodeTable extends AbstractCodeTable {
 
   private void loadAll() {
     try {
-      final Connection connection = JdbcUtils.getConnection(this.dataSource);
-
-      try {
-        final PreparedStatement statement = connection.prepareStatement(this.allSql);
-        try {
-          final ResultSet rs = statement.executeQuery();
-          try {
-            while (rs.next()) {
-              final Identifier id = SingleIdentifier.create(rs.getLong(1));
-              final List<Object> values = new ArrayList<Object>();
-              for (int i = 0; i < this.valueColumns.size(); i++) {
-                values.add(rs.getObject(2 + i));
-              }
-              addValue(id, values);
-            }
-          } finally {
-            rs.close();
+      try (
+          JdbcConnection connection = this.recordStore.getJdbcConnection();
+          final PreparedStatement statement = connection.prepareStatement(this.allSql);
+          final ResultSet rs = statement.executeQuery()) {
+        while (rs.next()) {
+          final Identifier id = SingleIdentifier.create(rs.getLong(1));
+          final List<Object> values = new ArrayList<Object>();
+          for (int i = 0; i < this.valueColumns.size(); i++) {
+            values.add(rs.getObject(2 + i));
           }
-        } finally {
-          JdbcUtils.close(statement);
+          addValue(id, values);
         }
-      } finally {
-        JdbcUtils.release(connection, this.dataSource);
       }
     } catch (final SQLException e) {
       throw new RuntimeException("Unable to load all values for: "
-        + this.tableName, e);
+          + this.tableName, e);
     }
   }
 
@@ -266,26 +237,20 @@ public class JdbcCodeTable extends AbstractCodeTable {
       id = getIdByValue(values);
     } else {
       try {
-        final Connection connection = JdbcUtils.getConnection(this.dataSource);
-        try {
-          final PreparedStatement statement = connection.prepareStatement(this.idByValueSql);
-          try {
-            int index = 1;
-            for (int i = 0; i < this.valueColumns.size(); i++) {
-              final Object value = values.get(i);
-              index = JdbcUtils.setValue(statement, index, value);
-            }
-            try (
-                final ResultSet resultSet = statement.executeQuery()) {
-              if (resultSet.next()) {
-                id = SingleIdentifier.create(resultSet.getLong(1));
-              }
-            }
-          } finally {
-            JdbcUtils.close(statement);
+        try (
+            JdbcConnection connection = this.recordStore.getJdbcConnection();
+            final PreparedStatement statement = connection.prepareStatement(this.idByValueSql)) {
+          int index = 1;
+          for (int i = 0; i < this.valueColumns.size(); i++) {
+            final Object value = values.get(i);
+            index = JdbcUtils.setValue(statement, index, value);
           }
-        } finally {
-          JdbcUtils.release(connection, this.dataSource);
+          try (
+              final ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+              id = SingleIdentifier.create(resultSet.getLong(1));
+            }
+          }
         }
       } catch (final SQLException e) {
         throw new RuntimeException(this.tableName + ": Unable to load ID: ", e);
@@ -307,28 +272,21 @@ public class JdbcCodeTable extends AbstractCodeTable {
       values = getValueById(id);
     } else {
       try {
-        final Connection connection = JdbcUtils.getConnection(this.dataSource);
-        try {
-          final PreparedStatement statement = connection.prepareStatement(this.valueByIdSql);
-          try {
-            JdbcUtils.setValue(statement, 1, id);
-            final ResultSet rs = statement.executeQuery();
-            try {
-              if (rs.next()) {
-                final int numColumns = rs.getMetaData().getColumnCount();
-                values = new ArrayList<Object>();
-                for (int i = 0; i < numColumns; i++) {
-                  values.add(rs.getObject(i + 1));
-                }
+        try (
+            JdbcConnection connection = this.recordStore.getJdbcConnection();
+            final PreparedStatement statement = connection.prepareStatement(this.valueByIdSql);) {
+          JdbcUtils.setValue(statement, 1, id);
+
+          try (
+              final ResultSet rs = statement.executeQuery()) {
+            if (rs.next()) {
+              final int numColumns = rs.getMetaData().getColumnCount();
+              values = new ArrayList<Object>();
+              for (int i = 0; i < numColumns; i++) {
+                values.add(rs.getObject(i + 1));
               }
-            } finally {
-              JdbcUtils.close(rs);
             }
-          } finally {
-            JdbcUtils.close(statement);
           }
-        } finally {
-          JdbcUtils.release(connection, this.dataSource);
         }
       } catch (final SQLException e) {
         throw new IllegalArgumentException(this.tableName + " " + id
@@ -354,23 +312,16 @@ public class JdbcCodeTable extends AbstractCodeTable {
     this.columnAliases = columnAliases;
   }
 
-  public void setDataSource(final DataSource dataSource) {
-    this.dataSource = dataSource;
-  }
-
-  public void setRecordStore(final JdbcRecordStore recordStore) {
-    this.recordStore = recordStore;
-    if (recordStore != null) {
-      this.dataSource = recordStore.getDataSource();
-    }
-  }
-
   public void setIdColumn(final String idColumn) {
     this.idColumn = idColumn;
   }
 
   public void setLoadAll(final boolean loadAll) {
     this.loadAll = loadAll;
+  }
+
+  public void setRecordStore(final JdbcRecordStore recordStore) {
+    this.recordStore = recordStore;
   }
 
   public void setSequenceName(final String sequenceName) {
