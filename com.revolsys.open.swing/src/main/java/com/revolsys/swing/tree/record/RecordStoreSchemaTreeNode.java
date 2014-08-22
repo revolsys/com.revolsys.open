@@ -20,7 +20,7 @@ import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
 public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
-RecordStoreConnectionMapProxy {
+  RecordStoreConnectionMapProxy {
 
   public static final ImageIcon ICON_SCHEMA = SilkIconLoader.getIcon("folder_table");
 
@@ -28,7 +28,7 @@ RecordStoreConnectionMapProxy {
 
   static {
     final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
-      "arrow_refresh", "refresh");
+      "arrow_refresh", NODE_EXISTS, "refresh");
     MENU.addMenuItem("default", refresh);
   }
 

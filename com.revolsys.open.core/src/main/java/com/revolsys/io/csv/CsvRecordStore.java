@@ -7,7 +7,6 @@ import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.AbstractRecordStore;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
@@ -59,10 +58,6 @@ public class CsvRecordStore extends AbstractRecordStore {
   @Override
   public void insert(final Record record) {
     this.writer.write(record);
-  }
-
-  @Override
-  protected void refreshSchema(final RecordStoreSchema schema) {
   }
 
   @Override

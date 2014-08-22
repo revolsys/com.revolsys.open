@@ -476,6 +476,16 @@ public final class CollectionUtil {
     }
   }
 
+  public static <V> List<V> list(final V... values) {
+    final ArrayList<V> list = new ArrayList<V>();
+    if (values != null) {
+      for (final V value : values) {
+        list.add(value);
+      }
+    }
+    return list;
+  }
+
   public static <K1, K2, V> V put(final Map<K1, Map<K2, V>> map, final K1 key1,
     final K2 key2, final V value) {
     final Map<K2, V> values = getMap(map, key1);

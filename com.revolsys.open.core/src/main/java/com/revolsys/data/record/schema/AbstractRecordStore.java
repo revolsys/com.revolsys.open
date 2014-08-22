@@ -129,10 +129,6 @@ implements RecordStore {
   }
 
   protected void addRecordDefinition(final RecordDefinition recordDefinition) {
-    final String typePath = recordDefinition.getPath();
-    final String schemaName = Path.getPath(typePath);
-    final RecordStoreSchema schema = getSchema(schemaName);
-    schema.addRecordDefinition(recordDefinition);
     final String idFieldName = recordDefinition.getIdAttributeName();
     for (final Attribute attribute : recordDefinition.getAttributes()) {
       final String fieldName = attribute.getName();
@@ -701,8 +697,6 @@ implements RecordStore {
     getRootSchema().refresh();
   }
 
-  protected abstract void refreshSchema(RecordStoreSchema schema);
-
   protected void refreshSchema(final String schemaName) {
     final RecordStoreSchema schema = getSchema(schemaName);
     if (schema != null) {
@@ -710,14 +704,9 @@ implements RecordStore {
     }
   }
 
-  protected void removeSchemaElement(final RecordStoreSchema schema,
-    final String path) {
-    schema.removeElement(path);
-  }
-
-  protected void replaceSchemaElement(final RecordStoreSchema schema,
-    final RecordStoreSchemaElement element) {
-    schema.replaceElement(element);
+  protected Map<String, ? extends RecordStoreSchemaElement> refreshSchemaElements(
+    final RecordStoreSchema schema) {
+    return Collections.emptyMap();
   }
 
   public void setCodeTableColumNames(

@@ -15,7 +15,7 @@ import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
 public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
-  implements PropertyChangeListener {
+implements PropertyChangeListener {
 
   public RecordStoreConnectionRegistryTreeNode(
     final RecordStoreConnectionsTreeNode parent,
@@ -59,23 +59,7 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
       final IndexedPropertyChangeEvent indexEvent = (IndexedPropertyChangeEvent)event;
       final String propertyName = indexEvent.getPropertyName();
       if (propertyName.equals("connections")) {
-        final int index = indexEvent.getIndex();
-        final Object newValue = indexEvent.getNewValue();
-        final Object oldValue = indexEvent.getOldValue();
-        if (newValue == null) {
-          if (oldValue != null) {
-            removeNode(index);
-            nodeRemoved(index, oldValue);
-          }
-        } else if (oldValue == null) {
-          final RecordStoreConnectionTreeNode node = new RecordStoreConnectionTreeNode(
-            this, (RecordStoreConnection)newValue);
-          addNode(index, node);
-
-          nodesInserted(index);
-        } else {
-          nodesChanged(index);
-        }
+        refresh();
       }
     }
   }

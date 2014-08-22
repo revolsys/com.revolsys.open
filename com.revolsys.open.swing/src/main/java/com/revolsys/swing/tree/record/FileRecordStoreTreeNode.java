@@ -30,7 +30,7 @@ import com.revolsys.swing.tree.file.FileTreeNode;
 import com.revolsys.util.Property;
 
 public class FileRecordStoreTreeNode extends FileTreeNode implements
-RecordStoreProxy, RecordStoreConnectionMapProxy {
+  RecordStoreProxy, RecordStoreConnectionMapProxy {
   public static void addRecordStoreConnection() {
     final FileRecordStoreTreeNode node = BaseTree.getMouseClickItem();
     final File file = node.getUserData();
@@ -51,7 +51,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
 
     SwingUtil.addLabel(panel, "Folder Connections");
     final List<RecordStoreConnectionRegistry> registries = RecordStoreConnectionManager.get()
-        .getVisibleConnectionRegistries();
+      .getVisibleConnectionRegistries();
     final JComboBox registryField = new JComboBox(
       new Vector<RecordStoreConnectionRegistry>(registries));
 
@@ -83,12 +83,12 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
 
   static {
     final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
-      "arrow_refresh", "refresh");
+      "arrow_refresh", NODE_EXISTS, "refresh");
     MENU.addMenuItem("default", refresh);
 
     MENU.addMenuItemTitleIcon("default", "Add Data Store Connection",
-      "link_add", null, FileRecordStoreTreeNode.class,
-        "addRecordStoreConnection");
+      "link_add", NODE_EXISTS, FileRecordStoreTreeNode.class,
+      "addRecordStoreConnection");
   }
 
   public FileRecordStoreTreeNode(final TreeNode parent, final File file) {

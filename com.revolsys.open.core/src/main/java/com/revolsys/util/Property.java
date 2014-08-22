@@ -84,6 +84,18 @@ public final class Property {
     return null;
   }
 
+  public static boolean equals(final Object object1, final Object object2,
+    final String propertyName) {
+    if (object1 == object2) {
+      return true;
+    } else if (object1 != null && object2 != null) {
+      final Object value1 = getSimple(object1, propertyName);
+      final Object value2 = getSimple(object2, propertyName);
+      return EqualsRegistry.equal(value1, value2);
+    }
+    return false;
+  }
+
   public static void firePropertyChange(final Object source,
     final PropertyChangeEvent event) {
     final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
@@ -321,7 +333,7 @@ public final class Property {
       return (V)ExceptionUtil.throwCauseException(e);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to invoke "
-        + toString(object, methodName, parameterArray), e);
+          + toString(object, methodName, parameterArray), e);
     }
   }
 
@@ -462,7 +474,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-              || listenerReference == propertyChangeListener) {
+                || listenerReference == propertyChangeListener) {
               propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
             }
           }
@@ -477,7 +489,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-              || listenerReference == propertyChangeListener) {
+                || listenerReference == propertyChangeListener) {
               component.removePropertyChangeListener(propertyChangeListener);
             }
           }
@@ -500,7 +512,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-              || listenerReference == propertyChangeListener) {
+                || listenerReference == propertyChangeListener) {
               propertyChangeSupport.removePropertyChangeListener(propertyName,
                 propertyChangeListener);
             }
@@ -517,7 +529,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null
-              || listenerReference == propertyChangeListener) {
+                || listenerReference == propertyChangeListener) {
               component.removePropertyChangeListener(propertyName,
                 propertyChangeListener);
             }
@@ -537,7 +549,7 @@ public final class Property {
           set(object, propertyName, value);
         } catch (final Throwable e) {
           ExceptionUtil.log(Property.class, "Unable to set property "
-            + propertyName, e);
+              + propertyName, e);
         }
       }
     }

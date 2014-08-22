@@ -15,12 +15,13 @@ import javax.swing.tree.TreePath;
 import com.revolsys.collection.IteratorEnumeration;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
-
   public static void collapse(final TreeNode node) {
     collapseDescendents(node);
     if (node instanceof AbstractTreeNode) {
@@ -78,6 +79,9 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
       }
     }
   }
+
+  public static final EnableCheck NODE_EXISTS = new TreeItemPropertyEnableCheck(
+    "exists");
 
   private boolean allowsChildren;
 
@@ -295,6 +299,16 @@ public abstract class AbstractTreeNode implements TreeNode, Iterable<TreeNode> {
 
   public boolean isAllowsChildren() {
     return this.allowsChildren;
+  }
+
+  public boolean isExists() {
+    final TreeNode parent = getParent();
+    if (parent instanceof AbstractTreeNode) {
+      final AbstractTreeNode node = (AbstractTreeNode)parent;
+      return node.isExists();
+    } else {
+      return true;
+    }
   }
 
   @Override

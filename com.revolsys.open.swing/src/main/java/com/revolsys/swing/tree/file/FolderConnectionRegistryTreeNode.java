@@ -22,7 +22,7 @@ import com.revolsys.swing.tree.model.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
 public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
-  implements PropertyChangeListener {
+implements PropertyChangeListener {
 
   private static final MenuFactory MENU = new MenuFactory();
 
@@ -97,23 +97,7 @@ public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
       final IndexedPropertyChangeEvent indexEvent = (IndexedPropertyChangeEvent)event;
       final String propertyName = indexEvent.getPropertyName();
       if (propertyName.equals("connections")) {
-        final int index = indexEvent.getIndex();
-        final Object newValue = indexEvent.getNewValue();
-        final Object oldValue = indexEvent.getOldValue();
-        if (newValue == null) {
-          if (oldValue != null) {
-            removeNode(index);
-            nodeRemoved(index, oldValue);
-          }
-        } else if (oldValue == null) {
-          final FolderConnectionTreeNode node = new FolderConnectionTreeNode(
-            this, (FolderConnection)newValue);
-          addNode(index, node);
-
-          nodesInserted(index);
-        } else {
-          nodesChanged(index);
-        }
+        refresh();
       }
     }
   }

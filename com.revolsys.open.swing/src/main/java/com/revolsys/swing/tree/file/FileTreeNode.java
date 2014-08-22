@@ -28,6 +28,7 @@ import com.revolsys.raster.AbstractGeoReferencedImageFactory;
 import com.revolsys.raster.GeoReferencedImageFactory;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
@@ -65,7 +66,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
       SwingUtil.addLabel(panel, "Folder Connections");
       final List<FolderConnectionRegistry> registries = FolderConnectionManager.get()
-        .getVisibleConnectionRegistries();
+          .getVisibleConnectionRegistries();
       final JComboBox registryField = new JComboBox(
         new Vector<FolderConnectionRegistry>(registries));
 
@@ -137,20 +138,16 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
         } else {
           return ICON_DRIVE_MISSING;
         }
-      } else if (exists) {
-        if (isRecordStore(file)) {
-          return ICON_FILE_DATABASE;
-        } else if (isImage(file)) {
-          return ICON_FILE_IMAGE;
-        } else if (RecordIoFactories.canReadRecords(file)) {
-          return ICON_FILE_TABLE;
-        } else if (file.isDirectory()) {
-          return ICON_FOLDER;
-        } else {
-          return ICON_FILE;
-        }
+      } else if (isRecordStore(file)) {
+        return ICON_FILE_DATABASE;
+      } else if (isImage(file)) {
+        return ICON_FILE_IMAGE;
+      } else if (RecordIoFactories.canReadRecords(file)) {
+        return ICON_FILE_TABLE;
+      } else if (file.isDirectory()) {
+        return ICON_FOLDER;
       } else {
-        return ICON_FOLDER_MISSING;
+        return ICON_FILE;
       }
     }
   }
@@ -221,14 +218,15 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     final EnableCheck isFileLayer = new TreeItemPropertyEnableCheck("fileLayer");
 
     final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
-      "arrow_refresh", "refresh");
+      "arrow_refresh", NODE_EXISTS, "refresh");
     MENU.addMenuItem("default", refresh);
 
     MENU.addMenuItemTitleIcon("default", "Add Layer", "map_add", isFileLayer,
       FileTreeNode.class, "addLayer");
 
     MENU.addMenuItemTitleIcon("default", "Add Folder Connection", "link_add",
-      isDirectory, FileTreeNode.class, "addFolderConnection");
+      new AndEnableCheck(isDirectory, NODE_EXISTS), FileTreeNode.class,
+        "addFolderConnection");
   }
 
   public FileTreeNode(final TreeNode parent, final File file) {
@@ -281,7 +279,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       final String extension = FileUtil.getFileNameExtension(file);
       if (Property.hasValue(extension)) {
         final IoFactory factory = IoFactoryRegistry.getInstance()
-          .getFactoryByFileExtension(IoFactory.class, extension);
+            .getFactoryByFileExtension(IoFactory.class, extension);
         if (factory != null) {
           return factory.getName();
         }
@@ -318,6 +316,16 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public boolean isDirectory() {
     final File file = getFile();
     return file.isDirectory();
+  }
+
+  @Override
+  public boolean isExists() {
+    final File file = getFile();
+    if (file == null) {
+      return false;
+    } else {
+      return file.exists() && super.isExists();
+    }
   }
 
   public boolean isFileLayer() {

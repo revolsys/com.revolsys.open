@@ -303,10 +303,6 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  protected void refreshSchema(final RecordStoreSchema schema) {
-  }
-
-  @Override
   public void removeProperty(final String propertyName) {
     this.recordStore.removeProperty(propertyName);
   }

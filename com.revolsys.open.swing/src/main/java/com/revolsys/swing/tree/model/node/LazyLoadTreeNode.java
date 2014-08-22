@@ -54,7 +54,7 @@ public abstract class LazyLoadTreeNode extends AbstractTreeNode {
 
   @Override
   protected void doDelete() {
-    children = LOADING_NODES;
+    this.children = LOADING_NODES;
     super.doDelete();
   }
 
@@ -64,24 +64,24 @@ public abstract class LazyLoadTreeNode extends AbstractTreeNode {
 
   @Override
   public List<TreeNode> getChildren() {
-    return children;
+    return this.children;
   }
 
   protected int getUpdateIndex() {
-    synchronized (updateIndicies) {
-      return updateIndicies.incrementAndGet();
+    synchronized (this.updateIndicies) {
+      return this.updateIndicies.incrementAndGet();
     }
   }
 
   public void loadChildren() {
     if (SwingUtilities.isEventDispatchThread()) {
-      if (children == LOADING_NODES) {
+      if (this.children == LOADING_NODES) {
         Invoke.background("Load tree node " + this.getName(), this,
           "loadChildren");
       }
     } else {
-      synchronized (sync) {
-        if (children == LOADING_NODES) {
+      synchronized (this.sync) {
+        if (this.children == LOADING_NODES) {
           final int updateIndex = getUpdateIndex();
           List<TreeNode> children = doLoadChildren();
           if (children == null) {
@@ -103,31 +103,17 @@ public abstract class LazyLoadTreeNode extends AbstractTreeNode {
   }
 
   public void refresh() {
-    final List<TreeNode> oldNodes = getChildren();
-
-    final List<TreeNode> newNodes = doLoadChildren();
-    for (int i = 0; i < oldNodes.size();) {
-      final TreeNode oldNode = oldNodes.get(i);
-      if (newNodes.contains(oldNode)) {
-        i++;
-      } else {
-        oldNodes.remove(i);
-        nodeRemoved(i, oldNode);
+    if (SwingUtilities.isEventDispatchThread()) {
+      Invoke.background("Refresh tree nodes " + this.getName(), this, "refresh");
+    } else {
+      synchronized (this.sync) {
+        final int updateIndex = getUpdateIndex();
+        List<TreeNode> children = doLoadChildren();
+        if (children == null) {
+          children = Collections.emptyList();
+        }
+        Invoke.later(this, setChildrenMethod, updateIndex, children);
       }
-    }
-    for (int i = 0; i < newNodes.size();) {
-      final TreeNode oldNode;
-      if (i < oldNodes.size()) {
-        oldNode = oldNodes.get(i);
-      } else {
-        oldNode = null;
-      }
-      final TreeNode newNode = newNodes.get(i);
-      if (!newNode.equals(oldNode)) {
-        oldNodes.add(i, newNode);
-        nodesInserted(i);
-      }
-      i++;
     }
   }
 
@@ -152,20 +138,45 @@ public abstract class LazyLoadTreeNode extends AbstractTreeNode {
   }
 
   protected void setChildren(final int updateIndex,
-    final List<TreeNode> children) {
-    synchronized (updateIndicies) {
-      if (updateIndex == updateIndicies.get()) {
+    final List<TreeNode> newNodes) {
+    synchronized (this.updateIndicies) {
+      if (this.children == LOADING_NODES) {
         nodeChanged();
         this.children = Collections.emptyList();
         nodeRemoved(0, LOADING_NODE);
-        this.children = children;
+        this.children = newNodes;
         final int[] newIndicies = new int[children.size()];
         for (int i = 0; i < newIndicies.length; i++) {
           newIndicies[i] = i;
         }
         nodesInserted(newIndicies);
-      } else if (children != LOADING_NODES) {
-        delete(children);
+      } else {
+        if (updateIndex == this.updateIndicies.get()) {
+          final List<TreeNode> oldNodes = this.children;
+          for (int i = 0; i < oldNodes.size();) {
+            final TreeNode oldNode = oldNodes.get(i);
+            if (newNodes.contains(oldNode)) {
+              i++;
+            } else {
+              oldNodes.remove(i);
+              nodeRemoved(i, oldNode);
+            }
+          }
+          for (int i = 0; i < newNodes.size();) {
+            final TreeNode oldNode;
+            if (i < oldNodes.size()) {
+              oldNode = oldNodes.get(i);
+            } else {
+              oldNode = null;
+            }
+            final TreeNode newNode = newNodes.get(i);
+            if (!newNode.equals(oldNode)) {
+              oldNodes.add(i, newNode);
+              nodesInserted(i);
+            }
+            i++;
+          }
+        }
       }
     }
   }

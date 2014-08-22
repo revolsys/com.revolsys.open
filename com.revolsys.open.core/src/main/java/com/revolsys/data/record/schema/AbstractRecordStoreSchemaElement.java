@@ -9,8 +9,8 @@ import com.revolsys.io.Path;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordStoreSchemaElement extends
-AbstractObjectWithProperties implements RecordStoreSchemaElement,
-Comparable<RecordStoreSchemaElement> {
+  AbstractObjectWithProperties implements RecordStoreSchemaElement,
+  Comparable<RecordStoreSchemaElement> {
 
   private final String path;
 
@@ -40,7 +40,6 @@ Comparable<RecordStoreSchemaElement> {
     } else {
       this.schema = new WeakReference<>(schema);
       this.path = Path.toPath(schema.getPath(), name);
-      schema.addSchemaElement(this);
     }
   }
 

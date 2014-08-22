@@ -4,14 +4,19 @@ import java.awt.Component;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import com.revolsys.awt.WebColors;
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.tree.model.node.AbstractTreeNode;
 import com.revolsys.util.JavaBeanUtil;
 
 public class BaseTreeCellRenderer extends DefaultTreeCellRenderer {
+  private static final ImageIcon ICON_MISSING = SilkIconLoader.getIcon("error");
+
   private static final long serialVersionUID = 1L;
 
   private final String labelPropertyName;
@@ -39,8 +44,13 @@ public class BaseTreeCellRenderer extends DefaultTreeCellRenderer {
     if (value instanceof AbstractTreeNode) {
       final AbstractTreeNode node = (AbstractTreeNode)value;
       final Icon icon = node.getIcon();
-      if (icon != null) {
-        setIcon(icon);
+      if (node.isExists()) {
+        if (icon != null) {
+          setIcon(icon);
+        }
+      } else {
+        setIcon(ICON_MISSING);
+        setForeground(WebColors.Red);
       }
     }
     return label;

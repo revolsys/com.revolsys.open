@@ -48,7 +48,7 @@ public class RecordStoreTableTreeNode extends LazyLoadTreeNode {
         SilkIconLoader.getIcon("table_" + geometryType.toLowerCase()));
     }
 
-    MENU.addMenuItemTitleIcon("default", "Add Layer", "map_add", null,
+    MENU.addMenuItemTitleIcon("default", "Add Layer", "map_add", NODE_EXISTS,
       RecordStoreTableTreeNode.class, "addLayer");
 
   }

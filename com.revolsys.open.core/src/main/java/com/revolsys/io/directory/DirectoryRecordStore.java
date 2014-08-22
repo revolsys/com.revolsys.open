@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 
@@ -24,6 +25,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
+import com.revolsys.data.record.schema.RecordStoreSchemaElement;
 import com.revolsys.io.ObjectWithProperties;
 import com.revolsys.io.Path;
 import com.revolsys.io.Writer;
@@ -180,7 +182,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       final File subDirectory = new File(getDirectory(), schemaName);
       final String fileExtension = getFileExtension();
       final File file = new File(subDirectory, recordDefinition.getName() + "."
-        + fileExtension);
+          + fileExtension);
       final Resource resource = new FileSystemResource(file);
       writer = RecordIoFactories.recordWriter(recordDefinition, resource);
       if (writer instanceof ObjectWithProperties) {
@@ -205,7 +207,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final RecordStoreSchema schema, final String schemaName,
     final Resource resource) {
     try (
-      RecordReader recordReader = RecordIoFactories.recordReader(resource)) {
+        RecordReader recordReader = RecordIoFactories.recordReader(resource)) {
       final String typePath = Path.toPath(schemaName,
         SpringUtil.getBaseName(resource));
       recordReader.setProperty("schema", schema);
@@ -235,7 +237,9 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  protected void refreshSchema(final RecordStoreSchema schema) {
+  protected Map<String, RecordStoreSchemaElement> refreshSchemaElements(
+    final RecordStoreSchema schema) {
+    final Map<String, RecordStoreSchemaElement> elements = new TreeMap<>();
     final String schemaPath = schema.getPath();
     final File subDirectory;
     if (schemaPath.equals("/")) {
@@ -249,18 +253,30 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       for (final File file : files) {
         if (filter.accept(file)) {
           final FileSystemResource resource = new FileSystemResource(file);
-          loadRecordDefinition(schema, schemaPath, resource);
+          final RecordDefinition recordDefinition = loadRecordDefinition(
+            schema, schemaPath, resource);
+          elements.put(recordDefinition.getPath().toUpperCase(),
+            recordDefinition);
         } else if (file.isDirectory()) {
-          String childSchemaName = file.getName();
+          String childSchemaPath = file.getName();
           if (schemaPath.equals("/")) {
-            childSchemaName = "/" + childSchemaName;
+            childSchemaPath = "/" + childSchemaPath;
           } else {
-            childSchemaName = schemaPath + "/" + childSchemaName;
+            childSchemaPath = schemaPath + "/" + childSchemaPath;
           }
-          new RecordStoreSchema(schema, childSchemaName);
+          RecordStoreSchema childSchema = schema.getSchema(schemaPath);
+          if (childSchema == null) {
+            childSchema = new RecordStoreSchema(schema, childSchemaPath);
+          } else {
+            if (childSchema.isInitialized()) {
+              childSchema.refresh();
+            }
+          }
+          elements.put(childSchemaPath.toUpperCase(), childSchema);
         }
       }
     }
+    return elements;
   }
 
   public void setCreateMissingRecordStore(final boolean createMissingRecordStore) {
@@ -300,14 +316,14 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     if (recordStore == this) {
       switch (record.getState()) {
         case Deleted:
-        break;
+          break;
         case Persisted:
-        break;
+          break;
         case Modified:
           throw new UnsupportedOperationException();
         default:
           insert(record);
-        break;
+          break;
       }
     } else {
       insert(record);
