@@ -20,7 +20,7 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 
 public class MenuFactory extends AbstractObjectWithProperties implements
-  ComponentFactory<JMenuItem> {
+ComponentFactory<JMenuItem> {
 
   private final Map<String, List<ComponentFactory<?>>> groups = new HashMap<String, List<ComponentFactory<?>>>();
 
@@ -234,6 +234,30 @@ public class MenuFactory extends AbstractObjectWithProperties implements
       object, methodName, parameters);
     action.setEnableCheck(enableCheck);
     return action;
+  }
+
+  public void deleteMenuItem(final String groupName, final String menuTitle) {
+    final List<ComponentFactory<?>> items = this.groups.get(groupName);
+    if (items != null) {
+      for (final ComponentFactory<?> item : items) {
+        boolean delete = false;
+        if (item instanceof MenuFactory) {
+          final MenuFactory menuFactory = (MenuFactory)item;
+          if (menuTitle.equals(menuFactory.getName())) {
+            delete = true;
+          }
+        } else if (item instanceof ActionMainMenuItemFactory) {
+          final ActionMainMenuItemFactory actionFactory = (ActionMainMenuItemFactory)item;
+          if (menuTitle.equals(actionFactory.getName())) {
+            delete = true;
+          }
+        }
+        if (delete) {
+          items.remove(item);
+          return;
+        }
+      }
+    }
   }
 
   /*

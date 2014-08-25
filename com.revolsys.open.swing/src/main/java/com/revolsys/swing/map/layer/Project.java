@@ -31,6 +31,8 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
@@ -42,6 +44,11 @@ public class Project extends LayerGroup {
 
   public static void set(final Project project) {
     Project.project = new WeakReference<Project>(project);
+  }
+
+  static {
+    final MenuFactory menu = ObjectTreeModel.getMenu(Project.class);
+    menu.deleteMenuItem("layer", "Delete Layer");
   }
 
   private static WeakReference<Project> project = new WeakReference<Project>(
