@@ -8,14 +8,14 @@ import com.revolsys.data.record.schema.RecordDefinition;
 
 public class RecordMapTableModel extends AbstractSingleRecordTableModel {
 
-  private static final long serialVersionUID = 1L;
-
   public static JComponent create(final RecordDefinition recordDefinition,
     final Map<String, Object> values, final boolean editable) {
     final RecordMapTableModel model = new RecordMapTableModel(recordDefinition,
       values, editable);
     return createTable(model);
   }
+
+  private static final long serialVersionUID = 1L;
 
   private Map<String, Object> values;
 
@@ -25,8 +25,18 @@ public class RecordMapTableModel extends AbstractSingleRecordTableModel {
     this.values = values;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Object getObjectValue(final int attributeIndex, int columnIndex) {
+  public <V extends Map<String, Object>> V getMap(final int columnIndex) {
+    if (columnIndex == 2) {
+      return (V)this.values;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public Object getObjectValue(final int attributeIndex, final int columnIndex) {
     final String name = getFieldName(attributeIndex);
     return this.values.get(name);
   }

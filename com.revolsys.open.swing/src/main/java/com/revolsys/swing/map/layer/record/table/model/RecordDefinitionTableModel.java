@@ -3,7 +3,7 @@ package com.revolsys.swing.map.layer.record.table.model;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.swing.table.AbstractTableModel;
+import com.revolsys.swing.table.AbstractTableModel;
 
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;

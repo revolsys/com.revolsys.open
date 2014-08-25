@@ -3,6 +3,8 @@ package com.revolsys.swing.table;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.lang.ref.Reference;
@@ -14,21 +16,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
+import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.util.Property;
 
 public class TablePanel extends JPanel implements MouseListener {
-  private static int eventColumn;
-
-  private static int eventRow;
-
-  private static Reference<JTable> eventTable = new WeakReference<JTable>(null);
-
-  private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(
-    null);
-
-  private static final long serialVersionUID = 1L;
-
   public static int getEventColumn() {
     return eventColumn;
   }
@@ -58,10 +54,25 @@ public class TablePanel extends JPanel implements MouseListener {
       if (eventColumn > -1) {
         eventColumn = table.convertColumnIndexToModel(eventColumn);
       }
+      if (e.getButton() == MouseEvent.BUTTON3) {
+        table.getSelectionModel().setSelectionInterval(eventRow, eventRow);
+        if (table.isEditing()) {
+          table.getCellEditor().stopCellEditing();
+        }
+      }
     }
   }
 
-  private final MenuFactory menu = new MenuFactory();
+  private static int eventColumn;
+
+  private static int eventRow;
+
+  private static Reference<JTable> eventTable = new WeakReference<JTable>(null);
+
+  private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(
+      null);
+
+  private static final long serialVersionUID = 1L;
 
   private final JTable table;
 
@@ -72,33 +83,82 @@ public class TablePanel extends JPanel implements MouseListener {
   public TablePanel(final JTable table) {
     super(new BorderLayout());
     this.table = table;
-
+    final AbstractTableModel model = (AbstractTableModel)table.getModel();
     add(this.toolBar, BorderLayout.NORTH);
 
-    scrollPane = new JScrollPane(table);
+    this.scrollPane = new JScrollPane(table);
     table.addMouseListener(this);
-    add(scrollPane, BorderLayout.CENTER);
+    add(this.scrollPane, BorderLayout.CENTER);
+
+    final MenuFactory menu = model.getMenu();
+
+    menu.addMenuItemTitleIcon("dataTransfer", "Copy Field Value", "page_copy",
+      new ObjectPropertyEnableCheck(this, "canCopy"), this, "copyFieldValue");
+
+    menu.addMenuItemTitleIcon("dataTransfer", "Cut Field Value", "cut",
+      new ObjectPropertyEnableCheck(this, "canCut"), this, "cutFieldValue");
+
+    menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value",
+      "paste_plain", new ObjectPropertyEnableCheck(this, "canPaste"), this,
+        "pasteFieldValue");
+  }
+
+  private void copyCurrentCell() {
+    final TableModel model = getTableModel();
+    final Object value = model.getValueAt(eventRow, eventColumn);
+
+    final String copyValue;
+    if (model instanceof AbstractTableModel) {
+      final AbstractTableModel tableModel = (AbstractTableModel)model;
+      copyValue = tableModel.toCopyValue(eventRow, eventColumn, value);
+    } else {
+      copyValue = StringConverterRegistry.toString(value);
+    }
+    final StringSelection transferable = new StringSelection(copyValue);
+    ClipboardUtil.setContents(transferable);
+  }
+
+  public void copyFieldValue() {
+    if (isEditingCurrentCell()) {
+      final Component editorComponent = this.table.getEditorComponent();
+      SwingUtil.dndCopy(editorComponent);
+    } else {
+      copyCurrentCell();
+    }
+  }
+
+  public void cutFieldValue() {
+    if (isEditingCurrentCell()) {
+      final Component editorComponent = this.table.getEditorComponent();
+      SwingUtil.dndCut(editorComponent);
+    } else {
+      copyCurrentCell();
+      if (isCurrentCellEditable()) {
+        final TableModel tableModel = getTableModel();
+        tableModel.setValueAt(null, eventRow, eventColumn);
+      }
+    }
   }
 
   private void doMenu(final MouseEvent e) {
     setEventRow(this.table, e);
     if (eventRow > -1 && e.isPopupTrigger()) {
       e.consume();
-      popupMouseEvent = new WeakReference<MouseEvent>(e);
-      final int x = e.getX();
-      final int y = e.getY();
-      final JPopupMenu popupMenu = this.menu.createJPopupMenu();
-      final Component component = e.getComponent();
-      popupMenu.show(component, x + 5, y);
+      final MenuFactory menu = getTableModel().getMenu(eventRow, eventColumn);
+      if (menu != null) {
+        popupMouseEvent = new WeakReference<MouseEvent>(e);
+        final int x = e.getX();
+        final int y = e.getY();
+
+        final JPopupMenu popupMenu = menu.createJPopupMenu();
+        final Component component = e.getComponent();
+        popupMenu.show(component, x + 5, y);
+      }
     }
   }
 
-  public MenuFactory getMenu() {
-    return this.menu;
-  }
-
   public JScrollPane getScrollPane() {
-    return scrollPane;
+    return this.scrollPane;
   }
 
   @SuppressWarnings("unchecked")
@@ -107,7 +167,7 @@ public class TablePanel extends JPanel implements MouseListener {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends TableModel> T getTableModel() {
+  public <T extends AbstractTableModel> T getTableModel() {
     return (T)this.table.getModel();
   }
 
@@ -115,8 +175,49 @@ public class TablePanel extends JPanel implements MouseListener {
     return this.toolBar;
   }
 
+  public boolean isCanCopy() {
+    return isEditingCurrentCell() || isCurrentCellHasValue();
+  }
+
+  public boolean isCanCut() {
+    return isEditingCurrentCell() || isCurrentCellHasValue()
+        && isCurrentCellEditable();
+  }
+
+  public boolean isCanPaste() {
+    if (isEditingCurrentCell()) {
+      return true;
+    } else if (isCurrentCellEditable()) {
+      final String value = ClipboardUtil.getContents(DataFlavor.stringFlavor);
+      return Property.hasValue(value);
+    }
+    return false;
+  }
+
+  public boolean isCurrentCellEditable() {
+    if (eventRow > -1 && eventColumn > -1) {
+      return getTableModel().isCellEditable(eventRow, eventColumn);
+    }
+    return false;
+  }
+
+  public boolean isCurrentCellHasValue() {
+    if (isEditingCurrentCell()) {
+      return true;
+    } else if (eventRow > -1 && eventColumn > -1) {
+      final TableModel tableModel = getTableModel();
+      final Object value = tableModel.getValueAt(eventRow, eventColumn);
+      return Property.hasValue(value);
+    }
+    return false;
+  }
+
+  public boolean isEditing() {
+    return this.table.isEditing();
+  }
+
   public boolean isEditingCurrentCell() {
-    if (this.table.isEditing()) {
+    if (isEditing()) {
       if (eventRow > -1 && eventRow == this.table.getEditingRow()) {
         if (eventColumn > -1 && eventColumn == this.table.getEditingColumn()) {
           return true;
@@ -128,7 +229,7 @@ public class TablePanel extends JPanel implements MouseListener {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    setEventRow(table, e);
+    setEventRow(this.table, e);
   }
 
   @Override
@@ -148,4 +249,20 @@ public class TablePanel extends JPanel implements MouseListener {
   public void mouseReleased(final MouseEvent e) {
     doMenu(e);
   }
+
+  public void pasteFieldValue() {
+    if (isEditingCurrentCell()) {
+      final Component editorComponent = this.table.getEditorComponent();
+      SwingUtil.dndPaste(editorComponent);
+    } else {
+      final String value = ClipboardUtil.getContents(DataFlavor.stringFlavor);
+      if (Property.hasValue(value)) {
+        final TableModel tableModel = getTableModel();
+        if (tableModel.isCellEditable(eventRow, eventColumn)) {
+          tableModel.setValueAt(value, eventRow, eventColumn);
+        }
+      }
+    }
+  }
+
 }

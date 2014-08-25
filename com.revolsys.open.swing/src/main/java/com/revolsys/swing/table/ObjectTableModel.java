@@ -3,7 +3,7 @@ package com.revolsys.swing.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.table.AbstractTableModel;
+import com.revolsys.swing.table.AbstractTableModel;
 
 import com.revolsys.util.JavaBeanUtil;
 

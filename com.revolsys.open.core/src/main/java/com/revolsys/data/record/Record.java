@@ -10,7 +10,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 
 public interface Record extends Map<String, Object>, Comparable<Record>,
-  Identifiable {
+Identifiable {
   /**
    * Create a clone of the data object.
    *
@@ -158,9 +158,11 @@ public interface Record extends Map<String, Object>, Comparable<Record>,
 
   void setValues(Map<String, ? extends Object> values);
 
-  void setValues(final Record object);
+  void setValues(Map<String, Object> record, Collection<String> attributeNames);
 
-  void setValues(Record object, Collection<String> attributeNames);
+  void setValues(Map<String, Object> record, String... attributeNames);
+
+  void setValues(final Record object);
 
   /**
    * Set the values on the object based on the values in the map.

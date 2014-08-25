@@ -1,15 +1,13 @@
 package com.revolsys.swing.parallel;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 
-import org.jdesktop.swingx.util.OS;
+import org.jdesktop.swingx.JXBusyLabel;
 
 import com.revolsys.swing.SwingUtil;
 
@@ -17,28 +15,27 @@ public class SwingWorkerProgressBar extends JPanel implements
 PropertyChangeListener {
   private static final long serialVersionUID = -5112492385171847107L;
 
-  private final JProgressBar progressBar = new JProgressBar();
+  private final JXBusyLabel busyLabel = new JXBusyLabel();
 
   public SwingWorkerProgressBar() {
     super(new BorderLayout());
+    this.busyLabel.setDelay(200);
     Invoke.getPropertyChangeSupport()
     .addPropertyChangeListener("workers", this);
-    if (!OS.isMacOSX()) {
-      this.progressBar.setIndeterminate(true);
-      add(this.progressBar, BorderLayout.WEST);
-      this.progressBar.setPreferredSize(new Dimension(48, 16));
-    }
+    add(this.busyLabel, BorderLayout.WEST);
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final List<?> workers = (List<?>)event.getNewValue();
-    SwingUtil.setVisible(this.progressBar, true);
+    boolean visible;
     if (workers == null || workers.isEmpty()) {
-      SwingUtil.setVisible(this, false);
+      visible = false;
     } else {
-      SwingUtil.setVisible(this, true);
+      visible = true;
     }
+    this.busyLabel.setBusy(visible);
+    SwingUtil.setVisible(this, visible);
   }
 
   @Override

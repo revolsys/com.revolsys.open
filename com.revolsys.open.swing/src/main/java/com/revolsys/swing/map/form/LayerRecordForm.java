@@ -92,6 +92,7 @@ import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsModified
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
@@ -105,7 +106,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerRecordForm extends JPanel implements PropertyChangeListener,
-CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
+  CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public static final String FLIP_FIELDS_ICON = "flip_fields";
 
@@ -122,7 +123,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   private static final long serialVersionUID = 1L;
 
   private JButton addOkButton = InvokeMethodAction.createButton("OK", this,
-    "actionAddOk");
+      "actionAddOk");
 
   private RecordLayerAttributesTableModel allAttributes;
 
@@ -280,8 +281,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (field instanceof ComboBox) {
       final ComboBox comboBox = (ComboBox)field;
       comboBox.getEditor()
-      .getEditorComponent()
-      .addFocusListener(new WeakFocusListener(this));
+        .getEditorComponent()
+        .addFocusListener(new WeakFocusListener(this));
     } else {
       ((JComponent)field).addFocusListener(new WeakFocusListener(this));
     }
@@ -410,10 +411,11 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
       }
     }
 
-    final JScrollPane scrollPane = addTab("All Fields", table);
+    final TablePanel tablePanel = new TablePanel(table);
+    final JScrollPane scrollPane = addTab("All Fields", tablePanel);
     int maxHeight = 500;
     for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
-        .getScreenDevices()) {
+      .getScreenDevices()) {
       final GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
       final Rectangle bounds = graphicsConfiguration.getBounds();
 
@@ -478,12 +480,12 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
     }
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canUndo");
+      "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canRedo");
+      "canRedo");
 
     final EnableCheck modifiedOrDeleted = new ObjectPropertyEnableCheck(this,
-        "modifiedOrDeleted");
+      "modifiedOrDeleted");
 
     this.toolBar.addButton("changes", "Revert Record", "arrow_revert",
       modifiedOrDeleted, this, "revertChanges");
@@ -507,9 +509,9 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (hasGeometry) {
       final DataType geometryDataType = geometryAttribute.getType();
       if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition)
-            .hasDirectionalAttributes()) {
+          .hasDirectionalAttributes()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME,
             FLIP_RECORD_ICON, editable, this, "flipRecordOrientation");
           this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME,
@@ -1000,7 +1002,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     final AbstractLayer layer = getLayer();
     if (layer != null) {
       final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-          map);
+        map);
       final Collection<String> ignorePasteFields = layer.getProperty("ignorePasteFields");
       if (ignorePasteFields != null) {
         newValues.keySet().removeAll(ignorePasteFields);

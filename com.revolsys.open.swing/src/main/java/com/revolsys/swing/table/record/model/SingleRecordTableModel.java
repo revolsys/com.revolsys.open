@@ -1,50 +1,59 @@
 package com.revolsys.swing.table.record.model;
 
+import java.util.Map;
+
 import javax.swing.JComponent;
 import javax.swing.table.JTableHeader;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.swing.table.BaseJxTable;
 
-public class SingleRecordTableModel extends
-  AbstractSingleRecordTableModel {
-  private static final long serialVersionUID = 1L;
-
-  public static JComponent create(final Record object,
-    final boolean editable) {
-    final SingleRecordTableModel model = new SingleRecordTableModel(
-      object, editable);
+public class SingleRecordTableModel extends AbstractSingleRecordTableModel {
+  public static JComponent create(final Record object, final boolean editable) {
+    final SingleRecordTableModel model = new SingleRecordTableModel(object,
+      editable);
     final BaseJxTable table = createTable(model);
     final JTableHeader tableHeader = table.getTableHeader();
     tableHeader.setReorderingAllowed(false);
     return table;
   }
 
-  private Record object;
+  private static final long serialVersionUID = 1L;
 
-  public SingleRecordTableModel(final Record object,
-    final boolean editable) {
+  private Record record;
+
+  public SingleRecordTableModel(final Record object, final boolean editable) {
     super(object.getRecordDefinition(), editable);
-    this.object = object;
+    this.record = object;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Map<String, Object>> V getMap(final int columnIndex) {
+    if (columnIndex == 2) {
+      return (V)this.record;
+    } else {
+      return null;
+    }
   }
 
   public Record getObject() {
-    return this.object;
+    return this.record;
   }
 
   @Override
-  public Object getObjectValue(final int rowIndex, int columnIndex) {
-    if (this.object == null) {
+  public Object getObjectValue(final int rowIndex, final int columnIndex) {
+    if (this.record == null) {
       return "\u2026";
     } else {
-      return this.object.getValue(rowIndex);
+      return this.record.getValue(rowIndex);
     }
   }
 
   public void setObject(final Record object) {
-    if (object != this.object) {
+    if (object != this.record) {
       setRecordDefinition(object.getRecordDefinition());
-      this.object = object;
+      this.record = object;
       fireTableDataChanged();
     }
 
@@ -52,8 +61,8 @@ public class SingleRecordTableModel extends
 
   @Override
   protected Object setObjectValue(final int rowIndex, final Object value) {
-    final Object oldValue = this.object.getValue(rowIndex);
-    this.object.setValue(rowIndex, value);
+    final Object oldValue = this.record.getValue(rowIndex);
+    this.record.setValue(rowIndex, value);
     return oldValue;
   }
 

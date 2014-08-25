@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.util.Map;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.RecordState;
@@ -16,7 +17,7 @@ import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.util.Property;
 
 public class RecordLayerAttributesTableModel extends
-AbstractSingleRecordTableModel implements PropertyChangeListener {
+  AbstractSingleRecordTableModel implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -53,8 +54,18 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
     return this.layer.getFieldTitle(fieldName);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Object getObjectValue(final int rowIndex, int columnIndex) {
+  public <V extends Map<String, Object>> V getMap(final int columnIndex) {
+    if (columnIndex == 2) {
+      return (V)this.record;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public Object getObjectValue(final int rowIndex, final int columnIndex) {
     if (this.record == null) {
       return null;
     } else {
@@ -97,7 +108,7 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
           }
         }
         if (recordDefinition.getGeometryAttributeNames()
-          .contains(attributeName)) {
+            .contains(attributeName)) {
           return false;
         } else {
           return this.form.get().isEditable(attributeName);

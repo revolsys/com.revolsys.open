@@ -1,17 +1,25 @@
 package com.revolsys.swing.table.record.model;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.swing.JTable;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.comparator.NumericComparator;
+import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.renderer.SingleRecordTableCellRenderer;
+import com.revolsys.util.CollectionUtil;
 
 public abstract class AbstractSingleRecordTableModel extends
-  AbstractRecordTableModel {
+AbstractRecordTableModel {
   public static BaseJxTable createTable(
     final AbstractSingleRecordTableModel model) {
     final BaseJxTable table = new BaseJxTable(model);
@@ -21,6 +29,7 @@ public abstract class AbstractSingleRecordTableModel extends
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     final SingleRecordTableCellRenderer cellRenderer = new SingleRecordTableCellRenderer();
     final RecordTableCellEditor cellEditor = new RecordTableCellEditor(table);
+    cellEditor.setPopupMenu(model.getMenu());
 
     final RecordDefinition recordDefinition = model.getRecordDefinition();
 
@@ -94,6 +103,8 @@ public abstract class AbstractSingleRecordTableModel extends
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getAttributeTitle(fieldName);
   }
+
+  public abstract <V extends Map<String, Object>> V getMap(int columnIndex);
 
   public abstract Object getObjectValue(final int attributeIndex,
     int columnIndex);
@@ -175,6 +186,43 @@ public abstract class AbstractSingleRecordTableModel extends
       final Object oldValue = setDisplayValue(rowIndex, value);
       final String propertyName = getFieldName(rowIndex);
       firePropertyChange(propertyName, oldValue, value);
+    }
+  }
+
+  @Override
+  public String toCopyValue(final int rowIndex, final int columnIndex,
+    final Object objectValue) {
+    if (objectValue == null) {
+      return null;
+    } else if (columnIndex < 2) {
+      return StringConverterRegistry.toString(objectValue);
+    } else {
+      String text;
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final String idFieldName = recordDefinition.getIdAttributeName();
+      final String name = getFieldName(rowIndex);
+      if (objectValue instanceof Geometry) {
+        final Geometry geometry = (Geometry)objectValue;
+        return geometry.toString();
+      }
+      CodeTable codeTable = null;
+      if (!name.equals(idFieldName)) {
+        codeTable = recordDefinition.getCodeTableByColumn(name);
+      }
+      if (codeTable == null) {
+        text = StringConverterRegistry.toString(objectValue);
+      } else {
+        final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
+        if (values == null || values.isEmpty()) {
+          return null;
+        } else {
+          text = CollectionUtil.toString(values);
+        }
+      }
+      if (text.length() == 0) {
+        return null;
+      }
+      return text;
     }
   }
 }

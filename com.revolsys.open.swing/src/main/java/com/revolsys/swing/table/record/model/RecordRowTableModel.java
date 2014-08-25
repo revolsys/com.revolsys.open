@@ -12,6 +12,9 @@ import javax.swing.SortOrder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 
+import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.Attribute;
@@ -21,10 +24,11 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public abstract class RecordRowTableModel extends AbstractRecordTableModel
-  implements SortableTableModel, CellEditorListener {
+implements SortableTableModel, CellEditorListener {
 
   public static final String LOADING_VALUE = "\u2026";
 
@@ -202,9 +206,8 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
           final String attributeName = getFieldName(rowIndex, columnIndex);
           if (attributeName != null) {
             if (!isReadOnly(attributeName)) {
-              RecordDefinition recordDefinition = getRecordDefinition();
-              final Class<?> attributeClass = recordDefinition.getAttributeClass(
-                attributeName);
+              final RecordDefinition recordDefinition = getRecordDefinition();
+              final Class<?> attributeClass = recordDefinition.getAttributeClass(attributeName);
               if (!Geometry.class.isAssignableFrom(attributeClass)) {
                 return true;
               }
@@ -233,7 +236,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     if (attributeNames == null || attributeNames.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
       this.attributeNames = new ArrayList<String>(
-        recordDefinition.getAttributeNames());
+          recordDefinition.getAttributeNames());
     } else {
       this.attributeNames = new ArrayList<String>(attributeNames);
     }
@@ -305,6 +308,41 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       }
     }
 
+  }
+
+  @Override
+  public String toCopyValue(final int rowIndex, final int attributeIndex,
+    final Object objectValue) {
+    String text;
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final String idFieldName = recordDefinition.getIdAttributeName();
+    final String name = getFieldName(attributeIndex);
+    if (objectValue == null) {
+      return null;
+    } else {
+      if (objectValue instanceof Geometry) {
+        final Geometry geometry = (Geometry)objectValue;
+        return geometry.toString();
+      }
+      CodeTable codeTable = null;
+      if (!name.equals(idFieldName)) {
+        codeTable = recordDefinition.getCodeTableByColumn(name);
+      }
+      if (codeTable == null) {
+        text = StringConverterRegistry.toString(objectValue);
+      } else {
+        final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
+        if (values == null || values.isEmpty()) {
+          return null;
+        } else {
+          text = CollectionUtil.toString(values);
+        }
+      }
+      if (text.length() == 0) {
+        return null;
+      }
+    }
+    return text;
   }
 
   @Override

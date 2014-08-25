@@ -1,16 +1,15 @@
 package com.revolsys.swing.map.layer.record.table;
 
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import javax.swing.table.TableCellEditor;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.DirectionalAttributes;
@@ -20,13 +19,11 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.InvokeMethodEnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
-import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -59,17 +56,20 @@ PropertyChangeListener {
 
   private final JToggleButton selectedButton;
 
-  private final RecordTableCellEditor tableCellEditor;
-
   public RecordLayerTablePanel(final AbstractRecordLayer layer,
     final RecordLayerTable table) {
     super(table);
     this.layer = layer;
-    this.tableCellEditor = table.getTableCellEditor();
-    this.tableCellEditor.setPopupMenu(getMenu());
+    this.tableModel = getTableModel();
+
+    // Right click Menu
+    final MenuFactory menu = this.tableModel.getMenu();
+
+    final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
+    tableCellEditor.setPopupMenu(menu);
+
     table.getTableCellEditor().addMouseListener(this);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-    this.tableModel = getTableModel();
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     final boolean hasGeometry = recordDefinition.getGeometryAttributeIndex() != -1;
     final EnableCheck deletableEnableCheck = new RecordRowPropertyEnableCheck(
@@ -87,11 +87,8 @@ PropertyChangeListener {
     final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
       layer, "editable");
 
-    final EnableCheck cellEditingEnableCheck = new ObjectPropertyEnableCheck(
-      this, "editingCurrentCell");
-
-    // Right click Menu
-    final MenuFactory menu = getMenu();
+    menu.addGroup(0, "record");
+    menu.addGroup(1, "dnd");
 
     final MenuFactory layerMenuFactory = ObjectTreeModel.findMenu(layer);
     // if (layerMenuFactory != null) {
@@ -117,13 +114,6 @@ PropertyChangeListener {
 
     menu.addMenuItemTitleIcon("dnd", "Copy Record", "page_copy", this,
         "copyRecord");
-
-    menu.addMenuItemTitleIcon("dataTransfer", "Cut Field Value", "cut",
-      cellEditingEnableCheck, this, "cutFieldValue");
-    menu.addMenuItemTitleIcon("dataTransfer", "Copy Field Value", "page_copy",
-      this, "copyFieldValue");
-    menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value",
-      "paste_plain", cellEditingEnableCheck, this, "pasteFieldValue");
 
     if (hasGeometry) {
       menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "geometry_paste",
@@ -216,32 +206,9 @@ PropertyChangeListener {
     return this.layer.canPasteRecordGeometry(record);
   }
 
-  public void copyFieldValue() {
-    if (isEditingCurrentCell()) {
-      final JComponent editorComponent = this.tableCellEditor.getEditorComponent();
-      SwingUtil.dndCopy(editorComponent);
-    } else {
-      final RecordRowTableModel model = getTableModel();
-      final int row = getEventRow();
-      final int column = getEventColumn();
-      final Object value = model.getValueAt(row, column);
-
-      final String displayValue = model.toCopyValue(row, column, value);
-      final StringSelection transferable = new StringSelection(displayValue);
-      ClipboardUtil.setContents(transferable);
-    }
-  }
-
   public void copyRecord() {
     final LayerRecord record = getEventRowObject();
     this.layer.copyRecordsToClipboard(Collections.singletonList(record));
-  }
-
-  public void cutFieldValue() {
-    if (isEditingCurrentCell()) {
-      final JComponent editorComponent = this.tableCellEditor.getEditorComponent();
-      SwingUtil.dndCut(editorComponent);
-    }
   }
 
   public void deleteRecord() {
@@ -303,15 +270,12 @@ PropertyChangeListener {
   public void mouseClicked(final MouseEvent e) {
     super.mouseClicked(e);
     if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-      this.tableCellEditor.stopCellEditing();
+      if (isEditing()) {
+        final JTable table = getTable();
+        final TableCellEditor cellEditor = table.getCellEditor();
+        cellEditor.stopCellEditing();
+      }
       editRecord();
-    }
-  }
-
-  public void pasteFieldValue() {
-    if (isEditingCurrentCell()) {
-      final JComponent editorComponent = this.tableCellEditor.getEditorComponent();
-      SwingUtil.dndPaste(editorComponent);
     }
   }
 

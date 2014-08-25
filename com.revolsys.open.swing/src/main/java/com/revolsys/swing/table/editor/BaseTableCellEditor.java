@@ -1,4 +1,4 @@
-package com.revolsys.swing.table.record.editor;
+package com.revolsys.swing.table.editor;
 
 import java.awt.AWTEventMulticaster;
 import java.awt.Component;
@@ -19,34 +19,30 @@ import javax.swing.JTextField;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTable;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.listener.Listener;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJxTable;
-import com.revolsys.swing.table.record.model.AbstractRecordTableModel;
 
-public class RecordTableCellEditor extends AbstractCellEditor implements
+public class BaseTableCellEditor extends AbstractCellEditor implements
 TableCellEditor, KeyListener, MouseListener, TableModelListener {
 
   private static final long serialVersionUID = 1L;
 
   private JComponent editorComponent;
 
-  private String attributeName;
-
   private final BaseJxTable table;
 
   private int rowIndex;
-
-  private Object oldValue;
 
   private int columnIndex;
 
@@ -56,9 +52,10 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
 
   private MouseListener mouseListener;
 
-  public RecordTableCellEditor(final BaseJxTable table) {
+  public BaseTableCellEditor(final BaseJxTable table) {
     this.table = table;
-    table.getModel().addTableModelListener(this);
+    final TableModel model = table.getModel();
+    model.addTableModelListener(this);
   }
 
   public synchronized void addMouseListener(final MouseListener l) {
@@ -67,47 +64,25 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
     }
   }
 
-  public String getAttributeName() {
-    return this.attributeName;
-  }
-
   @Override
   public Object getCellEditorValue() {
     final Object value = SwingUtil.getValue(this.editorComponent);
     return value;
   }
 
-  public int getColumnIndex() {
-    return this.columnIndex;
-  }
-
-  public JComponent getEditorComponent() {
-    return this.editorComponent;
-  }
-
-  public Object getOldValue() {
-    return this.oldValue;
-  }
-
-  public int getRowIndex() {
-    return this.rowIndex;
-  }
-
+  @SuppressWarnings("rawtypes")
   @Override
   public Component getTableCellEditorComponent(final JTable table,
     final Object value, final boolean isSelected, int rowIndex, int columnIndex) {
+
     if (table instanceof JXTable) {
       final JXTable jxTable = (JXTable)table;
       rowIndex = jxTable.convertRowIndexToModel(rowIndex);
       columnIndex = jxTable.convertColumnIndexToModel(columnIndex);
     }
-    this.oldValue = value;
-    final AbstractRecordTableModel model = (AbstractRecordTableModel)table.getModel();
-    this.attributeName = model.getFieldName(rowIndex, columnIndex);
-    final RecordDefinition recordDefinition = model.getRecordDefinition();
-    this.dataType = recordDefinition.getAttributeType(this.attributeName);
-    this.editorComponent = (JComponent)SwingUtil.createField(recordDefinition,
-      this.attributeName, true);
+    final AbstractTableModel model = (AbstractTableModel)table.getModel();
+
+    this.editorComponent = model.getEditorField(rowIndex, columnIndex, value);
     if (this.editorComponent instanceof JTextField) {
       final JTextField textField = (JTextField)this.editorComponent;
       textField.setBorder(BorderFactory.createCompoundBorder(

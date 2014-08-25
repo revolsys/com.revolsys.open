@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PreDestroy;
-import javax.swing.table.AbstractTableModel;
+import com.revolsys.swing.table.AbstractTableModel;
 
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.util.CaseConverter;

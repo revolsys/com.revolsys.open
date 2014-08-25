@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PreDestroy;
-import javax.swing.table.AbstractTableModel;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -21,8 +20,9 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecordTableModel extends AbstractTableModel
-  implements PropertyChangeSupportProxy {
+public abstract class AbstractRecordTableModel extends
+com.revolsys.swing.table.AbstractTableModel implements
+PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
 
@@ -128,40 +128,6 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
       this.recordDefinition = recordDefinition;
       fireTableStructureChanged();
     }
-  }
-
-  public String toCopyValue(final int rowIndex, final int attributeIndex,
-    final Object objectValue) {
-    String text;
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final String idFieldName = recordDefinition.getIdAttributeName();
-    final String name = getFieldName(attributeIndex);
-    if (objectValue == null) {
-      return null;
-    } else {
-      if (objectValue instanceof Geometry) {
-        final Geometry geometry = (Geometry)objectValue;
-        return geometry.toString();
-      }
-      CodeTable codeTable = null;
-      if (!name.equals(idFieldName)) {
-        codeTable = recordDefinition.getCodeTableByColumn(name);
-      }
-      if (codeTable == null) {
-        text = StringConverterRegistry.toString(objectValue);
-      } else {
-        final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
-        if (values == null || values.isEmpty()) {
-          return null;
-        } else {
-          text = CollectionUtil.toString(values);
-        }
-      }
-      if (text.length() == 0) {
-        return null;
-      }
-    }
-    return text;
   }
 
   public String toDisplayValue(final int rowIndex, final int attributeIndex,
