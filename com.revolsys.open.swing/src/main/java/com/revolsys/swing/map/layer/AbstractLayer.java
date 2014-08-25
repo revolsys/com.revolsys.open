@@ -60,6 +60,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.record.style.panel.RecordLayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
 import com.revolsys.swing.tree.TreeItemRunnable;
 import com.revolsys.swing.tree.model.ObjectTreeModel;
@@ -68,7 +69,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
-  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
+implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   static {
@@ -77,7 +78,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final EnableCheck exists = new TreeItemPropertyEnableCheck("exists");
 
     final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
-      "hasGeometry");
+        "hasGeometry");
     menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Layer",
       "magnifier", new AndEnableCheck(exists, hasGeometry), "zoomToLayer"));
 
@@ -85,7 +86,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     menu.addComponentFactory("scale", new TreeItemScaleMenu(false));
 
     menu.addMenuItem(TreeItemRunnable.createAction("Refresh", "arrow_refresh",
-      exists, "refresh"));
+      exists, "refreshAll"));
 
     menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete Layer",
       "delete", "deleteWithConfirm"));
@@ -253,18 +254,18 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       } else {
         extentPanel.add(new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
-            + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-            + boundingBox.getMaximum(1)
-            + "</td><td>&nbsp;</td></tr><tr>"
-            + "<td><b>Left</b>: "
-            + boundingBox.getMinimum(0)
-            + "</td><td>&nbsp;</td><td>&nbsp;</td>"
-            + "<td><b>Right</b>: "
-            + boundingBox.getMaximum(0)
-            + "</td></tr>"
-            + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-            + boundingBox.getMinimum(1) + "</td><td>&nbsp;</td></tr><tr>"
-            + "</tr></table></html>"));
+              + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+              + boundingBox.getMaximum(1)
+              + "</td><td>&nbsp;</td></tr><tr>"
+              + "<td><b>Left</b>: "
+              + boundingBox.getMinimum(0)
+              + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+              + "<td><b>Right</b>: "
+              + boundingBox.getMaximum(0)
+              + "</td></tr>"
+              + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+              + boundingBox.getMinimum(1) + "</td><td>&nbsp;</td></tr><tr>"
+              + "</tr></table></html>"));
 
       }
       GroupLayoutUtil.makeColumns(extentPanel, 1, true);
@@ -394,6 +395,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   protected void doRefresh() {
+  }
+
+  protected void doRefreshAll() {
+    doRefresh();
   }
 
   protected boolean doSaveChanges() {
@@ -574,7 +579,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         setExists(exists);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to initialize layer: "
-          + getPath(), e);
+            + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -648,7 +653,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public boolean isSelectable() {
     return isExists() && isVisible()
-      && (isSelectSupported() && this.selectable || isEditable());
+        && (isSelectSupported() && this.selectable || isEditable());
   }
 
   @Override
@@ -688,8 +693,22 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void refresh() {
-    doRefresh();
-    firePropertyChange("refresh", false, true);
+    if (SwingUtil.isEventDispatchThread()) {
+      Invoke.background("Refresh " + getName(), this, "refresh");
+    } else {
+      doRefresh();
+      firePropertyChange("refresh", false, true);
+    }
+  }
+
+  @Override
+  public void refreshAll() {
+    if (SwingUtil.isEventDispatchThread()) {
+      Invoke.background("Refresh " + getName(), this, "refreshAll");
+    } else {
+      doRefreshAll();
+      firePropertyChange("refresh", false, true);
+    }
   }
 
   @Override
@@ -984,8 +1003,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
     final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-      .expandPercent(0.1)
-      .clipToCoordinateSystem();
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
 
     project.setViewBoundingBox(boundingBox);
   }

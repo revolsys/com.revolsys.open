@@ -13,13 +13,14 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.renderer.SingleRecordTableCellRenderer;
 import com.revolsys.util.CollectionUtil;
 
 public abstract class AbstractSingleRecordTableModel extends
-AbstractRecordTableModel {
+  AbstractRecordTableModel {
   public static BaseJxTable createTable(
     final AbstractSingleRecordTableModel model) {
     final BaseJxTable table = new BaseJxTable(model);
@@ -105,6 +106,15 @@ AbstractRecordTableModel {
   }
 
   public abstract <V extends Map<String, Object>> V getMap(int columnIndex);
+
+  @Override
+  public MenuFactory getMenu(final int rowIndex, final int columnIndex) {
+    if (columnIndex == 2) {
+      return getMenu();
+    } else {
+      return null;
+    }
+  }
 
   public abstract Object getObjectValue(final int attributeIndex,
     int columnIndex);

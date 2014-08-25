@@ -292,6 +292,17 @@ Parent<Layer> {
   }
 
   @Override
+  protected void doRefresh() {
+  }
+
+  @Override
+  protected void doRefreshAll() {
+    for (final Layer layer : this.layers) {
+      layer.refreshAll();
+    }
+  }
+
+  @Override
   protected boolean doSaveSettings(final File directory) {
     final File groupDirectory = getGroupSettingsDirectory(directory);
     return super.doSaveSettings(groupDirectory);
@@ -661,13 +672,6 @@ Parent<Layer> {
   public void openFiles(final List<File> files) {
     for (final File file : files) {
       openFile(file);
-    }
-  }
-
-  @Override
-  public void refresh() {
-    for (final Layer layer : this.layers) {
-      layer.refresh();
     }
   }
 

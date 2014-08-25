@@ -9,8 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.swing.table.AbstractTableModel;
-
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -21,6 +19,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.swing.map.form.LayerRecordForm;
+import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.TablePanel;
 
 public class GeometryCoordinatesTableModel extends AbstractTableModel {
@@ -146,7 +145,11 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
   }
 
   public int[] getVertexIndex(final int rowIndex) {
-    return this.vertexIndices.get(rowIndex);
+    if (rowIndex >= 0 && rowIndex < getRowCount()) {
+      return this.vertexIndices.get(rowIndex);
+    } else {
+      return new int[0];
+    }
   }
 
   public int getVertexIndexColumn() {
