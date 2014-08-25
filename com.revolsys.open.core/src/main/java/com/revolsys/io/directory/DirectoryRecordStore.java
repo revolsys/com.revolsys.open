@@ -128,7 +128,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
         final Attribute newAttribute = new Attribute(attribute);
         newRecordDefinition.addAttribute(newAttribute);
       }
-      schema.addRecordDefinition(newRecordDefinition);
+      schema.addElement(newRecordDefinition);
     }
     return storeRecordDefinition;
   }
