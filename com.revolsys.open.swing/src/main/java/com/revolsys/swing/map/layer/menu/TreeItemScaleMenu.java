@@ -14,6 +14,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.util.ExceptionUtil;
 
@@ -60,7 +61,7 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
       name = "Hide zoomed in beyond (maximum) scale";
     }
     long layerScale = 0;
-    final Object object = BaseTree.getMouseClickItem();
+    final Object object = MenuFactory.getMenuSource();
     if (object instanceof Layer) {
       final Layer layer = (Layer)object;
       if (layer.isHasGeometry()) {

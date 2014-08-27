@@ -31,8 +31,8 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.SqlLayerFilter;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
-import com.revolsys.swing.tree.TreeItemRunnable;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.swing.tree.TreeUserDataPropertyEnableCheck;
+import com.revolsys.swing.tree.TreeUserDataRunnable;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -128,12 +128,13 @@ public abstract class AbstractRecordLayerRenderer extends
     addRendererClass("scaleStyle", ScaleMultipleRenderer.class);
     addRendererClass("filterStyle", FilterMultipleRenderer.class);
 
-    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractRecordLayerRenderer.class);
-    menu.addMenuItem("layer", TreeItemRunnable.createAction("View/Edit Style",
-      "palette", new TreeItemPropertyEnableCheck("editing", false),
-      "showProperties"));
-    menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete", "delete",
-      new TreeItemPropertyEnableCheck("parent", null, true), "delete"));
+    final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayerRenderer.class);
+    menu.addMenuItem("layer", TreeUserDataRunnable.createAction(
+      "View/Edit Style", "palette", new TreeUserDataPropertyEnableCheck(
+        "editing", false), "showProperties"));
+    menu.addMenuItem("layer",
+      TreeUserDataRunnable.createAction("Delete", "delete",
+        new TreeItemPropertyEnableCheck("parent", null, true), "delete"));
 
     menu.addComponentFactory("scale", new TreeItemScaleMenu(true));
     menu.addComponentFactory("scale", new TreeItemScaleMenu(false));
@@ -141,7 +142,7 @@ public abstract class AbstractRecordLayerRenderer extends
     for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
       final String iconName = ("style_" + type + "_wrap").toLowerCase();
       final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-      final InvokeMethodAction action = TreeItemRunnable.createAction(
+      final InvokeMethodAction action = TreeUserDataRunnable.createAction(
         "Wrap With " + type + " Style", icon, null, "wrapWith" + type + "Style");
       menu.addMenuItem("wrap", action);
     }

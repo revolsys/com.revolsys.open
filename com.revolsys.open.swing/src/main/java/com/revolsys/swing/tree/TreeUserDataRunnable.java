@@ -8,13 +8,14 @@ import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.node.BaseTreeNode;
 
-public class TreeItemRunnable extends InvokeMethodRunnable {
+public class TreeUserDataRunnable extends InvokeMethodRunnable {
 
   public static InvokeMethodAction createAction(final CharSequence name,
     final Icon icon, final EnableCheck enableCheck, final String methodName,
     final Object... parameters) {
-    final TreeItemRunnable runnable = new TreeItemRunnable(methodName,
+    final TreeUserDataRunnable runnable = new TreeUserDataRunnable(methodName,
       parameters);
     final InvokeMethodAction action = new InvokeMethodAction(name,
       name.toString(), icon, true, runnable);
@@ -36,13 +37,19 @@ public class TreeItemRunnable extends InvokeMethodRunnable {
     return createAction(name, icon, null, methodName, parameters);
   }
 
-  protected TreeItemRunnable(final String methodName, final Object[] parameters) {
+  protected TreeUserDataRunnable(final String methodName,
+    final Object[] parameters) {
     super(methodName, parameters);
   }
 
   @Override
   public Object getObject() {
-    return MenuFactory.getMenuSource();
+    final Object item = MenuFactory.getMenuSource();
+    if (item instanceof BaseTreeNode) {
+      final BaseTreeNode node = (BaseTreeNode)item;
+      return node.getUserObject();
+    }
+    return item;
   }
 
 }

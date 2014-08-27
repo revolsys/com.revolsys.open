@@ -11,40 +11,40 @@ import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
-import com.revolsys.swing.tree.TreeItemRunnable;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.swing.tree.TreeUserDataPropertyEnableCheck;
+import com.revolsys.swing.tree.TreeUserDataRunnable;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractMultipleRenderer extends
-AbstractRecordLayerRenderer {
+  AbstractRecordLayerRenderer {
   protected static void addMenuItem(final MenuFactory menu, final String type,
     final Class<?> rendererClass) {
     final String iconName = ("style_" + type + "_go").toLowerCase();
     final ImageIcon icon = SilkIconLoader.getIcon(iconName);
 
-    final TreeItemPropertyEnableCheck enableCheck = new TreeItemPropertyEnableCheck(
+    final EnableCheck enableCheck = new TreeUserDataPropertyEnableCheck(
       "class", rendererClass, true);
-    final InvokeMethodAction action = TreeItemRunnable.createAction(
+    final InvokeMethodAction action = TreeUserDataRunnable.createAction(
       "Convert to " + type + " Style", icon, enableCheck, "convertTo" + type
-      + "Style");
+        + "Style");
     menu.addMenuItem("convert", action);
   }
 
   static {
-    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractMultipleRenderer.class);
+    final MenuFactory menu = MenuFactory.getMenu(AbstractMultipleRenderer.class);
 
     for (final String type : Arrays.asList("Geometry", "Text", "Marker",
       "Multiple", "Filter", "Scale")) {
       final String iconName = ("style_" + type + "_add").toLowerCase();
       final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-      final InvokeMethodAction action = TreeItemRunnable.createAction("Add "
-          + type + " Style", icon, null, "add" + type + "Style");
+      final InvokeMethodAction action = TreeUserDataRunnable.createAction(
+        "Add " + type + " Style", icon, null, "add" + type + "Style");
       menu.addMenuItem("add", action);
     }
 

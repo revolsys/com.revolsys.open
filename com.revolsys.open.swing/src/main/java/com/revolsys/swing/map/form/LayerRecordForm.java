@@ -96,8 +96,6 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.swing.tree.ObjectTree;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.swing.undo.ReverseRecordAttributesUndo;
 import com.revolsys.swing.undo.ReverseRecordGeometryUndo;
 import com.revolsys.swing.undo.ReverseRecordUndo;
@@ -452,10 +450,10 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     final EnableCheck editable = new ObjectPropertyEnableCheck(this, "editable");
 
     if (layer != null) {
-      final MenuFactory menuFactory = ObjectTreeModel.findMenu(layer);
+      final MenuFactory menuFactory = MenuFactory.findMenu(layer);
       if (menuFactory != null) {
         this.toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
-          ObjectTree.class, "showMenu", menuFactory, layer, this, 10, 10);
+          menuFactory, "show", layer, this, 10, 10);
       }
     }
     final EnableCheck deletableEnableCheck = new ObjectPropertyEnableCheck(

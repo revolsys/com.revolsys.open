@@ -27,7 +27,6 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.tree.TreePath;
 
 import org.springframework.core.io.FileSystemResource;
 
@@ -60,7 +59,6 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
-import com.revolsys.swing.map.component.layerchooser.LayerChooserPanel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -74,17 +72,17 @@ import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
-import com.revolsys.swing.map.tree.ProjectTreeNodeModel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
-import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.ObjectTree;
-import com.revolsys.swing.tree.ObjectTreePanel;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.swing.tree.node.ListTreeNode;
+import com.revolsys.swing.tree.node.file.FileSystemsTreeNode;
+import com.revolsys.swing.tree.node.file.FolderConnectionsTreeNode;
+import com.revolsys.swing.tree.node.layer.ProjectTreeNode;
+import com.revolsys.swing.tree.node.record.RecordStoreConnectionsTreeNode;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
@@ -139,8 +137,6 @@ public class ProjectFrame extends BaseFrame {
 
   }
 
-  private ObjectTreePanel tocPanel;
-
   private Project project;
 
   private CControl dockControl = new CControl(this);
@@ -150,6 +146,8 @@ public class ProjectFrame extends BaseFrame {
   private BaseTree catalogTree;
 
   private boolean exitOnClose = true;
+
+  private BaseTree tocTree;
 
   public ProjectFrame(final String title) {
     this(title, new Project());
@@ -187,14 +185,27 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected void addCatalogPanel() {
-    this.catalogTree = LayerChooserPanel.createTree();
+    final RecordStoreConnectionsTreeNode recordStores = new RecordStoreConnectionsTreeNode();
+
+    final FileSystemsTreeNode fileSystems = new FileSystemsTreeNode();
+
+    final FolderConnectionsTreeNode folderConnections = new FolderConnectionsTreeNode();
+
+    final ListTreeNode root = new ListTreeNode(recordStores, fileSystems,
+      folderConnections);
+
+    final BaseTree tree = new BaseTree(root);
+    tree.setRootVisible(false);
+
+    recordStores.expandChildren();
+    fileSystems.expand();
+    folderConnections.expandChildren();
+
+    this.catalogTree = tree;
     final LayerGroup project = getProject();
 
     DockingFramesUtil.addDockable(project, MapPanel.MAP_CONTROLS_WORKING_AREA,
       "catalog", "Catalog", new JScrollPane(this.catalogTree));
-
-    ((DefaultSingleCDockable)getDockControl().getSingleDockable("toc")).toFront();
-
   }
 
   protected void addControlWorkingArea() {
@@ -230,22 +241,17 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected DefaultSingleCDockable addTableOfContents() {
-    final JPanel panel = new JPanel(new BorderLayout());
-
-    final ToolBar toolBar = new ToolBar();
-    panel.add(toolBar, BorderLayout.NORTH);
-
-    final ProjectTreeNodeModel model = new ProjectTreeNodeModel();
-    this.tocPanel = new ObjectTreePanel(this.project, model);
-    final ObjectTree tree = this.tocPanel.getTree();
-    tree.setRootVisible(true);
+    final Project project = getProject();
+    this.tocTree = ProjectTreeNode.createTree(project);
 
     Property.addListener(this.project, "layers",
       new InvokeMethodPropertyChangeListener(true, this, "expandLayers",
         PropertyChangeEvent.class));
-    panel.add(this.tocPanel, BorderLayout.CENTER);
+
     final DefaultSingleCDockable tableOfContents = DockingFramesUtil.addDockable(
-      this.project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC", panel);
+      project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC",
+      new JScrollPane(this.tocTree));
+
     tableOfContents.toFront();
     return tableOfContents;
   }
@@ -320,11 +326,7 @@ public class ProjectFrame extends BaseFrame {
           Project.set(null);
         }
       }
-      if (this.tocPanel != null) {
-        this.tocPanel.destroy();
-      }
-
-      this.tocPanel = null;
+      this.tocTree = null;
       this.project = null;
       if (this.dockControl != null) {
         int i = 0;
@@ -374,22 +376,21 @@ public class ProjectFrame extends BaseFrame {
   }
 
   public void expandLayers(final Layer layer) {
-    if (SwingUtilities.isEventDispatchThread()) {
-      final List<Layer> pathList = layer.getPathList();
-      final ObjectTree tree = this.tocPanel.getTree();
-      final TreePath treePath = ObjectTree.createTreePath(pathList);
-      if (layer instanceof LayerGroup) {
-        final LayerGroup layerGroup = (LayerGroup)layer;
-        tree.expandPath(treePath);
-        for (final Layer childLayer : layerGroup) {
-          expandLayers(childLayer);
+    if (layer != null) {
+      if (SwingUtilities.isEventDispatchThread()) {
+        final LayerGroup group;
+        if (layer instanceof LayerGroup) {
+          group = (LayerGroup)layer;
+        } else {
+          group = layer.getLayerGroup();
+        }
+        if (group != null) {
+          final List<Layer> layerPath = group.getPathList();
+          this.tocTree.expandPath(layerPath);
         }
       } else {
-        final ObjectTreeModel model = tree.getModel();
-        model.fireTreeNodesChanged(treePath);
+        Invoke.later(this, "expandLayers", layer);
       }
-    } else {
-      Invoke.later(this, "expandLayers", layer);
     }
   }
 
@@ -401,6 +402,14 @@ public class ProjectFrame extends BaseFrame {
         expandLayers((LayerGroup)newValue);
       }
     }
+  }
+
+  public double getControlWidth() {
+    return 0.20;
+  }
+
+  protected BoundingBox getDefaultBoundingBox() {
+    return new BoundingBoxDoubleGf();
   }
 
   // public void expandConnectionManagers(final PropertyChangeEvent event) {
@@ -420,14 +429,6 @@ public class ProjectFrame extends BaseFrame {
   // }
   // }
 
-  public double getControlWidth() {
-    return 0.20;
-  }
-
-  protected BoundingBox getDefaultBoundingBox() {
-    return new BoundingBoxDoubleGf();
-  }
-
   public CControl getDockControl() {
     return this.dockControl;
   }
@@ -440,8 +441,8 @@ public class ProjectFrame extends BaseFrame {
     return this.project;
   }
 
-  public ObjectTreePanel getTocPanel() {
-    return this.tocPanel;
+  public BaseTree getTocTree() {
+    return this.tocTree;
   }
 
   protected void initUi() {

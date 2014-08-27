@@ -33,34 +33,38 @@ import com.revolsys.io.ObjectWithProperties;
 
 public final class Property {
   public static void addListener(final Object source, final Object listener) {
-    final PropertyChangeListener propertyChangeListener = getPropertyChangeListener(listener);
-    if (propertyChangeListener != null) {
-      final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
-      if (propertyChangeSupport == null) {
-        if (source instanceof JComponent) {
-          final JComponent component = (JComponent)source;
-          component.addPropertyChangeListener(propertyChangeListener);
+    if (source != null) {
+      final PropertyChangeListener propertyChangeListener = getPropertyChangeListener(listener);
+      if (propertyChangeListener != null) {
+        final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
+        if (propertyChangeSupport == null) {
+          if (source instanceof JComponent) {
+            final JComponent component = (JComponent)source;
+            component.addPropertyChangeListener(propertyChangeListener);
+          }
+        } else {
+          propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
         }
-      } else {
-        propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
       }
     }
   }
 
   public static void addListener(final Object source,
     final String propertyName, final Object listener) {
-    final PropertyChangeListener propertyChangeListener = getPropertyChangeListener(listener);
-    if (propertyChangeListener != null) {
-      final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
-      if (propertyChangeSupport == null) {
-        if (source instanceof JComponent) {
-          final JComponent component = (JComponent)source;
-          component.addPropertyChangeListener(propertyName,
+    if (source != null) {
+      final PropertyChangeListener propertyChangeListener = getPropertyChangeListener(listener);
+      if (propertyChangeListener != null) {
+        final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
+        if (propertyChangeSupport == null) {
+          if (source instanceof JComponent) {
+            final JComponent component = (JComponent)source;
+            component.addPropertyChangeListener(propertyName,
+              propertyChangeListener);
+          }
+        } else {
+          propertyChangeSupport.addPropertyChangeListener(propertyName,
             propertyChangeListener);
         }
-      } else {
-        propertyChangeSupport.addPropertyChangeListener(propertyName,
-          propertyChangeListener);
       }
     }
   }
@@ -463,7 +467,7 @@ public final class Property {
   }
 
   public static void removeListener(final Object source, final Object listener) {
-    if (listener instanceof PropertyChangeListener) {
+    if (source != null && listener instanceof PropertyChangeListener) {
       final PropertyChangeListener propertyChangeListener = (PropertyChangeListener)listener;
       final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
       if (propertyChangeSupport != null) {

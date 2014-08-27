@@ -38,8 +38,6 @@ import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.row.RecordRowPropertyEnableCheck;
 import com.revolsys.swing.table.record.row.RecordRowRunnable;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.swing.tree.ObjectTree;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.Property;
 
 public class RecordLayerTablePanel extends TablePanel implements
@@ -90,7 +88,7 @@ PropertyChangeListener {
     menu.addGroup(0, "record");
     menu.addGroup(1, "dnd");
 
-    final MenuFactory layerMenuFactory = ObjectTreeModel.findMenu(layer);
+    final MenuFactory layerMenuFactory = MenuFactory.findMenu(layer);
     // if (layerMenuFactory != null) {
     // menu.addComponentFactory("default", 0, layerMenuFactory);
     // }
@@ -153,7 +151,7 @@ PropertyChangeListener {
 
     if (layerMenuFactory != null) {
       toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
-        ObjectTree.class, "showMenu", layerMenuFactory, layer, this, 10, 10);
+        layerMenuFactory, "show", layer, this, 10, 10);
     }
     toolBar.addComponent("count", new TableRowCount(this.tableModel));
 

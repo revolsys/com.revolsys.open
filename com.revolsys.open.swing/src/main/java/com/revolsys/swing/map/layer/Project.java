@@ -32,7 +32,6 @@ import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
@@ -47,7 +46,7 @@ public class Project extends LayerGroup {
   }
 
   static {
-    final MenuFactory menu = ObjectTreeModel.getMenu(Project.class);
+    final MenuFactory menu = MenuFactory.getMenu(Project.class);
     menu.deleteMenuItem("layer", "Delete Layer");
   }
 

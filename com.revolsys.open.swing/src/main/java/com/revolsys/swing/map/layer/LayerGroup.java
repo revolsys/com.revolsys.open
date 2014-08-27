@@ -38,13 +38,12 @@ import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeItemRunnable;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.swing.tree.TreeUserDataRunnable;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerGroup extends AbstractLayer implements List<Layer>,
-Parent<Layer> {
+  Parent<Layer> {
 
   public static LayerGroup create(final Map<String, Object> properties) {
     final LayerGroup layerGroup = new LayerGroup();
@@ -85,10 +84,10 @@ Parent<Layer> {
     "layerGroup", "Layer Group", LayerGroup.class, "create");
 
   static {
-    final MenuFactory menu = ObjectTreeModel.getMenu(LayerGroup.class);
+    final MenuFactory menu = MenuFactory.getMenu(LayerGroup.class);
     menu.addGroup(0, "group");
-    menu.addMenuItem("group",
-      TreeItemRunnable.createAction("Add Group", "folder_add", "addLayerGroup"));
+    menu.addMenuItem("group", TreeUserDataRunnable.createAction("Add Group",
+      "folder_add", "addLayerGroup"));
     menu.addMenuItem("group", new AddFileLayerAction());
   }
 
@@ -586,7 +585,7 @@ Parent<Layer> {
           } else if (object != null) {
             LoggerFactory.getLogger(LayerGroup.class).error(
               "Unexpected object type " + object.getClass() + " in "
-                  + childResource);
+                + childResource);
           }
         } else {
           LoggerFactory.getLogger(LayerGroup.class).error(

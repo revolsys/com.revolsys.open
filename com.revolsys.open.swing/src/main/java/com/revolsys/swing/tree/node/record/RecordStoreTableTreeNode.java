@@ -1,0 +1,90 @@
+package com.revolsys.swing.tree.node.record;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+
+import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.io.Path;
+import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.record.RecordStoreLayer;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.BaseTree;
+import com.revolsys.swing.tree.node.BaseTreeNode;
+import com.revolsys.util.CaseConverter;
+
+public class RecordStoreTableTreeNode extends BaseTreeNode {
+
+  public static void addLayer() {
+    final RecordStoreTableTreeNode node = MenuFactory.getMenuSource();
+    final String typePath = node.getTypePath();
+    final Map<String, Object> connection = node.getConnectionMap();
+    final Map<String, Object> layerConfig = new LinkedHashMap<String, Object>();
+    layerConfig.put("type", "recordStore");
+    layerConfig.put("name", node.getName());
+    layerConfig.put("connection", connection);
+    layerConfig.put("typePath", typePath);
+    final AbstractLayer layer = RecordStoreLayer.create(layerConfig);
+    Project.get().add(layer);
+    // TODO different layer groups?
+  }
+
+  public static final ImageIcon ICON_TABLE = SilkIconLoader.getIcon("table");
+
+  public static Map<String, Icon> ICONS_GEOMETRY = new HashMap<String, Icon>();
+
+  private static final MenuFactory MENU = new MenuFactory();
+
+  static {
+    for (final String geometryType : Arrays.asList("Point", "MultiPoint",
+      "LineString", "MultiLineString", "Polygon", "MultiPolygon")) {
+      ICONS_GEOMETRY.put(geometryType,
+        SilkIconLoader.getIcon("table_" + geometryType.toLowerCase()));
+    }
+
+    MENU.addMenuItemTitleIcon("default", "Add Layer", "map_add", NODE_EXISTS,
+      RecordStoreTableTreeNode.class, "addLayer");
+
+  }
+
+  private final Map<String, Object> connectionMap;
+
+  public RecordStoreTableTreeNode(final Map<String, Object> connectionMap,
+    final String typePath, final String geometryType) {
+    super(typePath);
+    this.connectionMap = connectionMap;
+    if (geometryType == null) {
+      setType("Data Table");
+    } else {
+      setType("Data Table (" + CaseConverter.toCapitalizedWords(geometryType)
+        + ")");
+    }
+
+    final String name = Path.getName(typePath);
+    setName(name);
+
+    Icon icon = ICONS_GEOMETRY.get(geometryType);
+    if (icon == null) {
+      icon = ICON_TABLE;
+    }
+    setIcon(icon);
+  }
+
+  public Map<String, Object> getConnectionMap() {
+    return this.connectionMap;
+  }
+
+  @Override
+  public MenuFactory getMenu() {
+    return MENU;
+  }
+
+  public String getTypePath() {
+    return (String)getUserObject();
+  }
+}

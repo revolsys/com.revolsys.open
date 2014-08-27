@@ -26,6 +26,7 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.raster.GeoReferencedImageFactory;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.util.CollectionUtil;
@@ -113,7 +114,7 @@ public class AddFileLayerAction extends AbstractAction {
 
     final int status = fileChooser.showDialog(window, "Open File");
     if (status == JFileChooser.APPROVE_OPTION) {
-      final LayerGroup layerGroup = BaseTree.getMouseClickItem();
+      final LayerGroup layerGroup = MenuFactory.getMenuSource();
       final File file = fileChooser.getSelectedFile();
       Invoke.background("Open File: " + FileUtil.getCanonicalPath(file),
         layerGroup, "openFile", file);

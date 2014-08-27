@@ -109,7 +109,7 @@ import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MultipleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.QueryFilterField;
-import com.revolsys.swing.map.layer.record.style.panel.RecordLayerStylePanel;
+import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordDefinitionTableModel;
@@ -121,9 +121,8 @@ import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJxTable;
-import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
-import com.revolsys.swing.tree.TreeItemRunnable;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.swing.tree.TreeUserDataPropertyEnableCheck;
+import com.revolsys.swing.tree.TreeUserDataRunnable;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.CompareUtil;
@@ -177,69 +176,73 @@ RecordFactory, AddGeometryCompleteAction {
   private static AtomicInteger formCount = new AtomicInteger();
 
   static {
-    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractRecordLayer.class);
+    final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayer.class);
     menu.setName("Layer");
     menu.addGroup(0, "table");
     menu.addGroup(2, "edit");
     menu.addGroup(3, "dnd");
 
-    final EnableCheck exists = new TreeItemPropertyEnableCheck("exists");
+    final EnableCheck exists = new TreeUserDataPropertyEnableCheck("exists");
 
-    menu.addMenuItem("table", TreeItemRunnable.createAction("View Records",
+    menu.addMenuItem("table", TreeUserDataRunnable.createAction("View Records",
       "table_go", exists, "showRecordsTable"));
 
-    final EnableCheck hasSelectedRecords = new TreeItemPropertyEnableCheck(
+    final EnableCheck hasSelectedRecords = new TreeUserDataPropertyEnableCheck(
         "hasSelectedRecords");
-    final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
+    final EnableCheck hasGeometry = new TreeUserDataPropertyEnableCheck(
         "hasGeometry");
-    menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Selected",
-      "magnifier_zoom_selected", new AndEnableCheck(exists, hasGeometry,
-        hasSelectedRecords), "zoomToSelected"));
+    menu.addMenuItem("zoom", TreeUserDataRunnable.createAction(
+      "Zoom to Selected", "magnifier_zoom_selected", new AndEnableCheck(exists,
+        hasGeometry, hasSelectedRecords), "zoomToSelected"));
 
-    final EnableCheck editable = new TreeItemPropertyEnableCheck("editable");
-    final EnableCheck readonly = new TreeItemPropertyEnableCheck("readOnly",
-      false);
-    final EnableCheck hasChanges = new TreeItemPropertyEnableCheck("hasChanges");
-    final EnableCheck canAdd = new TreeItemPropertyEnableCheck("canAddRecords");
-    final EnableCheck canDelete = new TreeItemPropertyEnableCheck(
+    final EnableCheck editable = new TreeUserDataPropertyEnableCheck("editable");
+    final EnableCheck readonly = new TreeUserDataPropertyEnableCheck(
+      "readOnly", false);
+    final EnableCheck hasChanges = new TreeUserDataPropertyEnableCheck(
+      "hasChanges");
+    final EnableCheck canAdd = new TreeUserDataPropertyEnableCheck(
+      "canAddRecords");
+    final EnableCheck canDelete = new TreeUserDataPropertyEnableCheck(
         "canDeleteRecords");
-    final EnableCheck canMergeRecords = new TreeItemPropertyEnableCheck(
+    final EnableCheck canMergeRecords = new TreeUserDataPropertyEnableCheck(
         "canMergeRecords");
-    final EnableCheck canPaste = new TreeItemPropertyEnableCheck("canPaste");
+    final EnableCheck canPaste = new TreeUserDataPropertyEnableCheck("canPaste");
 
-    menu.addCheckboxMenuItem("edit", TreeItemRunnable.createAction("Editable",
-      "pencil", readonly, "toggleEditable"), editable);
+    menu.addCheckboxMenuItem("edit", TreeUserDataRunnable.createAction(
+      "Editable", "pencil", readonly, "toggleEditable"), editable);
 
-    menu.addMenuItem("edit", TreeItemRunnable.createAction("Save Changes",
+    menu.addMenuItem("edit", TreeUserDataRunnable.createAction("Save Changes",
       "table_save", hasChanges, "saveChanges"));
 
-    menu.addMenuItem("edit", TreeItemRunnable.createAction("Cancel Changes",
-      "table_cancel", hasChanges, "cancelChanges"));
+    menu.addMenuItem("edit", TreeUserDataRunnable.createAction(
+      "Cancel Changes", "table_cancel", hasChanges, "cancelChanges"));
 
-    menu.addMenuItem("edit", TreeItemRunnable.createAction("Add New Record",
-      "table_row_insert", canAdd, "addNewRecord"));
+    menu.addMenuItem("edit", TreeUserDataRunnable.createAction(
+      "Add New Record", "table_row_insert", canAdd, "addNewRecord"));
 
-    menu.addMenuItem("edit", TreeItemRunnable.createAction(
+    menu.addMenuItem("edit", TreeUserDataRunnable.createAction(
       "Delete Selected Records", "table_row_delete", new AndEnableCheck(
         hasSelectedRecords, canDelete), "deleteSelectedRecords"));
 
-    menu.addMenuItem("edit", TreeItemRunnable.createAction(
+    menu.addMenuItem("edit", TreeUserDataRunnable.createAction(
       "Merge Selected Records", "shape_group", canMergeRecords,
         "mergeSelectedRecords"));
 
-    menu.addMenuItem("dnd", TreeItemRunnable.createAction(
+    menu.addMenuItem("dnd", TreeUserDataRunnable.createAction(
       "Copy Selected Records", "page_copy", hasSelectedRecords,
         "copySelectedRecords"));
 
-    menu.addMenuItem("dnd", TreeItemRunnable.createAction("Paste New Records",
-      "paste_plain", new AndEnableCheck(canAdd, canPaste), "pasteRecords"));
+    menu.addMenuItem("dnd", TreeUserDataRunnable.createAction(
+      "Paste New Records", "paste_plain", new AndEnableCheck(canAdd, canPaste),
+        "pasteRecords"));
 
-    menu.addMenuItem("layer", 0, TreeItemRunnable.createAction("Layer Style",
-      "palette", new AndEnableCheck(exists, hasGeometry), "showProperties",
-        "Style"));
+    menu.addMenuItem("layer", 0, TreeUserDataRunnable.createAction(
+      "Layer Style", "palette", new AndEnableCheck(exists, hasGeometry),
+      "showProperties", "Style"));
 
-    menu.addMenuItem("edit", 0, TreeItemRunnable.createAction("Export Records",
-      "disk", new AndEnableCheck(exists, hasSelectedRecords), "exportRecords"));
+    menu.addMenuItem("edit", 0, TreeUserDataRunnable.createAction(
+      "Export Records", "disk", new AndEnableCheck(exists, hasSelectedRecords),
+        "exportRecords"));
   }
 
   private BoundingBox boundingBox = new BoundingBoxDoubleGf();
@@ -663,7 +666,7 @@ RecordFactory, AddGeometryCompleteAction {
   protected void createPropertiesPanelStyle(
     final TabbedValuePanel propertiesPanel) {
     if (getRenderer() != null) {
-      final RecordLayerStylePanel stylePanel = new RecordLayerStylePanel(this);
+      final LayerStylePanel stylePanel = new LayerStylePanel(this);
       propertiesPanel.addTab("Style", stylePanel);
     }
   }

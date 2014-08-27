@@ -58,41 +58,40 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
-import com.revolsys.swing.map.layer.record.style.panel.RecordLayerStylePanel;
+import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
-import com.revolsys.swing.tree.TreeItemRunnable;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.swing.tree.TreeUserDataPropertyEnableCheck;
+import com.revolsys.swing.tree.TreeUserDataRunnable;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
-implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
+  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   static {
-    final MenuFactory menu = ObjectTreeModel.getMenu(AbstractLayer.class);
+    final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
 
-    final EnableCheck exists = new TreeItemPropertyEnableCheck("exists");
+    final EnableCheck exists = new TreeUserDataPropertyEnableCheck("exists");
 
-    final EnableCheck hasGeometry = new TreeItemPropertyEnableCheck(
-        "hasGeometry");
-    menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Layer",
+    final EnableCheck hasGeometry = new TreeUserDataPropertyEnableCheck(
+      "hasGeometry");
+    menu.addMenuItem("zoom", TreeUserDataRunnable.createAction("Zoom to Layer",
       "magnifier", new AndEnableCheck(exists, hasGeometry), "zoomToLayer"));
 
     menu.addComponentFactory("scale", new TreeItemScaleMenu(true));
     menu.addComponentFactory("scale", new TreeItemScaleMenu(false));
 
-    menu.addMenuItem(TreeItemRunnable.createAction("Refresh", "arrow_refresh",
-      exists, "refreshAll"));
+    menu.addMenuItem(TreeUserDataRunnable.createAction("Refresh",
+      "arrow_refresh", exists, "refreshAll"));
 
-    menu.addMenuItem("layer", TreeItemRunnable.createAction("Delete Layer",
+    menu.addMenuItem("layer", TreeUserDataRunnable.createAction("Delete Layer",
       "delete", "deleteWithConfirm"));
 
-    menu.addMenuItem("layer", TreeItemRunnable.createAction("Layer Properties",
-      "information", exists, "showProperties"));
+    menu.addMenuItem("layer", TreeUserDataRunnable.createAction(
+      "Layer Properties", "information", exists, "showProperties"));
   }
 
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(
@@ -166,7 +165,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   }
 
   public int addRenderer(final LayerRenderer<?> child) {
-    return addRenderer(child, 1);
+    return addRenderer(child, 0);
   }
 
   public int addRenderer(final LayerRenderer<?> child, final int index) {
@@ -254,18 +253,18 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
       } else {
         extentPanel.add(new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
-              + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-              + boundingBox.getMaximum(1)
-              + "</td><td>&nbsp;</td></tr><tr>"
-              + "<td><b>Left</b>: "
-              + boundingBox.getMinimum(0)
-              + "</td><td>&nbsp;</td><td>&nbsp;</td>"
-              + "<td><b>Right</b>: "
-              + boundingBox.getMaximum(0)
-              + "</td></tr>"
-              + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-              + boundingBox.getMinimum(1) + "</td><td>&nbsp;</td></tr><tr>"
-              + "</tr></table></html>"));
+            + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+            + boundingBox.getMaximum(1)
+            + "</td><td>&nbsp;</td></tr><tr>"
+            + "<td><b>Left</b>: "
+            + boundingBox.getMinimum(0)
+            + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+            + "<td><b>Right</b>: "
+            + boundingBox.getMaximum(0)
+            + "</td></tr>"
+            + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+            + boundingBox.getMinimum(1) + "</td><td>&nbsp;</td></tr><tr>"
+            + "</tr></table></html>"));
 
       }
       GroupLayoutUtil.makeColumns(extentPanel, 1, true);
@@ -579,7 +578,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
         setExists(exists);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to initialize layer: "
-            + getPath(), e);
+          + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -653,7 +652,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   @Override
   public boolean isSelectable() {
     return isExists() && isVisible()
-        && (isSelectSupported() && this.selectable || isEditable());
+      && (isSelectSupported() && this.selectable || isEditable());
   }
 
   @Override
@@ -939,7 +938,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
             final Window window = SwingUtilities.getWindowAncestor(map);
             final TabbedValuePanel panel = createPropertiesPanel();
             panel.setSelectdTab("Style");
-            final RecordLayerStylePanel stylePanel = panel.getTab("Style");
+            final LayerStylePanel stylePanel = panel.getTab("Style");
             stylePanel.setSelectedRenderer(renderer);
             panel.showDialog(window);
             refresh();
@@ -1003,8 +1002,8 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
     final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-        .expandPercent(0.1)
-        .clipToCoordinateSystem();
+      .expandPercent(0.1)
+      .clipToCoordinateSystem();
 
     project.setViewBoundingBox(boundingBox);
   }

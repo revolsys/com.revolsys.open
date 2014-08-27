@@ -18,8 +18,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeItemRunnable;
-import com.revolsys.swing.tree.model.ObjectTreeModel;
+import com.revolsys.swing.tree.TreeUserDataRunnable;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -31,9 +30,9 @@ public class GridLayer extends AbstractLayer {
   }
 
   static {
-    final MenuFactory menu = ObjectTreeModel.getMenu(GridLayer.class);
-    menu.addMenuItem("zoom", TreeItemRunnable.createAction("Zoom to Mapsheet",
-      "magnifier_zoom_grid", "zoomTosheet"));
+    final MenuFactory menu = MenuFactory.getMenu(GridLayer.class);
+    menu.addMenuItem("zoom", TreeUserDataRunnable.createAction(
+      "Zoom to Mapsheet", "magnifier_zoom_grid", "zoomTosheet"));
   }
 
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
@@ -62,7 +61,7 @@ public class GridLayer extends AbstractLayer {
       }
     } else {
       LoggerFactory.getLogger(getClass()).error(
-          "Layer definition does not contain a 'gridName' property");
+        "Layer definition does not contain a 'gridName' property");
     }
     return false;
   }
@@ -91,10 +90,10 @@ public class GridLayer extends AbstractLayer {
       final RectangularMapGrid grid = getGrid();
       final String gridName = grid.getName();
       final String preferenceName = CaseConverter.toCapitalizedWords(gridName)
-          + "Mapsheet";
+        + "Mapsheet";
       String mapsheet = PreferencesUtil.getString(getClass(), preferenceName);
       mapsheet = JOptionPane.showInputDialog(map, "Enter name of the"
-          + gridName + " mapsheet to zoom to", mapsheet);
+        + gridName + " mapsheet to zoom to", mapsheet);
       zoomTosheet(mapsheet);
     }
   }
@@ -112,12 +111,12 @@ public class GridLayer extends AbstractLayer {
           project.setViewBoundingBox(boundingBox);
         } catch (final Throwable e) {
           final String message = "Invalid mapsheet " + mapsheet + " for "
-              + gridName;
+            + gridName;
           LoggerFactory.getLogger(getClass()).error(message, e);
           JOptionPane.showMessageDialog(map, message);
         } finally {
           final String preferenceName = CaseConverter.toCapitalizedWords(gridName)
-              + "Mapsheet";
+            + "Mapsheet";
           PreferencesUtil.setString(getClass(), preferenceName, mapsheet);
         }
       }

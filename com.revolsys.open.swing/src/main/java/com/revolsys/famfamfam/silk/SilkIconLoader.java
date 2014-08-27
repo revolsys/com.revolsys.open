@@ -8,8 +8,10 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.revolsys.util.OS;
@@ -83,6 +85,45 @@ public class SilkIconLoader {
         .getResourceAsStream("images/" + imageName + ".png");
     }
     return getImage(in);
+  }
+
+  public static Icon merge(final List<Icon> icons, final int space) {
+    int maxWidth = 0;
+    int maxHeight = 0;
+    int i = 0;
+    for (final Icon icon : icons) {
+      if (icon != null) {
+        maxWidth += icon.getIconWidth();
+        maxHeight = Math.max(maxHeight, icon.getIconHeight());
+        i++;
+      }
+    }
+    maxWidth += (i - 1) * space;
+  
+    if (maxWidth == 0) {
+      return null;
+    }
+    if (maxHeight == 0) {
+      return null;
+    }
+  
+    final BufferedImage newImage = new BufferedImage(maxWidth, maxHeight,
+      BufferedImage.TYPE_INT_ARGB);
+  
+    final Graphics g = newImage.createGraphics();
+    int x = 0;
+    for (final Icon icon : icons) {
+      if (icon != null) {
+        final Image image = ((ImageIcon)icon).getImage();
+        final int iconWidth = icon.getIconWidth();
+        final int iconHeight = icon.getIconHeight();
+        g.drawImage(image, x, 0, iconWidth, iconHeight, null);
+        x += iconWidth;
+        x += space;
+      }
+    }
+  
+    return new ImageIcon(newImage);
   }
 
 }
