@@ -22,6 +22,12 @@ public class PdfImage extends JaiGeoReferencedImage {
   public PdfImage(final Resource imageResource) {
     setImageResource(imageResource);
     setRenderedImage(createBufferedImage());
+    if (!hasGeometryFactory()) {
+      loadProjectionFile();
+    }
+    if (!hasBoundingBox()) {
+      loadWorldFile();
+    }
   }
 
   protected BufferedImage createBufferedImage() {
@@ -45,24 +51,22 @@ public class PdfImage extends JaiGeoReferencedImage {
         final COSDictionary pageDictionary = page.getCOSDictionary();
         final Rectangle2D mediaBox = PdfUtil.findRectangle(pageDictionary,
           COSName.MEDIA_BOX);
-        final int resolution = 144;
-        final double scaleFactor = resolution / 72;
-        // BufferedImage image =
-        // page.convertToImage(BufferedImage.TYPE_INT_ARGB,
-        // resolution);
-        BufferedImage image = null;
+        final int resolution = 72;
+        BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_ARGB,
+          resolution);
         final COSDictionary viewport = PdfUtil.getPageViewport(pageDictionary);
         if (viewport != null) {
           final Rectangle2D bbox = PdfUtil.findRectangle(viewport, COSName.BBOX);
           if (bbox != null) {
-            final int width = (int)(bbox.getWidth() * scaleFactor);
-            final int height = (int)(bbox.getHeight() * scaleFactor);
-            final BufferedImage viewportImage = new BufferedImage(width,
-              height, BufferedImage.TYPE_INT_ARGB);
+            final double boxX = bbox.getX();
+            final double boxY = bbox.getY();
+            final int boxWidth = (int)bbox.getWidth();
+            final int boxHeight = (int)bbox.getHeight();
+            final BufferedImage viewportImage = new BufferedImage(boxWidth,
+              boxHeight, BufferedImage.TYPE_INT_ARGB);
             final Graphics2D graphics = (Graphics2D)viewportImage.getGraphics();
-            graphics.translate(-bbox.getX() * scaleFactor,
-              -(mediaBox.getHeight() - (bbox.getHeight() + bbox.getY()))
-              * scaleFactor);
+            final double translateY = -(mediaBox.getHeight() - (boxHeight + boxY));
+            graphics.translate(-boxX, translateY);
             graphics.scale(1, 1);
             graphics.drawImage(image, 0, 0, null);
             graphics.dispose();

@@ -43,7 +43,7 @@ public class AddFileLayerAction extends AbstractAction {
     final Class<? extends IoFactory> factoryClass) {
     final Map<String, FileFilter> filtersByName = new TreeMap<>();
     final Set<IoFactory> factories = IoFactoryRegistry.getInstance()
-      .getFactories(factoryClass);
+        .getFactories(factoryClass);
     for (final IoFactory factory : factories) {
       final List<String> fileExtensions = factory.getFileExtensions();
       String description = factory.getName();
@@ -75,7 +75,8 @@ public class AddFileLayerAction extends AbstractAction {
     }
 
     final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(),
-      "currentDirectory");
+        "currentDirectory");
+    fileChooser.setMultiSelectionEnabled(true);
 
     final List<FileFilter> imageFileFilters = new ArrayList<FileFilter>();
     final Set<String> allImageExtensions = new TreeSet<String>();
@@ -111,12 +112,13 @@ public class AddFileLayerAction extends AbstractAction {
     fileChooser.setAcceptAllFileFilterUsed(false);
     fileChooser.setFileFilter(allFilter);
 
-    final int status = fileChooser.showDialog(window, "Open File");
+    final int status = fileChooser.showDialog(window, "Open Files");
     if (status == JFileChooser.APPROVE_OPTION) {
       final LayerGroup layerGroup = MenuFactory.getMenuSource();
-      final File file = fileChooser.getSelectedFile();
-      Invoke.background("Open File: " + FileUtil.getCanonicalPath(file),
-        layerGroup, "openFile", file);
+      for (final File file : fileChooser.getSelectedFiles()) {
+        Invoke.background("Open file: " + FileUtil.getCanonicalPath(file),
+          layerGroup, "openFile", file);
+      }
     }
     SwingUtil.saveFileChooserDirectory(getClass(), "currentDirectory",
       fileChooser);

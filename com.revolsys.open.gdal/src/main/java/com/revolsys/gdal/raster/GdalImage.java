@@ -38,16 +38,21 @@ public class GdalImage extends AbstractGeoReferencedImage {
     final double[] geoTransform = dataset.GetGeoTransform();
     if (projection != null) {
       final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(projection);
-      final CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(esriCoordinateSystem);
-      final int srid = epsgCoordinateSystem.getId();
-      if (srid > 0 && srid < 2000000) {
-        setGeometryFactory(GeometryFactory.floating(srid, 2));
-      } else {
-        setGeometryFactory(GeometryFactory.fixed(epsgCoordinateSystem, 2, -1));
+      if (esriCoordinateSystem != null) {
+        CoordinateSystem epsgCoordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(esriCoordinateSystem);
+        if (epsgCoordinateSystem == null) {
+          epsgCoordinateSystem = esriCoordinateSystem;
+        }
+        final int srid = epsgCoordinateSystem.getId();
+        if (srid > 0 && srid < 2000000) {
+          setGeometryFactory(GeometryFactory.floating(srid, 2));
+        } else {
+          setGeometryFactory(GeometryFactory.fixed(epsgCoordinateSystem, 2, -1));
+        }
       }
     }
     setBoundingBox(geoTransform[0], geoTransform[3], geoTransform[1],
-      -geoTransform[5]);
+      geoTransform[5]);
     postConstruct();
   }
 
@@ -111,15 +116,15 @@ public class GdalImage extends AbstractGeoReferencedImage {
   @Override
   protected void finalize() throws Throwable {
     super.finalize();
-    dataset = Gdal.closeDataSet(dataset);
+    this.dataset = Gdal.closeDataSet(this.dataset);
   }
 
   public synchronized Dataset getDataset() {
-    if (dataset == null) {
+    if (this.dataset == null) {
       final File file = getFile();
-      dataset = Gdal.getDataset(file);
+      this.dataset = Gdal.getDataset(file);
     }
-    return dataset;
+    return this.dataset;
   }
 
   @Override
