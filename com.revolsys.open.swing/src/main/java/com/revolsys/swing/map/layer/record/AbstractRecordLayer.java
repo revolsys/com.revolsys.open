@@ -55,7 +55,7 @@ import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.data.filter.RecordGeometryDistanceFilter;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.io.ListRecordReader;
-import com.revolsys.data.io.RecordIoFactories;
+import com.revolsys.data.io.RecordIo;
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
@@ -1269,7 +1269,7 @@ RecordFactory, AddGeometryCompleteAction {
               } catch (final Throwable e) {
               }
               final Resource resource = new ByteArrayResource("t.csv", string);
-              reader = RecordIoFactories.recordReader(resource);
+              reader = RecordIo.recordReader(resource);
             } else {
               return null;
             }
@@ -1725,10 +1725,10 @@ RecordFactory, AddGeometryCompleteAction {
         if (Property.hasValue(string)) {
           if (string.contains("\t")) {
             final Resource tsvResource = new ByteArrayResource("t.tsv", string);
-            reader = RecordIoFactories.recordReader(tsvResource);
+            reader = RecordIo.recordReader(tsvResource);
           } else {
             final Resource csvResource = new ByteArrayResource("t.csv", string);
-            reader = RecordIoFactories.recordReader(csvResource);
+            reader = RecordIo.recordReader(csvResource);
           }
         }
       }

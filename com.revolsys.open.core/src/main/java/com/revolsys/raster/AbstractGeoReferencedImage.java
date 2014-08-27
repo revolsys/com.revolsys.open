@@ -52,7 +52,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractGeoReferencedImage extends
-AbstractPropertyChangeObject implements GeoReferencedImage {
+  AbstractPropertyChangeObject implements GeoReferencedImage {
 
   private static double[] calculateLSM(final BoundingBox boundingBox,
     final int imageWidth, final int imageHeight,
@@ -114,7 +114,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
 
     NodeList lst;
     final Element node = (Element)r.getImageMetadata(0).getAsTree(
-      "javax_imageio_1.0");
+        "javax_imageio_1.0");
     lst = node.getElementsByTagName("HorizontalPixelSize");
     if (lst != null && lst.getLength() == 1) {
       hdpi = (int)(mm2inch / Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
@@ -215,7 +215,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
     final int viewHeight, final boolean useTransform) {
     final BoundingBox imageBoundingBox = getBoundingBox();
     if (viewBoundingBox.intersects(imageBoundingBox) && viewWidth > 0
-        && viewHeight > 0) {
+      && viewHeight > 0) {
       final RenderedImage renderedImage = getRenderedImage();
       drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth,
         viewHeight, useTransform);
@@ -253,7 +253,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
             * scaleFactor);
 
           if (imageScreenWidth > 0 && imageScreenWidth < 10000
-              && imageScreenHeight > 0 && imageScreenHeight < 10000) {
+            && imageScreenHeight > 0 && imageScreenHeight < 10000) {
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
               RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             if (imageScreenWidth > 0 && imageScreenHeight > 0) {
@@ -556,7 +556,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
               spatialReference, "LatestWKID");
             if (sridElement == null) {
               sridElement = DomUtil.getFirstChildElement(spatialReference,
-                  "WKID");
+                "WKID");
             }
             if (sridElement != null) {
               srid = DomUtil.getInteger(sridElement);
@@ -578,13 +578,13 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
           setGeometryFactory(geometryFactory);
 
           final List<Double> sourceControlPoints = DomUtil.getDoubleList(doc,
-              "SourceGCPs");
+            "SourceGCPs");
           final List<Double> targetControlPoints = DomUtil.getDoubleList(doc,
-              "TargetGCPs");
+            "TargetGCPs");
           if (sourceControlPoints.size() > 0 && targetControlPoints.size() > 0) {
             final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
             for (int i = 0; i < sourceControlPoints.size()
-                && i < targetControlPoints.size(); i += 2) {
+              && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
               final Point sourcePixel = new PointDouble(imageX, imageY);
@@ -685,7 +685,6 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
 
   @SuppressWarnings("unused")
   protected void loadWorldFile(final Resource worldFile) {
-    // if (boundingBox.isEmpty()) {
     if (worldFile.exists()) {
       try {
         final BufferedReader reader = SpringUtil.getBufferedReader(worldFile);
@@ -699,7 +698,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
           final double y1 = Double.parseDouble(reader.readLine());
           setResolution(pixelWidth);
           // TODO rotation using a warp filter
-          setBoundingBox(x1, y1, pixelWidth, -pixelHeight);
+          setBoundingBox(x1, y1, pixelWidth, pixelHeight);
           // worldWarpFilter = new WarpAffineFilter(new BoundingBoxDoubleGf(
           // getGeometryFactory(), 0, 0, imageWidth, imageHeight), imageWidth,
           // imageHeight, x1, y1, pixelWidth, -pixelHeight, xRotation,
@@ -712,7 +711,6 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
           "Error reading world file " + worldFile, e);
       }
     }
-    // }
   }
 
   protected void loadWorldFileX() {
@@ -757,7 +755,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
   public boolean saveChanges() {
     try {
       final Resource rgResource = SpringUtil.addExtension(this.imageResource,
-          "rgobject");
+        "rgobject");
       MapObjectFactoryRegistry.write(rgResource, this);
       setHasChanges(false);
       return true;
@@ -778,17 +776,17 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
   }
 
   @Override
-  public void setBoundingBox(final double x1, final double y1,
+  public void setBoundingBox(final double minX, final double maxY,
     final double pixelWidth, final double pixelHeight) {
     final GeometryFactory geometryFactory = getGeometryFactory();
 
     final int imageWidth = getImageWidth();
-    final double x2 = x1 + pixelWidth * imageWidth;
+    final double maxX = minX + pixelWidth * imageWidth;
 
     final int imageHeight = getImageHeight();
-    final double y2 = y1 - pixelHeight * imageHeight;
+    final double minY = maxY + pixelHeight * imageHeight;
     final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2,
-      x1, y1, x2, y2);
+      minX, maxY, maxX, minY);
     setBoundingBox(boundingBox);
   }
 

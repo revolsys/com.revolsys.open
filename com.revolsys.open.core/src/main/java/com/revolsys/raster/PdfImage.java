@@ -39,11 +39,12 @@ public class PdfImage extends JaiGeoReferencedImage {
       } else {
         if (pages.size() > 1) {
           LoggerFactory.getLogger(getClass()).warn(
-            "PDF file " + imageResource + " doesn't contain any pages");
+            "PDF file " + imageResource + " doesn't contais more than 1 page");
         }
         final PDPage page = pages.get(0);
         final COSDictionary pageDictionary = page.getCOSDictionary();
-        final Rectangle2D mediaBox = PdfUtil.findRectangle(pageDictionary, COSName.MEDIA_BOX);
+        final Rectangle2D mediaBox = PdfUtil.findRectangle(pageDictionary,
+          COSName.MEDIA_BOX);
         final int resolution = 144;
         final double scaleFactor = resolution / 72;
         // BufferedImage image =
@@ -61,7 +62,7 @@ public class PdfImage extends JaiGeoReferencedImage {
             final Graphics2D graphics = (Graphics2D)viewportImage.getGraphics();
             graphics.translate(-bbox.getX() * scaleFactor,
               -(mediaBox.getHeight() - (bbox.getHeight() + bbox.getY()))
-                * scaleFactor);
+              * scaleFactor);
             graphics.scale(1, 1);
             graphics.drawImage(image, 0, 0, null);
             graphics.dispose();

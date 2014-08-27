@@ -90,9 +90,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     }
   }
 
-  public static final BoundingBox BC_ENVELOPE = new BoundingBoxDoubleGf(
-    GeometryFactory.fixed(3005, 1000.0), 2, 25000, 340000, 1900000, 1750000);
-
   public static final String MAP_CONTROLS_WORKING_AREA = "mapControlsCWorkingArea";
 
   public static final String MAP_PANEL = "mapPanel";
@@ -202,7 +199,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     createScales();
     this.viewport.setScales(getScales());
 
-    MapRulerBorder border = new MapRulerBorder(this.viewport);
+    final MapRulerBorder border = new MapRulerBorder(this.viewport);
     this.layeredPane.setBorder(border);
 
     this.baseMapOverlay = new LayerRendererOverlay(this);
@@ -374,9 +371,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private void addZoomButtons() {
     this.toolBar.addButtonTitleIcon("zoom", "Zoom to World",
       "magnifier_zoom_world", this, "zoomToWorld");
-
-    this.toolBar.addButtonTitleIcon("zoom", "Zoom to British Columbia",
-      "zoom_bc", this, "setBoundingBox", MapPanel.BC_ENVELOPE);
 
     this.toolBar.addButtonTitleIcon("zoom", "Zoom In", "magnifier_zoom_in",
       this, "zoomIn");

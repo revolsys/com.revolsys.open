@@ -16,7 +16,7 @@ public class FileRecordReaderFactory extends
 
   @Override
   public RecordReader createInstance() throws Exception {
-    return RecordIoFactories.recordReader(resource, factory);
+    return RecordIo.recordReader(resource, factory);
   }
 
   @Override

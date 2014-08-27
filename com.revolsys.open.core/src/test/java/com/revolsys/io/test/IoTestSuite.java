@@ -14,7 +14,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.springframework.core.io.FileSystemResource;
 
-import com.revolsys.data.io.RecordIoFactories;
+import com.revolsys.data.io.RecordIo;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
@@ -115,7 +115,7 @@ public class IoTestSuite {
     file.getParentFile().mkdirs();
     final FileSystemResource resource = new FileSystemResource(file);
     try (
-      Writer<Record> writer = RecordIoFactories.recordWriter(
+      Writer<Record> writer = RecordIo.recordWriter(
         recordDefinition, resource)) {
       writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);

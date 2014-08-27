@@ -5,7 +5,7 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.RecordIoFactories;
+import com.revolsys.data.io.RecordIo;
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.io.RecordReaderFactory;
 import com.revolsys.data.record.Record;
@@ -64,7 +64,7 @@ public class FileRecordLayer extends ListRecordLayer {
     final String fileNameExtension = FileUtil.getFileNameExtension(url);
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
-      final RecordReaderFactory factory = RecordIoFactories.recordReaderFactory(fileNameExtension);
+      final RecordReaderFactory factory = RecordIo.recordReaderFactory(fileNameExtension);
       if (factory != null) {
         SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
       }
@@ -96,7 +96,7 @@ public class FileRecordLayer extends ListRecordLayer {
       return false;
     } else {
       if (this.resource.exists()) {
-        final RecordReader reader = RecordIoFactories.recordReader(this.resource);
+        final RecordReader reader = RecordIo.recordReader(this.resource);
         if (reader == null) {
           LoggerFactory.getLogger(getClass()).error(
             "Cannot find reader for: " + this.resource);

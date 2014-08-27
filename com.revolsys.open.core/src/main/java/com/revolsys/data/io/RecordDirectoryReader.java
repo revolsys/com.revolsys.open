@@ -32,7 +32,7 @@ public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
 
   @Override
   protected Reader<Record> createReader(final Resource resource) {
-    final RecordReader reader = RecordIoFactories.recordReader(resource);
+    final RecordReader reader = RecordIo.recordReader(resource);
     addRecordDefinition(reader);
     return reader;
   }

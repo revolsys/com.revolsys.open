@@ -13,7 +13,7 @@ import javax.annotation.PostConstruct;
 
 public abstract class AbstractIoFactory implements IoFactory {
 
-  private final List<String> fileExtensions = new ArrayList<String>();
+  private final List<String> fileExtensions = new ArrayList<>();
 
   private final Map<String, Set<String>> fileExtensionToMediaType = new HashMap<String, Set<String>>();
 
@@ -44,7 +44,9 @@ public abstract class AbstractIoFactory implements IoFactory {
   protected void addMediaTypeAndFileExtension(final String mediaType,
     final String fileExtension) {
     addMediaType(mediaType);
-    this.fileExtensions.add(fileExtension);
+    if (!this.fileExtensions.contains(fileExtension)) {
+      this.fileExtensions.add(fileExtension);
+    }
     add(this.mediaTypeToFileExtension, mediaType, fileExtension);
     add(this.mediaTypeToFileExtension, fileExtension, fileExtension);
     add(this.fileExtensionToMediaType, fileExtension, mediaType);
@@ -98,6 +100,7 @@ public abstract class AbstractIoFactory implements IoFactory {
     return this.name;
   }
 
+  @Override
   @PostConstruct
   public void init() {
   }

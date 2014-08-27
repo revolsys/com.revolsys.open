@@ -19,7 +19,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.data.io.RecordIoFactories;
+import com.revolsys.data.io.RecordIo;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
 import com.revolsys.io.json.JsonMapIoFactory;
@@ -627,7 +627,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     Layer layer = null;
     if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(urlString)) {
       layer = new GeoReferencedImageLayer(properties);
-    } else if (RecordIoFactories.hasRecordReaderFactory(urlString)) {
+    } else if (RecordIo.hasRecordReaderFactory(urlString)) {
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = recordLayer.getRenderer();
       renderer.setStyle(GeometryStyle.createStyle());
@@ -654,7 +654,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
       final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
         properties);
       add(layer);
-    } else if (RecordIoFactories.hasRecordReaderFactory(urlString)) {
+    } else if (RecordIo.hasRecordReaderFactory(urlString)) {
       final FileRecordLayer layer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = layer.getRenderer();
       renderer.setStyle(GeometryStyle.createStyle());

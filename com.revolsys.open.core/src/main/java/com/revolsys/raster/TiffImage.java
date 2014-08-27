@@ -33,6 +33,55 @@ import com.sun.media.jai.codec.ImageCodec;
 
 @SuppressWarnings("deprecation")
 public class TiffImage extends JaiGeoReferencedImage {
+  private static void addGeoKey(final Map<Integer, Object> geoKeys,
+    final XTIFFDirectory dir, final int keyId, final int tiffTag,
+    final int valueCount, final int valueOrOffset) {
+    int type = XTIFFField.TIFF_SHORT;
+    Object value = null;
+    if (tiffTag > 0) {
+      // Values are in another tag:
+      final XTIFFField values = dir.getField(tiffTag);
+      if (values != null) {
+        type = values.getType();
+        if (type == XTIFFField.TIFF_ASCII) {
+          final String string = values.getAsString(0).substring(valueOrOffset,
+            valueOrOffset + valueCount - 1);
+          value = string;
+        } else if (type == XTIFFField.TIFF_DOUBLE) {
+          final double number = values.getAsDouble(valueOrOffset);
+          value = number;
+        }
+      } else {
+        throw new IllegalArgumentException("GeoTIFF tag not found");
+      }
+    } else {
+      // value is SHORT, stored in valueOrOffset
+      type = XTIFFField.TIFF_SHORT;
+      value = (short)valueOrOffset;
+    }
+
+    geoKeys.put(keyId, value);
+  }
+
+  private static Map<Integer, Object> getGeoKeys(final XTIFFDirectory dir) {
+    final Map<Integer, Object> geoKeys = new LinkedHashMap<Integer, Object>();
+
+    final XTIFFField geoKeyTag = dir.getField(XTIFF.TIFFTAG_GEO_KEY_DIRECTORY);
+
+    if (geoKeyTag != null) {
+      final char[] keys = geoKeyTag.getAsChars();
+      for (int i = 4; i < keys.length; i += 4) {
+        final int keyId = keys[i];
+        final int tiffTag = keys[i + 1];
+        final int valueCount = keys[i + 2];
+        final int valueOrOffset = keys[i + 3];
+        addGeoKey(geoKeys, dir, keyId, tiffTag, valueCount, valueOrOffset);
+      }
+
+    }
+    return geoKeys;
+  }
+
   private static final int TAG_X_RESOLUTION = 282;
 
   private static final int TAG_Y_RESOLUTION = 283;
@@ -121,55 +170,6 @@ public class TiffImage extends JaiGeoReferencedImage {
     // Mercator1SPSpherical.class);
     // registerCoordinatesProjection("Lambert_Conic_Conformal_(2SP_Belgium)",
     // LambertConicConformal.class);
-  }
-
-  private static void addGeoKey(final Map<Integer, Object> geoKeys,
-    final XTIFFDirectory dir, final int keyId, final int tiffTag,
-    final int valueCount, final int valueOrOffset) {
-    int type = XTIFFField.TIFF_SHORT;
-    Object value = null;
-    if (tiffTag > 0) {
-      // Values are in another tag:
-      final XTIFFField values = dir.getField(tiffTag);
-      if (values != null) {
-        type = values.getType();
-        if (type == XTIFFField.TIFF_ASCII) {
-          final String string = values.getAsString(0).substring(valueOrOffset,
-            valueOrOffset + valueCount - 1);
-          value = string;
-        } else if (type == XTIFFField.TIFF_DOUBLE) {
-          final double number = values.getAsDouble(valueOrOffset);
-          value = number;
-        }
-      } else {
-        throw new IllegalArgumentException("GeoTIFF tag not found");
-      }
-    } else {
-      // value is SHORT, stored in valueOrOffset
-      type = XTIFFField.TIFF_SHORT;
-      value = (short)valueOrOffset;
-    }
-
-    geoKeys.put(keyId, value);
-  }
-
-  private static Map<Integer, Object> getGeoKeys(final XTIFFDirectory dir) {
-    final Map<Integer, Object> geoKeys = new LinkedHashMap<Integer, Object>();
-
-    final XTIFFField geoKeyTag = dir.getField(XTIFF.TIFFTAG_GEO_KEY_DIRECTORY);
-
-    if (geoKeyTag != null) {
-      final char[] keys = geoKeyTag.getAsChars();
-      for (int i = 4; i < keys.length; i += 4) {
-        final int keyId = keys[i];
-        final int tiffTag = keys[i + 1];
-        final int valueCount = keys[i + 2];
-        final int valueOrOffset = keys[i + 3];
-        addGeoKey(geoKeys, dir, keyId, tiffTag, valueCount, valueOrOffset);
-      }
-
-    }
-    return geoKeys;
   }
 
   public TiffImage(final Resource imageResource) {
@@ -345,7 +345,7 @@ public class TiffImage extends JaiGeoReferencedImage {
         final double pixelWidth = pixelScale.getAsDouble(0);
         final double pixelHeight = pixelScale.getAsDouble(1);
         setResolution(pixelWidth);
-        setBoundingBox(x1, y1, pixelWidth, pixelHeight);
+        setBoundingBox(x1, y1, pixelWidth, -pixelHeight);
         return true;
       }
     }

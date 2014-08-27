@@ -15,7 +15,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.data.io.RecordIoFactories;
+import com.revolsys.data.io.RecordIo;
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
@@ -184,7 +184,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       final File file = new File(subDirectory, recordDefinition.getName() + "."
           + fileExtension);
       final Resource resource = new FileSystemResource(file);
-      writer = RecordIoFactories.recordWriter(recordDefinition, resource);
+      writer = RecordIo.recordWriter(recordDefinition, resource);
       if (writer instanceof ObjectWithProperties) {
         final ObjectWithProperties properties = writer;
         properties.setProperties(getProperties());
@@ -207,7 +207,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final RecordStoreSchema schema, final String schemaName,
     final Resource resource) {
     try (
-        RecordReader recordReader = RecordIoFactories.recordReader(resource)) {
+        RecordReader recordReader = RecordIo.recordReader(resource)) {
       final String typePath = Path.toPath(schemaName,
         SpringUtil.getBaseName(resource));
       recordReader.setProperty("schema", schema);
@@ -225,7 +225,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   public RecordReader query(final String path) {
     final RecordDefinition recordDefinition = getRecordDefinition(path);
     final Resource resource = getResource(path, recordDefinition);
-    final RecordReader reader = RecordIoFactories.recordReader(resource);
+    final RecordReader reader = RecordIo.recordReader(resource);
     if (reader == null) {
       throw new IllegalArgumentException("Cannot find reader for: " + path);
     } else {

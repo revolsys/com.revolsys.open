@@ -28,7 +28,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.util.CollectionUtil;
 
 public class AddFileLayerAction extends AbstractAction {
@@ -44,7 +43,7 @@ public class AddFileLayerAction extends AbstractAction {
     final Class<? extends IoFactory> factoryClass) {
     final Map<String, FileFilter> filtersByName = new TreeMap<>();
     final Set<IoFactory> factories = IoFactoryRegistry.getInstance()
-        .getFactories(factoryClass);
+      .getFactories(factoryClass);
     for (final IoFactory factory : factories) {
       final List<String> fileExtensions = factory.getFileExtensions();
       String description = factory.getName();
@@ -76,7 +75,7 @@ public class AddFileLayerAction extends AbstractAction {
     }
 
     final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(),
-        "currentDirectory");
+      "currentDirectory");
 
     final List<FileFilter> imageFileFilters = new ArrayList<FileFilter>();
     final Set<String> allImageExtensions = new TreeSet<String>();
@@ -92,13 +91,13 @@ public class AddFileLayerAction extends AbstractAction {
     allExtensions.addAll(allRecordExtensions);
     allExtensions.addAll(allImageExtensions);
     final FileNameExtensionFilter allFilter = createFileFilter(
-      "All Supported files", allExtensions);
+      "All Supported Files", allExtensions);
     fileChooser.addChoosableFileFilter(allFilter);
 
     fileChooser.addChoosableFileFilter(createFileFilter(
-      "All Vector/Record files", allRecordExtensions));
+      "All Vector/Record Files", allRecordExtensions));
 
-    fileChooser.addChoosableFileFilter(createFileFilter("All Image files",
+    fileChooser.addChoosableFileFilter(createFileFilter("All Image Files",
       allImageExtensions));
 
     for (final FileFilter fileFilter : recordFileFilters) {

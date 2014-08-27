@@ -12,7 +12,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Writer;
 
-public class RecordIoFactories {
+public class RecordIo {
   public static boolean canReadRecords(final File file) {
     for (final String fileNameExtension : FileUtil.getFileNameExtensions(file)) {
       if (canReadRecords(fileNameExtension)) {
@@ -102,6 +102,11 @@ public class RecordIoFactories {
     final RecordReaderFactory readerFactory = ioFactoryRegistry.getFactoryByFileName(
       RecordReaderFactory.class, fileName);
     return readerFactory;
+  }
+
+  public static Writer<Record> recordWriter(
+    final RecordDefinition recordDefinition, final File file) {
+    return recordWriter(recordDefinition, new FileSystemResource(file));
   }
 
   public static Writer<Record> recordWriter(

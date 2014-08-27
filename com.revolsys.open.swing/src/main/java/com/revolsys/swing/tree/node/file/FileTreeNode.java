@@ -15,7 +15,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.RecordIoFactories;
+import com.revolsys.data.io.RecordIo;
 import com.revolsys.data.io.RecordStoreFactoryRegistry;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.FileUtil;
@@ -142,7 +142,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
         return ICON_FILE_DATABASE;
       } else if (isImage(file)) {
         return ICON_FILE_IMAGE;
-      } else if (RecordIoFactories.canReadRecords(file)) {
+      } else if (RecordIo.canReadRecords(file)) {
         return ICON_FILE_TABLE;
       } else if (file.isDirectory()) {
         return ICON_FOLDER;
@@ -333,7 +333,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     final String fileName = FileUtil.getFileName(file);
     if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(fileName)) {
       return true;
-    } else if (RecordIoFactories.hasRecordReaderFactory(fileName)) {
+    } else if (RecordIo.hasRecordReaderFactory(fileName)) {
       return true;
     } else {
       return false;

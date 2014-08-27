@@ -43,7 +43,7 @@ public class PdfUtil {
       return (COSArray)item;
     } else {
       throw new IllegalArgumentException("Expecting COSArray not "
-        + item.getClass());
+          + item.getClass());
     }
   }
 
@@ -56,7 +56,7 @@ public class PdfUtil {
       return (COSArray)item;
     } else {
       throw new IllegalArgumentException("Expecting COSArray not "
-        + item.getClass());
+          + item.getClass());
     }
   }
 
@@ -95,7 +95,7 @@ public class PdfUtil {
       return (COSArray)item;
     } else {
       throw new IllegalArgumentException("Expecting COSArray not "
-        + item.getClass());
+          + item.getClass());
     }
   }
 
@@ -110,7 +110,7 @@ public class PdfUtil {
       return (COSDictionary)item;
     } else {
       throw new IllegalArgumentException("Expecting COSDictionary not "
-        + item.getClass());
+          + item.getClass());
     }
   }
 
@@ -134,7 +134,6 @@ public class PdfUtil {
         }
         if (item instanceof COSDictionary) {
           final COSDictionary viewport = (COSDictionary)item;
-          System.out.println(viewport);
           if (hasNameValue(viewport, "Type", "Viewport")) {
             return viewport;
           }

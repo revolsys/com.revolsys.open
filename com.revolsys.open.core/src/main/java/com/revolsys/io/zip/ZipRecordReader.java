@@ -7,7 +7,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.DelegatingReader;
-import com.revolsys.data.io.RecordIoFactories;
+import com.revolsys.data.io.RecordIo;
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
@@ -62,7 +62,7 @@ RecordReader {
     final File file = new File(this.directory, zipEntryName);
     if (file.exists()) {
       final FileSystemResource fileResource = new FileSystemResource(file);
-      this.reader = RecordIoFactories.recordReader(
+      this.reader = RecordIo.recordReader(
         fileResource, factory);
       if (this.reader == null) {
         close();

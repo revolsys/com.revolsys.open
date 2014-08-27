@@ -31,8 +31,7 @@ ItemListener, PropertyChangeListener {
     "unchecked"
   })
   public SelectMapCoordinateSystem(final MapPanel map) {
-    super(3857, 3005// , 26907, 26908, 26909, 26910, 26911
-        );
+    super(3857, 3005, 26907, 26908, 26909, 26910, 26911, 4326);
 
     this.map = new WeakReference<MapPanel>(map);
     setSelectedItem(map.getGeometryFactory().getSrid());
@@ -48,12 +47,12 @@ ItemListener, PropertyChangeListener {
     setToolTipText("Coordinate System");
   }
 
-  @SuppressWarnings("unchecked")
   public void addCoordinateSystem(final CoordinateSystem coordinateSystem) {
     final int srid = coordinateSystem.getId();
     addCoordinateSystem(srid);
   }
 
+  @SuppressWarnings("unchecked")
   public void addCoordinateSystem(final int srid) {
     final DefaultComboBoxModel<Object> model = (DefaultComboBoxModel<Object>)getModel();
     if (model.getIndexOf(srid) == -1) {

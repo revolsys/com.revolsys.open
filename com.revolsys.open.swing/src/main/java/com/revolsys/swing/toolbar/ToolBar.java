@@ -47,6 +47,23 @@ public class ToolBar extends JToolBar {
     return button;
   }
 
+  public JButton addButton(final String groupName, final int index,
+    final Action action) {
+    final JButton button = createButton(action);
+    button.setAction(action);
+    this.groups.addComponent(this, groupName, index, button);
+    return button;
+  }
+
+  public JButton addButton(final String groupName, final int index,
+    final String name, final String title, final Icon icon,
+    final Object object, final String methodName, final Object... parameters) {
+    final InvokeMethodAction action = new InvokeMethodAction(name, title, icon,
+      object, methodName, parameters);
+
+    return addButton(groupName, index, action);
+  }
+
   public JButton addButton(final String groupName, final String title,
     final Object object, final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(title, object,
@@ -79,6 +96,14 @@ public class ToolBar extends JToolBar {
       object, methodName, parameters);
 
     return addButton(groupName, action);
+  }
+
+  public JButton addButtonTitleIcon(final String groupName, final int index,
+    final String title, final String iconName, final Object object,
+    final String methodName, final Object... parameters) {
+    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    return addButton(groupName, index, iconName, title, icon, object,
+      methodName, parameters);
   }
 
   public JButton addButtonTitleIcon(final String groupName, final String title,
@@ -140,7 +165,7 @@ public class ToolBar extends JToolBar {
   protected JButton createButton(final Action action) {
     final JButton button = new JButton(action);
     if (action != null
-        && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
+      && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
       button.setHideActionText(true);
     }
     button.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -153,7 +178,7 @@ public class ToolBar extends JToolBar {
   protected JToggleButton createToggleButton(final Action action) {
     final JToggleButton button = new JToggleButton(action);
     if (action != null
-        && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
+      && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
       button.setHideActionText(true);
     }
     button.setHorizontalTextPosition(SwingConstants.CENTER);

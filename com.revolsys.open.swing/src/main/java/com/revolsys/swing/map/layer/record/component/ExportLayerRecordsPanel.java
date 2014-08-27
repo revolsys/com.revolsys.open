@@ -16,7 +16,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.RecordIoFactories;
+import com.revolsys.data.io.RecordIo;
 import com.revolsys.data.io.RecordReaderFactory;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.functions.EnvelopeIntersects;
@@ -125,7 +125,7 @@ public class ExportLayerRecordsPanel extends BasePanel {
 
   private void writeRecords(final Iterable<LayerRecord> records) {
     try (
-      Writer<Record> writer = RecordIoFactories.recordWriter(
+      Writer<Record> writer = RecordIo.recordWriter(
         this.layer.getRecordDefinition(), this.exportResource)) {
       for (final LayerRecord record : records) {
         writer.write(record);
