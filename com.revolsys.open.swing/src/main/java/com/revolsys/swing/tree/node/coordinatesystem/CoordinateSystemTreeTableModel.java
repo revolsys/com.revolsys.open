@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.tree.coordinatesystem;
+package com.revolsys.swing.tree.node.coordinatesystem;
 
 import java.util.ArrayList;
 import java.util.List;

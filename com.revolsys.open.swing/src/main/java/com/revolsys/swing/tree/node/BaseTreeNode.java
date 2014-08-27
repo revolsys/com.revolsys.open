@@ -28,17 +28,17 @@ import com.revolsys.collection.IteratorEnumeration;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
-import com.revolsys.swing.dnd.transferable.TreePathListTransferable;
-import com.revolsys.swing.dnd.transferhandler.BaseTreeTransferHandler;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
+import com.revolsys.swing.tree.dnd.TreePathListTransferable;
+import com.revolsys.swing.tree.dnd.TreeTransferHandler;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
-  PropertyChangeListener {
+PropertyChangeListener {
 
   @SuppressWarnings("unchecked")
   public static <V> V getUserData(final TreePath path) {
@@ -51,7 +51,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
   }
 
   public static final EnableCheck NODE_EXISTS = new TreeItemPropertyEnableCheck(
-    "exists");
+      "exists");
 
   private boolean allowsChildren;
 
@@ -139,8 +139,8 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
   }
 
   public boolean dndImportData(final TransferSupport support, int index)
-    throws IOException, UnsupportedFlavorException {
-    if (!BaseTreeTransferHandler.isDndNoneAction(support)) {
+      throws IOException, UnsupportedFlavorException {
+    if (!TreeTransferHandler.isDndNoneAction(support)) {
       final Transferable transferable = support.getTransferable();
       if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
         final Object data = transferable.getTransferData(TreePathListTransferable.FLAVOR);
@@ -417,7 +417,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
     final TreePathListTransferable pathTransferable, int index,
     final TreePath sourcePath) {
     Object child = getUserData(sourcePath);
-    if (BaseTreeTransferHandler.isDndCopyAction(support)) {
+    if (TreeTransferHandler.isDndCopyAction(support)) {
       if (isCopySupported(child)) {
         child = JavaBeanUtil.clone(child);
         pathTransferable.addCopiedPath(sourcePath);
@@ -508,8 +508,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
     final List<Class<?>> childClasses = getChildClasses();
     for (final Class<?> supportedClass : childClasses) {
       if (supportedClass.isAssignableFrom(valueClass)) {
-        final int dropAction = support.getDropAction();
-        if (BaseTreeTransferHandler.isDndCopyAction(dropAction)) {
+        if (TreeTransferHandler.isDndCopyAction(support)) {
           if (!isCopySupported(child)) {
             return false;
           }

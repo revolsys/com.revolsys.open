@@ -17,8 +17,8 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import com.revolsys.swing.dnd.transferhandler.BaseTreeTransferHandler;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.dnd.TreeTransferHandler;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
@@ -41,7 +41,7 @@ public class BaseTree extends JTree implements MouseListener,
     setRowHeight(0);
     setCellRenderer(new BaseTreeCellRenderer());
     setExpandsSelectedPaths(true);
-    setTransferHandler(new BaseTreeTransferHandler());
+    setTransferHandler(new TreeTransferHandler());
     setDragEnabled(true);
     setDropMode(DropMode.ON_OR_INSERT);
     final DefaultTreeSelectionModel selectionModel = new DefaultTreeSelectionModel();

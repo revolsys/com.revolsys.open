@@ -1,4 +1,4 @@
-package com.revolsys.swing.dnd.transferhandler;
+package com.revolsys.swing.tree.dnd;
 
 import java.awt.Component;
 import java.awt.datatransfer.Transferable;
@@ -11,7 +11,6 @@ import javax.swing.TransferHandler;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.swing.dnd.transferable.ObjectTransferable;
-import com.revolsys.swing.dnd.transferable.TreePathListTransferable;
 
 @SuppressWarnings("serial")
 public class TreePathListTransferHandler extends TransferHandler {

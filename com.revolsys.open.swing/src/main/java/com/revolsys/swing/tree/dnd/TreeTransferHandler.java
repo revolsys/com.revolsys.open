@@ -1,4 +1,4 @@
-package com.revolsys.swing.dnd.transferhandler;
+package com.revolsys.swing.tree.dnd;
 
 import java.awt.Component;
 import java.awt.datatransfer.Transferable;
@@ -12,18 +12,13 @@ import javax.swing.tree.TreePath;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.swing.dnd.transferable.TreePathListTransferable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 
-public class BaseTreeTransferHandler extends TransferHandler {
-
-  public static boolean isDndCopyAction(final int dropAction) {
-    return (dropAction & DnDConstants.ACTION_COPY) == DnDConstants.ACTION_COPY;
-  }
+public class TreeTransferHandler extends TransferHandler {
 
   public static boolean isDndCopyAction(final TransferSupport support) {
     final int dropAction = support.getDropAction();
-    return isDndCopyAction(dropAction);
+    return (dropAction & DnDConstants.ACTION_COPY) == DnDConstants.ACTION_COPY;
   }
 
   public static boolean isDndMoveAction(final int dropAction) {
@@ -35,18 +30,14 @@ public class BaseTreeTransferHandler extends TransferHandler {
     return isDndMoveAction(dropAction);
   }
 
-  public static boolean isDndNoneAction(final int dropAction) {
-    return dropAction == DnDConstants.ACTION_NONE;
-  }
-
   public static boolean isDndNoneAction(final TransferSupport support) {
     final int dropAction = support.getDropAction();
-    return isDndNoneAction(dropAction);
+    return dropAction == DnDConstants.ACTION_NONE;
   }
 
   private static final long serialVersionUID = 1L;
 
-  public BaseTreeTransferHandler() {
+  public TreeTransferHandler() {
   }
 
   @Override
@@ -94,16 +85,10 @@ public class BaseTreeTransferHandler extends TransferHandler {
             final Object parent = parentPath.getLastPathComponent();
             if (parent instanceof BaseTreeNode) {
               final BaseTreeNode parentNode = (BaseTreeNode)parent;
-              boolean removed = false;
               if (pathTransferable.isMoved(path)) {
-                removed = parentNode.removeChild(path);
+                parentNode.removeChild(path);
               }
-              // if (!removed) {
-              // this.model.fireTreeNodesChanged(parentPath);
-              // this.model.fireTreeNodesChanged(path);
-              // }
             }
-
           }
           pathTransferable.reset();
         }
