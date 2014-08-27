@@ -27,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.tree.TreePath;
 
 import org.springframework.core.io.FileSystemResource;
 
@@ -78,6 +79,7 @@ import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.tree.BaseTree;
+import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.swing.tree.node.file.FileSystemsTreeNode;
 import com.revolsys.swing.tree.node.file.FolderConnectionsTreeNode;
@@ -173,7 +175,7 @@ public class ProjectFrame extends BaseFrame {
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-      .getTheme();
+        .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -270,7 +272,7 @@ public class ProjectFrame extends BaseFrame {
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = InvokeMethodAction.createButton(null,
       "View Running Tasks", SilkIconLoader.getIcon("time_go"), dockable,
-      "toFront");
+        "toFront");
     viewTasksAction.setBorderPainted(false);
     progressBar.add(viewTasksAction, BorderLayout.EAST);
   }
@@ -412,6 +414,10 @@ public class ProjectFrame extends BaseFrame {
     return new BoundingBoxDoubleGf();
   }
 
+  public CControl getDockControl() {
+    return this.dockControl;
+  }
+
   // public void expandConnectionManagers(final PropertyChangeEvent event) {
   // final Object newValue = event.getNewValue();
   // if (newValue instanceof ConnectionRegistry) {
@@ -429,10 +435,6 @@ public class ProjectFrame extends BaseFrame {
   // }
   // }
 
-  public CControl getDockControl() {
-    return this.dockControl;
-  }
-
   public MapPanel getMapPanel() {
     return this.mapPanel;
   }
@@ -443,6 +445,16 @@ public class ProjectFrame extends BaseFrame {
 
   public BaseTree getTocTree() {
     return this.tocTree;
+  }
+
+  public BaseTreeNode getTreeNode(final Layer layer) {
+    final List<Layer> layerPath = layer.getPathList();
+    final TreePath treePath = this.tocTree.getTreePath(layerPath);
+    if (treePath == null) {
+      return null;
+    } else {
+      return (BaseTreeNode)treePath.getLastPathComponent();
+    }
   }
 
   protected void initUi() {

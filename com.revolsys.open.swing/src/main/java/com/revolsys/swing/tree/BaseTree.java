@@ -1,5 +1,6 @@
 package com.revolsys.swing.tree;
 
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
@@ -23,7 +24,7 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
 public class BaseTree extends JTree implements MouseListener,
-  TreeWillExpandListener, TreeExpansionListener {
+TreeWillExpandListener, TreeExpansionListener {
   private static final long serialVersionUID = 1L;
 
   private boolean menuEnabled = true;
@@ -104,6 +105,18 @@ public class BaseTree extends JTree implements MouseListener,
     } else {
       return null;
     }
+  }
+
+  @Override
+  public Rectangle getPathBounds(final TreePath path) {
+    final Object lastPathComponent = path.getLastPathComponent();
+    if (lastPathComponent instanceof BaseTreeNode) {
+      final BaseTreeNode treeNode = (BaseTreeNode)lastPathComponent;
+      if (!treeNode.isVisible()) {
+        return null;
+      }
+    }
+    return super.getPathBounds(path);
   }
 
   public BaseTreeNode getRootNode() {
@@ -196,7 +209,7 @@ public class BaseTree extends JTree implements MouseListener,
 
         TreePath[] selectionPaths = getSelectionPaths();
         if (selectionPaths == null
-          || !Arrays.asList(selectionPaths).contains(path)) {
+            || !Arrays.asList(selectionPaths).contains(path)) {
           selectionPaths = new TreePath[] {
             path
           };
@@ -218,21 +231,6 @@ public class BaseTree extends JTree implements MouseListener,
     this.menuEnabled = menuEnabled;
   }
 
-  public void setVisible(final Object object, final boolean visible) {
-    // final boolean oldVisible = !this.hiddenObjects.containsKey(object);
-    // if (visible) {
-    // this.hiddenObjects.remove(object);
-    // } else {
-    // this.hiddenObjects.put(object, true);
-    // }
-    // if (visible != oldVisible) {
-    // final TreePath path = getPath(object);
-    // if (path != null) {
-    // getModel().fireTreeNodesChanged(path);
-    // }
-    // }
-  }
-
   @Override
   public void treeCollapsed(final TreeExpansionEvent event) {
 
@@ -244,12 +242,12 @@ public class BaseTree extends JTree implements MouseListener,
 
   @Override
   public void treeWillCollapse(final TreeExpansionEvent event)
-    throws ExpandVetoException {
+      throws ExpandVetoException {
   }
 
   @Override
   public void treeWillExpand(final TreeExpansionEvent event)
-    throws ExpandVetoException {
+      throws ExpandVetoException {
     final TreePath path = event.getPath();
     final Object node = path.getLastPathComponent();
     if (node instanceof LazyLoadTreeNode) {

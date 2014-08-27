@@ -50,6 +50,8 @@ PropertyChangeListener {
     return (V)value;
   }
 
+  private boolean visible = true;
+
   public static final EnableCheck NODE_EXISTS = new TreeItemPropertyEnableCheck(
       "exists");
 
@@ -538,6 +540,10 @@ PropertyChangeListener {
     return getChildCount() == 0;
   }
 
+  public boolean isVisible() {
+    return this.visible;
+  }
+
   @Override
   public Iterator<BaseTreeNode> iterator() {
     final List<BaseTreeNode> children = getChildren();
@@ -651,6 +657,11 @@ PropertyChangeListener {
 
   public void setUserObject(final Object userObject) {
     this.userObject = userObject;
+  }
+
+  public void setVisible(final boolean visible) {
+    this.visible = visible;
+    nodeChanged();
   }
 
   @Override
