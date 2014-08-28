@@ -21,6 +21,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -29,7 +30,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class CsvRecordIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
 
   private final char fieldSeparator;
 
@@ -39,11 +40,9 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
 
   private String geometryColumnName;
 
-  private DataType geometryType;
+  private DataType geometryType = DataTypes.GEOMETRY;
 
-  private Integer geometrySrid;
-
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.floating3();
 
   private RecordFactory recordFactory;
 
@@ -76,40 +75,36 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
   }
 
   private void createRecordDefinition(final String[] fieldNames)
-    throws IOException {
-    final List<Attribute> attributes = new ArrayList<Attribute>();
+      throws IOException {
+    this.hasPointFields = Property.hasValue(this.pointXAttributeName)
+        && Property.hasValue(this.pointYAttributeName);
+    if (this.hasPointFields) {
+      this.geometryType = DataTypes.POINT;
+    } else {
+      this.pointXAttributeName = null;
+      this.pointYAttributeName = null;
+    }
+    final List<Attribute> attributes = new ArrayList<>();
     Attribute geometryAttribute = null;
     for (final String name : fieldNames) {
       DataType type = DataTypes.STRING;
-      if (name.equals(this.geometryColumnName)) {
-        type = DataTypes.GEOMETRY;
+      if (name.equalsIgnoreCase(this.geometryColumnName)) {
+        type = this.geometryType;
       }
       final Attribute attribute = new Attribute(name, type, false);
-      if (name.equals(this.geometryColumnName)) {
+      if (name.equalsIgnoreCase(this.geometryColumnName)) {
         geometryAttribute = attribute;
       }
       attributes.add(attribute);
     }
-    this.hasPointFields = Property.hasValue(this.pointXAttributeName)
-      && Property.hasValue(this.pointYAttributeName);
-    if (this.geometryColumnName != null || this.hasPointFields) {
-      if (this.hasPointFields) {
-        this.geometryType = DataTypes.POINT;
-      } else {
-        this.pointXAttributeName = null;
-        this.pointYAttributeName = null;
-      }
-      if (!Property.hasValue(this.geometryColumnName)) {
-        this.geometryColumnName = "GEOMETRY";
-      }
+    if (this.hasPointFields) {
       if (geometryAttribute == null) {
         geometryAttribute = new Attribute(this.geometryColumnName,
           this.geometryType, true);
         attributes.add(geometryAttribute);
       }
-      if (this.geometryFactory == null) {
-        this.geometryFactory = GeometryFactory.wgs84();
-      }
+    }
+    if (geometryAttribute != null) {
       geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
         this.geometryFactory);
     }
@@ -147,19 +142,24 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
     try {
       this.pointXAttributeName = getProperty("pointXAttributeName");
       this.pointYAttributeName = getProperty("pointYAttributeName");
-      this.geometryColumnName = getProperty("geometryColumnName");
-      this.geometrySrid = StringConverterRegistry.toObject(DataTypes.INT,
-        getProperty("geometrySrid"));
-      if (this.geometrySrid != null) {
-        this.geometryFactory = GeometryFactory.floating3(this.geometrySrid);
+      this.geometryColumnName = getProperty("geometryColumnName", "GEOMETRY");
+
+      this.geometryFactory = getProperty("geometryFactory");
+      if (this.geometryFactory == null) {
+        final Integer geometrySrid = Property.getInteger(this, "geometrySrid");
+        if (geometrySrid == null) {
+          this.geometryFactory = EsriCoordinateSystems.getGeometryFactory(this.resource);
+        } else {
+          this.geometryFactory = GeometryFactory.floating3(geometrySrid);
+        }
+      }
+      if (this.geometryFactory == null) {
+        this.geometryFactory = GeometryFactory.floating3();
       }
       final DataType geometryType = DataTypes.getType((String)getProperty("geometryType"));
       if (Geometry.class.isAssignableFrom(geometryType.getJavaClass())) {
         this.geometryType = geometryType;
-      } else {
-        this.geometryType = DataTypes.GEOMETRY;
       }
-      this.geometryFactory = getProperty("geometryFactory");
 
       this.in = new BufferedReader(
         FileUtil.createUtf8Reader(this.resource.getInputStream()));
@@ -217,7 +217,7 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
    * @throws IOException if bad things happen during the read
    */
   private String[] parseLine(final String nextLine, final boolean readLine)
-    throws IOException {
+      throws IOException {
     String line = nextLine;
     if (line.length() == 0) {
       return new String[0];
@@ -240,14 +240,14 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
           if (c == CsvConstants.QUOTE_CHARACTER) {
             hadQuotes = true;
             if (inQuotes && line.length() > i + 1
-              && line.charAt(i + 1) == CsvConstants.QUOTE_CHARACTER) {
+                && line.charAt(i + 1) == CsvConstants.QUOTE_CHARACTER) {
               sb.append(line.charAt(i + 1));
               i++;
             } else {
               inQuotes = !inQuotes;
               if (i > 2 && line.charAt(i - 1) != this.fieldSeparator
-                && line.length() > i + 1
-                && line.charAt(i + 1) != this.fieldSeparator) {
+                  && line.length() > i + 1
+                  && line.charAt(i + 1) != this.fieldSeparator) {
                 sb.append(c);
               }
             }

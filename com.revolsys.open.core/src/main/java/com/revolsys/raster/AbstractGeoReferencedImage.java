@@ -52,7 +52,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractGeoReferencedImage extends
-AbstractPropertyChangeObject implements GeoReferencedImage {
+  AbstractPropertyChangeObject implements GeoReferencedImage {
 
   private static double[] calculateLSM(final BoundingBox boundingBox,
     final int imageWidth, final int imageHeight,
@@ -114,7 +114,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
 
     NodeList lst;
     final Element node = (Element)r.getImageMetadata(0).getAsTree(
-      "javax_imageio_1.0");
+        "javax_imageio_1.0");
     lst = node.getElementsByTagName("HorizontalPixelSize");
     if (lst != null && lst.getLength() == 1) {
       hdpi = (int)(mm2inch / Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
@@ -215,7 +215,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
     final int viewHeight, final boolean useTransform) {
     final BoundingBox imageBoundingBox = getBoundingBox();
     if (viewBoundingBox.intersects(imageBoundingBox) && viewWidth > 0
-        && viewHeight > 0) {
+      && viewHeight > 0) {
       final RenderedImage renderedImage = getRenderedImage();
       drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth,
         viewHeight, useTransform);
@@ -253,7 +253,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
             * scaleFactor);
 
           if (imageScreenWidth > 0 && imageScreenWidth < 10000
-              && imageScreenHeight > 0 && imageScreenHeight < 10000) {
+            && imageScreenHeight > 0 && imageScreenHeight < 10000) {
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
               RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             if (imageScreenWidth > 0 && imageScreenHeight > 0) {
@@ -556,7 +556,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
               spatialReference, "LatestWKID");
             if (sridElement == null) {
               sridElement = DomUtil.getFirstChildElement(spatialReference,
-                  "WKID");
+                "WKID");
             }
             if (sridElement != null) {
               srid = DomUtil.getInteger(sridElement);
@@ -578,13 +578,13 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
           setGeometryFactory(geometryFactory);
 
           final List<Double> sourceControlPoints = DomUtil.getDoubleList(doc,
-              "SourceGCPs");
+            "SourceGCPs");
           final List<Double> targetControlPoints = DomUtil.getDoubleList(doc,
-              "TargetGCPs");
+            "TargetGCPs");
           if (sourceControlPoints.size() > 0 && targetControlPoints.size() > 0) {
             final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
             for (int i = 0; i < sourceControlPoints.size()
-                && i < targetControlPoints.size(); i += 2) {
+              && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
               final Point sourcePixel = new PointDouble(imageX, imageY);
@@ -627,12 +627,8 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
 
   protected void loadProjectionFile() {
     final Resource resource = getImageResource();
-    final Resource projectionFile = SpringUtil.getResourceWithExtension(
-      resource, "prj");
-    if (projectionFile.exists()) {
-      final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(projectionFile);
-      setCoordinateSystem(coordinateSystem);
-    }
+    final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+    setGeometryFactory(geometryFactory);
   }
 
   protected long loadSettings() {
@@ -753,7 +749,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
   public boolean saveChanges() {
     try {
       final Resource rgResource = SpringUtil.addExtension(this.imageResource,
-          "rgobject");
+        "rgobject");
       MapObjectFactoryRegistry.write(rgResource, this);
       setHasChanges(false);
       return true;
@@ -789,20 +785,16 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
   }
 
   @Override
-  public void setCoordinateSystem(final CoordinateSystem coordinateSystem) {
-    setGeometryFactory(coordinateSystem.getGeometryFactory());
-  }
-
-  @Override
   public void setDpi(final int... dpi) {
     this.dpi = dpi;
   }
 
-  @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory.convertAxisCount(2);
-    for (final MappedLocation mappedLocation : this.tiePoints) {
-      mappedLocation.setGeometryFactory(geometryFactory);
+    if (geometryFactory != null) {
+      this.geometryFactory = geometryFactory.convertAxisCount(2);
+      for (final MappedLocation mappedLocation : this.tiePoints) {
+        mappedLocation.setGeometryFactory(geometryFactory);
+      }
     }
   }
 

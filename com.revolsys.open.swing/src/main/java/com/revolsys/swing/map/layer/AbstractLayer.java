@@ -35,6 +35,7 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.BooleanStringConverter;
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
@@ -254,17 +255,17 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         extentPanel.add(new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
             + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-            + boundingBox.getMaximum(1)
+            + StringConverterRegistry.toString(boundingBox.getMaximum(1))
             + "</td><td>&nbsp;</td></tr><tr>"
             + "<td><b>Left</b>: "
-            + boundingBox.getMinimum(0)
+            + StringConverterRegistry.toString(boundingBox.getMinimum(0))
             + "</td><td>&nbsp;</td><td>&nbsp;</td>"
             + "<td><b>Right</b>: "
-            + boundingBox.getMaximum(0)
+            + StringConverterRegistry.toString(boundingBox.getMaximum(0))
             + "</td></tr>"
             + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-            + boundingBox.getMinimum(1) + "</td><td>&nbsp;</td></tr><tr>"
-            + "</tr></table></html>"));
+            + StringConverterRegistry.toString(boundingBox.getMinimum(1))
+            + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>"));
 
       }
       GroupLayoutUtil.makeColumns(extentPanel, 1, true);
@@ -1004,7 +1005,6 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
       .expandPercent(0.1)
       .clipToCoordinateSystem();
-
     project.setViewBoundingBox(boundingBox);
   }
 }

@@ -18,8 +18,6 @@ import com.revolsys.util.CollectionUtil;
 
 public class StringConverterRegistry {
 
-  public static StringConverterRegistry instance = new StringConverterRegistry();
-
   public static void clearInstance() {
     instance = null;
   }
@@ -73,8 +71,8 @@ public class StringConverterRegistry {
     if (value == null) {
       return null;
     } else {
-      final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-        .getConverter(valueClass);
+      final StringConverterRegistry registry = StringConverterRegistry.getInstance();
+      final StringConverter<Object> converter = registry.getConverter(valueClass);
       if (converter == null) {
         return value.toString();
       } else {
@@ -98,6 +96,8 @@ public class StringConverterRegistry {
       return toString(valueClass, value);
     }
   }
+
+  public static StringConverterRegistry instance = new StringConverterRegistry();
 
   private final Map<Class<?>, StringConverter<?>> classConverterMap = new HashMap<Class<?>, StringConverter<?>>();
 
@@ -132,7 +132,7 @@ public class StringConverterRegistry {
 
   public void addConverter(final Class<?> clazz,
     final StringConverter<?> converter) {
-    classConverterMap.put(clazz, converter);
+    this.classConverterMap.put(clazz, converter);
   }
 
   public void addConverter(final StringConverter<?> converter) {
@@ -148,7 +148,7 @@ public class StringConverterRegistry {
       final Class<?> interfaceClass = CollectionUtil.get(interfaces, i);
       converter = get(interfaces, interfaceClass);
       if (converter != null) {
-        classConverterMap.put(interfaceClass, converter);
+        this.classConverterMap.put(interfaceClass, converter);
         return converter;
       }
     }
@@ -160,7 +160,7 @@ public class StringConverterRegistry {
     final Class<?> clazz) {
     StringConverter converter = null;
     if (clazz != null) {
-      classConverterMap.get(clazz);
+      converter = this.classConverterMap.get(clazz);
       if (converter == null) {
         for (final Class<?> interfaceClass : clazz.getInterfaces()) {
           interfaces.add(interfaceClass);
@@ -170,7 +170,7 @@ public class StringConverterRegistry {
       }
     }
     if (converter != null) {
-      classConverterMap.put(clazz, converter);
+      this.classConverterMap.put(clazz, converter);
     }
     return converter;
   }
@@ -182,7 +182,7 @@ public class StringConverterRegistry {
 
     StringConverter converter = null;
     if (clazz != null) {
-      converter = classConverterMap.get(clazz);
+      converter = this.classConverterMap.get(clazz);
       if (converter == null) {
         final Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>();
         converter = get(interfaces, clazz);

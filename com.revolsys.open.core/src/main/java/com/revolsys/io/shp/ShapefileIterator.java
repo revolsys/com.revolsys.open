@@ -18,7 +18,6 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.gis.io.EndianMappedByteBuffer;
@@ -34,7 +33,7 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.Property;
 
 public class ShapefileIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
 
   private boolean closeFile = true;
 
@@ -108,27 +107,26 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
         if (xbaseResource.exists()) {
           this.xbaseIterator = new XbaseIterator(xbaseResource,
             this.recordDefinitionFactory, new InvokeMethodRunnable(this,
-              "updateRecordDefinition"));
+                "updateRecordDefinition"));
           this.xbaseIterator.setTypeName(this.typeName);
           this.xbaseIterator.setProperty("memoryMapped", memoryMapped);
           this.xbaseIterator.setCloseFile(this.closeFile);
         }
         loadHeader();
         int axisCount;
-        int srid = 0;
         switch (this.shapeType) {
           case ShapefileConstants.POINT_SHAPE: // 1
           case ShapefileConstants.POLYLINE_SHAPE: // 3
           case ShapefileConstants.POLYGON_SHAPE: // 5
           case ShapefileConstants.MULTI_POINT_SHAPE: // 8
             axisCount = 2;
-          break;
+            break;
           case ShapefileConstants.POINT_Z_SHAPE: // 9
           case ShapefileConstants.POLYLINE_Z_SHAPE: // 10
           case ShapefileConstants.POLYGON_Z_SHAPE: // 19
           case ShapefileConstants.MULTI_POINT_Z_SHAPE: // 20
             axisCount = 3;
-          break;
+            break;
           case ShapefileConstants.POINT_ZM_SHAPE: // 11
           case ShapefileConstants.POLYLINE_ZM_SHAPE: // 13
           case ShapefileConstants.POLYGON_ZM_SHAPE: // 15
@@ -138,28 +136,18 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
           case ShapefileConstants.POLYGON_M_SHAPE: // 25
           case ShapefileConstants.MULTI_POINT_M_SHAPE: // 28
             axisCount = 4;
-          break;
+            break;
           default:
             throw new RuntimeException("Unknown shape type:" + this.shapeType);
         }
         this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-        final Resource projResource = this.resource.createRelative(this.name
-          + ".prj");
-        if (projResource.exists()) {
-          try {
-            final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(projResource);
-            srid = EsriCoordinateSystems.getCrsId(coordinateSystem);
-            setProperty(IoConstants.GEOMETRY_FACTORY, this.geometryFactory);
-          } catch (final Exception e) {
-            e.printStackTrace();
-          }
+        if (this.geometryFactory == null) {
+          this.geometryFactory = EsriCoordinateSystems.getGeometryFactory(this.resource);
         }
         if (this.geometryFactory == null) {
-          if (srid < 1) {
-            srid = 4326;
-          }
-          this.geometryFactory = GeometryFactory.floating(srid, axisCount);
+          this.geometryFactory = GeometryFactory.floating(0, axisCount);
         }
+        setProperty(IoConstants.GEOMETRY_FACTORY, this.geometryFactory);
 
         if (this.xbaseIterator != null) {
           this.xbaseIterator.hasNext();
@@ -368,7 +356,7 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
       }
     } else {
       throw new UnsupportedOperationException(
-        "The position can only be set on files");
+          "The position can only be set on files");
     }
   }
 
@@ -400,31 +388,31 @@ public class ShapefileIterator extends AbstractIterator<Record> implements
           case ShapefileConstants.POINT_M_SHAPE:
           case ShapefileConstants.POINT_ZM_SHAPE:
             geometryType = DataTypes.POINT;
-          break;
+            break;
 
           case ShapefileConstants.POLYLINE_SHAPE:
           case ShapefileConstants.POLYLINE_Z_SHAPE:
           case ShapefileConstants.POLYLINE_M_SHAPE:
           case ShapefileConstants.POLYLINE_ZM_SHAPE:
             geometryType = DataTypes.MULTI_LINE_STRING;
-          break;
+            break;
 
           case ShapefileConstants.POLYGON_SHAPE:
           case ShapefileConstants.POLYGON_Z_SHAPE:
           case ShapefileConstants.POLYGON_M_SHAPE:
           case ShapefileConstants.POLYGON_ZM_SHAPE:
             geometryType = DataTypes.MULTI_POLYGON;
-          break;
+            break;
 
           case ShapefileConstants.MULTI_POINT_SHAPE:
           case ShapefileConstants.MULTI_POINT_Z_SHAPE:
           case ShapefileConstants.MULTI_POINT_M_SHAPE:
           case ShapefileConstants.MULTI_POINT_ZM_SHAPE:
             geometryType = DataTypes.MULTI_POINT;
-          break;
+            break;
 
           default:
-          break;
+            break;
         }
         recordDefinition.addAttribute("geometry", geometryType, true);
       }

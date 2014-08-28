@@ -14,7 +14,7 @@ import com.revolsys.io.wkt.EWktWriter;
 import com.revolsys.jts.geom.Geometry;
 
 public class CsvRecordWriter extends AbstractRecordWriter {
-  private final char fieldSeparator = ',';
+  private final char fieldSeparator;
 
   /** The writer */
   private final PrintWriter out;
@@ -36,6 +36,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     final boolean ewkt) {
     this.recordDefinition = recordDefinition;
     this.out = new PrintWriter(out);
+    this.fieldSeparator = fieldSeparator;
     this.useQuotes = useQuotes;
     this.ewkt = ewkt;
     for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
@@ -91,7 +92,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         @SuppressWarnings("unchecked")
         final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
         final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-            .getConverter(dataTypeClass);
+          .getConverter(dataTypeClass);
         if (converter == null) {
           string(value);
         } else {

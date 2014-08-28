@@ -74,11 +74,7 @@ public interface GeoReferencedImage extends MapSerializer,
   void setBoundingBox(final double x1, final double y1,
     final double pixelWidth, final double pixelHeight);
 
-  void setCoordinateSystem(final CoordinateSystem coordinateSystem);
-
   void setDpi(final int... dpi);
-
-  void setGeometryFactory(final GeometryFactory geometryFactory);
 
   void setRenderedImage(final RenderedImage image);
 

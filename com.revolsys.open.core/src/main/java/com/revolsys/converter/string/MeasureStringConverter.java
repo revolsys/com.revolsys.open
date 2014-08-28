@@ -47,9 +47,16 @@ public class MeasureStringConverter implements StringConverter<Measure> {
   public String toString(final Object value) {
     if (value == null) {
       return null;
+    } else if (value instanceof Measure) {
+      final Measure<?> measure = (Measure<?>)value;
+      final double doubleValue = measure.getValue().doubleValue();
+      if (Double.isInfinite(doubleValue) || Double.isNaN(doubleValue)) {
+        return String.valueOf(doubleValue) + " " + measure.getUnit();
+      } else {
+        return measure.toString();
+      }
     } else {
       return value.toString();
     }
   }
-
 }

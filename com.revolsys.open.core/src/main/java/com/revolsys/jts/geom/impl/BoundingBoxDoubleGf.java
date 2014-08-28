@@ -280,17 +280,13 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   @Override
   public BoundingBox convert(final GeometryFactory geometryFactory) {
     final GeometryFactory factory = getGeometryFactory();
-    if (factory == null) {
-      if (geometryFactory == null) {
-        return this;
-      } else {
-        return new BoundingBoxDoubleGf(geometryFactory, getAxisCount(),
-          getBounds());
-      }
-    } else if (geometryFactory == null) {
-      return new BoundingBoxDoubleGf(getAxisCount(), getBounds());
+    if (geometryFactory == null) {
+      return this;
     } else if (factory == geometryFactory) {
       return this;
+    } else if (factory == null || factory.getCoordinateSystem() == null) {
+      return new BoundingBoxDoubleGf(geometryFactory, getAxisCount(),
+        getBounds());
     } else if (isEmpty()) {
       return new BoundingBoxDoubleGf(geometryFactory);
     } else {

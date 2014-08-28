@@ -39,6 +39,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
@@ -194,7 +195,7 @@ public class Gdal {
                 sourceOffsetY = 0;
               }
               if (sourceOffsetX >= overviewWidth
-                  || sourceOffsetY >= overviewHeight) {
+                || sourceOffsetY >= overviewHeight) {
                 return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
               }
 
@@ -222,7 +223,7 @@ public class Gdal {
             }
             if (pixels > 0 && sourceHeight > 0 && sourceWidth > 0) {
               final int bufferSize = pixels
-                  * gdal.GetDataTypeSize(bandDataType) / 8;
+                * gdal.GetDataTypeSize(bandDataType) / 8;
 
               final ByteBuffer data = ByteBuffer.allocateDirect(bufferSize);
               data.order(ByteOrder.nativeOrder());
@@ -488,10 +489,9 @@ public class Gdal {
 
   public static void setProjectionFromPrjFile(final Dataset dataset,
     final Resource resource) {
-    final Resource projectionFile = SpringUtil.getResourceWithExtension(
-      resource, "prj");
-    if (projectionFile.exists()) {
-      final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(projectionFile);
+    final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
+    if (geometryFactory != null) {
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       setSpatialReference(dataset, coordinateSystem);
     }
   }
