@@ -45,7 +45,6 @@ import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
-import com.revolsys.gis.desktop.print.SinglePage;
 import com.revolsys.io.datastore.RecordStoreConnectionManager;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionManager;
@@ -74,10 +73,10 @@ import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
 import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
+import com.revolsys.swing.map.print.SinglePage;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
-import com.revolsys.swing.pdf.SaveAsPdf;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.tree.BaseTree;
@@ -177,7 +176,7 @@ public class ProjectFrame extends BaseFrame {
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-      .getTheme();
+        .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -274,7 +273,7 @@ public class ProjectFrame extends BaseFrame {
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = InvokeMethodAction.createButton(null,
       "View Running Tasks", SilkIconLoader.getIcon("time_go"), dockable,
-      "toFront");
+        "toFront");
     viewTasksAction.setBorderPainted(false);
     progressBar.add(viewTasksAction, BorderLayout.EAST);
   }
@@ -305,10 +304,11 @@ public class ProjectFrame extends BaseFrame {
     file.addMenuItem("project", "Save Project", "Save Project",
       SilkIconLoader.getIcon("layout_save"), this.project, "saveAllSettings");
 
-    file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
-      "save");
+    // file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
+    // "save");
+
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-        "print");
+      "print");
 
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;

@@ -4,26 +4,26 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
-import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.util.Property;
 
-public class TreeItemPropertyEnableCheck extends AbstractEnableCheck {
+public class TreeNodePropertyEnableCheck extends AbstractEnableCheck {
   private final String propertyName;
 
   private final Object value;
 
   private boolean inverse = false;
 
-  public TreeItemPropertyEnableCheck(final String propertyName) {
+  public TreeNodePropertyEnableCheck(final String propertyName) {
     this(propertyName, true);
   }
 
-  public TreeItemPropertyEnableCheck(final String propertyName,
+  public TreeNodePropertyEnableCheck(final String propertyName,
     final Object value) {
     this(propertyName, value, false);
   }
 
-  public TreeItemPropertyEnableCheck(final String propertyName,
+  public TreeNodePropertyEnableCheck(final String propertyName,
     final Object value, final boolean inverse) {
     this.propertyName = propertyName;
     this.value = value;
@@ -32,13 +32,13 @@ public class TreeItemPropertyEnableCheck extends AbstractEnableCheck {
 
   @Override
   public boolean isEnabled() {
-    final Object object = MenuFactory.getMenuSource();
-    if (object == null) {
+    final BaseTreeNode node = BaseTree.getMenuNode();
+    if (node == null) {
       return disabled();
     } else {
       try {
-        final Object value = Property.get(object, this.propertyName);
-        if (inverse != EqualsRegistry.equal(value, this.value)) {
+        final Object value = Property.get(node, this.propertyName);
+        if (this.inverse != EqualsRegistry.equal(value, this.value)) {
           return enabled();
         } else {
           return disabled();

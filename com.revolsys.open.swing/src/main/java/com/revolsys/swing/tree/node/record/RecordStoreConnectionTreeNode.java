@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 
@@ -18,28 +19,15 @@ import com.revolsys.data.record.schema.RecordStoreSchemaElement;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.datastore.RecordStoreConnection;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
-import com.revolsys.swing.tree.TreeItemRunnable;
+import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
+import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
 public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements
 RecordStoreProxy, RecordStoreConnectionMapProxy {
-  public static void deleteConnection() {
-    final RecordStoreConnectionTreeNode node = MenuFactory.getMenuSource();
-    final RecordStoreConnection connection = node.getConnection();
-    final int confirm = JOptionPane.showConfirmDialog(
-      SwingUtil.getActiveWindow(), "Delete data store connection '"
-          + connection.getName() + "'? This action cannot be undone.",
-          "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
-    if (confirm == JOptionPane.OK_OPTION) {
-      connection.delete();
-    }
-  }
-
   public static List<BaseTreeNode> getChildren(
     final Map<String, Object> connectionMap, final RecordStore recordStore) {
     if (recordStore == null) {
@@ -83,16 +71,16 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
   private static final MenuFactory MENU = new MenuFactory();
 
   static {
-    final TreeItemPropertyEnableCheck notReadOnly = new TreeItemPropertyEnableCheck(
-      "readOnly", false);
+    final EnableCheck notReadOnly = new TreeNodePropertyEnableCheck("readOnly",
+      false);
 
-    final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
-      "arrow_refresh", NODE_EXISTS, "refresh");
+    final Action refresh = TreeNodeRunnable.createAction("Refresh",
+      "arrow_refresh", "refresh");
     MENU.addMenuItem("default", refresh);
 
-    MENU.addMenuItemTitleIcon("default", "Delete Data Store Connection",
-      "delete", notReadOnly, RecordStoreConnectionTreeNode.class,
-        "deleteConnection");
+    MENU.addMenuItem("default",
+      TreeNodeRunnable.createAction("Delete Data Store Connection", "delete",
+        notReadOnly, "deleteConnection"));
   }
 
   public RecordStoreConnectionTreeNode(final RecordStoreConnection connection) {
@@ -100,6 +88,17 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
     setType("Data Store Connection");
     setName(connection.getName());
     setIcon(ICON);
+  }
+
+  public void deleteConnection() {
+    final RecordStoreConnection connection = getConnection();
+    final int confirm = JOptionPane.showConfirmDialog(
+      SwingUtil.getActiveWindow(), "Delete data store connection '"
+          + connection.getName() + "'? This action cannot be undone.",
+          "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+    if (confirm == JOptionPane.OK_OPTION) {
+      connection.delete();
+    }
   }
 
   @Override

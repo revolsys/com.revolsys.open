@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -37,6 +39,7 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsInstance;
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
@@ -62,36 +65,41 @@ import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.tree.TreeUserDataPropertyEnableCheck;
-import com.revolsys.swing.tree.TreeUserDataRunnable;
+import com.revolsys.swing.tree.MenuSourcePropertyEnableCheck;
+import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
   implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
+  public static final ImageIcon ICON_LAYER = SilkIconLoader.getIcon("map");
+
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
 
-    final EnableCheck exists = new TreeUserDataPropertyEnableCheck("exists");
+    final EnableCheck exists = new MenuSourcePropertyEnableCheck("exists");
 
-    final EnableCheck hasGeometry = new TreeUserDataPropertyEnableCheck(
-      "hasGeometry");
-    menu.addMenuItem("zoom", TreeUserDataRunnable.createAction("Zoom to Layer",
-      "magnifier", new AndEnableCheck(exists, hasGeometry), "zoomToLayer"));
+    final EnableCheck hasGeometry = new AndEnableCheck(exists,
+      new MenuSourcePropertyEnableCheck("hasGeometry"));
 
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(true));
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(false));
+    menu.addMenuItem("zoom", MenuSourceRunnable.createAction("Zoom to Layer",
+      "magnifier", new AndEnableCheck(hasGeometry,
+        new MenuSourcePropertyEnableCheck("boundingBox",
+          new BoundingBoxDoubleGf(), true)), "zoomToLayer"));
 
-    menu.addMenuItem(TreeUserDataRunnable.createAction("Refresh",
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(true, hasGeometry));
+    menu.addComponentFactory("scale", new TreeItemScaleMenu(false, hasGeometry));
+
+    menu.addMenuItem("refresh", MenuSourceRunnable.createAction("Refresh",
       "arrow_refresh", exists, "refreshAll"));
 
-    menu.addMenuItem("layer", TreeUserDataRunnable.createAction("Delete Layer",
+    menu.addMenuItem("layer", MenuSourceRunnable.createAction("Delete Layer",
       "delete", "deleteWithConfirm"));
 
-    menu.addMenuItem("layer", TreeUserDataRunnable.createAction(
+    menu.addMenuItem("layer", MenuSourceRunnable.createAction(
       "Layer Properties", "information", exists, "showProperties"));
   }
 
@@ -107,6 +115,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   private GeometryFactory geometryFactory;
 
   private long id = ID_GEN.incrementAndGet();
+
+  private Icon icon = ICON_LAYER;
 
   private boolean initialized;
 
@@ -372,7 +382,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     setEventsEnabled(false);
     final LayerGroup layerGroup = getLayerGroup();
     if (layerGroup != null) {
-      layerGroup.remove(this);
+      layerGroup.removeLayer(this);
     }
     final PropertyChangeSupport propertyChangeSupport = this.propertyChangeSupport;
     if (propertyChangeSupport != null) {
@@ -470,6 +480,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     } else {
       return this.geometryFactory;
     }
+  }
+
+  @Override
+  public Icon getIcon() {
+    return this.icon;
   }
 
   @Override
@@ -668,12 +683,15 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean isVisible() {
-    return this.visible;
+    final LayerGroup parent = getParent();
+    return this.visible && (parent == null || parent.isVisible());
   }
 
   @Override
   public boolean isVisible(final double scale) {
-    if (isExists() && isVisible()) {
+    final LayerGroup parent = getParent();
+    if (isExists() && isVisible()
+      && (parent == null || parent.isVisible(scale))) {
       final long longScale = (long)scale;
       final long minimumScale = getMinimumScale();
       final long maximumScale = getMaximumScale();
@@ -764,6 +782,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     }
   }
 
+  public void setIcon(final Icon icon) {
+    this.icon = icon;
+  }
+
   protected void setInitialized(final boolean initialized) {
     this.initialized = initialized;
     firePropertyChange("initialized", !initialized, this.initialized);
@@ -784,18 +806,22 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public void setMaximumScale(long maximumScale) {
+    final double oldValue = this.maximumScale;
     if (maximumScale < 0) {
       maximumScale = 0;
     }
     this.maximumScale = maximumScale;
+    firePropertyChange("maximumScale", oldValue, this.minimumScale);
   }
 
   @Override
   public void setMinimumScale(long minimumScale) {
+    final double oldValue = this.minimumScale;
     if (minimumScale <= 0) {
       minimumScale = Long.MAX_VALUE;
     }
     this.minimumScale = minimumScale;
+    firePropertyChange("minimumScale", oldValue, this.minimumScale);
   }
 
   @Override

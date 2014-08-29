@@ -7,14 +7,13 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
-import com.revolsys.swing.menu.MenuFactory;
 
-public class TreeItemRunnable extends InvokeMethodRunnable {
+public class TreeNodeRunnable extends InvokeMethodRunnable {
 
   public static InvokeMethodAction createAction(final CharSequence name,
     final Icon icon, final EnableCheck enableCheck, final String methodName,
     final Object... parameters) {
-    final TreeItemRunnable runnable = new TreeItemRunnable(methodName,
+    final TreeNodeRunnable runnable = new TreeNodeRunnable(methodName,
       parameters);
     final InvokeMethodAction action = new InvokeMethodAction(name,
       name.toString(), icon, true, runnable);
@@ -36,13 +35,13 @@ public class TreeItemRunnable extends InvokeMethodRunnable {
     return createAction(name, icon, null, methodName, parameters);
   }
 
-  protected TreeItemRunnable(final String methodName, final Object[] parameters) {
+  protected TreeNodeRunnable(final String methodName, final Object[] parameters) {
     super(methodName, parameters);
   }
 
   @Override
   public Object getObject() {
-    return MenuFactory.getMenuSource();
+    return BaseTree.getMenuNode();
   }
 
 }

@@ -14,24 +14,18 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.BaseTree;
+import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.util.CaseConverter;
 
 public class RecordStoreTableTreeNode extends BaseTreeNode {
 
-  public static void addLayer() {
-    final RecordStoreTableTreeNode node = MenuFactory.getMenuSource();
-    final String typePath = node.getTypePath();
-    final Map<String, Object> connection = node.getConnectionMap();
-    final Map<String, Object> layerConfig = new LinkedHashMap<String, Object>();
-    layerConfig.put("type", "recordStore");
-    layerConfig.put("name", node.getName());
-    layerConfig.put("connection", connection);
-    layerConfig.put("typePath", typePath);
-    final AbstractLayer layer = RecordStoreLayer.create(layerConfig);
-    Project.get().add(layer);
-    // TODO different layer groups?
+  public static Icon getIcon(final String geometryType) {
+    Icon icon = ICONS_GEOMETRY.get(geometryType);
+    if (icon == null) {
+      icon = ICON_TABLE;
+    }
+    return icon;
   }
 
   public static final ImageIcon ICON_TABLE = SilkIconLoader.getIcon("table");
@@ -47,9 +41,8 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
         SilkIconLoader.getIcon("table_" + geometryType.toLowerCase()));
     }
 
-    MENU.addMenuItemTitleIcon("default", "Add Layer", "map_add", NODE_EXISTS,
-      RecordStoreTableTreeNode.class, "addLayer");
-
+    MENU.addMenuItem("default",
+      TreeNodeRunnable.createAction("Add Layer", "map_add", "addLayer"));
   }
 
   private final Map<String, Object> connectionMap;
@@ -68,11 +61,21 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     final String name = Path.getName(typePath);
     setName(name);
 
-    Icon icon = ICONS_GEOMETRY.get(geometryType);
-    if (icon == null) {
-      icon = ICON_TABLE;
-    }
+    final Icon icon = getIcon(geometryType);
     setIcon(icon);
+  }
+
+  public void addLayer() {
+    final String typePath = getTypePath();
+    final Map<String, Object> connection = getConnectionMap();
+    final Map<String, Object> layerConfig = new LinkedHashMap<String, Object>();
+    layerConfig.put("type", "recordStore");
+    layerConfig.put("name", getName());
+    layerConfig.put("connection", connection);
+    layerConfig.put("typePath", typePath);
+    final AbstractLayer layer = RecordStoreLayer.create(layerConfig);
+    Project.get().addLayer(layer);
+    // TODO different layer groups?
   }
 
   public Map<String, Object> getConnectionMap() {

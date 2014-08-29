@@ -9,26 +9,35 @@ import javax.swing.JMenu;
 import javax.swing.SwingConstants;
 
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.util.ExceptionUtil;
 
 public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
 
   private final boolean min;
 
-  public TreeItemScaleMenu(final boolean min) {
+  private final EnableCheck enableCheck;
+
+  public TreeItemScaleMenu(final boolean min, final EnableCheck enableCheck) {
     this.min = min;
+    this.enableCheck = enableCheck;
   }
 
   protected void addScaleMenuItem(final long layerScale, final Object object,
-    final String methodName, final JMenu menu, final long scale,
-    final String label) {
+    final String methodName, final JMenu menu, final long scale) {
+    final String label;
+    if (scale <= 0) {
+      label = "Unlimited";
+    } else {
+      label = MapScale.formatScale(scale);
+    }
+
     final InvokeMethodAction action = new InvokeMethodAction(label, object,
       methodName, scale);
     final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
@@ -60,40 +69,55 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
     } else {
       name = "Hide zoomed in beyond (maximum) scale";
     }
-    long layerScale = 0;
-    final Object object = MenuFactory.getMenuSource();
-    if (object instanceof Layer) {
-      final Layer layer = (Layer)object;
-      if (layer.isHasGeometry()) {
+
+    final JMenu menu = new JMenu(name);
+    if (this.enableCheck == null || this.enableCheck.isEnabled()) {
+      long layerScale = 0;
+      final Object object = MenuFactory.getMenuSource();
+      if (object instanceof Layer) {
+        final Layer layer = (Layer)object;
+        if (layer.isHasGeometry()) {
+          if (this.min) {
+            layerScale = layer.getMinimumScale();
+          } else {
+            layerScale = layer.getMaximumScale();
+          }
+        }
+      } else if (object instanceof AbstractRecordLayerRenderer) {
+        final AbstractRecordLayerRenderer renderer = (AbstractRecordLayerRenderer)object;
         if (this.min) {
-          layerScale = layer.getMinimumScale();
+          layerScale = renderer.getMinimumScale();
         } else {
-          layerScale = layer.getMaximumScale();
+          layerScale = renderer.getMaximumScale();
         }
       }
-    } else if (object instanceof AbstractRecordLayerRenderer) {
-      final AbstractRecordLayerRenderer renderer = (AbstractRecordLayerRenderer)object;
+      String methodName;
       if (this.min) {
-        layerScale = renderer.getMinimumScale();
+        methodName = "setMinimumScale";
       } else {
-        layerScale = renderer.getMaximumScale();
+        methodName = "setMaximumScale";
       }
-    }
-    String methodName;
-    if (min) {
-      methodName = "setMinimumScale";
+      if (layerScale == Long.MAX_VALUE) {
+        layerScale = 0;
+      }
+      addScaleMenuItem(layerScale, object, methodName, menu, 0);
+      boolean scaleIncluded = layerScale == 0;
+      for (final long scale : MapPanel.SCALES) {
+        if (layerScale == scale) {
+          scaleIncluded = true;
+        } else if (!scaleIncluded) {
+          if (layerScale > scale) {
+            addScaleMenuItem(layerScale, object, methodName, menu, layerScale);
+            scaleIncluded = true;
+          }
+        }
+        addScaleMenuItem(layerScale, object, methodName, menu, scale);
+      }
+      if (!scaleIncluded) {
+        addScaleMenuItem(layerScale, object, methodName, menu, layerScale);
+      }
     } else {
-      methodName = "setMaximumScale";
-    }
-    if (layerScale == Long.MAX_VALUE) {
-      layerScale = 0;
-    }
-    final JMenu menu = new JMenu(name);
-    addScaleMenuItem(layerScale, object, methodName, menu, 0, "Unlimited");
-    for (final long scale : MapPanel.SCALES) {
-      final String label = MapScale.formatScale(scale);
-
-      addScaleMenuItem(layerScale, object, methodName, menu, scale, label);
+      menu.setEnabled(false);
     }
     return menu;
   }

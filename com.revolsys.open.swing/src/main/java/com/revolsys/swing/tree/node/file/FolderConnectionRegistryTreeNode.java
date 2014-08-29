@@ -15,13 +15,12 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.DirectoryNameField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.BaseTree;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
 public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
-implements PropertyChangeListener {
+  implements PropertyChangeListener {
 
   private static final MenuFactory MENU = new MenuFactory();
 
@@ -35,8 +34,7 @@ implements PropertyChangeListener {
   }
 
   public void addConnection() {
-    final FolderConnectionRegistryTreeNode node = MenuFactory.getMenuSource();
-    final FolderConnectionRegistry registry = node.getRegistry();
+    final FolderConnectionRegistry registry = getRegistry();
     final ValueField panel = new ValueField();
     panel.setTitle("Add Folder Connection");
     SwingUtil.setTitledBorder(panel, "Folder Connection");

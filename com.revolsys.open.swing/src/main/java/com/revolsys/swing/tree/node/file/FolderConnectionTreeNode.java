@@ -9,10 +9,10 @@ import javax.swing.JOptionPane;
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
-import com.revolsys.swing.tree.TreeItemRunnable;
+import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
+import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.UrlProxy;
@@ -20,9 +20,28 @@ import com.revolsys.util.UrlUtil;
 
 public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
   UrlProxy {
-  public static void deleteConnection() {
-    final FolderConnectionTreeNode node = MenuFactory.getMenuSource();
-    final FolderConnection connection = node.getUserData();
+  private static final MenuFactory MENU = new MenuFactory();
+
+  static {
+    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",
+      "arrow_refresh", NODE_EXISTS, "refresh");
+    MENU.addMenuItem("default", refresh);
+
+    final EnableCheck readOnly = new TreeNodePropertyEnableCheck("readOnly",
+      false);
+    MENU.addMenuItem("default", TreeNodeRunnable.createAction(
+      "Delete Folder Connection", "delete", readOnly, "deleteConnection"));
+  }
+
+  public FolderConnectionTreeNode(final FolderConnection connection) {
+    super(connection);
+    setType("Folder Connection");
+    setName(connection.getName());
+    setIcon(FileTreeNode.ICON_FOLDER_LINK);
+  }
+
+  public void deleteConnection() {
+    final FolderConnection connection = getUserData();
     final int confirm = JOptionPane.showConfirmDialog(
       SwingUtil.getActiveWindow(),
       "Delete folder connection '" + connection.getName()
@@ -31,26 +50,6 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
     if (confirm == JOptionPane.OK_OPTION) {
       connection.delete();
     }
-  }
-
-  private static final MenuFactory MENU = new MenuFactory();
-
-  static {
-    final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
-      "arrow_refresh", NODE_EXISTS, "refresh");
-    MENU.addMenuItem("default", refresh);
-
-    final TreeItemPropertyEnableCheck readOnly = new TreeItemPropertyEnableCheck(
-      "readOnly", false);
-    MENU.addMenuItemTitleIcon("default", "Delete Folder Connection", "delete",
-      readOnly, FolderConnectionTreeNode.class, "deleteConnection");
-  }
-
-  public FolderConnectionTreeNode(final FolderConnection connection) {
-    super(connection);
-    setType("Folder Connection");
-    setName(connection.getName());
-    setIcon(FileTreeNode.ICON_FOLDER_LINK);
   }
 
   @Override

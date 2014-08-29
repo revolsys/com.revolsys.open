@@ -4,7 +4,6 @@ import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.jts.GeometryEditUtil;
-import com.revolsys.gis.util.Debug;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -61,8 +60,6 @@ public class CloseLocation implements Comparable<CloseLocation> {
         if (location.getPoint().equals(getPoint())) {
           return true;
         }
-      } else {
-        Debug.noOp();
       }
     }
     return false;
@@ -137,7 +134,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
       return "Edge";
     } else {
       if (GeometryEditUtil.isFromPoint(geometry, getVertexIndex())
-        || GeometryEditUtil.isToPoint(geometry, getVertexIndex())) {
+          || GeometryEditUtil.isToPoint(geometry, getVertexIndex())) {
         return "End-Vertex";
       } else {
         return "Vertex";

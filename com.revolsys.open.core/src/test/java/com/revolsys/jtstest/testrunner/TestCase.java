@@ -43,7 +43,6 @@ import junit.framework.Test;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.gis.util.Debug;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
@@ -59,7 +58,7 @@ import com.revolsys.util.Property;
  * @version 1.7
  */
 public class TestCase extends junit.framework.TestSuite implements
-MapSerializer {
+  MapSerializer {
   private String testDescription;
 
   private Geometry a;
@@ -84,9 +83,6 @@ MapSerializer {
     this.testFile = testFile;
     this.caseIndex = caseIndex;
     if (Property.hasValue(description)) {
-      if (description.startsWith("P/L-2")) {
-        Debug.noOp();
-      }
       this.testDescription = description.replaceAll("\\s+", " ").replaceAll(
         "[^A-Za-z0-9\\-_ ]", " ");
       setName(getId() + "." + this.testDescription);
@@ -205,7 +201,7 @@ MapSerializer {
     xml += "<case>" + StringUtil.newLine;
     if (this.testDescription != null && this.testDescription.length() > 0) {
       xml += "  <desc>" + StringUtil.escapeHTML(this.testDescription)
-        + "</desc>" + StringUtil.newLine;
+          + "</desc>" + StringUtil.newLine;
     }
     xml += xml("a", this.a) + StringUtil.newLine;
     xml += xml("b", this.b);

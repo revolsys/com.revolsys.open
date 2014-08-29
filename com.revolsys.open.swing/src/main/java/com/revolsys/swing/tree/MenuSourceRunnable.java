@@ -10,12 +10,12 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 
-public class TreeUserDataRunnable extends InvokeMethodRunnable {
+public class MenuSourceRunnable extends InvokeMethodRunnable {
 
   public static InvokeMethodAction createAction(final CharSequence name,
     final Icon icon, final EnableCheck enableCheck, final String methodName,
     final Object... parameters) {
-    final TreeUserDataRunnable runnable = new TreeUserDataRunnable(methodName,
+    final MenuSourceRunnable runnable = new MenuSourceRunnable(methodName,
       parameters);
     final InvokeMethodAction action = new InvokeMethodAction(name,
       name.toString(), icon, true, runnable);
@@ -37,7 +37,7 @@ public class TreeUserDataRunnable extends InvokeMethodRunnable {
     return createAction(name, icon, null, methodName, parameters);
   }
 
-  protected TreeUserDataRunnable(final String methodName,
+  protected MenuSourceRunnable(final String methodName,
     final Object[] parameters) {
     super(methodName, parameters);
   }

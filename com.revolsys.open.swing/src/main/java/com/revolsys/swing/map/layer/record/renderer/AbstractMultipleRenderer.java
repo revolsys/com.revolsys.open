@@ -16,8 +16,8 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeUserDataPropertyEnableCheck;
-import com.revolsys.swing.tree.TreeUserDataRunnable;
+import com.revolsys.swing.tree.MenuSourcePropertyEnableCheck;
+import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -28,9 +28,9 @@ public abstract class AbstractMultipleRenderer extends
     final String iconName = ("style_" + type + "_go").toLowerCase();
     final ImageIcon icon = SilkIconLoader.getIcon(iconName);
 
-    final EnableCheck enableCheck = new TreeUserDataPropertyEnableCheck(
+    final EnableCheck enableCheck = new MenuSourcePropertyEnableCheck(
       "class", rendererClass, true);
-    final InvokeMethodAction action = TreeUserDataRunnable.createAction(
+    final InvokeMethodAction action = MenuSourceRunnable.createAction(
       "Convert to " + type + " Style", icon, enableCheck, "convertTo" + type
         + "Style");
     menu.addMenuItem("convert", action);
@@ -43,7 +43,7 @@ public abstract class AbstractMultipleRenderer extends
       "Multiple", "Filter", "Scale")) {
       final String iconName = ("style_" + type + "_add").toLowerCase();
       final ImageIcon icon = SilkIconLoader.getIcon(iconName);
-      final InvokeMethodAction action = TreeUserDataRunnable.createAction(
+      final InvokeMethodAction action = MenuSourceRunnable.createAction(
         "Add " + type + " Style", icon, null, "add" + type + "Style");
       menu.addMenuItem("add", action);
     }

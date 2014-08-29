@@ -16,15 +16,6 @@ import com.revolsys.util.CollectionUtil;
 
 public class FileGdbRecordStoreFactory implements RecordStoreFactory {
 
-  private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gdb");
-
-  private static final List<String> URL_PATTERNS = Arrays.asList(
-    "file:/(//)?.*.gdb/?", "folderconnection:/(//)?.*.gdb/?");
-
-  private static final Map<String, AtomicInteger> COUNTS = new HashMap<String, AtomicInteger>();
-
-  private static final Map<String, CapiFileGdbRecordStore> DATA_STORES = new HashMap<String, CapiFileGdbRecordStore>();
-
   public static CapiFileGdbRecordStore create(File file) {
     if (file == null) {
       return null;
@@ -72,34 +63,42 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     }
   }
 
+  private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gdb");
+
+  private static final List<String> URL_PATTERNS = Arrays.asList(
+    "file:/(//)?.*.gdb/?", "folderconnection:/(//)?.*.gdb/?");
+
+  private static final Map<String, AtomicInteger> COUNTS = new HashMap<String, AtomicInteger>();
+
+  private static final Map<String, CapiFileGdbRecordStore> DATA_STORES = new HashMap<String, CapiFileGdbRecordStore>();
+
   @Override
   public FileGdbRecordStore createRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
     final Map<String, Object> properties = new LinkedHashMap<String, Object>(
-      connectionProperties);
+        connectionProperties);
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);
 
     final FileGdbRecordStore recordStore = create(file);
-    RecordStoreFactoryRegistry.setConnectionProperties(recordStore,
-      properties);
+    RecordStoreFactoryRegistry.setConnectionProperties(recordStore, properties);
     return recordStore;
+  }
+
+  @Override
+  public String getName() {
+    return "ESRI File Geodatabase";
+  }
+
+  @Override
+  public List<String> getRecordStoreFileExtensions() {
+    return FILE_NAME_EXTENSIONS;
   }
 
   @Override
   public Class<? extends RecordStore> getRecordStoreInterfaceClass(
     final Map<String, ? extends Object> connectionProperties) {
     return RecordStore.class;
-  }
-
-  @Override
-  public List<String> getFileExtensions() {
-    return FILE_NAME_EXTENSIONS;
-  }
-
-  @Override
-  public String getName() {
-    return "ESRI File Geodatabase";
   }
 
   @Override

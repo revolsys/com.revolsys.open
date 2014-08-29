@@ -24,7 +24,7 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.object.ObjectListTable;
 import com.revolsys.swing.table.object.ObjectListTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.swing.tree.TreeUserDataRunnable;
+import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.Property;
 
 public class TiePointsPanel extends TablePanel implements
@@ -72,7 +72,7 @@ public class TiePointsPanel extends TablePanel implements
         "show", layer, this, 10, 10);
     }
 
-    menu.addMenuItem("zoom", TreeUserDataRunnable.createAction("Zoom to Layer",
+    menu.addMenuItem("zoom", MenuSourceRunnable.createAction("Zoom to Layer",
       "magnifier", "zoomToLayer"));
 
     toolBar.addButton("zoom", "Zoom to Layer", "magnifier", (EnableCheck)null,

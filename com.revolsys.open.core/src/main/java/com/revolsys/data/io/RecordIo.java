@@ -43,6 +43,29 @@ public class RecordIo {
       RecordWriterFactory.class, fileNameExtension);
   }
 
+  public static void copy(final File sourceFile, final File targetFile) {
+    try (
+        RecordReader reader = recordReader(sourceFile);) {
+      if (reader == null) {
+        throw new IllegalArgumentException("Unable to read " + sourceFile);
+      } else {
+        try (
+            Writer<Record> writer = recordWriter(reader.getRecordDefinition(),
+              targetFile)) {
+          if (writer == null) {
+            throw new IllegalArgumentException("Unable to create writer "
+                + targetFile);
+          } else {
+            for (final Record record : reader) {
+              writer.write(record);
+            }
+          }
+        }
+      }
+    }
+
+  }
+
   public static boolean hasRecordReaderFactory(final Resource resource) {
     return recordReaderFactory(resource) != null;
   }

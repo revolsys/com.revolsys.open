@@ -2,8 +2,10 @@ package com.revolsys.swing.tree;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.image.ImageObserver;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
@@ -14,12 +16,17 @@ import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.file.FileTreeNode;
 
-public class BaseTreeCellRenderer extends DefaultTreeCellRenderer {
+public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements
+ImageObserver {
   private static final ImageIcon ICON_MISSING = SilkIconLoader.getIcon("error");
 
   private static final long serialVersionUID = 1L;
 
   private final JLabel hiddenRenderer = new JLabel();
+
+  private final BaseTreeNodeLoadingIcon loading = new BaseTreeNodeLoadingIcon();
+
+  private final Icon loadingIcon = this.loading.getIcon();
 
   public BaseTreeCellRenderer() {
     setOpenIcon(FileTreeNode.ICON_FOLDER);
@@ -36,21 +43,26 @@ public class BaseTreeCellRenderer extends DefaultTreeCellRenderer {
   public Component getTreeCellRendererComponent(final JTree tree,
     final Object value, final boolean selected, final boolean expanded,
     final boolean leaf, final int row, final boolean hasFocus) {
-    Component renderer = super.getTreeCellRendererComponent(tree, value,
+    final Component renderer = super.getTreeCellRendererComponent(tree, value,
       selected, expanded, leaf, row, hasFocus);
 
     if (value instanceof BaseTreeNode) {
       final BaseTreeNode node = (BaseTreeNode)value;
+      this.loading.removeNode(node);
       if (node.isVisible()) {
-        renderer = node.getTreeCellRendererComponent(renderer, tree, value,
-          selected, expanded, leaf, row, hasFocus);
+        if (node.isUserObjectInitialized()) {
 
-        if (node.isExists()) {
-        } else if (!node.isEnabled()) {
-          renderer.setEnabled(false);
+          if (node.isExists()) {
+            return node.getTreeCellRendererComponent(renderer, tree, value,
+              selected, expanded, leaf, row, hasFocus);
+          } else {
+            setIcon(ICON_MISSING);
+            setForeground(WebColors.Red);
+          }
         } else {
-          setIcon(ICON_MISSING);
-          setForeground(WebColors.Red);
+          setIcon(this.loadingIcon);
+          setForeground(WebColors.Gray);
+          this.loading.addNode(node);
         }
       } else {
         return this.hiddenRenderer;

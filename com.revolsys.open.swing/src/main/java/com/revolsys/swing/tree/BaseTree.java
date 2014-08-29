@@ -3,6 +3,8 @@ package com.revolsys.swing.tree;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,16 +20,24 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import com.revolsys.collection.EmptyReference;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.dnd.TreeTransferHandler;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
 public class BaseTree extends JTree implements MouseListener,
-TreeWillExpandListener, TreeExpansionListener {
+  TreeWillExpandListener, TreeExpansionListener {
+  @SuppressWarnings("unchecked")
+  public static <V extends BaseTreeNode> V getMenuNode() {
+    return (V)menuNode.get();
+  }
+
   private static final long serialVersionUID = 1L;
 
   private boolean menuEnabled = true;
+
+  private static Reference<BaseTreeNode> menuNode = new EmptyReference<>();
 
   public BaseTree(final BaseTreeNode root) {
     super(new DefaultTreeModel(root, true));
@@ -119,6 +129,19 @@ TreeWillExpandListener, TreeExpansionListener {
     return super.getPathBounds(path);
   }
 
+  // private void initializePath(final TreePath path) {
+  // final TreePath parent = path.getParentPath();
+  // if (parent != null) {
+  // initializePath(parent);
+  // }
+  // final Object object = BaseTreeNode.getUserData(path);
+  // synchronized (this.objectPathMap) {
+  // if (!this.objectPathMap.containsKey(object)) {
+  // this.objectPathMap.put(object, path);
+  // }
+  // }
+  // }
+
   public BaseTreeNode getRootNode() {
     final TreeModel model = getModel();
     final BaseTreeNode root = (BaseTreeNode)model.getRoot();
@@ -134,19 +157,6 @@ TreeWillExpandListener, TreeExpansionListener {
     }
 
   }
-
-  // private void initializePath(final TreePath path) {
-  // final TreePath parent = path.getParentPath();
-  // if (parent != null) {
-  // initializePath(parent);
-  // }
-  // final Object object = BaseTreeNode.getUserData(path);
-  // synchronized (this.objectPathMap) {
-  // if (!this.objectPathMap.containsKey(object)) {
-  // this.objectPathMap.put(object, path);
-  // }
-  // }
-  // }
 
   public boolean isMenuEnabled() {
     return this.menuEnabled;
@@ -209,7 +219,7 @@ TreeWillExpandListener, TreeExpansionListener {
 
         TreePath[] selectionPaths = getSelectionPaths();
         if (selectionPaths == null
-            || !Arrays.asList(selectionPaths).contains(path)) {
+          || !Arrays.asList(selectionPaths).contains(path)) {
           selectionPaths = new TreePath[] {
             path
           };
@@ -218,6 +228,7 @@ TreeWillExpandListener, TreeExpansionListener {
 
         final MenuFactory menu = getMenuFactory(path);
         final BaseTreeNode node = (BaseTreeNode)path.getLastPathComponent();
+        menuNode = new WeakReference<BaseTreeNode>(node);
         Object userObject = node.getUserObject();
         if (userObject == null) {
           userObject = node;
@@ -242,12 +253,12 @@ TreeWillExpandListener, TreeExpansionListener {
 
   @Override
   public void treeWillCollapse(final TreeExpansionEvent event)
-      throws ExpandVetoException {
+    throws ExpandVetoException {
   }
 
   @Override
   public void treeWillExpand(final TreeExpansionEvent event)
-      throws ExpandVetoException {
+    throws ExpandVetoException {
     final TreePath path = event.getPath();
     final Object node = path.getLastPathComponent();
     if (node instanceof LazyLoadTreeNode) {

@@ -793,15 +793,15 @@ MouseListener, CaretListener, ItemListener {
                     typeClass, value);
                   if (convertedValue == null
                       || !typeClass.isAssignableFrom(typeClass)) {
-                    setInvalidMessage(name + " requires a "
-                        + attribute.getType() + " not the value " + value);
+                    setInvalidMessage(name + "='" + value + "' is not a valid "
+                        + attribute.getType());
                     return null;
                   } else {
                     rightCondition = new Value(attribute, convertedValue);
                   }
                 } catch (final Throwable t) {
-                  setInvalidMessage(name + " requires a " + attribute.getType()
-                    + " not the value " + value);
+                  setInvalidMessage(name + "='" + value + "' is not a valid "
+                      + attribute.getType());
                 }
               } else {
                 Object id;
@@ -814,8 +814,9 @@ MouseListener, CaretListener, ItemListener {
                   id = codeTable.getId(value);
                 }
                 if (id == null) {
-                  setInvalidMessage(name
-                    + " requires a valid code value that exists not " + value);
+                  setInvalidMessage(name + "='" + value
+                    + "' could not be found in the code table "
+                    + codeTable.getName());
                 } else {
                   rightCondition = new Value(attribute, id);
                 }

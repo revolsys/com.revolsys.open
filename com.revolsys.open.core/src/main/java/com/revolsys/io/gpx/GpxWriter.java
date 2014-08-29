@@ -36,7 +36,7 @@ public class GpxWriter extends AbstractRecordWriter {
     this.file = file;
   }
 
-  public GpxWriter(final Writer writer) throws IOException {
+  public GpxWriter(final Writer writer) {
     this.out = new XmlWriter(new BufferedWriter(writer));
     this.out.setIndent(false);
     this.out.startDocument("UTF-8", "1.0");

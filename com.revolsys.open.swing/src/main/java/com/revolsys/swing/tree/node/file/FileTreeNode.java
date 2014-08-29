@@ -33,9 +33,8 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
-import com.revolsys.swing.tree.TreeItemRunnable;
+import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
+import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.FileRecordStoreTreeNode;
@@ -45,60 +44,8 @@ import com.revolsys.util.UrlUtil;
 
 public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
-  public static void addFolderConnection() {
-    final FileTreeNode node = MenuFactory.getMenuSource();
-    if (node.isDirectory()) {
-      final File directory = node.getUserData();
-      final String fileName = node.getName();
-
-      final ValueField panel = new ValueField();
-      panel.setTitle("Add Folder Connection");
-      SwingUtil.setTitledBorder(panel, "Folder Connection");
-
-      SwingUtil.addLabel(panel, "Folder");
-      final JLabel fileLabel = new JLabel(directory.getAbsolutePath());
-      panel.add(fileLabel);
-
-      SwingUtil.addLabel(panel, "Name");
-      final TextField nameField = new TextField(20);
-      panel.add(nameField);
-      nameField.setText(fileName);
-
-      SwingUtil.addLabel(panel, "Folder Connections");
-      final List<FolderConnectionRegistry> registries = FolderConnectionManager.get()
-          .getVisibleConnectionRegistries();
-      final JComboBox registryField = new JComboBox(
-        new Vector<FolderConnectionRegistry>(registries));
-
-      panel.add(registryField);
-
-      GroupLayoutUtil.makeColumns(panel, 2, true);
-      panel.showDialog();
-      if (panel.isSaved()) {
-        final FolderConnectionRegistry registry = (FolderConnectionRegistry)registryField.getSelectedItem();
-        String connectionName = nameField.getText();
-        if (!Property.hasValue(connectionName)) {
-          connectionName = fileName;
-        }
-        final String baseConnectionName = connectionName;
-        int i = 0;
-        while (registry.getConnection(connectionName) != null) {
-          connectionName = baseConnectionName + i;
-          i++;
-        }
-        registry.addConnection(connectionName, directory);
-      }
-    }
-  }
-
-  public static void addLayer() {
-    final FileTreeNode node = MenuFactory.getMenuSource();
-    final URL url = node.getUrl();
-    Project.get().openFile(url);
-  }
-
-  public static List<BaseTreeNode> getFileNodes(
-    final BaseTreeNode parent, final File file) {
+  public static List<BaseTreeNode> getFileNodes(final BaseTreeNode parent,
+    final File file) {
     if (file.isDirectory()) {
       final File[] files = file.listFiles();
       return getFileNodes(parent, files);
@@ -107,8 +54,8 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     }
   }
 
-  public static List<BaseTreeNode> getFileNodes(
-    final BaseTreeNode parent, final File[] files) {
+  public static List<BaseTreeNode> getFileNodes(final BaseTreeNode parent,
+    final File[] files) {
     final List<BaseTreeNode> children = new ArrayList<>();
     if (files != null) {
       for (final File childFile : files) {
@@ -214,25 +161,75 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   private static final MenuFactory MENU = new MenuFactory();
 
   static {
-    final EnableCheck isDirectory = new TreeItemPropertyEnableCheck("directory");
-    final EnableCheck isFileLayer = new TreeItemPropertyEnableCheck("fileLayer");
+    final EnableCheck isDirectory = new TreeNodePropertyEnableCheck("directory");
+    final EnableCheck isFileLayer = new TreeNodePropertyEnableCheck("fileLayer");
 
-    final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
+    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",
       "arrow_refresh", NODE_EXISTS, "refresh");
     MENU.addMenuItem("default", refresh);
 
-    MENU.addMenuItemTitleIcon("default", "Add Layer", "map_add", isFileLayer,
-      FileTreeNode.class, "addLayer");
+    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Add Layer",
+      "map_add", isFileLayer, "addLayer"));
 
-    MENU.addMenuItemTitleIcon("default", "Add Folder Connection", "link_add",
-      new AndEnableCheck(isDirectory, NODE_EXISTS), FileTreeNode.class,
-        "addFolderConnection");
+    MENU.addMenuItem("default", TreeNodeRunnable.createAction(
+      "Add Folder Connection", "link_add", new AndEnableCheck(isDirectory,
+        NODE_EXISTS), "addFolderConnection"));
   }
 
   public FileTreeNode(final File file) {
     super(file);
     final String fileName = FileUtil.getFileName(file);
     setName(fileName);
+  }
+
+  public void addFolderConnection() {
+    if (isDirectory()) {
+      final File directory = getUserData();
+      final String fileName = getName();
+
+      final ValueField panel = new ValueField();
+      panel.setTitle("Add Folder Connection");
+      SwingUtil.setTitledBorder(panel, "Folder Connection");
+
+      SwingUtil.addLabel(panel, "Folder");
+      final JLabel fileLabel = new JLabel(directory.getAbsolutePath());
+      panel.add(fileLabel);
+
+      SwingUtil.addLabel(panel, "Name");
+      final TextField nameField = new TextField(20);
+      panel.add(nameField);
+      nameField.setText(fileName);
+
+      SwingUtil.addLabel(panel, "Folder Connections");
+      final List<FolderConnectionRegistry> registries = FolderConnectionManager.get()
+          .getVisibleConnectionRegistries();
+      final JComboBox registryField = new JComboBox(
+        new Vector<FolderConnectionRegistry>(registries));
+
+      panel.add(registryField);
+
+      GroupLayoutUtil.makeColumns(panel, 2, true);
+      panel.showDialog();
+      if (panel.isSaved()) {
+        final FolderConnectionRegistry registry = (FolderConnectionRegistry)registryField.getSelectedItem();
+        String connectionName = nameField.getText();
+        if (!Property.hasValue(connectionName)) {
+          connectionName = fileName;
+        }
+        final String baseConnectionName = connectionName;
+        int i = 0;
+        while (registry.getConnection(connectionName) != null) {
+          connectionName = baseConnectionName + i;
+          i++;
+        }
+        registry.addConnection(connectionName, directory);
+      }
+    }
+  }
+
+  public void addLayer() {
+    final URL url = getUrl();
+    Project.get().openFile(url);
   }
 
   @Override

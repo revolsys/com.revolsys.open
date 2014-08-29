@@ -10,11 +10,11 @@ public class WeakPropertyChangeListener implements PropertyChangeListener {
   private final Reference<PropertyChangeListener> listenerReference;
 
   public WeakPropertyChangeListener(final PropertyChangeListener listener) {
-    this.listenerReference = new WeakReference<PropertyChangeListener>(listener);
+    this.listenerReference = new WeakReference<>(listener);
   }
 
   public PropertyChangeListener getListener() {
-    return listenerReference.get();
+    return this.listenerReference.get();
   }
 
   @Override
@@ -22,6 +22,16 @@ public class WeakPropertyChangeListener implements PropertyChangeListener {
     final PropertyChangeListener listener = getListener();
     if (listener != null) {
       listener.propertyChange(event);
+    }
+  }
+
+  @Override
+  public String toString() {
+    final PropertyChangeListener listener = this.listenerReference.get();
+    if (listener == null) {
+      return null;
+    } else {
+      return listener.toString();
     }
   }
 }

@@ -23,21 +23,13 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 
 public class LayerTreeNode extends AbstractLayerTreeNode implements
-MouseListener {
+  MouseListener {
 
   private static final Icon EDIT_ICON = SilkIconLoader.getIcon("pencil");
 
-  private static final Icon EDIT_DISABLED_ICON = SilkIconLoader.getIcon("pencil_gray");
-
   private static final Icon SELECT_ICON = SilkIconLoader.getIcon("map_select");
 
-  private static final Icon SELECT_DISABLED_ICON = SilkIconLoader.getIcon("map_select_gray");
-
-  private static final Icon VISIBLE_ICON = SilkIconLoader.getIcon("map");
-
   private static final Icon NOT_EXISTS_ICON = SilkIconLoader.getIcon("error");
-
-  private static final Icon VISIBLE_DISABLED_ICON = SilkIconLoader.getIcon("map_gray");
 
   private static final Map<List<Icon>, Icon> ICON_CACHE = new HashMap<List<Icon>, Icon>();
 
@@ -94,40 +86,36 @@ MouseListener {
     final Layer layer = getLayer();
     final List<Icon> icons = new ArrayList<Icon>();
     if (!layer.isExists() && layer.isInitialized()) {
-
       return NOT_EXISTS_ICON;
-    } else if (layer.getRenderer() != null) {
-      if (layer.isVisible()) {
-        icons.add(VISIBLE_ICON);
+    } else {
+      final Icon layerIcon = layer.getIcon();
+      if (layer.getRenderer() == null) {
+        SilkIconLoader.addIcon(icons, layerIcon, true);
       } else {
-        icons.add(VISIBLE_DISABLED_ICON);
-      }
-      if (layer.isSelectSupported()) {
-        if (layer.isSelectable()) {
-          icons.add(SELECT_ICON);
-        } else {
-          icons.add(SELECT_DISABLED_ICON);
+        final boolean visible = layer.isVisible();
+        SilkIconLoader.addIcon(icons, layerIcon, visible);
+        if (layer.isSelectSupported()) {
+
+          final boolean selectable = layer.isSelectable();
+          SilkIconLoader.addIcon(icons, SELECT_ICON, selectable);
         }
       }
-    }
-    if (!layer.isReadOnly()) {
-      if (layer.isEditable()) {
-        icons.add(EDIT_ICON);
+      if (!layer.isReadOnly()) {
+        final boolean editable = layer.isEditable();
+        SilkIconLoader.addIcon(icons, EDIT_ICON, editable);
+      }
+      if (icons.isEmpty()) {
+        return null;
+      } else if (icons.size() == 1) {
+        return icons.get(0);
       } else {
-        icons.add(EDIT_DISABLED_ICON);
+        Icon icon = ICON_CACHE.get(icons);
+        if (icon == null) {
+          icon = SilkIconLoader.merge(icons, 5);
+          ICON_CACHE.put(icons, icon);
+        }
+        return icon;
       }
-    }
-    if (icons.isEmpty()) {
-      return null;
-    } else if (icons.size() == 1) {
-      return icons.get(0);
-    } else {
-      Icon icon = ICON_CACHE.get(icons);
-      if (icon == null) {
-        icon = SilkIconLoader.merge(icons, 5);
-        ICON_CACHE.put(icons, icon);
-      }
-      return icon;
     }
   }
 
@@ -174,12 +162,6 @@ MouseListener {
       }
       e.consume();
     }
-  }
-
-  @Override
-  public boolean removeChild(final TreePath path) {
-    // TODO Auto-generated method stub
-    return super.removeChild(path);
   }
 
 }

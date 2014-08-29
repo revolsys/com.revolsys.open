@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;
@@ -18,21 +19,21 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeUserDataRunnable;
+import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class GridLayer extends AbstractLayer {
-
   public static GridLayer create(final Map<String, Object> properties) {
     return new GridLayer(properties);
   }
 
   static {
     final MenuFactory menu = MenuFactory.getMenu(GridLayer.class);
-    menu.addMenuItem("zoom", TreeUserDataRunnable.createAction(
+    menu.addMenuItem("zoom", MenuSourceRunnable.createAction(
       "Zoom to Mapsheet", "magnifier_zoom_grid", "zoomTosheet"));
+    menu.deleteMenuItem("zoom", "Zoom to Layer");
   }
 
   public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
@@ -46,6 +47,7 @@ public class GridLayer extends AbstractLayer {
     setReadOnly(true);
     setSelectSupported(false);
     setRenderer(new GridLayerRenderer(this));
+    setIcon(SilkIconLoader.getIcon("grid"));
   }
 
   @Override

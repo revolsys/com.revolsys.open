@@ -4,12 +4,10 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
@@ -38,12 +36,12 @@ import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeUserDataRunnable;
+import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public class LayerGroup extends AbstractLayer implements List<Layer>,
-  Parent<Layer> {
+public class LayerGroup extends AbstractLayer implements Parent<Layer>,
+Iterable<Layer> {
 
   public static LayerGroup create(final Map<String, Object> properties) {
     final LayerGroup layerGroup = new LayerGroup();
@@ -86,7 +84,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
   static {
     final MenuFactory menu = MenuFactory.getMenu(LayerGroup.class);
     menu.addGroup(0, "group");
-    menu.addMenuItem("group", TreeUserDataRunnable.createAction("Add Group",
+    menu.addMenuItem("group", MenuSourceRunnable.createAction("Add Group",
       "folder_add", "addLayerGroup"));
     menu.addMenuItem("group", new AddFileLayerAction());
   }
@@ -104,8 +102,15 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     setInitialized(true);
   }
 
-  @Override
-  public void add(final int index, final Layer layer) {
+  protected <V extends Layer> void addDescendants(final List<V> layers,
+    final Class<V> layerClass) {
+    addLayers(layers, layerClass);
+    for (final LayerGroup layerGroup : getLayerGroups()) {
+      layerGroup.addDescendants(layers, layerClass);
+    }
+  }
+
+  public void addLayer(final int index, final Layer layer) {
     synchronized (this.layers) {
       if (layer != null && !this.layers.contains(layer)) {
         final String name = layer.getName();
@@ -124,48 +129,15 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     }
   }
 
-  @Override
-  public boolean add(final Layer layer) {
+  public boolean addLayer(final Layer layer) {
     synchronized (this.layers) {
       if (layer == null || this.layers.contains(layer)) {
         return false;
       } else {
         final int index = this.layers.size();
-        add(index, layer);
+        addLayer(index, layer);
         return true;
       }
-    }
-  }
-
-  @Override
-  public boolean addAll(final Collection<? extends Layer> layers) {
-    boolean added = false;
-    for (final Layer layer : layers) {
-      if (add(layer)) {
-        added = true;
-      }
-    }
-    return added;
-  }
-
-  @Override
-  public boolean addAll(int index, final Collection<? extends Layer> layers) {
-    boolean added = false;
-    for (final Layer layer : layers) {
-      if (!layers.contains(layer)) {
-        add(index, layer);
-        added = true;
-        index++;
-      }
-    }
-    return added;
-  }
-
-  protected <V extends Layer> void addDescendants(final List<V> layers,
-    final Class<V> layerClass) {
-    addLayers(layers, layerClass);
-    for (final LayerGroup layerGroup : getLayerGroups()) {
-      layerGroup.addDescendants(layers, layerClass);
     }
   }
 
@@ -174,7 +146,9 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
       SwingUtil.getActiveWindow(), "Enter the name of the new Layer Group.",
       "Add Layer Group", JOptionPane.PLAIN_MESSAGE);
     if (Property.hasValue(name)) {
-      return addLayerGroup(name);
+      final LayerGroup newGroup = new LayerGroup(name);
+      addLayer(newGroup);
+      return newGroup;
     } else {
       return null;
     }
@@ -185,7 +159,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
       final Layer layer = getLayer(name);
       if (layer == null) {
         final LayerGroup group = new LayerGroup(name);
-        add(index, group);
+        addLayer(index, group);
         return group;
       }
       if (layer instanceof LayerGroup) {
@@ -201,7 +175,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
       final Layer layer = getLayer(name);
       if (layer == null) {
         final LayerGroup group = new LayerGroup(name);
-        add(group);
+        addLayer(group);
         return group;
       }
       if (layer instanceof LayerGroup) {
@@ -252,7 +226,6 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     }
   }
 
-  @Override
   public void clear() {
     for (final Layer layer : new ArrayList<Layer>(this.layers)) {
       layer.delete();
@@ -261,18 +234,8 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
 
   }
 
-  public boolean contains(final Layer layer) {
+  public boolean containsLayer(final Layer layer) {
     return this.layers.contains(layer);
-  }
-
-  @Override
-  public boolean contains(final Object o) {
-    return this.layers.contains(o);
-  }
-
-  @Override
-  public boolean containsAll(final Collection<?> c) {
-    return this.layers.containsAll(c);
   }
 
   @Override
@@ -308,11 +271,6 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
   }
 
   @Override
-  public Layer get(final int index) {
-    return this.layers.get(index);
-  }
-
-  @Override
   public BoundingBox getBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     BoundingBox boudingBox = new BoundingBoxDoubleGf(geometryFactory);
@@ -344,7 +302,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
 
   @Override
   public List<Layer> getChildren() {
-    return this;
+    return getLayers();
   }
 
   public <V extends Layer> List<V> getDescenants(final Class<V> layerClass) {
@@ -417,6 +375,10 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     return getLayerByPath(path);
   }
 
+  public int getLayerCount() {
+    return this.layers.size();
+  }
+
   public List<LayerGroup> getLayerGroups() {
     final List<LayerGroup> layerGroups = new ArrayList<LayerGroup>();
     for (final Layer layer : this.layers) {
@@ -429,7 +391,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
   }
 
   public List<Layer> getLayers() {
-    return new ArrayList<Layer>(this);
+    return new ArrayList<>(this.layers);
   }
 
   public <V extends Layer> List<V> getLayers(final Class<V> layerClass) {
@@ -493,11 +455,6 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     return this.layers.indexOf(layer);
   }
 
-  @Override
-  public int indexOf(final Object o) {
-    return this.layers.indexOf(o);
-  }
-
   public void initialize(final Layer layer) {
     if (getProject() != null) {
       LayerInitializer.initialize(layer);
@@ -510,43 +467,23 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     }
   }
 
-  @Override
   public boolean isEmpty() {
     return this.layers.isEmpty();
   }
 
   @Override
   public boolean isQueryable() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public boolean isQuerySupported() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public Iterator<Layer> iterator() {
     return getLayers().iterator();
-  }
-
-  @Override
-  public int lastIndexOf(final Object o) {
-    return this.layers.lastIndexOf(o);
-  }
-
-  @Override
-  public ListIterator<Layer> listIterator() {
-    // TODO avoid modification
-    return this.layers.listIterator();
-  }
-
-  @Override
-  public ListIterator<Layer> listIterator(final int index) {
-    // TODO avoid modification
-    return this.layers.listIterator(index);
   }
 
   protected void loadLayer(final File file) {
@@ -557,7 +494,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
       final Map<String, Object> properties = JsonMapIoFactory.toMap(file);
       final Layer layer = MapObjectFactoryRegistry.toObject(properties);
       if (layer != null) {
-        add(layer);
+        addLayer(layer);
       }
     } catch (final Throwable t) {
       LoggerFactory.getLogger(getClass()).error(
@@ -581,7 +518,7 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
           final Object object = MapObjectFactoryRegistry.toObject(childResource);
           if (object instanceof Layer) {
             final Layer layer = (Layer)object;
-            add(layer);
+            addLayer(layer);
           } else if (object != null) {
             LoggerFactory.getLogger(LayerGroup.class).error(
               "Unexpected object type " + object.getClass() + " in "
@@ -635,9 +572,9 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     }
     if (layer != null) {
       if (index == -1) {
-        add(layer);
+        addLayer(layer);
       } else {
-        add(index++, layer);
+        addLayer(index++, layer);
       }
     }
     return index;
@@ -653,12 +590,12 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(urlString)) {
       final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
         properties);
-      add(layer);
+      addLayer(layer);
     } else if (RecordIo.hasRecordReaderFactory(urlString)) {
       final FileRecordLayer layer = new FileRecordLayer(properties);
       final GeometryStyleRenderer renderer = layer.getRenderer();
       renderer.setStyle(GeometryStyle.createStyle());
-      add(layer);
+      addLayer(layer);
     }
   }
 
@@ -674,12 +611,11 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     }
   }
 
-  @Override
-  public Layer remove(final int index) {
+  public Layer removeLayer(final int index) {
     synchronized (this.layers) {
       final Layer layer = this.layers.remove(index);
-      Property.removeListener(layer, this);
       fireIndexedPropertyChange("layers", index, layer, null);
+      Property.removeListener(layer, this);
       if (layer.getLayerGroup() == this) {
         layer.setLayerGroup(null);
       }
@@ -687,36 +623,15 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     }
   }
 
-  @Override
-  public boolean remove(final Object o) {
+  public boolean removeLayer(final Object o) {
     synchronized (this.layers) {
       final int index = this.layers.indexOf(o);
       if (index < 0) {
         return false;
       } else {
-        remove(index);
+        removeLayer(index);
         return true;
       }
-    }
-  }
-
-  @Override
-  public boolean removeAll(final Collection<?> c) {
-    synchronized (this.layers) {
-      final boolean removed = false;
-      for (Object layer : c) {
-        if (remove(layer)) {
-          layer = true;
-        }
-      }
-      return removed;
-    }
-  }
-
-  @Override
-  public boolean retainAll(final Collection<?> c) {
-    synchronized (this.layers) {
-      return this.layers.retainAll(c);
     }
   }
 
@@ -748,36 +663,10 @@ public class LayerGroup extends AbstractLayer implements List<Layer>,
     return saved;
   }
 
-  @Override
-  public Layer set(final int index, final Layer element) {
-    // TODO events
-    return this.layers.set(index, element);
-  }
-
-  @Override
-  public int size() {
-    return this.layers.size();
-  }
-
   public void sort() {
     synchronized (this.layers) {
       Collections.sort(this.layers);
     }
-  }
-
-  @Override
-  public List<Layer> subList(final int fromIndex, final int toIndex) {
-    return this.layers.subList(fromIndex, toIndex);
-  }
-
-  @Override
-  public Object[] toArray() {
-    return this.layers.toArray();
-  }
-
-  @Override
-  public <T> T[] toArray(final T[] a) {
-    return this.layers.toArray(a);
   }
 
   @Override

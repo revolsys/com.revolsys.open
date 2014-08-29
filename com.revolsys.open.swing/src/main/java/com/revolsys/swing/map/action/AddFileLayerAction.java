@@ -26,8 +26,10 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.raster.GeoReferencedImageFactory;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.tree.node.layer.LayerGroupTreeNode;
 import com.revolsys.util.CollectionUtil;
 
 public class AddFileLayerAction extends AbstractAction {
@@ -43,7 +45,7 @@ public class AddFileLayerAction extends AbstractAction {
     final Class<? extends IoFactory> factoryClass) {
     final Map<String, FileFilter> filtersByName = new TreeMap<>();
     final Set<IoFactory> factories = IoFactoryRegistry.getInstance()
-        .getFactories(factoryClass);
+      .getFactories(factoryClass);
     for (final IoFactory factory : factories) {
       final List<String> fileExtensions = factory.getFileExtensions();
       String description = factory.getName();
@@ -75,7 +77,7 @@ public class AddFileLayerAction extends AbstractAction {
     }
 
     final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(),
-        "currentDirectory");
+      "currentDirectory");
     fileChooser.setMultiSelectionEnabled(true);
 
     final List<FileFilter> imageFileFilters = new ArrayList<FileFilter>();
@@ -114,7 +116,16 @@ public class AddFileLayerAction extends AbstractAction {
 
     final int status = fileChooser.showDialog(window, "Open Files");
     if (status == JFileChooser.APPROVE_OPTION) {
-      final LayerGroup layerGroup = MenuFactory.getMenuSource();
+      final Object menuSource = MenuFactory.getMenuSource();
+      final LayerGroup layerGroup;
+      if (menuSource instanceof LayerGroupTreeNode) {
+        final LayerGroupTreeNode node = (LayerGroupTreeNode)menuSource;
+        layerGroup = node.getGroup();
+      } else if (menuSource instanceof LayerGroup) {
+        layerGroup = (LayerGroup)menuSource;
+      } else {
+        layerGroup = Project.get();
+      }
       for (final File file : fileChooser.getSelectedFiles()) {
         Invoke.background("Open file: " + FileUtil.getCanonicalPath(file),
           layerGroup, "openFile", file);

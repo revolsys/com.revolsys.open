@@ -215,14 +215,14 @@ public abstract class QueryValue implements Cloneable {
                     typeClass, value);
                   if (convertedValue == null
                       || !typeClass.isAssignableFrom(typeClass)) {
-                    throw new IllegalArgumentException(name + " requires a "
-                        + attribute.getType() + " not the value " + value);
+                    throw new IllegalArgumentException(name + "='" + value
+                      + "' is not a valid " + attribute.getType());
                   } else {
                     rightCondition = new Value(attribute, convertedValue);
                   }
                 } catch (final Throwable t) {
-                  throw new IllegalArgumentException(name + " requires a "
-                      + attribute.getType() + " not the value " + value);
+                  throw new IllegalArgumentException(name + "='" + value
+                    + "' is not a valid " + attribute.getType(), t);
                 }
               } else {
                 Object id;
@@ -234,8 +234,9 @@ public abstract class QueryValue implements Cloneable {
                   id = codeTable.getId(value);
                 }
                 if (id == null) {
-                  throw new IllegalArgumentException(name
-                    + " requires a valid code value that exists not " + value);
+                  throw new IllegalArgumentException(name + "='" + value
+                    + "' could not be found in the code table "
+                    + codeTable.getName());
                 } else {
                   rightCondition = new Value(attribute, id);
                 }

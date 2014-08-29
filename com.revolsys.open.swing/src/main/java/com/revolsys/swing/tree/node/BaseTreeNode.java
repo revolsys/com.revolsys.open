@@ -30,7 +30,7 @@ import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.tree.TreeItemPropertyEnableCheck;
+import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
 import com.revolsys.swing.tree.dnd.TreePathListTransferable;
 import com.revolsys.swing.tree.dnd.TreeTransferHandler;
 import com.revolsys.util.ExceptionUtil;
@@ -38,7 +38,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
-PropertyChangeListener {
+  PropertyChangeListener {
 
   @SuppressWarnings("unchecked")
   public static <V> V getUserData(final TreePath path) {
@@ -52,8 +52,8 @@ PropertyChangeListener {
 
   private boolean visible = true;
 
-  public static final EnableCheck NODE_EXISTS = new TreeItemPropertyEnableCheck(
-      "exists");
+  public static final EnableCheck NODE_EXISTS = new TreeNodePropertyEnableCheck(
+    "exists");
 
   private boolean allowsChildren;
 
@@ -68,6 +68,8 @@ PropertyChangeListener {
   private String type;
 
   private JTree tree;
+
+  private boolean userObjectInitialized = true;
 
   public BaseTreeNode(final boolean allowsChildren) {
     this(null, allowsChildren);
@@ -141,7 +143,7 @@ PropertyChangeListener {
   }
 
   public boolean dndImportData(final TransferSupport support, int index)
-      throws IOException, UnsupportedFlavorException {
+    throws IOException, UnsupportedFlavorException {
     if (!TreeTransferHandler.isDndNoneAction(support)) {
       final Transferable transferable = support.getTransferable();
       if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
@@ -174,17 +176,22 @@ PropertyChangeListener {
 
   @Override
   public boolean equals(final Object object) {
+    final Object userObject = getUserObject();
     if (object == null) {
       return false;
     } else if (object == this) {
       return true;
-    } else if (object == getUserObject()) {
+    } else if (object == userObject) {
       return true;
     } else if (object.getClass().equals(getClass())) {
       final BaseTreeNode node = (BaseTreeNode)object;
-      return EqualsRegistry.equal(getUserObject(), node.getUserObject());
+      final Object otherUserObject1 = node.getUserObject();
+      if (EqualsRegistry.equal(userObject, otherUserObject1)) {
+        return true;
+      } else {
+        return false;
+      }
     } else {
-      final Object userObject = getUserObject();
       if (userObject != null && userObject.equals(object)) {
         return true;
       } else {
@@ -522,10 +529,6 @@ PropertyChangeListener {
     return false;
   }
 
-  public boolean isEnabled() {
-    return true;
-  }
-
   public boolean isExists() {
     final BaseTreeNode parent = getParent();
     if (parent == null) {
@@ -538,6 +541,10 @@ PropertyChangeListener {
   @Override
   public boolean isLeaf() {
     return getChildCount() == 0;
+  }
+
+  public boolean isUserObjectInitialized() {
+    return this.userObjectInitialized;
   }
 
   public boolean isVisible() {
@@ -657,6 +664,10 @@ PropertyChangeListener {
 
   public void setUserObject(final Object userObject) {
     this.userObject = userObject;
+  }
+
+  public void setUserObjectInitialized(final boolean userObjectInitialized) {
+    this.userObjectInitialized = userObjectInitialized;
   }
 
   public void setVisible(final boolean visible) {

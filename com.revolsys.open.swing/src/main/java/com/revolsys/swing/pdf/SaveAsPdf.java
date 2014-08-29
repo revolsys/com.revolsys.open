@@ -9,6 +9,7 @@ import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.slf4j.LoggerFactory;
 
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.swing.map.MapPanel;
@@ -20,11 +21,14 @@ import com.revolsys.swing.map.layer.Project;
 public class SaveAsPdf {
 
   public static void save() {
+    final Project project = Project.get();
+    final String directory = "/Users/paustin/Downloads/";
+    final File file = new File(directory, project.getName() + ".pdf");
     try {
       final PDDocument document = new PDDocument();
 
-      final Project project = Project.get();
-      final Viewport2D viewport = MapPanel.get(project).getViewport();
+      final MapPanel mapPanel = MapPanel.get(project);
+      final Viewport2D viewport = mapPanel.getViewport();
       BoundingBox boundingBox = viewport.getBoundingBox();
       final int width = viewport.getViewWidthPixels();
       final int height = viewport.getViewHeightPixels();
@@ -37,8 +41,8 @@ public class SaveAsPdf {
       final PDRectangle pageSize = new PDRectangle(width, height);
       final PDPage page = new PDPage(pageSize);
       try (
-          PdfViewport pdfViewport = new PdfViewport(document, page, project,
-            width, height, boundingBox)) {
+        PdfViewport pdfViewport = new PdfViewport(document, page, project,
+          width, height, boundingBox)) {
         final LayerRenderer<? extends Layer> renderer = project.getRenderer();
         renderer.render(pdfViewport);
       }
@@ -55,10 +59,10 @@ public class SaveAsPdf {
       xmpSchema.setAbout("");
       metadata.importXMPMetadata(xmp);
 
-      document.save(new File("/Users/paustin/Downloads/map.pdf"));
+      document.save(file);
     } catch (final Throwable e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LoggerFactory.getLogger(SaveAsPdf.class).error(
+        "Unable to create PDF " + file, e);
     }
   }
 }

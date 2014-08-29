@@ -1,9 +1,12 @@
 package com.revolsys.swing.tree.node.layer;
 
+import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler.TransferSupport;
+import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
 import com.revolsys.famfamfam.silk.SilkIconLoader;
@@ -21,7 +27,10 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 
-public class LayerGroupTreeNode extends AbstractLayerTreeNode {
+public class LayerGroupTreeNode extends AbstractLayerTreeNode implements
+MouseListener {
+  public static final Icon DISABLED_ICON = SilkIconLoader.getDisabledIcon("folder");
+
   public static final Icon ICON = SilkIconLoader.getIcon("folder");
 
   public LayerGroupTreeNode(final LayerGroup layerGroup) {
@@ -34,7 +43,7 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode {
     if (object instanceof Layer) {
       final Layer layer = (Layer)object;
       final LayerGroup group = getGroup();
-      group.add(index, layer);
+      group.addLayer(index, layer);
       return index;
     } else {
       return -1;
@@ -46,7 +55,7 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode {
     if (object instanceof Layer) {
       final Layer layer = (Layer)object;
       final LayerGroup group = getGroup();
-      group.add(layer);
+      group.addLayer(layer);
       return getChildCount();
     } else {
       return -1;
@@ -107,7 +116,11 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode {
 
   @Override
   public Icon getIcon() {
-    return ICON;
+    if (getLayer().isVisible()) {
+      return ICON;
+    } else {
+      return DISABLED_ICON;
+    }
   }
 
   @Override
@@ -123,11 +136,36 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode {
   }
 
   @Override
+  public void mouseClicked(final MouseEvent e) {
+    final Object source = e.getSource();
+    final JTree tree = getTree();
+    if (source == tree) {
+      final int clickCount = e.getClickCount();
+      if (clickCount == 2 && SwingUtilities.isLeftMouseButton(e)) {
+        final int x = e.getX();
+        final int y = e.getY();
+        final TreePath path = tree.getPathForLocation(x, y);
+        final Layer layer = getLayer();
+        final TreeUI ui = tree.getUI();
+        final Rectangle bounds = ui.getPathBounds(tree, path);
+        final int cX = x - bounds.x;
+        final int index = cX / 21;
+        int offset = 0;
+        if (index == offset) {
+          layer.setVisible(!layer.isVisible());
+        }
+        offset++;
+      }
+      e.consume();
+    }
+  }
+
+  @Override
   public boolean removeChild(final Object child) {
     if (child instanceof Layer) {
       final Layer layer = (Layer)child;
       final LayerGroup group = getGroup();
-      return group.remove(layer);
+      return group.removeLayer(layer);
     } else {
       return false;
     }

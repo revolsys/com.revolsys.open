@@ -14,7 +14,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
 
 public class LayerGroupListModel extends AbstractListModel implements
-  ComboBoxModel, Reorderable, PropertyChangeListener {
+ComboBoxModel, Reorderable, PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private final LayerGroup group;
@@ -41,7 +41,7 @@ public class LayerGroupListModel extends AbstractListModel implements
       }
       index--;
     }
-    return this.group.get(index);
+    return this.group.getLayer(index);
   }
 
   @Override
@@ -51,7 +51,7 @@ public class LayerGroupListModel extends AbstractListModel implements
 
   @Override
   public int getSize() {
-    int size = this.group.size();
+    int size = this.group.getLayerCount();
     if (this.allowNull) {
       size++;
     }
@@ -89,8 +89,8 @@ public class LayerGroupListModel extends AbstractListModel implements
       toIndex--;
     }
     final Layer layer = getElementAt(fromIndex);
-    this.group.remove(fromIndex);
-    this.group.add(toIndex, layer);
+    this.group.removeLayer(fromIndex);
+    this.group.addLayer(toIndex, layer);
   }
 
   @Override

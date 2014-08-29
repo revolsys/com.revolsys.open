@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.tree.BaseTreeNodeLoadingIcon;
 
 public class ListTreeNode extends BaseTreeNode {
   private final List<BaseTreeNode> children = new ArrayList<>();
@@ -68,7 +69,8 @@ public class ListTreeNode extends BaseTreeNode {
 
   public void refresh() {
     if (SwingUtilities.isEventDispatchThread()) {
-      setChildren(doLoadChildren());
+      final List<BaseTreeNode> newChildren = doLoadChildren();
+      setChildren(newChildren);
     } else {
       Invoke.andWait(this, "refresh");
     }
@@ -97,6 +99,7 @@ public class ListTreeNode extends BaseTreeNode {
           oldChildren.remove(i);
           nodeRemoved(i, oldChild);
           oldChild.setParent(null);
+          BaseTreeNodeLoadingIcon.removeNode(oldChild);
         }
       }
       int i = 0;

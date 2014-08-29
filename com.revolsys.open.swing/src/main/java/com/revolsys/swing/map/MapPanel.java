@@ -225,9 +225,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   public void addBaseMap(final Layer layer) {
     if (layer != null) {
-      this.baseMapLayers.add(layer);
+      this.baseMapLayers.addLayer(layer);
     }
-    if (this.baseMapLayers.size() == 1) {
+    if (this.baseMapLayers.getLayerCount() == 1) {
       if (layer.isVisible()) {
         setBaseMapLayer(layer);
       }
@@ -255,7 +255,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.baseMapLayerField.setMaximumSize(new Dimension(200, 22));
     this.baseMapLayerField.addItemListener(new InvokeMethodSelectedItemListener(
       this, "setBaseMapLayer"));
-    if (this.baseMapLayers.size() > 0) {
+    if (this.baseMapLayers.getLayerCount() > 0) {
       this.baseMapLayerField.setSelectedIndex(1);
     }
     this.baseMapLayerField.setToolTipText("Base Map");
@@ -345,9 +345,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addUndoButtons() {
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canUndo");
+        "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canRedo");
+        "canRedo");
 
     this.toolBar.addButton("undo", "Undo", "arrow_undo", canUndo,
       this.undoManager, "undo");
@@ -718,7 +718,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {
         if (this.baseMapOverlay != null
-          && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
+            && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
           final Layer layer = (Layer)event.getNewValue();
           if (layer != null && layer.isVisible()) {
             this.baseMapOverlay.setLayer(layer);
@@ -737,7 +737,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public synchronized void setBaseMapLayer(final Layer layer) {
-    if (layer == NullLayer.INSTANCE || this.baseMapLayers.contains(layer)) {
+    if (layer == NullLayer.INSTANCE || this.baseMapLayers.containsLayer(layer)) {
       final Layer oldValue = getBaseMapLayer();
       this.baseMapOverlay.setLayer(layer);
       firePropertyChange("baseMapLayer", oldValue, layer);
@@ -944,11 +944,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final PopupMenu menu = new PopupMenu();
     final MenuFactory factory = menu.getMenu();
     factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
-      "addZoomBookmark");
+        "addZoomBookmark");
 
     final Project project = getProject();
     for (final Entry<String, BoundingBox> entry : project.getZoomBookmarks()
-      .entrySet()) {
+        .entrySet()) {
       final String name = entry.getKey();
       final BoundingBox boundingBox = entry.getValue();
       factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier",

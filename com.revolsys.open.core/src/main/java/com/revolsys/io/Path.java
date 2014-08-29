@@ -32,12 +32,12 @@ public final class Path {
               builder.append('/');
               slash = true;
             }
-          break;
+            break;
 
           default:
             builder.append(c);
             slash = false;
-          break;
+            break;
         }
 
       }
@@ -134,7 +134,7 @@ public final class Path {
           break;
         }
       }
-      while (startIndex > 1) {
+      while (startIndex > 0) {
         final char c = path.charAt(startIndex - 1);
         if (c == '/' || c == '\\') {
           break;
@@ -206,7 +206,7 @@ public final class Path {
       childPath = cleanUpper(childPath);
       if (childPath.length() > parentPath.length()) {
         if (parentPath.length() == 1
-          || childPath.charAt(parentPath.length()) == '/') {
+            || childPath.charAt(parentPath.length()) == '/') {
           if (childPath.startsWith(parentPath)) {
             return true;
           }
@@ -222,7 +222,7 @@ public final class Path {
       childPath = cleanUpper(childPath);
       if (childPath.length() > parentPath.length()) {
         if (parentPath.length() == 1
-          || childPath.charAt(parentPath.length()) == '/') {
+            || childPath.charAt(parentPath.length()) == '/') {
           if (childPath.startsWith(parentPath)) {
             if (childPath.indexOf('/', parentPath.length() + 1) == -1) {
               return true;

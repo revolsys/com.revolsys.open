@@ -55,7 +55,6 @@ import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.gis.util.Debug;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
@@ -434,7 +433,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return multiPolygon(geometries);
     } else {
       throw new IllegalArgumentException("Unknown geometry type "
-          + collectionDataType);
+        + collectionDataType);
     }
   }
 
@@ -1001,9 +1000,6 @@ public class GeometryFactory implements Serializable, MapSerializer {
 
   protected void init(final int axisCount, final double... scales) {
     this.axisCount = Math.max(axisCount, 2);
-    if (axisCount > 3) {
-      Debug.noOp();
-    }
     this.scales = getScales(axisCount, scales);
   }
 
@@ -1185,7 +1181,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return multiPoint();
     } else if (coordinates.length % axisCount != 0) {
       throw new IllegalArgumentException("Coordinates length="
-          + coordinates.length + " must be a multiple of " + axisCount);
+        + coordinates.length + " must be a multiple of " + axisCount);
     } else {
       final Point[] points = new Point[coordinates.length / axisCount];
       for (int i = 0; i < points.length; i++) {
@@ -1315,7 +1311,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
         return point(coordinates);
       } else {
         throw new IllegalArgumentException("Point can only have 1 vertex not "
-            + size);
+          + size);
       }
     }
   }
@@ -1349,7 +1345,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return point((LineString)object);
     } else {
       throw new IllegalArgumentException("Cannot create a point from "
-          + object.getClass());
+        + object.getClass());
     }
   }
 

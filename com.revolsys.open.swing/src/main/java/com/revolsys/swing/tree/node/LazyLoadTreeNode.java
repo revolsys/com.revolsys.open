@@ -9,18 +9,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.tree.BaseTreeNodeLoadingIcon;
 import com.revolsys.util.ExceptionUtil;
 
 public abstract class LazyLoadTreeNode extends BaseTreeNode {
 
   private final AtomicInteger updateIndicies = new AtomicInteger();
 
-  private static final BaseTreeNode LOADING_NODE = new BaseTreeNode(
-    "Loading...");
-
-  private static final List<BaseTreeNode> LOADING_NODES = Collections.singletonList(LOADING_NODE);
-
-  private List<BaseTreeNode> children = LOADING_NODES;
+  private List<BaseTreeNode> children = Collections.emptyList();
 
   private final Object sync = new Object();
 
@@ -39,18 +35,25 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
 
   public LazyLoadTreeNode(final Object userObject) {
     super(userObject, true);
+    setLoading();
   }
 
   protected void addNode(final int index, final BaseTreeNode node) {
     final List<BaseTreeNode> children = this.children;
-    if (children != LOADING_NODES) {
+    if (isLoaded()) {
       children.add(index, node);
     }
   }
 
+  private List<BaseTreeNode> createLoadingNodes() {
+    final List<BaseTreeNode> nodes = new ArrayList<>();
+    nodes.add(new LoadingTreeNode(this));
+    return nodes;
+  }
+
   @Override
   protected void doClose() {
-    this.children = LOADING_NODES;
+    setLoading();
     super.doClose();
   }
 
@@ -69,15 +72,23 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
     }
   }
 
+  public boolean isLoaded() {
+    if (this.children.size() == 1) {
+      return !(this.children.get(0) instanceof LoadingTreeNode);
+    } else {
+      return true;
+    }
+  }
+
   public void loadChildren() {
     if (SwingUtilities.isEventDispatchThread()) {
-      if (this.children == LOADING_NODES) {
+      if (!isLoaded()) {
         Invoke.background("Load tree node " + this.getName(), this,
           "loadChildren");
       }
     } else {
       synchronized (this.sync) {
-        if (this.children == LOADING_NODES) {
+        if (!isLoaded()) {
           final int updateIndex = getUpdateIndex();
           List<BaseTreeNode> children = doLoadChildren();
           if (children == null) {
@@ -94,7 +105,7 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
     super.nodeCollapsed(treeNode);
     if (treeNode != this) {
       final int updateIndex = getUpdateIndex();
-      setChildren(updateIndex, LOADING_NODES);
+      setChildren(updateIndex, createLoadingNodes());
     }
   }
 
@@ -115,7 +126,7 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
 
   public final void removeNode(final BaseTreeNode node) {
     final List<BaseTreeNode> children = this.children;
-    if (children != LOADING_NODES) {
+    if (isLoaded()) {
       final int index = children.indexOf(node);
       removeNode(index);
     }
@@ -123,7 +134,7 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
 
   public final void removeNode(final int index) {
     final List<BaseTreeNode> children = this.children;
-    if (children != LOADING_NODES) {
+    if (isLoaded()) {
       if (index > 0 && index < children.size()) {
         final BaseTreeNode node = children.remove(index);
         nodeRemoved(index, node);
@@ -134,49 +145,39 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
   protected void setChildren(final int updateIndex,
     final List<BaseTreeNode> newNodes) {
     synchronized (this.updateIndicies) {
-      if (this.children == LOADING_NODES) {
-        nodeChanged();
-        this.children = Collections.emptyList();
-        nodeRemoved(0, LOADING_NODE);
-        this.children = newNodes;
-        final int[] newIndicies = new int[this.children.size()];
-        for (int i = 0; i < newIndicies.length; i++) {
-          newIndicies[i] = i;
-        }
-        for (final BaseTreeNode child : this.children) {
-          child.setParent(this);
-        }
-        nodesInserted(newIndicies);
-      } else {
-        if (updateIndex == this.updateIndicies.get()) {
-          final List<BaseTreeNode> oldNodes = this.children;
-          for (int i = 0; i < oldNodes.size();) {
-            final BaseTreeNode oldNode = oldNodes.get(i);
-            if (newNodes.contains(oldNode)) {
-              i++;
-            } else {
-              oldNodes.remove(i);
-              nodeRemoved(i, oldNode);
-              oldNode.setParent(null);
-            }
-          }
-          for (int i = 0; i < newNodes.size();) {
-            final BaseTreeNode oldNode;
-            if (i < oldNodes.size()) {
-              oldNode = oldNodes.get(i);
-            } else {
-              oldNode = null;
-            }
-            final BaseTreeNode newNode = newNodes.get(i);
-            if (!newNode.equals(oldNode)) {
-              newNode.setParent(this);
-              oldNodes.add(i, newNode);
-              nodesInserted(i);
-            }
+      if (updateIndex == this.updateIndicies.get()) {
+        final List<BaseTreeNode> oldNodes = this.children;
+        for (int i = 0; i < oldNodes.size();) {
+          final BaseTreeNode oldNode = oldNodes.get(i);
+          if (newNodes.contains(oldNode)) {
             i++;
+          } else {
+            oldNodes.remove(i);
+            nodeRemoved(i, oldNode);
+            oldNode.setParent(null);
+            BaseTreeNodeLoadingIcon.removeNode(oldNode);
           }
+        }
+        for (int i = 0; i < newNodes.size();) {
+          final BaseTreeNode oldNode;
+          if (i < oldNodes.size()) {
+            oldNode = oldNodes.get(i);
+          } else {
+            oldNode = null;
+          }
+          final BaseTreeNode newNode = newNodes.get(i);
+          if (!newNode.equals(oldNode)) {
+            newNode.setParent(this);
+            oldNodes.add(i, newNode);
+            nodesInserted(i);
+          }
+          i++;
         }
       }
     }
+  }
+
+  private void setLoading() {
+    this.children = createLoadingNodes();
   }
 }

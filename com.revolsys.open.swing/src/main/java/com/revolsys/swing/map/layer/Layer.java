@@ -5,6 +5,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
+import javax.swing.Icon;
+
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.Child;
 import com.revolsys.io.ObjectWithProperties;
@@ -14,8 +16,8 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.component.TabbedValuePanel;
 
 public interface Layer extends PropertyChangeSupportProxy,
-  ObjectWithProperties, PropertyChangeListener, Comparable<Layer>,
-  MapSerializer, Child<LayerGroup>, Cloneable {
+ObjectWithProperties, PropertyChangeListener, Comparable<Layer>,
+MapSerializer, Child<LayerGroup>, Cloneable {
 
   TabbedValuePanel createPropertiesPanel();
 
@@ -28,6 +30,8 @@ public interface Layer extends PropertyChangeSupportProxy,
   Collection<Class<?>> getChildClasses();
 
   GeometryFactory getGeometryFactory();
+
+  Icon getIcon();
 
   long getId();
 

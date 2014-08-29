@@ -1,4 +1,4 @@
-package com.revolsys.gis.desktop.print;
+package com.revolsys.swing.map.print;
 
 import java.awt.event.ActionEvent;
 import java.awt.print.PageFormat;

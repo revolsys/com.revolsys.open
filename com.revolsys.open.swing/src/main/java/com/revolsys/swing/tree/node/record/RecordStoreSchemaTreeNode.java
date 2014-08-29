@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 
 import com.revolsys.data.io.RecordStoreConnectionMapProxy;
@@ -12,9 +13,8 @@ import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.Path;
-import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.TreeItemRunnable;
+import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
@@ -27,8 +27,8 @@ RecordStoreConnectionMapProxy {
   private static final MenuFactory MENU = new MenuFactory();
 
   static {
-    final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
-      "arrow_refresh", NODE_EXISTS, "refresh");
+    final Action refresh = TreeNodeRunnable.createAction("Refresh",
+      "arrow_refresh", "refresh");
     MENU.addMenuItem("default", refresh);
   }
 

@@ -21,8 +21,8 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcDatabaseFactory;
+import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
 
@@ -73,17 +73,6 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   }
 
   @Override
-  public JdbcRecordStore createRecordStore(final DataSource dataSource) {
-    return new OracleRecordStore(dataSource);
-  }
-
-  @Override
-  public JdbcRecordStore createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
-    return new OracleRecordStore(this, connectionProperties);
-  }
-
-  @Override
   public DataSource createDataSource(final Map<String, ? extends Object> config) {
     try {
       final Map<String, Object> newConfig = new HashMap<String, Object>(config);
@@ -125,19 +114,19 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
       return dataSource;
     } catch (final Throwable e) {
       throw new IllegalArgumentException("Unable to create data source for "
-        + config, e);
+          + config, e);
     }
   }
 
   @Override
-  public Class<? extends RecordStore> getRecordStoreInterfaceClass(
-    final Map<String, ? extends Object> connectionProperties) {
-    return JdbcRecordStore.class;
+  public JdbcRecordStore createRecordStore(final DataSource dataSource) {
+    return new OracleRecordStore(dataSource);
   }
 
   @Override
-  public List<String> getFileExtensions() {
-    return Collections.emptyList();
+  public JdbcRecordStore createRecordStore(
+    final Map<String, ? extends Object> connectionProperties) {
+    return new OracleRecordStore(this, connectionProperties);
   }
 
   @Override
@@ -148,6 +137,17 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   @Override
   public List<String> getProductNames() {
     return Collections.singletonList("Oracle");
+  }
+
+  @Override
+  public List<String> getRecordStoreFileExtensions() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public Class<? extends RecordStore> getRecordStoreInterfaceClass(
+    final Map<String, ? extends Object> connectionProperties) {
+    return JdbcRecordStore.class;
   }
 
   @Override

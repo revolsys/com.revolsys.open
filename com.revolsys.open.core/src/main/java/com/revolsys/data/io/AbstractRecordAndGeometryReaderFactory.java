@@ -2,6 +2,7 @@ package com.revolsys.data.io;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +20,8 @@ import com.revolsys.io.directory.DirectoryRecordStore;
 import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractRecordAndGeometryReaderFactory extends
-AbstractGeometryReaderFactory implements RecordReaderFactory,
-MapReaderFactory, RecordStoreFactory {
+  AbstractGeometryReaderFactory implements RecordReaderFactory,
+  MapReaderFactory, RecordStoreFactory {
 
   private final ArrayRecordFactory recordFactory = new ArrayRecordFactory();
 
@@ -123,6 +124,11 @@ MapReaderFactory, RecordStoreFactory {
     final File directory = SpringUtil.getFile(resource);
     final List<String> fileExtensions = getFileExtensions();
     return new DirectoryRecordStore(directory, fileExtensions);
+  }
+
+  @Override
+  public List<String> getRecordStoreFileExtensions() {
+    return Collections.emptyList();
   }
 
   @Override

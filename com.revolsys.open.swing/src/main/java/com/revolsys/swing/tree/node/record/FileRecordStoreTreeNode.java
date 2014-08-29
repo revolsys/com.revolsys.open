@@ -23,17 +23,37 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.TreeItemRunnable;
+import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.file.FileTreeNode;
 import com.revolsys.util.Property;
 
 public class FileRecordStoreTreeNode extends FileTreeNode implements
 RecordStoreProxy, RecordStoreConnectionMapProxy {
-  public static void addRecordStoreConnection() {
-    final FileRecordStoreTreeNode node = MenuFactory.getMenuSource();
-    final File file = node.getUserData();
+  private static final MenuFactory MENU = new MenuFactory();
+
+  static {
+    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",
+      "arrow_refresh", NODE_EXISTS, "refresh");
+    MENU.addMenuItem("default", refresh);
+
+    MENU.addMenuItem("default", TreeNodeRunnable.createAction(
+      "Add Record Store Connection", "link_add", NODE_EXISTS,
+        "addRecordStoreConnection"));
+  }
+
+  public FileRecordStoreTreeNode(final File file) {
+    super(file);
+    setType("Data Store");
+    setName(FileUtil.getFileName(file));
+    setIcon(FileTreeNode.ICON_FILE_DATABASE);
+  }
+
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public void addRecordStoreConnection() {
+    final File file = getUserData();
     final String fileName = FileUtil.getBaseName(file);
 
     final ValueField panel = new ValueField();
@@ -71,31 +91,12 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
         connectionName = baseConnectionName + i;
         i++;
       }
-      final Map<String, Object> connection = node.getRecordStoreConnectionMap();
+      final Map<String, Object> connection = getRecordStoreConnectionMap();
       final Map<String, Object> config = new HashMap<String, Object>();
       config.put("name", connectionName);
       config.put("connection", connection);
       registry.createConnection(config);
     }
-  }
-
-  private static final MenuFactory MENU = new MenuFactory();
-
-  static {
-    final InvokeMethodAction refresh = TreeItemRunnable.createAction("Refresh",
-      "arrow_refresh", NODE_EXISTS, "refresh");
-    MENU.addMenuItem("default", refresh);
-
-    MENU.addMenuItemTitleIcon("default", "Add Data Store Connection",
-      "link_add", NODE_EXISTS, FileRecordStoreTreeNode.class,
-        "addRecordStoreConnection");
-  }
-
-  public FileRecordStoreTreeNode(final File file) {
-    super(file);
-    setType("Data Store");
-    setName(FileUtil.getFileName(file));
-    setIcon(FileTreeNode.ICON_FILE_DATABASE);
   }
 
   @Override

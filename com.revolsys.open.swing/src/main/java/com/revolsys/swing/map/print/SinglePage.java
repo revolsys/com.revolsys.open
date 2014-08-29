@@ -1,4 +1,4 @@
-package com.revolsys.gis.desktop.print;
+package com.revolsys.swing.map.print;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -14,6 +14,8 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.parallel.Invoke;
 
 public class SinglePage extends Viewport2D implements Pageable, Printable {
@@ -101,6 +103,12 @@ public class SinglePage extends Viewport2D implements Pageable, Printable {
   @Override
   public int getScreenResolution() {
     return 72;
+  }
+
+  @Override
+  public boolean isHidden(final AbstractRecordLayer layer,
+    final LayerRecord record) {
+    return false;
   }
 
   @Override

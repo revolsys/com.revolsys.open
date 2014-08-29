@@ -9,6 +9,18 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 public class WebColors {
+  public static int colorToRGB(final int alpha, final int red, final int green,
+    final int blue) {
+    int rgba = alpha;
+    rgba <<= 8;
+    rgba += red;
+    rgba <<= 8;
+    rgba += green;
+    rgba <<= 8;
+    rgba += blue;
+    return rgba;
+  }
+
   public static String getName(final Color color) {
     final Color newColor = new Color(color.getRed(), color.getGreen(),
       color.getBlue());
