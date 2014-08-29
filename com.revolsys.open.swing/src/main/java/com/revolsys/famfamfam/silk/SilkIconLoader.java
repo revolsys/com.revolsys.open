@@ -170,6 +170,11 @@ public class SilkIconLoader {
       in = Thread.currentThread()
           .getContextClassLoader()
           .getResourceAsStream("images/" + imageName + "." + fileExtension);
+      if (in == null) {
+        in = Thread.currentThread()
+            .getContextClassLoader()
+            .getResourceAsStream("icons/" + imageName + "." + fileExtension);
+      }
     }
     image = getImage(in);
     return image;
