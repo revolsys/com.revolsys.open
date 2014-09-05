@@ -7,10 +7,16 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.LayoutManager;
 import java.awt.MenuContainer;
 import java.awt.MenuItem;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.SplashScreen;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -38,8 +44,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -94,7 +102,7 @@ public class SwingUtil {
     if (component instanceof JComboBox) {
       final JComboBox comboBox = (JComboBox)component;
       final JComponent editorComponent = (JComponent)comboBox.getEditor()
-        .getEditorComponent();
+          .getEditorComponent();
       addAction(editorComponent, keyStroke, actionKey, object, methodName,
         parameters);
     }
@@ -147,6 +155,15 @@ public class SwingUtil {
     container.add(field);
   }
 
+  public static Rectangle applyInsets(final Rectangle bounds,
+    final Insets insets) {
+    final int x = bounds.x + insets.left;
+    final int y = bounds.y + insets.top;
+    final int width = bounds.width - insets.left - insets.right;
+    final int height = bounds.height - insets.top - insets.bottom;
+    return new Rectangle(x, y, width, height);
+  }
+
   public static void autoAdjustPosition(final Window window) {
     final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -177,7 +194,7 @@ public class SwingUtil {
       }
       int longestLength = -1;
       for (final Entry<Identifier, List<Object>> codes : codeTable.getCodes()
-        .entrySet()) {
+          .entrySet()) {
         final List<Object> values = codes.getValue();
         if (values != null && !values.isEmpty()) {
           final String text = CollectionUtil.toString(values);
@@ -218,14 +235,14 @@ public class SwingUtil {
       return new DataFlavor(mimeType);
     } catch (final ClassNotFoundException e) {
       throw new IllegalArgumentException("Cannot create data flavor for "
-        + mimeType, e);
+          + mimeType, e);
     }
   }
 
   public static DateField createDateField(final String fieldName) {
     final DateField dateField = new DateField(fieldName);
     dateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd",
-      "yyyy/MMM/dd");
+        "yyyy/MMM/dd");
     PopupMenu.getPopupMenuFactory(dateField.getEditor());
     return dateField;
   }
@@ -450,6 +467,53 @@ public class SwingUtil {
 
   }
 
+  public static Rectangle getScreenBounds(Component component) {
+    if (component == null) {
+      component = SwingUtil.getActiveWindow();
+    }
+    final Point mousePosition;
+    if (component == null) {
+      mousePosition = null;
+    } else {
+      mousePosition = component.getMousePosition();
+      if (mousePosition != null) {
+        SwingUtilities.convertPointToScreen(mousePosition, component);
+      }
+    }
+    return getScreenBounds(mousePosition);
+  }
+
+  /**
+   * Get the screen rectangle in which the mouse is in. If the mouse is outside all bounds return the current screen.
+   *
+   * @param point
+   * @return
+   */
+  public static Rectangle getScreenBounds(final Point point) {
+    Rectangle firstBounds = null;
+    final GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    for (final GraphicsDevice device : graphicsEnvironment.getScreenDevices()) {
+      for (final GraphicsConfiguration config : device.getConfigurations()) {
+        final Rectangle bounds = config.getBounds();
+
+        if (point != null && bounds.contains(point)) {
+          final Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(
+            config);
+          return applyInsets(bounds, insets);
+        } else if (firstBounds == null) {
+          firstBounds = bounds;
+        }
+      }
+    }
+    final GraphicsDevice defaultScreenDevice = graphicsEnvironment.getDefaultScreenDevice();
+    for (final GraphicsConfiguration config : defaultScreenDevice.getConfigurations()) {
+      final Rectangle bounds = config.getBounds();
+      final Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(config);
+      return applyInsets(bounds, insets);
+    }
+    return firstBounds;
+  }
+
   public static int getTabIndex(final JTabbedPane tabs, final String title) {
     for (int i = 0; i < tabs.getTabCount(); i++) {
       if (tabs.getTitleAt(i).equals(title)) {
@@ -542,7 +606,7 @@ public class SwingUtil {
   public static boolean isControlOrMetaDown(final InputEvent event) {
     final int modifiersEx = event.getModifiersEx();
     final int flag = modifiersEx
-      & (InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
+        & (InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
     return flag != 0;
   }
 
@@ -575,7 +639,7 @@ public class SwingUtil {
   public static boolean isLeftButtonAndNoModifiers(final MouseEvent event) {
     final int modifiers = event.getModifiers();
     return SwingUtilities.isLeftMouseButton(event)
-      && InputEvent.BUTTON1_MASK == modifiers;
+        && InputEvent.BUTTON1_MASK == modifiers;
   }
 
   public static boolean isLeftButtonOnly(final MouseEvent event) {
@@ -607,8 +671,8 @@ public class SwingUtil {
   public static boolean isModifierKeyDown(final InputEvent event) {
     final int modifiersEx = event.getModifiersEx();
     final int flag = modifiersEx
-      & (InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK
-        | InputEvent.ALT_GRAPH_DOWN_MASK | InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
+        & (InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK
+            | InputEvent.ALT_GRAPH_DOWN_MASK | InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
     return flag != 0;
   }
 
@@ -624,7 +688,7 @@ public class SwingUtil {
         "/usr/bin/defaults",
         "read",
         System.getProperty("user.home")
-          + "/Library/Preferences/.GlobalPreferences.plist",
+        + "/Library/Preferences/.GlobalPreferences.plist",
         "com.apple.swipescrolldirection"
       };
       Process process = null;
@@ -749,6 +813,18 @@ public class SwingUtil {
     }
   }
 
+  public static void setLocationCentre(final Rectangle bounds,
+    final Window window) {
+    final int x = (bounds.width - window.getWidth()) / 2;
+    final int y = (bounds.height - window.getHeight()) / 2;
+    window.setLocation(x, y);
+  }
+
+  public static void setLocationCentre(final Window window) {
+    final Rectangle bounds = getScreenBounds((Component)null);
+    setLocationCentre(bounds, window);
+  }
+
   public static void setMaximumWidth(final JComponent component, final int width) {
     final Dimension preferredSize = component.getPreferredSize();
     final Dimension size = new Dimension(width, preferredSize.height);
@@ -769,17 +845,14 @@ public class SwingUtil {
 
   public static void setSizeAndMaximize(final JFrame frame, final int minusX,
     final int minusY) {
-    final Toolkit toolkit = Toolkit.getDefaultToolkit();
-    final Dimension screenSize = toolkit.getScreenSize();
-    final double screenWidth = screenSize.getWidth();
-    final double screenHeight = screenSize.getHeight();
-    final Dimension size = new Dimension((int)(screenWidth - minusX),
-      (int)(screenHeight - minusY));
-    frame.setLocationByPlatform(true);
+    final Rectangle bounds = getScreenBounds((Point)null);
+    final Dimension size = new Dimension(bounds.width - minusX, bounds.height
+      - minusY);
     frame.setPreferredSize(size);
+    frame.pack();
     frame.setExtendedState(Frame.MAXIMIZED_BOTH);
     frame.setState(Frame.MAXIMIZED_BOTH);
-    frame.pack();
+    setLocationCentre(bounds, frame);
   }
 
   public static void setSplashTitle(final String title) {
@@ -814,6 +887,24 @@ public class SwingUtil {
         Invoke.later(component, "setVisible", visible);
       }
     }
+  }
+
+  public static void showErrorDialog(final Window window, final String title,
+    final String message, final Throwable e) {
+    final String exceptionMessage = e.getMessage().replaceAll("\n", "<br />");
+    final String errorMessage = "<html><body><p style=\"margin-bottom: 10px\"><strong>"
+        + message + "</strong></p><pre>" + exceptionMessage + "</pre></body></p>";
+
+    final JScrollPane scrollPane = new JScrollPane(new JLabel(errorMessage));
+    final Dimension preferredSize = scrollPane.getPreferredSize();
+    final Rectangle bounds = SwingUtil.getScreenBounds(window);
+    final int width = Math.min(bounds.width - 200, preferredSize.width + 20);
+    final int height = Math.min(bounds.height - 100, preferredSize.height + 20);
+
+    scrollPane.setPreferredSize(new Dimension(width, height));
+
+    JOptionPane.showMessageDialog(window, scrollPane, title,
+      JOptionPane.ERROR_MESSAGE);
   }
 
   public static final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);
