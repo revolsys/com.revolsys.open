@@ -23,8 +23,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -56,8 +58,8 @@ public final class UrlUtil {
               final String[] values = (String[])value;
               for (int i = 0; i < values.length; i++) {
                 query.append(name)
-                .append('=')
-                .append(URLEncoder.encode(values[i], "US-ASCII"));
+                  .append('=')
+                  .append(URLEncoder.encode(values[i], "US-ASCII"));
                 if (i < values.length - 1) {
                   query.append('&');
                 }
@@ -73,16 +75,16 @@ public final class UrlUtil {
                     query.append('&');
                   }
                   query.append(name)
-                  .append('=')
-                  .append(
-                    URLEncoder.encode(childValue.toString(), "US-ASCII"));
+                    .append('=')
+                    .append(
+                      URLEncoder.encode(childValue.toString(), "US-ASCII"));
                 }
               }
 
             } else {
               query.append(name)
-              .append('=')
-              .append(URLEncoder.encode(value.toString(), "US-ASCII"));
+                .append('=')
+                .append(URLEncoder.encode(value.toString(), "US-ASCII"));
             }
           } catch (final UnsupportedEncodingException e) {
             throw new Error(e);
@@ -105,8 +107,8 @@ public final class UrlUtil {
           final String[] values = (String[])value;
           for (int i = 0; i < values.length; i++) {
             query.append(name)
-            .append('=')
-            .append(URLEncoder.encode(values[i], "US-ASCII"));
+              .append('=')
+              .append(URLEncoder.encode(values[i], "US-ASCII"));
             if (i < values.length - 1) {
               query.append('&');
             }
@@ -122,15 +124,15 @@ public final class UrlUtil {
                 query.append('&');
               }
               query.append(name)
-              .append('=')
-              .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
+                .append('=')
+                .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
             }
           }
 
         } else {
           query.append(name)
-          .append('=')
-          .append(URLEncoder.encode(value.toString(), "US-ASCII"));
+            .append('=')
+            .append(URLEncoder.encode(value.toString(), "US-ASCII"));
         }
       } catch (final UnsupportedEncodingException e) {
         throw new Error(e);
@@ -147,8 +149,8 @@ public final class UrlUtil {
    */
   public static String cleanPath(final String url) {
     return url.replaceAll("/+", "/")
-        .replaceAll("^((\\w)+:)/", "$1//")
-        .replaceAll("^file://", "file:///");
+      .replaceAll("^((\\w)+:)/", "$1//")
+      .replaceAll("^file://", "file:///");
   }
 
   public static String getContent(final String urlString) {
@@ -239,6 +241,33 @@ public final class UrlUtil {
     return query.toString();
   }
 
+  @SuppressWarnings("unchecked")
+  public static Map<String, Object> getQueryStringMap(final String queryString) {
+    final Map<String, Object> map = new LinkedHashMap<>();
+    for (final String part : queryString.split("\\&")) {
+      final int equalsIndex = part.indexOf("=");
+      if (equalsIndex > -1) {
+        final String name = part.substring(0, equalsIndex);
+        final String value = percentDecode(part.substring(equalsIndex + 1)
+          .replaceAll("\\+", " "));
+        if (map.containsKey(name)) {
+          final Object existingValue = map.get(name);
+          if (existingValue instanceof List) {
+            final List<Object> list = (List<Object>)existingValue;
+            list.add(value);
+          } else {
+            final List<Object> list = new ArrayList<>();
+            list.add(existingValue);
+            list.add(value);
+          }
+        } else {
+          map.put(name, value);
+        }
+      }
+    }
+    return map;
+  }
+
   public static URI getUri(final String uri) {
     try {
       return new URI(uri);
@@ -323,7 +352,7 @@ public final class UrlUtil {
         return new URL(parent, encodedChild);
       } catch (final MalformedURLException e) {
         throw new IllegalArgumentException("Cannot create child URL for "
-            + parent + " + " + child);
+          + parent + " + " + child);
       }
     }
   }
@@ -383,8 +412,8 @@ public final class UrlUtil {
     for (int i = 0; i < len; i++) {
       final char ch = text.charAt(i);
       if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0'
-        && ch <= '9' || ch == '-' || ch == ',' || ch == '.' || ch == '_'
-        || ch == '~' || ch == '/') {
+          && ch <= '9' || ch == '-' || ch == ',' || ch == '.' || ch == '_'
+          || ch == '~' || ch == '/') {
         encoded.append(ch);
       } else {
         encoded.append('%');
@@ -406,15 +435,15 @@ public final class UrlUtil {
   private static final String IP4_ADDRESS = "\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}";
 
   private static final String DOMAIN = "(?:" + IP4_ADDRESS + "|" + DOMAIN_NAME
-      + ")";
+    + ")";
 
   private static final String WORD_CHARACTERS = "a-zA-Z0-9\\+!#$%&'*+-/=?^_`{}|~";
 
   private static final String LOCAL_PART = "[" + WORD_CHARACTERS + "]["
-      + WORD_CHARACTERS + "\\.]*[" + WORD_CHARACTERS + "]?";
+    + WORD_CHARACTERS + "\\.]*[" + WORD_CHARACTERS + "]?";
 
   private static final String EMAIL_RE = "^(" + LOCAL_PART + ")@(" + DOMAIN
-      + ")$";
+    + ")$";
 
   private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_RE);
 

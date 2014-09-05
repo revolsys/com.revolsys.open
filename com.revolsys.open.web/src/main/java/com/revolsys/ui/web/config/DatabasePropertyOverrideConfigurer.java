@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,12 +51,12 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
   private boolean ignoreInvalidKeys = false;
 
   /** Contains names of beans that have overrides */
-  private final Set beanNames = Collections.synchronizedSet(new HashSet());
+  private final Set<String> beanNames = Collections.synchronizedSet(new HashSet<String>());
 
   /**
    * Apply the given property value to the corresponding map property on the
    * bean.
-   * 
+   *
    * @param factory The bean factory.
    * @param beanName The name of the bean.
    * @param propertyName The name of the property.
@@ -64,11 +64,8 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
    * @param value The value to set.
    */
   protected void applyMapPropertyValue(
-    final ConfigurableListableBeanFactory factory,
-    final String beanName,
-    final String propertyName,
-    final String mapKey,
-    final String value) {
+    final ConfigurableListableBeanFactory factory, final String beanName,
+    final String propertyName, final String mapKey, final String value) {
     this.beanNames.add(beanName);
     final BeanDefinition bd = factory.getBeanDefinition(beanName);
     final MutablePropertyValues values = bd.getPropertyValues();
@@ -83,7 +80,7 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
           + "." + propertyName + "] is not a Map");
       }
     } else {
-      final Map map = new HashMap();
+      final Map<String, Object> map = new HashMap<>();
       map.put(mapKey, value);
       values.addPropertyValue(propertyName, map);
     }
@@ -91,27 +88,27 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
 
   /**
    * Apply the given property value to the corresponding bean.
-   * 
+   *
    * @param factory The bean factory.
    * @param beanName The name of the bean.
    * @param propertyName The name of the property.
    * @param value The value to set.
    */
   protected void applyPropertyValue(
-    final ConfigurableListableBeanFactory factory,
-    final String beanName,
-    final String propertyName,
-    final String value) {
+    final ConfigurableListableBeanFactory factory, final String beanName,
+    final String propertyName, final String value) {
     this.beanNames.add(beanName);
     final BeanDefinition bd = factory.getBeanDefinition(beanName);
     final MutablePropertyValues values = bd.getPropertyValues();
-    values.add(propertyName, value);
+    final PropertyValue propertyValue = new PropertyValue(propertyName, value);
+    propertyValue.setOptional(this.ignoreInvalidKeys);
+    values.addPropertyValue(propertyValue);
   }
 
   /**
    * Were there overrides for this bean? Only valid after processing has
    * occurred at least once.
-   * 
+   *
    * @param beanName name of the bean to query status for
    * @return whether there were property overrides for the named bean
    */
@@ -121,15 +118,13 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
 
   /**
    * Process the given key as 'beanName.property' entry.
-   * 
+   *
    * @param factory The bean factory.
    * @param key The key used to set the property.
    * @param value The value to set. @ If there was an problem setting the value.
    */
-  protected void processKey(
-    final ConfigurableListableBeanFactory factory,
-    final String key,
-    final String value) {
+  protected void processKey(final ConfigurableListableBeanFactory factory,
+    final String key, final String value) {
     final Matcher mapProperetyValueMatcher = MAP_PROPERTY_VALUE_PATTERN.matcher(key);
     if (mapProperetyValueMatcher.matches()) {
       final String beanName = mapProperetyValueMatcher.group(1);
@@ -159,8 +154,7 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
    */
   @Override
   protected void processProperties(
-    final ConfigurableListableBeanFactory beanFactory,
-    final Map properties) {
+    final ConfigurableListableBeanFactory beanFactory, final Map properties) {
     for (final Iterator en = properties.keySet().iterator(); en.hasNext();) {
       final String key = (String)en.next();
       try {
@@ -188,7 +182,7 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
    * 'beanName.property' format will just be logged as warning. This allows to
    * have arbitrary other keys in a properties file.
    * </p>
-   * 
+   *
    * @param ignore The flag indictaing if invalid keys should be ignored or an
    *          exception thrown.
    */

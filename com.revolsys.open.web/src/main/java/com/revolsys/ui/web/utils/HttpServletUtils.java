@@ -2,8 +2,11 @@ package com.revolsys.ui.web.utils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -99,6 +102,25 @@ public final class HttpServletUtils {
   public static String getParameter(final String name) {
     final HttpServletRequest request = getRequest();
     return request.getParameter(name);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Map<String, Object> getParameterMap(
+    final HttpServletRequest request) {
+    final Map<String, Object> parameters = new LinkedHashMap<>();
+    final Enumeration<String> parameterNames = request.getParameterNames();
+    while (parameterNames.hasMoreElements()) {
+      final String name = parameterNames.nextElement();
+      final String[] values = request.getParameterValues(name);
+      if (values.length == 0) {
+        parameters.put(name, null);
+      } else if (values.length == 1) {
+        parameters.put(name, values[0]);
+      } else if (values.length == 1) {
+        parameters.put(name, Arrays.asList(values));
+      }
+    }
+    return parameters;
   }
 
   public static String[] getParameterValues(final String name) {

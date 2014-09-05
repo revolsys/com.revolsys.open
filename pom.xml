@@ -220,6 +220,10 @@
             <artifactId>commons-logging</artifactId>
             <groupId>commons-logging</groupId>
           </exclusion>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -253,6 +257,10 @@
             <artifactId>commons-logging</artifactId>
             <groupId>commons-logging</groupId>
           </exclusion>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -275,6 +283,10 @@
             <artifactId>commons-logging</artifactId>
             <groupId>commons-logging</groupId>
           </exclusion>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -286,6 +298,10 @@
             <artifactId>commons-logging</artifactId>
             <groupId>commons-logging</groupId>
           </exclusion>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -296,6 +312,10 @@
           <exclusion>
             <artifactId>commons-logging</artifactId>
             <groupId>commons-logging</groupId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -335,4 +355,4 @@
     <org.springframework.version>3.0.7.RELEASE</org.springframework.version>
     <org.springframework.security.version>3.0.7.RELEASE</org.springframework.security.version>
   </properties>
-</project>
+ </project>

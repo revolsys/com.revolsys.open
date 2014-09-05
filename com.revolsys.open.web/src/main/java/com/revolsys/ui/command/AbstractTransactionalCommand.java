@@ -1,28 +1,11 @@
-/*
- * Copyright 2004-2005 Revolution Systems Inc.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.revolsys.ui.command;
 
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.transaction.PlatformTransactionManager;
 
-import com.revolsys.transaction.InvokeMethodInTransaction;
+import com.revolsys.transaction.Propagation;
+import com.revolsys.transaction.Transaction;
 
-/**
- * @author paustin
- * @version 1.0
- */
 public abstract class AbstractTransactionalCommand implements Runnable {
   private final BeanFactory beanFactory;
 
@@ -31,12 +14,19 @@ public abstract class AbstractTransactionalCommand implements Runnable {
   }
 
   public BeanFactory getBeanFactory() {
-    return beanFactory;
+    return this.beanFactory;
   }
 
   public void runInTransaction() {
-    final InvokeMethodInTransaction invoker = new InvokeMethodInTransaction(
-      getBeanFactory(), true, -1, false);
-    invoker.execute(this, "run");
+    final PlatformTransactionManager transactionManager = (PlatformTransactionManager)this.beanFactory.getBean("transactionManager");
+    try (
+      Transaction transaction = new Transaction(transactionManager,
+        Propagation.REQUIRES_NEW)) {
+      try {
+        run();
+      } catch (final RuntimeException e) {
+        throw transaction.setRollbackOnly(e);
+      }
+    }
   }
 }
