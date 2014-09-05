@@ -44,12 +44,12 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
     final JTableHeader tableHeader = getTableHeader();
 
     final TableColumnModel columnModel = getColumnModel();
-    tableCellEditor = new RecordTableCellEditor(this);
-    tableCellEditor.addCellEditorListener(model);
+    this.tableCellEditor = new RecordTableCellEditor(this);
+    this.tableCellEditor.addCellEditorListener(model);
     for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
       final TableColumn column = columnModel.getColumn(columnIndex);
       if (columnIndex >= model.getAttributesOffset()) {
-        column.setCellEditor(tableCellEditor);
+        column.setCellEditor(this.tableCellEditor);
       }
       column.setCellRenderer(cellRenderer);
     }
@@ -89,7 +89,7 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
   }
 
   public RecordTableCellEditor getTableCellEditor() {
-    return tableCellEditor;
+    return this.tableCellEditor;
   }
 
   @Override
@@ -111,8 +111,9 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
           columnWidth = Math.min(columnWidth, 200);
           attribute.setProperty("tableColumnWidth", columnWidth);
         }
-        column.setMinWidth(columnName.length() * 7 + 15);
-        column.setPreferredWidth(columnWidth);
+        final int nameWidth = columnName.length() * 8 + 15;
+        column.setMinWidth(nameWidth);
+        column.setPreferredWidth(Math.max(nameWidth, columnWidth));
       }
     }
   }

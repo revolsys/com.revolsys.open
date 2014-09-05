@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -138,7 +137,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
 
   private final Set<Integer> loadingPageNumbersToProcess = new LinkedHashSet<>();
 
-  private Map<String, Boolean> orderBy = new LinkedHashMap<String, Boolean>();
+  private Map<String, Boolean> orderBy;
 
   private int refreshIndex = 0;
 
@@ -636,7 +635,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
     } else if (sortOrder == SortOrder.DESCENDING) {
       orderBy = Collections.singletonMap(attributeName, false);
     } else {
-      orderBy = Collections.emptyMap();
+      orderBy = Collections.singletonMap(attributeName, true);
     }
     if (this.sync == null) {
       this.orderBy = orderBy;

@@ -21,14 +21,13 @@ import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public abstract class RecordRowTableModel extends AbstractRecordTableModel
-implements SortableTableModel, CellEditorListener {
+  implements SortableTableModel, CellEditorListener {
 
   public static final String LOADING_VALUE = "\u2026";
 
@@ -152,15 +151,15 @@ implements SortableTableModel, CellEditorListener {
 
   public abstract <V extends Record> V getRecord(final int row);
 
-  public List<LayerRecord> getRecords(final int[] rows) {
-    final List<LayerRecord> objects = new ArrayList<LayerRecord>();
+  public <V extends Record> List<V> getRecords(final int[] rows) {
+    final List<V> records = new ArrayList<V>();
     for (final int row : rows) {
-      final LayerRecord record = getRecord(row);
+      final V record = getRecord(row);
       if (record != null) {
-        objects.add(record);
+        records.add(record);
       }
     }
-    return objects;
+    return records;
   }
 
   public Map<Integer, SortOrder> getSortedColumns() {
@@ -236,7 +235,7 @@ implements SortableTableModel, CellEditorListener {
     if (attributeNames == null || attributeNames.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
       this.attributeNames = new ArrayList<String>(
-          recordDefinition.getAttributeNames());
+        recordDefinition.getAttributeNames());
     } else {
       this.attributeNames = new ArrayList<String>(attributeNames);
     }

@@ -18,66 +18,66 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.util.Reorderable;
 
 public class RecordListTableModel extends RecordRowTableModel implements
-Reorderable {
+  Reorderable {
   public static TablePanel createPanel(final AbstractRecordLayer layer) {
-    return createPanel(layer.getRecordDefinition(),
-      new ArrayList<LayerRecord>(), layer.getFieldNamesSet());
+    return createPanel(layer.getRecordDefinition(), new ArrayList<Record>(),
+      layer.getFieldNamesSet());
   }
 
   public static TablePanel createPanel(final AbstractRecordLayer layer,
-    final Collection<LayerRecord> objects) {
-    return createPanel(layer.getRecordDefinition(), objects,
+    final Collection<? extends Record> records) {
+    return createPanel(layer.getRecordDefinition(), records,
       layer.getFieldNames());
   }
 
   public static TablePanel createPanel(final RecordDefinition recordDefinition,
-    final Collection<LayerRecord> objects,
+    final Collection<? extends Record> records,
     final Collection<String> attributeNames) {
     final RecordListTableModel model = new RecordListTableModel(
-      recordDefinition, objects, attributeNames);
+      recordDefinition, records, attributeNames);
     final JTable table = new RecordRowTable(model);
     return new TablePanel(table);
   }
 
   public static TablePanel createPanel(final RecordDefinition recordDefinition,
-    final List<LayerRecord> objects, final String... attributeNames) {
-    return createPanel(recordDefinition, objects, Arrays.asList(attributeNames));
+    final List<? extends Record> records, final String... attributeNames) {
+    return createPanel(recordDefinition, records, Arrays.asList(attributeNames));
   }
 
   private static final long serialVersionUID = 1L;
 
-  private final List<LayerRecord> records = new ArrayList<LayerRecord>();
+  private final List<Record> records = new ArrayList<>();
 
   public RecordListTableModel(final RecordDefinition recordDefinition,
-    final Collection<LayerRecord> objects, final Collection<String> columnNames) {
+    final Collection<? extends Record> records,
+    final Collection<String> columnNames) {
     super(recordDefinition, columnNames);
-    if (objects != null) {
-      this.records.addAll(objects);
+    if (records != null) {
+      this.records.addAll(records);
     }
     setEditable(true);
   }
 
-  public void add(final int index, final LayerRecord object) {
-    this.records.add(index, object);
-    fireTableRowsInserted(index, index + 1);
+  public void add(final int index, final Record record) {
+    this.records.add(index, record);
+    fireTableDataChanged();
   }
 
-  public void add(final LayerRecord... objects) {
-    for (final LayerRecord object : objects) {
-      this.records.add(object);
-      fireTableRowsInserted(this.records.size() - 1, this.records.size());
+  public void add(final Record... records) {
+    for (final Record record : records) {
+      this.records.add(record);
     }
+    fireTableDataChanged();
   }
 
-  public void addAll(final Collection<LayerRecord> objects) {
+  public void addAll(final Collection<? extends Record> records) {
     this.records.clear();
-    this.records.addAll(objects);
+    this.records.addAll(records);
   }
 
   public void clear() {
@@ -105,8 +105,9 @@ Reorderable {
   /**
    * @return the records
    */
-  public List<LayerRecord> getRecords() {
-    return this.records;
+  @SuppressWarnings("unchecked")
+  public <V extends Record> List<V> getRecords() {
+    return (List<V>)this.records;
   }
 
   @Override
@@ -137,22 +138,22 @@ Reorderable {
   }
 
   public void remove(final int... rows) {
-    final List<LayerRecord> rowsToRemove = getRecords(rows);
+    final List<Record> rowsToRemove = getRecords(rows);
     removeAll(rowsToRemove);
   }
 
-  public void removeAll(final Collection<LayerRecord> objects) {
-    for (final LayerRecord object : objects) {
-      final int row = this.records.indexOf(object);
+  public void removeAll(final Collection<? extends Record> records) {
+    for (final Record record : records) {
+      final int row = this.records.indexOf(record);
       if (row != -1) {
         this.records.remove(row);
-        fireTableRowsDeleted(row, row + 1);
       }
     }
+    fireTableDataChanged();
   }
 
-  public void removeAll(final LayerRecord... removedFeatures) {
-    removeAll(Arrays.asList(removedFeatures));
+  public void removeAll(final Record... records) {
+    removeAll(Arrays.asList(records));
   }
 
   @Override
@@ -160,23 +161,20 @@ Reorderable {
     if (fromIndex < toIndex) {
       toIndex--;
     }
-    final Record object = getRecord(fromIndex);
-    if (object instanceof LayerRecord) {
-      final LayerRecord layerRecord = (LayerRecord)object;
-      removeAll(layerRecord);
-      add(toIndex, layerRecord);
-      clearSortedColumns();
-    }
+    final Record record = getRecord(fromIndex);
+    removeAll(record);
+    add(toIndex, record);
+    clearSortedColumns();
     firePropertyChange("reorder", false, true);
   }
 
   /**
    * @param records the records to set
    */
-  public void setRecords(final List<LayerRecord> objects) {
+  public void setRecords(final Collection<? extends Record> records) {
     this.records.clear();
-    if (objects != null) {
-      this.records.addAll(objects);
+    if (records != null) {
+      this.records.addAll(records);
     }
     fireTableDataChanged();
   }
@@ -197,12 +195,12 @@ Reorderable {
   @Override
   public void setValueAt(final Object value, final int rowIndex,
     final int columnIndex) {
-    final Record object = getRecord(rowIndex);
-    if (object != null) {
+    final Record record = getRecord(rowIndex);
+    if (record != null) {
       final String name = getColumnName(columnIndex);
-      final Object oldValue = object.getValueByPath(name);
-      object.setValue(name, value);
-      final PropertyChangeEvent event = new PropertyChangeEvent(object, name,
+      final Object oldValue = record.getValueByPath(name);
+      record.setValue(name, value);
+      final PropertyChangeEvent event = new PropertyChangeEvent(record, name,
         oldValue, value);
       getPropertyChangeSupport().firePropertyChange(event);
     }

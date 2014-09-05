@@ -21,8 +21,8 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordTableModel extends
-com.revolsys.swing.table.AbstractTableModel implements
-PropertyChangeSupportProxy {
+  com.revolsys.swing.table.AbstractTableModel implements
+  PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
 
@@ -48,9 +48,16 @@ PropertyChangeSupportProxy {
     Property.addListener(this.propertyChangeSupport, propertyChangeListener);
   }
 
+  public void addReadOnlyFieldNames(final Collection<String> fieldNames) {
+    if (fieldNames != null) {
+      this.readOnlyFieldNames.addAll(fieldNames);
+    }
+  }
+
   public void addReadOnlyFieldNames(final String... readOnlyFieldNames) {
     if (readOnlyFieldNames != null) {
-      this.readOnlyFieldNames.addAll(Arrays.asList(readOnlyFieldNames));
+      final List<String> fieldNames = Arrays.asList(readOnlyFieldNames);
+      addReadOnlyFieldNames(fieldNames);
     }
   }
 

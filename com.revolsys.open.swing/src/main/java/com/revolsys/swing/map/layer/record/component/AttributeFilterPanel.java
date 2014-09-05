@@ -52,14 +52,14 @@ import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.table.TablePanel;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class AttributeFilterPanel extends JComponent implements ActionListener,
-  ItemListener, DocumentListener, PropertyChangeListener {
+ItemListener, DocumentListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -81,7 +81,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   private final AbstractRecordLayer layer;
 
-  private final ComboBox numericOperatorField = new ComboBox("=", "<>", "Like",
+  private final ComboBox numericOperatorField = new ComboBox("=", "<>",
     "IS NULL", "IS NOT NULL", "<", "<=", ">", ">=");
 
   private final ComboBox dateOperatorField = new ComboBox("=", "<>", "IS NULL",
@@ -107,9 +107,10 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   private Attribute attribute;
 
-  public AttributeFilterPanel(final RecordLayerTablePanel tablePanel) {
-    this.tableModel = tablePanel.getTableModel();
-    this.layer = tablePanel.getLayer();
+  public AttributeFilterPanel(final TablePanel tablePanel,
+    final RecordLayerTableModel tableModel) {
+    this.tableModel = tableModel;
+    this.layer = tableModel.getLayer();
     this.recordDefinition = this.layer.getRecordDefinition();
 
     this.whereLabel = new JLabel();
@@ -122,7 +123,7 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     this.whereLabel.setBackground(WebColors.White);
     add(this.whereLabel);
 
-    this.attributeNames = new ArrayList<String>(tablePanel.getColumnNames());
+    this.attributeNames = new ArrayList<String>(this.layer.getFieldNamesSet());
     this.attributeNames.remove(this.recordDefinition.getGeometryAttributeName());
     final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
       this.layer);
@@ -275,7 +276,8 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (event.getPropertyName().equals("filter")) {
+    final String propertyName = event.getPropertyName();
+    if (propertyName.equals("filter")) {
       final Condition filter = (Condition)event.getNewValue();
       setFilter(filter);
     } else if (event.getSource() == this.searchField) {
@@ -470,7 +472,6 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
     if (!EqualsRegistry.equal(searchFieldName, this.previousSearchFieldName)) {
       this.previousSearchFieldName = searchFieldName;
       this.layer.setProperty("searchField", searchFieldName);
-      this.codeTable = this.recordDefinition.getCodeTableByColumn(searchFieldName);
       final RecordDefinition recordDefinition = this.tableModel.getRecordDefinition();
       this.attribute = recordDefinition.getAttribute(searchFieldName);
       final Class<?> attributeClass = this.attribute.getTypeClass();
@@ -478,10 +479,13 @@ public class AttributeFilterPanel extends JComponent implements ActionListener,
         this.nameField.getSelectedItem())) {
         this.nameField.setFieldValue(searchFieldName);
       }
-
+      if (searchFieldName.equals(recordDefinition.getIdAttributeName())) {
+        this.codeTable = null;
+      } else {
+        this.codeTable = this.recordDefinition.getCodeTableByColumn(searchFieldName);
+      }
       ComboBox operatorField;
-      if (this.codeTable != null
-        && !searchFieldName.equals(recordDefinition.getIdAttributeName())) {
+      if (this.codeTable != null) {
         operatorField = this.codeTableOperatorField;
       } else if (Number.class.isAssignableFrom(attributeClass)) {
         operatorField = this.numericOperatorField;

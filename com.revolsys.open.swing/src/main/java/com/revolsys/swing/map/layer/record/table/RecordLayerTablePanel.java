@@ -41,7 +41,7 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class RecordLayerTablePanel extends TablePanel implements
-PropertyChangeListener {
+  PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   public static final String FILTER_GEOMETRY = "filter_geometry";
@@ -71,12 +71,12 @@ PropertyChangeListener {
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     final boolean hasGeometry = recordDefinition.getGeometryAttributeIndex() != -1;
     final EnableCheck deletableEnableCheck = new RecordRowPropertyEnableCheck(
-        "deletable");
+      "deletable");
 
     final EnableCheck modifiedEnableCheck = new RecordRowPropertyEnableCheck(
-        "modified");
+      "modified");
     final EnableCheck deletedEnableCheck = new RecordRowPropertyEnableCheck(
-        "deleted");
+      "deleted");
     final EnableCheck notEnableCheck = new RecordRowPropertyEnableCheck(
       "deleted", false);
     final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(
@@ -108,10 +108,10 @@ PropertyChangeListener {
 
     menu.addMenuItem("record", RecordRowRunnable.createAction(
       "Revert Empty Fields", "field_empty_revert", modifiedEnableCheck,
-        "revertEmptyFields"));
+      "revertEmptyFields"));
 
     menu.addMenuItemTitleIcon("dnd", "Copy Record", "page_copy", this,
-        "copyRecord");
+      "copyRecord");
 
     if (hasGeometry) {
       menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "geometry_paste",
@@ -120,11 +120,11 @@ PropertyChangeListener {
 
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
       final DataType geometryDataType = recordDefinition.getGeometryAttribute()
-          .getType();
+        .getType();
       if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition)
-            .hasDirectionalAttributes()) {
+          .hasDirectionalAttributes()) {
           editMenu.addMenuItemTitleIcon("geometry",
             LayerRecordForm.FLIP_RECORD_NAME, LayerRecordForm.FLIP_RECORD_ICON,
             editableEnableCheck, this, "flipRecordOrientation");
@@ -156,10 +156,10 @@ PropertyChangeListener {
     toolBar.addComponent("count", new TableRowCount(this.tableModel));
 
     toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this,
-        "refresh");
+      "refresh");
 
     final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
-      this);
+      this, this.tableModel);
     toolBar.addComponent("search", attributeFilterPanel);
 
     toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
@@ -319,8 +319,8 @@ PropertyChangeListener {
     if (geometry != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()
-          .convert(geometryFactory)
-          .expandPercent(0.1);
+        .convert(geometryFactory)
+        .expandPercent(0.1);
       project.setViewBoundingBox(boundingBox);
     }
   }
