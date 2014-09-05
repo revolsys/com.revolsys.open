@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -16,9 +17,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.io.RecordIterator;
@@ -37,7 +35,6 @@ import com.revolsys.util.DateUtil;
 import com.revolsys.util.MathUtil;
 
 public class GpxIterator implements RecordIterator {
-  private static final DateTimeFormatter XML_DATE_TIME_FORMAT = ISODateTimeFormat.dateTimeParser();
 
   private static final Logger LOG = Logger.getLogger(GpxIterator.class);
 
@@ -366,8 +363,8 @@ public class GpxIterator implements RecordIterator {
           }
         } else if (this.in.getName().equals(GpxConstants.TIME_ELEMENT)) {
           final String dateText = StaxUtils.getElementText(this.in);
-          final DateTime date = XML_DATE_TIME_FORMAT.parseDateTime(dateText);
-          final long time = date.getMillis();
+          final Calendar calendar = DateUtil.getIsoCalendar(dateText);
+          final long time = calendar.getTimeInMillis();
           m = time;
           if (axisCount < 4) {
             axisCount = 4;

@@ -44,7 +44,7 @@ public class GpxWriter extends AbstractRecordWriter {
     this.out.startTag(GpxConstants.GPX_ELEMENT);
     this.out.attribute(GpxConstants.VERSION_ATTRIBUTE, "1.1");
     this.out.attribute(GpxConstants.CREATOR_ATTRIBUTE,
-        "Revolution Systems Inc. - GIS");
+      "Revolution Systems Inc. - GIS");
   }
 
   @Override
@@ -107,7 +107,7 @@ public class GpxWriter extends AbstractRecordWriter {
     if (time != null) {
       if (time instanceof Date) {
         final DateFormat timestampFormat = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss.");
+          "yyyy-MM-dd'T'HH:mm:ss'Z'");
         timestampFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         this.out.element(GpxConstants.TIME_ELEMENT,
           timestampFormat.format(time));

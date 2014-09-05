@@ -3,7 +3,6 @@ package com.revolsys.raster;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-import com.jhlabs.image.WholeImageFilter;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
@@ -59,7 +58,7 @@ public class ProjectionImageFilter extends WholeImageFilter {
   protected int[] filterPixels(final int imageWidth, final int imageHeight,
     final int[] inPixels, final Rectangle transformedSpace) {
     final int[] outPixels = new int[transformedSpace.width
-                                    * transformedSpace.height];
+      * transformedSpace.height];
 
     final double minX = this.sourceBoundingBox.getMinX();
     final double minY = this.sourceBoundingBox.getMinY();

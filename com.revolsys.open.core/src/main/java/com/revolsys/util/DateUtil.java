@@ -9,12 +9,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DateUtil {
-
-  private static final String DATE_TIME_NANOS_PATTERN = "\\s*(\\d{4})-(\\d{2})-(\\d{2})(?:[\\sT]+(\\d{2})\\:(\\d{2})\\:(\\d{2})(?:\\.(\\d{1,9}))?)?\\s*";
 
   public static String format(final DateFormat format, final Date date) {
     return format.format(date);
@@ -146,6 +145,109 @@ public class DateUtil {
     }
   }
 
+  public static Calendar getIsoCalendar(String dateString) {
+    if (Property.hasValue(dateString)) {
+      dateString = dateString.trim();
+      final int length = dateString.length();
+
+      if (length < 4) {
+        throw new IllegalArgumentException(dateString
+          + " is not a valid ISO 8601 date");
+      } else {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+
+        final int year = Integer.valueOf(dateString.substring(0, 4));
+        int month = 0;
+        int day = 1;
+        int hour = 1;
+        int minute = 1;
+        int second = 0;
+        int millis = 0;
+        if (length >= 7) {
+          month = Integer.valueOf(dateString.substring(5, 7)) - 1;
+          if (length >= 10) {
+            day = Integer.valueOf(dateString.substring(8, 10));
+            if (length >= 13) {
+              hour = Integer.valueOf(dateString.substring(11, 13));
+              if (length >= 16) {
+                minute = Integer.valueOf(dateString.substring(14, 16));
+                if (length >= 19) {
+                  second = Integer.valueOf(dateString.substring(17, 19));
+                }
+              }
+
+              if (length > 19) {
+                int tzIndex = 19;
+                if (dateString.charAt(tzIndex) == '.') {
+                  final int millisIndex = 20;
+                  tzIndex = 20;
+                  while (tzIndex < length
+                    && Character.isDigit(dateString.charAt(tzIndex))) {
+                    tzIndex++;
+                  }
+                  if (millisIndex != tzIndex) {
+                    final String millisString = dateString.substring(
+                      millisIndex, tzIndex);
+                    millis = Integer.valueOf(millisString);
+                    if (millisString.length() == 1) {
+                      millis = millis * 100;
+                    } else if (millisString.length() == 2) {
+                      millis = millis * 10;
+                    }
+                  }
+
+                }
+                if (tzIndex < length) {
+                  final char tzChar = dateString.charAt(tzIndex);
+                  if (tzChar == 'Z') {
+                  } else if (tzChar == '+' || tzChar == '-') {
+                    if (tzIndex + 5 < length) {
+                      final String tzString = dateString.substring(tzIndex,
+                        tzIndex + 6);
+                      timeZone = TimeZone.getTimeZone("GMT" + tzString);
+                    }
+                  }
+                }
+              }
+
+            }
+          }
+
+        }
+        final Calendar calendar = new GregorianCalendar(timeZone);
+        calendar.clear();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, second);
+        calendar.set(Calendar.MILLISECOND, millis);
+
+        return calendar;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  public static Date getIsoDate(final String dateString) {
+    final Calendar calendar = getIsoCalendar(dateString);
+    return calendar.getTime();
+  }
+
+  public static java.sql.Date getIsoSqlDate(final String dateString) {
+    final Calendar calendar = getIsoCalendar(dateString);
+    final long time = calendar.getTimeInMillis();
+    return new java.sql.Date(time);
+  }
+
+  public static Timestamp getIsoTimestamp(final String dateString) {
+    final Calendar calendar = getIsoCalendar(dateString);
+    final long time = calendar.getTimeInMillis();
+    return new Timestamp(time);
+  }
+
   public static java.sql.Date getSqlDate() {
     return new java.sql.Date(System.currentTimeMillis());
   }
@@ -240,4 +342,6 @@ public class DateUtil {
     final Calendar calendar = Calendar.getInstance();
     return calendar.get(Calendar.YEAR);
   }
+
+  private static final String DATE_TIME_NANOS_PATTERN = "\\s*(\\d{4})-(\\d{2})-(\\d{2})(?:[\\sT]+(\\d{2})\\:(\\d{2})\\:(\\d{2})(?:\\.(\\d{1,9}))?)?\\s*";
 }

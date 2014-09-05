@@ -108,19 +108,6 @@
       <version>0.9.4</version>
     </dependency>
     <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>1.6</version>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.jms</groupId>
-      <artifactId>jms-api</artifactId>
-      <version>1.1-rev-1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>com.akiban</groupId>
       <artifactId>akiban-sql-parser</artifactId>
       <version>1.0.16</version>
@@ -168,11 +155,6 @@
           <groupId>jai</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.jhlabs</groupId>
-      <artifactId>filters</artifactId>
-      <version>2.0.235</version>
     </dependency>
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
