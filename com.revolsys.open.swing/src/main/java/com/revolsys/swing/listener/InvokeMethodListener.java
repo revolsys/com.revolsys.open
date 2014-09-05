@@ -19,8 +19,8 @@ import com.revolsys.beans.NonWeakListener;
 import com.revolsys.swing.parallel.Invoke;
 
 public class InvokeMethodListener extends InvokeMethodPropertyChangeListener
-  implements ActionListener, DocumentListener, ListSelectionListener,
-  ItemListener, PropertyChangeListener, FocusListener, NonWeakListener {
+implements ActionListener, DocumentListener, ListSelectionListener,
+ItemListener, PropertyChangeListener, FocusListener, NonWeakListener {
 
   private final boolean invokeLater;
 

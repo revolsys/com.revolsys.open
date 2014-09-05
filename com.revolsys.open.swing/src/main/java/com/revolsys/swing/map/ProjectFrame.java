@@ -172,11 +172,10 @@ public class ProjectFrame extends BaseFrame {
     this.project.setViewBoundingBox(defaultBoundingBox);
     Project.set(project);
     SwingUtil.setSizeAndMaximize(this, 100, 100);
-    setLocationByPlatform(true);
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-        .getTheme();
+      .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -273,7 +272,7 @@ public class ProjectFrame extends BaseFrame {
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = InvokeMethodAction.createButton(null,
       "View Running Tasks", SilkIconLoader.getIcon("time_go"), dockable,
-        "toFront");
+      "toFront");
     viewTasksAction.setBorderPainted(false);
     progressBar.add(viewTasksAction, BorderLayout.EAST);
   }
@@ -308,7 +307,7 @@ public class ProjectFrame extends BaseFrame {
     // "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-      "print");
+        "print");
 
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;

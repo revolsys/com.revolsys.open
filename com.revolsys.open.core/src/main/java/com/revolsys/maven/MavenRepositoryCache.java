@@ -17,7 +17,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.spring.SpringUtil;
-import com.revolsys.util.HexConverter;
+import com.revolsys.util.Hex;
 import com.revolsys.util.Property;
 
 public class MavenRepositoryCache extends MavenRepository {
@@ -61,7 +61,7 @@ public class MavenRepositoryCache extends MavenRepository {
           SpringUtil.copy(digestIn, resource);
           final MessageDigest messageDigest = digestIn.getMessageDigest();
           final byte[] digest = messageDigest.digest();
-          final String fileDigest = HexConverter.toHex(digest);
+          final String fileDigest = Hex.toHex(digest);
           if (!sha1Digest.equals(fileDigest)) {
             LoggerFactory.getLogger(getClass()).error(
               ".sha1 digest is different for: " + repositoryResource);

@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,42 +33,122 @@ import com.revolsys.io.FileUtil;
 
 /**
  * The UrlUtil class is a utility class for processing and create URL strings.
- * 
+ *
  * @author Paul Austin
  */
 public final class UrlUtil {
 
-  private static final String DOMAIN_PART = "\\p{Alpha}[\\p{Alpha}0-9\\-]*\\.";
+  public static void appendQuery(final StringBuilder query,
+    final Map<String, ? extends Object> parameters) throws Error {
+    if (parameters != null) {
+      boolean firstParameter = true;
+      for (final Entry<String, ? extends Object> parameter : parameters.entrySet()) {
+        final String name = parameter.getKey();
+        final Object value = parameter.getValue();
+        if (name != null && value != null) {
+          if (!firstParameter) {
+            query.append('&');
+          } else {
+            firstParameter = false;
+          }
+          try {
+            if (value instanceof String[]) {
+              final String[] values = (String[])value;
+              for (int i = 0; i < values.length; i++) {
+                query.append(name)
+                .append('=')
+                .append(URLEncoder.encode(values[i], "US-ASCII"));
+                if (i < values.length - 1) {
+                  query.append('&');
+                }
+              }
+            } else if (value instanceof Collection) {
+              boolean first = true;
+              final Collection<?> values = (Collection<?>)value;
+              for (final Object childValue : values) {
+                if (childValue != null) {
+                  if (first == true) {
+                    first = false;
+                  } else {
+                    query.append('&');
+                  }
+                  query.append(name)
+                  .append('=')
+                  .append(
+                    URLEncoder.encode(childValue.toString(), "US-ASCII"));
+                }
+              }
 
-  private static final String TLD = "\\p{Alpha}+";
+            } else {
+              query.append(name)
+              .append('=')
+              .append(URLEncoder.encode(value.toString(), "US-ASCII"));
+            }
+          } catch (final UnsupportedEncodingException e) {
+            throw new Error(e);
+          }
 
-  private static final String DOMAIN_NAME = "(?:" + DOMAIN_PART + ")+" + TLD;
+        }
+      }
+    }
+  }
 
-  private static final String IP4_ADDRESS = "\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}";
+  public static void appendQuery(final StringBuilder query, final String name,
+    final Object value) {
+    final boolean firstParameter = query.length() == 0;
+    if (name != null && value != null) {
+      if (!firstParameter) {
+        query.append('&');
+      }
+      try {
+        if (value instanceof String[]) {
+          final String[] values = (String[])value;
+          for (int i = 0; i < values.length; i++) {
+            query.append(name)
+            .append('=')
+            .append(URLEncoder.encode(values[i], "US-ASCII"));
+            if (i < values.length - 1) {
+              query.append('&');
+            }
+          }
+        } else if (value instanceof Collection) {
+          boolean first = true;
+          final Collection<?> values = (Collection<?>)value;
+          for (final Object childValue : values) {
+            if (childValue != null) {
+              if (first == true) {
+                first = false;
+              } else {
+                query.append('&');
+              }
+              query.append(name)
+              .append('=')
+              .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
+            }
+          }
 
-  private static final String DOMAIN = "(?:" + IP4_ADDRESS + "|" + DOMAIN_NAME
-    + ")";
+        } else {
+          query.append(name)
+          .append('=')
+          .append(URLEncoder.encode(value.toString(), "US-ASCII"));
+        }
+      } catch (final UnsupportedEncodingException e) {
+        throw new Error(e);
+      }
 
-  private static final String WORD_CHARACTERS = "a-zA-Z0-9\\+!#$%&'*+-/=?^_`{}|~";
-
-  private static final String LOCAL_PART = "[" + WORD_CHARACTERS + "]["
-    + WORD_CHARACTERS + "\\.]*[" + WORD_CHARACTERS + "]?";
-
-  private static final String EMAIL_RE = "^(" + LOCAL_PART + ")@(" + DOMAIN
-    + ")$";
-
-  private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_RE);
+    }
+  }
 
   /**
    * Clean repeated // characters from the URL path.
-   * 
+   *
    * @param url
    * @return
    */
   public static String cleanPath(final String url) {
     return url.replaceAll("/+", "/")
-      .replaceAll("^((\\w)+:)/", "$1//")
-      .replaceAll("^file://", "file:///");
+        .replaceAll("^((\\w)+:)/", "$1//")
+        .replaceAll("^file://", "file:///");
   }
 
   public static String getContent(final String urlString) {
@@ -144,6 +224,21 @@ public final class UrlUtil {
     return getParent(urlString);
   }
 
+  /**
+   * Create a new URL from the baseUrl with the additional query string
+   * parameters.
+   *
+   * @param baseUrl The baseUrl.
+   * @param parameters The additional parameters to add to the query string.
+   * @return The new URL.
+   */
+  public static String getQueryString(
+    final Map<String, ? extends Object> parameters) {
+    final StringBuilder query = new StringBuilder();
+    appendQuery(query, parameters);
+    return query.toString();
+  }
+
   public static URI getUri(final String uri) {
     try {
       return new URI(uri);
@@ -163,7 +258,7 @@ public final class UrlUtil {
   /**
    * Create a new URL from the baseUrl with the additional query string
    * parameters.
-   * 
+   *
    * @param baseUrl The baseUrl.
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
@@ -184,7 +279,7 @@ public final class UrlUtil {
   /**
    * Create a new URL from the baseUrl with the additional query string
    * parameters.
-   * 
+   *
    * @param baseUrl The baseUrl.
    * @param parameters The additional parameters to add to the query string.
    * @return The new URL.
@@ -197,58 +292,8 @@ public final class UrlUtil {
       fragment = baseUrl.substring(fragmentIndex + 1);
       baseUrl = baseUrl.substring(0, fragmentIndex);
     }
-    final StringBuffer query = new StringBuffer();
-    if (parameters != null) {
-      boolean firstParameter = true;
-      for (final Entry<String, ? extends Object> parameter : parameters.entrySet()) {
-        final String name = parameter.getKey();
-        final Object value = parameter.getValue();
-        if (name != null && value != null) {
-          if (!firstParameter) {
-            query.append('&');
-          } else {
-            firstParameter = false;
-          }
-          try {
-            if (value instanceof String[]) {
-              final String[] values = (String[])value;
-              for (int i = 0; i < values.length; i++) {
-                query.append(name)
-                  .append('=')
-                  .append(URLEncoder.encode(values[i], "US-ASCII"));
-                if (i < values.length - 1) {
-                  query.append('&');
-                }
-              }
-            } else if (value instanceof Collection) {
-              boolean first = true;
-              final Collection values = (Collection)value;
-              for (final Object childValue : values) {
-                if (childValue != null) {
-                  if (first == true) {
-                    first = false;
-                  } else {
-                    query.append('&');
-                  }
-                  query.append(name)
-                    .append('=')
-                    .append(
-                      URLEncoder.encode(childValue.toString(), "US-ASCII"));
-                }
-              }
+    final String query = getQueryString(parameters);
 
-            } else {
-              query.append(name)
-                .append('=')
-                .append(URLEncoder.encode(value.toString(), "US-ASCII"));
-            }
-          } catch (final UnsupportedEncodingException e) {
-            throw new Error(e);
-          }
-
-        }
-      }
-    }
     String url;
     if (query.length() == 0) {
       url = baseUrl;
@@ -278,7 +323,7 @@ public final class UrlUtil {
         return new URL(parent, encodedChild);
       } catch (final MalformedURLException e) {
         throw new IllegalArgumentException("Cannot create child URL for "
-          + parent + " + " + child);
+            + parent + " + " + child);
       }
     }
   }
@@ -337,9 +382,9 @@ public final class UrlUtil {
     final StringBuilder encoded = new StringBuilder(len);
     for (int i = 0; i < len; i++) {
       final char ch = text.charAt(i);
-      if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
-        || (ch >= '0' && ch <= '9') || ch == '-' || ch == ',' || ch == '.'
-        || ch == '_' || ch == '~' || ch == '/') {
+      if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0'
+        && ch <= '9' || ch == '-' || ch == ',' || ch == '.' || ch == '_'
+        || ch == '~' || ch == '/') {
         encoded.append(ch);
       } else {
         encoded.append('%');
@@ -351,6 +396,27 @@ public final class UrlUtil {
     }
     return encoded.toString();
   }
+
+  private static final String DOMAIN_PART = "\\p{Alpha}[\\p{Alpha}0-9\\-]*\\.";
+
+  private static final String TLD = "\\p{Alpha}+";
+
+  private static final String DOMAIN_NAME = "(?:" + DOMAIN_PART + ")+" + TLD;
+
+  private static final String IP4_ADDRESS = "\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}";
+
+  private static final String DOMAIN = "(?:" + IP4_ADDRESS + "|" + DOMAIN_NAME
+      + ")";
+
+  private static final String WORD_CHARACTERS = "a-zA-Z0-9\\+!#$%&'*+-/=?^_`{}|~";
+
+  private static final String LOCAL_PART = "[" + WORD_CHARACTERS + "]["
+      + WORD_CHARACTERS + "\\.]*[" + WORD_CHARACTERS + "]?";
+
+  private static final String EMAIL_RE = "^(" + LOCAL_PART + ")@(" + DOMAIN
+      + ")$";
+
+  private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_RE);
 
   /**
    * Construct a new UrlUtil.

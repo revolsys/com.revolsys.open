@@ -108,43 +108,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     setExists(exists);
     setType("recordStore");
 
-    setRecordDefinition(recordStore.getRecordDefinition(typePath));
+    final RecordDefinition recordDefinition = recordStore.getRecordDefinition(typePath);
     setTypePath(typePath);
-  }
-
-  @Override
-  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
-    final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
-    final Map<String, String> connectionProperties = getProperty("connection");
-    String connectionName = null;
-    String url = null;
-    String username = null;
-    if (isExists()) {
-      final RecordStore recordStore = getRecordStore();
-      url = recordStore.getUrl();
-      username = recordStore.getUsername();
-    }
-    if (connectionProperties != null) {
-      connectionName = connectionProperties.get("name");
-      if (!isExists()) {
-        url = connectionProperties.get("url");
-        username = connectionProperties.get("username");
-
-      }
-    }
-    if (connectionName != null) {
-      SwingUtil.addReadOnlyTextField(panel, "Data Store Name", connectionName);
-    }
-    if (url != null) {
-      SwingUtil.addReadOnlyTextField(panel, "Data Store URL", url);
-    }
-    if (username != null) {
-      SwingUtil.addReadOnlyTextField(panel, "Data Store Username", username);
-    }
-    SwingUtil.addReadOnlyTextField(panel, "Type Path", this.typePath);
-
-    GroupLayoutUtil.makeColumns(panel, 2, true);
-    return panel;
+    setRecordDefinition(recordDefinition);
   }
 
   @SuppressWarnings("unchecked")
@@ -268,6 +234,42 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return new LoadingWorker(this, boundingBox);
   }
 
+  @Override
+  protected ValueField createPropertiesTabGeneralPanelSource(
+    final BasePanel parent) {
+    final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
+    final Map<String, String> connectionProperties = getProperty("connection");
+    String connectionName = null;
+    String url = null;
+    String username = null;
+    if (isExists()) {
+      final RecordStore recordStore = getRecordStore();
+      url = recordStore.getUrl();
+      username = recordStore.getUsername();
+    }
+    if (connectionProperties != null) {
+      connectionName = connectionProperties.get("name");
+      if (!isExists()) {
+        url = connectionProperties.get("url");
+        username = connectionProperties.get("username");
+
+      }
+    }
+    if (connectionName != null) {
+      SwingUtil.addReadOnlyTextField(panel, "Data Store Name", connectionName);
+    }
+    if (url != null) {
+      SwingUtil.addReadOnlyTextField(panel, "Data Store URL", url);
+    }
+    if (username != null) {
+      SwingUtil.addReadOnlyTextField(panel, "Data Store Username", username);
+    }
+    SwingUtil.addReadOnlyTextField(panel, "Type Path", this.typePath);
+
+    GroupLayoutUtil.makeColumns(panel, 2, true);
+    return panel;
+  }
+
   @SuppressWarnings("unchecked")
   protected <V extends LayerRecord> V createProxyRecord(
     final Identifier identifier) {
@@ -312,43 +314,51 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   @Override
   protected boolean doInitialize() {
-    final Map<String, String> connectionProperties = getProperty("connection");
-    if (connectionProperties == null) {
-      LoggerFactory.getLogger(getClass())
-        .error(
-          "A data store layer requires a connectionProperties entry with a name or url, username, and password: "
-            + getPath());
-    } else {
-      final Map<String, Object> config = new HashMap<String, Object>();
-      config.put("connection", connectionProperties);
-      final RecordStore recordStore = RecordStoreConnectionManager.getRecordStore(config);
-
-      final String typePath = getTypePath();
-      if (recordStore == null) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unable to create data store for layer: " + getPath());
+    RecordStore recordStore = this.recordStore;
+    if (recordStore == null) {
+      final Map<String, String> connectionProperties = getProperty("connection");
+      if (connectionProperties == null) {
+        LoggerFactory.getLogger(getClass())
+          .error(
+            "A data store layer requires a connectionProperties entry with a name or url, username, and password: "
+              + getPath());
+        return false;
       } else {
-        try {
-          recordStore.initialize();
-        } catch (final Throwable e) {
-          throw new RuntimeException(
-            "Unable to iniaitlize data store for layer " + getPath(), e);
-        }
+        final Map<String, Object> config = new HashMap<String, Object>();
+        config.put("connection", connectionProperties);
+        recordStore = RecordStoreConnectionManager.getRecordStore(config);
 
-        setRecordStore(recordStore);
-
-        final RecordDefinition recordDefinition = recordStore.getRecordDefinition(typePath);
-
-        if (recordDefinition == null) {
+        if (recordStore == null) {
           LoggerFactory.getLogger(getClass()).error(
-            "Cannot find table " + typePath + " for layer " + getPath());
+            "Unable to create data store for layer: " + getPath());
+          return false;
         } else {
-          setRecordDefinition(recordDefinition);
-          return true;
+          try {
+            recordStore.initialize();
+          } catch (final Throwable e) {
+            throw new RuntimeException(
+              "Unable to iniaitlize data store for layer " + getPath(), e);
+          }
+
+          setRecordStore(recordStore);
         }
       }
     }
-    return false;
+    final String typePath = getTypePath();
+    RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      recordDefinition = recordStore.getRecordDefinition(typePath);
+      if (recordDefinition == null) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Cannot find table " + typePath + " for layer " + getPath());
+        return false;
+      } else {
+        setRecordDefinition(recordDefinition);
+        return true;
+      }
+    } else {
+      return true;
+    }
   }
 
   @SuppressWarnings({

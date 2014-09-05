@@ -384,6 +384,28 @@ public final class CollectionUtil {
     }
   }
 
+  public static long getLong(final Map<String, ? extends Object> map,
+    final String name, final long defaultValue) {
+    final Object value = get(map, name);
+    if (value == null) {
+      return defaultValue;
+    } else if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.longValue();
+    } else {
+      final String stringValue = value.toString();
+      if (Property.hasValue(stringValue)) {
+        try {
+          return Long.valueOf(stringValue);
+        } catch (final NumberFormatException e) {
+          throw new IllegalArgumentException(value + " is not a valid long");
+        }
+      } else {
+        return defaultValue;
+      }
+    }
+  }
+
   public static <K1, K2, V> Map<K2, V> getMap(final Map<K1, Map<K2, V>> map,
     final K1 key) {
     Map<K2, V> value = map.get(key);
@@ -442,6 +464,16 @@ public final class CollectionUtil {
     final Object value = get(map, name);
     if (value == null) {
       return null;
+    } else {
+      return StringConverterRegistry.toString(value);
+    }
+  }
+
+  public static String getString(final Map<String, ? extends Object> map,
+    final String name, final String defaultValue) {
+    final Object value = get(map, name);
+    if (value == null) {
+      return defaultValue;
     } else {
       return StringConverterRegistry.toString(value);
     }

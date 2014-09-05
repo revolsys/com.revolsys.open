@@ -1,6 +1,6 @@
 package com.revolsys.util;
 
-public class HexConverter {
+public class Hex {
   public static byte[] toDecimalBytes(final String hexString) {
     final byte[] bytes = new byte[hexString.length() / 2];
     for (int i = 0; i < bytes.length; i++) {

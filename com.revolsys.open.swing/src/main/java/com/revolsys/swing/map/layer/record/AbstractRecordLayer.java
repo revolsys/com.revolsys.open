@@ -198,12 +198,12 @@ RecordFactory, AddGeometryCompleteAction {
         hasGeometry, hasSelectedRecords), "zoomToSelected"));
 
     final EnableCheck editable = new MenuSourcePropertyEnableCheck("editable");
-    final EnableCheck readonly = new MenuSourcePropertyEnableCheck(
-      "readOnly", false);
+    final EnableCheck readonly = new MenuSourcePropertyEnableCheck("readOnly",
+      false);
     final EnableCheck hasChanges = new MenuSourcePropertyEnableCheck(
-      "hasChanges");
+        "hasChanges");
     final EnableCheck canAdd = new MenuSourcePropertyEnableCheck(
-      "canAddRecords");
+        "canAddRecords");
     final EnableCheck canDelete = new MenuSourcePropertyEnableCheck(
         "canDeleteRecords");
     final EnableCheck canMergeRecords = new MenuSourcePropertyEnableCheck(
@@ -216,11 +216,11 @@ RecordFactory, AddGeometryCompleteAction {
     menu.addMenuItem("edit", MenuSourceRunnable.createAction("Save Changes",
       "table_save", hasChanges, "saveChanges"));
 
-    menu.addMenuItem("edit", MenuSourceRunnable.createAction(
-      "Cancel Changes", "table_cancel", hasChanges, "cancelChanges"));
+    menu.addMenuItem("edit", MenuSourceRunnable.createAction("Cancel Changes",
+      "table_cancel", hasChanges, "cancelChanges"));
 
-    menu.addMenuItem("edit", MenuSourceRunnable.createAction(
-      "Add New Record", "table_row_insert", canAdd, "addNewRecord"));
+    menu.addMenuItem("edit", MenuSourceRunnable.createAction("Add New Record",
+      "table_row_insert", canAdd, "addNewRecord"));
 
     menu.addMenuItem("edit", MenuSourceRunnable.createAction(
       "Delete Selected Records", "table_row_delete", new AndEnableCheck(
@@ -238,9 +238,9 @@ RecordFactory, AddGeometryCompleteAction {
       "Paste New Records", "paste_plain", new AndEnableCheck(canAdd, canPaste),
         "pasteRecords"));
 
-    menu.addMenuItem("layer", 0, MenuSourceRunnable.createAction(
-      "Layer Style", "palette", new AndEnableCheck(exists, hasGeometry),
-      "showProperties", "Style"));
+    menu.addMenuItem("layer", 0, MenuSourceRunnable.createAction("Layer Style",
+      "palette", new AndEnableCheck(exists, hasGeometry), "showProperties",
+        "Style"));
 
     menu.addMenuItem("edit", 0, MenuSourceRunnable.createAction(
       "Export Records", "disk", new AndEnableCheck(exists, hasSelectedRecords),
@@ -2184,14 +2184,14 @@ RecordFactory, AddGeometryCompleteAction {
       if (Property.hasValue(name)) {
         final Collection<String> names = entry.getValue();
         if (Property.hasValue(names)) {
-          final List<String> fieldNames = new ArrayList<>(names);
+          final Set<String> fieldNames = new LinkedHashSet<>(names);
           if (ALL.equalsIgnoreCase(name)) {
             if (Property.hasValue(this.fieldNames)) {
               fieldNames.addAll(this.fieldNames);
               fieldNames.retainAll(this.fieldNames);
             }
           }
-          this.fieldNamesSets.put(name, fieldNames);
+          this.fieldNamesSets.put(name, new ArrayList<>(fieldNames));
         }
       }
     }
@@ -2281,14 +2281,16 @@ RecordFactory, AddGeometryCompleteAction {
       final Icon icon = RecordStoreTableTreeNode.getIcon(geometryType);
       setIcon(icon);
       this.fieldNames = recordDefinition.getAttributeNames();
-      final List<String> allFieldNames = this.fieldNamesSets.get(ALL);
+      List<String> allFieldNames = this.fieldNamesSets.get(ALL);
       if (Property.hasValue(allFieldNames)) {
-        allFieldNames.addAll(this.fieldNames);
-        allFieldNames.retainAll(this.fieldNames);
-        this.fieldNamesSets.put(ALL, allFieldNames);
+        final Set<String> mergedFieldNames = new LinkedHashSet<>(allFieldNames);
+        mergedFieldNames.addAll(this.fieldNames);
+        mergedFieldNames.retainAll(this.fieldNames);
+        allFieldNames = new ArrayList<>(mergedFieldNames);
       } else {
-        this.fieldNamesSets.put(ALL, this.fieldNames);
+        allFieldNames = new ArrayList<>(this.fieldNames);
       }
+      this.fieldNamesSets.put(ALL, allFieldNames);
       this.query.setRecordDefinition(recordDefinition);
     }
 
