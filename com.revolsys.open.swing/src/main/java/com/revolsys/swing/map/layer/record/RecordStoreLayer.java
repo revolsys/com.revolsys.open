@@ -72,6 +72,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     "recordStore", "Record Store", RecordStoreLayer.class, "create");
 
   static {
+    // TODO remove after GBA upgrade
     MapObjectFactoryRegistry.addFactory(new InvokeMethodMapObjectFactory(
       "dataStore", "Data Store", RecordStoreLayer.class, "create"));
   }
@@ -320,8 +321,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       final Map<String, String> connectionProperties = getProperty("connection");
       if (connectionProperties == null) {
         LoggerFactory.getLogger(getClass())
-        .error(
-          "A data store layer requires a connectionProperties entry with a name or url, username, and password: "
+          .error(
+            "A data store layer requires a connectionProperties entry with a name or url, username, and password: "
               + getPath());
         return false;
       } else {
@@ -410,7 +411,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
           final Statistics statistics = query.getProperty("statistics");
           query.setProperty("recordFactory", this);
           try (
-              final Reader<LayerRecord> reader = (Reader)recordStore.query(query)) {
+            final Reader<LayerRecord> reader = (Reader)recordStore.query(query)) {
             final List<LayerRecord> records = new ArrayList<>();
             for (final LayerRecord record : reader) {
               final boolean added = addProxyRecordToList(records, record);
@@ -440,7 +441,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       synchronized (getSync()) {
         final BoundingBox loadBoundingBox = boundingBox.expandPercent(0.2);
         if (!this.loadedBoundingBox.covers(boundingBox)
-            && !this.loadingBoundingBox.covers(boundingBox)) {
+          && !this.loadingBoundingBox.covers(boundingBox)) {
           if (this.loadingWorker != null) {
             this.loadingWorker.cancel(true);
           }
@@ -491,16 +492,16 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     final RecordStore recordStore = getRecordStore();
     final PlatformTransactionManager transactionManager = recordStore.getTransactionManager();
     try (
-        Transaction transaction = new Transaction(transactionManager,
-          Propagation.REQUIRES_NEW)) {
+      Transaction transaction = new Transaction(transactionManager,
+        Propagation.REQUIRES_NEW)) {
       try {
 
         if (isExists()) {
           if (recordStore != null) {
             try (
-                final Writer<Record> writer = recordStore.createWriter()) {
+              final Writer<Record> writer = recordStore.createWriter()) {
               if (isCached(this.getCacheIdDeleted(), record)
-                  || super.isDeleted(record)) {
+                || super.isDeleted(record)) {
                 preDeleteRecord(record);
                 record.setState(RecordState.Deleted);
                 writer.write(record);
@@ -827,7 +828,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       boolean removed = false;
       if (isLayerRecord(record)) {
         for (final Label cacheId : new ArrayList<>(
-            this.cacheIdToRecordIdMap.keySet())) {
+          this.cacheIdToRecordIdMap.keySet())) {
           removed |= removeRecordFromCache(cacheId, record);
         }
       }

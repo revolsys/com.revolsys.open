@@ -37,6 +37,7 @@ public class FileRecordLayer extends ListRecordLayer {
     "recordFile", "File", FileRecordLayer.class, "create");
 
   static {
+    // TODO remove after GBA upgrade
     MapObjectFactoryRegistry.addFactory(new InvokeMethodMapObjectFactory(
       "dataObjectFile", "File", FileRecordLayer.class, "create"));
   }
@@ -51,7 +52,8 @@ public class FileRecordLayer extends ListRecordLayer {
   }
 
   @Override
-  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
+  protected ValueField createPropertiesTabGeneralPanelSource(
+    final BasePanel parent) {
     final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
 
     final String url = getUrl();
