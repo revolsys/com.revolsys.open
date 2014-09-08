@@ -1058,7 +1058,12 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public CoordinateSystem getCoordinateSystem() {
-    return getGeometryFactory().getCoordinateSystem();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory == null) {
+      return null;
+    } else {
+      return geometryFactory.getCoordinateSystem();
+    }
   }
 
   public int getDeletedRecordCount() {
@@ -2268,16 +2273,19 @@ RecordFactory, AddGeometryCompleteAction {
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = recordDefinition;
     if (recordDefinition != null) {
-      setGeometryFactory(recordDefinition.getGeometryFactory());
       final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
       String geometryType = null;
+      GeometryFactory geometryFactory;
       if (geometryAttribute == null) {
+        geometryFactory = null;
         setVisible(false);
         setSelectSupported(false);
         setRenderer(null);
       } else {
+        geometryFactory = recordDefinition.getGeometryFactory();
         geometryType = geometryAttribute.getType().toString();
       }
+      setGeometryFactory(geometryFactory);
       final Icon icon = RecordStoreTableTreeNode.getIcon(geometryType);
       setIcon(icon);
       this.fieldNames = recordDefinition.getAttributeNames();

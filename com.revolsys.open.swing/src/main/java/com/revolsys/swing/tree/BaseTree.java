@@ -118,6 +118,11 @@ public class BaseTree extends JTree implements MouseListener,
   }
 
   @Override
+  public DefaultTreeModel getModel() {
+    return (DefaultTreeModel)super.getModel();
+  }
+
+  @Override
   public Rectangle getPathBounds(final TreePath path) {
     final Object lastPathComponent = path.getLastPathComponent();
     if (lastPathComponent instanceof BaseTreeNode) {
@@ -127,6 +132,12 @@ public class BaseTree extends JTree implements MouseListener,
       }
     }
     return super.getPathBounds(path);
+  }
+
+  public BaseTreeNode getRootNode() {
+    final TreeModel model = getModel();
+    final BaseTreeNode root = (BaseTreeNode)model.getRoot();
+    return root;
   }
 
   // private void initializePath(final TreePath path) {
@@ -141,12 +152,6 @@ public class BaseTree extends JTree implements MouseListener,
   // }
   // }
   // }
-
-  public BaseTreeNode getRootNode() {
-    final TreeModel model = getModel();
-    final BaseTreeNode root = (BaseTreeNode)model.getRoot();
-    return root;
-  }
 
   public TreePath getTreePath(final List<?> items) {
     final BaseTreeNode root = getRootNode();
@@ -240,6 +245,11 @@ public class BaseTree extends JTree implements MouseListener,
 
   public void setMenuEnabled(final boolean menuEnabled) {
     this.menuEnabled = menuEnabled;
+  }
+
+  public void setRoot(final BaseTreeNode root) {
+    final DefaultTreeModel model = getModel();
+    model.setRoot(root);
   }
 
   @Override

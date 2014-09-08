@@ -852,6 +852,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.overlayActionCursors.put(name, cursor);
   }
 
+  public void setProject(final Project project) {
+    this.project = project;
+    this.layerOverlay.setLayer(project);
+  }
+
   public synchronized void setScale(double scale) {
     if (!this.settingScale && !Double.isNaN(scale) && !Double.isInfinite(scale)) {
       try {

@@ -312,6 +312,10 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
     return this.name;
   }
 
+  public Icon getOpenIcon() {
+    return getIcon();
+  }
+
   @Override
   public BaseTreeNode getParent() {
     if (this.parent == null) {
@@ -344,7 +348,12 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
     final JTree tree, final Object value, final boolean selected,
     final boolean expanded, final boolean leaf, final int row,
     final boolean hasFocus) {
-    final Icon icon = getIcon();
+    final Icon icon;
+    if (expanded) {
+      icon = getOpenIcon();
+    } else {
+      icon = getIcon();
+    }
     if (icon != null && renderer instanceof JLabel) {
       ((JLabel)renderer).setIcon(icon);
     }

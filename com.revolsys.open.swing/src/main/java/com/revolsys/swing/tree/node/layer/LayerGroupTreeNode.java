@@ -29,9 +29,10 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 
 public class LayerGroupTreeNode extends AbstractLayerTreeNode implements
 MouseListener {
-  public static final Icon DISABLED_ICON = SilkIconLoader.getDisabledIcon("folder");
 
   public static final Icon ICON = SilkIconLoader.getIcon("folder");
+
+  public static final Icon ICON_OPEN = SilkIconLoader.getIcon("folder_open");
 
   public LayerGroupTreeNode(final LayerGroup layerGroup) {
     super(layerGroup);
@@ -116,10 +117,21 @@ MouseListener {
 
   @Override
   public Icon getIcon() {
-    if (getLayer().isVisible()) {
+    final Layer layer = getLayer();
+    if (layer.isVisible()) {
       return ICON;
     } else {
-      return DISABLED_ICON;
+      return SilkIconLoader.getDisabledIcon(ICON);
+    }
+  }
+
+  @Override
+  public Icon getOpenIcon() {
+    final Layer layer = getLayer();
+    if (layer.isVisible()) {
+      return ICON_OPEN;
+    } else {
+      return SilkIconLoader.getDisabledIcon(ICON_OPEN);
     }
   }
 

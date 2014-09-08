@@ -60,6 +60,7 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
+import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -137,6 +138,7 @@ public class ProjectFrame extends BaseFrame {
     MapObjectFactoryRegistry.addFactory(WikipediaBoundingBoxLayerWorker.FACTORY);
     MapObjectFactoryRegistry.addFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);
     MapObjectFactoryRegistry.addFactory(GeoReferencedImageLayer.FACTORY);
+    MapObjectFactoryRegistry.addFactory(BaseMapLayerGroup.FACTORY);
 
   }
 
@@ -184,6 +186,12 @@ public class ProjectFrame extends BaseFrame {
     DockingFramesUtil.setFlapSizes(this.dockControl);
 
     initUi();
+  }
+
+  public void actionNewProject() {
+    if (this.project != null && this.project.saveWithPrompt()) {
+      this.project.reset();
+    }
   }
 
   protected void addCatalogPanel() {
@@ -300,6 +308,9 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory createMenuFile() {
     final MenuFactory file = new MenuFactory("File");
 
+    file.addMenuItem("project", "New Project", "New Project",
+      SilkIconLoader.getIcon("layout_add"), this, "actionNewProject");
+
     file.addMenuItem("project", "Save Project", "Save Project",
       SilkIconLoader.getIcon("layout_save"), this.project, "saveAllSettings");
 
@@ -307,7 +318,7 @@ public class ProjectFrame extends BaseFrame {
     // "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-        "print");
+      "print");
 
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;
@@ -425,6 +436,10 @@ public class ProjectFrame extends BaseFrame {
     return this.dockControl;
   }
 
+  public MapPanel getMapPanel() {
+    return this.mapPanel;
+  }
+
   // public void expandConnectionManagers(final PropertyChangeEvent event) {
   // final Object newValue = event.getNewValue();
   // if (newValue instanceof ConnectionRegistry) {
@@ -441,10 +456,6 @@ public class ProjectFrame extends BaseFrame {
   // }
   // }
   // }
-
-  public MapPanel getMapPanel() {
-    return this.mapPanel;
-  }
 
   public Project getProject() {
     return this.project;
@@ -531,6 +542,19 @@ public class ProjectFrame extends BaseFrame {
 
   public void setExitOnClose(final boolean exitOnClose) {
     this.exitOnClose = exitOnClose;
+  }
+
+  public void setProject(final Project project) {
+    if (this.project != project) {
+      final Project oldProject = this.project;
+      this.mapPanel.setProject(project);
+      this.tocTree.setRoot(new ProjectTreeNode(project));
+      if (oldProject != null) {
+        oldProject.delete();
+      }
+      this.project = project;
+      firePropertyChange("project", oldProject, project);
+    }
   }
 
   @Override

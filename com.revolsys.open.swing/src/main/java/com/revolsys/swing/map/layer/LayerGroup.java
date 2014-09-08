@@ -324,6 +324,17 @@ Iterable<Layer> {
     return null;
   }
 
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    final LayerGroup layerGroup = getLayerGroup();
+    final GeometryFactory geometryFactory = super.getGeometryFactory();
+    if (geometryFactory == null && layerGroup != null) {
+      return layerGroup.getGeometryFactory();
+    } else {
+      return geometryFactory;
+    }
+  }
+
   protected File getGroupSettingsDirectory(final File directory) {
     final String name = getName();
     final String groupDirectoryName = FileUtil.getSafeFileName(name);
@@ -482,6 +493,14 @@ Iterable<Layer> {
   }
 
   @Override
+  public boolean isZoomToLayerEnabled() {
+    if (!getBoundingBox().isEmpty()) {
+      return true;
+    }
+    return false;
+  }
+
+  @Override
   public Iterator<Layer> iterator() {
     return getLayers().iterator();
   }
@@ -522,7 +541,7 @@ Iterable<Layer> {
           } else if (object != null) {
             LoggerFactory.getLogger(LayerGroup.class).error(
               "Unexpected object type " + object.getClass() + " in "
-                + childResource);
+                  + childResource);
           }
         } else {
           LoggerFactory.getLogger(LayerGroup.class).error(

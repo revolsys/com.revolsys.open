@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.TiledImageLayerRenderer;
 
-public abstract class AbstractTiledImageLayer extends AbstractLayer {
+public abstract class AbstractTiledImageLayer extends AbstractLayer implements
+  BaseMapLayer {
 
   private boolean hasError = false;
 

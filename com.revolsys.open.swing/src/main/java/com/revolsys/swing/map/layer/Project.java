@@ -53,7 +53,7 @@ public class Project extends LayerGroup {
   private static WeakReference<Project> project = new WeakReference<Project>(
     null);
 
-  private LayerGroup baseMapLayers = new LayerGroup("Base Maps");
+  private BaseMapLayerGroup baseMapLayers = new BaseMapLayerGroup();
 
   private RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
     "Project");
@@ -300,6 +300,18 @@ public class Project extends LayerGroup {
     if (name != null) {
       this.zoomBookmarks.remove(name);
     }
+  }
+
+  public void reset() {
+    clear();
+    this.baseMapLayers.clear();
+    this.recordStores = new RecordStoreConnectionRegistry("Project");
+    this.folderConnections = new FolderConnectionRegistry("Project");
+    this.initialBoundingBox = null;
+    this.resource = null;
+    this.viewBoundingBox = new BoundingBoxDoubleGf();
+    this.zoomBookmarks.clear();
+    firePropertyChange("reset", false, true);
   }
 
   public void save() {

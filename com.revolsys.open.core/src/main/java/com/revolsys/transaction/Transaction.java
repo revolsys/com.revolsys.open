@@ -138,6 +138,14 @@ public class Transaction implements AutoCloseable {
     return this.transactionStatus;
   }
 
+  public boolean isCompleted() {
+    if (this.transactionStatus == null) {
+      return true;
+    } else {
+      return this.transactionStatus.isCompleted();
+    }
+  }
+
   public boolean isRollbackOnly() {
     return this.transactionStatus.isRollbackOnly();
   }

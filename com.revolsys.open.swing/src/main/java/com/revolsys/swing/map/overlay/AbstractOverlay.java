@@ -58,8 +58,8 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
 
 public class AbstractOverlay extends JComponent implements
-PropertyChangeListener, MouseListener, MouseMotionListener,
-MouseWheelListener, KeyListener, FocusListener {
+  PropertyChangeListener, MouseListener, MouseMotionListener,
+  MouseWheelListener, KeyListener, FocusListener {
   public static final Cursor CURSOR_LINE_ADD_NODE = SilkIconLoader.getCursor(
     "cursor_line_node_add", 8, 6);
 
@@ -90,8 +90,6 @@ MouseWheelListener, KeyListener, FocusListener {
 
   private MapPanel map;
 
-  private Project project;
-
   private Point snapCentre;
 
   private java.awt.Point snapEventPoint;
@@ -111,7 +109,6 @@ MouseWheelListener, KeyListener, FocusListener {
   protected AbstractOverlay(final MapPanel map) {
     this.map = map;
     this.viewport = map.getViewport();
-    this.project = map.getProject();
 
     map.addMapOverlay(this);
   }
@@ -143,9 +140,9 @@ MouseWheelListener, KeyListener, FocusListener {
         text.append(typePath);
         text.append("</i></b>\n");
         text.append("<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">"
-            + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
-            + idAttributeName
-            + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th style=\"border-right: solid black 1px\">SRID</th><th>POINT</th></tr></th><tbody>");
+          + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
+          + idAttributeName
+          + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th style=\"border-right: solid black 1px\">SRID</th><th>POINT</th></tr></th><tbody>");
         for (final CloseLocation location : locations) {
           text.append("<tr style=\"border-bottom: solid black 1px\"><td style=\"border-right: solid black 1px\">");
           text.append(location.getId());
@@ -224,7 +221,6 @@ MouseWheelListener, KeyListener, FocusListener {
 
   public void destroy() {
     this.map = null;
-    this.project = null;
     this.snapEventPoint = null;
     this.snapPoint = null;
     this.snapPointLocationMap.clear();
@@ -376,7 +372,7 @@ MouseWheelListener, KeyListener, FocusListener {
   protected GeometryFactory getGeometryFactory() {
     GeometryFactory geometryFactory = this.geometryFactory;
     if (geometryFactory == null) {
-      geometryFactory = this.project.getGeometryFactory();
+      geometryFactory = getProject().getGeometryFactory();
       if (geometryFactory == null) {
         geometryFactory = getViewportGeometryFactory();
       }
@@ -456,11 +452,12 @@ MouseWheelListener, KeyListener, FocusListener {
   }
 
   public Project getProject() {
-    return this.project;
+    return this.map.getProject();
   }
 
   protected List<AbstractRecordLayer> getSnapLayers() {
-    return AbstractRecordLayer.getVisibleLayers(this.project);
+    final Project project = getProject();
+    return AbstractRecordLayer.getVisibleLayers(project);
   }
 
   public Point getSnapPoint() {
@@ -689,7 +686,7 @@ MouseWheelListener, KeyListener, FocusListener {
 
       boolean nodeSnap = false;
       final StringBuffer text = new StringBuffer(
-          "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
+        "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
       text.append("<li style=\"padding: 2px; margin:1px;");
       if (0 == this.snapPointIndex) {
         text.append("border: 2px solid maroon");

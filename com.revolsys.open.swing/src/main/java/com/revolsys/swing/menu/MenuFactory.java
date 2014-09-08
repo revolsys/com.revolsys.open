@@ -23,7 +23,7 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 
 public class MenuFactory extends AbstractObjectWithProperties implements
-  ComponentFactory<JMenuItem> {
+ComponentFactory<JMenuItem> {
 
   public static MenuFactory findMenu(final Class<?> clazz) {
     synchronized (CLASS_MENUS) {
@@ -309,6 +309,11 @@ public class MenuFactory extends AbstractObjectWithProperties implements
         } else if (item instanceof ActionMainMenuItemFactory) {
           final ActionMainMenuItemFactory actionFactory = (ActionMainMenuItemFactory)item;
           if (menuTitle.equals(actionFactory.getName())) {
+            delete = true;
+          }
+        } else if (item instanceof Action) {
+          final Action action = (Action)item;
+          if (menuTitle.equals(action.getValue(Action.NAME))) {
             delete = true;
           }
         }
