@@ -35,7 +35,6 @@ import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.algorithm.index.quadtree.GeometrySegmentQuadTree;
 import com.revolsys.gis.algorithm.index.quadtree.GeometryVertexQuadTree;
 import com.revolsys.jts.geom.BoundingBox;
@@ -46,6 +45,7 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.geom.vertex.VertexIndexComparator;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
@@ -60,19 +60,19 @@ import com.revolsys.util.MathUtil;
 public class AbstractOverlay extends JComponent implements
   PropertyChangeListener, MouseListener, MouseMotionListener,
   MouseWheelListener, KeyListener, FocusListener {
-  public static final Cursor CURSOR_LINE_ADD_NODE = SilkIconLoader.getCursor(
+  public static final Cursor CURSOR_LINE_ADD_NODE = Icons.getCursor(
     "cursor_line_node_add", 8, 6);
 
-  public static final Cursor CURSOR_LINE_SNAP = SilkIconLoader.getCursor(
+  public static final Cursor CURSOR_LINE_SNAP = Icons.getCursor(
     "cursor_line_snap", 8, 4);
 
-  public static final Cursor CURSOR_NODE_ADD = SilkIconLoader.getCursor(
+  public static final Cursor CURSOR_NODE_ADD = Icons.getCursor(
     "cursor_node_add", 8, 7);
 
-  public static final Cursor CURSOR_NODE_EDIT = SilkIconLoader.getCursor(
+  public static final Cursor CURSOR_NODE_EDIT = Icons.getCursor(
     "cursor_node_edit", 8, 7);
 
-  public static final Cursor CURSOR_NODE_SNAP = SilkIconLoader.getCursor(
+  public static final Cursor CURSOR_NODE_SNAP = Icons.getCursor(
     "cursor_node_snap", 8, 7);
 
   public static final Cursor DEFAULT_CURSOR = Cursor.getDefaultCursor();

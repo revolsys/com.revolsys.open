@@ -2,7 +2,6 @@ package com.revolsys.swing.menu;
 
 import java.awt.Component;
 
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 
 import com.revolsys.swing.action.AbstractAction;
@@ -10,10 +9,10 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.util.ExceptionUtil;
 
 public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
-  implements ComponentFactory<JMenuItem> {
+implements ComponentFactory<JMenuItem> {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 
@@ -33,11 +32,9 @@ public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
   @Override
   public JMenuItem createComponent() {
     if (isCheckBox()) {
-      return new JCheckBoxMenuItem(this);
+      return createCheckboxMenuItem();
     } else {
-      final JMenuItem menuItem = new JMenuItem(this);
-
-      return menuItem;
+      return createMenuItem();
     }
   }
 

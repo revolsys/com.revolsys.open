@@ -9,9 +9,9 @@ import java.util.Map.Entry;
 
 import javax.swing.Icon;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -25,7 +25,7 @@ import com.revolsys.util.ExceptionUtil;
  */
 public class FilterMultipleRenderer extends AbstractMultipleRenderer {
 
-  private static final Icon ICON = SilkIconLoader.getIcon("style_filter");
+  private static final Icon ICON = Icons.getIcon("style_filter");
 
   public FilterMultipleRenderer(final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {

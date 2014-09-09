@@ -9,8 +9,8 @@ import java.awt.print.PrinterJob;
 import javax.print.PrintService;
 import javax.swing.ImageIcon;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -23,7 +23,7 @@ public class Print extends I18nAction {
    */
   private static final long serialVersionUID = 8194892040166851551L;
 
-  private static final ImageIcon ICON = SilkIconLoader.getIcon("printer");
+  private static final ImageIcon ICON = Icons.getIcon("printer");
 
   private PrintService printService;
 

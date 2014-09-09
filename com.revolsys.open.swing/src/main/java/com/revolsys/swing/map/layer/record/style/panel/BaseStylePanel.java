@@ -30,7 +30,7 @@ import javax.swing.JTextField;
 import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.component.TogglePanel;
@@ -64,7 +64,7 @@ public class BaseStylePanel extends ValueField implements
     final List<Action> actions = new ArrayList<Action>();
     for (final String alignmentType : alignmentTypes) {
       final String iconName = ("line_" + type + "_" + alignmentType).toLowerCase();
-      final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+      final ImageIcon icon = Icons.getIcon(iconName);
       final String toolTip = CaseConverter.toCapitalizedWords(alignmentType
         + " " + type);
       final I18nAction action = new I18nAction(alignmentType, null, toolTip,
@@ -79,7 +79,7 @@ public class BaseStylePanel extends ValueField implements
     for (final String alignmentType : alignmentTypes) {
       final I18nAction action = new I18nAction(alignmentType, null,
         CaseConverter.toCapitalizedWords(alignmentType),
-        SilkIconLoader.getIcon("text_align_" + alignmentType));
+        Icons.getIcon("text_align_" + alignmentType));
       actions.add(action);
     }
     return actions;

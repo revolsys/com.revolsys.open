@@ -10,16 +10,14 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.i18n.I18nCharSequence;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.AbstractActionMainMenuItemFactory;
 import com.revolsys.swing.parallel.Invoke;
 
 public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
-
-  private static final long serialVersionUID = -5339626097125548212L;
 
   public static JButton createButton(final CharSequence name,
     final String toolTip, final Icon icon, final Object object,
@@ -42,32 +40,32 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     final Object object, final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, object,
       methodName, parameters);
-    final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(action);
-    return menuItem;
+    action.setCheckBox(true);
+    return (JCheckBoxMenuItem)action.createComponent();
   }
 
   public static JMenuItem createMenuItem(final String name, final Icon icon,
     final Object object, final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, icon,
       object, methodName, parameters);
-    final JMenuItem menuItem = new JMenuItem(action);
-    return menuItem;
+    return action.createComponent();
   }
 
   public static JMenuItem createMenuItem(final String name,
     final Object object, final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, object,
       methodName, parameters);
-    final JMenuItem menuItem = new JMenuItem(action);
-    return menuItem;
+    return action.createComponent();
   }
 
   public static JMenuItem createMenuItem(final String name,
     final String iconName, final Object object, final String methodName,
     final Object... parameters) {
-    final Icon icon = SilkIconLoader.getIcon(iconName);
+    final Icon icon = Icons.getIcon(iconName);
     return createMenuItem(name, icon, object, methodName, parameters);
   }
+
+  private static final long serialVersionUID = -5339626097125548212L;
 
   private boolean invokeLater;
 
@@ -95,13 +93,12 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     }
     if (name instanceof I18nCharSequence) {
       final I18nCharSequence i18nName = (I18nCharSequence)name;
-      i18nName.getI18n().addListener("locale",
-        new PropertyChangeListener() {
-          @Override
-          public void propertyChange(final PropertyChangeEvent evt) {
-            putValue(NAME, name.toString());
-          }
-        });
+      i18nName.getI18n().addListener("locale", new PropertyChangeListener() {
+        @Override
+        public void propertyChange(final PropertyChangeEvent evt) {
+          putValue(NAME, name.toString());
+        }
+      });
 
     }
   }
@@ -138,13 +135,12 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     }
     if (name instanceof I18nCharSequence) {
       final I18nCharSequence i18nName = (I18nCharSequence)name;
-      i18nName.getI18n().addListener("locale",
-        new PropertyChangeListener() {
-          @Override
-          public void propertyChange(final PropertyChangeEvent evt) {
-            putValue(NAME, name.toString());
-          }
-        });
+      i18nName.getI18n().addListener("locale", new PropertyChangeListener() {
+        @Override
+        public void propertyChange(final PropertyChangeEvent evt) {
+          putValue(NAME, name.toString());
+        }
+      });
 
     }
   }

@@ -16,8 +16,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.beans.ClassRegistry;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.swing.Icons;
+import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
@@ -89,8 +90,8 @@ ComponentFactory<JMenuItem> {
     this.name = name;
   }
 
-  public void addCheckboxMenuItem(final String groupName, final Action action,
-    final EnableCheck itemChecked) {
+  public void addCheckboxMenuItem(final String groupName,
+    final AbstractAction action, final EnableCheck itemChecked) {
     final ActionMainMenuItemFactory factory = new ActionMainMenuItemFactory(
       itemChecked, action);
     addComponentFactory(groupName, factory);
@@ -128,7 +129,7 @@ ComponentFactory<JMenuItem> {
     getGroup(groupName);
   }
 
-  public void addMenuItem(final Action action) {
+  public void addMenuItem(final AbstractAction action) {
     addMenuItem("default", action);
   }
 
@@ -143,20 +144,14 @@ ComponentFactory<JMenuItem> {
     return menuItem;
   }
 
-  public void addMenuItem(final String groupName, final Action action) {
-    if (action == this) {
-      throw new RuntimeException("Cannot recursively add");
-    }
+  public void addMenuItem(final String groupName, final AbstractAction action) {
     final ActionMainMenuItemFactory factory = new ActionMainMenuItemFactory(
       action);
     addComponentFactory(groupName, factory);
   }
 
   public void addMenuItem(final String groupName, final int index,
-    final Action action) {
-    if (action == this) {
-      throw new RuntimeException("Cannot recursively add");
-    }
+    final AbstractAction action) {
     final ActionMainMenuItemFactory factory = new ActionMainMenuItemFactory(
       action);
     addComponentFactory(groupName, index, factory);
@@ -165,7 +160,7 @@ ComponentFactory<JMenuItem> {
   public void addMenuItem(final String groupName, final int index,
     final String title, final String iconName, final EnableCheck enableCheck,
     final Object object, final String methodName, final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final ImageIcon icon = Icons.getIcon(iconName);
     final InvokeMethodAction menuItem = createMenuItem(title, title, icon,
       enableCheck, object, methodName, parameters);
     addComponentFactory(groupName, index, menuItem);
@@ -174,7 +169,7 @@ ComponentFactory<JMenuItem> {
   public void addMenuItem(final String groupName, final int index,
     final String title, final String iconName, final Object object,
     final String methodName, final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final ImageIcon icon = Icons.getIcon(iconName);
     final InvokeMethodAction menuItem = createMenuItem(title, title, icon,
       null, object, methodName, parameters);
     addComponentFactory(groupName, index, menuItem);
@@ -200,7 +195,7 @@ ComponentFactory<JMenuItem> {
   public void addMenuItemTitleIcon(final String groupName, final String title,
     final String iconName, final EnableCheck enableCheck, final Object object,
     final String methodName, final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final ImageIcon icon = Icons.getIcon(iconName);
     addMenuItem(groupName, title, title, icon, enableCheck, object, methodName,
       parameters);
   }
@@ -208,7 +203,7 @@ ComponentFactory<JMenuItem> {
   public void addMenuItemTitleIcon(final String groupName, final String title,
     final String iconName, final Object object, final String methodName,
     final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final ImageIcon icon = Icons.getIcon(iconName);
     final InvokeMethodAction menuItem = createMenuItem(title, title, icon,
       null, object, methodName, parameters);
     addComponentFactory(groupName, menuItem);

@@ -20,11 +20,11 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -45,7 +45,7 @@ public class ZoomOverlay extends AbstractOverlay {
 
   private static final Cursor CURSOR_PAN = new Cursor(Cursor.HAND_CURSOR);
 
-  private static final Cursor CURSOR_ZOOM_BOX = SilkIconLoader.getCursor(
+  private static final Cursor CURSOR_ZOOM_BOX = Icons.getCursor(
     "cursor_zoom_box", 9, 9);
 
   private static final long serialVersionUID = 1L;

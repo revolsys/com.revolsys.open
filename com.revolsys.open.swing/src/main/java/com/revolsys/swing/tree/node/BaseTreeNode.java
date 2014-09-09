@@ -27,6 +27,7 @@ import javax.swing.tree.TreePath;
 import com.revolsys.collection.IteratorEnumeration;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -38,7 +39,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
-  PropertyChangeListener {
+PropertyChangeListener {
 
   @SuppressWarnings("unchecked")
   public static <V> V getUserData(final TreePath path) {
@@ -53,7 +54,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
   private boolean visible = true;
 
   public static final EnableCheck NODE_EXISTS = new TreeNodePropertyEnableCheck(
-    "exists");
+      "exists");
 
   private boolean allowsChildren;
 
@@ -143,7 +144,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
   }
 
   public boolean dndImportData(final TransferSupport support, int index)
-    throws IOException, UnsupportedFlavorException {
+      throws IOException, UnsupportedFlavorException {
     if (!TreeTransferHandler.isDndNoneAction(support)) {
       final Transferable transferable = support.getTransferable();
       if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {
@@ -355,7 +356,10 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
       icon = getIcon();
     }
     if (icon != null && renderer instanceof JLabel) {
-      ((JLabel)renderer).setIcon(icon);
+      final JLabel label = (JLabel)renderer;
+      label.setIcon(icon);
+      final Icon disabledIcon = Icons.getDisabledIcon(icon);
+      label.setDisabledIcon(disabledIcon);
     }
     return renderer;
   }

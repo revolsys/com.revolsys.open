@@ -17,7 +17,6 @@ import javax.swing.SwingUtilities;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
@@ -27,6 +26,7 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.raster.BufferedGeoReferencedImage;
 import com.revolsys.raster.GeoReferencedImage;
 import com.revolsys.raster.MappedLocation;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.MapPanel;
@@ -43,10 +43,10 @@ import com.revolsys.swing.undo.SetObjectProperty;
 public class EditGeoReferencedImageOverlay extends AbstractOverlay {
   private static final String ACTION_TIE_POINT_ADD = "Add Tie Point";
 
-  private static final Cursor CURSOR_MOVE_IMAGE = SilkIconLoader.getCursor(
+  private static final Cursor CURSOR_MOVE_IMAGE = Icons.getCursor(
     "cursor_move", 8, 7);
 
-  private static final Cursor CURSOR_SOURCE_PIXEL_ADD = SilkIconLoader.getCursor(
+  private static final Cursor CURSOR_SOURCE_PIXEL_ADD = Icons.getCursor(
     "cursor_source_pixel_add", 5, 5);
 
   private static final Color COLOR_OUTLINE = WebColors.Black;

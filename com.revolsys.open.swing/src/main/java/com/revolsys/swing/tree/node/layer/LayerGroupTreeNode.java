@@ -21,7 +21,7 @@ import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -30,9 +30,9 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 public class LayerGroupTreeNode extends AbstractLayerTreeNode implements
 MouseListener {
 
-  public static final Icon ICON = SilkIconLoader.getIcon("folder");
+  public static final Icon ICON = Icons.getIcon("folder");
 
-  public static final Icon ICON_OPEN = SilkIconLoader.getIcon("folder_open");
+  public static final Icon ICON_OPEN = Icons.getIcon("folder_open");
 
   public LayerGroupTreeNode(final LayerGroup layerGroup) {
     super(layerGroup);
@@ -121,7 +121,7 @@ MouseListener {
     if (layer.isVisible()) {
       return ICON;
     } else {
-      return SilkIconLoader.getDisabledIcon(ICON);
+      return Icons.getDisabledIcon(ICON);
     }
   }
 
@@ -131,7 +131,7 @@ MouseListener {
     if (layer.isVisible()) {
       return ICON_OPEN;
     } else {
-      return SilkIconLoader.getDisabledIcon(ICON_OPEN);
+      return Icons.getDisabledIcon(ICON_OPEN);
     }
   }
 

@@ -12,19 +12,19 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.revolsys.data.io.RecordReaderFactory;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.raster.GeoReferencedImageFactory;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
@@ -45,7 +45,7 @@ public class AddFileLayerAction extends AbstractAction {
     final Class<? extends IoFactory> factoryClass) {
     final Map<String, FileFilter> filtersByName = new TreeMap<>();
     final Set<IoFactory> factories = IoFactoryRegistry.getInstance()
-      .getFactories(factoryClass);
+        .getFactories(factoryClass);
     for (final IoFactory factory : factories) {
       final List<String> fileExtensions = factory.getFileExtensions();
       String description = factory.getName();
@@ -62,7 +62,7 @@ public class AddFileLayerAction extends AbstractAction {
 
   public AddFileLayerAction() {
     putValue(NAME, "Open File Layer");
-    putValue(SMALL_ICON, SilkIconLoader.getIcon("page_add"));
+    putValue(SMALL_ICON, Icons.getIcon("page_add"));
   }
 
   @Override
@@ -77,7 +77,7 @@ public class AddFileLayerAction extends AbstractAction {
     }
 
     final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(),
-      "currentDirectory");
+        "currentDirectory");
     fileChooser.setMultiSelectionEnabled(true);
 
     final List<FileFilter> imageFileFilters = new ArrayList<FileFilter>();

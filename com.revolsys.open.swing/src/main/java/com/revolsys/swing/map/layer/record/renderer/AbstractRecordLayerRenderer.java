@@ -14,12 +14,12 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.filter.MultipleAttributeValuesFilter;
 import com.revolsys.data.record.Record;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.filter.AcceptAllFilter;
 import com.revolsys.filter.Filter;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.TopologyException;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -140,7 +140,7 @@ public abstract class AbstractRecordLayerRenderer extends
 
     for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
       final String iconName = ("style_" + type + "_wrap").toLowerCase();
-      final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+      final ImageIcon icon = Icons.getIcon(iconName);
       final InvokeMethodAction action = MenuSourceRunnable.createAction(
         "Wrap With " + type + " Style", icon, null, "wrapWith" + type + "Style");
       menu.addMenuItem("wrap", action);

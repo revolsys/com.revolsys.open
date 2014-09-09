@@ -32,7 +32,6 @@ import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -46,6 +45,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
@@ -123,7 +123,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
 
   private static final String ACTION_MOVE_GEOMETRY = "moveGeometry";
 
-  private static final Cursor CURSOR_MOVE = SilkIconLoader.getCursor(
+  private static final Cursor CURSOR_MOVE = Icons.getCursor(
     "cursor_move", 8, 7);
 
   public static final SelectedRecordsRenderer MOVE_GEOMETRY_RENDERER = new SelectedRecordsRenderer(

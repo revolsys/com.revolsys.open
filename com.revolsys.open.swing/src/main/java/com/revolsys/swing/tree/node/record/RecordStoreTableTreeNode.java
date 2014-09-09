@@ -8,8 +8,8 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.Path;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
@@ -28,7 +28,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     return icon;
   }
 
-  public static final ImageIcon ICON_TABLE = SilkIconLoader.getIcon("table");
+  public static final ImageIcon ICON_TABLE = Icons.getIcon("table");
 
   public static Map<String, Icon> ICONS_GEOMETRY = new HashMap<String, Icon>();
 
@@ -38,7 +38,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     for (final String geometryType : Arrays.asList("Point", "MultiPoint",
       "LineString", "MultiLineString", "Polygon", "MultiPolygon")) {
       ICONS_GEOMETRY.put(geometryType,
-        SilkIconLoader.getIcon("table_" + geometryType.toLowerCase()));
+        Icons.getIcon("table_" + geometryType.toLowerCase()));
     }
 
     MENU.addMenuItem("default",

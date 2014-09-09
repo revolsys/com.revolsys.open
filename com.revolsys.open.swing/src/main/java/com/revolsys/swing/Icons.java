@@ -1,4 +1,4 @@
-package com.revolsys.famfamfam.silk;
+package com.revolsys.swing;
 
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -22,15 +22,43 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.collection.WeakCache;
 import com.revolsys.util.OS;
 
-public class SilkIconLoader {
+public class Icons {
   public static void addIcon(final List<Icon> icons, Icon icon,
     final boolean enabled) {
     if (icon != null) {
       if (!enabled) {
-        icon = SilkIconLoader.getDisabledIcon(icon);
+        icon = Icons.getDisabledIcon(icon);
       }
       icons.add(icon);
     }
+  }
+
+  public static BufferedImage alpha(final BufferedImage original,
+    final float percent) {
+    final int width = original.getWidth();
+    final int height = original.getHeight();
+    final int type = original.getType();
+    final BufferedImage newImage = new BufferedImage(width, height, type);
+
+    final int[] avgLUT = new int[766];
+    for (int i = 0; i < avgLUT.length; i++) {
+      avgLUT[i] = i / 3;
+    }
+
+    for (int i = 0; i < width; i++) {
+      for (int j = 0; j < height; j++) {
+        final int rgb = original.getRGB(i, j);
+        final int alpha = rgb >> 24 & 0xff;
+      final int red = rgb >> 16 & 0xff;
+    final int green = rgb >> 8 & 0xff;
+    final int blue = rgb & 0xff;
+    final int newAlpha = (int)Math.ceil(alpha * percent);
+    final int newRgb = WebColors.colorToRGB(newAlpha, red, green, blue);
+
+    newImage.setRGB(i, j, newRgb);
+      }
+    }
+    return newImage;
   }
 
   public static Cursor getCursor(final String imageName) {
@@ -62,17 +90,21 @@ public class SilkIconLoader {
   }
 
   public static Icon getDisabledIcon(final Icon icon) {
-    ImageIcon disabledIcon = null;
-    final Reference<ImageIcon> iconReference = DISABLED_ICON_BY_ICON.get(icon);
-    if (iconReference != null) {
-      disabledIcon = iconReference.get();
+    if (icon == null) {
+      return null;
+    } else {
+      ImageIcon disabledIcon = null;
+      final Reference<ImageIcon> iconReference = DISABLED_ICON_BY_ICON.get(icon);
+      if (iconReference != null) {
+        disabledIcon = iconReference.get();
+      }
+      if (disabledIcon == null) {
+        disabledIcon = new ImageIcon(
+          getDisabledImage((BufferedImage)((ImageIcon)icon).getImage()));
+        DISABLED_ICON_BY_ICON.put(icon, new WeakReference<>(disabledIcon));
+      }
+      return disabledIcon;
     }
-    if (disabledIcon == null) {
-      disabledIcon = new ImageIcon(
-        grayscale((BufferedImage)((ImageIcon)icon).getImage()));
-      DISABLED_ICON_BY_ICON.put(icon, new WeakReference<>(disabledIcon));
-    }
-    return disabledIcon;
   }
 
   public static ImageIcon getDisabledIcon(final String imageName) {
@@ -96,6 +128,10 @@ public class SilkIconLoader {
     return icon;
   }
 
+  public static BufferedImage getDisabledImage(final BufferedImage image) {
+    return alpha(image, 0.30f);
+  }
+
   public static Image getDisabledImage(final String imageName) {
     BufferedImage image = null;
     final Reference<BufferedImage> imageReference = DISABLED_IMAGE_CACHE.get(imageName);
@@ -104,7 +140,7 @@ public class SilkIconLoader {
     }
     if (image == null) {
       image = getImage(imageName);
-      image = grayscale(image);
+      image = getDisabledImage(image);
       DISABLED_IMAGE_CACHE.put(imageName, new WeakReference<>(image));
     }
     return image;
@@ -162,7 +198,7 @@ public class SilkIconLoader {
   public static BufferedImage getImage(final String imageName,
     final String fileExtension) {
     BufferedImage image;
-    final Class<?> clazz = SilkIconLoader.class;
+    final Class<?> clazz = Icons.class;
     final String resourceName = RESOURCE_FOLDER + imageName + "."
         + fileExtension;
     InputStream in = clazz.getResourceAsStream(resourceName);
@@ -248,8 +284,7 @@ public class SilkIconLoader {
     return new ImageIcon(newImage);
   }
 
-  public static final String RESOURCE_FOLDER = "/"
-      + SilkIconLoader.class.getPackage().getName().replace(".", "/") + "/icons/";
+  public static final String RESOURCE_FOLDER = "/com/revolsys/famfamfam/silk/icons/";
 
   private static final Map<String, Reference<BufferedImage>> IMAGE_CACHE = new HashMap<>();
 

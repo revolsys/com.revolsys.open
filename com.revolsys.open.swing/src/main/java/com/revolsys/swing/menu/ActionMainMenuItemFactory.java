@@ -7,6 +7,7 @@ import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 
+import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.util.ExceptionUtil;
@@ -15,14 +16,14 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
 
   private EnableCheck checkBoxSelectedCheck;
 
-  private final Action action;
+  private final AbstractAction action;
 
-  public ActionMainMenuItemFactory(final Action action) {
+  public ActionMainMenuItemFactory(final AbstractAction action) {
     this.action = action;
   }
 
   public ActionMainMenuItemFactory(final EnableCheck checkBoxSelectedCheck,
-    final Action action) {
+    final AbstractAction action) {
     this(action);
     this.checkBoxSelectedCheck = checkBoxSelectedCheck;
   }
@@ -43,12 +44,12 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
 
   @Override
   public JMenuItem createComponent() {
-    if (this.checkBoxSelectedCheck != null) {
-      final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(this.action);
+    if (this.checkBoxSelectedCheck == null) {
+      return this.action.createMenuItem();
+    } else {
+      final JCheckBoxMenuItem menuItem = this.action.createCheckboxMenuItem();
       menuItem.setSelected(this.checkBoxSelectedCheck.isEnabled());
       return menuItem;
-    } else {
-      return new JMenuItem(this.action);
     }
   }
 

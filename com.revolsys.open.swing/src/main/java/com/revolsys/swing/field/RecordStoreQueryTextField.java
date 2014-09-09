@@ -53,7 +53,7 @@ import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.list.RecordListCellRenderer;
@@ -64,7 +64,7 @@ public class RecordStoreQueryTextField extends TextField implements
 DocumentListener, KeyListener, MouseListener, FocusListener,
 ListDataListener, ItemSelectable, Field, ListSelectionListener,
 HighlightPredicate {
-  private static final Icon ICON_DELETE = SilkIconLoader.getIcon("delete");
+  private static final Icon ICON_DELETE = Icons.getIcon("delete");
 
   private static final long serialVersionUID = 1L;
 

@@ -15,7 +15,7 @@ import javax.swing.text.Document;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -48,8 +48,8 @@ public class TextNameField extends ValueField {
     this.fieldNamesField.setRenderer(converter);
 
     final JButton addButton = InvokeMethodAction.createButton(null,
-      "Add field name", SilkIconLoader.getIcon("add"), this, "addFieldName");
-    addButton.setIcon(SilkIconLoader.getIcon("add"));
+      "Add field name", Icons.getIcon("add"), this, "addFieldName");
+    addButton.setIcon(Icons.getIcon("add"));
     addButton.setToolTipText("Add field Name");
 
     final BasePanel fieldNamesPanel = new BasePanel(new FlowLayout(

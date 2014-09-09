@@ -17,7 +17,6 @@ import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.revolsys.beans.InvokeMethodCallable;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.InvokeMethodMapObjectFactory;
@@ -35,6 +34,7 @@ import com.revolsys.raster.GeoReferencedImageFactory;
 import com.revolsys.raster.MappedLocation;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.DockingFramesUtil;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -118,7 +118,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     setRenderer(new GeoReferencedImageLayerRenderer(this));
     final int opacity = CollectionUtil.getInteger(properties, "opacity", 255);
     setOpacity(opacity);
-    setIcon(SilkIconLoader.getIcon("picture"));
+    setIcon(Icons.getIcon("picture"));
   }
 
   public void cancelChanges() {

@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -25,11 +25,11 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 public class LayerTreeNode extends AbstractLayerTreeNode implements
   MouseListener {
 
-  private static final Icon EDIT_ICON = SilkIconLoader.getIcon("pencil");
+  private static final Icon EDIT_ICON = Icons.getIcon("pencil");
 
-  private static final Icon SELECT_ICON = SilkIconLoader.getIcon("map_select");
+  private static final Icon SELECT_ICON = Icons.getIcon("map_select");
 
-  private static final Icon NOT_EXISTS_ICON = SilkIconLoader.getIcon("error");
+  private static final Icon NOT_EXISTS_ICON = Icons.getIcon("error");
 
   private static final Map<List<Icon>, Icon> ICON_CACHE = new HashMap<List<Icon>, Icon>();
 
@@ -90,19 +90,19 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements
     } else {
       final Icon layerIcon = layer.getIcon();
       if (layer.getRenderer() == null) {
-        SilkIconLoader.addIcon(icons, layerIcon, true);
+        Icons.addIcon(icons, layerIcon, true);
       } else {
         final boolean visible = layer.isVisible();
-        SilkIconLoader.addIcon(icons, layerIcon, visible);
+        Icons.addIcon(icons, layerIcon, visible);
         if (layer.isSelectSupported()) {
 
           final boolean selectable = layer.isSelectable();
-          SilkIconLoader.addIcon(icons, SELECT_ICON, selectable);
+          Icons.addIcon(icons, SELECT_ICON, selectable);
         }
       }
       if (!layer.isReadOnly()) {
         final boolean editable = layer.isEditable();
-        SilkIconLoader.addIcon(icons, EDIT_ICON, editable);
+        Icons.addIcon(icons, EDIT_ICON, editable);
       }
       if (icons.isEmpty()) {
         return null;
@@ -111,7 +111,7 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements
       } else {
         Icon icon = ICON_CACHE.get(icons);
         if (icon == null) {
-          icon = SilkIconLoader.merge(icons, 5);
+          icon = Icons.merge(icons, 5);
           ICON_CACHE.put(icons, icon);
         }
         return icon;

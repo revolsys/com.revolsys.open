@@ -21,12 +21,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.data.record.Record;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.MapPanel;
@@ -52,13 +52,13 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private static final Color COLOR_BOX_TRANSPARENT = WebColors.setAlpha(
     COLOR_BOX, 127);
 
-  private static final Cursor CURSOR_SELECT_BOX = SilkIconLoader.getCursor(
+  private static final Cursor CURSOR_SELECT_BOX = Icons.getCursor(
     "cursor_select_box", 9, 9);
 
-  private static final Cursor CURSOR_SELECT_BOX_ADD = SilkIconLoader.getCursor(
+  private static final Cursor CURSOR_SELECT_BOX_ADD = Icons.getCursor(
     "cursor_select_box_add", 9, 9);
 
-  private static final Cursor CURSOR_SELECT_BOX_DELETE = SilkIconLoader.getCursor(
+  private static final Cursor CURSOR_SELECT_BOX_DELETE = Icons.getCursor(
     "cursor_select_box_delete", 9, 9);
 
   public static final SelectedRecordsRenderer HIGHLIGHT_RENDERER = new SelectedRecordsRenderer(

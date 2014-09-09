@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 
@@ -16,9 +15,10 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.record.schema.RecordStoreSchemaElement;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.datastore.RecordStoreConnection;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodePropertyEnableCheck;
@@ -27,7 +27,7 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
 public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements
-RecordStoreProxy, RecordStoreConnectionMapProxy {
+  RecordStoreProxy, RecordStoreConnectionMapProxy {
   public static List<BaseTreeNode> getChildren(
     final Map<String, Object> connectionMap, final RecordStore recordStore) {
     if (recordStore == null) {
@@ -66,7 +66,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
     return children;
   }
 
-  public static final Icon ICON = SilkIconLoader.getIcon("database_link");
+  public static final Icon ICON = Icons.getIcon("database_link");
 
   private static final MenuFactory MENU = new MenuFactory();
 
@@ -74,7 +74,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
     final EnableCheck notReadOnly = new TreeNodePropertyEnableCheck("readOnly",
       false);
 
-    final Action refresh = TreeNodeRunnable.createAction("Refresh",
+    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",
       "arrow_refresh", "refresh");
     MENU.addMenuItem("default", refresh);
 
@@ -94,8 +94,8 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
     final RecordStoreConnection connection = getConnection();
     final int confirm = JOptionPane.showConfirmDialog(
       SwingUtil.getActiveWindow(), "Delete data store connection '"
-          + connection.getName() + "'? This action cannot be undone.",
-          "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+        + connection.getName() + "'? This action cannot be undone.",
+      "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
     if (confirm == JOptionPane.OK_OPTION) {
       connection.delete();
     }

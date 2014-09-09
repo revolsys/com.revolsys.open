@@ -12,13 +12,13 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.file.FileTreeNode;
 
 public class BaseTreeCellRenderer extends DefaultTreeCellRenderer implements
 ImageObserver {
-  private static final ImageIcon ICON_MISSING = SilkIconLoader.getIcon("error");
+  private static final ImageIcon ICON_MISSING = Icons.getIcon("error");
 
   private static final long serialVersionUID = 1L;
 

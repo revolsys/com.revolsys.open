@@ -14,8 +14,8 @@ import javax.swing.Icon;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.beans.AbstractPropertyChangeObject;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.panel.BaseStylePanel;
@@ -26,7 +26,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   AbstractPropertyChangeObject implements LayerRenderer<T>,
   PropertyChangeListener, Cloneable {
 
-  private static final Icon ICON = SilkIconLoader.getIcon("palette");
+  private static final Icon ICON = Icons.getIcon("palette");
 
   private Icon icon = ICON;
 

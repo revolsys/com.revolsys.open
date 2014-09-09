@@ -4,8 +4,8 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.table.TablePanel;
@@ -28,7 +28,7 @@ public class RecordRowRunnable extends InvokeMethodRunnable {
   public static InvokeMethodAction createAction(final CharSequence name,
     final String iconName, final EnableCheck enableCheck,
     final String methodName, final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final ImageIcon icon = Icons.getIcon(iconName);
     return createAction(name, icon, enableCheck, methodName, parameters);
   }
 

@@ -44,7 +44,6 @@ import bibliothek.gui.dock.common.theme.CEclipseTheme;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.datastore.RecordStoreConnectionManager;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionManager;
@@ -55,6 +54,7 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.net.urlcache.FileResponseCache;
 import com.revolsys.swing.DockingFramesUtil;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BaseFrame;
@@ -279,7 +279,7 @@ public class ProjectFrame extends BaseFrame {
       "Background Tasks", panel);
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = InvokeMethodAction.createButton(null,
-      "View Running Tasks", SilkIconLoader.getIcon("time_go"), dockable,
+      "View Running Tasks", Icons.getIcon("time_go"), dockable,
       "toFront");
     viewTasksAction.setBorderPainted(false);
     progressBar.add(viewTasksAction, BorderLayout.EAST);
@@ -309,10 +309,10 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory file = new MenuFactory("File");
 
     file.addMenuItem("project", "New Project", "New Project",
-      SilkIconLoader.getIcon("layout_add"), this, "actionNewProject");
+      Icons.getIcon("layout_add"), this, "actionNewProject");
 
     file.addMenuItem("project", "Save Project", "Save Project",
-      SilkIconLoader.getIcon("layout_save"), this.project, "saveAllSettings");
+      Icons.getIcon("layout_save"), this.project, "saveAllSettings");
 
     // file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
     // "save");
@@ -328,7 +328,7 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory tools = new MenuFactory("Tools");
 
     tools.addMenuItem("script", "Run Script...", "Run Script",
-      SilkIconLoader.getIcon("script_go"), this, "runScript");
+      Icons.getIcon("script_go"), this, "runScript");
     return tools;
   }
 

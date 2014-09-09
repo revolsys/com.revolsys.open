@@ -8,8 +8,8 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.map.MapSerializerUtil;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -26,7 +26,7 @@ public abstract class AbstractMultipleRenderer extends
   protected static void addMenuItem(final MenuFactory menu, final String type,
     final Class<?> rendererClass) {
     final String iconName = ("style_" + type + "_go").toLowerCase();
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final ImageIcon icon = Icons.getIcon(iconName);
 
     final EnableCheck enableCheck = new MenuSourcePropertyEnableCheck(
       "class", rendererClass, true);
@@ -42,7 +42,7 @@ public abstract class AbstractMultipleRenderer extends
     for (final String type : Arrays.asList("Geometry", "Text", "Marker",
       "Multiple", "Filter", "Scale")) {
       final String iconName = ("style_" + type + "_add").toLowerCase();
-      final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+      final ImageIcon icon = Icons.getIcon(iconName);
       final InvokeMethodAction action = MenuSourceRunnable.createAction(
         "Add " + type + " Style", icon, null, "add" + type + "Style");
       menu.addMenuItem("add", action);

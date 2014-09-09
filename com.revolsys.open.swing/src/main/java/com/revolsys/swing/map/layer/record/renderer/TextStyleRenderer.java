@@ -27,7 +27,6 @@ import javax.swing.Icon;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.Record;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.jts.PointUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.PointWithOrientation;
@@ -38,6 +37,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -369,7 +369,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
   public static final AffineTransform NOOP_TRANSFORM = AffineTransform.getTranslateInstance(
     0, 0);
 
-  private static final Icon ICON = SilkIconLoader.getIcon("style_text");
+  private static final Icon ICON = Icons.getIcon("style_text");
 
   private TextStyle style;
 

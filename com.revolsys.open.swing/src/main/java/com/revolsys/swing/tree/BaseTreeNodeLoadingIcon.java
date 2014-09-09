@@ -16,7 +16,7 @@ import javax.swing.tree.TreePath;
 
 import org.apache.commons.collections4.set.MapBackedSet;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 
 public class BaseTreeNodeLoadingIcon implements ImageObserver {
@@ -29,8 +29,8 @@ public class BaseTreeNodeLoadingIcon implements ImageObserver {
   }
 
   private static ImageIcon createIcon() {
-    final Class<?> clazz = SilkIconLoader.class;
-    final String resourceName = SilkIconLoader.RESOURCE_FOLDER + "loading.gif";
+    final Class<?> clazz = Icons.class;
+    final String resourceName = Icons.RESOURCE_FOLDER + "loading.gif";
     final URL resource = clazz.getResource(resourceName);
     return new ImageIcon(resource);
   }

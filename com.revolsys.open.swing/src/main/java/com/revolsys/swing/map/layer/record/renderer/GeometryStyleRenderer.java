@@ -14,13 +14,13 @@ import javax.swing.ImageIcon;
 
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -33,7 +33,7 @@ import com.revolsys.swing.map.util.GeometryShapeUtil;
 
 public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
 
-  private static final Icon ICON = SilkIconLoader.getIcon("style_geometry");
+  private static final Icon ICON = Icons.getIcon("style_geometry");
 
   public static GeneralPath getLineShape() {
     final GeneralPath path = new GeneralPath();

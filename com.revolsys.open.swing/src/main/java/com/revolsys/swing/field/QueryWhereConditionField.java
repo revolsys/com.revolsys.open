@@ -83,8 +83,8 @@ import com.revolsys.data.query.Value;
 import com.revolsys.data.query.functions.Function;
 import com.revolsys.data.record.schema.Attribute;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.spring.SpelUtil;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BasePanel;
@@ -135,7 +135,7 @@ MouseListener, CaretListener, ItemListener {
     }
   }
 
-  private static final ImageIcon ICON = SilkIconLoader.getIcon("add");
+  private static final ImageIcon ICON = Icons.getIcon("add");
 
   private static final long serialVersionUID = 1L;
 

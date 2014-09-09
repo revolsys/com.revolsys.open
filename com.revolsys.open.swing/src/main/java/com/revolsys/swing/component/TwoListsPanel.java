@@ -11,7 +11,7 @@ import javax.swing.Spring;
 import javax.swing.SpringLayout;
 import javax.swing.SpringLayout.Constraints;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.listener.InvokeMethodListSelectionListener;
 
@@ -24,10 +24,10 @@ public class TwoListsPanel<T> extends JPanel {
   private final JList leftList;
 
   private final JButton moveLeftButton = new JButton(new InvokeMethodAction(
-    SilkIconLoader.getIcon("arrow_left"), this, "moveSelectedLeft"));
+    Icons.getIcon("arrow_left"), this, "moveSelectedLeft"));
 
   private final JButton moveRightButton = new JButton(new InvokeMethodAction(
-    SilkIconLoader.getIcon("arrow_right"), this, "moveSelectedLeft"));
+    Icons.getIcon("arrow_right"), this, "moveSelectedLeft"));
 
   private final JList rightList;
 

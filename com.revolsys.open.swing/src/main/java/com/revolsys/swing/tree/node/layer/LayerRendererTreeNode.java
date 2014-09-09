@@ -18,7 +18,7 @@ import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.TreePath;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -30,7 +30,7 @@ import com.revolsys.util.Property;
 
 public class LayerRendererTreeNode extends ListTreeNode implements
 MouseListener {
-  public static final Icon ICON = SilkIconLoader.getIcon("folder");
+  public static final Icon ICON = Icons.getIcon("folder");
 
   public LayerRendererTreeNode(final LayerRenderer<?> renderer) {
     super(renderer);

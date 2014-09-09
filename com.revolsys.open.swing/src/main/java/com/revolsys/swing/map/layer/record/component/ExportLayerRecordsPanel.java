@@ -23,9 +23,9 @@ import com.revolsys.data.query.functions.EnvelopeIntersects;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.BoundingBox;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.I18nAction;
 import com.revolsys.swing.component.BasePanel;
@@ -80,13 +80,13 @@ public class ExportLayerRecordsPanel extends BasePanel {
     final List<Action> actions = new ArrayList<>();
 
     actions.add(new I18nAction("allRecords", null, "All Records",
-      SilkIconLoader.getIcon("table_filter")));
+      Icons.getIcon("table_filter")));
 
     actions.add(new I18nAction("mapRecords", null, "Records on Map",
-      SilkIconLoader.getIcon("map_filter")));
+      Icons.getIcon("map_filter")));
 
     actions.add(new I18nAction("selectedRecords", null, "Selected Records",
-      SilkIconLoader.getIcon("filter_selected")));
+      Icons.getIcon("filter_selected")));
 
     this.recordsFilterType = new TogglePanel("recordsFilterType", "",
       new Dimension(28, 28), actions);

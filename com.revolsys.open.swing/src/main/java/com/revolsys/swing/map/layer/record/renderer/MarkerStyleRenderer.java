@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.Icon;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.PointWithOrientation;
@@ -21,6 +20,7 @@ import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.math.Angle;
+import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -36,7 +36,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   private static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
     .geometry();
 
-  private static final Icon ICON = SilkIconLoader.getIcon("style_marker");
+  private static final Icon ICON = Icons.getIcon("style_marker");
 
   public static Geometry getGeometry(final Viewport2D viewport,
     final Geometry geometry) {

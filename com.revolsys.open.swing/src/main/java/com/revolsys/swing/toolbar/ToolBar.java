@@ -3,16 +3,15 @@ package com.revolsys.swing.toolbar;
 import java.awt.Component;
 import java.util.List;
 
-import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 
-import com.revolsys.famfamfam.silk.SilkIconLoader;
+import com.revolsys.swing.Icons;
+import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentGroup;
@@ -34,22 +33,22 @@ public class ToolBar extends JToolBar {
     setFloatable(false);
   }
 
-  public JButton addButton(final Action action) {
-    final JButton button = createButton(action);
+  public JButton addButton(final AbstractAction action) {
+    final JButton button = action.createButton();
     this.groups.addComponent(this, button);
     return button;
   }
 
-  public JButton addButton(final String groupName, final Action action) {
-    final JButton button = createButton(action);
+  public JButton addButton(final String groupName, final AbstractAction action) {
+    final JButton button = action.createButton();
     button.setAction(action);
     this.groups.addComponent(this, groupName, button);
     return button;
   }
 
   public JButton addButton(final String groupName, final int index,
-    final Action action) {
-    final JButton button = createButton(action);
+    final AbstractAction action) {
+    final JButton button = action.createButton();
     button.setAction(action);
     this.groups.addComponent(this, groupName, index, button);
     return button;
@@ -77,7 +76,7 @@ public class ToolBar extends JToolBar {
     String name = null;
     Icon icon = null;
     if (Property.hasValue(iconName)) {
-      icon = SilkIconLoader.getIcon(iconName);
+      icon = Icons.getIcon(iconName);
     } else {
       name = title;
       title = null;
@@ -101,7 +100,7 @@ public class ToolBar extends JToolBar {
   public JButton addButtonTitleIcon(final String groupName, final int index,
     final String title, final String iconName, final Object object,
     final String methodName, final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final ImageIcon icon = Icons.getIcon(iconName);
     return addButton(groupName, index, iconName, title, icon, object,
       methodName, parameters);
   }
@@ -109,7 +108,7 @@ public class ToolBar extends JToolBar {
   public JButton addButtonTitleIcon(final String groupName, final String title,
     final String iconName, final Object object, final String methodName,
     final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final ImageIcon icon = Icons.getIcon(iconName);
     return addButton(groupName, iconName, title, icon, object, methodName,
       parameters);
   }
@@ -129,7 +128,7 @@ public class ToolBar extends JToolBar {
   public JToggleButton addToggleButton(final String groupName, final int index,
     final String title, final String iconName, final EnableCheck enableCheck,
     final Object object, final String methodName, final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final ImageIcon icon = Icons.getIcon(iconName);
     return addToggleButton(groupName, index, iconName, title, icon,
       enableCheck, object, methodName, parameters);
   }
@@ -142,7 +141,7 @@ public class ToolBar extends JToolBar {
       object, methodName, parameters);
     action.setEnableCheck(enableCheck);
 
-    final JToggleButton button = createToggleButton(action);
+    final JToggleButton button = action.createToggleButton();
     this.groups.addComponent(this, groupName, index, button);
     final ButtonGroup buttonGroup = getButtonGroup(groupName);
     buttonGroup.add(button);
@@ -152,7 +151,7 @@ public class ToolBar extends JToolBar {
   public JToggleButton addToggleButtonTitleIcon(final String groupName,
     final int index, final String title, final String iconName,
     final Object object, final String methodName, final Object... parameters) {
-    final ImageIcon icon = SilkIconLoader.getIcon(iconName);
+    final ImageIcon icon = Icons.getIcon(iconName);
     return addToggleButton(groupName, index, iconName, title, icon, null,
       object, methodName, parameters);
   }
@@ -160,32 +159,6 @@ public class ToolBar extends JToolBar {
   public void clear() {
     super.removeAll();
     this.groups.clear();
-  }
-
-  protected JButton createButton(final Action action) {
-    final JButton button = new JButton(action);
-    if (action != null
-      && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
-      button.setHideActionText(true);
-    }
-    button.setHorizontalTextPosition(SwingConstants.CENTER);
-    button.setVerticalTextPosition(SwingConstants.BOTTOM);
-    button.setFocusPainted(false);
-    button.setBorderPainted(false);
-    return button;
-  }
-
-  protected JToggleButton createToggleButton(final Action action) {
-    final JToggleButton button = new JToggleButton(action);
-    if (action != null
-      && (action.getValue(Action.SMALL_ICON) != null || action.getValue(Action.LARGE_ICON_KEY) != null)) {
-      button.setHideActionText(true);
-    }
-    button.setHorizontalTextPosition(SwingConstants.CENTER);
-    button.setVerticalTextPosition(SwingConstants.BOTTOM);
-    button.setFocusPainted(false);
-    button.setBorderPainted(true);
-    return button;
   }
 
   public ButtonGroup getButtonGroup(final String groupName) {
