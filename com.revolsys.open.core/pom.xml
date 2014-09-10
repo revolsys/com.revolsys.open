@@ -7,7 +7,7 @@
   <parent>
     <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <version>TRUNK-SNAPSHOT</version>
+    <version>MTEC-SNAPSHOT</version>
   </parent>
   <artifactId>com.revolsys.open.core</artifactId>
   <name>RS Core</name>
