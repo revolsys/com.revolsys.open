@@ -126,21 +126,25 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final int[] vertexIndex = getVertexIndex(rowIndex);
-    if (columnIndex < vertexIndex.length) {
-      return vertexIndex[columnIndex];
-    } else if (columnIndex == this.segmentIndexColumn) {
-      return vertexIndex[vertexIndex.length - 1] + " \u2193";
-    } else {
-      final int axisIndex = columnIndex - this.numIndexItems;
-      final Point point = getCoordinates(rowIndex);
-      if (point != null) {
-        final double coordinate = point.getCoordinate(axisIndex);
-        if (!Double.isNaN(coordinate)) {
-          return coordinate;
+    if (rowIndex < getRowCount()) {
+      final int[] vertexIndex = getVertexIndex(rowIndex);
+      if (columnIndex < vertexIndex.length) {
+        return vertexIndex[columnIndex];
+      } else if (columnIndex == this.segmentIndexColumn) {
+        return vertexIndex[vertexIndex.length - 1] + " \u2193";
+      } else {
+        final int axisIndex = columnIndex - this.numIndexItems;
+        final Point point = getCoordinates(rowIndex);
+        if (point != null) {
+          final double coordinate = point.getCoordinate(axisIndex);
+          if (!Double.isNaN(coordinate)) {
+            return coordinate;
+          }
         }
+        return 0;
       }
-      return 0;
+    } else {
+      return null;
     }
   }
 

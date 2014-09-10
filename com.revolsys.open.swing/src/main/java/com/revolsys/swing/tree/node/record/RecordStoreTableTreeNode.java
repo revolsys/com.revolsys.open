@@ -35,11 +35,12 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
   private static final MenuFactory MENU = new MenuFactory();
 
   static {
-    for (final String geometryType : Arrays.asList("Point", "MultiPoint",
-      "LineString", "MultiLineString", "Polygon", "MultiPolygon")) {
+    for (final String geometryType : Arrays.asList("Geometry", "Point",
+      "MultiPoint", "LineString", "MultiLineString", "Polygon", "MultiPolygon")) {
       ICONS_GEOMETRY.put(geometryType,
         Icons.getIcon("table_" + geometryType.toLowerCase()));
     }
+    ICONS_GEOMETRY.put("GeometryCollection", Icons.getIcon("table_geometry"));
 
     MENU.addMenuItem("default",
       TreeNodeRunnable.createAction("Add Layer", "map_add", "addLayer"));

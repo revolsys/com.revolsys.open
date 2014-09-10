@@ -105,7 +105,8 @@ public class FileRecordLayer extends ListRecordLayer {
           return false;
         } else {
           try {
-            reader.setProperties(getProperties());
+            Map<String, Object> properties = getProperties();
+            reader.setProperties(properties);
             final RecordDefinition recordDefinition = reader.getRecordDefinition();
             setRecordDefinition(recordDefinition);
             final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();

@@ -240,8 +240,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   @Override
   public void renderRecord(final Viewport2D viewport,
     final BoundingBox visibleArea, final AbstractLayer layer,
-    final LayerRecord object) {
-    final Geometry geometry = object.getGeometryValue();
+    final LayerRecord record) {
+    final Geometry geometry = record.getGeometryValue();
     viewport.drawGeometry(geometry, style);
   }
 

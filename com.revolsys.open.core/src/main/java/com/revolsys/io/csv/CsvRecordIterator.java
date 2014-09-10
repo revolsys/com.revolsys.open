@@ -88,11 +88,33 @@ RecordIterator {
     Attribute geometryAttribute = null;
     for (final String name : fieldNames) {
       DataType type = DataTypes.STRING;
+      boolean isGeometryAttribute = false;
       if (name.equalsIgnoreCase(this.geometryColumnName)) {
         type = this.geometryType;
+        isGeometryAttribute = true;
+      } else if ("POINT".equalsIgnoreCase(name)) {
+        type = DataTypes.POINT;
+        isGeometryAttribute = true;
+      } else if ("MULTIPOINT".equalsIgnoreCase(name)) {
+        type = DataTypes.MULTI_POINT;
+        isGeometryAttribute = true;
+      } else if ("LINESTRING".equalsIgnoreCase(name)
+          || "LINE".equalsIgnoreCase(name)) {
+        type = DataTypes.LINE_STRING;
+        isGeometryAttribute = true;
+      } else if ("MULTILINESTRING".equalsIgnoreCase(name)
+          || "MULTILINE".equalsIgnoreCase(name)) {
+        type = DataTypes.MULTI_LINE_STRING;
+        isGeometryAttribute = true;
+      } else if ("POLYGON".equalsIgnoreCase(name)) {
+        type = DataTypes.POLYGON;
+        isGeometryAttribute = true;
+      } else if ("MULTIPOLYGON".equalsIgnoreCase(name)) {
+        type = DataTypes.MULTI_POLYGON;
+        isGeometryAttribute = true;
       }
       final Attribute attribute = new Attribute(name, type, false);
-      if (name.equalsIgnoreCase(this.geometryColumnName)) {
+      if (isGeometryAttribute) {
         geometryAttribute = attribute;
       }
       attributes.add(attribute);
