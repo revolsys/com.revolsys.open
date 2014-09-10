@@ -34,11 +34,15 @@ public class SelectMapScaleEditor implements ComboBoxEditor {
 
   @Override
   public Object getItem() {
-    final Object item = this.wrapped.getItem();
-    String string = StringConverterRegistry.toString(item);
-    string = string.replaceAll("((^1:)|([^0-9\\.])+)", "");
-    final double scale = Double.parseDouble(string);
-    return this.stringConverter.getPreferredStringForItem(scale);
+    try {
+      final Object item = this.wrapped.getItem();
+      String string = StringConverterRegistry.toString(item);
+      string = string.replaceAll("((^1:)|([^0-9\\.])+)", "");
+      final double scale = Double.parseDouble(string);
+      return this.stringConverter.getPreferredStringForItem(scale);
+    } catch (final NumberFormatException e) {
+      return "";
+    }
   }
 
   @Override
