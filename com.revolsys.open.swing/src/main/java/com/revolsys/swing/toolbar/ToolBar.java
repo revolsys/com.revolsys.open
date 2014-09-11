@@ -28,7 +28,7 @@ public class ToolBar extends JToolBar {
 
   public ToolBar(final int orientation) {
     super(orientation);
-    setOpaque(false);
+    setOpaque(true);
     setRollover(false);
     setFloatable(false);
   }
