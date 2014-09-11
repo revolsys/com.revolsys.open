@@ -19,7 +19,7 @@ public class SwingWorkerProgressBar extends JPanel implements
   private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(16, 16));
 
   public SwingWorkerProgressBar() {
-    super(new BorderLayout());
+    super(new BorderLayout(2, 2));
     this.busyLabel.setDelay(200);
     Invoke.getPropertyChangeSupport()
       .addPropertyChangeListener("workers", this);

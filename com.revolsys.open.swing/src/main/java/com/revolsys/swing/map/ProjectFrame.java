@@ -177,7 +177,7 @@ public class ProjectFrame extends BaseFrame {
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-      .getTheme();
+        .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -279,9 +279,9 @@ public class ProjectFrame extends BaseFrame {
       "Background Tasks", panel);
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = InvokeMethodAction.createButton(null,
-      "View Running Tasks", Icons.getIcon("time_go"), dockable,
-      "toFront");
+      "View Running Tasks", Icons.getIcon("time_go"), dockable, "toFront");
     viewTasksAction.setBorderPainted(false);
+    viewTasksAction.setBorder(null);
     progressBar.add(viewTasksAction, BorderLayout.EAST);
   }
 
@@ -318,7 +318,7 @@ public class ProjectFrame extends BaseFrame {
     // "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-      "print");
+        "print");
 
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;
