@@ -22,7 +22,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 
 public class MapPointerLocation extends JLabel implements MouseMotionListener,
-PropertyChangeListener {
+  PropertyChangeListener {
   private static NumberFormat getFormat() {
     return new DecimalFormat("############.############");
   }
@@ -47,9 +47,13 @@ PropertyChangeListener {
 
     Property.addListener(map, "geometryFactory", this);
     map.getMouseOverlay().addMouseMotionListener(this);
+    setBorder(BorderFactory.createCompoundBorder(
+      BorderFactory.createBevelBorder(BevelBorder.LOWERED),
+      BorderFactory.createEmptyBorder(2, 3, 2, 3)));
+    setText(" ");
 
-    setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-    setPreferredSize(new Dimension(250, 30));
+    final int height2 = getPreferredSize().height;
+    setPreferredSize(new Dimension(250, height2));
   }
 
   @Override
@@ -66,10 +70,10 @@ PropertyChangeListener {
       final double projectedY = mapPoint.getY();
       if (this.geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
         setText(this.title + ": " + getFormat().format(projectedY) + ", "
-            + getFormat().format(projectedX));
+          + getFormat().format(projectedX));
       } else {
         setText(this.title + ": " + getFormat().format(projectedX) + ", "
-            + getFormat().format(projectedY));
+          + getFormat().format(projectedY));
       }
     }
   }

@@ -116,7 +116,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private LayerRendererOverlay layerOverlay;
 
   private BasePanel leftStatusBar = new BasePanel(new FlowLayout(
-    FlowLayout.LEFT));
+    FlowLayout.LEFT, 2, 2));
 
   private MouseOverlay mouseOverlay;
 
@@ -136,7 +136,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private Project project;
 
   private BasePanel rightStatusBar = new BasePanel(new FlowLayout(
-    FlowLayout.RIGHT));
+    FlowLayout.RIGHT, 2, 1));
 
   private double scale = 500000000;
 
@@ -307,7 +307,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addStatusBar() {
     this.statusBarPanel = new JPanel(new BorderLayout());
-    this.statusBarPanel.setMinimumSize(new Dimension(200, 42));
+    this.statusBarPanel.setPreferredSize(new Dimension(200, 30));
     add(this.statusBarPanel, BorderLayout.SOUTH);
     this.statusBarPanel.add(this.leftStatusBar, BorderLayout.WEST);
     this.statusBarPanel.add(this.rightStatusBar, BorderLayout.EAST);
@@ -318,8 +318,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     this.overlayActionLabel = new JLabel();
     this.overlayActionLabel.setBorder(BorderFactory.createCompoundBorder(
       BorderFactory.createBevelBorder(BevelBorder.LOWERED),
-      BorderFactory.createEmptyBorder(1, 3, 1, 3)));
-    this.overlayActionLabel.setMinimumSize(new Dimension(20, 30));
+      BorderFactory.createEmptyBorder(2, 3, 2, 3)));
     this.overlayActionLabel.setVisible(false);
     this.overlayActionLabel.setForeground(WebColors.Green);
     this.leftStatusBar.add(this.overlayActionLabel);
@@ -345,9 +344,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addUndoButtons() {
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canUndo");
+      "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canRedo");
+      "canRedo");
 
     this.toolBar.addButton("undo", "Undo", "arrow_undo", canUndo,
       this.undoManager, "undo");
@@ -718,7 +717,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {
         if (this.baseMapOverlay != null
-            && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
+          && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
           final Layer layer = (Layer)event.getNewValue();
           if (layer != null && layer.isVisible()) {
             this.baseMapOverlay.setLayer(layer);
@@ -949,11 +948,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final PopupMenu menu = new PopupMenu();
     final MenuFactory factory = menu.getMenu();
     factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
-        "addZoomBookmark");
+      "addZoomBookmark");
 
     final Project project = getProject();
     for (final Entry<String, BoundingBox> entry : project.getZoomBookmarks()
-        .entrySet()) {
+      .entrySet()) {
       final String name = entry.getKey();
       final BoundingBox boundingBox = entry.getValue();
       factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier",

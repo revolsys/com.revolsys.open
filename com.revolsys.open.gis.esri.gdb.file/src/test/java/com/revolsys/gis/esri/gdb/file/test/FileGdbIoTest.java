@@ -59,6 +59,7 @@ public class FileGdbIoTest {
       final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
         typePath);
       recordDefinition.addAttribute("ID", DataTypes.INT, true);
+      recordDefinition.addAttribute("NAME", DataTypes.STRING, 50, false);
       recordDefinition.addAttribute("GEOMETRY", dataType, true);
       recordDefinition.setGeometryFactory(geometryFactory);
       recordStore.getRecordDefinition(recordDefinition);

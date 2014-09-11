@@ -1,6 +1,7 @@
 package com.revolsys.swing.parallel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -12,16 +13,16 @@ import org.jdesktop.swingx.JXBusyLabel;
 import com.revolsys.swing.SwingUtil;
 
 public class SwingWorkerProgressBar extends JPanel implements
-PropertyChangeListener {
+  PropertyChangeListener {
   private static final long serialVersionUID = -5112492385171847107L;
 
-  private final JXBusyLabel busyLabel = new JXBusyLabel();
+  private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(16, 16));
 
   public SwingWorkerProgressBar() {
     super(new BorderLayout());
     this.busyLabel.setDelay(200);
     Invoke.getPropertyChangeSupport()
-    .addPropertyChangeListener("workers", this);
+      .addPropertyChangeListener("workers", this);
     add(this.busyLabel, BorderLayout.WEST);
   }
 
