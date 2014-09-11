@@ -21,11 +21,7 @@
 package com.revolsys.io.shp;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.lang.reflect.Method;
-
-import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
@@ -35,12 +31,9 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.gis.cs.CoordinateSystem;
-import com.revolsys.gis.cs.CoordinateSystems;
-import com.revolsys.gis.cs.esri.EsriCsWktWriter;
+import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.ResourceEndianOutput;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.xbase.FieldDefinition;
 import com.revolsys.io.xbase.XbaseRecordWriter;
@@ -118,29 +111,8 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
     }
   }
 
-  private void createPrjFile(final GeometryFactory geometryFactory)
-      throws IOException {
-    if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem != null) {
-        final int srid = coordinateSystem.getId();
-        final Resource prjResource = SpringUtil.getResourceWithExtension(
-          this.resource, "prj");
-        if (!(prjResource instanceof NonExistingResource)) {
-          final OutputStream out = SpringUtil.getOutputStream(prjResource);
-          final PrintWriter writer = new PrintWriter(
-            FileUtil.createUtf8Writer(out));
-          final CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
-            "ESRI", String.valueOf(srid)));
-          EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
-          writer.close();
-        }
-      }
-    }
-  }
-
   private void doubleNotNaN(final ResourceEndianOutput out, final double value)
-      throws IOException {
+    throws IOException {
     if (MathUtil.isNanOrInfinite(value)) {
       out.writeLEDouble(0);
     } else {
@@ -189,8 +161,8 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         }
         if (this.geometryDataType == null) {
           this.geometryDataType = object.getRecordDefinition()
-              .getGeometryAttribute()
-              .getType();
+            .getGeometryAttribute()
+            .getType();
           if (DataTypes.GEOMETRY.equals(this.geometryDataType)) {
             final String geometryType = geometry.getGeometryType();
             this.geometryDataType = DataTypes.getType(geometryType);
@@ -201,7 +173,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         this.geometryWriteMethod = ShapefileGeometryUtil.getWriteMethod(
           this.geometryFactory, this.geometryDataType);
       }
-      createPrjFile(this.geometryFactory);
+      EsriCoordinateSystems.createPrjFile(this.resource, this.geometryFactory);
     }
   }
 
@@ -232,7 +204,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
   @Override
   protected boolean writeField(final Record object, final FieldDefinition field)
-      throws IOException {
+    throws IOException {
     if (field.getFullName().equals(this.geometryPropertyName)) {
       final long recordIndex = this.out.getFilePointer();
       Geometry geometry = object.getGeometryValue();

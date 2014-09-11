@@ -1,9 +1,14 @@
 package com.revolsys.gis.cs.esri;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.namespace.QName;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -12,13 +17,37 @@ import org.springframework.core.io.Resource;
 import com.revolsys.gis.cs.Authority;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.CoordinateSystemParser;
+import com.revolsys.gis.cs.CoordinateSystems;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.WktCsParser;
+import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 
 public class EsriCoordinateSystems {
+
+  public static void createPrjFile(final Resource resource,
+    final GeometryFactory geometryFactory) throws IOException {
+    if (geometryFactory != null) {
+      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+      if (coordinateSystem != null) {
+        final int srid = coordinateSystem.getId();
+        final Resource prjResource = SpringUtil.getResourceWithExtension(
+          resource, "prj");
+        if (!(prjResource instanceof NonExistingResource)) {
+          final OutputStream out = SpringUtil.getOutputStream(prjResource);
+          final PrintWriter writer = new PrintWriter(
+            FileUtil.createUtf8Writer(out));
+          final CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
+            "ESRI", String.valueOf(srid)));
+          EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
+          writer.close();
+        }
+      }
+    }
+  }
 
   public static CoordinateSystem getCoordinateSystem(
     final CoordinateSystem coordinateSystem) {
@@ -79,7 +108,7 @@ public class EsriCoordinateSystems {
    */
   public static GeometryFactory getGeometryFactory(final Resource resource) {
     final Resource projResource = SpringUtil.getResourceWithExtension(resource,
-        "prj");
+      "prj");
     if (projResource.exists()) {
       try {
         final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);

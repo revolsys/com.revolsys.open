@@ -260,6 +260,18 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return fixed(srid, 0.0, 0.0);
   }
 
+  public static GeometryFactory get(final Object factory) {
+    if (factory instanceof GeometryFactory) {
+      return (GeometryFactory)factory;
+    } else if (factory instanceof Map) {
+      @SuppressWarnings("unchecked")
+      final Map<String, Object> properties = (Map<String, Object>)factory;
+      return create(properties);
+    } else {
+      return null;
+    }
+  }
+
   /**
    * <p>
    * Get a GeometryFactory with the coordinate system, 3D axis (x, y &amp; z)
@@ -433,7 +445,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return multiPolygon(geometries);
     } else {
       throw new IllegalArgumentException("Unknown geometry type "
-        + collectionDataType);
+          + collectionDataType);
     }
   }
 
@@ -1181,7 +1193,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return multiPoint();
     } else if (coordinates.length % axisCount != 0) {
       throw new IllegalArgumentException("Coordinates length="
-        + coordinates.length + " must be a multiple of " + axisCount);
+          + coordinates.length + " must be a multiple of " + axisCount);
     } else {
       final Point[] points = new Point[coordinates.length / axisCount];
       for (int i = 0; i < points.length; i++) {
@@ -1311,7 +1323,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
         return point(coordinates);
       } else {
         throw new IllegalArgumentException("Point can only have 1 vertex not "
-          + size);
+            + size);
       }
     }
   }
@@ -1345,7 +1357,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return point((LineString)object);
     } else {
       throw new IllegalArgumentException("Cannot create a point from "
-        + object.getClass());
+          + object.getClass());
     }
   }
 

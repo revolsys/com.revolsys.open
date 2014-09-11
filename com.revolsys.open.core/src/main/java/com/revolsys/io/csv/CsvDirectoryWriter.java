@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.core.io.FileSystemResource;
+
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
@@ -75,6 +78,9 @@ public class CsvDirectoryWriter extends AbstractRecordWriter {
         final File vrtFile = new File(this.directory, path.toString() + ".vrt");
         final String typeName = recordDefinition.getName();
         OgrVrtWriter.write(vrtFile, recordDefinition, typeName + ".csv");
+
+        EsriCoordinateSystems.createPrjFile(new FileSystemResource(file),
+          recordDefinition.getGeometryFactory());
 
       } catch (final IOException e) {
         throw new IllegalArgumentException(e.getMessage(), e);

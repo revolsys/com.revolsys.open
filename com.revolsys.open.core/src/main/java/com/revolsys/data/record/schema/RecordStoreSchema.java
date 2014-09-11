@@ -56,6 +56,8 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
       if (element instanceof RecordDefinition) {
         final RecordDefinition recordDefinition = (RecordDefinition)element;
         this.recordDefinitionsByPath.put(upperPath, recordDefinition);
+        final AbstractRecordStore recordStore = getRecordStore();
+        recordStore.addRecordDefinitionProperties((RecordDefinitionImpl)recordDefinition);
       }
       if (element instanceof RecordStoreSchema) {
         final RecordStoreSchema schema = (RecordStoreSchema)element;
@@ -224,7 +226,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
               if (Property.equals(newRecordDefinition, oldRecordDefinition,
                   "geometryAttributeIndexes")) {
                 if (Property.equals(newRecordDefinition, oldRecordDefinition,
-                  "attributes")) {
+                    "attributes")) {
                   return true;
                 }
               }
