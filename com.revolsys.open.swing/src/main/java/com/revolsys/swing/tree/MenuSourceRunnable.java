@@ -17,8 +17,8 @@ public class MenuSourceRunnable extends InvokeMethodRunnable {
     final Object... parameters) {
     final MenuSourceRunnable runnable = new MenuSourceRunnable(methodName,
       parameters);
-    final InvokeMethodAction action = new InvokeMethodAction(name,
-      name.toString(), icon, true, runnable);
+    final InvokeMethodAction action = new InvokeMethodAction(name, null, icon,
+      true, runnable);
     action.setEnableCheck(enableCheck);
 
     return action;

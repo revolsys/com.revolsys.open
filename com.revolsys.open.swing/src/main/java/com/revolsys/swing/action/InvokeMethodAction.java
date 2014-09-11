@@ -86,7 +86,6 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     this.invokeLater = invokeLater;
     if (name != null) {
       putValue(NAME, name.toString());
-      putValue(SHORT_DESCRIPTION, name.toString());
     }
     if (icon != null) {
       putValue(SMALL_ICON, icon);
