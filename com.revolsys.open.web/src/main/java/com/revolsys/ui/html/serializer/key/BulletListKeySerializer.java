@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 public class BulletListKeySerializer extends AbstractKeySerializer {

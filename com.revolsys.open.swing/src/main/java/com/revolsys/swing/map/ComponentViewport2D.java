@@ -1,5 +1,6 @@
 package com.revolsys.swing.map;
 
+import java.awt.Cursor;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
@@ -49,7 +50,7 @@ public class ComponentViewport2D extends Viewport2D implements
   /**
    * Get the bounding box for the dimensions of the viewport at the specified
    * scale, centred at the x, y model coordinates.
-   * 
+   *
    * @param x The model x coordinate.
    * @param y The model y coordinate.
    * @param scale The scale.
@@ -64,15 +65,15 @@ public class ComponentViewport2D extends Viewport2D implements
     final double y1 = y - height / 2;
     final double x2 = x1 + width;
     final double y2 = y1 + height;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory(), 2, x1,
-      y1, x2, y2);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(
+      getGeometryFactory(), 2, x1, y1, x2, y2);
     return boundingBox;
   }
 
   /**
    * Get the bounding box in model units for the pair of coordinates in view
    * units. The bounding box will be clipped to the model's bounding box.
-   * 
+   *
    * @param x1 The first x value.
    * @param y1 The first y value.
    * @param x2 The second x value.
@@ -83,8 +84,8 @@ public class ComponentViewport2D extends Viewport2D implements
     final double x2, final double y2) {
     final double[] c1 = toModelCoordinates(x1, y1);
     final double[] c2 = toModelCoordinates(x2, y2);
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory(), 2,
-      c1[0], c1[1], c2[0], c2[1]);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(
+      getGeometryFactory(), 2, c1[0], c1[1], c2[0], c2[1]);
 
     // Clip the bounding box with the map's visible area
     BoundingBox intersection = boundingBox.intersection(boundingBox);
@@ -98,7 +99,7 @@ public class ComponentViewport2D extends Viewport2D implements
   /**
    * Get the bounding box for the dimensions of the viewport at the specified
    * scale, centred at the x, y view coordinates.
-   * 
+   *
    * @param x The view x coordinate.
    * @param y The view y coordinate.
    * @param scale The scale.
@@ -109,6 +110,14 @@ public class ComponentViewport2D extends Viewport2D implements
     final double mapX = ordinates[0];
     final double mapY = ordinates[1];
     return getBoundingBox(mapX, mapY, scale);
+  }
+
+  public Cursor getCursor() {
+    if (this.component == null) {
+      return null;
+    } else {
+      return this.component.getCursor();
+    }
   }
 
   public double getMaxScale() {
@@ -152,7 +161,7 @@ public class ComponentViewport2D extends Viewport2D implements
   /**
    * Get the rectangle in view units for the pair of coordinates in view units.
    * The bounding box will be clipped to the view's dimensions.
-   * 
+   *
    * @param x1 The first x value.
    * @param y1 The first y value.
    * @param x2 The second x value.
@@ -242,7 +251,7 @@ public class ComponentViewport2D extends Viewport2D implements
 
   /**
    * Set the coordinate system the map is displayed in.
-   * 
+   *
    * @param coordinateSystem The coordinate system the map is displayed in.
    */
   @Override
@@ -290,9 +299,9 @@ public class ComponentViewport2D extends Viewport2D implements
   public void translate(final double dx, final double dy) {
     final BoundingBox boundingBox = getBoundingBox();
     final BoundingBox newBoundingBox = new BoundingBoxDoubleGf(
-      boundingBox.getGeometryFactory(), 2,
-      boundingBox.getMinX() + dx, boundingBox.getMinY() + dy,
-      boundingBox.getMaxX() + dx, boundingBox.getMaxY() + dy);
+      boundingBox.getGeometryFactory(), 2, boundingBox.getMinX() + dx,
+      boundingBox.getMinY() + dy, boundingBox.getMaxX() + dx,
+      boundingBox.getMaxY() + dy);
     setBoundingBox(newBoundingBox);
 
   }

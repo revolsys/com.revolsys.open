@@ -18,7 +18,7 @@ package com.revolsys.ui.html.layout;
 import java.util.Iterator;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
 

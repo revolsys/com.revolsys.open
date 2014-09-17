@@ -3,7 +3,7 @@ package com.revolsys.ui.html.fields;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
 public abstract class NumberField extends TextField {

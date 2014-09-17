@@ -29,7 +29,7 @@ public class ClassUtil {
     }
   }
 
-  public static String getFileName(final Class<?> clazz) {
+  public static String getClassName(final Class<?> clazz) {
     final String name = clazz.getName();
     final int index = name.lastIndexOf('.');
     if (index == -1) {

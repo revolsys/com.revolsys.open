@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.layout.DefinitionListLayout;
 import com.revolsys.ui.html.layout.UnorderedListLayout;
 import com.revolsys.ui.html.view.DivElementContainer;

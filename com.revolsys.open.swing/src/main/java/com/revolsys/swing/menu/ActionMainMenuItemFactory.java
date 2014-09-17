@@ -8,6 +8,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 
 import com.revolsys.swing.action.AbstractAction;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.util.ExceptionUtil;
@@ -18,8 +19,14 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
 
   private final AbstractAction action;
 
+  private String iconName;
+
   public ActionMainMenuItemFactory(final AbstractAction action) {
     this.action = action;
+    if (action instanceof InvokeMethodAction) {
+      final InvokeMethodAction invokeAction = (InvokeMethodAction)action;
+      this.iconName = invokeAction.getIconName();
+    }
   }
 
   public ActionMainMenuItemFactory(final EnableCheck checkBoxSelectedCheck,
@@ -56,6 +63,11 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
   @Override
   public final Icon getIcon() {
     return (Icon)this.action.getValue(Action.SMALL_ICON);
+  }
+
+  @Override
+  public String getIconName() {
+    return this.iconName;
   }
 
   @Override

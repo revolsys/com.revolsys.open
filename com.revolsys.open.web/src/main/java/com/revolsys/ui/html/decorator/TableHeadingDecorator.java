@@ -1,7 +1,7 @@
 package com.revolsys.ui.html.decorator;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;

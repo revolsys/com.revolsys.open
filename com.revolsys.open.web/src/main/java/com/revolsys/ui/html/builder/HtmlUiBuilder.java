@@ -45,7 +45,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.spring.InvokeMethodAfterCommit;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.decorator.FieldLabelDecorator;
 import com.revolsys.ui.html.decorator.TableHeadingDecorator;

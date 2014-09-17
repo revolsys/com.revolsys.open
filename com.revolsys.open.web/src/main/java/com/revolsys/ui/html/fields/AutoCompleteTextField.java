@@ -1,7 +1,7 @@
 package com.revolsys.ui.html.fields;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 
 public class AutoCompleteTextField extends TextField {
   private int maxResults = 25;

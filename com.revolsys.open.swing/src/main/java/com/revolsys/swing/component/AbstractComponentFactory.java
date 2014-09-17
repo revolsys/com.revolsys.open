@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.Icon;
 
 public abstract class AbstractComponentFactory<T extends Component> implements
-  ComponentFactory<T>, Cloneable {
+ComponentFactory<T>, Cloneable {
 
   private Icon icon;
 
@@ -40,6 +40,11 @@ public abstract class AbstractComponentFactory<T extends Component> implements
   @Override
   public Icon getIcon() {
     return this.icon;
+  }
+
+  @Override
+  public String getIconName() {
+    return null;
   }
 
   @Override

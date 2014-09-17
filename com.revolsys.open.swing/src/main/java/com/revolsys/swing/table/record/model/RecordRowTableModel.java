@@ -27,7 +27,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public abstract class RecordRowTableModel extends AbstractRecordTableModel
-  implements SortableTableModel, CellEditorListener {
+implements SortableTableModel, CellEditorListener {
 
   public static final String LOADING_VALUE = "\u2026";
 
@@ -129,17 +129,21 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     if (columnIndex < this.attributesOffset) {
       return null;
     } else {
-      final String attributeName = this.attributeNames.get(columnIndex
-        - this.attributesOffset);
-      if (attributeName == null) {
-        return null;
-      } else {
-        final int index = attributeName.indexOf('.');
-        if (index == -1) {
-          return attributeName;
+      final int fieldIndex = columnIndex - this.attributesOffset;
+      if (fieldIndex < this.attributeNames.size()) {
+        final String attributeName = this.attributeNames.get(fieldIndex);
+        if (attributeName == null) {
+          return null;
         } else {
-          return attributeName.substring(0, index);
+          final int index = attributeName.indexOf('.');
+          if (index == -1) {
+            return attributeName;
+          } else {
+            return attributeName.substring(0, index);
+          }
         }
+      } else {
+        return null;
       }
     }
   }
@@ -235,7 +239,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     if (attributeNames == null || attributeNames.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
       this.attributeNames = new ArrayList<String>(
-        recordDefinition.getAttributeNames());
+          recordDefinition.getAttributeNames());
     } else {
       this.attributeNames = new ArrayList<String>(attributeNames);
     }

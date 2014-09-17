@@ -9,7 +9,7 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.util.ExceptionUtil;
 
 public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
-implements ComponentFactory<JMenuItem> {
+  implements ComponentFactory<JMenuItem> {
 
   /**
    *
@@ -38,4 +38,8 @@ implements ComponentFactory<JMenuItem> {
     }
   }
 
+  @Override
+  public String getIconName() {
+    return null;
+  }
 }

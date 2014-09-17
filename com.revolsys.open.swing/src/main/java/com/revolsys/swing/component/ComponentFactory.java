@@ -14,6 +14,8 @@ public interface ComponentFactory<T extends Component> extends Cloneable {
 
   Icon getIcon();
 
+  String getIconName();
+
   String getName();
 
   String getToolTip();

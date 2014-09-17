@@ -18,7 +18,7 @@ package com.revolsys.ui.html.view;
 import javax.xml.namespace.QName;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 
 /**
  * @author paustin

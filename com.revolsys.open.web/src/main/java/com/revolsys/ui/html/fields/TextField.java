@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.Property;
 

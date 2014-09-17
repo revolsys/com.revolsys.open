@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 
 /**
  * @author paustin

@@ -67,7 +67,7 @@ public class AbstractOverlay extends JComponent implements
     "cursor_line_snap", 8, 4);
 
   public static final Cursor CURSOR_NODE_ADD = Icons.getCursor(
-    "cursor_node_add", 8, 7);
+    "cursor_node_add", 8, 8);
 
   public static final Cursor CURSOR_NODE_EDIT = Icons.getCursor(
     "cursor_node_edit", 8, 7);
@@ -605,7 +605,7 @@ public class AbstractOverlay extends JComponent implements
 
   protected void setMapCursor(final Cursor cursor) {
     if (this.map != null) {
-      this.map.setCursor(cursor);
+      this.map.setMapCursor(cursor);
     }
   }
 

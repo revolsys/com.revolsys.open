@@ -117,6 +117,9 @@ public class ProjectFrame extends BaseFrame {
       project, "saveChanges"));
   }
 
+  public static void init() {
+  }
+
   public static final String SAVE_PROJECT_KEY = "Save Project";
 
   public static final String SAVE_CHANGES_KEY = "Save Changes";
@@ -177,7 +180,7 @@ public class ProjectFrame extends BaseFrame {
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-        .getTheme();
+      .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -318,7 +321,7 @@ public class ProjectFrame extends BaseFrame {
     // "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-        "print");
+      "print");
 
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;

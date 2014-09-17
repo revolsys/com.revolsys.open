@@ -38,6 +38,11 @@ public class ComponentComponentFactory implements ComponentFactory<Component> {
   }
 
   @Override
+  public String getIconName() {
+    return null;
+  }
+
+  @Override
   public String getName() {
     return null;
   }

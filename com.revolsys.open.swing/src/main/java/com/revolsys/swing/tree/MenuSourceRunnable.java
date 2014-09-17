@@ -28,13 +28,19 @@ public class MenuSourceRunnable extends InvokeMethodRunnable {
     final String iconName, final EnableCheck enableCheck,
     final String methodName, final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    return createAction(name, icon, enableCheck, methodName, parameters);
+    final InvokeMethodAction action = createAction(name, icon, enableCheck,
+      methodName, parameters);
+    action.setIconName(iconName);
+    return action;
   }
 
   public static InvokeMethodAction createAction(final CharSequence name,
     final String iconName, final String methodName, final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    return createAction(name, icon, null, methodName, parameters);
+    final InvokeMethodAction action = createAction(name, icon, null,
+      methodName, parameters);
+    action.setIconName(iconName);
+    return action;
   }
 
   protected MenuSourceRunnable(final String methodName,

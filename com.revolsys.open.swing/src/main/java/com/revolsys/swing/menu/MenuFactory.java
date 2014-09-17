@@ -24,7 +24,7 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 
 public class MenuFactory extends AbstractObjectWithProperties implements
-ComponentFactory<JMenuItem> {
+  ComponentFactory<JMenuItem> {
 
   public static MenuFactory findMenu(final Class<?> clazz) {
     synchronized (CLASS_MENUS) {
@@ -248,12 +248,6 @@ ComponentFactory<JMenuItem> {
     return menu;
   }
 
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
-
   public JPopupMenu createJPopupMenu() {
     final JPopupMenu menu = new JPopupMenu(this.name);
     boolean first = true;
@@ -281,6 +275,12 @@ ComponentFactory<JMenuItem> {
     }
     return menu;
   }
+
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
 
   public InvokeMethodAction createMenuItem(final String name,
     final String title, final Icon icon, final EnableCheck enableCheck,
@@ -347,8 +347,21 @@ ComponentFactory<JMenuItem> {
     return factories;
   }
 
+  public List<String> getGroupNames() {
+    return this.groupNames;
+  }
+
+  public Map<String, List<ComponentFactory<?>>> getGroups() {
+    return this.groups;
+  }
+
   @Override
   public Icon getIcon() {
+    return null;
+  }
+
+  @Override
+  public String getIconName() {
     return null;
   }
 

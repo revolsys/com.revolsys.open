@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 

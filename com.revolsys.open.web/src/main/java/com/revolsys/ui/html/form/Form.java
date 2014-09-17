@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.util.UrlPathHelper;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.util.Property;

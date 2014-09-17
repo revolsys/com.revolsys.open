@@ -128,8 +128,17 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
   }
 
   @Override
-  public String getName() {
+  public String getIconName() {
     return null;
+  }
+
+  @Override
+  public String getName() {
+    if (this.min) {
+      return "Hide zoomed out beyond (minimum) scale";
+    } else {
+      return "Hide zoomed in beyond (maximum) scale";
+    }
   }
 
   @Override

@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.csv.CsvUtil;
 
 public class RecordReaderTransferable implements Transferable {
@@ -29,21 +30,23 @@ public class RecordReaderTransferable implements Transferable {
 
   @Override
   public Object getTransferData(final DataFlavor flavor)
-    throws UnsupportedFlavorException, IOException {
+      throws UnsupportedFlavorException, IOException {
     if (this.reader == null) {
       return null;
     } else if (DATA_OBJECT_READER_FLAVOR.equals(flavor)
-      || MapTransferable.MAP_FLAVOR.equals(flavor)) {
+        || MapTransferable.MAP_FLAVOR.equals(flavor)) {
       return this.reader;
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       final StringWriter out = new StringWriter();
-      final Collection<String> attributeNames = this.reader.getRecordDefinition()
-        .getAttributeNames();
-      CsvUtil.writeColumns(out, attributeNames, '\t', '\n');
-      for (final Record object : this.reader) {
-        if (object != null) {
-          final Collection<Object> values = object.values();
-          CsvUtil.writeColumns(out, values, '\t', '\n');
+      final RecordDefinition recordDefinition = this.reader.getRecordDefinition();
+      if (recordDefinition != null) {
+        final Collection<String> attributeNames = recordDefinition.getAttributeNames();
+        CsvUtil.writeColumns(out, attributeNames, '\t', '\n');
+        for (final Record object : this.reader) {
+          if (object != null) {
+            final Collection<Object> values = object.values();
+            CsvUtil.writeColumns(out, values, '\t', '\n');
+          }
         }
       }
       final String text = out.toString();

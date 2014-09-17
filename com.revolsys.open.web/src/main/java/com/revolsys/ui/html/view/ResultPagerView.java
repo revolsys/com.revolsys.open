@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.ui.html.HtmlUtil;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.UrlUtil;
 
 /**

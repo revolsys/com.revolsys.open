@@ -62,7 +62,10 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     final String iconName, final Object object, final String methodName,
     final Object... parameters) {
     final Icon icon = Icons.getIcon(iconName);
-    return createMenuItem(name, icon, object, methodName, parameters);
+    final InvokeMethodAction action = new InvokeMethodAction(name, icon,
+      object, methodName, parameters);
+    action.setIconName(iconName);
+    return action.createComponent();
   }
 
   private static final long serialVersionUID = -5339626097125548212L;
@@ -71,13 +74,15 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
 
   private Runnable runnable;
 
+  private String iconName;
+
   public InvokeMethodAction() {
   }
 
   public InvokeMethodAction(final CharSequence name, final boolean invokeLater,
     final Object object, final String methodName, final Object... parameters) {
     this(name, null, invokeLater, object, methodName, parameters);
-  }
+  };
 
   public InvokeMethodAction(final CharSequence name, final Icon icon,
     final boolean invokeLater, final Object object, final String methodName,
@@ -177,6 +182,11 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   }
 
   @Override
+  public String getIconName() {
+    return this.iconName;
+  }
+
+  @Override
   public Integer getMnemonic() {
     return (Integer)getValue(Action.MNEMONIC_KEY);
   }
@@ -194,6 +204,10 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   @Override
   protected void setIcon(final Icon icon) {
     putValue(Action.SMALL_ICON, icon);
+  }
+
+  public void setIconName(final String iconName) {
+    this.iconName = iconName;
   }
 
   @Override
