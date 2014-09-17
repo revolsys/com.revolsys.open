@@ -126,7 +126,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   private final LinkedList<Cursor> overlayActionCursorStack = new LinkedList<>();
 
   /** Map from an overlay action (current) to the overlay actions that can override it (new). */
-  private final Map<String, Set<String>> overlayActionOverrides = new HashMap<String, Set<String>>();
+  private final Map<String, Set<String>> overlayActionOverrides = new HashMap<>();
 
   private JLabel overlayActionLabel;
 
@@ -141,7 +141,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private double scale = 500000000;
 
-  private List<Long> scales = new ArrayList<Long>();
+  private List<Long> scales = new ArrayList<>();
 
   private SelectMapCoordinateSystem selectCoordinateSystem;
 
@@ -165,7 +165,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   private JButton zoomBookmarkButton;
 
-  private final LinkedList<BoundingBox> zoomHistory = new LinkedList<BoundingBox>();
+  private final LinkedList<BoundingBox> zoomHistory = new LinkedList<>();
 
   private int zoomHistoryIndex = -1;
 
@@ -348,9 +348,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addUndoButtons() {
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canUndo");
+        "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canRedo");
+        "canRedo");
 
     this.toolBar.addButton("undo", "Undo", "arrow_undo", canUndo,
       this.undoManager, "undo");
@@ -707,7 +707,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       final BoundingBox boundingBox = (BoundingBox)event.getNewValue();
       setBoundingBox(boundingBox);
     } else if (source == this.viewport) {
-      if ("scale".equals(propertyName)) {
+      if ("boundingBox".equals(propertyName)) {
+        final BoundingBox boundingBox = this.viewport.getBoundingBox();
+        setBoundingBox(boundingBox);
+      } else if ("scale".equals(propertyName)) {
         final double scale = this.viewport.getScale();
         setScale(scale);
       }
@@ -721,7 +724,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {
         if (this.baseMapOverlay != null
-          && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
+            && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
           final Layer layer = (Layer)event.getNewValue();
           if (layer != null && layer.isVisible()) {
             this.baseMapOverlay.setLayer(layer);
@@ -955,11 +958,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final PopupMenu menu = new PopupMenu();
     final MenuFactory factory = menu.getMenu();
     factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
-      "addZoomBookmark");
+        "addZoomBookmark");
 
     final Project project = getProject();
     for (final Entry<String, BoundingBox> entry : project.getZoomBookmarks()
-      .entrySet()) {
+        .entrySet()) {
       final String name = entry.getKey();
       final BoundingBox boundingBox = entry.getValue();
       factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier",
