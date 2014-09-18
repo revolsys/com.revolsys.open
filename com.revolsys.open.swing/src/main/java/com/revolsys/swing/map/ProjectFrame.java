@@ -5,6 +5,7 @@ import groovy.lang.GroovyShell;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -117,8 +118,23 @@ public class ProjectFrame extends BaseFrame {
       project, "saveChanges"));
   }
 
+  public static ProjectFrame get(final Layer layer) {
+    if (layer == null) {
+      return null;
+    } else {
+      final LayerGroup project = layer.getProject();
+      if (project == null) {
+        return null;
+      } else {
+        return project.getProperty(PROJECT_FRAME);
+      }
+    }
+  }
+
   public static void init() {
   }
+
+  public static final String PROJECT_FRAME = "projectFrame";
 
   public static final String SAVE_PROJECT_KEY = "Save Project";
 
@@ -168,6 +184,8 @@ public class ProjectFrame extends BaseFrame {
 
   public ProjectFrame(final String title, final Project project) {
     super(title);
+    setBounds((Object)null);
+
     final JRootPane rootPane = getRootPane();
 
     addSaveActions(rootPane, project);
@@ -176,11 +194,11 @@ public class ProjectFrame extends BaseFrame {
     final BoundingBox defaultBoundingBox = getDefaultBoundingBox();
     this.project.setViewBoundingBox(defaultBoundingBox);
     Project.set(project);
-    SwingUtil.setSizeAndMaximize(this, 100, 100);
+    project.setProperty(PROJECT_FRAME, this);
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-      .getTheme();
+        .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -321,7 +339,7 @@ public class ProjectFrame extends BaseFrame {
     // "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-      "print");
+        "print");
 
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;
@@ -497,6 +515,10 @@ public class ProjectFrame extends BaseFrame {
     final FileSystemResource resource = new FileSystemResource(projectDirectory);
     this.project.readProject(resource);
 
+    final Object frameBoundsObject = this.project.getProperty("frameBounds");
+    setBounds(frameBoundsObject);
+    setVisible(true);
+
     final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager.get();
     recordStoreConnectionManager.removeConnectionRegistry("Project");
     recordStoreConnectionManager.addConnectionRegistry(this.project.getRecordStores());
@@ -539,6 +561,52 @@ public class ProjectFrame extends BaseFrame {
         shell.run(scriptFile, args);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to run script:" + scriptFile, e);
+      }
+    }
+  }
+
+  public void setBounds(final Object frameBoundsObject) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      if (frameBoundsObject instanceof List) {
+        try {
+          @SuppressWarnings("unchecked")
+          final List<Number> frameBoundsList = (List<Number>)frameBoundsObject;
+          if (frameBoundsList.size() == 4) {
+            int x = frameBoundsList.get(0).intValue();
+            int y = frameBoundsList.get(1).intValue();
+            int width = frameBoundsList.get(2).intValue();
+            int height = frameBoundsList.get(3).intValue();
+
+            final Rectangle screenBounds = SwingUtil.getScreenBounds(x, y);
+
+            width = Math.min(width, screenBounds.width);
+            height = Math.min(height, screenBounds.height);
+            setSize(width, height);
+
+            if (x < screenBounds.x || x > screenBounds.x + screenBounds.width) {
+              x = 0;
+            } else {
+              x = Math.min(x, screenBounds.x + screenBounds.width - width);
+            }
+            if (y < screenBounds.y || x > screenBounds.y + screenBounds.height) {
+              y = 0;
+            } else {
+              y = Math.min(y, screenBounds.y + screenBounds.height - height);
+            }
+            setLocation(x, y);
+            return;
+          }
+        } catch (final Throwable t) {
+        }
+      }
+      final Rectangle screenBounds = SwingUtil.getScreenBounds();
+      setLocation(screenBounds.x + 10, screenBounds.y + 10);
+      setSize(screenBounds.width - 20, screenBounds.height - 20);
+    } else {
+      if (frameBoundsObject == null) {
+        Invoke.later(this, "setBounds", new Object());
+      } else {
+        Invoke.later(this, "setBounds", frameBoundsObject);
       }
     }
   }

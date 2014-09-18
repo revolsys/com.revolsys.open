@@ -1,8 +1,10 @@
 package com.revolsys.swing.map.layer;
 
+import java.awt.Rectangle;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,6 +33,7 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
@@ -51,15 +54,15 @@ public class Project extends LayerGroup {
   }
 
   private static WeakReference<Project> project = new WeakReference<Project>(
-    null);
+      null);
 
   private BaseMapLayerGroup baseMapLayers = new BaseMapLayerGroup();
 
   private RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
-    "Project");
+      "Project");
 
   private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry(
-    "Project");
+      "Project");
 
   private BoundingBox initialBoundingBox;
 
@@ -197,7 +200,7 @@ public class Project extends LayerGroup {
 
   protected void readBaseMapsLayers(final Resource resource) {
     final Resource baseMapsResource = SpringUtil.getResource(resource,
-      "Base Maps");
+        "Base Maps");
     final Resource layerGroupResource = SpringUtil.getResource(
       baseMapsResource, "rgLayerGroup.rgobject");
     if (layerGroupResource.exists()) {
@@ -223,7 +226,7 @@ public class Project extends LayerGroup {
 
   protected void readLayers(final Resource resource) {
     final Resource layerGroupResource = SpringUtil.getResource(resource,
-      "rgLayerGroup.rgobject");
+        "rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       LoggerFactory.getLogger(getClass()).error(
         "File not found: " + layerGroupResource);
@@ -248,6 +251,7 @@ public class Project extends LayerGroup {
       try {
         final Resource layersDir = SpringUtil.getResource(resource, "Layers");
         readProperties(layersDir);
+
         final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry.getForThread();
         try {
           final Resource recordStoresDirectory = SpringUtil.getResource(
@@ -278,7 +282,7 @@ public class Project extends LayerGroup {
 
   protected void readProperties(final Resource resource) {
     final Resource layerGroupResource = SpringUtil.getResource(resource,
-      "rgLayerGroup.rgobject");
+        "rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       LoggerFactory.getLogger(getClass()).error(
         "File not found: " + layerGroupResource);
@@ -339,9 +343,9 @@ public class Project extends LayerGroup {
         final MapPanel mapPanel = MapPanel.get(this);
         final JLabel message = new JLabel(
           "<html><body><p><b>The following layers have un-saved changes.</b></p>"
-            + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
-            + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-            + "</li></ul></body></html>");
+              + "<p><b>Do you want to save the changes before continuing?</b></p><ul><li>"
+              + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
+              + "</li></ul></body></html>");
 
         final int option = JOptionPane.showConfirmDialog(mapPanel, message,
           "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION,
@@ -362,9 +366,9 @@ public class Project extends LayerGroup {
           } else {
             final JLabel message2 = new JLabel(
               "<html><body><p><b>The following layers could not be saved.</b></p>"
-                + "<p><b>Do you want to ignore these changes and continue?</b></p><ul><li>"
-                + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
-                + "</li></ul></body></html>");
+                  + "<p><b>Do you want to ignore these changes and continue?</b></p><ul><li>"
+                  + CollectionUtil.toString("</li>\n<li>", layersWithChanges)
+                  + "</li></ul></body></html>");
 
             final int option2 = JOptionPane.showConfirmDialog(mapPanel,
               message2, "Ignore Changes", JOptionPane.OK_CANCEL_OPTION,
@@ -386,7 +390,7 @@ public class Project extends LayerGroup {
     } else {
       final MapPanel mapPanel = MapPanel.get(this);
       final JLabel message = new JLabel(
-        "<html><body><p><b>Save changes to project?</b></p></body></html>");
+          "<html><body><p><b>Save changes to project?</b></p></body></html>");
 
       final int option = JOptionPane.showConfirmDialog(mapPanel, message,
         "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION,
@@ -401,7 +405,7 @@ public class Project extends LayerGroup {
         } else {
           final JLabel message2 = new JLabel(
             "<html><body><p>Saving project failed.</b></p>"
-              + "<p><b>Do you want to ignore any changes and continue?</b></p></body></html>");
+                + "<p><b>Do you want to ignore any changes and continue?</b></p></body></html>");
 
           final int option2 = JOptionPane.showConfirmDialog(mapPanel, message2,
             "Ignore Changes", JOptionPane.OK_CANCEL_OPTION,
@@ -543,6 +547,11 @@ public class Project extends LayerGroup {
         defaultBoundingBox);
       final Map<String, BoundingBox> zoomBookmarks = getZoomBookmarks();
       MapSerializerUtil.add(map, "zoomBookmarks", zoomBookmarks);
+    }
+    final Rectangle frameBounds = ProjectFrame.get(this).getBounds();
+    if (frameBounds != null) {
+      map.put("frameBounds", Arrays.asList(frameBounds.x, frameBounds.y,
+        frameBounds.width, frameBounds.height));
     }
 
     return map;

@@ -165,16 +165,14 @@ public class SwingUtil {
   }
 
   public static void autoAdjustPosition(final Window window) {
-    final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    window.pack();
 
-    final int width = Math.min(window.getWidth(), screenSize.width - 100);
-    final int height = Math.min(window.getHeight(), screenSize.height - 100);
-
+    final Rectangle bounds = getScreenBounds();
+    final int width = Math.min(window.getWidth(), bounds.width - 100);
+    final int height = Math.min(window.getHeight(), bounds.height - 100);
     window.setSize(width, height);
 
-    final int x = (screenSize.width - width) / 2;
-    final int y = (screenSize.height - height) / 2;
-    window.setLocation(x, y);
+    setLocationCentre(bounds, window);
   }
 
   public static ComboBox createComboBox(final CodeTable codeTable,
@@ -467,6 +465,10 @@ public class SwingUtil {
 
   }
 
+  public static Rectangle getScreenBounds() {
+    return getScreenBounds((Component)null);
+  }
+
   public static Rectangle getScreenBounds(Component component) {
     if (component == null) {
       component = SwingUtil.getActiveWindow();
@@ -481,6 +483,10 @@ public class SwingUtil {
       }
     }
     return getScreenBounds(mousePosition);
+  }
+
+  public static Rectangle getScreenBounds(final int x, final int y) {
+    return getScreenBounds(new Point(x, y));
   }
 
   /**
@@ -815,13 +821,17 @@ public class SwingUtil {
 
   public static void setLocationCentre(final Rectangle bounds,
     final Window window) {
-    final int x = (bounds.width - window.getWidth()) / 2;
-    final int y = (bounds.height - window.getHeight()) / 2;
+    final int width = window.getWidth();
+    final int height = window.getHeight();
+
+    final int x = bounds.x + (bounds.width - width) / 2;
+    final int y = bounds.y + (bounds.height - height) / 2;
+
     window.setLocation(x, y);
   }
 
   public static void setLocationCentre(final Window window) {
-    final Rectangle bounds = getScreenBounds((Component)null);
+    final Rectangle bounds = getScreenBounds();
     setLocationCentre(bounds, window);
   }
 
