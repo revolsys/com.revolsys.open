@@ -30,10 +30,6 @@ import com.revolsys.spring.config.AttributesBeanConfigurer;
 
 public class SpringUtil {
 
-  public static final Pattern KEY_PATTERN = Pattern.compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
-
-  private static final ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<Resource>();
-
   public static Resource addExtension(final Resource resource,
     final String extension) {
     final String fileName = resource.getFilename();
@@ -154,7 +150,7 @@ public class SpringUtil {
       return resource.getFile();
     } catch (final IOException e) {
       throw new IllegalArgumentException("Cannot get File for resource "
-        + resource, e);
+          + resource, e);
     }
   }
 
@@ -178,9 +174,10 @@ public class SpringUtil {
   }
 
   public static OutputStream getFileOutputStream(final Resource resource)
-    throws IOException, FileNotFoundException {
+      throws IOException, FileNotFoundException {
     final File file = resource.getFile();
-    return new BufferedOutputStream(new FileOutputStream(file));
+    final FileOutputStream fileOut = new FileOutputStream(file);
+    return new BufferedOutputStream(fileOut);
   }
 
   public static InputStream getInputStream(final Resource resource) {
@@ -189,7 +186,7 @@ public class SpringUtil {
       return in;
     } catch (final IOException e) {
       throw new RuntimeException("Unable to open stream to resource "
-        + resource, e);
+          + resource, e);
     }
   }
 
@@ -213,7 +210,7 @@ public class SpringUtil {
         return file;
       } else {
         throw new IllegalArgumentException("Cannot get File for resource "
-          + resource, e);
+            + resource, e);
       }
     }
   }
@@ -229,6 +226,8 @@ public class SpringUtil {
         final URL url = resource.getURL();
         final String protocol = url.getProtocol();
         if (protocol.equals("file")) {
+          return getFileOutputStream(resource);
+        } else if (protocol.equals("folderconnection")) {
           return getFileOutputStream(resource);
         } else {
           final URLConnection connection = url.openConnection();
@@ -317,7 +316,7 @@ public class SpringUtil {
       return resource.getURL();
     } catch (final IOException e) {
       throw new IllegalArgumentException("Cannot get URL for resource "
-        + resource, e);
+          + resource, e);
     }
   }
 
@@ -331,4 +330,8 @@ public class SpringUtil {
     SpringUtil.BASE_RESOURCE.set(baseResource);
     return oldResource;
   }
+
+  public static final Pattern KEY_PATTERN = Pattern.compile("(\\w[\\w\\d]*)(?:(?:\\[([\\w\\d]+)\\])|(?:\\.([\\w\\d]+)))?");
+
+  private static final ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<Resource>();
 }

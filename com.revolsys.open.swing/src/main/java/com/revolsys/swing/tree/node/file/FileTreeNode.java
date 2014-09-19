@@ -94,6 +94,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       } else if (file.isDirectory()) {
         return ICON_FOLDER;
       } else {
+        // return FileSystemView.getFileSystemView().getSystemIcon(file);
         return ICON_FILE;
       }
     }

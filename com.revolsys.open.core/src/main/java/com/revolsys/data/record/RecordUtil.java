@@ -5,7 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
+import com.revolsys.comparator.StringNumberComparator;
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
@@ -19,6 +22,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -248,6 +252,27 @@ public final class RecordUtil {
       objects.add(object);
     }
     return objects;
+  }
+
+  public static void mergeStringListValue(final Map<String, Object> object,
+    final Record object1, final Record object2, final String fieldName,
+    final String separator) {
+    final String value1 = object1.getString(fieldName);
+    final String value2 = object2.getString(fieldName);
+    Object value;
+    if (!Property.hasValue(value1)) {
+      value = value2;
+    } else if (!Property.hasValue(value2)) {
+      value = value1;
+    } else if (EqualsRegistry.equal(value1, value2)) {
+      value = value1;
+    } else {
+      final Set<String> values = new TreeSet<>(new StringNumberComparator());
+      values.addAll(CollectionUtil.split(value1, ","));
+      values.addAll(CollectionUtil.split(value2, ","));
+      value = CollectionUtil.toString(values);
+    }
+    object.put(fieldName, value);
   }
 
   public static void mergeValue(final Map<String, Object> object,

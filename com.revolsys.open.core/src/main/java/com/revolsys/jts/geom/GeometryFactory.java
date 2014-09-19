@@ -1027,6 +1027,40 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return this.coordinateSystem instanceof ProjectedCoordinateSystem;
   }
 
+  public boolean isSameCoordinateSystem(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      return false;
+    } else {
+      final int srid = getSrid();
+      final int srid2 = geometryFactory.getSrid();
+      if (srid == srid2) {
+        return true;
+      } else {
+        final CoordinateSystem coordinateSystem = getCoordinateSystem();
+        final CoordinateSystem coordinateSystem2 = geometryFactory.getCoordinateSystem();
+        if (coordinateSystem == null) {
+          if (srid <= 0) {
+            return true;
+          } else if (coordinateSystem2 == null && srid2 <= 0) {
+            return true;
+          } else {
+            return false;
+          }
+        } else if (coordinateSystem2 == null) {
+          if (srid2 <= 0) {
+            return true;
+          } else if (srid <= 0) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return coordinateSystem.equals(coordinateSystem2);
+        }
+      }
+    }
+  }
+
   public LinearRing linearRing() {
     return new LinearRingDoubleGf(this);
   }

@@ -14,6 +14,7 @@ import javax.annotation.PreDestroy;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
@@ -21,8 +22,8 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordTableModel extends
-  com.revolsys.swing.table.AbstractTableModel implements
-  PropertyChangeSupportProxy {
+com.revolsys.swing.table.AbstractTableModel implements
+PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
 
@@ -177,14 +178,8 @@ public abstract class AbstractRecordTableModel extends
 
   public Object toObjectValue(final int attributeIndex,
     final Object displayValue) {
-    if (displayValue == null) {
+    if (!Property.hasValue(displayValue)) {
       return null;
-    }
-    if (displayValue instanceof String) {
-      final String string = (String)displayValue;
-      if (!Property.hasValue(string)) {
-        return null;
-      }
     }
     final RecordDefinition recordDefinition = getRecordDefinition();
     final String name = getFieldName(attributeIndex);
@@ -195,8 +190,13 @@ public abstract class AbstractRecordTableModel extends
         displayValue);
       return objectValue;
     } else {
-      final Object objectValue = codeTable.getId(displayValue);
-      return objectValue;
+      if (displayValue instanceof Identifier) {
+        final Identifier identifier = (Identifier)displayValue;
+        return identifier;
+      } else {
+        final Object objectValue = codeTable.getId(displayValue);
+        return objectValue;
+      }
     }
   }
 

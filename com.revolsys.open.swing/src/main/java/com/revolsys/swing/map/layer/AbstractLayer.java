@@ -72,7 +72,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
-implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
+  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   public static final ImageIcon ICON_LAYER = Icons.getIcon("map");
 
   private static final AtomicLong ID_GEN = new AtomicLong();
@@ -87,7 +87,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
 
     menu.addMenuItem("zoom", MenuSourceRunnable.createAction("Zoom to Layer",
       "magnifier", new MenuSourcePropertyEnableCheck("zoomToLayerEnabled"),
-        "zoomToLayer"));
+      "zoomToLayer"));
 
     menu.addComponentFactory("scale", new TreeItemScaleMenu(true, hasGeometry));
     menu.addComponentFactory("scale", new TreeItemScaleMenu(false, hasGeometry));
@@ -263,18 +263,18 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
       } else {
         extentPanel.add(new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
-              + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-              + StringConverterRegistry.toString(boundingBox.getMaximum(1))
-              + "</td><td>&nbsp;</td></tr><tr>"
-              + "<td><b>Left</b>: "
-              + StringConverterRegistry.toString(boundingBox.getMinimum(0))
-              + "</td><td>&nbsp;</td><td>&nbsp;</td>"
-              + "<td><b>Right</b>: "
-              + StringConverterRegistry.toString(boundingBox.getMaximum(0))
-              + "</td></tr>"
-              + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-              + StringConverterRegistry.toString(boundingBox.getMinimum(1))
-              + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>"));
+            + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+            + StringConverterRegistry.toString(boundingBox.getMaximum(1))
+            + "</td><td>&nbsp;</td></tr><tr>"
+            + "<td><b>Left</b>: "
+            + StringConverterRegistry.toString(boundingBox.getMinimum(0))
+            + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+            + "<td><b>Right</b>: "
+            + StringConverterRegistry.toString(boundingBox.getMaximum(0))
+            + "</td></tr>"
+            + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+            + StringConverterRegistry.toString(boundingBox.getMinimum(1))
+            + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>"));
 
       }
       GroupLayoutUtil.makeColumns(extentPanel, 1, true);
@@ -563,7 +563,11 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   @Override
   public BoundingBox getSelectedBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.boundingBox();
+    if (geometryFactory == null) {
+      return new BoundingBoxDoubleGf();
+    } else {
+      return geometryFactory.boundingBox();
+    }
   }
 
   protected String getSettingsFileName() {
@@ -588,7 +592,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
         setExists(exists);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to initialize layer: "
-            + getPath(), e);
+          + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -662,7 +666,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   @Override
   public boolean isSelectable() {
     return isExists() && isVisible()
-        && (isSelectSupported() && this.selectable || isEditable());
+      && (isSelectSupported() && this.selectable || isEditable());
   }
 
   @Override
@@ -685,7 +689,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   public boolean isVisible(final double scale) {
     final LayerGroup parent = getParent();
     if (isExists() && isVisible()
-        && (parent == null || parent.isVisible(scale))) {
+      && (parent == null || parent.isVisible(scale))) {
       final long longScale = (long)scale;
       final long minimumScale = getMinimumScale();
       final long maximumScale = getMaximumScale();
@@ -1032,8 +1036,8 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
     final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-        .expandPercent(0.1)
-        .clipToCoordinateSystem();
+      .expandPercent(0.1)
+      .clipToCoordinateSystem();
     project.setViewBoundingBox(boundingBox);
   }
 }

@@ -9,6 +9,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.log4j.Appender;
@@ -57,6 +58,8 @@ public class BaseMain implements UncaughtExceptionHandler {
 
   private final String name;
 
+  private String lookAndFeelName;
+
   public BaseMain(final String name) {
     this.name = name;
     Thread.setDefaultUncaughtExceptionHandler(this);
@@ -67,10 +70,30 @@ public class BaseMain implements UncaughtExceptionHandler {
   }
 
   public void doRun() throws Throwable {
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    final boolean lookSet = false;
+    if (Property.hasValue(this.lookAndFeelName)) {
+      final LookAndFeelInfo[] installedLookAndFeels = UIManager.getInstalledLookAndFeels();
+      for (final LookAndFeelInfo lookAndFeelInfo : installedLookAndFeels) {
+        final String name = lookAndFeelInfo.getName();
+        if (this.lookAndFeelName.equals(name)) {
+          try {
+            final String className = lookAndFeelInfo.getClassName();
+            UIManager.setLookAndFeel(className);
+          } catch (final Throwable e) {
+          }
+        }
+      }
+    }
+    if (!lookSet) {
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    }
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
     ToolTipManager.sharedInstance().setInitialDelay(100);
+  }
+
+  public String getLookAndFeelName() {
+    return this.lookAndFeelName;
   }
 
   public void processArguments(final String[] args) {
@@ -89,6 +112,10 @@ public class BaseMain implements UncaughtExceptionHandler {
       ExceptionUtil.log(getClass(), "Unable to start application " + this.name,
         e);
     }
+  }
+
+  public void setLookAndFeelName(final String lookAndFeelName) {
+    this.lookAndFeelName = lookAndFeelName;
   }
 
   @Override

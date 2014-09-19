@@ -27,7 +27,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public abstract class RecordRowTableModel extends AbstractRecordTableModel
-implements SortableTableModel, CellEditorListener {
+  implements SortableTableModel, CellEditorListener {
 
   public static final String LOADING_VALUE = "\u2026";
 
@@ -239,7 +239,7 @@ implements SortableTableModel, CellEditorListener {
     if (attributeNames == null || attributeNames.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
       this.attributeNames = new ArrayList<String>(
-          recordDefinition.getAttributeNames());
+        recordDefinition.getAttributeNames());
     } else {
       this.attributeNames = new ArrayList<String>(attributeNames);
     }
@@ -302,11 +302,11 @@ implements SortableTableModel, CellEditorListener {
     if (isCellEditable(rowIndex, columnIndex)) {
 
       if (columnIndex >= this.attributesOffset) {
-        final Record object = getRecord(rowIndex);
-        if (object != null) {
+        final Record record = getRecord(rowIndex);
+        if (record != null) {
           final String name = getFieldName(columnIndex);
           final Object objectValue = toObjectValue(columnIndex, value);
-          object.setValue(name, objectValue);
+          record.setValue(name, objectValue);
         }
       }
     }

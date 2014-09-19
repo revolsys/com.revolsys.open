@@ -17,7 +17,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
 
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.jts.geom.BoundingBox;
@@ -293,11 +292,11 @@ public class ZoomOverlay extends AbstractOverlay {
   public boolean panStart(final MouseEvent event, final boolean drag) {
     if (this.panX1 == -1) {
       boolean pan = false;
-      if (SwingUtilities.isMiddleMouseButton(event)) {
+      final int button = event.getButton();
+      if (button == MouseEvent.BUTTON2) {
         pan = true;
         this.panButton = MouseEvent.BUTTON2;
-      } else if (!drag && SwingUtilities.isLeftMouseButton(event)
-          && !hasOverlayAction()) {
+      } else if (!drag && button == MouseEvent.BUTTON1 && !hasOverlayAction()) {
         if (event.getModifiersEx() == MouseEvent.BUTTON1_DOWN_MASK) {
           pan = true;
           this.panButton = MouseEvent.BUTTON1;

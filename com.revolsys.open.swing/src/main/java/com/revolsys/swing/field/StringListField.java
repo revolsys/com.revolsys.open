@@ -123,6 +123,7 @@ public class StringListField extends ValueField {
           }
         }
         updateFields();
+        setFieldValue(CollectionUtil.toString(this.values));
         return true;
       }
     }
@@ -150,6 +151,7 @@ public class StringListField extends ValueField {
         selectionModel.setSelectionInterval(index, index);
       }
     }
+    setFieldValue(CollectionUtil.toString(this.values));
     updateFields();
     this.valueEntry.requestFocusInWindow();
   }

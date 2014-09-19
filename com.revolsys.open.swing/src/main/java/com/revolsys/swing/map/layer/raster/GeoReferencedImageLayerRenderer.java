@@ -6,13 +6,16 @@ import java.awt.Graphics2D;
 import java.util.Collections;
 import java.util.Map;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.raster.GeoReferencedImage;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
+import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
 public class GeoReferencedImageLayerRenderer extends
-AbstractLayerRenderer<GeoReferencedImageLayer> {
+  AbstractLayerRenderer<GeoReferencedImageLayer> {
 
   public static void render(final Viewport2D viewport,
     final Graphics2D graphics, final GeoReferencedImage image,
@@ -42,6 +45,18 @@ AbstractLayerRenderer<GeoReferencedImageLayer> {
     }
   }
 
+  public static void renderDifferentCoordinateSystem(final Viewport2D viewport,
+    final BoundingBox boundingBox, final Graphics2D graphics) {
+    if (!boundingBox.getGeometryFactory().isSameCoordinateSystem(
+      viewport.getGeometryFactory())) {
+      GeometryStyleRenderer.renderOutline(viewport, graphics,
+        boundingBox.toPolygon(0), STYLE_DIFFERENT_COORDINATE_SYSTEM);
+    }
+  }
+
+  private static final GeometryStyle STYLE_DIFFERENT_COORDINATE_SYSTEM = GeometryStyle.line(
+    WebColors.Red, 4);
+
   public GeoReferencedImageLayerRenderer(final GeoReferencedImageLayer layer) {
     super("raster", layer);
   }
@@ -62,6 +77,7 @@ AbstractLayerRenderer<GeoReferencedImageLayer> {
           if (graphics != null) {
             renderAlpha(graphics, viewport, image, layer.getOpacity() / 255.0,
               true);
+            renderDifferentCoordinateSystem(viewport, boundingBox, graphics);
           }
         }
       }

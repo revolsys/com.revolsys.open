@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -33,6 +34,8 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.gis.graph.Node;
 import com.revolsys.gis.graph.RecordGraph;
+import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.map.MapPanel;
@@ -69,7 +72,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
   private final Set<LayerRecord> replacedOriginalRecords = new LinkedHashSet<LayerRecord>();
 
-  private HashMap<Record, Set<LayerRecord>> mergedRecords;
+  private Map<Record, Set<LayerRecord>> mergedRecords = Collections.emptyMap();
 
   private final UndoManager undoManager;
 
@@ -159,14 +162,24 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       this.mergedRecords = new HashMap<Record, Set<LayerRecord>>();
       if (originalRecords.size() < 2) {
         errorMessage = " at least two records must be selected to merge.";
-      } else if (!DataTypes.LINE_STRING.equals(geometryType)) {
+      } else if (!DataTypes.LINE_STRING.equals(geometryType)
+          && !DataTypes.MULTI_LINE_STRING.equals(geometryType)) {
         errorMessage = "Merging " + geometryType + " not currently supported";
       } else {
         final RecordGraph graph = new RecordGraph();
         for (final LayerRecord originalRecord : originalRecords) {
-          final Record mergeableRecord = new ArrayRecord(originalRecord);
-          this.mergeableToOiginalRecordMap.put(mergeableRecord, originalRecord);
-          graph.addEdge(mergeableRecord);
+          Geometry geometry = originalRecord.getGeometryValue();
+          if (geometry != null && !geometry.isEmpty()) {
+            geometry = this.layer.getGeometryFactory().geometry(
+              LineString.class, geometry);
+            if (geometry instanceof LineString) {
+              final Record mergeableRecord = new ArrayRecord(originalRecord);
+              mergeableRecord.setGeometryValue(geometry);
+              this.mergeableToOiginalRecordMap.put(mergeableRecord,
+                originalRecord);
+              graph.addEdge(mergeableRecord);
+            }
+          }
         }
         for (final Node<Record> node : graph.nodes()) {
           if (node != null) {
@@ -208,7 +221,6 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass()).error("Error " + this, e);
-    } finally {
     }
   }
 
@@ -222,8 +234,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
 
     final JPanel panel = new JPanel(new VerticalLayout());
     panel.add(tablePanel);
-    SwingUtil.setTitledBorder(panel, "Merged " + objects.size()
-      + " Source Records");
+    SwingUtil.setTitledBorder(panel, "Merged " + objects.size() + " Records");
     this.mergedObjectsPanel.add(panel);
 
   }
@@ -231,7 +242,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
   public void setMergedRecords(String errorMessage,
     final Map<Record, Set<LayerRecord>> mergedRecords) {
     final Set<Record> unMergeableRecords = new HashSet<Record>(
-      this.mergeableToOiginalRecordMap.keySet());
+        this.mergeableToOiginalRecordMap.keySet());
     unMergeableRecords.removeAll(mergedRecords.keySet());
     if (!mergedRecords.isEmpty()) {
       int i = 0;
@@ -243,7 +254,7 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
         i++;
       }
     }
-    if (!unMergeableRecords.isEmpty()) {
+    if (!unMergeableRecords.isEmpty() || Property.hasValue(errorMessage)) {
       final Set<LayerRecord> records = new LinkedHashSet<LayerRecord>();
       for (final Record record : unMergeableRecords) {
         final LayerRecord originalRecord = this.mergeableToOiginalRecordMap.get(record);
@@ -263,22 +274,20 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
         errorMessage = "The following records could not be merged and will not be modified.";
       }
       final JLabel unMergeLabel = new JLabel("<html><p style=\"color:red\">"
-        + errorMessage + "</p></html>");
+          + errorMessage + "</p></html>");
       panel.add(unMergeLabel, BorderLayout.NORTH);
       panel.add(tablePanel, BorderLayout.SOUTH);
       SwingUtil.setTitledBorder(panel, unMergeableRecords.size()
-        + " Un-Mergable Records");
+        + " Un-Mergeable Records");
 
       this.mergedObjectsPanel.add(panel);
     }
-    pack();
     SwingUtil.autoAdjustPosition(this);
+    setVisible(true);
   }
 
   private void showDialog() {
     Invoke.background(toString(), this, "run");
-    pack();
-    setVisible(true);
   }
 
   @Override

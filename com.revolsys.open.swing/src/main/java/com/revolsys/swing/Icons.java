@@ -99,8 +99,13 @@ public class Icons {
         disabledIcon = iconReference.get();
       }
       if (disabledIcon == null) {
-        disabledIcon = new ImageIcon(
-          getDisabledImage((BufferedImage)((ImageIcon)icon).getImage()));
+        if (icon instanceof ImageIcon) {
+          final ImageIcon imageIcon = (ImageIcon)icon;
+          disabledIcon = new ImageIcon(
+            getDisabledImage((BufferedImage)imageIcon.getImage()));
+        } else {
+          return icon;
+        }
         DISABLED_ICON_BY_ICON.put(icon, new WeakReference<>(disabledIcon));
       }
       return disabledIcon;
