@@ -227,6 +227,14 @@ public class MenuFactory extends AbstractObjectWithProperties implements
 
   @Override
   public JMenu createComponent() {
+    return createJMenu();
+  }
+
+  public JMenu createJMenu() {
+    return createJMenu(false);
+  }
+
+  public JMenu createJMenu(boolean forceEnable) {
     final JMenu menu = new JMenu(this.name);
     boolean first = true;
     for (final String groupName : this.groupNames) {
@@ -240,6 +248,9 @@ public class MenuFactory extends AbstractObjectWithProperties implements
         for (final ComponentFactory<?> factory : factories) {
           final Component component = factory.createComponent();
           if (component != null) {
+            if (forceEnable) {
+              component.setEnabled(true);
+            }
             menu.add(component);
           }
         }
@@ -249,6 +260,10 @@ public class MenuFactory extends AbstractObjectWithProperties implements
   }
 
   public JPopupMenu createJPopupMenu() {
+    return createJPopupMenu(false);
+  }
+
+  public JPopupMenu createJPopupMenu(boolean forceEnable) {
     final JPopupMenu menu = new JPopupMenu(this.name);
     boolean first = true;
     for (final String groupName : this.groupNames) {
@@ -260,6 +275,9 @@ public class MenuFactory extends AbstractObjectWithProperties implements
 
           final Component component = factory.createComponent();
           if (component != null) {
+            if (forceEnable) {
+              component.setEnabled(true);
+            }
             if (!groupHasItem) {
               groupHasItem = true;
               if (first) {
