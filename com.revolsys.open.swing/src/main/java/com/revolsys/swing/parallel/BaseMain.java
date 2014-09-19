@@ -46,7 +46,7 @@ public class BaseMain implements UncaughtExceptionHandler {
       }
       final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
       final Object closeAllWindows = quitStrategyClass.getField(
-          "CLOSE_ALL_WINDOWS").get(quitStrategyClass);
+        "CLOSE_ALL_WINDOWS").get(quitStrategyClass);
       MethodUtils.invokeExactMethod(application, "setQuitStrategy",
         closeAllWindows);
       MacApplicationListenerHandler.init(application);
@@ -70,7 +70,7 @@ public class BaseMain implements UncaughtExceptionHandler {
   }
 
   public void doRun() throws Throwable {
-    final boolean lookSet = false;
+    boolean lookSet = false;
     if (Property.hasValue(this.lookAndFeelName)) {
       final LookAndFeelInfo[] installedLookAndFeels = UIManager.getInstalledLookAndFeels();
       for (final LookAndFeelInfo lookAndFeelInfo : installedLookAndFeels) {
@@ -79,6 +79,7 @@ public class BaseMain implements UncaughtExceptionHandler {
           try {
             final String className = lookAndFeelInfo.getClassName();
             UIManager.setLookAndFeel(className);
+            lookSet = true;
           } catch (final Throwable e) {
           }
         }
@@ -132,7 +133,7 @@ public class BaseMain implements UncaughtExceptionHandler {
     ExceptionUtil.log(logClass, message, e);
     @SuppressWarnings("unchecked")
     final Enumeration<Appender> allAppenders = Logger.getRootLogger()
-    .getAllAppenders();
+      .getAllAppenders();
     while (allAppenders.hasMoreElements()) {
       final Appender appender = allAppenders.nextElement();
       if (appender instanceof ListLog4jAppender) {
