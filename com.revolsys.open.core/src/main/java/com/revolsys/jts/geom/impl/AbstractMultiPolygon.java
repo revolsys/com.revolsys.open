@@ -66,7 +66,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *@version 1.7
  */
 public abstract class AbstractMultiPolygon extends AbstractGeometryCollection
-  implements MultiPolygon {
+implements MultiPolygon {
 
   @SuppressWarnings("unchecked")
   @Override
@@ -160,6 +160,33 @@ public abstract class AbstractMultiPolygon extends AbstractGeometryCollection
   }
 
   @Override
+  public Vertex getToVertex(int... vertexId) {
+    if (vertexId == null || vertexId.length != 3) {
+      return null;
+    } else {
+      final int partIndex = vertexId[0];
+      if (partIndex >= 0 && partIndex < getGeometryCount()) {
+        final Polygon polygon = getPolygon(partIndex);
+        final int ringIndex = vertexId[1];
+        if (ringIndex >= 0 && ringIndex < polygon.getRingCount()) {
+          final LinearRing ring = polygon.getRing(ringIndex);
+          int vertexIndex = vertexId[2];
+          final int vertexCount = ring.getVertexCount();
+          vertexIndex = vertexCount - 2 - vertexIndex;
+          if (vertexIndex <= vertexCount) {
+            while (vertexIndex < 0) {
+              vertexIndex += vertexCount - 1;
+            }
+            vertexId = setVertexIndex(vertexId, vertexIndex);
+            return new MultiPolygonVertex(this, vertexId);
+          }
+        }
+      }
+      return null;
+    }
+  }
+
+  @Override
   public Vertex getVertex(final int... vertexId) {
     if (vertexId == null || vertexId.length != 3) {
       return null;
@@ -170,8 +197,12 @@ public abstract class AbstractMultiPolygon extends AbstractGeometryCollection
         final int ringIndex = vertexId[1];
         if (ringIndex >= 0 && ringIndex < polygon.getRingCount()) {
           final LinearRing ring = polygon.getRing(ringIndex);
-          final int vertexIndex = vertexId[2];
-          if (vertexIndex >= 0 && vertexIndex < ring.getVertexCount()) {
+          int vertexIndex = vertexId[2];
+          final int vertexCount = ring.getVertexCount();
+          if (vertexIndex <= vertexCount) {
+            while (vertexIndex < 0) {
+              vertexIndex += vertexCount - 1;
+            }
             return new MultiPolygonVertex(this, vertexId);
           }
         }

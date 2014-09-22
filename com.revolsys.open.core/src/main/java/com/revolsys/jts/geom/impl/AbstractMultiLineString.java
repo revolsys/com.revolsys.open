@@ -63,7 +63,7 @@ import com.revolsys.jts.operation.BoundaryOp;
  *@version 1.7
  */
 public abstract class AbstractMultiLineString extends
-  AbstractGeometryCollection implements MultiLineString {
+AbstractGeometryCollection implements MultiLineString {
 
   private static final long serialVersionUID = 8166665132445433741L;
 
@@ -170,6 +170,29 @@ public abstract class AbstractMultiLineString extends
     }
   }
 
+  @Override
+  public Vertex getToVertex(int... vertexId) {
+    if (vertexId == null || vertexId.length != 2) {
+      return null;
+    } else {
+      final int partIndex = vertexId[0];
+      if (partIndex >= 0 && partIndex < getGeometryCount()) {
+        final LineString line = getLineString(partIndex);
+        int vertexIndex = vertexId[1];
+        final int vertexCount = line.getVertexCount();
+        vertexIndex = vertexCount - 1 - vertexIndex;
+        if (vertexIndex <= vertexCount) {
+          while (vertexIndex < 0) {
+            vertexIndex += vertexCount - 1;
+          }
+          vertexId = setVertexIndex(vertexId, vertexIndex);
+          return new MultiLineStringVertex(this, vertexId);
+        }
+      }
+      return null;
+    }
+  }
+
   /**
    * Gets the user data object for this geometry, if any.
    *
@@ -188,8 +211,12 @@ public abstract class AbstractMultiLineString extends
       final int partIndex = vertexId[0];
       if (partIndex >= 0 && partIndex < getGeometryCount()) {
         final LineString line = getLineString(partIndex);
-        final int vertexIndex = vertexId[1];
-        if (vertexIndex >= 0 && vertexIndex < line.getVertexCount()) {
+        int vertexIndex = vertexId[1];
+        final int vertexCount = line.getVertexCount();
+        if (vertexIndex <= vertexCount) {
+          while (vertexIndex < 0) {
+            vertexIndex += vertexCount - 1;
+          }
           return new MultiLineStringVertex(this, vertexId);
         }
       }

@@ -40,7 +40,7 @@ public class PointVertex extends AbstractVertex {
     final Point point = getPoint();
     if (point == null || point.isEmpty()) {
       return false;
-    } else if (vertexIndex == -1) {
+    } else if (this.vertexIndex == -1) {
       return true;
     } else {
       return false;
@@ -48,19 +48,9 @@ public class PointVertex extends AbstractVertex {
   }
 
   @Override
-  public boolean isFrom() {
-    return vertexIndex == 0;
-  }
-
-  @Override
-  public boolean isTo() {
-    return vertexIndex == 0;
-  }
-
-  @Override
   public Vertex next() {
     if (hasNext()) {
-      vertexIndex++;
+      this.vertexIndex++;
       return this;
     } else {
       throw new NoSuchElementException();

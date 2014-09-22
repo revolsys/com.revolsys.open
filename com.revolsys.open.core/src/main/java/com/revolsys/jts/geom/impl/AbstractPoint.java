@@ -372,6 +372,11 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
+  public Vertex getToVertex(final int... vertexId) {
+    return getVertex(vertexId);
+  }
+
+  @Override
   public GeometryFactory getGeometryFactory() {
     return GeometryFactory.floating3();
   }

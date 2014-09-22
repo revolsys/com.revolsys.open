@@ -8,23 +8,8 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.vertex.Vertex;
 
 public class GeometryEditUtil {
-
-  public static Point getVertex(final Geometry geometry, final int[] partId,
-    final int pointIndex) {
-    final int[] vertexId = new int[partId.length + 1];
-    System.arraycopy(partId, 0, vertexId, 0, partId.length);
-    vertexId[partId.length] = pointIndex;
-    return geometry.getVertex(vertexId);
-  }
-
-  public static int getVertexIndex(final int[] index) {
-    final int length = index.length;
-    final int lastIndex = length - 1;
-    return index[lastIndex];
-  }
 
   public static int[] incrementVertexIndex(final int[] index) {
     final int length = index.length;
@@ -32,36 +17,6 @@ public class GeometryEditUtil {
     final int[] newIndex = new int[length];
     System.arraycopy(index, 0, newIndex, 0, lastIndex);
     newIndex[lastIndex] = index[lastIndex] + 1;
-    return newIndex;
-  }
-
-  public static boolean isFromPoint(final Geometry geometry,
-    final int[] vertexId) {
-    if (geometry != null) {
-      final Vertex vertex = geometry.getVertex(vertexId);
-      if (vertex != null) {
-        return vertex.isFrom();
-      }
-    }
-    return false;
-  }
-
-  public static boolean isToPoint(final Geometry geometry, final int[] vertexId) {
-    if (geometry != null) {
-      final Vertex vertex = geometry.getVertex(vertexId);
-      if (vertex != null) {
-        return vertex.isTo();
-      }
-    }
-    return false;
-  }
-
-  public static int[] setVertexIndex(final int[] index, final int vertexIndex) {
-    final int length = index.length;
-    final int lastIndex = length - 1;
-    final int[] newIndex = new int[length];
-    System.arraycopy(index, 0, newIndex, 0, lastIndex);
-    newIndex[lastIndex] = vertexIndex;
     return newIndex;
   }
 

@@ -22,7 +22,7 @@ public class MultiLineStringVertex extends AbstractVertex {
     if (lineString == null) {
       return Double.NaN;
     } else {
-      return lineString.getCoordinate(vertexIndex, index);
+      return lineString.getCoordinate(this.vertexIndex, index);
     }
   }
 
@@ -30,9 +30,9 @@ public class MultiLineStringVertex extends AbstractVertex {
   public Vertex getLineNext() {
     final LineString line = getLineString();
     if (line != null) {
-      final int newVertexIndex = vertexIndex + 1;
+      final int newVertexIndex = this.vertexIndex + 1;
       if (newVertexIndex < line.getVertexCount() - 1) {
-        return new MultiLineStringVertex(getMultiLineString(), partIndex,
+        return new MultiLineStringVertex(getMultiLineString(), this.partIndex,
           newVertexIndex);
       }
     }
@@ -43,9 +43,9 @@ public class MultiLineStringVertex extends AbstractVertex {
   public Vertex getLinePrevious() {
     final LineString line = getLineString();
     if (line != null) {
-      final int newVertexIndex = vertexIndex - 1;
+      final int newVertexIndex = this.vertexIndex - 1;
       if (newVertexIndex >= 0) {
-        return new MultiLineStringVertex(getMultiLineString(), partIndex,
+        return new MultiLineStringVertex(getMultiLineString(), this.partIndex,
           newVertexIndex);
       }
     }
@@ -54,7 +54,7 @@ public class MultiLineStringVertex extends AbstractVertex {
 
   public LineString getLineString() {
     final MultiLineString multiLineString = getMultiLineString();
-    return multiLineString.getLineString(partIndex);
+    return multiLineString.getLineString(this.partIndex);
   }
 
   public MultiLineString getMultiLineString() {
@@ -69,13 +69,13 @@ public class MultiLineStringVertex extends AbstractVertex {
   @Override
   public int[] getVertexId() {
     return new int[] {
-      partIndex, vertexIndex
+      this.partIndex, this.vertexIndex
     };
   }
 
   @Override
   public int getVertexIndex() {
-    return vertexIndex;
+    return this.vertexIndex;
   }
 
   @Override
@@ -102,16 +102,29 @@ public class MultiLineStringVertex extends AbstractVertex {
   }
 
   @Override
+  public boolean isFrom() {
+    return getVertexIndex() == 0;
+  }
+
+  @Override
+  public boolean isTo() {
+    final int vertexIndex = getVertexIndex();
+    final LineString lineString = getLineString();
+    final int lastVertexIndex = lineString.getVertexCount() - 1;
+    return vertexIndex == lastVertexIndex;
+  }
+
+  @Override
   public Vertex next() {
     final MultiLineString multiLineString = getMultiLineString();
-    vertexIndex++;
-    while (partIndex < multiLineString.getGeometryCount()) {
-      final LineString lineString = multiLineString.getLineString(partIndex);
-      if (vertexIndex < lineString.getVertexCount()) {
+    this.vertexIndex++;
+    while (this.partIndex < multiLineString.getGeometryCount()) {
+      final LineString lineString = multiLineString.getLineString(this.partIndex);
+      if (this.vertexIndex < lineString.getVertexCount()) {
         return this;
       } else {
-        partIndex++;
-        vertexIndex = 0;
+        this.partIndex++;
+        this.vertexIndex = 0;
       }
     }
     throw new NoSuchElementException();

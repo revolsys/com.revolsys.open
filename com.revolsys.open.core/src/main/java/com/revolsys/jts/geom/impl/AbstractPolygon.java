@@ -448,6 +448,26 @@ Polygon {
   }
 
   @Override
+  public Vertex getToVertex(int... vertexId) {
+    if (vertexId == null || vertexId.length != 2) {
+      return null;
+    } else {
+      final int ringIndex = vertexId[0];
+      if (ringIndex >= 0 && ringIndex < getRingCount()) {
+        final LinearRing ring = getRing(ringIndex);
+        int vertexIndex = vertexId[1];
+        final int vertexCount = ring.getVertexCount();
+        vertexIndex = vertexCount - 2 - vertexIndex;
+        vertexId = setVertexIndex(vertexId, vertexIndex);
+        if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+          return new PolygonVertex(this, vertexId);
+        }
+      }
+      return null;
+    }
+  }
+
+  @Override
   public Vertex getVertex(final int... vertexId) {
     if (vertexId == null || vertexId.length != 2) {
       return null;
@@ -455,8 +475,12 @@ Polygon {
       final int ringIndex = vertexId[0];
       if (ringIndex >= 0 && ringIndex < getRingCount()) {
         final LinearRing ring = getRing(ringIndex);
-        final int vertexIndex = vertexId[1];
-        if (vertexIndex >= 0 && vertexIndex < ring.getVertexCount()) {
+        int vertexIndex = vertexId[1];
+        final int vertexCount = ring.getVertexCount();
+        if (vertexIndex <= vertexCount) {
+          while (vertexIndex < 0) {
+            vertexIndex += vertexCount - 1;
+          }
           return new PolygonVertex(this, vertexId);
         }
       }
@@ -702,6 +726,26 @@ Polygon {
   public Reader<Segment> segments() {
     final PolygonSegment iterator = new PolygonSegment(this, 0, -1);
     return new IteratorReader<>(iterator);
+  }
+
+  @Override
+  public <G extends Geometry> G toClockwise() {
+    final List<Geometry> geometries = new ArrayList<>();
+    for (final LinearRing ring : rings()) {
+      geometries.add(ring.toClockwise());
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (G)geometryFactory.polygon(geometries);
+  }
+
+  @Override
+  public <G extends Geometry> G toCounterClockwise() {
+    final List<Geometry> geometries = new ArrayList<>();
+    for (final LinearRing ring : rings()) {
+      geometries.add(ring.toCounterClockwise());
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return (G)geometryFactory.polygon(geometries);
   }
 
   @Override

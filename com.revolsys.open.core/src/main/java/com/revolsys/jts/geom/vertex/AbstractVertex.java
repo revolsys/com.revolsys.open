@@ -41,12 +41,12 @@ public abstract class AbstractVertex extends AbstractPoint implements Vertex {
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry() {
-    return (V)geometry;
+    return (V)this.geometry;
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometry.getGeometryFactory();
+    return this.geometry.getGeometryFactory();
   }
 
   @Override
@@ -91,12 +91,12 @@ public abstract class AbstractVertex extends AbstractPoint implements Vertex {
 
   @Override
   public boolean isFrom() {
-    return getVertexIndex() == 0;
+    return false;
   }
 
   @Override
   public boolean isTo() {
-    return getVertexIndex() == getVertexCount() - 1;
+    return false;
   }
 
   @Override

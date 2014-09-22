@@ -9,15 +9,19 @@ import javax.swing.BorderFactory;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.table.BaseJxTable;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.geometry.GeometryCoordinatesTableModel;
+import com.revolsys.swing.table.renderer.BaseTableCellRenderer;
 
 public class GeometryCoordinatesPanel extends ValueField implements
-  TableModelListener {
+TableModelListener {
   private static final long serialVersionUID = 1L;
 
   private final GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel();
@@ -76,6 +80,13 @@ public class GeometryCoordinatesPanel extends ValueField implements
     if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
       this.model.setGeometry(geometry);
+      final TableCellRenderer cellRenderer = new BaseTableCellRenderer();
+      final TableColumnModel columnModel = this.table.getColumnModel();
+      for (int columnIndex = 0; columnIndex < this.model.getColumnCount(); columnIndex++) {
+        final TableColumn column = columnModel.getColumn(columnIndex);
+
+        column.setCellRenderer(cellRenderer);
+      }
     }
     super.setFieldValue(value);
   }

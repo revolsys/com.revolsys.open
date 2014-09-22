@@ -80,7 +80,7 @@ import com.revolsys.util.MathUtil;
  * @version 1.7
  */
 public abstract class AbstractLineString extends AbstractGeometry implements
-  LineString {
+LineString {
 
   private static final long serialVersionUID = 3110669828065365560L;
 
@@ -100,7 +100,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
         final double[] newCoordinates = new double[axisCount
-          * (vertexCount + 1)];
+                                                   * (vertexCount + 1)];
 
         final int length = vertexCount * axisCount;
         System.arraycopy(coordinates, 0, newCoordinates, 0, length);
@@ -111,8 +111,8 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       }
     } else {
       throw new IllegalArgumentException("Geometry id's for "
-        + getGeometryType() + " must have length 0. "
-        + Arrays.toString(geometryId));
+          + getGeometryType() + " must have length 0. "
+          + Arrays.toString(geometryId));
     }
   }
 
@@ -210,19 +210,19 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   public LineString deleteVertex(final int vertexIndex) {
     if (isEmpty()) {
       throw new IllegalArgumentException(
-        "Cannot delete vertex for empty LineString");
+          "Cannot delete vertex for empty LineString");
     } else {
       final int vertexCount = getVertexCount();
       if (vertexCount <= 2) {
         throw new IllegalArgumentException(
-          "LineString must have a minimum of 2 vertices");
+            "LineString must have a minimum of 2 vertices");
       } else if (vertexIndex >= 0 && vertexIndex < vertexCount) {
         final GeometryFactory geometryFactory = getGeometryFactory();
 
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
         final double[] newCoordinates = new double[axisCount
-          * (vertexCount - 1)];
+                                                   * (vertexCount - 1)];
         final int beforeLength = vertexIndex * axisCount;
         if (vertexIndex > 0) {
           System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
@@ -516,6 +516,22 @@ public abstract class AbstractLineString extends AbstractGeometry implements
   }
 
   @Override
+  public AbstractVertex getToVertex(final int... vertexId) {
+    if (vertexId.length == 1) {
+      int vertexIndex = vertexId[0];
+      final int vertexCount = getVertexCount();
+      vertexIndex = vertexCount - vertexIndex - 1;
+      if (vertexIndex < vertexCount) {
+        while (vertexIndex < 0) {
+          vertexIndex += vertexCount;
+        }
+        return new LineStringVertex(this, vertexIndex);
+      }
+    }
+    return null;
+  }
+
+  @Override
   public AbstractVertex getVertex(final int... vertexId) {
     if (vertexId.length == 1) {
       int vertexIndex = vertexId[0];
@@ -572,7 +588,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
         final double[] coordinates = getCoordinates();
         final int axisCount = getAxisCount();
         final double[] newCoordinates = new double[axisCount
-          * (vertexCount + 1)];
+                                                   * (vertexCount + 1)];
 
         final int vertexIndex = vertexId[0];
 
@@ -592,8 +608,8 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       }
     } else {
       throw new IllegalArgumentException("Geometry id's for "
-        + getGeometryType() + " must have length 1. "
-        + Arrays.toString(vertexId));
+          + getGeometryType() + " must have length 1. "
+          + Arrays.toString(vertexId));
     }
   }
 
@@ -603,7 +619,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       return false;
     } else {
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory()
-        .convertAxisCount(2);
+          .convertAxisCount(2);
       double previousX = Double.NaN;
       double previousY = Double.NaN;
 
@@ -687,7 +703,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
      * it contains coincident line segments.
      */
     if (equalsVertex(iPrev, hiPtX, hiPtY) || equalsVertex(iNext, hiPtX, hiPtY)
-      || equalsVertex(2, iPrev, iNext)) {
+        || equalsVertex(2, iPrev, iNext)) {
       return false;
     }
 
@@ -758,7 +774,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
         coordinates, newVertexCount, vertexCount2 - 1);
     } else {
       throw new IllegalArgumentException("lines don't touch\n" + this + "\n"
-        + line2);
+          + line2);
 
     }
     final GeometryFactory factory = getGeometryFactory();
@@ -803,7 +819,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
         coordinates, newVertexCount, vertexCount2 - 1);
     } else {
       throw new IllegalArgumentException("lines don't touch\n" + this + "\n"
-        + line2);
+          + line2);
 
     }
     final GeometryFactory factory = getGeometryFactory();
@@ -857,7 +873,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
       return this;
     } else if (isEmpty()) {
       throw new IllegalArgumentException(
-        "Cannot move vertex for empty LineString");
+          "Cannot move vertex for empty LineString");
     } else {
       final int vertexCount = getVertexCount();
       if (vertexIndex >= 0 && vertexIndex < vertexCount) {
@@ -939,7 +955,7 @@ public abstract class AbstractLineString extends AbstractGeometry implements
     for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         final int coordinateIndex = (vertexCount - 1 - vertexIndex) * axisCount
-          + axisIndex;
+            + axisIndex;
         coordinates[coordinateIndex] = getCoordinate(vertexIndex, axisIndex);
       }
     }
@@ -1052,6 +1068,26 @@ public abstract class AbstractLineString extends AbstractGeometry implements
         coordinates);
       GeometryProperties.copyUserData(this, newLine);
       return newLine;
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <G extends Geometry> G toClockwise() {
+    if (isClockwise()) {
+      return (G)this;
+    } else {
+      return (G)this.reverse();
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <G extends Geometry> G toCounterClockwise() {
+    if (isClockwise()) {
+      return (G)this.reverse();
+    } else {
+      return (G)this;
     }
   }
 

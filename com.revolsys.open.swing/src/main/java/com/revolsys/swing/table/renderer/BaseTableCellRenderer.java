@@ -9,9 +9,11 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.renderer.IconValue;
 import org.jdesktop.swingx.renderer.StringValue;
 
+import com.revolsys.converter.string.StringConverterRegistry;
+
 public class BaseTableCellRenderer extends DefaultTableRenderer {
 
-  private int rowHeight;
+  private static final long serialVersionUID = 1L;
 
   public BaseTableCellRenderer() {
     super();
@@ -43,8 +45,9 @@ public class BaseTableCellRenderer extends DefaultTableRenderer {
   public Component getTableCellRendererComponent(final JTable table,
     final Object value, final boolean isSelected, final boolean hasFocus,
     final int row, final int columnIndex) {
+    final String text = StringConverterRegistry.toString(value);
     final Component component = super.getTableCellRendererComponent(table,
-      value, isSelected, hasFocus, row, columnIndex);
+      text, isSelected, hasFocus, row, columnIndex);
     return component;
   }
 }

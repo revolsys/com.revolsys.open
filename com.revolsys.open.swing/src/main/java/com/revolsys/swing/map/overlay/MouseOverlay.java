@@ -12,7 +12,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +28,15 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 
 public class MouseOverlay extends JComponent implements MouseListener,
-MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
+  MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
+
+  public static int getEventX() {
+    return x;
+  }
+
+  public static int getEventY() {
+    return y;
+  }
 
   public static boolean isMouseInMap() {
     return x != -1;
@@ -57,7 +64,7 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
   @Override
   public void focusGained(final FocusEvent e) {
     if (e.getComponent() == this
-        && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
+      && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
     } else {
       for (final Component overlay : getOverlays()) {
         if (overlay instanceof FocusListener) {
@@ -71,7 +78,7 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
   @Override
   public void focusLost(final FocusEvent e) {
     if (e.getComponent() == this
-        && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
+      && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
     } else {
       for (final Component overlay : getOverlays()) {
         if (overlay instanceof FocusListener) {
@@ -88,16 +95,8 @@ MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
     return point;
   }
 
-  public Point2D getEventPosition() {
+  public java.awt.Point getEventPosition() {
     return new java.awt.Point(x, y);
-  }
-
-  public int getEventX() {
-    return x;
-  }
-
-  public int getEventY() {
-    return y;
   }
 
   private GeometryFactory getGeometryFactory() {

@@ -40,6 +40,7 @@ import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
+import com.revolsys.swing.map.overlay.MouseOverlay;
 
 public class Viewport2D implements PropertyChangeSupportProxy {
 
@@ -83,7 +84,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   }
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
-      .geometry();
+    .geometry();
 
   private double pixelsPerXUnit;
 
@@ -145,7 +146,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
       }
       if (boundingBox.isEmpty()) {
         boundingBox = geometryFactory.getCoordinateSystem()
-            .getAreaBoundingBox();
+          .getAreaBoundingBox();
       }
     }
     setGeometryFactory(geometryFactory);
@@ -172,11 +173,6 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     return modelToScreenTransform;
   }
 
-  protected double getPixelsPerYUnit(final double viewHeight,
-    final double mapHeight) {
-    return -viewHeight / mapHeight;
-  }
-
   public void drawGeometry(final Geometry geometry, final GeometryStyle style) {
     final Graphics2D graphics = getGraphics();
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -195,6 +191,13 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
+  }
+
+  public BoundingBox getBoundingBox(final GeometryFactory geometryFactory,
+    final int pixels) {
+    final int x = MouseOverlay.getEventX();
+    final int y = MouseOverlay.getEventY();
+    return getBoundingBox(geometryFactory, x, y, pixels);
   }
 
   public BoundingBox getBoundingBox(final GeometryFactory geometryFactory,
@@ -281,6 +284,11 @@ public class Viewport2D implements PropertyChangeSupportProxy {
 
   public double getPixelsPerYUnit() {
     return this.pixelsPerYUnit;
+  }
+
+  protected double getPixelsPerYUnit(final double viewHeight,
+    final double mapHeight) {
+    return -viewHeight / mapHeight;
   }
 
   public Project getProject() {
@@ -498,10 +506,10 @@ public class Viewport2D implements PropertyChangeSupportProxy {
           final Measurable<Length> viewWidthLength = getViewWidthLength();
           final Measurable<Length> modelWidthLength = newBoundingBox.getWidthLength();
           unitsPerPixel = modelWidthLength.doubleValue(SI.METRE)
-              / viewWidthPixels;
+            / viewWidthPixels;
           double scale = getScale(viewWidthLength, modelWidthLength);
           if (!this.scales.isEmpty() && viewWidthPixels > 0
-              && viewHeightPixels > 0) {
+            && viewHeightPixels > 0) {
             final double minScale = this.scales.get(this.scales.size() - 1);
             final double maxScale = this.scales.get(0);
             if (scale < minScale) {
@@ -653,7 +661,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double... viewCoordinates) {
     final double[] coordinates = toModelCoordinates(viewCoordinates);
     if (Double.isInfinite(coordinates[0]) || Double.isInfinite(coordinates[1])
-        || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
+      || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
       return geometryFactory.point();
     } else {
       final Point point = this.geometryFactory2d.point(coordinates);

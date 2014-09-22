@@ -902,6 +902,15 @@ DataTypeProxy {
   int getSrid();
 
   /**
+   * <p>Get the {@link Vertex} at the specified vertexId starting at the end of the geometry (see {@link Vertex#getVertexId()}).</p>
+   *
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param vertexId The id of the vertex.
+   * @return The vertex or null if it does not exist.
+   */
+  Vertex getToVertex(final int... vertexId);
+
+  /**
    * Gets the user data object for this geometry, if any.
    *
    * @return the user data object, or <code>null</code> if none set
@@ -1163,6 +1172,10 @@ DataTypeProxy {
    * @throws IllegalArgumentException if either input is a non-empty GeometryCollection
    */
   Geometry symDifference(final Geometry other);
+
+  <G extends Geometry> G toClockwise();
+
+  <G extends Geometry> G toCounterClockwise();
 
   /**
    * Tests whether this geometry touches the

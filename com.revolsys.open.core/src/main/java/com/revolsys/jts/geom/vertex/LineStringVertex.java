@@ -65,6 +65,19 @@ public class LineStringVertex extends AbstractVertex {
   }
 
   @Override
+  public boolean isFrom() {
+    return getVertexIndex() == 0;
+  }
+
+  @Override
+  public boolean isTo() {
+    final int vertexIndex = getVertexIndex();
+    final LineString lineString = getLineString();
+    final int lastVertexIndex = lineString.getVertexCount() - 1;
+    return vertexIndex == lastVertexIndex;
+  }
+
+  @Override
   public Vertex next() {
     final LineString lineString = getLineString();
     this.vertexIndex++;

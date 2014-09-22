@@ -24,7 +24,7 @@ public class MultiPointVertex extends AbstractVertex {
 
   @Override
   public int getPartIndex() {
-    return partIndex;
+    return this.partIndex;
   }
 
   @Override
@@ -54,20 +54,10 @@ public class MultiPointVertex extends AbstractVertex {
   }
 
   @Override
-  public boolean isFrom() {
-    return partIndex == 0;
-  }
-
-  @Override
-  public boolean isTo() {
-    return partIndex == 0;
-  }
-
-  @Override
   public Vertex next() {
     final MultiPoint multiPoint = getMultiPoint();
-    partIndex++;
-    if (partIndex < multiPoint.getGeometryCount()) {
+    this.partIndex++;
+    if (this.partIndex < multiPoint.getGeometryCount()) {
       return this;
     } else {
       throw new NoSuchElementException();

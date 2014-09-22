@@ -108,6 +108,16 @@ public abstract class AbstractMultiPoint extends AbstractGeometryCollection
   }
 
   @Override
+  public Vertex getToVertex(final int... vertexId) {
+    if (vertexId.length != 1 || vertexId[0] < 0
+      || vertexId[0] >= getGeometryCount()) {
+      return null;
+    } else {
+      return new MultiPointVertex(this, vertexId);
+    }
+  }
+
+  @Override
   public Vertex getVertex(final int... vertexId) {
     if (vertexId.length != 1 || vertexId[0] < 0
       || vertexId[0] >= getGeometryCount()) {
@@ -180,6 +190,18 @@ public abstract class AbstractMultiPoint extends AbstractGeometryCollection
   @Override
   public IteratorReader<Segment> segments() {
     return new IteratorReader<Segment>();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <G extends Geometry> G toClockwise() {
+    return (G)this;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <G extends Geometry> G toCounterClockwise() {
+    return (G)this;
   }
 
   @Override

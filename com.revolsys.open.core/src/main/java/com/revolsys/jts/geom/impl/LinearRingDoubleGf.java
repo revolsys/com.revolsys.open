@@ -42,6 +42,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
  * Models an OGC SFS <code>LinearRing</code>.
@@ -142,13 +143,13 @@ LinearRing {
         final int axisCount = getAxisCount();
         final double[] newCoordinates = new double[axisCount
                                                    * (vertexCount + 1)];
-
+        final Vertex fromPoint = getVertex(0);
         final int length = (vertexCount - 1) * axisCount;
-        System.arraycopy(coordinates, 0, newCoordinates, axisCount, length);
-        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, 0,
-          newPoint);
+        System.arraycopy(coordinates, 0, newCoordinates, 0, length);
         CoordinatesListUtil.setCoordinates(newCoordinates, axisCount,
-          vertexCount, newPoint);
+          vertexCount - 1, newPoint);
+        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount,
+          vertexCount, fromPoint);
 
         return (V)geometryFactory.linearRing(axisCount, newCoordinates);
       }

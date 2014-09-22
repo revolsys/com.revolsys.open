@@ -304,6 +304,11 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
   }
 
   @Override
+  public Vertex getToVertex(final int... vertexId) {
+    return new GeometryCollectionVertex(this, vertexId);
+  }
+
+  @Override
   public Vertex getVertex(final int... vertexId) {
     return new GeometryCollectionVertex(this, vertexId);
   }
@@ -473,6 +478,26 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
     final GeometryCollectionSegment iterator = new GeometryCollectionSegment(
       this, -1);
     return iterator.reader();
+  }
+
+  @Override
+  public <G extends Geometry> G toClockwise() {
+    final List<Geometry> geometries = new ArrayList<>();
+    for (final Geometry geometry : geometries()) {
+      geometries.add(geometry.toClockwise());
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.geometry(geometries);
+  }
+
+  @Override
+  public <G extends Geometry> G toCounterClockwise() {
+    final List<Geometry> geometries = new ArrayList<>();
+    for (final Geometry geometry : geometries()) {
+      geometries.add(geometry.toCounterClockwise());
+    }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.geometry(geometries);
   }
 
   @Override

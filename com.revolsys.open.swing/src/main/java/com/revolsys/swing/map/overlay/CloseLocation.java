@@ -1,9 +1,9 @@
 package com.revolsys.swing.map.overlay;
 
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.gis.jts.GeometryEditUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -53,13 +53,22 @@ public class CloseLocation implements Comparable<CloseLocation> {
       final LayerRecord record1 = getRecord();
       final LayerRecord record2 = location.getRecord();
       if (record1 == null) {
-        return record2 == null;
+        if (record2 != null) {
+          return false;
+        }
       } else if (record2 == null) {
         return false;
-      } else if (record2.isSame(record1)) {
-        if (location.getPoint().equals(getPoint())) {
-          return true;
-        }
+      } else if (!record2.isSame(record1)) {
+        return false;
+      }
+      if (!EqualsRegistry.equal(getVertex(), location.getVertex())) {
+        return false;
+      } else if (!EqualsRegistry.equal(getSegment(), location.getSegment())) {
+        return false;
+      } else if (location.getPoint().equals(getPoint())) {
+        return true;
+      } else {
+        return false;
       }
     }
     return false;
@@ -133,8 +142,8 @@ public class CloseLocation implements Comparable<CloseLocation> {
     } else if (this.segment != null) {
       return "Edge";
     } else {
-      if (GeometryEditUtil.isFromPoint(geometry, getVertexIndex())
-          || GeometryEditUtil.isToPoint(geometry, getVertexIndex())) {
+      final Vertex vertex = geometry.getVertex(getVertexIndex());
+      if (vertex.isFrom() || vertex.isTo()) {
         return "End-Vertex";
       } else {
         return "Vertex";

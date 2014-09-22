@@ -191,6 +191,19 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *@version 1.7
  */
 public abstract class AbstractGeometry implements Geometry {
+  public static int[] createVertexId(final int[] partId, final int vertexIndex) {
+    final int[] vertexId = new int[partId.length + 1];
+    System.arraycopy(partId, 0, vertexId, 0, partId.length);
+    vertexId[partId.length] = vertexIndex;
+    return vertexId;
+  }
+
+  public static int getVertexIndex(final int[] index) {
+    final int length = index.length;
+    final int lastIndex = length - 1;
+    return index[lastIndex];
+  }
+
   /**
    * Returns true if the array contains any non-empty <code>Geometry</code>s.
    *
@@ -222,6 +235,15 @@ public abstract class AbstractGeometry implements Geometry {
       }
     }
     return false;
+  }
+
+  public static int[] setVertexIndex(final int[] vertexId, final int vertexIndex) {
+    final int length = vertexId.length;
+    final int lastIndex = length - 1;
+    final int[] newVertextId = new int[length];
+    System.arraycopy(vertexId, 0, newVertextId, 0, lastIndex);
+    newVertextId[lastIndex] = vertexIndex;
+    return newVertextId;
   }
 
   private static final long serialVersionUID = 8763622679187376702L;
@@ -347,7 +369,7 @@ public abstract class AbstractGeometry implements Geometry {
     final DataType dataType = geometry.getDataType();
     if (dataType.equals(DataTypes.GEOMETRY_COLLECTION)) {
       throw new IllegalArgumentException(
-        "This method does not support GeometryCollection arguments");
+          "This method does not support GeometryCollection arguments");
     }
   }
 
@@ -1386,11 +1408,11 @@ public abstract class AbstractGeometry implements Geometry {
       final Geometry g2 = other;
       return GeometryCollectionMapper.map((GeometryCollection)this,
         new GeometryMapper.MapOp() {
-          @Override
-          public Geometry map(final Geometry g) {
-            return g.intersection(g2);
-          }
-        });
+        @Override
+        public Geometry map(final Geometry g) {
+          return g.intersection(g2);
+        }
+      });
     }
     // if (isGeometryCollection(other))
     // return other.intersection(this);
@@ -1736,6 +1758,18 @@ public abstract class AbstractGeometry implements Geometry {
     checkNotGeometryCollection(this);
     checkNotGeometryCollection(other);
     return SnapIfNeededOverlayOp.overlayOp(this, other, OverlayOp.SYMDIFFERENCE);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <G extends Geometry> G toClockwise() {
+    return (G)this;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <G extends Geometry> G toCounterClockwise() {
+    return (G)this;
   }
 
   @Override
