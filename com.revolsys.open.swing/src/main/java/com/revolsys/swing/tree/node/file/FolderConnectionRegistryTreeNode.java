@@ -20,9 +20,10 @@ import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
 public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
-  implements PropertyChangeListener {
+implements PropertyChangeListener {
 
-  private static final MenuFactory MENU = new MenuFactory();
+  private static final MenuFactory MENU = new MenuFactory(
+    "Folder Connection Registry");
 
   public FolderConnectionRegistryTreeNode(
     final FolderConnectionRegistry registry) {

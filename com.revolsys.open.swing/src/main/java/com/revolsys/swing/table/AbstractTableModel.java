@@ -9,7 +9,7 @@ import com.revolsys.swing.menu.MenuFactory;
 public abstract class AbstractTableModel extends
   javax.swing.table.AbstractTableModel {
 
-  private MenuFactory menu = new MenuFactory();
+  private MenuFactory menu = new MenuFactory(getClass().getName());
 
   public AbstractTableModel() {
   }

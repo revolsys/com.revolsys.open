@@ -27,7 +27,7 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
 public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements
-  RecordStoreProxy, RecordStoreConnectionMapProxy {
+RecordStoreProxy, RecordStoreConnectionMapProxy {
   public static List<BaseTreeNode> getChildren(
     final Map<String, Object> connectionMap, final RecordStore recordStore) {
     if (recordStore == null) {
@@ -68,7 +68,8 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements
 
   public static final Icon ICON = Icons.getIcon("database_link");
 
-  private static final MenuFactory MENU = new MenuFactory();
+  private static final MenuFactory MENU = new MenuFactory(
+    "Record Store Connection");
 
   static {
     final EnableCheck notReadOnly = new TreeNodePropertyEnableCheck("readOnly",
@@ -94,8 +95,8 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements
     final RecordStoreConnection connection = getConnection();
     final int confirm = JOptionPane.showConfirmDialog(
       SwingUtil.getActiveWindow(), "Delete data store connection '"
-        + connection.getName() + "'? This action cannot be undone.",
-      "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+          + connection.getName() + "'? This action cannot be undone.",
+          "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
     if (confirm == JOptionPane.OK_OPTION) {
       connection.delete();
     }

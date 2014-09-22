@@ -32,7 +32,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
 
   public static Map<String, Icon> ICONS_GEOMETRY = new HashMap<String, Icon>();
 
-  private static final MenuFactory MENU = new MenuFactory();
+  private static final MenuFactory MENU = new MenuFactory("Record Store Table");
 
   static {
     for (final String geometryType : Arrays.asList("Geometry", "Point",

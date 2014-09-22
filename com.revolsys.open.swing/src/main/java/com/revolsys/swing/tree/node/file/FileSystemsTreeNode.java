@@ -16,7 +16,7 @@ public class FileSystemsTreeNode extends ListTreeNode {
 
   public static final Icon ICON_FOLDER_DRIVE = Icons.getIcon("folder_drive");
 
-  private static final MenuFactory MENU = new MenuFactory();
+  private static final MenuFactory MENU = new MenuFactory("File Systems");
 
   static {
     final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",

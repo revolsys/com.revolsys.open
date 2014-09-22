@@ -159,7 +159,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public static final Icon ICON_FOLDER_MISSING = Icons.getIcon("folder_error");
 
-  private static final MenuFactory MENU = new MenuFactory();
+  private static final MenuFactory MENU = new MenuFactory("File");
 
   static {
     final EnableCheck isDirectory = new TreeNodePropertyEnableCheck("directory");
@@ -203,7 +203,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
       SwingUtil.addLabel(panel, "Folder Connections");
       final List<FolderConnectionRegistry> registries = FolderConnectionManager.get()
-          .getVisibleConnectionRegistries();
+        .getVisibleConnectionRegistries();
       final JComboBox registryField = new JComboBox(
         new Vector<FolderConnectionRegistry>(registries));
 
@@ -277,7 +277,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       final String extension = FileUtil.getFileNameExtension(file);
       if (Property.hasValue(extension)) {
         final IoFactory factory = IoFactoryRegistry.getInstance()
-            .getFactoryByFileExtension(IoFactory.class, extension);
+          .getFactoryByFileExtension(IoFactory.class, extension);
         if (factory != null) {
           return factory.getName();
         }

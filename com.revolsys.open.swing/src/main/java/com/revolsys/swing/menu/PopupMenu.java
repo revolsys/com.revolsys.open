@@ -7,15 +7,21 @@ import java.awt.event.MouseListener;
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JPopupMenu;
 import javax.swing.text.JTextComponent;
+
+import com.revolsys.swing.field.Field;
 
 public class PopupMenu implements MouseListener {
   public static PopupMenu getPopupMenu(final JComponent component) {
     synchronized (component) {
       PopupMenu popupMenu = getPopupMenuInternal(component);
       if (popupMenu == null) {
-        popupMenu = new PopupMenu();
+        String name = "Field";
+        if (component instanceof Field) {
+          final Field field = (Field)component;
+          name += " " + field.getFieldName();
+        }
+        popupMenu = new PopupMenu(name);
         popupMenu.addToComponent(component);
       }
       return popupMenu;
@@ -42,6 +48,7 @@ public class PopupMenu implements MouseListener {
     }
   }
 
+  @SuppressWarnings("rawtypes")
   public static void removeFromComponent(final JComponent component) {
     for (final MouseListener mouseListener : component.getMouseListeners()) {
       if (mouseListener instanceof PopupMenu) {
@@ -60,14 +67,15 @@ public class PopupMenu implements MouseListener {
 
   private final MenuFactory menu;
 
-  public PopupMenu() {
-    this(new MenuFactory());
-  }
-
   public PopupMenu(final MenuFactory menu) {
     this.menu = menu;
   }
 
+  public PopupMenu(final String name) {
+    this(new MenuFactory(name));
+  }
+
+  @SuppressWarnings("rawtypes")
   public boolean addToComponent(final JComponent component) {
     synchronized (component) {
       removeFromComponent(component);
@@ -81,7 +89,7 @@ public class PopupMenu implements MouseListener {
       if (component instanceof JTextComponent) {
         final MenuFactory menu = getMenu();
         final JTextComponent textComponent = (JTextComponent)component;
-        if (autoCreateDnd) {
+        if (this.autoCreateDnd) {
           if (!menu.getProperty("hasDndMenu", Boolean.FALSE)) {
             menu.setProperty("hasDndMenu", Boolean.TRUE);
             menu.addMenuItemTitleIcon("dataTransfer", "Cut", "cut",
@@ -103,7 +111,7 @@ public class PopupMenu implements MouseListener {
   }
 
   public boolean isAutoCreateDnd() {
-    return autoCreateDnd;
+    return this.autoCreateDnd;
   }
 
   @Override
@@ -133,9 +141,7 @@ public class PopupMenu implements MouseListener {
   }
 
   public void show(final Component component, final int x, final int y) {
-    final JPopupMenu popupMenu = this.menu.createJPopupMenu();
-    popupMenu.pack();
-    popupMenu.show(component, x, y);
+    this.menu.show(null, component, x, y);
   }
 
   protected void showMenu(final MouseEvent e) {

@@ -19,8 +19,8 @@ import com.revolsys.util.UrlProxy;
 import com.revolsys.util.UrlUtil;
 
 public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
-  UrlProxy {
-  private static final MenuFactory MENU = new MenuFactory();
+UrlProxy {
+  private static final MenuFactory MENU = new MenuFactory("Folder Connection");
 
   static {
     final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",
@@ -45,7 +45,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
     final int confirm = JOptionPane.showConfirmDialog(
       SwingUtil.getActiveWindow(),
       "Delete folder connection '" + connection.getName()
-        + "'? This action cannot be undone.", "Delete Layer",
+      + "'? This action cannot be undone.", "Delete Layer",
       JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
     if (confirm == JOptionPane.OK_OPTION) {
       connection.delete();
@@ -73,7 +73,7 @@ public class FolderConnectionTreeNode extends LazyLoadTreeNode implements
   public URL getUrl() {
     final String name = getName();
     final String urlstring = "folderconnection://"
-      + UrlUtil.percentEncode(name) + "/";
+        + UrlUtil.percentEncode(name) + "/";
     try {
       final URL url = new URL(urlstring);
       return url;

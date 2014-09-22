@@ -22,6 +22,7 @@ import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
+import com.revolsys.util.Property;
 
 public class MenuFactory extends AbstractObjectWithProperties implements
   ComponentFactory<JMenuItem> {
@@ -46,7 +47,7 @@ public class MenuFactory extends AbstractObjectWithProperties implements
         if (menu == null) {
           final Class<?> superClass = layerClass.getSuperclass();
           final MenuFactory parentMenu = getMenu(superClass);
-          menu = parentMenu.clone();
+          menu = new MenuFactory(layerClass.getName(), parentMenu);
           CLASS_MENUS.put(layerClass, menu);
         }
         return menu;
@@ -75,19 +76,35 @@ public class MenuFactory extends AbstractObjectWithProperties implements
 
   private static Object menuSource;
 
-  private final Map<String, List<ComponentFactory<?>>> groups = new HashMap<String, List<ComponentFactory<?>>>();
+  private final Map<String, List<ComponentFactory<?>>> groups = new HashMap<>();
 
   private final List<String> groupNames = new ArrayList<String>();
 
   private String name;
 
-  private static final ClassRegistry<MenuFactory> CLASS_MENUS = new ClassRegistry<MenuFactory>();
+  private static final ClassRegistry<MenuFactory> CLASS_MENUS = new ClassRegistry<>();
 
   public MenuFactory() {
   }
 
+  public MenuFactory(final MenuFactory menuFactory) {
+    this(null, menuFactory);
+  }
+
   public MenuFactory(final String name) {
+    this(name, null);
+  }
+
+  public MenuFactory(final String name, final MenuFactory menuFactory) {
     this.name = name;
+    if (menuFactory != null) {
+      for (final String groupName : menuFactory.getGroupNames()) {
+        for (final ComponentFactory<?> factory : menuFactory.getGroup(groupName)) {
+          final ComponentFactory<?> cloneFactory = factory.clone();
+          addComponentFactory(groupName, cloneFactory);
+        }
+      }
+    }
   }
 
   public void addCheckboxMenuItem(final String groupName,
@@ -211,13 +228,8 @@ public class MenuFactory extends AbstractObjectWithProperties implements
 
   @Override
   public MenuFactory clone() {
-    final MenuFactory clone = new MenuFactory();
-    for (final String groupName : this.groupNames) {
-      for (final ComponentFactory<?> factory : this.groups.get(groupName)) {
-        final ComponentFactory<?> cloneFactory = factory.clone();
-        clone.addComponentFactory(groupName, cloneFactory);
-      }
-    }
+    final MenuFactory clone = new MenuFactory(this);
+
     return clone;
   }
 
@@ -234,8 +246,13 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     return createJMenu(false);
   }
 
-  public JMenu createJMenu(boolean forceEnable) {
-    final JMenu menu = new JMenu(this.name);
+  public JMenu createJMenu(final boolean forceEnable) {
+    final String name = this.name;
+    return createJMenu(name, forceEnable);
+  }
+
+  public JMenu createJMenu(final String name, final boolean forceEnable) {
+    final JMenu menu = new JMenu(name);
     boolean first = true;
     for (final String groupName : this.groupNames) {
       final List<ComponentFactory<?>> factories = this.groups.get(groupName);
@@ -263,7 +280,7 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     return createJPopupMenu(false);
   }
 
-  public JPopupMenu createJPopupMenu(boolean forceEnable) {
+  public JPopupMenu createJPopupMenu(final boolean forceEnable) {
     final JPopupMenu menu = new JPopupMenu(this.name);
     boolean first = true;
     for (final String groupName : this.groupNames) {
@@ -294,12 +311,6 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     return menu;
   }
 
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
-
   public InvokeMethodAction createMenuItem(final String name,
     final String title, final Icon icon, final EnableCheck enableCheck,
     final Object object, final String methodName, final Object... parameters) {
@@ -308,6 +319,12 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     action.setEnableCheck(enableCheck);
     return action;
   }
+
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
 
   public void deleteMenuItem(final String groupName, final String menuTitle) {
     final List<ComponentFactory<?>> items = this.groups.get(groupName);
@@ -420,8 +437,18 @@ public class MenuFactory extends AbstractObjectWithProperties implements
           }
           window.toFront();
         }
+        menu.validate();
         menu.show(component, x, y);
       }
+    }
+  }
+
+  @Override
+  public String toString() {
+    if (Property.hasValue(this.name)) {
+      return this.name;
+    } else {
+      return super.toString();
     }
   }
 }

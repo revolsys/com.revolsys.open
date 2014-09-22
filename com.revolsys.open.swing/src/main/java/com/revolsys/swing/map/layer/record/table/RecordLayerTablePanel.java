@@ -31,6 +31,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.component.AttributeFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.WrappedMenuFactory;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
@@ -41,7 +42,7 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class RecordLayerTablePanel extends TablePanel implements
-PropertyChangeListener {
+  PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   public static final String FILTER_GEOMETRY = "filter_geometry";
@@ -71,12 +72,12 @@ PropertyChangeListener {
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     final boolean hasGeometry = recordDefinition.getGeometryAttributeIndex() != -1;
     final EnableCheck deletableEnableCheck = new RecordRowPropertyEnableCheck(
-        "deletable");
+      "deletable");
 
     final EnableCheck modifiedEnableCheck = new RecordRowPropertyEnableCheck(
-        "modified");
+      "modified");
     final EnableCheck deletedEnableCheck = new RecordRowPropertyEnableCheck(
-        "deleted");
+      "deleted");
     final EnableCheck notEnableCheck = new RecordRowPropertyEnableCheck(
       "deleted", false);
     final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(
@@ -85,13 +86,15 @@ PropertyChangeListener {
     final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
       layer, "editable");
 
-    menu.addGroup(0, "record");
-    menu.addGroup(1, "dnd");
+    menu.addGroup(0, "default");
+    menu.addGroup(1, "record");
+    menu.addGroup(2, "dnd");
 
     final MenuFactory layerMenuFactory = MenuFactory.findMenu(layer);
-    // if (layerMenuFactory != null) {
-    // menu.addComponentFactory("default", 0, layerMenuFactory);
-    // }
+    if (layerMenuFactory != null) {
+      menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer",
+        layerMenuFactory));
+    }
 
     menu.addMenuItemTitleIcon("record", "View/Edit Record", "table_edit",
       notEnableCheck, this, "editRecord");
@@ -108,10 +111,10 @@ PropertyChangeListener {
 
     menu.addMenuItem("record", RecordRowRunnable.createAction(
       "Revert Empty Fields", "field_empty_revert", modifiedEnableCheck,
-        "revertEmptyFields"));
+      "revertEmptyFields"));
 
     menu.addMenuItemTitleIcon("dnd", "Copy Record", "page_copy", this,
-        "copyRecord");
+      "copyRecord");
 
     if (hasGeometry) {
       menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "geometry_paste",
@@ -120,11 +123,11 @@ PropertyChangeListener {
 
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
       final DataType geometryDataType = recordDefinition.getGeometryAttribute()
-          .getType();
+        .getType();
       if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition)
-            .hasDirectionalAttributes()) {
+          .hasDirectionalAttributes()) {
           editMenu.addMenuItemTitleIcon("geometry",
             LayerRecordForm.FLIP_RECORD_NAME, LayerRecordForm.FLIP_RECORD_ICON,
             editableEnableCheck, this, "flipRecordOrientation");
@@ -153,7 +156,7 @@ PropertyChangeListener {
     toolBar.addComponent("count", new TableRowCount(this.tableModel));
 
     toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this,
-        "refresh");
+      "refresh");
 
     final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
       this, this.tableModel);
@@ -254,6 +257,11 @@ PropertyChangeListener {
     return this.layer;
   }
 
+  @Override
+  protected Object getMenuSource() {
+    return this.layer;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public RecordLayerTableModel getTableModel() {
@@ -305,6 +313,7 @@ PropertyChangeListener {
 
   public void setAttributeFilterMode(final String mode) {
     if (RecordLayerTableModel.MODE_SELECTED.equals(mode)) {
+      this.selectedButton.setSelected(true);
       this.selectedButton.doClick();
     }
   }
@@ -316,8 +325,8 @@ PropertyChangeListener {
     if (geometry != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()
-          .convert(geometryFactory)
-          .expandPercent(0.1);
+        .convert(geometryFactory)
+        .expandPercent(0.1);
       project.setViewBoundingBox(boundingBox);
     }
   }

@@ -20,11 +20,11 @@ import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
 public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
-  RecordStoreConnectionMapProxy {
+RecordStoreConnectionMapProxy {
 
   public static final ImageIcon ICON_SCHEMA = Icons.getIcon("folder_table");
 
-  private static final MenuFactory MENU = new MenuFactory();
+  private static final MenuFactory MENU = new MenuFactory("Record Store Schema");
 
   static {
     final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",

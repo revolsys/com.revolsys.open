@@ -11,7 +11,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
@@ -70,7 +69,7 @@ public class TablePanel extends JPanel implements MouseListener {
   private static Reference<JTable> eventTable = new WeakReference<JTable>(null);
 
   private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(
-      null);
+    null);
 
   private static final long serialVersionUID = 1L;
 
@@ -100,7 +99,7 @@ public class TablePanel extends JPanel implements MouseListener {
 
     menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value",
       "paste_plain", new ObjectPropertyEnableCheck(this, "canPaste"), this,
-        "pasteFieldValue");
+      "pasteFieldValue");
   }
 
   private void copyCurrentCell() {
@@ -150,11 +149,14 @@ public class TablePanel extends JPanel implements MouseListener {
         final int x = e.getX();
         final int y = e.getY();
 
-        final JPopupMenu popupMenu = menu.createJPopupMenu();
         final Component component = e.getComponent();
-        popupMenu.show(component, x + 5, y);
+        menu.show(getMenuSource(), component, x + 5, y);
       }
     }
+  }
+
+  protected Object getMenuSource() {
+    return null;
   }
 
   public JScrollPane getScrollPane() {
@@ -181,7 +183,7 @@ public class TablePanel extends JPanel implements MouseListener {
 
   public boolean isCanCut() {
     return isEditingCurrentCell() || isCurrentCellHasValue()
-        && isCurrentCellEditable();
+      && isCurrentCellEditable();
   }
 
   public boolean isCanPaste() {

@@ -79,6 +79,7 @@ import com.revolsys.swing.map.print.SinglePage;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SwingWorkerProgressBar;
+import com.revolsys.swing.pdf.SaveAsPdf;
 import com.revolsys.swing.preferences.PreferencesDialog;
 import com.revolsys.swing.table.worker.SwingWorkerTableModel;
 import com.revolsys.swing.tree.BaseTree;
@@ -198,7 +199,7 @@ public class ProjectFrame extends BaseFrame {
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-        .getTheme();
+      .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -335,11 +336,11 @@ public class ProjectFrame extends BaseFrame {
     file.addMenuItem("project", "Save Project", "Save Project",
       Icons.getIcon("layout_save"), this.project, "saveAllSettings");
 
-    // file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
-    // "save");
+    file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
+      "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-        "print");
+      "print");
 
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;
