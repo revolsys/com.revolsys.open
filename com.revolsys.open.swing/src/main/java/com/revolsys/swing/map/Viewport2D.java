@@ -84,7 +84,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
   }
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
-    .geometry();
+      .geometry();
 
   private double pixelsPerXUnit;
 
@@ -146,7 +146,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
       }
       if (boundingBox.isEmpty()) {
         boundingBox = geometryFactory.getCoordinateSystem()
-          .getAreaBoundingBox();
+            .getAreaBoundingBox();
       }
     }
     setGeometryFactory(geometryFactory);
@@ -506,10 +506,10 @@ public class Viewport2D implements PropertyChangeSupportProxy {
           final Measurable<Length> viewWidthLength = getViewWidthLength();
           final Measurable<Length> modelWidthLength = newBoundingBox.getWidthLength();
           unitsPerPixel = modelWidthLength.doubleValue(SI.METRE)
-            / viewWidthPixels;
+              / viewWidthPixels;
           double scale = getScale(viewWidthLength, modelWidthLength);
           if (!this.scales.isEmpty() && viewWidthPixels > 0
-            && viewHeightPixels > 0) {
+              && viewHeightPixels > 0) {
             final double minScale = this.scales.get(this.scales.size() - 1);
             final double maxScale = this.scales.get(0);
             if (scale < minScale) {
@@ -661,7 +661,7 @@ public class Viewport2D implements PropertyChangeSupportProxy {
     final double... viewCoordinates) {
     final double[] coordinates = toModelCoordinates(viewCoordinates);
     if (Double.isInfinite(coordinates[0]) || Double.isInfinite(coordinates[1])
-      || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
+        || Double.isNaN(coordinates[0]) || Double.isNaN(coordinates[1])) {
       return geometryFactory.point();
     } else {
       final Point point = this.geometryFactory2d.point(coordinates);

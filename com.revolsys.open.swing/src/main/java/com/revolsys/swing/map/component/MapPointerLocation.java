@@ -7,25 +7,21 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
-import com.revolsys.gis.cs.GeographicCoordinateSystem;
+import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class MapPointerLocation extends JLabel implements MouseMotionListener,
-  PropertyChangeListener {
-  private static NumberFormat getFormat() {
-    return new DecimalFormat("############.############");
-  }
+PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -63,17 +59,19 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
 
   @Override
   public void mouseMoved(final MouseEvent e) {
+    final int x = e.getX();
+    final int y = e.getY();
     final Point mapPoint = this.viewport.toModelPointRounded(
-      this.geometryFactory, e.getX(), e.getY());
+      this.geometryFactory, x, y);
     if (!mapPoint.isEmpty()) {
       final double projectedX = mapPoint.getX();
+      final String textX = MathUtil.toString(projectedX);
       final double projectedY = mapPoint.getY();
-      if (this.geometryFactory.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
-        setText(this.title + ": " + getFormat().format(projectedY) + ", "
-          + getFormat().format(projectedX));
+      final String textY = MathUtil.toString(projectedY);
+      if (this.geometryFactory.isGeographics()) {
+        setText(this.title + ": " + textY + ", " + textX);
       } else {
-        setText(this.title + ": " + getFormat().format(projectedX) + ", "
-          + getFormat().format(projectedY));
+        setText(this.title + ": " + textX + ", " + textY);
       }
     }
   }
@@ -87,6 +85,11 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
   }
 
   public void setGeometryFactory(GeometryFactory geometryFactory) {
+    if (this.geographics && geometryFactory.isGeographics()) {
+      setVisible(false);
+    } else {
+      setVisible(true);
+    }
     geometryFactory = geometryFactory.convertAxisCount(2);
 
     if (this.geographics || geometryFactory.isGeographics()) {
@@ -99,7 +102,8 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener,
     }
     final int srid = geometryFactory.getSrid();
     this.geometryFactory = geometryFactory;
-    this.setToolTipText(geometryFactory.getCoordinateSystem().getName());
+    CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    this.setToolTipText(coordinateSystem.getName());
     this.title = String.valueOf(srid);
 
   }

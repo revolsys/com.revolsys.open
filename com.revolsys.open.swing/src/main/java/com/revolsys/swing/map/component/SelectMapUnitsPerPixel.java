@@ -9,7 +9,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Vector;
 
@@ -28,10 +27,11 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
-  PropertyChangeListener, ActionListener {
+PropertyChangeListener, ActionListener {
   private static ComboBoxModel GEOGRAPHIC_MODEL = new DefaultComboBoxModel(
     new Vector<Double>(Arrays.asList(2.0, 1.0, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01,
       0.005, 0.002, 0.001, 0.0005, 0.0002, 0.0001, 0.00005, 0.00002, 0.00001,
@@ -88,22 +88,21 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
   public String format(final Object value) {
     if (value instanceof Number) {
       final Number number = (Number)value;
-      int numDigits;
-      if (getModel() == PROJECTED_MODEL) {
-        numDigits = 3;
+      double doubleValue = number.doubleValue();
+      final ComboBoxModel<?> model = getModel();
+      if (model == PROJECTED_MODEL) {
+        doubleValue = MathUtil.makePrecise(1000, doubleValue);
       } else {
-        numDigits = 7;
+        doubleValue = MathUtil.makePrecise(10000000, doubleValue);
       }
-      return new BigDecimal(number.doubleValue()).setScale(numDigits,
-        BigDecimal.ROUND_HALF_UP).toPlainString()
-        + unitString;
+      return MathUtil.toString(doubleValue) + this.unitString;
     } else {
       return "Unknown";
     }
   }
 
   public MapPanel getMap() {
-    return map.get();
+    return this.map.get();
   }
 
   @Override
@@ -130,7 +129,7 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
       if ("scale".equals(propertyName) || "unitsPerPixel".equals(propertyName)) {
         final double unitsPerPixel = map.getUnitsPerPixel();
         if (unitsPerPixel > 0 && !Double.isInfinite(unitsPerPixel)
-          && !Double.isNaN(unitsPerPixel)) {
+            && !Double.isNaN(unitsPerPixel)) {
           Invoke.later(this, "setSelectedItem", unitsPerPixel);
         }
       } else if ("boundingBox".equals(propertyName)) {
@@ -138,7 +137,7 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
         final BoundingBox boundingBox = map.getBoundingBox();
         ComboBoxModel model = PROJECTED_MODEL;
         if (boundingBox == null) {
-          toolTip = "Resolution (m/pixel)";
+          toolTip = "Map Resolution (m/pixel)";
         } else {
           final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
           final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -149,7 +148,27 @@ public class SelectMapUnitsPerPixel extends JComboBox implements ItemListener,
           }
           final Unit<Quantity> unit = coordinateSystem.getUnit();
           this.unitString = unit.toString();
-          toolTip = "Resolution (" + unit + "/pixel)";
+          toolTip = "Map Resolution (" + unit + "/pixel)";
+        }
+        Invoke.later(this, "setToolTipText", toolTip);
+
+        if (model != getModel()) {
+          Invoke.later(this, "setModel", model);
+        }
+      } else if ("geometryFactory".equals(propertyName)) {
+        String toolTip;
+        final GeometryFactory geometryFactory = map.getGeometryFactory();
+        ComboBoxModel model = PROJECTED_MODEL;
+        if (geometryFactory == null) {
+          toolTip = "Map Resolution (m/pixel)";
+        } else {
+          final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+          if (geometryFactory.isGeographics()) {
+            model = GEOGRAPHIC_MODEL;
+          }
+          final Unit<Quantity> unit = coordinateSystem.getUnit();
+          this.unitString = unit.toString();
+          toolTip = "Map Resolution (" + unit + "/pixel)";
         }
         Invoke.later(this, "setToolTipText", toolTip);
 
