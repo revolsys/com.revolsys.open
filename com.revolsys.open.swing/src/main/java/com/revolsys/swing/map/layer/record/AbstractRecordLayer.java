@@ -175,7 +175,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayer.class);
+    final Class<AbstractRecordLayer> clazz = AbstractRecordLayer.class;
+    final MenuFactory menu = MenuFactory.getMenu(clazz);
     menu.setName("Layer");
     menu.addGroup(0, "table");
     menu.addGroup(2, "edit");
@@ -183,8 +184,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
     final EnableCheck exists = new MenuSourcePropertyEnableCheck("exists");
 
-    menu.addMenuItem("table", MenuSourceRunnable.createAction("View Records",
-      "table_go", exists, "showRecordsTable"));
+    menu.addMenuItem(clazz, "ViewRecords");
 
     final EnableCheck hasSelectedRecords = new MenuSourcePropertyEnableCheck(
       "hasSelectedRecords");

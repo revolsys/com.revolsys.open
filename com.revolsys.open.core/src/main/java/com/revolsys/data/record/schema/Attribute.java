@@ -16,8 +16,6 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.AbstractObjectWithProperties;
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.util.CaseConverter;
@@ -34,14 +32,11 @@ import com.revolsys.util.Property;
  * @see RecordDefinition
  */
 public class Attribute extends AbstractObjectWithProperties implements
-Cloneable, MapSerializer {
+  Cloneable, MapSerializer {
 
   public static Attribute create(final Map<String, Object> properties) {
     return new Attribute(properties);
   }
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "field", "Data Record Field", Attribute.class, "create");
 
   private final Map<Object, Object> allowedValues = new LinkedHashMap<Object, Object>();
 
@@ -106,7 +101,7 @@ Cloneable, MapSerializer {
     }
     this.description = CollectionUtil.getString(properties, "description");
     this.type = DataTypes.getType(CollectionUtil.getString(properties,
-        "dataType"));
+      "dataType"));
     this.required = CollectionUtil.getBool(properties, "required");
     this.length = CollectionUtil.getInteger(properties, "length", 0);
     this.scale = CollectionUtil.getInteger(properties, "scale", 0);
@@ -524,7 +519,7 @@ Cloneable, MapSerializer {
 
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = new WeakReference<RecordDefinition>(
-        recordDefinition);
+      recordDefinition);
   }
 
   public void setRequired(final boolean required) {
@@ -589,7 +584,7 @@ Cloneable, MapSerializer {
 
     if (isRequired()) {
       if (value == null || value instanceof String
-          && !Property.hasValue((String)value)) {
+        && !Property.hasValue((String)value)) {
         throw new IllegalArgumentException(fieldName + " is required");
       }
     }

@@ -1,18 +1,33 @@
 package com.revolsys.swing.tree;
 
+import java.util.Map;
+
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class MenuSourcePropertyEnableCheck extends AbstractEnableCheck {
+
+  public static MenuSourcePropertyEnableCheck create(
+    final Map<String, Object> config) {
+    return new MenuSourcePropertyEnableCheck(config);
+  }
+
   private final String propertyName;
 
   private final Object value;
 
   private boolean inverse = false;
+
+  public MenuSourcePropertyEnableCheck(final Map<String, Object> config) {
+    this.propertyName = (String)config.get("propertyName");
+    this.value = config.get("value");
+    this.inverse = CollectionUtil.getBool(config, "inverse");
+  }
 
   public MenuSourcePropertyEnableCheck(final String propertyName) {
     this(propertyName, true);

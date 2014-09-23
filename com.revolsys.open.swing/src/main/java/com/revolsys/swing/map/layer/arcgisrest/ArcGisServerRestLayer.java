@@ -7,8 +7,6 @@ import java.util.Map;
 import com.revolsys.io.esri.map.rest.ArcGisServerRestClient;
 import com.revolsys.io.esri.map.rest.MapServer;
 import com.revolsys.io.esri.map.rest.map.TileInfo;
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -23,10 +21,6 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
     final Map<String, Object> properties) {
     return new ArcGisServerRestLayer(properties);
   }
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "arcgisServerRest", "Arc GIS Server REST", ArcGisServerRestLayer.class,
-      "create");
 
   private MapServer mapServer;
 
@@ -57,7 +51,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
           }
         } catch (final Throwable e) {
           throw new RuntimeException("Error connecting to ArcGIS rest server "
-              + this.url, e);
+            + this.url, e);
         }
       } else {
         return true;

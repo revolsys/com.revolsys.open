@@ -1,0 +1,21 @@
+{
+  "group": "scale",
+  "name": "Hide zoomed out beyond (minimum) scale",
+  "typeClass": "com.revolsys.swing.map.layer.menu.TreeItemScaleMenu",
+  "min": true,
+  "enableCheck": {
+    "type": "andEnableCheck",
+    "enableChecks": [
+      {
+        "type": "menuSourceEnableCheck",
+        "propertyName": "exists",
+        "value": true
+      },
+      {
+        "type": "menuSourceEnableCheck",
+        "propertyName": "hasGeometry",
+        "value": true
+      }
+    ]
+  }
+}

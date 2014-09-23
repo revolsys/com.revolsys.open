@@ -51,8 +51,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.enablecheck.AndEnableCheck;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.border.TitledBorder;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -61,45 +59,22 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
-import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.tree.MenuSourcePropertyEnableCheck;
-import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
-  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
+implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   public static final ImageIcon ICON_LAYER = Icons.getIcon("map");
 
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
-
-    final EnableCheck exists = new MenuSourcePropertyEnableCheck("exists");
-
-    final EnableCheck hasGeometry = new AndEnableCheck(exists,
-      new MenuSourcePropertyEnableCheck("hasGeometry"));
-
-    menu.addMenuItem("zoom", MenuSourceRunnable.createAction("Zoom to Layer",
-      "magnifier", new MenuSourcePropertyEnableCheck("zoomToLayerEnabled"),
-      "zoomToLayer"));
-
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(true, hasGeometry));
-    menu.addComponentFactory("scale", new TreeItemScaleMenu(false, hasGeometry));
-
-    menu.addMenuItem("refresh", MenuSourceRunnable.createAction("Refresh",
-      "arrow_refresh", exists, "refreshAll"));
-
-    menu.addMenuItem("layer", MenuSourceRunnable.createAction("Delete Layer",
-      "delete", "deleteWithConfirm"));
-
-    menu.addMenuItem("layer", MenuSourceRunnable.createAction(
-      "Layer Properties", "information", exists, "showProperties"));
+    MenuFactory.createMenu(AbstractLayer.class, "ZoomToLayer", "MinScale",
+      "MaxScale", "Refresh", "DeleteLayer", "LayerProperties");
   }
 
   private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(
@@ -263,18 +238,18 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       } else {
         extentPanel.add(new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
-            + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-            + StringConverterRegistry.toString(boundingBox.getMaximum(1))
-            + "</td><td>&nbsp;</td></tr><tr>"
-            + "<td><b>Left</b>: "
-            + StringConverterRegistry.toString(boundingBox.getMinimum(0))
-            + "</td><td>&nbsp;</td><td>&nbsp;</td>"
-            + "<td><b>Right</b>: "
-            + StringConverterRegistry.toString(boundingBox.getMaximum(0))
-            + "</td></tr>"
-            + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-            + StringConverterRegistry.toString(boundingBox.getMinimum(1))
-            + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>"));
+              + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+              + StringConverterRegistry.toString(boundingBox.getMaximum(1))
+              + "</td><td>&nbsp;</td></tr><tr>"
+              + "<td><b>Left</b>: "
+              + StringConverterRegistry.toString(boundingBox.getMinimum(0))
+              + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+              + "<td><b>Right</b>: "
+              + StringConverterRegistry.toString(boundingBox.getMaximum(0))
+              + "</td></tr>"
+              + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+              + StringConverterRegistry.toString(boundingBox.getMinimum(1))
+              + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>"));
 
       }
       GroupLayoutUtil.makeColumns(extentPanel, 1, true);
@@ -592,7 +567,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         setExists(exists);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to initialize layer: "
-          + getPath(), e);
+            + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -666,7 +641,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public boolean isSelectable() {
     return isExists() && isVisible()
-      && (isSelectSupported() && this.selectable || isEditable());
+        && (isSelectSupported() && this.selectable || isEditable());
   }
 
   @Override
@@ -689,7 +664,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public boolean isVisible(final double scale) {
     final LayerGroup parent = getParent();
     if (isExists() && isVisible()
-      && (parent == null || parent.isVisible(scale))) {
+        && (parent == null || parent.isVisible(scale))) {
       final long longScale = (long)scale;
       final long minimumScale = getMinimumScale();
       final long maximumScale = getMaximumScale();
@@ -1036,8 +1011,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
     final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-      .expandPercent(0.1)
-      .clipToCoordinateSystem();
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
     project.setViewBoundingBox(boundingBox);
   }
 }

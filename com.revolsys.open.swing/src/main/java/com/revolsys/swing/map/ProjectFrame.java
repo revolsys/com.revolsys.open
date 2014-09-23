@@ -48,7 +48,6 @@ import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 import com.revolsys.io.datastore.RecordStoreConnectionManager;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionManager;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
@@ -61,20 +60,9 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
-import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.arcgisrest.ArcGisServerRestLayer;
-import com.revolsys.swing.map.layer.bing.BingLayer;
-import com.revolsys.swing.map.layer.geonames.GeoNamesBoundingBoxLayerWorker;
-import com.revolsys.swing.map.layer.grid.GridLayer;
-import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapApiLayer;
-import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayer;
-import com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer;
-import com.revolsys.swing.map.layer.record.FileRecordLayer;
-import com.revolsys.swing.map.layer.record.RecordStoreLayer;
-import com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker;
 import com.revolsys.swing.map.print.SinglePage;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -145,21 +133,6 @@ public class ProjectFrame extends BaseFrame {
 
   static {
     ResponseCache.setDefault(new FileResponseCache());
-
-    // TODO move to a file config
-    MapObjectFactoryRegistry.addFactory(LayerGroup.FACTORY);
-    MapObjectFactoryRegistry.addFactory(RecordStoreLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(ArcGisServerRestLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(BingLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(OpenStreetMapLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(OpenStreetMapApiLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(FileRecordLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(GridLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(WikipediaBoundingBoxLayerWorker.FACTORY);
-    MapObjectFactoryRegistry.addFactory(GeoNamesBoundingBoxLayerWorker.FACTORY);
-    MapObjectFactoryRegistry.addFactory(GeoReferencedImageLayer.FACTORY);
-    MapObjectFactoryRegistry.addFactory(BaseMapLayerGroup.FACTORY);
-
   }
 
   private Project project;
@@ -199,7 +172,7 @@ public class ProjectFrame extends BaseFrame {
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-      .getTheme();
+        .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -337,10 +310,10 @@ public class ProjectFrame extends BaseFrame {
       Icons.getIcon("layout_save"), this.project, "saveAllSettings");
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
-      "save");
+        "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-      "print");
+        "print");
 
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;

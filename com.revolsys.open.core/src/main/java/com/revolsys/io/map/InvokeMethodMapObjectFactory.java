@@ -1,41 +1,44 @@
 package com.revolsys.io.map;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.beanutils.MethodUtils;
 
 import com.revolsys.util.ExceptionUtil;
 
-public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory {
+public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
+implements MapSerializer {
 
-  private final Reference<Object> object;
+  private final Class<?> typeClass;
 
   private final String methodName;
 
   public InvokeMethodMapObjectFactory(final String typeName,
-    final String description, final Object object, final String methodName) {
+    final String description, final Class<?> typeClass, final String methodName) {
     super(typeName, description);
-    this.object = new WeakReference<Object>(object);
+    this.typeClass = typeClass;
     this.methodName = methodName;
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<>();
+    map.put("typeName", getTypeName());
+    map.put("description", getDescription());
+    map.put("typeClass", this.typeClass);
+    map.put("methodName", this.methodName);
+    return map;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V> V toObject(final Map<String, ? extends Object> properties) {
     try {
-      final Object object = this.object.get();
-      if (object instanceof Class<?>) {
-        final Class<?> clazz = (Class<?>)object;
-        return (V)MethodUtils.invokeStaticMethod(clazz, this.methodName,
-          properties);
-      } else if (object != null) {
-        return (V)MethodUtils.invokeMethod(object, this.methodName, properties);
-      } else {
-        return null;
-      }
+      final Class<?> clazz = this.typeClass;
+      return (V)MethodUtils.invokeStaticMethod(clazz, this.methodName,
+        properties);
     } catch (final NoSuchMethodException e) {
       return ExceptionUtil.throwUncheckedException(e);
     } catch (final IllegalAccessException e) {

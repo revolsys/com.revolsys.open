@@ -26,8 +26,6 @@ import com.revolsys.data.record.property.AttributeProperties;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
 import com.revolsys.data.record.property.ValueRecordDefinitionProperty;
 import com.revolsys.data.types.DataType;
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.Geometry;
@@ -37,7 +35,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
-implements RecordDefinition {
+  implements RecordDefinition {
   public static RecordDefinitionImpl create(final Map<String, Object> properties) {
     return new RecordDefinitionImpl(properties);
   }
@@ -55,10 +53,6 @@ implements RecordDefinition {
   private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
 
   private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakCache<Integer, RecordDefinitionImpl>();
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "dataRecordDefinition", "Data Record Definition",
-    RecordDefinitionImpl.class, "create");
 
   private final Map<String, Integer> attributeIdMap = new HashMap<String, Integer>();
 
@@ -620,7 +614,7 @@ implements RecordDefinition {
   }
 
   private void readObject(final ObjectInputStream ois)
-      throws ClassNotFoundException, IOException {
+    throws ClassNotFoundException, IOException {
     ois.defaultReadObject();
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }

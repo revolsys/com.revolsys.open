@@ -2,6 +2,7 @@ package com.revolsys.swing.menu;
 
 import java.awt.Component;
 import java.awt.Window;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +16,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import org.slf4j.LoggerFactory;
+
 import com.revolsys.beans.ClassRegistry;
 import com.revolsys.io.AbstractObjectWithProperties;
+import com.revolsys.io.json.JsonParser;
+import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -25,7 +30,14 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.util.Property;
 
 public class MenuFactory extends AbstractObjectWithProperties implements
-  ComponentFactory<JMenuItem> {
+ComponentFactory<JMenuItem> {
+
+  public static MenuFactory createMenu(final Class<?> clazz,
+    final String... menuNames) {
+    final MenuFactory menu = getMenu(clazz);
+    menu.addMenuItems(clazz, menuNames);
+    return menu;
+  }
 
   public static MenuFactory findMenu(final Class<?> clazz) {
     synchronized (CLASS_MENUS) {
@@ -38,17 +50,17 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     return findMenu(clazz);
   }
 
-  public static MenuFactory getMenu(final Class<?> layerClass) {
-    if (layerClass == null) {
+  public static MenuFactory getMenu(final Class<?> clazz) {
+    if (clazz == null) {
       return new MenuFactory();
     } else {
       synchronized (CLASS_MENUS) {
-        MenuFactory menu = CLASS_MENUS.get(layerClass);
+        MenuFactory menu = CLASS_MENUS.get(clazz);
         if (menu == null) {
-          final Class<?> superClass = layerClass.getSuperclass();
+          final Class<?> superClass = clazz.getSuperclass();
           final MenuFactory parentMenu = getMenu(superClass);
-          menu = new MenuFactory(layerClass.getName(), parentMenu);
-          CLASS_MENUS.put(layerClass, menu);
+          menu = new MenuFactory(clazz.getName(), parentMenu);
+          CLASS_MENUS.put(clazz, menu);
         }
         return menu;
       }
@@ -150,6 +162,30 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     addMenuItem("default", action);
   }
 
+  public void addMenuItem(final Class<?> clazz, final String name) {
+    final String fileName = name + ".json";
+    final InputStream in = clazz.getResourceAsStream(fileName);
+    if (in == null) {
+      LoggerFactory.getLogger(clazz).error(
+        "Unable to find menu configuration file " + fileName);
+    } else {
+      final Map<String, Object> config = JsonParser.getMap(in);
+      final String groupName = (String)config.get("group");
+
+      final Object object = MapObjectFactoryRegistry.toObject(config);
+      if (object instanceof AbstractAction) {
+        final AbstractAction action = (AbstractAction)object;
+        addMenuItem(groupName, action);
+      } else if (object instanceof ComponentFactory<?>) {
+        final ComponentFactory<?> factory = (ComponentFactory<?>)object;
+        addComponentFactory(groupName, factory);
+      } else {
+        LoggerFactory.getLogger(clazz).error(
+          "Invalid menu configuration " + config);
+      }
+    }
+  }
+
   public JMenuItem addMenuItem(final JMenuItem menuItem) {
     addComponent(menuItem);
     return menuItem;
@@ -207,6 +243,12 @@ public class MenuFactory extends AbstractObjectWithProperties implements
       object, methodName, parameters);
 
     addComponentFactory(groupName, action);
+  }
+
+  public void addMenuItems(final Class<?> clazz, final String... menuNames) {
+    for (final String menuName : menuNames) {
+      addMenuItem(clazz, menuName);
+    }
   }
 
   public void addMenuItemTitleIcon(final String groupName, final String title,

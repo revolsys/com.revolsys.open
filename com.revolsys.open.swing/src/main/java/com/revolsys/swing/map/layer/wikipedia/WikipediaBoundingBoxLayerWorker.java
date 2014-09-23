@@ -7,8 +7,6 @@ import java.util.Map;
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -22,7 +20,7 @@ import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
 public class WikipediaBoundingBoxLayerWorker extends
-  AbstractSwingWorker<List<LayerRecord>, Void> {
+AbstractSwingWorker<List<LayerRecord>, Void> {
 
   public static BoundingBoxRecordLayer create(
     final Map<String, Object> properties) {
@@ -40,10 +38,6 @@ public class WikipediaBoundingBoxLayerWorker extends
     layer.setProperties(properties);
     return layer;
   }
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "wikipedia", "Wikipedia Articles", WikipediaBoundingBoxLayerWorker.class,
-    "create");
 
   private final BoundingBoxRecordLayer layer;
 
@@ -68,7 +62,7 @@ public class WikipediaBoundingBoxLayerWorker extends
     if (coordinateSystem instanceof ProjectedCoordinateSystem) {
       final ProjectedCoordinateSystem projCs = (ProjectedCoordinateSystem)coordinateSystem;
       geometryFactory = projCs.getGeographicCoordinateSystem()
-        .getGeometryFactory();
+          .getGeometryFactory();
       boundingBox = boundingBox.convert(geometryFactory);
     }
     final List<LayerRecord> results = (List)this.geoNamesService.getWikipediaArticles(boundingBox);
@@ -80,7 +74,7 @@ public class WikipediaBoundingBoxLayerWorker extends
       String text;
       if (thumbnailImage != null) {
         text = "<html><b>" + title + "</b><br /><img src=\"" + thumbnailImage
-          + "\" /><br /></html>";
+            + "\" /><br /></html>";
       } else {
         text = "<html><b>" + title + "</b><br /></html>";
       }

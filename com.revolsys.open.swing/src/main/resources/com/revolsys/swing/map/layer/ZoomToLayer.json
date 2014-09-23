@@ -1,0 +1,14 @@
+{
+  "group":"zoom",
+  "name": "Zoom to Layer",
+  "icon": "magnifier",
+  "type": "menuSourceRunnable",
+  "methodName": "zoomToLayer",
+  "parameters": [
+  ],
+  "enableCheck": {
+    "type": "menuSourceEnableCheck",
+    "propertyName": "zoomToLayerEnabled",
+    "value": true
+  }
+}

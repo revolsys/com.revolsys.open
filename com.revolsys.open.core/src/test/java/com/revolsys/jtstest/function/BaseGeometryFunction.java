@@ -32,21 +32,21 @@
  */
 package com.revolsys.jtstest.function;
 
+import com.revolsys.beans.Classes;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.jtstest.util.ClassUtil;
 
 /**
  * A base for implementations of
- * {@link GeometryFunction} which provides most 
+ * {@link GeometryFunction} which provides most
  * of the required structure.
- * Extenders must supply the behaviour for the 
+ * Extenders must supply the behaviour for the
  * actual function invocation.
- * 
+ *
  * @author Martin Davis
  *
  */
 public abstract class BaseGeometryFunction implements GeometryFunction,
-  Comparable {
+Comparable {
   private static int compareTo(final Class c1, final Class c2) {
     return c1.getName().compareTo(c2.getName());
   }
@@ -73,7 +73,7 @@ public abstract class BaseGeometryFunction implements GeometryFunction,
 
   public static boolean isBinaryGeomFunction(final GeometryFunction func) {
     return func.getParameterTypes().length >= 1
-      && func.getParameterTypes()[0] == Geometry.class;
+        && func.getParameterTypes()[0] == Geometry.class;
   }
 
   protected String category = null;
@@ -112,18 +112,18 @@ public abstract class BaseGeometryFunction implements GeometryFunction,
   @Override
   public int compareTo(final Object o) {
     final BaseGeometryFunction func = (BaseGeometryFunction)o;
-    final int cmp = name.compareTo(func.getName());
+    final int cmp = this.name.compareTo(func.getName());
     if (cmp != 0) {
       return cmp;
     }
-    return compareTo(returnType, func.getReturnType());
+    return compareTo(this.returnType, func.getReturnType());
     // TODO: compare parameter lists as well
   }
 
   /**
-   * Two functions are the same if they have the 
+   * Two functions are the same if they have the
    * same signature (name, parameter types and return type).
-   * 
+   *
    * @param obj
    * @return true if this object is the same as the <tt>obj</tt> argument
    */
@@ -133,19 +133,19 @@ public abstract class BaseGeometryFunction implements GeometryFunction,
       return false;
     }
     final GeometryFunction func = (GeometryFunction)obj;
-    if (!name.equals(func.getName())) {
+    if (!this.name.equals(func.getName())) {
       return false;
     }
-    if (!returnType.equals(func.getReturnType())) {
+    if (!this.returnType.equals(func.getReturnType())) {
       return false;
     }
 
     final Class[] funcParamTypes = func.getParameterTypes();
-    if (parameterTypes.length != funcParamTypes.length) {
+    if (this.parameterTypes.length != funcParamTypes.length) {
       return false;
     }
-    for (int i = 0; i < parameterTypes.length; i++) {
-      if (!parameterTypes[i].equals(funcParamTypes[i])) {
+    for (int i = 0; i < this.parameterTypes.length; i++) {
+      if (!this.parameterTypes[i].equals(funcParamTypes[i])) {
         return false;
       }
     }
@@ -154,51 +154,52 @@ public abstract class BaseGeometryFunction implements GeometryFunction,
 
   @Override
   public String getCategory() {
-    return category;
+    return this.category;
   }
 
   @Override
   public String getDescription() {
-    return description;
+    return this.description;
   }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
   }
 
   @Override
   public String[] getParameterNames() {
-    return parameterNames;
+    return this.parameterNames;
   }
 
   /**
    * Gets the types of the other function arguments,
    * if any.
-   * 
+   *
    * @return the types
    */
   @Override
   public Class[] getParameterTypes() {
-    return parameterTypes;
+    return this.parameterTypes;
   }
 
   @Override
   public Class getReturnType() {
-    return returnType;
+    return this.returnType;
   }
 
   @Override
   public String getSignature() {
     final StringBuffer paramTypes = new StringBuffer();
     paramTypes.append("Geometry");
-    for (int i = 0; i < parameterTypes.length; i++) {
+    for (int i = 0; i < this.parameterTypes.length; i++) {
       paramTypes.append(",");
-      paramTypes.append(ClassUtil.getClassname(parameterTypes[i]));
+      paramTypes.append(Classes.className(this.parameterTypes[i]));
     }
-    return name + "(" + paramTypes + ")" + " -> "
-      + ClassUtil.getClassname(returnType);
+    final Class clz = this.returnType;
+    return this.name + "(" + paramTypes + ")" + " -> " + Classes.className(clz);
   }
 
+  @Override
   public abstract Object invoke(Geometry geom, Object[] args);
 }

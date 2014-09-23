@@ -46,7 +46,7 @@ import com.revolsys.jts.geom.Geometry;
 
 /**
  * A registry to manage a collection of {@link GeometryFunction}s.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -81,7 +81,6 @@ public class GeometryFunctionRegistry {
     funcRegistry.add(TriangulationFunctions.class);
     funcRegistry.add(TriangleFunctions.class);
     funcRegistry.add(ValidationFunctions.class);
-    funcRegistry.add(WriterFunctions.class);
 
     return funcRegistry;
   }
@@ -107,7 +106,7 @@ public class GeometryFunctionRegistry {
 
   /**
    * Adds functions for all the static methods in the given class.
-   * 
+   *
    * @param geomFuncClass
    */
   public void add(final Class geomFuncClass) {
@@ -128,35 +127,36 @@ public class GeometryFunctionRegistry {
    * Adds a function if it does not currently
    * exist in the registry, or replaces the existing one
    * with the same signature.
-   * 
+   *
    * @param func a function
    */
   public void add(final GeometryFunction func) {
-    functions.add(func);
-    sortedFunctions.put(func.getName(), func);
-    categorizedFunctions.put(func.getCategory(), func.getName(), func);
+    this.functions.add(func);
+    this.sortedFunctions.put(func.getName(), func);
+    this.categorizedFunctions.put(func.getCategory(), func.getName(), func);
     if (hasGeometryResult(func)) {
-      categorizedGeometryFunctions.put(func.getCategory(), func.getName(), func);
+      this.categorizedGeometryFunctions.put(func.getCategory(), func.getName(),
+        func);
     }
   }
 
   /**
    * Adds functions for all the static methods in the given class.
-   * 
+   *
    * @param geomFuncClassname the name of the class to load and extract functions from
    */
   public void add(final String geomFuncClassname) throws ClassNotFoundException {
     Class geomFuncClass = null;
     geomFuncClass = this.getClass()
-      .getClassLoader()
-      .loadClass(geomFuncClassname);
+        .getClassLoader()
+        .loadClass(geomFuncClassname);
     add(geomFuncClass);
   }
 
   /**
-   * Create {@link GeometryFunction}s for all the static 
+   * Create {@link GeometryFunction}s for all the static
    * methods in the given class
-   * 
+   *
    * @param functionClass
    * @return a list of the functions created
    */
@@ -174,12 +174,12 @@ public class GeometryFunctionRegistry {
 
   /**
    * Finds the first function which matches the given name.
-   * 
+   *
    * @param name
    * @return a matching function, or null
    */
   public GeometryFunction find(final String name) {
-    for (final Iterator i = functions.iterator(); i.hasNext();) {
+    for (final Iterator i = this.functions.iterator(); i.hasNext();) {
       final GeometryFunction func = (GeometryFunction)i.next();
       final String funcName = func.getName();
       if (funcName.equalsIgnoreCase(name)) {
@@ -191,7 +191,7 @@ public class GeometryFunctionRegistry {
 
   /**
    * Finds the first function which matches the given signature.
-   * 
+   *
    * @param name
    * @param paramTypes
    * @return a matching function, or null
@@ -202,16 +202,16 @@ public class GeometryFunctionRegistry {
 
   /**
    * Finds the first function which matches the given name and argument count.
-   * 
+   *
    * @param name
    * @return a matching function, or null
    */
   public GeometryFunction find(final String name, final int argCount) {
-    for (final Iterator i = functions.iterator(); i.hasNext();) {
+    for (final Iterator i = this.functions.iterator(); i.hasNext();) {
       final GeometryFunction func = (GeometryFunction)i.next();
       final String funcName = func.getName();
       if (funcName.equalsIgnoreCase(name)
-        && func.getParameterTypes().length == argCount) {
+          && func.getParameterTypes().length == argCount) {
         return func;
       }
     }
@@ -219,15 +219,15 @@ public class GeometryFunctionRegistry {
   }
 
   public Collection getCategories() {
-    return categorizedFunctions.keySet();
+    return this.categorizedFunctions.keySet();
   }
 
   public DoubleKeyMap getCategorizedGeometryFunctions() {
-    return categorizedGeometryFunctions;
+    return this.categorizedGeometryFunctions;
   }
 
   public List getFunctions() {
-    return functions;
+    return this.functions;
   }
 
   /*
@@ -237,12 +237,12 @@ public class GeometryFunctionRegistry {
    */
 
   public Collection getFunctions(final String category) {
-    return categorizedFunctions.values(category);
+    return this.categorizedFunctions.values(category);
   }
 
   public List getGeometryFunctions() {
     final List funList = new ArrayList();
-    for (final Iterator i = sortedFunctions.values().iterator(); i.hasNext();) {
+    for (final Iterator i = this.sortedFunctions.values().iterator(); i.hasNext();) {
       final GeometryFunction fun = (GeometryFunction)i.next();
       if (hasGeometryResult(fun)) {
         funList.add(fun);
@@ -253,7 +253,7 @@ public class GeometryFunctionRegistry {
 
   public List getScalarFunctions() {
     final List scalarFun = new ArrayList();
-    for (final Iterator i = sortedFunctions.values().iterator(); i.hasNext();) {
+    for (final Iterator i = this.sortedFunctions.values().iterator(); i.hasNext();) {
       final GeometryFunction fun = (GeometryFunction)i.next();
       if (!hasGeometryResult(fun)) {
         scalarFun.add(fun);

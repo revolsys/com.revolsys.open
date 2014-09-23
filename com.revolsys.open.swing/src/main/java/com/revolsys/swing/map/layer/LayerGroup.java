@@ -21,8 +21,6 @@ import com.revolsys.data.io.RecordIo;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
 import com.revolsys.io.json.JsonMapIoFactory;
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -41,7 +39,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerGroup extends AbstractLayer implements Parent<Layer>,
-Iterable<Layer> {
+  Iterable<Layer> {
 
   public static LayerGroup create(final Map<String, Object> properties) {
     final LayerGroup layerGroup = new LayerGroup();
@@ -77,9 +75,6 @@ Iterable<Layer> {
     }
     return null;
   }
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "layerGroup", "Layer Group", LayerGroup.class, "create");
 
   static {
     final MenuFactory menu = MenuFactory.getMenu(LayerGroup.class);
@@ -541,7 +536,7 @@ Iterable<Layer> {
           } else if (object != null) {
             LoggerFactory.getLogger(LayerGroup.class).error(
               "Unexpected object type " + object.getClass() + " in "
-                  + childResource);
+                + childResource);
           }
         } else {
           LoggerFactory.getLogger(LayerGroup.class).error(

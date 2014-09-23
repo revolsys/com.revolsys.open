@@ -32,14 +32,16 @@
  */
 package com.revolsys.jtstest.function;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import junit.framework.Assert;
 
+import com.revolsys.beans.Classes;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.testrunner.StringUtil;
-import com.revolsys.jtstest.util.ClassUtil;
 
 /**
  * A {@link GeometryFunction} which calls a static
@@ -80,7 +82,7 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
 
     final Class clz = method.getDeclaringClass();
 
-    final String category = extractCategory(com.revolsys.jtstest.util.ClassUtil.getClassname(clz));
+    final String category = extractCategory(Classes.className(clz));
     final String funcName = method.getName();
     final String description = extractDescription(method);
     final String[] paramNames = extractParamNames(method);
@@ -99,7 +101,7 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
   private static String extractDescription(final Method method) {
     // try to get names from predefined ones first
     final String paramsName = method.getName() + DESCRIPTION_SUFFIX;
-    return ClassUtil.getStringClassField(method.getDeclaringClass(), paramsName);
+    return StaticMethodGeometryFunction.getStringClassField(method.getDeclaringClass(), paramsName);
   }
 
   /**
@@ -111,7 +113,7 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
   private static String[] extractParamNames(final Method method) {
     // try to get names from predefined ones first
     final String paramsName = method.getName() + PARAMETERS_SUFFIX;
-    final String[] codeName = ClassUtil.getStringArrayClassField(
+    final String[] codeName = StaticMethodGeometryFunction.getStringArrayClassField(
       method.getDeclaringClass(), paramsName);
     if (codeName != null) {
       return codeName;
@@ -179,5 +181,46 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
   @Override
   public Object invoke(final Geometry g, final Object[] arg) {
     return invoke(method, null, createFullArgs(g, arg));
+  }
+
+  public static Object dynamicCall(final String clzName,
+    final String methodName, final Class[] methodParamTypes,
+    final Object[] methodArgs) throws ClassNotFoundException,
+    SecurityException, NoSuchMethodException, IllegalArgumentException,
+    InstantiationException, IllegalAccessException, InvocationTargetException {
+    final Class clz = Class.forName(clzName);
+  
+    final Class[] constParTypes = new Class[] {
+      String.class, String.class
+    };
+    final Constructor constr = clz.getConstructor(new Class[0]);
+    final Object dummyto = constr.newInstance(new Object[0]);
+  
+    final Method meth = clz.getMethod(methodName, methodParamTypes);
+    final Object result = meth.invoke(dummyto, methodArgs);
+    return result;
+  }
+
+  public static String[] getStringArrayClassField(final Class clz,
+    final String name) {
+    try {
+      final Field field = clz.getField(name);
+      final String[] str = (String[])field.get(null);
+      return str;
+    } catch (final NoSuchFieldException ex) {
+    } catch (final IllegalAccessException ex) {
+    }
+    return null;
+  }
+
+  public static String getStringClassField(final Class clz, final String name) {
+    try {
+      final Field field = clz.getField(name);
+      final String str = (String)field.get(null);
+      return str;
+    } catch (final NoSuchFieldException ex) {
+    } catch (final IllegalAccessException ex) {
+    }
+    return null;
   }
 }

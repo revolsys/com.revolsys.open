@@ -55,8 +55,6 @@ import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.wkt.WktParser;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
@@ -329,9 +327,6 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return floating3(3857);
   }
 
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "geometryFactory", "Geometry Factory", GeometryFactory.class, "create");
-
   private static final long serialVersionUID = 4328651897279304108L;
 
   private static IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
@@ -445,7 +440,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return multiPolygon(geometries);
     } else {
       throw new IllegalArgumentException("Unknown geometry type "
-          + collectionDataType);
+        + collectionDataType);
     }
   }
 
@@ -1227,7 +1222,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return multiPoint();
     } else if (coordinates.length % axisCount != 0) {
       throw new IllegalArgumentException("Coordinates length="
-          + coordinates.length + " must be a multiple of " + axisCount);
+        + coordinates.length + " must be a multiple of " + axisCount);
     } else {
       final Point[] points = new Point[coordinates.length / axisCount];
       for (int i = 0; i < points.length; i++) {
@@ -1357,7 +1352,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
         return point(coordinates);
       } else {
         throw new IllegalArgumentException("Point can only have 1 vertex not "
-            + size);
+          + size);
       }
     }
   }
@@ -1391,7 +1386,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return point((LineString)object);
     } else {
       throw new IllegalArgumentException("Cannot create a point from "
-          + object.getClass());
+        + object.getClass());
     }
   }
 

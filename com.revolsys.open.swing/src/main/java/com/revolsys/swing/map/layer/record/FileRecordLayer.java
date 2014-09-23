@@ -11,9 +11,6 @@ import com.revolsys.data.io.RecordReaderFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
-import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -31,15 +28,6 @@ public class FileRecordLayer extends ListRecordLayer {
 
   public static FileRecordLayer create(final Map<String, Object> properties) {
     return new FileRecordLayer(properties);
-  }
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "recordFile", "File", FileRecordLayer.class, "create");
-
-  static {
-    // TODO remove after GBA upgrade
-    MapObjectFactoryRegistry.addFactory(new InvokeMethodMapObjectFactory(
-      "dataObjectFile", "File", FileRecordLayer.class, "create"));
   }
 
   private String url;
@@ -105,7 +93,7 @@ public class FileRecordLayer extends ListRecordLayer {
           return false;
         } else {
           try {
-            Map<String, Object> properties = getProperties();
+            final Map<String, Object> properties = getProperties();
             reader.setProperties(properties);
             final RecordDefinition recordDefinition = reader.getRecordDefinition();
             setRecordDefinition(recordDefinition);

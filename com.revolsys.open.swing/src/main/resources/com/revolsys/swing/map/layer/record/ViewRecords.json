@@ -1,0 +1,14 @@
+{
+  "group":"table",
+  "name": "View Records",
+  "icon": "table_go",
+  "type": "menuSourceRunnable",
+  "methodName": "showRecordsTable",
+  "parameters": [
+  ],
+  "enableCheck": {
+    "type": "menuSourceEnableCheck",
+    "propertyName": "exists",
+    "value": true
+  }
+}

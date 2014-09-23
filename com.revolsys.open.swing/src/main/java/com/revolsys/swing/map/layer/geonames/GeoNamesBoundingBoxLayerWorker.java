@@ -8,8 +8,6 @@ import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
@@ -22,7 +20,7 @@ import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
 public class GeoNamesBoundingBoxLayerWorker extends
-  AbstractSwingWorker<List<LayerRecord>, Void> {
+AbstractSwingWorker<List<LayerRecord>, Void> {
 
   public static BoundingBoxRecordLayer create(
     final Map<String, Object> properties) {
@@ -38,9 +36,6 @@ public class GeoNamesBoundingBoxLayerWorker extends
     layer.setProperties(properties);
     return layer;
   }
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "geoname", "Geoname.org", GeoNamesBoundingBoxLayerWorker.class, "create");
 
   private final BoundingBoxRecordLayer layer;
 

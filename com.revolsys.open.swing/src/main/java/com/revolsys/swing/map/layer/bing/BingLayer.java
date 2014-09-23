@@ -7,8 +7,6 @@ import java.util.Map;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -25,9 +23,6 @@ public class BingLayer extends AbstractTiledImageLayer {
   public static BingLayer create(final Map<String, Object> properties) {
     return new BingLayer(properties);
   }
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "bing", "Bing Tiles", BingLayer.class, "create");
 
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
 
@@ -106,8 +101,8 @@ public class BingLayer extends AbstractTiledImageLayer {
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
-          .convert(GEOMETRY_FACTORY)
-          .intersection(MAX_BOUNDING_BOX);
+        .convert(GEOMETRY_FACTORY)
+        .intersection(MAX_BOUNDING_BOX);
       final double minX = geographicBoundingBox.getMinX();
       final double minY = geographicBoundingBox.getMinY();
       final double maxX = geographicBoundingBox.getMaxX();

@@ -1,8 +1,19 @@
 package com.revolsys.swing.action.enablecheck;
 
+import java.util.Map;
+
 public class OrEnableCheck extends MultiEnableCheck {
+
+  public static OrEnableCheck create(final Map<String, Object> config) {
+    return new OrEnableCheck(config);
+  }
+
   public OrEnableCheck(final EnableCheck... enableChecks) {
     super(enableChecks);
+  }
+
+  public OrEnableCheck(final Map<String, Object> config) {
+    super(config);
   }
 
   @Override

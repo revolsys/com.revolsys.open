@@ -1,13 +1,8 @@
 package com.revolsys.swing.map.layer;
 
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.swing.menu.MenuFactory;
 
 public class BaseMapLayerGroup extends LayerGroup {
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "baseMapLayerGroup", "Base Map Layer Group", BaseMapLayerGroup.class,
-      "create");
 
   static {
     final MenuFactory menu = MenuFactory.getMenu(BaseMapLayerGroup.class);

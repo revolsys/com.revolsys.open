@@ -1,16 +1,31 @@
 package com.revolsys.swing.tree;
 
+import java.util.Map;
+
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 import com.revolsys.swing.Icons;
+import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 
 public class MenuSourceRunnable extends InvokeMethodRunnable {
+
+  @SuppressWarnings("unchecked")
+  public static AbstractAction create(final Map<String, Object> config) {
+    final String name = (String)config.get("name");
+    final String iconName = (String)config.get("icon");
+    final String methodName = (String)config.get("methodName");
+    final Object[] parameters = new Object[0]; // TODO
+    final Map<String, Object> enableCheckConfig = (Map<String, Object>)config.get("enableCheck");
+    final EnableCheck enableCheck = AbstractEnableCheck.enableCheck(enableCheckConfig);
+    return createAction(name, iconName, enableCheck, methodName, parameters);
+  }
 
   public static InvokeMethodAction createAction(final CharSequence name,
     final Icon icon, final EnableCheck enableCheck, final String methodName,

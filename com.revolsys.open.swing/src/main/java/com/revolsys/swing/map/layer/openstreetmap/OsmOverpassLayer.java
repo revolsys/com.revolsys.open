@@ -9,8 +9,6 @@ import java.util.Map;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.openstreetmap.model.OsmConstants;
 import com.revolsys.io.openstreetmap.model.OsmDocument;
 import com.revolsys.io.openstreetmap.model.OsmElement;
@@ -29,10 +27,6 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
   }
 
   private String serverUrl = "http://api.openstreetmap.org/";
-
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "openStreetMapVectorApi", "Open Street Map (Vector API)",
-    OsmOverpassLayer.class, "create");
 
   private static final int TILE_SCALE_X = 50;
 
@@ -105,13 +99,13 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
     boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
     final List<BoundingBox> boundingBoxes = new ArrayList<>();
     final double minX = Math.floor(boundingBox.getMinX() * TILE_SCALE_X)
-      / TILE_SCALE_X;
+        / TILE_SCALE_X;
     final double minY = Math.floor(boundingBox.getMinY() * TILE_SCALE_Y)
-      / TILE_SCALE_Y;
+        / TILE_SCALE_Y;
     final double maxX = Math.ceil(boundingBox.getMaxX() * TILE_SCALE_X)
-      / TILE_SCALE_X;
+        / TILE_SCALE_X;
     final double maxY = Math.ceil(boundingBox.getMaxY() * TILE_SCALE_Y)
-      / TILE_SCALE_Y;
+        / TILE_SCALE_Y;
     int indexY = 0;
     for (double y = minY; y < maxY;) {
       int indexX = 0;

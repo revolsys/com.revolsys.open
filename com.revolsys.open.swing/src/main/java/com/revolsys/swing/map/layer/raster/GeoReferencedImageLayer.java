@@ -20,8 +20,6 @@ import bibliothek.gui.dock.common.mode.ExtendedMode;
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.io.map.InvokeMethodMapObjectFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -62,10 +60,6 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     return new GeoReferencedImageLayer(properties);
   }
 
-  public static final MapObjectFactory FACTORY = new InvokeMethodMapObjectFactory(
-    "geoReferencedImage", "Geo-referenced Image",
-    GeoReferencedImageLayer.class, "create");
-
   static {
     final MenuFactory menu = MenuFactory.getMenu(GeoReferencedImageLayer.class);
     menu.addGroup(0, "table");
@@ -75,9 +69,9 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       false);
     final EnableCheck editable = new MenuSourcePropertyEnableCheck("editable");
     final EnableCheck showOriginalImage = new MenuSourcePropertyEnableCheck(
-      "showOriginalImage");
+        "showOriginalImage");
     final EnableCheck hasTransform = new MenuSourcePropertyEnableCheck(
-      "hasTransform");
+        "hasTransform");
 
     menu.addMenuItem("table", MenuSourceRunnable.createAction(
       "View Tie-Points", "table_go", "showTiePointsTable"));
@@ -167,8 +161,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
       final GeoReferencedImageFactory factory = IoFactoryRegistry.getInstance()
-        .getFactoryByFileExtension(GeoReferencedImageFactory.class,
-          fileNameExtension);
+          .getFactoryByFileExtension(GeoReferencedImageFactory.class,
+            fileNameExtension);
       if (factory != null) {
         SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
       }
@@ -182,7 +176,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       this.image.deleteTiePoint(tiePoint);
     } else {
       LoggerFactory.getLogger("Cannot delete tie-point. Layer " + getClass())
-        .error(getPath() + " is not editable");
+      .error(getPath() + " is not editable");
     }
   }
 
@@ -196,7 +190,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       return true;
     } else {
       LoggerFactory.getLogger(getClass()).error(
-        "Layer definition does not contain a 'url' property");
+          "Layer definition does not contain a 'url' property");
       return false;
     }
   }
@@ -428,8 +422,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
                 final boolean visible = dockable.isVisible();
                 if (!visible) {
                   dockable.getControl()
-                    .getOwner()
-                    .remove((SingleCDockable)dockable);
+                  .getOwner()
+                  .remove((SingleCDockable)dockable);
                   setProperty("TableView", null);
                 }
               }
@@ -552,8 +546,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       boundingBox = boundingBox.expandToInclude(line);
     }
     boundingBox = boundingBox.convert(geometryFactory)
-      .expandPercent(0.1)
-      .clipToCoordinateSystem();
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
 
     project.setViewBoundingBox(boundingBox);
   }

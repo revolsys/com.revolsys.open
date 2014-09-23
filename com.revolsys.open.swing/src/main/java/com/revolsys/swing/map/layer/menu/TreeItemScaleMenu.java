@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.menu;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
@@ -9,6 +10,7 @@ import javax.swing.JMenu;
 import javax.swing.SwingConstants;
 
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.map.MapPanel;
@@ -16,6 +18,7 @@ import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
@@ -24,9 +27,24 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
 
   private final EnableCheck enableCheck;
 
+  private String name;
+
   public TreeItemScaleMenu(final boolean min, final EnableCheck enableCheck) {
     this.min = min;
     this.enableCheck = enableCheck;
+    if (this.min) {
+      this.name = "Hide zoomed out beyond (minimum) scale";
+    } else {
+      this.name = "Hide zoomed in beyond (maximum) scale";
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public TreeItemScaleMenu(final Map<String, Object> config) {
+    this.name = CollectionUtil.getString(config, "name");
+    this.min = CollectionUtil.getBool(config, "min");
+    final Map<String, Object> enableCheckConfig = (Map<String, Object>)config.get("enableCheck");
+    this.enableCheck = AbstractEnableCheck.enableCheck(enableCheckConfig);
   }
 
   protected void addScaleMenuItem(final long layerScale, final Object object,
@@ -63,14 +81,8 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
 
   @Override
   public JMenu createComponent() {
-    String name;
-    if (this.min) {
-      name = "Hide zoomed out beyond (minimum) scale";
-    } else {
-      name = "Hide zoomed in beyond (maximum) scale";
-    }
 
-    final JMenu menu = new JMenu(name);
+    final JMenu menu = new JMenu(this.name);
     if (this.enableCheck == null || this.enableCheck.isEnabled()) {
       long layerScale = 0;
       final Object object = MenuFactory.getMenuSource();
@@ -134,11 +146,7 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
 
   @Override
   public String getName() {
-    if (this.min) {
-      return "Hide zoomed out beyond (minimum) scale";
-    } else {
-      return "Hide zoomed in beyond (maximum) scale";
-    }
+    return this.name;
   }
 
   @Override
