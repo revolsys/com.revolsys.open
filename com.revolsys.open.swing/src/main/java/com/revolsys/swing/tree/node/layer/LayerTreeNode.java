@@ -23,7 +23,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 
 public class LayerTreeNode extends AbstractLayerTreeNode implements
-  MouseListener {
+MouseListener {
 
   private static final Icon EDIT_ICON = Icons.getIcon("pencil");
 
@@ -84,7 +84,7 @@ public class LayerTreeNode extends AbstractLayerTreeNode implements
   @Override
   public Icon getIcon() {
     final Layer layer = getLayer();
-    final List<Icon> icons = new ArrayList<Icon>();
+    final List<Icon> icons = new ArrayList<>();
     if (!layer.isExists() && layer.isInitialized()) {
       return NOT_EXISTS_ICON;
     } else {

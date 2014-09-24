@@ -27,7 +27,7 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
 public class BaseTree extends JTree implements MouseListener,
-  TreeWillExpandListener, TreeExpansionListener {
+TreeWillExpandListener, TreeExpansionListener {
   @SuppressWarnings("unchecked")
   public static <V extends BaseTreeNode> V getMenuNode() {
     return (V)menuNode.get();
@@ -224,7 +224,7 @@ public class BaseTree extends JTree implements MouseListener,
 
         TreePath[] selectionPaths = getSelectionPaths();
         if (selectionPaths == null
-          || !Arrays.asList(selectionPaths).contains(path)) {
+            || !Arrays.asList(selectionPaths).contains(path)) {
           selectionPaths = new TreePath[] {
             path
           };
@@ -238,7 +238,9 @@ public class BaseTree extends JTree implements MouseListener,
         if (userObject == null) {
           userObject = node;
         }
-        menu.show(userObject, this, x, y);
+        if (menu != null) {
+          menu.show(userObject, this, x, y);
+        }
       }
     }
   }
@@ -263,12 +265,12 @@ public class BaseTree extends JTree implements MouseListener,
 
   @Override
   public void treeWillCollapse(final TreeExpansionEvent event)
-    throws ExpandVetoException {
+      throws ExpandVetoException {
   }
 
   @Override
   public void treeWillExpand(final TreeExpansionEvent event)
-    throws ExpandVetoException {
+      throws ExpandVetoException {
     final TreePath path = event.getPath();
     final Object node = path.getLastPathComponent();
     if (node instanceof LazyLoadTreeNode) {

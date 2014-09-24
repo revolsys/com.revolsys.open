@@ -32,6 +32,7 @@ import javax.swing.tree.TreePath;
 
 import org.springframework.core.io.FileSystemResource;
 
+import bibliothek.extension.gui.dock.theme.EclipseTheme;
 import bibliothek.gui.dock.common.CContentArea;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CLocation;
@@ -171,8 +172,11 @@ public class ProjectFrame extends BaseFrame {
     project.setProperty(PROJECT_FRAME, this);
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
+    this.dockControl.getController()
+    .getProperties()
+    .set(EclipseTheme.PAINT_ICONS_WHEN_DESELECTED, true);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-        .getTheme();
+      .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -209,8 +213,12 @@ public class ProjectFrame extends BaseFrame {
     this.catalogTree = tree;
     final LayerGroup project = getProject();
 
-    DockingFramesUtil.addDockable(project, MapPanel.MAP_CONTROLS_WORKING_AREA,
-      "catalog", "Catalog", new JScrollPane(this.catalogTree));
+    final DefaultSingleCDockable dockable = DockingFramesUtil.addDockable(
+      project, MapPanel.MAP_CONTROLS_WORKING_AREA, "catalog", "Catalog",
+      new JScrollPane(this.catalogTree));
+    dockable.setTitleIcon(Icons.getIcon("tree_catalog"));
+    dockable.setTitleText(null);
+    dockable.setTitleToolTip("Catalog");
   }
 
   protected void addControlWorkingArea() {
@@ -221,8 +229,11 @@ public class ProjectFrame extends BaseFrame {
 
   protected void addLogPanel() {
     final JPanel panel = Log4jTableModel.createPanel();
-    DockingFramesUtil.addDockable(this.project,
-      MapPanel.MAP_TABLE_WORKING_AREA, "log4j", "Logging", panel);
+    final DefaultSingleCDockable dockable = DockingFramesUtil.addDockable(
+      this.project, MapPanel.MAP_TABLE_WORKING_AREA, "log4j", "Logging", panel);
+    dockable.setTitleIcon(Icons.getIcon("error"));
+    dockable.setTitleText(null);
+    dockable.setTitleToolTip("Log Messages");
   }
 
   protected MapPanel addMapPanel() {
@@ -230,6 +241,7 @@ public class ProjectFrame extends BaseFrame {
 
     final DefaultSingleCDockable dockable = new DefaultSingleCDockable("map",
       "Map", this.mapPanel);
+    dockable.setTitleIcon(Icons.getIcon("map"));
     dockable.setStackable(false);
     dockable.setCloseable(false);
     dockable.setDefaultLocation(ExtendedMode.MINIMIZED, CLocation.base()
@@ -256,6 +268,9 @@ public class ProjectFrame extends BaseFrame {
     final DefaultSingleCDockable tableOfContents = DockingFramesUtil.addDockable(
       project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC",
       new JScrollPane(this.tocTree));
+    tableOfContents.setTitleIcon(Icons.getIcon("tree_layers"));
+    tableOfContents.setTitleText(null);
+    tableOfContents.setTitleToolTip("TOC - Layers");
 
     tableOfContents.toFront();
     return tableOfContents;
@@ -272,6 +287,11 @@ public class ProjectFrame extends BaseFrame {
     final DefaultSingleCDockable dockable = DockingFramesUtil.addDockable(
       this.project, MapPanel.MAP_TABLE_WORKING_AREA, "tasks",
       "Background Tasks", panel);
+
+    dockable.setTitleText("");
+    dockable.setTitleIcon(Icons.getIcon("time"));
+    dockable.setTitleToolTip("Background Tasks");
+
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = InvokeMethodAction.createButton(null,
       "View Running Tasks", Icons.getIcon("time_go"), dockable, "toFront");
@@ -310,10 +330,10 @@ public class ProjectFrame extends BaseFrame {
       Icons.getIcon("layout_save"), this.project, "saveAllSettings");
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
-        "save");
+      "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-        "print");
+      "print");
 
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;
