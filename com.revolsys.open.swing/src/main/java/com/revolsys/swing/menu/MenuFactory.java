@@ -30,7 +30,7 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.util.Property;
 
 public class MenuFactory extends AbstractObjectWithProperties implements
-ComponentFactory<JMenuItem> {
+  ComponentFactory<JMenuItem> {
 
   public static MenuFactory createMenu(final Class<?> clazz,
     final String... menuNames) {
@@ -251,11 +251,11 @@ ComponentFactory<JMenuItem> {
     }
   }
 
-  public void addMenuItemTitleIcon(final String groupName, final String title,
+  public void addMenuItemTitleIcon(final String groupName, final String name,
     final String iconName, final EnableCheck enableCheck, final Object object,
     final String methodName, final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    addMenuItem(groupName, title, title, icon, enableCheck, object, methodName,
+    addMenuItem(groupName, name, null, icon, enableCheck, object, methodName,
       parameters);
   }
 
@@ -263,8 +263,8 @@ ComponentFactory<JMenuItem> {
     final String iconName, final Object object, final String methodName,
     final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    final InvokeMethodAction menuItem = createMenuItem(title, title, icon,
-      null, object, methodName, parameters);
+    final InvokeMethodAction menuItem = createMenuItem(title, null, icon, null,
+      object, methodName, parameters);
     addComponentFactory(groupName, menuItem);
   }
 
@@ -346,6 +346,12 @@ ComponentFactory<JMenuItem> {
               }
             }
             menu.add(component);
+            if (component instanceof JMenu) {
+              final JMenu childMenu = (JMenu)component;
+              if (childMenu.getMenuComponentCount() == 0) {
+                childMenu.setEnabled(false);
+              }
+            }
           }
         }
       }

@@ -121,7 +121,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   private static final long serialVersionUID = 1L;
 
   private JButton addOkButton = InvokeMethodAction.createButton("OK", this,
-    "actionAddOk");
+      "actionAddOk");
 
   private RecordLayerAttributesTableModel allAttributes;
 
@@ -1305,7 +1305,9 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
           for (final String fieldName : fieldNames) {
             final Object value = values.get(fieldName);
             final JComponent field = (JComponent)getField(fieldName);
-            SwingUtil.setFieldValue(field, value);
+            if (field != null) {
+              SwingUtil.setFieldValue(field, value);
+            }
           }
         } finally {
           setFieldValidationEnabled(validationEnabled);

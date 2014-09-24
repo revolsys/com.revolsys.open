@@ -16,10 +16,10 @@ public class RecordRowRunnable extends InvokeMethodRunnable {
   public static InvokeMethodAction createAction(final CharSequence name,
     final Icon icon, final EnableCheck enableCheck, final String methodName,
     final Object... parameters) {
-    final RecordRowRunnable runnable = new RecordRowRunnable(
-      methodName, parameters);
-    final InvokeMethodAction action = new InvokeMethodAction(name,
-      name.toString(), icon, true, runnable);
+    final RecordRowRunnable runnable = new RecordRowRunnable(methodName,
+      parameters);
+    final InvokeMethodAction action = new InvokeMethodAction(name, null, icon,
+      true, runnable);
     action.setEnableCheck(enableCheck);
 
     return action;
@@ -32,8 +32,7 @@ public class RecordRowRunnable extends InvokeMethodRunnable {
     return createAction(name, icon, enableCheck, methodName, parameters);
   }
 
-  protected RecordRowRunnable(final String methodName,
-    final Object[] parameters) {
+  protected RecordRowRunnable(final String methodName, final Object[] parameters) {
     super(methodName, parameters);
   }
 

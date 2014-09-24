@@ -388,18 +388,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public String getAttributeName(final int i) {
-    try {
-      if (i == -1) {
-        return null;
-      } else if (this.attributes == null) {
-        return null;
-      } else {
-        final Attribute attribute = this.attributes.get(i);
-        return attribute.getName();
-      }
-    } catch (final ArrayIndexOutOfBoundsException e) {
-      throw e;
+    if (this.attributes != null && i >= 0 && i < this.attributes.size()) {
+      final Attribute attribute = this.attributes.get(i);
+      return attribute.getName();
     }
+    return null;
   }
 
   @Override
@@ -588,7 +581,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   @Override
   public boolean isAttributeRequired(final CharSequence name) {
     final Attribute attribute = getAttribute(name);
-    return attribute.isRequired();
+    if (attribute == null) {
+      return false;
+    } else {
+      return attribute.isRequired();
+    }
   }
 
   @Override

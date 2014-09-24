@@ -15,8 +15,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import com.revolsys.collection.EmptyReference;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.menu.MenuFactory;
@@ -69,7 +69,7 @@ public class TablePanel extends JPanel implements MouseListener {
   private static Reference<JTable> eventTable = new WeakReference<JTable>(null);
 
   private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(
-    null);
+      null);
 
   private static final long serialVersionUID = 1L;
 
@@ -81,6 +81,10 @@ public class TablePanel extends JPanel implements MouseListener {
 
   public TablePanel(final JTable table) {
     super(new BorderLayout());
+    eventRow = -1;
+    eventColumn = -1;
+    eventTable = new EmptyReference<>();
+    popupMouseEvent = new EmptyReference<>();
     this.table = table;
     final AbstractTableModel model = (AbstractTableModel)table.getModel();
     add(this.toolBar, BorderLayout.NORTH);
@@ -99,7 +103,7 @@ public class TablePanel extends JPanel implements MouseListener {
 
     menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value",
       "paste_plain", new ObjectPropertyEnableCheck(this, "canPaste"), this,
-      "pasteFieldValue");
+        "pasteFieldValue");
   }
 
   private void copyCurrentCell() {
@@ -119,23 +123,23 @@ public class TablePanel extends JPanel implements MouseListener {
 
   public void copyFieldValue() {
     if (isEditingCurrentCell()) {
-      final Component editorComponent = this.table.getEditorComponent();
-      SwingUtil.dndCopy(editorComponent);
-    } else {
-      copyCurrentCell();
+      if (!this.table.getCellEditor().stopCellEditing()) {
+        return;
+      }
     }
+    copyCurrentCell();
   }
 
   public void cutFieldValue() {
     if (isEditingCurrentCell()) {
-      final Component editorComponent = this.table.getEditorComponent();
-      SwingUtil.dndCut(editorComponent);
-    } else {
-      copyCurrentCell();
-      if (isCurrentCellEditable()) {
-        final TableModel tableModel = getTableModel();
-        tableModel.setValueAt(null, eventRow, eventColumn);
+      if (!this.table.getCellEditor().stopCellEditing()) {
+        return;
       }
+    }
+    copyCurrentCell();
+    if (isCurrentCellEditable()) {
+      final TableModel tableModel = getTableModel();
+      tableModel.setValueAt(null, eventRow, eventColumn);
     }
   }
 
@@ -183,7 +187,7 @@ public class TablePanel extends JPanel implements MouseListener {
 
   public boolean isCanCut() {
     return isEditingCurrentCell() || isCurrentCellHasValue()
-      && isCurrentCellEditable();
+        && isCurrentCellEditable();
   }
 
   public boolean isCanPaste() {
@@ -254,15 +258,15 @@ public class TablePanel extends JPanel implements MouseListener {
 
   public void pasteFieldValue() {
     if (isEditingCurrentCell()) {
-      final Component editorComponent = this.table.getEditorComponent();
-      SwingUtil.dndPaste(editorComponent);
-    } else {
-      final String value = ClipboardUtil.getContents(DataFlavor.stringFlavor);
-      if (Property.hasValue(value)) {
-        final TableModel tableModel = getTableModel();
-        if (tableModel.isCellEditable(eventRow, eventColumn)) {
-          tableModel.setValueAt(value, eventRow, eventColumn);
-        }
+      if (!this.table.getCellEditor().stopCellEditing()) {
+        return;
+      }
+    }
+    final String value = ClipboardUtil.getContents(DataFlavor.stringFlavor);
+    if (Property.hasValue(value)) {
+      final TableModel tableModel = getTableModel();
+      if (tableModel.isCellEditable(eventRow, eventColumn)) {
+        tableModel.setValueAt(value, eventRow, eventColumn);
       }
     }
   }

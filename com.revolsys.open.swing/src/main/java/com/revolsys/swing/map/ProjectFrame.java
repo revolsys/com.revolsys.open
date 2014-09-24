@@ -173,10 +173,10 @@ public class ProjectFrame extends BaseFrame {
 
     this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     this.dockControl.getController()
-    .getProperties()
-    .set(EclipseTheme.PAINT_ICONS_WHEN_DESELECTED, true);
+      .getProperties()
+      .set(EclipseTheme.PAINT_ICONS_WHEN_DESELECTED, true);
     final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-      .getTheme();
+        .getTheme();
     theme.intern().setMovingImageFactory(
       new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
 
@@ -270,7 +270,7 @@ public class ProjectFrame extends BaseFrame {
       new JScrollPane(this.tocTree));
     tableOfContents.setTitleIcon(Icons.getIcon("tree_layers"));
     tableOfContents.setTitleText(null);
-    tableOfContents.setTitleToolTip("TOC - Layers");
+    tableOfContents.setTitleToolTip("Layers (Table of Contents)");
 
     tableOfContents.toFront();
     return tableOfContents;
@@ -330,10 +330,10 @@ public class ProjectFrame extends BaseFrame {
       Icons.getIcon("layout_save"), this.project, "saveAllSettings");
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
-      "save");
+        "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-      "print");
+        "print");
 
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;

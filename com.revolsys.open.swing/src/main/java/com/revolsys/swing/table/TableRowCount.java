@@ -13,14 +13,14 @@ import javax.swing.table.TableModel;
 
 public class TableRowCount extends JLabel implements TableModelListener {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 
   private final TableModel model;
 
   public TableRowCount(final TableModel model) {
-    setToolTipText("Number of records");
+    setToolTipText("Record Count");
     setBorder(BorderFactory.createCompoundBorder(
       BorderFactory.createBevelBorder(BevelBorder.LOWERED),
       BorderFactory.createEmptyBorder(2, 5, 2, 5)));
