@@ -33,6 +33,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.gdal.raster.GdalImageFactory;
 import com.revolsys.gis.cs.CoordinateSystem;
+import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.io.FileUtil;
@@ -195,7 +196,7 @@ public class Gdal {
                 sourceOffsetY = 0;
               }
               if (sourceOffsetX >= overviewWidth
-                || sourceOffsetY >= overviewHeight) {
+                  || sourceOffsetY >= overviewHeight) {
                 return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
               }
 
@@ -223,7 +224,7 @@ public class Gdal {
             }
             if (pixels > 0 && sourceHeight > 0 && sourceWidth > 0) {
               final int bufferSize = pixels
-                * gdal.GetDataTypeSize(bandDataType) / 8;
+                  * gdal.GetDataTypeSize(bandDataType) / 8;
 
               final ByteBuffer data = ByteBuffer.allocateDirect(bufferSize);
               data.order(ByteOrder.nativeOrder());
@@ -323,6 +324,13 @@ public class Gdal {
   public static BufferedImage getBufferedImage(final String fileName) {
     final File file = FileUtil.getFile(fileName);
     return getBufferedImage(file);
+  }
+
+  public static CoordinateSystem getCoordinateSystem(
+    final SpatialReference spatialReference) {
+    final String wkt = spatialReference.ExportToWkt();
+    final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
+    return EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
   }
 
   public static Dataset getDataset(final File file) {

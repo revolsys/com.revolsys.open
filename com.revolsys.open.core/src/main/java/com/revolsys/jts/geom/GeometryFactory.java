@@ -200,6 +200,23 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   /**
+   * get a  geometry factory with a floating scale.
+   */
+  public static GeometryFactory floating(
+    final CoordinateSystem coordinateSystem, final int axisCount) {
+    if (coordinateSystem == null) {
+      return floating(0, axisCount);
+    } else {
+      final int srid = coordinateSystem.getId();
+      if (srid == 0) {
+        return new GeometryFactory(coordinateSystem, axisCount);
+      } else {
+        return floating(srid, axisCount);
+      }
+    }
+  }
+
+  /**
    * <p>
    * Get a GeometryFactory with the coordinate system, number of axis and a
    * floating precision model.
@@ -440,7 +457,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return multiPolygon(geometries);
     } else {
       throw new IllegalArgumentException("Unknown geometry type "
-        + collectionDataType);
+          + collectionDataType);
     }
   }
 
@@ -1222,7 +1239,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return multiPoint();
     } else if (coordinates.length % axisCount != 0) {
       throw new IllegalArgumentException("Coordinates length="
-        + coordinates.length + " must be a multiple of " + axisCount);
+          + coordinates.length + " must be a multiple of " + axisCount);
     } else {
       final Point[] points = new Point[coordinates.length / axisCount];
       for (int i = 0; i < points.length; i++) {
@@ -1352,7 +1369,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
         return point(coordinates);
       } else {
         throw new IllegalArgumentException("Point can only have 1 vertex not "
-          + size);
+            + size);
       }
     }
   }
@@ -1386,7 +1403,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return point((LineString)object);
     } else {
       throw new IllegalArgumentException("Cannot create a point from "
-        + object.getClass());
+          + object.getClass());
     }
   }
 
