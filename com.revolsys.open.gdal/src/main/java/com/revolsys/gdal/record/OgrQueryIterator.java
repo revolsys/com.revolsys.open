@@ -64,7 +64,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
   @Override
   protected synchronized void doClose() {
     if (this.layer != null) {
-      this.layer.delete();
+      this.recordStore.releaseLayerToClose(this.layer);
     }
     this.geometryFactory = null;
     this.layer = null;
@@ -82,6 +82,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
       if (dataSource != null) {
         final String sql = this.recordStore.getSql(this.query);
         this.layer = dataSource.ExecuteSQL(sql);
+        this.recordStore.addLayerToClose(this.layer);
       }
     }
   }
@@ -158,55 +159,58 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
           } else {
             this.statistics.add(record);
           }
+          record.setValue(OgrRecordStore.OGR_FID, feature.GetFID());
           final int fieldCount = feature.GetFieldCount();
           for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
-            final String fieldName = feature.GetFieldDefnRef(fieldIndex)
-                .GetName();
-            final int fieldType = feature.GetFieldType(fieldIndex);
-            Object value;
-            switch (fieldType) {
-              case 0:
-                value = feature.GetFieldAsInteger(fieldIndex);
-                break;
-              case 1:
-                value = feature.GetFieldAsIntegerList(fieldIndex);
-                break;
-              case 2:
-                value = feature.GetFieldAsDouble(fieldIndex);
-                break;
-              case 3:
-                value = feature.GetFieldAsDoubleList(fieldIndex);
-                break;
-              case 4:
-              case 6:
-                value = feature.GetFieldAsString(fieldIndex);
-                break;
-              case 5:
-              case 7:
-                value = feature.GetFieldAsStringList(fieldIndex);
-                break;
-              case 8:
-                value = null;
-                // binary
-                break;
-              case 9:
-                final Calendar date = getCalendar(feature, fieldIndex);
-                value = new Date(date.getTimeInMillis());
-                break;
-              case 10:
-                value = null;
-                // time
-                break;
-              case 11:
-                final Calendar dateTime = getCalendar(feature, fieldIndex);
-                value = new java.util.Date(dateTime.getTimeInMillis());
-                break;
+            if (feature.IsFieldSet(fieldIndex)) {
+              final String fieldName = feature.GetFieldDefnRef(fieldIndex)
+                  .GetName();
+              final int fieldType = feature.GetFieldType(fieldIndex);
+              Object value;
+              switch (fieldType) {
+                case 0:
+                  value = feature.GetFieldAsInteger(fieldIndex);
+                  break;
+                case 1:
+                  value = feature.GetFieldAsIntegerList(fieldIndex);
+                  break;
+                case 2:
+                  value = feature.GetFieldAsDouble(fieldIndex);
+                  break;
+                case 3:
+                  value = feature.GetFieldAsDoubleList(fieldIndex);
+                  break;
+                case 4:
+                case 6:
+                  value = feature.GetFieldAsString(fieldIndex);
+                  break;
+                case 5:
+                case 7:
+                  value = feature.GetFieldAsStringList(fieldIndex);
+                  break;
+                case 8:
+                  value = null;
+                  // binary
+                  break;
+                case 9:
+                  final Calendar date = getCalendar(feature, fieldIndex);
+                  value = new Date(date.getTimeInMillis());
+                  break;
+                case 10:
+                  value = null;
+                  // time
+                  break;
+                case 11:
+                  final Calendar dateTime = getCalendar(feature, fieldIndex);
+                  value = new java.util.Date(dateTime.getTimeInMillis());
+                  break;
 
-              default:
-                value = null;
-                break;
+                default:
+                  value = null;
+                  break;
+              }
+              record.setValue(fieldName, value);
             }
-            record.setValue(fieldName, value);
           }
           final int geometryCount = feature.GetGeomFieldCount();
           for (int geometryIndex = 0; geometryIndex < geometryCount; geometryIndex++) {
@@ -226,48 +230,55 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
   }
 
   protected Geometry toGeometry(final org.gdal.ogr.Geometry ogrGeometry) {
-    final int geometryType = ogrGeometry.GetGeometryType();
-    final int axisCount = ogrGeometry.GetCoordinateDimension();
-    switch (geometryType) {
-      case 1:
-      case 0x80000000 + 1:
-        final double[] pointCoordinates = getCoordinates(ogrGeometry, axisCount);
-      return this.geometryFactory.point(pointCoordinates);
-      case 2:
-      case 0x80000000 + 2:
-        final double[] lineCoordinates = getCoordinates(ogrGeometry, axisCount);
-      return this.geometryFactory.lineString(axisCount, lineCoordinates);
-      case 3:
-      case 0x80000000 + 3:
-        final List<LineString> rings = new ArrayList<>();
-      for (int partIndex = 0; partIndex < ogrGeometry.GetGeometryCount(); partIndex++) {
-        final org.gdal.ogr.Geometry ogrRing = ogrGeometry.GetGeometryRef(partIndex);
-        final double[] ringCoordinates = getCoordinates(ogrRing, axisCount);
-        final LinearRing ring = this.geometryFactory.linearRing(axisCount,
-          ringCoordinates);
-        rings.add(ring);
+    if (ogrGeometry == null) {
+      return null;
+    } else {
+      final int geometryType = ogrGeometry.GetGeometryType();
+      final int axisCount = ogrGeometry.GetCoordinateDimension();
+      switch (geometryType) {
+        case 1:
+        case 0x80000000 + 1:
+          final double[] pointCoordinates = getCoordinates(ogrGeometry,
+            axisCount);
+        return this.geometryFactory.point(pointCoordinates);
+        case 2:
+        case 0x80000000 + 2:
+          final double[] lineCoordinates = getCoordinates(ogrGeometry,
+            axisCount);
+        return this.geometryFactory.lineString(axisCount, lineCoordinates);
+        case 3:
+        case 0x80000000 + 3:
+          final List<LineString> rings = new ArrayList<>();
+        for (int partIndex = 0; partIndex < ogrGeometry.GetGeometryCount(); partIndex++) {
+          final org.gdal.ogr.Geometry ogrRing = ogrGeometry.GetGeometryRef(partIndex);
+          final double[] ringCoordinates = getCoordinates(ogrRing, axisCount);
+          final LinearRing ring = this.geometryFactory.linearRing(axisCount,
+            ringCoordinates);
+          rings.add(ring);
+        }
+        return this.geometryFactory.polygon(rings);
+        case 4:
+        case 0x80000000 + 4:
+        case 5:
+        case 0x80000000 + 5:
+        case 6:
+        case 0x80000000 + 6:
+        case 7:
+        case 0x80000000 + 7:
+          final List<Geometry> parts = new ArrayList<>();
+        for (int partIndex = 0; partIndex < ogrGeometry.GetGeometryCount(); partIndex++) {
+          final org.gdal.ogr.Geometry ogrPart = ogrGeometry.GetGeometryRef(partIndex);
+          final Geometry part = toGeometry(ogrPart);
+          parts.add(part);
+        }
+        return this.geometryFactory.geometry(parts);
+        case 101:
+          final double[] ringCoordinates = getCoordinates(ogrGeometry,
+            axisCount);
+          return this.geometryFactory.linearRing(axisCount, ringCoordinates);
+        default:
+          return null;
       }
-      return this.geometryFactory.polygon(rings);
-      case 4:
-      case 0x80000000 + 4:
-      case 5:
-      case 0x80000000 + 5:
-      case 6:
-      case 0x80000000 + 6:
-      case 7:
-      case 0x80000000 + 7:
-        final List<Geometry> parts = new ArrayList<>();
-      for (int partIndex = 0; partIndex < ogrGeometry.GetGeometryCount(); partIndex++) {
-        final org.gdal.ogr.Geometry ogrPart = ogrGeometry.GetGeometryRef(partIndex);
-        final Geometry part = toGeometry(ogrPart);
-        parts.add(part);
-      }
-      return this.geometryFactory.geometry(parts);
-      case 101:
-        final double[] ringCoordinates = getCoordinates(ogrGeometry, axisCount);
-        return this.geometryFactory.linearRing(axisCount, ringCoordinates);
-      default:
-        return null;
     }
   }
 

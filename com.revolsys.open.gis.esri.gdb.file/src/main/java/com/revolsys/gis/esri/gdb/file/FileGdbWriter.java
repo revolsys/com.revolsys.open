@@ -107,7 +107,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
         final Object value = record.getValue(name);
         if (value == null && !(attribute instanceof OidAttribute)) {
           throw new IllegalArgumentException("Atribute " + typePath + "."
-            + name + " is required");
+              + name + " is required");
         }
       }
     }
@@ -151,12 +151,12 @@ public class FileGdbWriter extends AbstractRecordWriter {
     getTable(typePath);
   }
 
-  private void update(final Record object) {
-    final Object objectId = object.getValue("OBJECTID");
+  private void update(final Record record) {
+    final Object objectId = record.getValue("OBJECTID");
     if (objectId == null) {
-      insert(object);
+      insert(record);
     } else {
-      final RecordDefinition sourceRecordDefinition = object.getRecordDefinition();
+      final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
       final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
       final String typePath = sourceRecordDefinition.getPath();
       final Table table = getTable(typePath);
@@ -171,25 +171,25 @@ public class FileGdbWriter extends AbstractRecordWriter {
               try {
                 for (final Attribute attribute : recordDefinition.getAttributes()) {
                   final String name = attribute.getName();
-                  final Object value = object.getValue(name);
+                  final Object value = record.getValue(name);
                   final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
-                  esriValues.add(esriAttribute.setUpdateValue(object, row,
+                  esriValues.add(esriAttribute.setUpdateValue(record, row,
                     value));
                 }
                 this.recordStore.updateRow(table, row);
               } finally {
-                this.recordStore.addStatistic("Update", object);
+                this.recordStore.addStatistic("Update", record);
               }
             } catch (final IllegalArgumentException e) {
               LoggerFactory.getLogger(FileGdbWriter.class).error(
                 "Unable to update row " + e.getMessage() + "\n"
-                  + object.toString(), e);
+                    + record.toString(), e);
             } catch (final RuntimeException e) {
               LoggerFactory.getLogger(FileGdbWriter.class).error(
-                "Unable to update row \n:" + object.toString());
+                "Unable to update row \n:" + record.toString());
               if (LoggerFactory.getLogger(FileGdbWriter.class).isDebugEnabled()) {
                 LoggerFactory.getLogger(FileGdbWriter.class).debug(
-                  "Unable to update row \n:" + object.toString());
+                  "Unable to update row \n:" + record.toString());
               }
               throw new RuntimeException("Unable to update row", e);
             } finally {
@@ -204,29 +204,29 @@ public class FileGdbWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public synchronized void write(final Record object) {
+  public synchronized void write(final Record record) {
     try {
-      final RecordDefinition recordDefinition = object.getRecordDefinition();
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
       final RecordStore recordStore = recordDefinition.getRecordStore();
       if (recordStore == this.recordStore) {
-        switch (object.getState()) {
+        switch (record.getState()) {
           case New:
-            insert(object);
-          break;
+            insert(record);
+            break;
           case Modified:
-            update(object);
-          break;
+            update(record);
+            break;
           case Persisted:
-          // No action required
-          break;
+            // No action required
+            break;
           case Deleted:
-            delete(object);
-          break;
+            delete(record);
+            break;
           default:
             throw new IllegalStateException("State not known");
         }
       } else {
-        insert(object);
+        insert(record);
       }
     } catch (final RuntimeException e) {
       throw e;

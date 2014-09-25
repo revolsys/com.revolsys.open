@@ -2,10 +2,12 @@ package com.revolsys.gdal.record;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,6 +62,8 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
 
 public class OgrRecordStore extends AbstractRecordStore {
+  public static final String OGR_FID = "FID";
+
   static {
     Gdal.init();
   }
@@ -76,8 +80,14 @@ public class OgrRecordStore extends AbstractRecordStore {
 
   private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
 
+  private final Set<Layer> layersToClose = new HashSet<>();
+
   protected OgrRecordStore(final File file) {
     this.file = file;
+  }
+
+  synchronized void addLayerToClose(final Layer layer) {
+    this.layersToClose.add(layer);
   }
 
   @Override
@@ -232,6 +242,10 @@ public class OgrRecordStore extends AbstractRecordStore {
     }
   }
 
+  protected DataSource createDataSource(final boolean update) {
+    return ogr.Open(FileUtil.getCanonicalPath(this.file), update);
+  }
+
   @Override
   public AbstractIterator<Record> createIterator(final Query query,
     final Map<String, Object> properties) {
@@ -260,7 +274,8 @@ public class OgrRecordStore extends AbstractRecordStore {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
       schema, typePath);
     final FeatureDefn layerDefinition = layer.GetLayerDefn();
-
+    recordDefinition.addAttribute(OGR_FID, DataTypes.INT, true);
+    recordDefinition.setIdAttributeName(OGR_FID);
     for (int fieldIndex = 0; fieldIndex < layerDefinition.GetFieldCount(); fieldIndex++) {
       final FieldDefn fieldDefinition = layerDefinition.GetFieldDefn(fieldIndex);
       final String fieldName = fieldDefinition.GetName();
@@ -364,16 +379,18 @@ public class OgrRecordStore extends AbstractRecordStore {
 
   @Override
   public Writer<Record> createWriter() {
-    // TODO Auto-generated method stub
-    return null;
+    return new OgrRecordWriter(this);
   }
 
   public void doClose() {
     synchronized (this) {
-
       if (!isClosed()) {
         if (this.dataSource != null) {
           try {
+            for (final Layer layer : this.layersToClose) {
+              this.dataSource.ReleaseResultSet(layer);
+            }
+            this.layersToClose.clear();
             this.dataSource.delete();
           } finally {
             this.dataSource = null;
@@ -390,14 +407,29 @@ public class OgrRecordStore extends AbstractRecordStore {
       return null;
     } else {
       if (this.dataSource == null) {
-        this.dataSource = ogr.Open(FileUtil.getCanonicalPath(this.file), true);
+        this.dataSource = createDataSource(false);
       }
       return this.dataSource;
     }
   }
 
+  protected Layer getLayer(final String typePath) {
+    final DataSource dataSource = getDataSource();
+    if (dataSource == null) {
+      return null;
+    } else {
+      final String layerName = getLayerName(typePath);
+      return dataSource.GetLayer(layerName);
+    }
+  }
+
   protected String getLayerName(final String typePath) {
-    return this.pathToLayerNameMap.get(typePath.toUpperCase());
+    final String layerName = this.pathToLayerNameMap.get(typePath.toUpperCase());
+    if (layerName == null) {
+      return typePath;
+    } else {
+      return layerName;
+    }
   }
 
   @Override
@@ -431,13 +463,19 @@ public class OgrRecordStore extends AbstractRecordStore {
       if (dataSource != null) {
         final Layer result = dataSource.ExecuteSQL(sql.toString());
         if (result != null) {
-          final Feature feature = result.GetNextFeature();
-          if (feature != null) {
-            try {
-              return feature.GetFieldAsInteger(0);
-            } finally {
-              feature.delete();
+
+          addLayerToClose(result);
+          try {
+            final Feature feature = result.GetNextFeature();
+            if (feature != null) {
+              try {
+                return feature.GetFieldAsInteger(0);
+              } finally {
+                feature.delete();
+              }
             }
+          } finally {
+            releaseLayerToClose(result);
           }
         }
       }
@@ -453,12 +491,12 @@ public class OgrRecordStore extends AbstractRecordStore {
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
 
-    final List<String> attributeNames = query.getAttributeNames();
+    List<String> attributeNames = query.getAttributeNames();
     if (attributeNames.isEmpty()) {
-      CollectionUtil.append(sql, recordDefinition.getAttributeNames());
-    } else {
-      CollectionUtil.append(sql, attributeNames);
+      attributeNames = recordDefinition.getAttributeNames();
     }
+    attributeNames.remove(OgrRecordStore.OGR_FID);
+    CollectionUtil.append(sql, attributeNames);
     sql.append(" FROM ");
     final String layerName = getLayerName(typePath);
     sql.append(layerName);
@@ -472,16 +510,18 @@ public class OgrRecordStore extends AbstractRecordStore {
         .iterator(); iterator.hasNext();) {
       final Entry<String, Boolean> entry = iterator.next();
       final String column = entry.getKey();
-      if (first) {
-        sql.append(" ORDER BY ");
-        first = false;
-      } else {
-        sql.append(", ");
-      }
-      sql.append(column);
-      final Boolean ascending = entry.getValue();
-      if (!ascending) {
-        sql.append(" DESC");
+      if (!OGR_FID.equals(column)) {
+        if (first) {
+          sql.append(" ORDER BY ");
+          first = false;
+        } else {
+          sql.append(", ");
+        }
+        sql.append(column);
+        final Boolean ascending = entry.getValue();
+        if (!ascending) {
+          sql.append(" DESC");
+        }
       }
     }
     return sql.toString();
@@ -501,7 +541,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  protected Map<String, ? extends RecordStoreSchemaElement> refreshSchemaElements(
+  protected synchronized Map<String, ? extends RecordStoreSchemaElement> refreshSchemaElements(
     final RecordStoreSchema schema) {
     final Map<String, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
     if (!isClosed()) {
@@ -509,16 +549,43 @@ public class OgrRecordStore extends AbstractRecordStore {
       if (dataSource != null) {
         for (int layerIndex = 0; layerIndex < dataSource.GetLayerCount(); layerIndex++) {
           final Layer layer = dataSource.GetLayer(layerIndex);
-          final RecordDefinitionImpl recordDefinition = createRecordDefinition(
-            schema, layer);
-          final String typePath = recordDefinition.getPath().toUpperCase();
-          final String layerName = layer.GetName();
-          this.layerNameToPathMap.put(layerName.toUpperCase(), typePath);
-          this.pathToLayerNameMap.put(typePath, layerName);
-          elementsByPath.put(typePath, recordDefinition);
+          try {
+            final RecordDefinitionImpl recordDefinition = createRecordDefinition(
+              schema, layer);
+            final String typePath = recordDefinition.getPath().toUpperCase();
+            final String layerName = layer.GetName();
+            this.layerNameToPathMap.put(layerName.toUpperCase(), typePath);
+            this.pathToLayerNameMap.put(typePath, layerName);
+            elementsByPath.put(typePath, recordDefinition);
+          } finally {
+            layer.delete();
+          }
         }
       }
     }
     return elementsByPath;
+  }
+
+  synchronized void releaseLayerToClose(final Layer layer) {
+    if (layer != null) {
+      try {
+        if (this.dataSource != null) {
+          this.dataSource.ReleaseResultSet(layer);
+        }
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Cannot close Table " + layer.GetName(), e);
+      } finally {
+        this.layersToClose.remove(layer);
+        layer.delete();
+      }
+    }
+    if (this.layersToClose.isEmpty() && this.dataSource != null) {
+      try {
+        this.dataSource.delete();
+      } finally {
+        this.dataSource = null;
+      }
+    }
   }
 }
