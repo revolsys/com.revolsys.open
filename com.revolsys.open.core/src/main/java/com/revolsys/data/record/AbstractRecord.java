@@ -688,7 +688,7 @@ implements Record, Cloneable {
    */
   @Override
   public String toString() {
-    final StringBuffer s = new StringBuffer();
+    final StringBuilder s = new StringBuilder();
     s.append(this.getRecordDefinition().getPath()).append("(\n");
     for (int i = 0; i < this.getRecordDefinition().getAttributeCount(); i++) {
       final Object value = getValue(i);

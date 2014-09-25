@@ -377,13 +377,13 @@ public abstract class QueryValue implements Cloneable {
     "+", "-", "/", "*", "%", "MOD");
 
   public abstract void appendDefaultSql(Query query, RecordStore recordStore,
-    StringBuffer sql);
+    StringBuilder sql);
 
   // TODO wrap in a more generic structure
   public abstract int appendParameters(int index, PreparedStatement statement);
 
   public void appendSql(final Query query, final RecordStore recordStore,
-    final StringBuffer sql) {
+    final StringBuilder sql) {
     if (recordStore == null) {
       appendDefaultSql(query, null, sql);
     } else {

@@ -51,7 +51,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public void addColumnName(final StringBuffer sql, final String tablePrefix) {
+  public void addColumnName(final StringBuilder sql, final String tablePrefix) {
     sql.append(tablePrefix);
     sql.append(".GEOMETRY.SDO_GTYPE, ");
     sql.append(tablePrefix);

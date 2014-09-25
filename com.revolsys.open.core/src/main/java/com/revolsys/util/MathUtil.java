@@ -95,7 +95,7 @@ public final class MathUtil {
     return (V)StringConverterRegistry.toObject(resultClass, result);
   }
 
-  public static void append(final StringBuffer string, final double number) {
+  public static void append(final StringBuilder string, final double number) {
     if (Double.isNaN(number)) {
       string.append("NaN");
     } else {
@@ -646,19 +646,19 @@ public final class MathUtil {
   }
 
   public static String toString(final double number) {
-    final StringBuffer string = new StringBuffer();
+    final StringBuilder string = new StringBuilder();
     append(string, number);
     return string.toString();
   }
 
   public static String toString(final double number, final int precision) {
-    final StringBuffer string = new StringBuffer();
+    final StringBuilder string = new StringBuilder();
     DoubleFormatUtil.formatDoublePrecise(number, precision, precision, string);
     return string.toString();
   }
 
   public static String toString(final float number) {
-    final StringBuffer string = new StringBuffer();
+    final StringBuilder string = new StringBuilder();
     DoubleFormatUtil.formatDoublePrecise(number, 1, 15, string);
     return string.toString();
   }

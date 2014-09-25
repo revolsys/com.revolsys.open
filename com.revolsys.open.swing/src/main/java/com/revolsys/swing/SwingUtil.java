@@ -208,7 +208,7 @@ public class SwingUtil {
       if (maxLength > 0 && longestLength > maxLength) {
         longestLength = maxLength;
       }
-      final StringBuffer value = new StringBuffer();
+      final StringBuilder value = new StringBuilder();
       for (int i = 0; i < longestLength; i++) {
         value.append("W");
       }

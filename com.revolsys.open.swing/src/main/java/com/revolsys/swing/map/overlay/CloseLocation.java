@@ -175,7 +175,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
 
   @Override
   public String toString() {
-    final StringBuffer string = new StringBuffer();
+    final StringBuilder string = new StringBuilder();
     string.append(getTypePath());
     string.append(", ");
     final RecordDefinition recordDefinition = getRecordDefinition();

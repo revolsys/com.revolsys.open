@@ -19,7 +19,7 @@ public class GeometryTextCleaner
 	
 	private static String clean(String input, String allowedSymbols)
 	{
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		for (int i = 0; i < input.length(); i++) {
 			char c = input.charAt(i);
 			if (isAllowed(c, allowedSymbols))

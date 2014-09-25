@@ -190,7 +190,7 @@ Comparable {
 
   @Override
   public String getSignature() {
-    final StringBuffer paramTypes = new StringBuffer();
+    final StringBuilder paramTypes = new StringBuilder();
     paramTypes.append("Geometry");
     for (int i = 0; i < this.parameterTypes.length; i++) {
       paramTypes.append(",");

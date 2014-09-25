@@ -287,7 +287,7 @@ public class Attribute extends AbstractObjectWithProperties implements
     this.allowedValues.put(value, text);
   }
 
-  public void appendType(final StringBuffer string) {
+  public void appendType(final StringBuilder string) {
     string.append(this.type);
     if (this.length > 0) {
       string.append('(');
@@ -401,7 +401,7 @@ public class Attribute extends AbstractObjectWithProperties implements
   }
 
   public String getSimpleType() {
-    final StringBuffer string = new StringBuffer();
+    final StringBuilder string = new StringBuilder();
     String typeName;
     if (Number.class.isAssignableFrom(getTypeClass())) {
       typeName = "NUMBER";
@@ -455,7 +455,7 @@ public class Attribute extends AbstractObjectWithProperties implements
    * @return The data type of the attribute value.
    */
   public String getTypeDescription() {
-    final StringBuffer typeDescription = new StringBuffer();
+    final StringBuilder typeDescription = new StringBuilder();
     appendType(typeDescription);
     return typeDescription.toString();
   }
@@ -573,7 +573,7 @@ public class Attribute extends AbstractObjectWithProperties implements
 
   @Override
   public String toString() {
-    final StringBuffer string = new StringBuffer(this.name);
+    final StringBuilder string = new StringBuilder(this.name);
     string.append(':');
     appendType(string);
     return string.toString();

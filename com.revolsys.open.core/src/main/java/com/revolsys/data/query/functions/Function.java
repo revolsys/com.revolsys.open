@@ -34,7 +34,7 @@ public class Function extends QueryValue {
 
   @Override
   public void appendDefaultSql(Query query,
-    final RecordStore recordStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuilder buffer) {
     buffer.append(name);
     buffer.append("(");
     boolean first = true;

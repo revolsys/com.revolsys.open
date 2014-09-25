@@ -592,7 +592,7 @@ public class IntersectionMatrix implements Cloneable {
    */
   @Override
   public String toString() {
-    final StringBuffer buf = new StringBuffer("123456789");
+    final StringBuilder buf = new StringBuilder("123456789");
     for (int ai = 0; ai < 3; ai++) {
       for (int bi = 0; bi < 3; bi++) {
         buf.setCharAt(3 * ai + bi, Dimension.toDimensionSymbol(matrix[ai][bi]));

@@ -124,7 +124,7 @@ public class AbstractOverlay extends JComponent implements
     this.map.addUndo(edit);
   }
 
-  protected void appendLocations(final StringBuffer text, final String title,
+  protected void appendLocations(final StringBuilder text, final String title,
     final Map<String, Set<CloseLocation>> vertexLocations) {
     if (!vertexLocations.isEmpty()) {
       text.append("<div style=\"border-bottom: solid black 1px; font-weight:bold;padding: 1px 3px 1px 3px\">");
@@ -161,7 +161,7 @@ public class AbstractOverlay extends JComponent implements
     }
   }
 
-  protected void appendPoint(final StringBuffer text, final Point point) {
+  protected void appendPoint(final StringBuilder text, final Point point) {
     final double unitsPerPixel = getViewport().getUnitsPerPixel();
     double scale = getGeometryFactory().getScaleXY();
     if (getGeometryFactory().isProjected()) {
@@ -711,7 +711,7 @@ public class AbstractOverlay extends JComponent implements
       }
 
       boolean nodeSnap = false;
-      final StringBuffer text = new StringBuffer(
+      final StringBuilder text = new StringBuilder(
         "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
       text.append("<li style=\"padding: 2px; margin:1px;");
       if (0 == this.snapPointIndex) {

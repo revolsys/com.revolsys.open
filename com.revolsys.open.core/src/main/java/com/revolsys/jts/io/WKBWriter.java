@@ -196,7 +196,7 @@ public class WKBWriter {
    * @return a string of hexadecimal digits
    */
   public static String toHex(final byte[] bytes) {
-    final StringBuffer buf = new StringBuffer();
+    final StringBuilder buf = new StringBuilder();
     for (int i = 0; i < bytes.length; i++) {
       final byte b = bytes[i];
       buf.append(toHexDigit((b >> 4) & 0x0F));

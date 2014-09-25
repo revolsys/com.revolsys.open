@@ -41,7 +41,7 @@ public final class JexlUtil {
    * @param jexlExpression The expression to add the test to.
    * @param text The text to add.
    */
-  private static void addText(final StringBuffer jexlExpression,
+  private static void addText(final StringBuilder jexlExpression,
     final String text) {
     jexlExpression.append("'")
       .append(text.replaceAll("'", "' + \"'\" + '"))
@@ -93,7 +93,7 @@ public final class JexlUtil {
     final Matcher matcher = compiledPattern.matcher(newExpression);
     int lastEnd = 0;
     if (matcher.find()) {
-      final StringBuffer jexlExpression = new StringBuffer();
+      final StringBuilder jexlExpression = new StringBuilder();
       do {
         final int startIndex = matcher.start();
         if (startIndex != lastEnd) {

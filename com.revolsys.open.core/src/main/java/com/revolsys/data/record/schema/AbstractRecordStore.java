@@ -180,7 +180,7 @@ implements RecordStore {
   }
 
   @Override
-  public void appendQueryValue(final Query query, final StringBuffer sql,
+  public void appendQueryValue(final Query query, final StringBuilder sql,
     final QueryValue queryValue) {
     queryValue.appendDefaultSql(query, this, sql);
   }

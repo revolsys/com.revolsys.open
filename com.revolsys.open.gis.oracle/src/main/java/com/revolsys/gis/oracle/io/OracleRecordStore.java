@@ -87,7 +87,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   private void appendEnvelopeIntersects(final Query query,
-    final StringBuffer sql, final EnvelopeIntersects envelopeIntersects) {
+    final StringBuilder sql, final EnvelopeIntersects envelopeIntersects) {
     final Attribute geometryAttribute = query.getGeometryAttribute();
 
     if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
@@ -128,7 +128,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     }
   }
 
-  private void appendGeometryEqual2d(final Query query, final StringBuffer sql,
+  private void appendGeometryEqual2d(final Query query, final StringBuilder sql,
     final GeometryEqual2d equals) {
     final Attribute geometryAttribute = query.getGeometryAttribute();
 
@@ -171,7 +171,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  public void appendQueryValue(final Query query, final StringBuffer sql,
+  public void appendQueryValue(final Query query, final StringBuilder sql,
     final QueryValue queryValue) {
     if (queryValue instanceof GeometryEqual2d) {
       appendGeometryEqual2d(query, sql, (GeometryEqual2d)queryValue);
@@ -184,7 +184,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     }
   }
 
-  private void appendWithinDistance(final Query query, final StringBuffer sql,
+  private void appendWithinDistance(final Query query, final StringBuilder sql,
     final WithinDistance withinDistance) {
     final Attribute geometryAttribute = query.getGeometryAttribute();
     if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {

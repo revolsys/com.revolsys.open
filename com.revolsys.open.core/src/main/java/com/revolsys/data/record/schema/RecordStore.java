@@ -31,7 +31,7 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   void addStatistic(String name, String typePath, int count);
 
-  void appendQueryValue(Query query, StringBuffer sql, QueryValue queryValue);
+  void appendQueryValue(Query query, StringBuilder sql, QueryValue queryValue);
 
   @Override
   void close();

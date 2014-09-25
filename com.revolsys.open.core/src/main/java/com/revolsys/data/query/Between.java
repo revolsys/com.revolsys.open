@@ -49,7 +49,7 @@ public class Between extends Condition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final RecordStore recordStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuilder buffer) {
     column.appendSql(query, recordStore, buffer);
     buffer.append(" BETWEEN ");
     min.appendSql(query, recordStore, buffer);

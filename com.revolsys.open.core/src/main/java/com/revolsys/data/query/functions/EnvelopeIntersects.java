@@ -38,7 +38,7 @@ public class EnvelopeIntersects extends Condition {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuilder buffer) {
     buffer.append("ST_INTERSECTS(");
     if (boundingBox1Value == null) {
       buffer.append("NULL");

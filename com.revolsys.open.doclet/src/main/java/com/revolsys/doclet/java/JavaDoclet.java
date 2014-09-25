@@ -108,7 +108,7 @@ public class JavaDoclet {
   }
 
   public static String getAnchor(final ExecutableMemberDoc member) {
-    final StringBuffer anchor = new StringBuffer();
+    final StringBuilder anchor = new StringBuilder();
     final ClassDoc classDoc = member.containingClass();
     final String className = DocletUtil.qualifiedName(classDoc);
     anchor.append(className);

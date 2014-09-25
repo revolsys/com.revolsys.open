@@ -100,7 +100,7 @@ public class CsnIterator {
 
   public static final int VALUE = 16;
 
-  private StringBuffer buffer = new StringBuffer();
+  private StringBuilder buffer = new StringBuilder();
 
   private int columnNumber;
 
@@ -146,9 +146,9 @@ public class CsnIterator {
     reader.close();
   }
 
-  private String findClassName(final StringBuffer buffer) throws IOException {
+  private String findClassName(final StringBuilder buffer) throws IOException {
     final String className = findUpperName(buffer);
-    final StringBuffer newBuffer = getStrippedBuffer();
+    final StringBuilder newBuffer = getStrippedBuffer();
     // If the class name is fullowed by '::' get and return the schema name
     if (newBuffer.charAt(0) == ':' && newBuffer.charAt(1) == ':') {
       removeExtraToken(0, 2);
@@ -159,7 +159,7 @@ public class CsnIterator {
     }
   }
 
-  private String findEnumTag(final StringBuffer buffer) {
+  private String findEnumTag(final StringBuilder buffer) {
     int endIndex = 1;
     boolean validChar = true;
     final int len = buffer.length();
@@ -199,7 +199,7 @@ public class CsnIterator {
     }
   }
 
-  private String findLowerName(final StringBuffer buffer) {
+  private String findLowerName(final StringBuilder buffer) {
     if (isLowerCase(buffer.charAt(0))) {
       return findName(buffer);
     } else {
@@ -207,7 +207,7 @@ public class CsnIterator {
     }
   }
 
-  private String findName(final StringBuffer buffer) {
+  private String findName(final StringBuilder buffer) {
     int endIndex = 0;
     boolean validChar = true;
     final int len = buffer.length();
@@ -225,7 +225,7 @@ public class CsnIterator {
     return name;
   }
 
-  private int findStartDefinition(final StringBuffer buffer) throws IOException {
+  private int findStartDefinition(final StringBuilder buffer) throws IOException {
     if (buffer.charAt(0) != '<') {
       return UNKNOWN;
     } else {
@@ -236,7 +236,7 @@ public class CsnIterator {
     }
   }
 
-  private String findUpperName(final StringBuffer buffer) {
+  private String findUpperName(final StringBuilder buffer) {
     if (isUpperCase(buffer.charAt(0))) {
       return findName(buffer);
     } else {
@@ -248,7 +248,7 @@ public class CsnIterator {
     return ((Boolean)value).booleanValue();
   }
 
-  private StringBuffer getBuffer() throws IOException {
+  private StringBuilder getBuffer() throws IOException {
     if (buffer == null || buffer.length() == 0) {
       line = reader.readLine();
       lineNumber++;
@@ -290,8 +290,8 @@ public class CsnIterator {
     return (String)value;
   }
 
-  private StringBuffer getStrippedBuffer() throws IOException {
-    StringBuffer buffer = stripWhitespace(getBuffer());
+  private StringBuilder getStrippedBuffer() throws IOException {
+    StringBuilder buffer = stripWhitespace(getBuffer());
     while (buffer != null && buffer.length() == 0) {
       buffer = stripWhitespace(getBuffer());
     }
@@ -338,12 +338,12 @@ public class CsnIterator {
     return eventType;
   }
 
-  private void processAttribute(final StringBuffer buffer) throws IOException {
-    StringBuffer localBuffer = buffer;
+  private void processAttribute(final StringBuilder buffer) throws IOException {
+    StringBuilder localBuffer = buffer;
     if (nextEventType == OPTIONAL_ATTRIBUTE) {
       final String attributeName = findLowerName(localBuffer);
       if (attributeName != null) {
-        final StringBuffer newBuffer = getStrippedBuffer();
+        final StringBuilder newBuffer = getStrippedBuffer();
         if (newBuffer.charAt(0) == ']') {
           removeToken(0, 1);
           nextEventType = ATTRIBUTE_NAME;
@@ -359,7 +359,7 @@ public class CsnIterator {
     } else if (nextEventType == COLLECTION_ATTRIBUTE) {
       final String className = findClassName(localBuffer);
       if (className != null) {
-        final StringBuffer newBuffer = getStrippedBuffer();
+        final StringBuilder newBuffer = getStrippedBuffer();
         if (newBuffer.charAt(0) == ')') {
           nextEventType = CLASS_NAME;
           setNextToken(className);
@@ -391,7 +391,7 @@ public class CsnIterator {
       if (className != null) {
         if (className.equals("Set") || className.equals("List")
           || className.equals("Relation")) {
-          final StringBuffer newBuffer = getStrippedBuffer();
+          final StringBuilder newBuffer = getStrippedBuffer();
           if (newBuffer.charAt(0) == '(') {
             nextEventType = COLLECTION_ATTRIBUTE;
             removeExtraToken(0, 1);
@@ -400,7 +400,7 @@ public class CsnIterator {
             throw new IllegalStateException("Expecting a '(");
           }
         } else if (className.equals("String")) {
-          final StringBuffer newBuffer = getStrippedBuffer();
+          final StringBuilder newBuffer = getStrippedBuffer();
           if (newBuffer.charAt(0) == '(') {
             nextEventType = STRING_ATTRIBUTE;
             removeExtraToken(0, 1);
@@ -419,7 +419,7 @@ public class CsnIterator {
     }
   }
 
-  private int processAttributeName(final StringBuffer buffer)
+  private int processAttributeName(final StringBuilder buffer)
     throws IOException {
     final String attributeName = findLowerName(buffer);
     if (attributeName == null) {
@@ -434,8 +434,8 @@ public class CsnIterator {
   }
 
   private int processAttributePath() throws IOException {
-    StringBuffer buffer = getStrippedBuffer();
-    final StringBuffer attributePath = new StringBuffer();
+    StringBuilder buffer = getStrippedBuffer();
+    final StringBuilder attributePath = new StringBuilder();
     String attributeName = findLowerName(buffer);
     if (attributeName == null) {
       return UNKNOWN;
@@ -479,7 +479,7 @@ public class CsnIterator {
   }
 
   public void processAttributes() throws IOException {
-    final StringBuffer buffer = getStrippedBuffer();
+    final StringBuilder buffer = getStrippedBuffer();
     if (buffer.charAt(0) == '>') {
       removeToken(0, 1);
       scopeStack.pop();
@@ -500,7 +500,7 @@ public class CsnIterator {
   }
 
   public void processClassAttributes() throws IOException {
-    final StringBuffer buffer = getStrippedBuffer();
+    final StringBuilder buffer = getStrippedBuffer();
     if (buffer.charAt(0) == '>') {
       removeToken(0, 1);
       scopeStack.pop();
@@ -559,7 +559,7 @@ public class CsnIterator {
   }
 
   public void processDefaults() throws IOException {
-    final StringBuffer buffer = getStrippedBuffer();
+    final StringBuilder buffer = getStrippedBuffer();
     if (buffer.charAt(0) == '>') {
       removeToken(0, 1);
       scopeStack.pop();
@@ -573,7 +573,7 @@ public class CsnIterator {
     }
   }
 
-  private void processDefinitions(final StringBuffer buffer) throws IOException {
+  private void processDefinitions(final StringBuilder buffer) throws IOException {
     final char c = buffer.charAt(0);
     // End of Definition
     if (c == '>') {
@@ -585,13 +585,13 @@ public class CsnIterator {
       final String className = findClassName(buffer);
       nextEventType = CLASS_NAME;
       setNextToken(className);
-      final StringBuffer newBuffer = getStrippedBuffer();
+      final StringBuilder newBuffer = getStrippedBuffer();
       if (newBuffer.charAt(0) == ',') {
         removeExtraToken(0, 1);
       }
     } else if (isLowerCase(c)) {
       final String componentName = findLowerName(buffer);
-      final StringBuffer newBuffer = getStrippedBuffer();
+      final StringBuilder newBuffer = getStrippedBuffer();
       if (newBuffer.charAt(0) == ':') {
         removeExtraToken(0, 1);
         nextEventType = COMPONENT_NAME;
@@ -641,7 +641,7 @@ public class CsnIterator {
     return nextEventType;
   }
 
-  private void processDocument(final StringBuffer buffer) throws IOException {
+  private void processDocument(final StringBuilder buffer) throws IOException {
     nextEventType = findStartDefinition(buffer);
     if (nextEventType == UNKNOWN) {
       throw new IllegalStateException(lineNumber + ":"
@@ -650,7 +650,7 @@ public class CsnIterator {
   }
 
   private void processNext() throws IOException {
-    final StringBuffer buffer = getStrippedBuffer();
+    final StringBuilder buffer = getStrippedBuffer();
     setNextToken(null);
     if (buffer == null) {
       nextEventType = END_DOCUMENT;
@@ -721,7 +721,7 @@ public class CsnIterator {
   }
 
   public void processRestricted() throws IOException {
-    final StringBuffer newBuffer = getStrippedBuffer();
+    final StringBuilder newBuffer = getStrippedBuffer();
 
     if (newBuffer.charAt(0) == '>') {
       removeToken(0, 1);
@@ -739,7 +739,7 @@ public class CsnIterator {
   }
 
   private void processRestrictionValues() throws IOException {
-    StringBuffer buffer = getStrippedBuffer();
+    StringBuilder buffer = getStrippedBuffer();
     final char c = buffer.charAt(0);
     if (c == '^') {
       nextEventType = FORCE_TYPE;
@@ -779,11 +779,11 @@ public class CsnIterator {
   }
 
   private int processValue() throws IOException {
-    StringBuffer buffer = getStrippedBuffer();
+    StringBuilder buffer = getStrippedBuffer();
     char c = buffer.charAt(0);
     if (c == '"') {
       removeToken(0, 1);
-      final StringBuffer text = new StringBuffer();
+      final StringBuilder text = new StringBuilder();
       int endIndex = 0;
       c = buffer.charAt(endIndex);
       int len = buffer.length();
@@ -876,7 +876,7 @@ public class CsnIterator {
     this.nextToken = token;
   }
 
-  private StringBuffer stripWhitespace(final StringBuffer buffer) {
+  private StringBuilder stripWhitespace(final StringBuilder buffer) {
     if (buffer == null) {
       return null;
     }

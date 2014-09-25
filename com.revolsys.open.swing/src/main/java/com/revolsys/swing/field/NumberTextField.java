@@ -28,7 +28,7 @@ public class NumberTextField extends JXTextField implements Field,
   public static Number createMaximumValue(final DataType dataType,
     final int length, final int scale) {
     final Class<?> javaClass = dataType.getJavaClass();
-    final StringBuffer text = new StringBuffer(length);
+    final StringBuilder text = new StringBuilder(length);
     for (int i = length - scale + 1; i > 1; i--) {
       text.append('9');
     }

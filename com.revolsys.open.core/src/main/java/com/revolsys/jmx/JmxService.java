@@ -500,7 +500,7 @@ public class JmxService {
     attributeMap.put("operationId", operation.getName());
     attributeMap.put("returnType", operation.getReturnType());
     final MBeanParameterInfo[] parameters = operation.getSignature();
-    final StringBuffer parameterSpec = new StringBuffer();
+    final StringBuilder parameterSpec = new StringBuilder();
     if (parameters.length > 0) {
       for (final MBeanParameterInfo parameter : parameters) {
         final String name = parameter.getName();

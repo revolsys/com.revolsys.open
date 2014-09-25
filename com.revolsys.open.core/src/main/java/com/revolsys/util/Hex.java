@@ -13,7 +13,7 @@ public class Hex {
   }
 
   public static String toHex(final byte[] bytes) {
-    final StringBuffer hexString = new StringBuffer();
+    final StringBuilder hexString = new StringBuilder();
     for (final byte c : bytes) {
       final String hexChar = Integer.toString((c & 0xff) + 0x100, 16)
         .substring(1);
@@ -23,7 +23,7 @@ public class Hex {
   }
 
   public static String toHex(final String string) {
-    final StringBuffer hexString = new StringBuffer();
+    final StringBuilder hexString = new StringBuilder();
     for (final char c : string.toCharArray()) {
       final String hexChar = Integer.toHexString(c);
       hexString.append(hexChar);

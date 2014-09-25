@@ -44,7 +44,7 @@ public class CollectionValue extends QueryValue {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuilder buffer) {
     buffer.append('(');
     for (int i = 0; i < this.queryValues.size(); i++) {
       if (i > 0) {

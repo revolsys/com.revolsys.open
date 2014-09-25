@@ -1333,7 +1333,7 @@ public class EditGeometryOverlay extends AbstractOverlay implements
             CollectionUtil.addToSet(vertexLocations, typePath, location);
           }
         }
-        final StringBuffer text = new StringBuffer("<html>");
+        final StringBuilder text = new StringBuilder("<html>");
         appendLocations(text, "Move Vertices", vertexLocations);
         appendLocations(text, "Insert Vertices", segmentLocations);
         text.append("</html>");

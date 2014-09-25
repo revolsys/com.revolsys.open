@@ -154,8 +154,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           point = geometry.getCentroid().copy(geometryFactory);
           if (!viewport.getBoundingBox().covers(point)) {
             final Geometry clippedGeometry = viewport.getBoundingBox()
-                .toPolygon()
-                .intersection(geometry);
+              .toPolygon()
+              .intersection(geometry);
             if (!clippedGeometry.isEmpty()) {
               double maxArea = 0;
               double maxLength = 0;
@@ -251,7 +251,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           final int ascent = fontMetrics.getAscent();
           final int leading = fontMetrics.getLeading();
           final double maxHeight = lines.length * (ascent + descent)
-              + (lines.length - 1) * leading;
+            + (lines.length - 1) * leading;
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
           } else if ("middle".equals(verticalAlignment)) {

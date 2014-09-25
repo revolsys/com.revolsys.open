@@ -162,7 +162,7 @@ public class LineFacetSequence implements FacetSequence {
 
   @Override
   public String toString() {
-    final StringBuffer buf = new StringBuffer();
+    final StringBuilder buf = new StringBuilder();
     buf.append("LINESTRING ( ");
     for (int i = 0; i < getVertexCount(); i++) {
       if (i > 0) {

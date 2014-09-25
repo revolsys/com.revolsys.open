@@ -140,7 +140,12 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     } else {
       Row row = null;
       while (this.offset > 0 && this.count < this.offset) {
-        this.recordStore.nextRow(this.rows);
+        row = this.recordStore.nextRow(this.rows);
+        if (row == null) {
+          throw new NoSuchElementException();
+        } else {
+          this.recordStore.closeRow(row);
+        }
         this.count++;
       }
       if (this.limit > -1 && this.count >= this.offset + this.limit) {

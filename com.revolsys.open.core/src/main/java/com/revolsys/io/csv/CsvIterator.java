@@ -109,7 +109,7 @@ public class CsvIterator implements Iterator<List<String>>,
     } else {
 
       final List<String> fields = new ArrayList<String>();
-      StringBuffer sb = new StringBuffer();
+      StringBuilder sb = new StringBuilder();
       boolean inQuotes = false;
       boolean hadQuotes = false;
       do {
@@ -142,7 +142,7 @@ public class CsvIterator implements Iterator<List<String>>,
             } else {
               fields.add(null);
             }
-            sb = new StringBuffer();
+            sb = new StringBuilder();
           } else {
             sb.append(c);
           }

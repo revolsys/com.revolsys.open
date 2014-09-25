@@ -551,7 +551,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
 
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     sb.append(' ');
     if (isRemoved()) {
       return "Removed Edge";

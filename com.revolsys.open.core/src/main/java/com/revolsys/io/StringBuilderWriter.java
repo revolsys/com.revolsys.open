@@ -2,11 +2,11 @@ package com.revolsys.io;
 
 import java.io.IOException;
 
-public class StringBufferWriter extends java.io.Writer {
+public class StringBuilderWriter extends java.io.Writer {
 
-  private final StringBuffer buffer;
+  private final StringBuilder buffer;
 
-  public StringBufferWriter(final StringBuffer buffer) {
+  public StringBuilderWriter(final StringBuilder buffer) {
     this.buffer = buffer;
   }
 
@@ -21,7 +21,7 @@ public class StringBufferWriter extends java.io.Writer {
   public void flush() {
   }
 
-  public StringBuffer getBuffer() {
+  public StringBuilder getBuffer() {
     return buffer;
   }
 

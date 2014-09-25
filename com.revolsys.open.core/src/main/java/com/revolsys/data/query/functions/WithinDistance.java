@@ -48,7 +48,7 @@ public class WithinDistance extends Condition {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuffer sql) {
+    final RecordStore recordStore, final StringBuilder sql) {
     sql.append("ST_DWithin(");
     if (geometry1Value == null) {
       sql.append("NULL");

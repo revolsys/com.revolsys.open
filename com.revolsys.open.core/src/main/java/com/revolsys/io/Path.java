@@ -238,7 +238,7 @@ public final class Path {
     if (parts.length == 0) {
       return "/";
     } else {
-      final StringBuffer path = new StringBuffer();
+      final StringBuilder path = new StringBuilder();
       for (String part : parts) {
         if (part != null) {
           part = part.replaceAll("^/*", "");

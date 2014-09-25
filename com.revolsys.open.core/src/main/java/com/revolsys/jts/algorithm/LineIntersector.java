@@ -324,7 +324,7 @@ public abstract class LineIntersector {
   }
 
   private String getTopologySummary() {
-    final StringBuffer catBuf = new StringBuffer();
+    final StringBuilder catBuf = new StringBuilder();
     if (isEndPoint()) {
       catBuf.append(" endpoint");
     }

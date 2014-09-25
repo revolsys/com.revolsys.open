@@ -599,7 +599,7 @@ public class ImageInfo {
         {
           final int extensionType = read();
           if (collectComments && extensionType == 0xfe) {
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             int n;
             do {
               n = read();
@@ -1120,10 +1120,10 @@ public class ImageInfo {
   }
 
   private String readLine() throws IOException {
-    return readLine(new StringBuffer());
+    return readLine(new StringBuilder());
   }
 
-  private String readLine(final StringBuffer sb) throws IOException {
+  private String readLine(final StringBuilder sb) throws IOException {
     boolean finished;
     do {
       final int value = read();

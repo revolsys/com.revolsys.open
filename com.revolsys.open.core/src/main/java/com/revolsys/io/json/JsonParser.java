@@ -446,7 +446,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
   }
 
   private void processNumber() throws IOException {
-    final StringBuffer text = new StringBuffer();
+    final StringBuilder text = new StringBuilder();
     if (currentCharacter == '-') {
       text.append((char)currentCharacter);
       currentCharacter = reader.read();
@@ -480,7 +480,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
   }
 
   private void processString() throws IOException {
-    final StringBuffer text = new StringBuffer();
+    final StringBuilder text = new StringBuilder();
     currentCharacter = reader.read();
     while (currentCharacter != '"') {
       if (currentCharacter == '\\') {

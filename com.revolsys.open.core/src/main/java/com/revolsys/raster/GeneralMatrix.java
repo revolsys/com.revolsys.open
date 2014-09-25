@@ -9,8 +9,6 @@ import javax.vecmath.GMatrix;
 public class GeneralMatrix extends GMatrix
 
 {
-  private static final long serialVersionUID = 8447482612423035360L;
-
   static boolean epsilonEquals(final GeneralMatrix m1, final GeneralMatrix m2,
     final double tolerance) {
     final int numRow = m1.getNumRow();
@@ -80,6 +78,8 @@ public class GeneralMatrix extends GMatrix
     return buffer.toString();
   }
 
+  private static final long serialVersionUID = 8447482612423035360L;
+
   public GeneralMatrix(final GeneralMatrix matrix) {
     this(matrix.getNumRow(), matrix.getNumCol());
     final int height = getNumRow();
@@ -97,7 +97,7 @@ public class GeneralMatrix extends GMatrix
 
   @Override
   public GeneralMatrix clone() {
-    return ((GeneralMatrix)super.clone());
+    return (GeneralMatrix)super.clone();
   }
 
   public boolean equals(final GeneralMatrix matrix, final double tolerance) {
@@ -122,7 +122,7 @@ public class GeneralMatrix extends GMatrix
     }
     --dimension;
     for (int i = 0; i <= dimension; ++i) {
-      if (getElement(dimension, i) != ((i == dimension) ? 1 : 0)) {
+      if (getElement(dimension, i) != (i == dimension ? 1 : 0)) {
         return false;
       }
     }
@@ -137,13 +137,13 @@ public class GeneralMatrix extends GMatrix
     }
     for (int j = 0; j < numRow; ++j) {
       for (int i = 0; i < numCol; ++i) {
-        if (getElement(j, i) != ((i == j) ? 1 : 0)) {
+        if (getElement(j, i) != (i == j ? 1 : 0)) {
           return false;
         }
       }
     }
-    assert (isAffine()) : this;
-    assert (isIdentity(0.0D)) : this;
+    assert isAffine() : this;
+    assert isIdentity(0.0D) : this;
     return true;
   }
 
@@ -166,7 +166,7 @@ public class GeneralMatrix extends GMatrix
   }
 
   public final AffineTransform toAffineTransform2D()
-    throws IllegalStateException {
+      throws IllegalStateException {
     if (getNumRow() != 3 || getNumCol() != 3) {
       throw new IllegalStateException("Must be a 3x3 matrix");
     }

@@ -92,7 +92,7 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
 
   @Override
   public String getMapTileName(final double x, final double y) {
-    final StringBuffer tileName = new StringBuffer(super.getMapTileName(x, y));
+    final StringBuilder tileName = new StringBuilder(super.getMapTileName(x, y));
     for (int index = tileName.indexOf("/"); index != -1; index = tileName.indexOf("/")) {
       tileName.delete(index, index + 1);
     }

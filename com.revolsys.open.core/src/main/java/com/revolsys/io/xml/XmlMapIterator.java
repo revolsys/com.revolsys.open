@@ -119,7 +119,7 @@ public class XmlMapIterator extends AbstractIterator<Map<String, Object>> {
     }
     if (elementIndex == 0) {
       if (textIndex > 0) {
-        final StringBuffer fullText = new StringBuffer();
+        final StringBuilder fullText = new StringBuilder();
         for (final Object text : map.values()) {
           fullText.append(text);
         }

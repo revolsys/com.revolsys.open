@@ -332,7 +332,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   @Override
   public String toString() {
     try {
-      final StringBuffer string = new StringBuffer();
+      final StringBuilder string = new StringBuilder();
       if (this.sql == null) {
         string.append(JdbcUtils.getSelectSql(this));
       } else {

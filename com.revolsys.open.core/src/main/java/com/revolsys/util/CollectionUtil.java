@@ -73,12 +73,12 @@ public final class CollectionUtil {
     return values.add(value);
   }
 
-  public static void append(final StringBuffer string,
+  public static void append(final StringBuilder string,
     final Collection<? extends Object> values) {
     append(string, values, ",");
   }
 
-  public static void append(final StringBuffer buffer,
+  public static void append(final StringBuilder buffer,
     final Collection<? extends Object> values, final String separator) {
     boolean first = true;
     for (final Object value : values) {
@@ -600,7 +600,7 @@ public final class CollectionUtil {
     if (string == null) {
       return null;
     } else {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       for (int i = 0; i < string.length(); ++i) {
         char c = string.charAt(i);
         switch (c) {
@@ -610,7 +610,7 @@ public final class CollectionUtil {
               c = string.charAt(i);
               if (c == '{') {
                 ++i;
-                final StringBuffer propertyName = new StringBuffer();
+                final StringBuilder propertyName = new StringBuilder();
                 for (; i < string.length() && c != '}'; ++i) {
                   c = string.charAt(i);
                   if (c != '}') {
@@ -778,7 +778,7 @@ public final class CollectionUtil {
     if (values == null) {
       return null;
     } else {
-      final StringBuffer string = new StringBuffer();
+      final StringBuilder string = new StringBuilder();
       append(string, values, separator);
       return string.toString();
     }

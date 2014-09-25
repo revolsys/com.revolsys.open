@@ -92,7 +92,7 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
         ThreadLocalFileAppender.getAppender().setLocalFile(logPath);
       }
       if (logScriptInfo) {
-        final StringBuffer message = new StringBuffer("Processing ");
+        final StringBuilder message = new StringBuilder("Processing ");
         message.append(" -s ");
         message.append(script);
         if (logPath != null) {

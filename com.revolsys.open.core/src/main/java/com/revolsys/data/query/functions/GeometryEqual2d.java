@@ -37,7 +37,7 @@ public class GeometryEqual2d extends Condition {
 
   @Override
   public void appendDefaultSql(final Query query,
-    final RecordStore recordStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuilder buffer) {
     buffer.append("ST_EQUALS(");
     if (geometry1Value == null) {
       buffer.append("NULL");

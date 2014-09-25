@@ -81,7 +81,7 @@ public class PlaceholderResolvingStringValueResolver implements
     final Map<String, Object> attributes, final Set<String> visitedPlaceholders)
     throws BeanDefinitionStoreException {
 
-    final StringBuffer buf = new StringBuffer(strVal);
+    final StringBuilder buf = new StringBuilder(strVal);
 
     int startIndex = strVal.indexOf(placeholderPrefix);
     while (startIndex != -1) {

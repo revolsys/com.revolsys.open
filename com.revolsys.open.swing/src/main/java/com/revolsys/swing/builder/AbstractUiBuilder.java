@@ -10,7 +10,7 @@ public abstract class AbstractUiBuilder implements UiBuilder {
     final char[] content = new char[value.length()];
     value.getChars(0, value.length(), content, 0);
 
-    final StringBuffer result = new StringBuffer();
+    final StringBuilder result = new StringBuilder();
 
     for (final char element : content) {
       switch (element) {
@@ -213,7 +213,7 @@ public abstract class AbstractUiBuilder implements UiBuilder {
 
   @Override
   public String toHtml(final Object object) {
-    final StringBuffer s = new StringBuffer();
+    final StringBuilder s = new StringBuilder();
     appendHtml(s, object);
     return s.toString();
   }

@@ -87,7 +87,7 @@ public class RecordConverterProcess extends BaseInOutProcess<Record, Record> {
 
       }
     } else {
-      final StringBuffer sb = new StringBuffer("Multiple conveters found: \n  ");
+      final StringBuilder sb = new StringBuilder("Multiple conveters found: \n  ");
       for (final FilterRecordConverter filterConverter : converters) {
         final Filter<Record> filter = filterConverter.getFilter();
         if (filter.accept(source)) {

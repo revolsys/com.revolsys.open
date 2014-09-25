@@ -11,7 +11,7 @@ import org.w3c.dom.NodeList;
 import com.revolsys.util.Property;
 
 public class DomUtil {
-  public static void appendChildText(final StringBuffer text, final Node node) {
+  public static void appendChildText(final StringBuilder text, final Node node) {
     if (node != null) {
       for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
         final short type = child.getNodeType();
@@ -30,7 +30,7 @@ public class DomUtil {
     if (node == null) {
       return null;
     } else {
-      final StringBuffer text = new StringBuffer();
+      final StringBuilder text = new StringBuilder();
       appendChildText(text, node);
       return text.toString();
     }

@@ -209,8 +209,8 @@ public class XbaseIterator extends AbstractIterator<Record> implements
      * (memoFile.exists()) { if (log.isInfoEnabled()) { log.info("Opening memo
      * mappedFile:
      * " + memoFile); } memoIn = new RandomAccessFile(memoFile, "r"); } else {
-     * return null; } } memoIn.seek(memoIndex 512); StringBuffer memo = new
-     * StringBuffer(512); byte[] memoBuffer = new byte[512]; while
+     * return null; } } memoIn.seek(memoIndex 512); StringBuilder memo = new
+     * StringBuilder(512); byte[] memoBuffer = new byte[512]; while
      * (memoIn.read(memoBuffer) != -1) { int i = 0; while (i <
      * memoBuffer.length) { if (memoBuffer[i] == 0x1A) { return memo.toString();
      * } memo.append((char)memoBuffer[i]); i++; } } return memo.toString(); }
@@ -340,7 +340,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
     this.recordDefinition = new RecordDefinitionImpl(this.typeName);
     int b = this.in.read();
     while (b != 0x0D) {
-      final StringBuffer fieldName = new StringBuffer();
+      final StringBuilder fieldName = new StringBuilder();
       boolean endOfName = false;
       for (int i = 0; i < 11; i++) {
         if (!endOfName && b != 0) {

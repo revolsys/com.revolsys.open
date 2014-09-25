@@ -85,7 +85,7 @@ public class BoundingBoxTest implements TestConstants {
 
     Unit unit = SI.METRE;
     Unit lengthUnit = SI.METRE;
-    final StringBuffer wkt = new StringBuffer();
+    final StringBuilder wkt = new StringBuilder();
     final int srid = boundingBox.getSrid();
     if (geometryFactory == null) {
       Assert.assertEquals("coordinateSystem", null,

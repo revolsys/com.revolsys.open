@@ -59,7 +59,7 @@ public class ListStringConverter implements StringConverter<List<String>> {
       return null;
     } else if (value instanceof List) {
       final List<?> list = (List<?>)value;
-      final StringBuffer string = new StringBuffer("[");
+      final StringBuilder string = new StringBuilder("[");
       for (final Iterator<?> iterator = list.iterator(); iterator.hasNext();) {
         final Object object = iterator.next();
         final String stringValue = StringConverterRegistry.toString(object);

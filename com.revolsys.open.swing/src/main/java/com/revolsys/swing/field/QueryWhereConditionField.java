@@ -362,7 +362,7 @@ MouseListener, CaretListener, ItemListener {
           if (fieldValue != null) {
 
             final Document document = this.whereTextField.getDocument();
-            final StringBuffer text = new StringBuffer();
+            final StringBuilder text = new StringBuilder();
             if (position > 0) {
               text.append(" ");
             }
@@ -408,7 +408,7 @@ MouseListener, CaretListener, ItemListener {
             }
           }
           if (fieldValue != null) {
-            final StringBuffer text = new StringBuffer();
+            final StringBuilder text = new StringBuilder();
             try {
               final Document document = this.whereTextField.getDocument();
               final String currentText = document.getText(0, position);
@@ -452,7 +452,7 @@ MouseListener, CaretListener, ItemListener {
               attributeClass, fieldValue);
 
             final Document document = this.whereTextField.getDocument();
-            final StringBuffer text = new StringBuffer();
+            final StringBuilder text = new StringBuilder();
             if (position > 0) {
               text.append(" ");
             }
@@ -480,7 +480,7 @@ MouseListener, CaretListener, ItemListener {
         final int position = this.whereTextField.getCaretPosition();
 
         final Document document = this.whereTextField.getDocument();
-        final StringBuffer text = new StringBuffer();
+        final StringBuilder text = new StringBuilder();
         if (position > 0) {
           text.append(" ");
         }
@@ -499,7 +499,7 @@ MouseListener, CaretListener, ItemListener {
     }
   }
 
-  public void appendValue(final StringBuffer text, final Class<?> type,
+  public void appendValue(final StringBuilder text, final Class<?> type,
     final Object value) {
     final String valueString = StringConverterRegistry.toString(type, value);
     if (Date.class.isAssignableFrom(type)) {

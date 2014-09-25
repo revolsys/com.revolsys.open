@@ -1503,7 +1503,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
 
   @Override
   public String toString() {
-    final StringBuffer string = new StringBuffer();
+    final StringBuilder string = new StringBuilder();
     final int srid = getSrid();
     if (this.coordinateSystem != null) {
       string.append(this.coordinateSystem.getName());

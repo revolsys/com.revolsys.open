@@ -292,7 +292,7 @@ public class Form extends ElementContainer {
 
     out.startTag(HtmlUtil.FORM);
     if (this.onSubmit.size() > 0) {
-      final StringBuffer submitScripts = new StringBuffer();
+      final StringBuilder submitScripts = new StringBuilder();
       for (final String script : this.onSubmit) {
         submitScripts.append(script).append(';');
       }

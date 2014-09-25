@@ -83,7 +83,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   public static BoundingBox create(final String wkt) {
     if (Property.hasValue(wkt)) {
       GeometryFactory geometryFactory = null;
-      final StringBuffer text = new StringBuffer(wkt);
+      final StringBuilder text = new StringBuilder(wkt);
       if (WktParser.hasText(text, "SRID=")) {
         final Integer srid = WktParser.parseInteger(text);
         if (srid != null) {
@@ -1114,33 +1114,54 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
   }
 
   @Override
-  public boolean intersects(double x1, double y1, final double x2,
-    final double y2) {
-    int out1, out2;
-    if ((out2 = outcode(x2, y2)) == 0) {
-      return true;
-    }
-    while ((out1 = outcode(x1, y1)) != 0) {
-      if ((out1 & out2) != 0) {
+  public boolean intersects(double x0, double y0, double x1, double y1) {
+    int out1 = outcode(x0, y0);
+    int out2 = outcode(x1, y1);
+    final double xmin = getMinX();
+    final double ymin = getMinY();
+    final double xmax = getMaxX();
+    final double ymax = getMaxY();
+    while (true) {
+      if ((out1 | out2) == 0) {
+        return true;
+      } else if ((out1 & out2) != 0) {
         return false;
-      }
-      if ((out1 & (OUT_LEFT | OUT_RIGHT)) != 0) {
-        double minX = getMinX();
-        if ((out1 & OUT_RIGHT) != 0) {
-          minX += getWidth();
-        }
-        y1 = y1 + (minX - x1) * (y2 - y1) / (x2 - x1);
-        x1 = minX;
       } else {
-        double minY = getMinY();
-        if ((out1 & OUT_TOP) != 0) {
-          minY += getHeight();
+
+        int out;
+        if (out1 != 0) {
+          out = out1;
+        } else {
+          out = out2;
         }
-        x1 = x1 + (minY - y1) * (x2 - x1) / (y2 - y1);
-        y1 = minY;
+
+        double x = 0;
+        double y = 0;
+        if ((out & OUT_TOP) != 0) {
+          x = x0 + (x1 - x0) * (ymax - y0) / (y1 - y0);
+          y = ymax;
+        } else if ((out & OUT_BOTTOM) != 0) {
+          x = x0 + (x1 - x0) * (ymin - y0) / (y1 - y0);
+          y = ymin;
+        } else if ((out & OUT_RIGHT) != 0) {
+          y = y0 + (y1 - y0) * (xmax - x0) / (x1 - x0);
+          x = xmax;
+        } else if ((out & OUT_LEFT) != 0) {
+          y = y0 + (y1 - y0) * (xmin - x0) / (x1 - x0);
+          x = xmin;
+        }
+
+        if (out == out1) {
+          x0 = x;
+          y0 = y;
+          out1 = outcode(x0, y0);
+        } else {
+          x1 = x;
+          y1 = y;
+          out2 = outcode(x1, y1);
+        }
       }
     }
-    return true;
   }
 
   public boolean intersects(final Geometry geometry) {
@@ -1369,7 +1390,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
 
   @Override
   public String toString() {
-    final StringBuffer s = new StringBuffer();
+    final StringBuilder s = new StringBuilder();
     final int srid = getSrid();
     if (srid > 0) {
       s.append("SRID=");

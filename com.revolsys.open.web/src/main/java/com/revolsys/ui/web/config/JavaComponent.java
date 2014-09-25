@@ -176,7 +176,7 @@ public class JavaComponent extends Component {
 
   @Override
   public String toString() {
-    final StringBuffer s = new StringBuffer(className).append("(");
+    final StringBuilder s = new StringBuilder(className).append("(");
     for (final Iterator props = properties.entrySet().iterator(); props.hasNext();) {
       final Map.Entry prop = (Map.Entry)props.next();
       s.append(prop.getKey()).append("=").append(prop.getValue());

@@ -20,14 +20,18 @@ import com.revolsys.io.IoFactoryRegistry;
 
 public class RecordStoreFactoryRegistry {
 
+  public static <T extends RecordStore> T createRecordStore(final File file) {
+    return createRecordStore(FileUtil.toUrlString(file));
+  }
+
   public static <T extends RecordStore> T createRecordStore(
     final File directory, final String fileExtension) {
     if (!directory.exists()) {
       throw new IllegalArgumentException("Directory does not exist: "
-        + directory);
+          + directory);
     } else if (!directory.isDirectory()) {
       throw new IllegalArgumentException("File is not a directory: "
-        + directory);
+          + directory);
     } else {
       final String url = FileUtil.toUrlString(directory) + "?format="
           + fileExtension;
@@ -47,7 +51,7 @@ public class RecordStoreFactoryRegistry {
     final RecordStoreFactory factory = getRecordStoreFactory(url);
     if (factory == null) {
       throw new IllegalArgumentException("Record Store Factory not found for "
-        + url);
+          + url);
     } else {
       return (T)factory.createRecordStore(connectionProperties);
     }
@@ -58,7 +62,7 @@ public class RecordStoreFactoryRegistry {
     final RecordStoreFactory factory = getRecordStoreFactory(url);
     if (factory == null) {
       throw new IllegalArgumentException("Record Store Factory not found for "
-        + url);
+          + url);
     } else {
       final Map<String, Object> connectionProperties = new HashMap<String, Object>();
       connectionProperties.put("url", url);
@@ -95,7 +99,7 @@ public class RecordStoreFactoryRegistry {
     final RecordStoreFactory factory = getRecordStoreFactory(url);
     if (factory == null) {
       throw new IllegalArgumentException("Data Source Factory not found for "
-        + url);
+          + url);
     } else {
       return factory.getRecordStoreInterfaceClass(connectionProperties);
     }
@@ -137,7 +141,7 @@ public class RecordStoreFactoryRegistry {
 
   static {
     new ClassPathXmlApplicationContext(
-      "classpath*:META-INF/com.revolsys.gis.recordStore.sf.xml");
+        "classpath*:META-INF/com.revolsys.gis.recordStore.sf.xml");
     IoFactoryRegistry.getInstance();
   }
 }

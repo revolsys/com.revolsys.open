@@ -48,7 +48,7 @@ import com.revolsys.util.MathUtil;
 
 public class EWktWriter {
 
-  public static void append(final StringBuffer wkt, final int axisCount,
+  public static void append(final StringBuilder wkt, final int axisCount,
     final Point point) {
     for (int i = 0; i < axisCount; i++) {
       if (i > 0) {
@@ -58,7 +58,7 @@ public class EWktWriter {
     }
   }
 
-  public static void appendLineString(final StringBuffer wkt,
+  public static void appendLineString(final StringBuilder wkt,
     final Point... points) {
     wkt.append("LINESTRING");
     int axisCount = 2;
@@ -82,7 +82,7 @@ public class EWktWriter {
     wkt.append(")");
   }
 
-  public static void appendPoint(final StringBuffer wkt, final Point point) {
+  public static void appendPoint(final StringBuilder wkt, final Point point) {
     wkt.append("POINT");
     final int axisCount = point.getAxisCount();
     if (axisCount > 3) {
@@ -104,7 +104,7 @@ public class EWktWriter {
    * @return the WKT
    */
   public static String lineString(final Point... points) {
-    final StringBuffer wkt = new StringBuffer();
+    final StringBuilder wkt = new StringBuilder();
     appendLineString(wkt, points);
     return wkt.toString();
   }
@@ -118,7 +118,7 @@ public class EWktWriter {
    * @return the WKT
    */
   public static String point(final Point point) {
-    final StringBuffer wkt = new StringBuffer();
+    final StringBuilder wkt = new StringBuilder();
     appendPoint(wkt, point);
     return wkt.toString();
   }

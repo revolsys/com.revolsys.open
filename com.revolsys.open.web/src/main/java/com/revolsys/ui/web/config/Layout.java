@@ -113,7 +113,7 @@ public class Layout extends Component {
 
   public void setComponent(final String name, final Component component) {
     if (!areas.contains(name)) {
-      throw new IllegalArgumentException(new StringBuffer(
+      throw new IllegalArgumentException(new StringBuilder(
         "Area does not exist with name ").append(name).toString());
     }
     components.put(name, component);

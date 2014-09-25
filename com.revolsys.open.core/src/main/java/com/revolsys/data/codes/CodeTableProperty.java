@@ -428,7 +428,7 @@ RecordDefinitionProperty {
   }
 
   public String toString(final List<String> values) {
-    final StringBuffer string = new StringBuffer(values.get(0));
+    final StringBuilder string = new StringBuilder(values.get(0));
     for (int i = 1; i < values.size(); i++) {
       final String value = values.get(i);
       string.append(",");

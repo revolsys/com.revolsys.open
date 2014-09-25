@@ -504,7 +504,7 @@ public final class HtmlUtil {
   private HtmlUtil() {
   }
 
-  public void addTableRow(final StringBuffer text, final String... cells) {
+  public void addTableRow(final StringBuilder text, final String... cells) {
     text.append("<tr>");
     for (final String string : cells) {
 

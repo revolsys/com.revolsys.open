@@ -66,7 +66,7 @@ public class StatisticsMap {
     statistics.add(path, count);
   }
 
-  public synchronized void addCountsText(final StringBuffer sb) {
+  public synchronized void addCountsText(final StringBuilder sb) {
     for (final Statistics stats : statisticsMap.values()) {
       stats.addCountsText(sb);
     }
@@ -92,7 +92,7 @@ public class StatisticsMap {
   }
 
   public synchronized String getCountsText() {
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     addCountsText(sb);
     return sb.toString();
   }

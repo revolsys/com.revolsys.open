@@ -1,7 +1,7 @@
 package com.revolsys.swing.builder;
 
 public interface UiBuilder {
-  void appendHtml(StringBuffer s, Object object);
+  void appendHtml(StringBuilder s, Object object);
 
   UiBuilderRegistry getRegistry();
 

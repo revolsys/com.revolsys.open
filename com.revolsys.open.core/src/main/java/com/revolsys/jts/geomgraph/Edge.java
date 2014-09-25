@@ -287,7 +287,7 @@ public class Edge extends GraphComponent {
 
   @Override
   public String toString() {
-    final StringBuffer buf = new StringBuffer();
+    final StringBuilder buf = new StringBuilder();
     buf.append("edge " + name + ": ");
     buf.append("LINESTRING (");
     for (int i = 0; i < getNumPoints(); i++) {

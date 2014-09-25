@@ -130,7 +130,7 @@ PropertyChangeListener {
     if (displayValue - Math.floor(displayValue) == 0) {
       format = new DecimalFormat("#,###,###,###");
     } else {
-      final StringBuffer formatString = new StringBuffer("#,###,###,###.");
+      final StringBuilder formatString = new StringBuilder("#,###,###,###.");
       final double stepSize = Measure.valueOf(1, scaleUnit).doubleValue(
         displayUnit);
       final int numZeros = (int)Math.abs(Math.round(Math.log10(stepSize % 1.0)));

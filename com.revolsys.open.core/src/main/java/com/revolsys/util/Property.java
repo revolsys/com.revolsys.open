@@ -577,7 +577,7 @@ public final class Property {
 
   public static String toString(final Object object, final String methodName,
     final List<Object> parameters) {
-    final StringBuffer string = new StringBuffer();
+    final StringBuilder string = new StringBuilder();
 
     if (object == null) {
     } else if (object instanceof Class<?>) {

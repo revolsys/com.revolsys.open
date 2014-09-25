@@ -28,7 +28,7 @@ public class XbaseSchemaReader {
       recordDefinition = new RecordDefinitionImpl(typePath);
       int b = in.read();
       while (b != 0x0D) {
-        final StringBuffer fieldName = new StringBuffer();
+        final StringBuilder fieldName = new StringBuilder();
         boolean endOfName = false;
         for (int i = 0; i < 11; i++) {
           if (!endOfName && b != 0) {

@@ -529,7 +529,7 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
 
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer("Node: ");
+    final StringBuilder sb = new StringBuilder("Node: ");
     sb.append(' ');
     if (isRemoved()) {
       sb.insert(0, "Removed");

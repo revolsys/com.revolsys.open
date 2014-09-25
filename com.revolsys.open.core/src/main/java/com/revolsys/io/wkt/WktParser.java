@@ -16,7 +16,7 @@ import com.revolsys.util.Property;
 
 public class WktParser {
 
-  public static boolean hasText(final StringBuffer text, final String expected) {
+  public static boolean hasText(final StringBuilder text, final String expected) {
     skipWhitespace(text);
     final int length = expected.length();
     final CharSequence subText = text.subSequence(0, length);
@@ -28,7 +28,7 @@ public class WktParser {
     }
   }
 
-  public static Double parseDouble(final StringBuffer text) {
+  public static Double parseDouble(final StringBuilder text) {
     skipWhitespace(text);
     int i = 0;
     for (; i < text.length(); i++) {
@@ -47,7 +47,7 @@ public class WktParser {
 
   }
 
-  public static Integer parseInteger(final StringBuffer text) {
+  public static Integer parseInteger(final StringBuilder text) {
     skipWhitespace(text);
     int i = 0;
     while (i < text.length() && Character.isDigit(text.charAt(i))) {
@@ -65,7 +65,7 @@ public class WktParser {
     }
   }
 
-  public static void skipWhitespace(final StringBuffer text) {
+  public static void skipWhitespace(final StringBuilder text) {
     for (int i = 0; i < text.length(); i++) {
       final char c = text.charAt(i);
       if (!Character.isWhitespace(c)) {
@@ -87,7 +87,7 @@ public class WktParser {
     this.geometryFactory = geometryFactory;
   }
 
-  private int getAxisCount(final StringBuffer text) {
+  private int getAxisCount(final StringBuilder text) {
     skipWhitespace(text);
     final char c = text.charAt(0);
     switch (c) {
@@ -111,7 +111,7 @@ public class WktParser {
     }
   }
 
-  private boolean isEmpty(final StringBuffer text) {
+  private boolean isEmpty(final StringBuilder text) {
     if (hasText(text, "EMPTY")) {
       skipWhitespace(text);
       if (text.length() > 0) {
@@ -125,7 +125,7 @@ public class WktParser {
   }
 
   private LineString parseCoordinates(final GeometryFactory geometryFactory,
-    final StringBuffer text, final int axisCount) {
+    final StringBuilder text, final int axisCount) {
     final int geometryFactoryAxisCount = geometryFactory.getAxisCount();
     char c = text.charAt(0);
     if (c == '(') {
@@ -199,7 +199,7 @@ public class WktParser {
       final double scaleXY = geometryFactory.getScaleXY();
       final double scaleZ = geometryFactory.getScaleZ();
       Geometry geometry;
-      final StringBuffer text = new StringBuffer(value);
+      final StringBuilder text = new StringBuilder(value);
       if (hasText(text, "SRID=")) {
         final Integer srid = parseInteger(text);
         if (srid != null && srid != this.geometryFactory.getSrid()) {
@@ -248,7 +248,7 @@ public class WktParser {
   }
 
   private LineString parseLineString(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuffer text) {
+    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
@@ -269,7 +269,7 @@ public class WktParser {
   }
 
   private MultiLineString parseMultiLineString(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuffer text) {
+    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
@@ -290,7 +290,7 @@ public class WktParser {
   }
 
   private MultiPoint parseMultiPoint(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuffer text) {
+    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
@@ -312,7 +312,7 @@ public class WktParser {
   }
 
   private MultiPolygon parseMultiPolygon(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuffer text) {
+    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
@@ -334,7 +334,7 @@ public class WktParser {
   }
 
   private List<LineString> parseParts(final GeometryFactory geometryFactory,
-    final StringBuffer text, final int axisCount) {
+    final StringBuilder text, final int axisCount) {
     final List<LineString> parts = new ArrayList<LineString>();
     final char firstChar = text.charAt(0);
     switch (firstChar) {
@@ -362,7 +362,7 @@ public class WktParser {
   }
 
   private List<List<LineString>> parsePartsList(
-    final GeometryFactory geometryFactory, final StringBuffer text,
+    final GeometryFactory geometryFactory, final StringBuilder text,
     final int axisCount) {
     final List<List<LineString>> partsList = new ArrayList<List<LineString>>();
     final char firstChar = text.charAt(0);
@@ -391,7 +391,7 @@ public class WktParser {
   }
 
   private Point parsePoint(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuffer text) {
+    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {
@@ -415,7 +415,7 @@ public class WktParser {
   }
 
   private Polygon parsePolygon(GeometryFactory geometryFactory,
-    final boolean useAxisCountFromGeometryFactory, final StringBuffer text) {
+    final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
       if (axisCount != geometryFactory.getAxisCount()) {

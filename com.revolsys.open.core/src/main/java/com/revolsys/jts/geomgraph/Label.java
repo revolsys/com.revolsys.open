@@ -223,7 +223,7 @@ public class Label {
 
   @Override
   public String toString() {
-    final StringBuffer buf = new StringBuffer();
+    final StringBuilder buf = new StringBuilder();
     if (elt[0] != null) {
       buf.append("A:");
       buf.append(elt[0].toString());

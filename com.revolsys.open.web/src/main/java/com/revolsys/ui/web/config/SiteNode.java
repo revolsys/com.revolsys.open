@@ -91,7 +91,7 @@ public final class SiteNode implements Comparable, Cloneable {
    * 
    * @param buffer The buffer to add the path to.
    */
-  private void addPath(final StringBuffer buffer) {
+  private void addPath(final StringBuilder buffer) {
     if (hasParent()) {
       parent.addPath(buffer);
     }
@@ -200,7 +200,7 @@ public final class SiteNode implements Comparable, Cloneable {
    * @return The path.
    */
   public String getFullPath() {
-    final StringBuffer path = new StringBuffer();
+    final StringBuilder path = new StringBuilder();
     addPath(path);
     return path.toString();
   }

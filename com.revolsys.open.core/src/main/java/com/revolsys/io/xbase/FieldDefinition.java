@@ -85,7 +85,7 @@ public class FieldDefinition {
     this.length = length;
     this.decimalPlaces = decimalPlaces;
     if (type == FieldDefinition.NUMBER_TYPE) {
-      final StringBuffer format = new StringBuffer("0");
+      final StringBuilder format = new StringBuilder("0");
       if (decimalPlaces > 0) {
         format.append(".");
         for (int i = 0; i < decimalPlaces; i++) {

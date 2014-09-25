@@ -495,7 +495,7 @@ implements JdbcRecordStore, RecordStoreExtension {
     final String tableName = JdbcUtils.getQualifiedTableName(typePath);
     String sql = this.sequenceTypeSqlMap.get(typePath);
     if (sql == null) {
-      final StringBuffer sqlBuffer = new StringBuffer();
+      final StringBuilder sqlBuffer = new StringBuilder();
       sqlBuffer.append("insert ");
 
       sqlBuffer.append(" into ");

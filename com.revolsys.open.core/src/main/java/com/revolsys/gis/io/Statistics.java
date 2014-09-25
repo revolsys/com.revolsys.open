@@ -72,7 +72,7 @@ public class Statistics {
     }
   }
 
-  public synchronized void addCountsText(final StringBuffer sb) {
+  public synchronized void addCountsText(final StringBuilder sb) {
     int totalCount = 0;
     if (message != null) {
       sb.append(message);
@@ -133,7 +133,7 @@ public class Statistics {
   }
 
   public synchronized String logCounts() {
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     addCountsText(sb);
     final String string = sb.toString();
     if (isLogCounts() && !counts.isEmpty()) {

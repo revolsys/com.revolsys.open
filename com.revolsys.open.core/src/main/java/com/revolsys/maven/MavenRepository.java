@@ -34,7 +34,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
   public static String getPath(final String groupId, final String artifactId,
     final String pathVersion, final String type, final String classifier,
     final String version, final String algorithm) {
-    final StringBuffer path = new StringBuffer();
+    final StringBuilder path = new StringBuilder();
     path.append('/');
     path.append(groupId.replace('.', '/'));
     path.append('/');

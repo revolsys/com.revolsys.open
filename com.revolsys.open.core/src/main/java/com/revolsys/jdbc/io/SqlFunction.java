@@ -15,7 +15,7 @@ public class SqlFunction {
   }
 
   public String toSql(final Object... parameters) {
-    final StringBuffer sql = new StringBuffer();
+    final StringBuilder sql = new StringBuilder();
     sql.append(prefix);
     if (parameters.length > 0) {
       Object value = parameters[0];

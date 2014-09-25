@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
-import com.revolsys.io.StringBufferWriter;
+import com.revolsys.io.StringBuilderWriter;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -22,9 +22,9 @@ import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
 public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
-  public static void append(final StringBuffer buffer, final Geometry geometry) {
+  public static void append(final StringBuilder buffer, final Geometry geometry) {
     final KmlXmlWriter writer = new KmlXmlWriter(
-      new StringBufferWriter(buffer), false);
+      new StringBuilderWriter(buffer), false);
 
     writer.writeGeometry(geometry, 2);
     writer.close();

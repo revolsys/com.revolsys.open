@@ -142,7 +142,7 @@ public class StringUtil {
     replace(s, "\r\n", "\n", true);
     replace(s, "\n\r", "\n", true);
     replace(s, "\r", "\n", true);
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     final int n = s.length();
     for (int i = 0; i < n; i++) {
       final char c = s.charAt(i);
@@ -295,7 +295,7 @@ public class StringUtil {
    */
   public static String removeConsecutiveDuplicates(final String s) {
     String previous = "??";
-    final StringBuffer result = new StringBuffer();
+    final StringBuilder result = new StringBuilder();
     for (int i = 0; i < s.length(); i++) {
       final String c = s.charAt(i) + "";
       if (!previous.equalsIgnoreCase(c)) {
@@ -361,7 +361,7 @@ public class StringUtil {
    */
   public static String replace(final String str, final char oldChar,
     final String newStr) {
-    final StringBuffer buf = new StringBuffer();
+    final StringBuilder buf = new StringBuilder();
     for (int i = 0; i < str.length(); i++) {
       final char ch = str.charAt(i);
       if (ch == oldChar) {
@@ -380,17 +380,17 @@ public class StringUtil {
    */
   public static String replace(final String original,
     final String oldSubstring, final String newSubstring, final boolean all) {
-    final StringBuffer b = new StringBuffer(original);
+    final StringBuilder b = new StringBuilder(original);
     replace(b, oldSubstring, newSubstring, all);
     return b.toString();
   }
 
   /**
    *  Replaces all instances of the String o with the String n in the
-   *  StringBuffer orig if all is true, or only the first instance if all is
+   *  StringBuilder orig if all is true, or only the first instance if all is
    *  false. Posted by Steve Chapel <schapel@breakthr.com> on UseNet
    */
-  public static void replace(final StringBuffer orig, final String o,
+  public static void replace(final StringBuilder orig, final String o,
     final String n, final boolean all) {
     if (orig == null || o == null || o.length() == 0 || n == null) {
       throw new IllegalArgumentException("Null or zero-length String");
@@ -445,7 +445,7 @@ public class StringUtil {
    *  character
    */
   public static String stringOfChar(final char ch, final int count) {
-    final StringBuffer buf = new StringBuffer();
+    final StringBuilder buf = new StringBuilder();
     for (int i = 0; i < count; i++) {
       buf.append(ch);
     }
@@ -460,7 +460,7 @@ public class StringUtil {
     // Strip the tags from the HTML description
     boolean skipping = false;
     boolean writing = false;
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     final StringTokenizer tokenizer = new StringTokenizer(original, "<>", true);
     while (tokenizer.hasMoreTokens()) {
       final String token = tokenizer.nextToken();
@@ -494,7 +494,7 @@ public class StringUtil {
     if (c.isEmpty()) {
       throw new IllegalArgumentException();
     }
-    final StringBuffer result = new StringBuffer();
+    final StringBuilder result = new StringBuilder();
     for (final Iterator i = c.iterator(); i.hasNext();) {
       final Object o = i.next();
       result.append(", " + o.toString());
@@ -507,7 +507,7 @@ public class StringUtil {
    *  single-quotes
    */
   public static String toCommaDelimitedStringInQuotes(final Collection c) {
-    final StringBuffer result = new StringBuffer();
+    final StringBuilder result = new StringBuilder();
     for (final Iterator i = c.iterator(); i.hasNext();) {
       final Object o = i.next();
       result.append(",'" + o.toString() + "'");
@@ -551,7 +551,7 @@ public class StringUtil {
    *  columns.
    */
   public static String wrap(final String s, final int n) {
-    final StringBuffer b = new StringBuffer();
+    final StringBuilder b = new StringBuilder();
     boolean wrapPending = false;
     for (int i = 0; i < s.length(); i++) {
       if (i % n == 0 && i > 0) {

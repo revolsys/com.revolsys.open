@@ -73,7 +73,7 @@ public class Config implements Serializable {
   public void addComponent(final Component component) {
     final String name = component.getName();
     if (components.containsKey(name)) {
-      throw new IllegalArgumentException(new StringBuffer(
+      throw new IllegalArgumentException(new StringBuilder(
         "Duplicate Component definition with name ").append(name).toString());
     }
     components.put(name, component);
@@ -86,7 +86,7 @@ public class Config implements Serializable {
     addComponent(layout);
     final String name = layout.getName();
     if (layouts.containsKey(name)) {
-      throw new IllegalArgumentException(new StringBuffer(
+      throw new IllegalArgumentException(new StringBuilder(
         "Duplicate Layout definition with name ").append(name).toString());
     }
     layouts.put(name, layout);
@@ -95,7 +95,7 @@ public class Config implements Serializable {
   public void addMenu(final Menu menu) {
     final String name = menu.getName();
     if (menus.containsKey(name)) {
-      throw new IllegalArgumentException(new StringBuffer(
+      throw new IllegalArgumentException(new StringBuilder(
         "Duplicate Menu definition with name ").append(name).toString());
     }
     menus.put(name, menu);
@@ -169,7 +169,7 @@ public class Config implements Serializable {
   public Component getComponent(final String name) {
     final Component component = (Component)components.get(name);
     if (component == null) {
-      throw new IllegalArgumentException(new StringBuffer(
+      throw new IllegalArgumentException(new StringBuilder(
         "There does not exist a Component definition with name '").append(name)
         .append("'")
         .toString());
@@ -184,7 +184,7 @@ public class Config implements Serializable {
   public Layout getLayout(final String name) {
     final Layout layout = (Layout)layouts.get(name);
     if (layout == null) {
-      throw new IllegalArgumentException(new StringBuffer(
+      throw new IllegalArgumentException(new StringBuilder(
         "There does not exist a Component definition with name '").append(name)
         .append("'")
         .toString());

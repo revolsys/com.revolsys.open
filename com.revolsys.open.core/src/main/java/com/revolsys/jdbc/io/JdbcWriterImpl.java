@@ -102,7 +102,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
     statistics.connect();
   }
 
-  private void addSqlColumEqualsPlaceholder(final StringBuffer sqlBuffer,
+  private void addSqlColumEqualsPlaceholder(final StringBuilder sqlBuffer,
     final JdbcAttribute attribute) {
     final String attributeName = attribute.getName();
     if (this.quoteColumnNames) {
@@ -281,7 +281,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
     final String tableName = JdbcUtils.getQualifiedTableName(typePath);
     String sql = this.typeDeleteSqlMap.get(typePath);
     if (sql == null) {
-      final StringBuffer sqlBuffer = new StringBuffer();
+      final StringBuilder sqlBuffer = new StringBuilder();
       if (this.sqlPrefix != null) {
         sqlBuffer.append(this.sqlPrefix);
       }
@@ -332,7 +332,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       sql = this.typeInsertSqlMap.get(typePath);
     }
     if (sql == null) {
-      final StringBuffer sqlBuffer = new StringBuffer();
+      final StringBuilder sqlBuffer = new StringBuilder();
       if (this.sqlPrefix != null) {
         sqlBuffer.append(this.sqlPrefix);
       }
@@ -419,7 +419,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
     final String tableName = JdbcUtils.getQualifiedTableName(typePath);
     String sql = this.typeUpdateSqlMap.get(typePath);
     if (sql == null) {
-      final StringBuffer sqlBuffer = new StringBuffer();
+      final StringBuilder sqlBuffer = new StringBuilder();
       if (this.sqlPrefix != null) {
         sqlBuffer.append(this.sqlPrefix);
       }

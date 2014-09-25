@@ -36,7 +36,7 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.util.Property;
 
 public final class JdbcUtils {
-  public static void addAttributeName(final StringBuffer sql,
+  public static void addAttributeName(final StringBuilder sql,
     final String tablePrefix, final Attribute attribute) {
     if (attribute instanceof JdbcAttribute) {
       final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
@@ -46,7 +46,7 @@ public final class JdbcUtils {
     }
   }
 
-  public static void addColumnNames(final StringBuffer sql,
+  public static void addColumnNames(final StringBuilder sql,
     final RecordDefinition recordDefinition, final String tablePrefix) {
     for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
       if (i > 0) {
@@ -57,7 +57,7 @@ public final class JdbcUtils {
     }
   }
 
-  public static void addColumnNames(final StringBuffer sql,
+  public static void addColumnNames(final StringBuilder sql,
     final RecordDefinition recordDefinition, final String tablePrefix,
     final List<String> attributeNames, boolean hasColumns) {
     for (final String attributeName : attributeNames) {
@@ -74,7 +74,7 @@ public final class JdbcUtils {
     }
   }
 
-  public static void addOrderBy(final StringBuffer sql,
+  public static void addOrderBy(final StringBuilder sql,
     final Map<String, Boolean> orderBy) {
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
@@ -94,7 +94,7 @@ public final class JdbcUtils {
     }
   }
 
-  public static void appendWhere(final StringBuffer sql, final Query query) {
+  public static void appendWhere(final StringBuilder sql, final Query query) {
     final Condition where = query.getWhereCondition();
     if (where != null && !where.isEmpty()) {
       sql.append(" WHERE ");
@@ -153,7 +153,7 @@ public final class JdbcUtils {
     final boolean lockResults, final List<String> attributeNames,
     final Query query, final Map<String, Boolean> orderBy) {
     final String typePath = recordDefinition.getPath();
-    final StringBuffer sql = new StringBuffer();
+    final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
     boolean hasColumns = false;
     if (attributeNames.isEmpty() || attributeNames.remove("*")) {
@@ -247,7 +247,7 @@ public final class JdbcUtils {
     final String tableName = query.getTypeName();
     final String dbTableName = getQualifiedTableName(tableName);
 
-    final StringBuffer sql = new StringBuffer();
+    final StringBuilder sql = new StringBuilder();
     sql.append("DELETE FROM ");
     sql.append(dbTableName);
     sql.append(" T ");
@@ -343,14 +343,14 @@ public final class JdbcUtils {
         attributeNames, query, orderBy);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
-        final StringBuffer newSql = new StringBuffer("SELECT ");
+        final StringBuilder newSql = new StringBuilder("SELECT ");
         addColumnNames(newSql, recordDefinition, dbTableName);
         newSql.append(" FROM ");
         newSql.append(sql.substring(14));
         sql = newSql.toString();
       }
       if (!orderBy.isEmpty()) {
-        final StringBuffer buffer = new StringBuffer(sql);
+        final StringBuilder buffer = new StringBuilder(sql);
         addOrderBy(buffer, orderBy);
         sql = buffer.toString();
       }

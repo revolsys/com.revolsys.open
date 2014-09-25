@@ -445,7 +445,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     // ",\"fnServerData\": function ( sSource, aoData, fnCallback ) {$.ajax( {'dataType': 'json','type': 'POST','url': sSource,'data': aoData,'success': fnCallback} );}";
     // }
     jsonMap += "}";
-    final StringBuffer scriptBody = new StringBuffer();
+    final StringBuilder scriptBody = new StringBuilder();
     scriptBody.append("$(document).ready(function() {\n");
     scriptBody.append("  var tableDiv = $('#");
     scriptBody.append(tableId);

@@ -327,7 +327,7 @@ public class ScriptTool {
 
     }
 
-    final StringBuffer message = new StringBuffer("Processing ");
+    final StringBuilder message = new StringBuilder("Processing ");
     message.append(" -s ");
     message.append(scriptFileName);
     if (propertiesName != null) {

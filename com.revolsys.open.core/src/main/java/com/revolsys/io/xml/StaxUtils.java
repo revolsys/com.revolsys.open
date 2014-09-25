@@ -104,7 +104,7 @@ public final class StaxUtils {
   }
 
   public static String getElementText(final XMLStreamReader parser) {
-    final StringBuffer text = new StringBuffer();
+    final StringBuilder text = new StringBuilder();
     require(parser, XMLStreamConstants.START_ELEMENT, null, null);
     while (next(parser) != XMLStreamConstants.END_ELEMENT) {
       switch (parser.getEventType()) {

@@ -108,7 +108,7 @@ public class InvokeMethodRunnable extends AbstractRunnable implements Process {
 
   @Override
   public String toString() {
-    final StringBuffer string = new StringBuffer();
+    final StringBuilder string = new StringBuilder();
     final Object object = getObject();
     if (object == null) {
     } else if (object instanceof Class<?>) {

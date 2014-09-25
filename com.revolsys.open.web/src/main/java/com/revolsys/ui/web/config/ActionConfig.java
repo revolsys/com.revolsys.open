@@ -211,6 +211,6 @@ public class ActionConfig {
    */
   @Override
   public String toString() {
-    return new StringBuffer(type).append(" ").append(parameters).toString();
+    return new StringBuilder(type).append(" ").append(parameters).toString();
   }
 }

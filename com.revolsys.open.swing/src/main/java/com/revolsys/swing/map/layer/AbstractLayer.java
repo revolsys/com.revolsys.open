@@ -696,7 +696,12 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     if (SwingUtil.isEventDispatchThread()) {
       Invoke.background("Refresh " + getName(), this, "refresh");
     } else {
-      doRefresh();
+      try {
+        doRefresh();
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Unable to refresh layer: " + getName(), e);
+      }
       firePropertyChange("refresh", false, true);
     }
   }
@@ -706,7 +711,12 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     if (SwingUtil.isEventDispatchThread()) {
       Invoke.background("Refresh " + getName(), this, "refreshAll");
     } else {
-      doRefreshAll();
+      try {
+        doRefreshAll();
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(getClass()).error(
+          "Unable to refresh layer: " + getName(), e);
+      }
       firePropertyChange("refresh", false, true);
     }
   }

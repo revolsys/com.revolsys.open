@@ -253,22 +253,22 @@ public class DocletUtil {
       if (i < 0) {
         return text;
       } else {
-        final StringBuffer stringbuffer = new StringBuffer();
+        final StringBuilder StringBuilder = new StringBuilder();
         int k = 0;
         do {
           final int j = lowerText.indexOf("{@docroot}", k);
           if (j < 0) {
-            stringbuffer.append(text.substring(k));
+            StringBuilder.append(text.substring(k));
             break;
           }
-          stringbuffer.append(text.substring(k, j));
+          StringBuilder.append(text.substring(k, j));
           k = j + 10;
-          stringbuffer.append("./");
+          StringBuilder.append("./");
           if ("./".length() > 0 && k < text.length() && text.charAt(k) != '/') {
-            stringbuffer.append("/");
+            StringBuilder.append("/");
           }
         } while (true);
-        return stringbuffer.toString();
+        return StringBuilder.toString();
       }
     }
   }
@@ -280,11 +280,11 @@ public class DocletUtil {
       final boolean code = !name.equalsIgnoreCase("@linkplain");
       String label = seeTag.label();
 
-      final StringBuffer stringbuffer = new StringBuffer();
+      final StringBuilder StringBuilder = new StringBuilder();
 
       final String seeTagText = replaceDocRootDir(seeTag.text());
       if (seeTagText.startsWith("<") || seeTagText.startsWith("\"")) {
-        stringbuffer.append(seeTagText);
+        StringBuilder.append(seeTagText);
         writer.write(seeTagText);
       } else {
         final ClassDoc referencedClass = seeTag.referencedClass();
@@ -303,15 +303,15 @@ public class DocletUtil {
             // String s9 = getCrossPackageLink(referencedClassName);
             // String s8;
             // if (s9 != null)
-            // stringbuffer.append(getHyperLink(s9, "", s1.length() != 0 ? s1
+            // StringBuilder.append(getHyperLink(s9, "", s1.length() != 0 ? s1
             // : s3, false));
             // else if ((s8 = getCrossClassLink(referencedClassName,
             // referencedMemberName, s1, false, "", !plainLink)) != null) {
-            // stringbuffer.append(s8);
+            // StringBuilder.append(s8);
             // } else {
             // configuration.getDocletSpecificMsg().warning(seeTag.position(),
             // "doclet.see.class_or_package_not_found", name, s2);
-            // stringbuffer.append(s1.length() != 0 ? s1 : s3);
+            // StringBuilder.append(s1.length() != 0 ? s1 : s3);
             // }
           }
         } else {

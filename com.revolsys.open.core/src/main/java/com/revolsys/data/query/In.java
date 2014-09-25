@@ -63,7 +63,7 @@ public class In extends Condition {
 
   @Override
   public void appendDefaultSql(Query query,
-    final RecordStore recordStore, final StringBuffer buffer) {
+    final RecordStore recordStore, final StringBuilder buffer) {
     if (left == null) {
       buffer.append("NULL");
     } else {

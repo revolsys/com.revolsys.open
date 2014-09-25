@@ -66,7 +66,7 @@ public class SegmentStringUtil {
   }
 
   public static String toString(final List<? extends SegmentString> segments) {
-    final StringBuffer buf = new StringBuffer();
+    final StringBuilder buf = new StringBuilder();
     for (final SegmentString segment : segments) {
       buf.append(segment.toString());
       buf.append("\n");

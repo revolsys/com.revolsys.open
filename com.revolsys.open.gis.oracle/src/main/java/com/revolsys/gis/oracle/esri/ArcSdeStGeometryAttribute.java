@@ -81,7 +81,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
   }
 
   @Override
-  public void addColumnName(final StringBuffer sql, final String tablePrefix) {
+  public void addColumnName(final StringBuilder sql, final String tablePrefix) {
     sql.append(tablePrefix);
     sql.append(".GEOMETRY.ENTITY, ");
     sql.append(tablePrefix);
@@ -91,7 +91,7 @@ public class ArcSdeStGeometryAttribute extends JdbcAttribute {
   }
 
   @Override
-  public void addStatementPlaceHolder(final StringBuffer sql) {
+  public void addStatementPlaceHolder(final StringBuilder sql) {
     sql.append("SDE.ST_GEOMETRY(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
   }
 

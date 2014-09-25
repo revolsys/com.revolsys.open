@@ -93,7 +93,7 @@ public class Bcgs20000RectangularMapGrid extends Nts250000RectangularMapGrid {
     final String mapTileName = getTileName(mapsheet);
     final int block = getBlock(mapTileName);
     final char letter = getLetter(mapTileName);
-    final StringBuffer path = new StringBuffer();
+    final StringBuilder path = new StringBuilder();
     path.append(block);
     path.append('/');
     path.append(letter);

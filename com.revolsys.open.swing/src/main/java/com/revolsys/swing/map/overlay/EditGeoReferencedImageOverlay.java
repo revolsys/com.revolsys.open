@@ -247,7 +247,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     }
   }
 
-  protected void appendTiePointLocation(final StringBuffer toolTip,
+  protected void appendTiePointLocation(final StringBuilder toolTip,
     final List<MappedLocation> tiePoints, final List<Integer> indices,
     final int startNumber, final boolean source) {
     if (!indices.isEmpty()) {
@@ -1097,7 +1097,7 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
     if (!this.closeSourcePixelIndexes.isEmpty()
         || !this.closeTargetPointIndexes.isEmpty()) {
       final List<MappedLocation> tiePoints = this.image.getTiePoints();
-      final StringBuffer toolTip = new StringBuffer();
+      final StringBuilder toolTip = new StringBuilder();
       toolTip.append("<html>");
 
       appendTiePointLocation(toolTip, tiePoints, this.closeTargetPointIndexes,

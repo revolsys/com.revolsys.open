@@ -29,7 +29,7 @@ import com.revolsys.swing.tree.node.file.FileTreeNode;
 import com.revolsys.util.Property;
 
 public class FileRecordStoreTreeNode extends FileTreeNode implements
-  RecordStoreProxy, RecordStoreConnectionMapProxy {
+RecordStoreProxy, RecordStoreConnectionMapProxy {
   private static final MenuFactory MENU = new MenuFactory("File Record Store");
 
   static {
@@ -39,7 +39,7 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
 
     MENU.addMenuItem("default", TreeNodeRunnable.createAction(
       "Add Record Store Connection", "link_add", NODE_EXISTS,
-      "addRecordStoreConnection"));
+        "addRecordStoreConnection"));
   }
 
   public FileRecordStoreTreeNode(final File file) {
@@ -71,7 +71,7 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
 
     SwingUtil.addLabel(panel, "Folder Connections");
     final List<RecordStoreConnectionRegistry> registries = RecordStoreConnectionManager.get()
-      .getVisibleConnectionRegistries();
+        .getVisibleConnectionRegistries();
     final JComboBox registryField = new JComboBox(
       new Vector<RecordStoreConnectionRegistry>(registries));
 
@@ -125,6 +125,11 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
     final URL url = FileTreeNode.getUrl(parent, file);
 
     return Collections.<String, Object> singletonMap("url", url.toString());
+  }
+
+  @Override
+  public boolean isAllowsChildren() {
+    return true;
   }
 
 }

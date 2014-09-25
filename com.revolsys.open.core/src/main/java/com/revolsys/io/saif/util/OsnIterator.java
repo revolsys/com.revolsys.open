@@ -124,7 +124,7 @@ public class OsnIterator implements Iterator<Object> {
 
   private int columnNumber = 1;
 
-  // private StringBuffer buffer = new StringBuffer();
+  // private StringBuilder buffer = new StringBuilder();
 
   private int currentCharacter;
 
@@ -295,7 +295,7 @@ public class OsnIterator implements Iterator<Object> {
       lineNumber = currentLineNumber;
       columnNumber = currentColumnNumber;
     }
-    final StringBuffer name = new StringBuffer();
+    final StringBuilder name = new StringBuilder();
     int c = currentCharacter;
     while (c != -1 && IS_NAME_CHARACTER[c]) {
       name.append((char)c);
@@ -567,7 +567,7 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   private Object processDigitString() throws IOException {
-    final StringBuffer number = new StringBuffer();
+    final StringBuilder number = new StringBuilder();
     int c = currentCharacter;
     while (IS_NUMBER_CHARACTER[(char)c]) {
       number.append((char)c);
@@ -632,7 +632,7 @@ public class OsnIterator implements Iterator<Object> {
     lineNumber = currentLineNumber;
     columnNumber = currentColumnNumber;
 
-    final StringBuffer text = new StringBuffer();
+    final StringBuilder text = new StringBuilder();
     char c = (char)getNextCharacter();
     while (c != '"') {
       if (c == '\\') {

@@ -8,7 +8,7 @@ import com.revolsys.util.DateUtil;
 public class DateTimeUiBuilder extends AbstractUiBuilder {
 
   @Override
-  public void appendHtml(final StringBuffer s, final Object object) {
+  public void appendHtml(final StringBuilder s, final Object object) {
     if (object instanceof Date) {
       final Date date = (Date)object;
       final DateFormat format = getDateFormat();
