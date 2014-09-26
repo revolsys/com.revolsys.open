@@ -328,9 +328,13 @@ public class Gdal {
 
   public static CoordinateSystem getCoordinateSystem(
     final SpatialReference spatialReference) {
-    final String wkt = spatialReference.ExportToWkt();
-    final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
-    return EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
+    if (spatialReference == null) {
+      return null;
+    } else {
+      final String wkt = spatialReference.ExportToWkt();
+      final CoordinateSystem coordinateSystem = EsriCoordinateSystems.getCoordinateSystem(wkt);
+      return EpsgCoordinateSystems.getCoordinateSystem(coordinateSystem);
+    }
   }
 
   public static Dataset getDataset(final File file) {

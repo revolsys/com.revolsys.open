@@ -27,8 +27,10 @@ public class EnvelopeIntersects extends Condition {
 
   @Override
   public boolean accept(final Map<String, Object> record) {
-    final BoundingBox boundingBox1 = getBoundingBox(boundingBox1Value, record);
-    final BoundingBox boundingBox2 = getBoundingBox(boundingBox2Value, record);
+    final BoundingBox boundingBox1 = getBoundingBox(this.boundingBox1Value,
+      record);
+    final BoundingBox boundingBox2 = getBoundingBox(this.boundingBox2Value,
+      record);
     if (boundingBox1 == null || boundingBox2 == null) {
       return false;
     } else {
@@ -40,27 +42,27 @@ public class EnvelopeIntersects extends Condition {
   public void appendDefaultSql(final Query query,
     final RecordStore recordStore, final StringBuilder buffer) {
     buffer.append("ST_INTERSECTS(");
-    if (boundingBox1Value == null) {
+    if (this.boundingBox1Value == null) {
       buffer.append("NULL");
     } else {
-      boundingBox1Value.appendSql(query, recordStore, buffer);
+      this.boundingBox1Value.appendSql(query, recordStore, buffer);
     }
     buffer.append(", ");
-    if (boundingBox1Value == null) {
+    if (this.boundingBox2Value == null) {
       buffer.append("NULL");
     } else {
-      boundingBox1Value.appendSql(query, recordStore, buffer);
+      this.boundingBox2Value.appendSql(query, recordStore, buffer);
     }
     buffer.append(")");
   }
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    if (boundingBox1Value != null) {
-      index = boundingBox1Value.appendParameters(index, statement);
+    if (this.boundingBox1Value != null) {
+      index = this.boundingBox1Value.appendParameters(index, statement);
     }
-    if (boundingBox2Value != null) {
-      index = boundingBox2Value.appendParameters(index, statement);
+    if (this.boundingBox2Value != null) {
+      index = this.boundingBox2Value.appendParameters(index, statement);
     }
     return index;
   }
@@ -68,11 +70,11 @@ public class EnvelopeIntersects extends Condition {
   @Override
   public EnvelopeIntersects clone() {
     final EnvelopeIntersects clone = (EnvelopeIntersects)super.clone();
-    if (boundingBox1Value != null) {
-      clone.boundingBox1Value = boundingBox1Value.clone();
+    if (this.boundingBox1Value != null) {
+      clone.boundingBox1Value = this.boundingBox1Value.clone();
     }
-    if (boundingBox2Value != null) {
-      clone.boundingBox2Value = boundingBox2Value.clone();
+    if (this.boundingBox2Value != null) {
+      clone.boundingBox2Value = this.boundingBox2Value.clone();
     }
     return clone;
   }
@@ -83,7 +85,8 @@ public class EnvelopeIntersects extends Condition {
       final EnvelopeIntersects condition = (EnvelopeIntersects)obj;
       if (EqualsRegistry.equal(condition.boundingBox1Value,
         this.boundingBox1Value)) {
-        if (EqualsRegistry.equal(condition.boundingBox2Value, boundingBox1Value)) {
+        if (EqualsRegistry.equal(condition.boundingBox2Value,
+          this.boundingBox1Value)) {
           return true;
         }
       }
@@ -109,23 +112,23 @@ public class EnvelopeIntersects extends Condition {
   }
 
   public QueryValue getBoundingBox1Value() {
-    return boundingBox1Value;
+    return this.boundingBox1Value;
   }
 
   public QueryValue getBoundingBox2Value() {
-    return boundingBox2Value;
+    return this.boundingBox2Value;
   }
 
   @Override
   public List<QueryValue> getQueryValues() {
-    return Arrays.asList(boundingBox1Value, boundingBox2Value);
+    return Arrays.asList(this.boundingBox1Value, this.boundingBox2Value);
   }
 
   @Override
   public String toString() {
     return "ST_INTERSECTS("
-      + StringConverterRegistry.toString(boundingBox1Value) + ","
-      + StringConverterRegistry.toString(boundingBox2Value) + ")";
+        + StringConverterRegistry.toString(this.boundingBox1Value) + ","
+        + StringConverterRegistry.toString(this.boundingBox2Value) + ")";
   }
 
 }

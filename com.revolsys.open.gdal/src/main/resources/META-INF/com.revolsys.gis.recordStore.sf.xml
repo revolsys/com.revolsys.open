@@ -14,15 +14,28 @@
     factory-method="register"
   >
     <constructor-arg>
-      <bean
-        class="com.revolsys.gdal.record.OgrRecordStoreFactory"
-      >
+      <bean class="com.revolsys.gdal.record.OgrRecordStoreFactory">
         <constructor-arg
           name="name"
           value="SQLite/SpatiaLite" />
         <constructor-arg
           name="fileNameExtension"
           value="sqlite" />
+      </bean>
+    </constructor-arg>
+  </bean>
+  <bean
+    class="com.revolsys.data.io.RecordStoreFactoryRegistry"
+    factory-method="register"
+  >
+    <constructor-arg>
+      <bean class="com.revolsys.gdal.record.OgrRecordStoreFactory">
+        <constructor-arg
+          name="name"
+          value="GeoPackage" />
+        <constructor-arg
+          name="fileNameExtension"
+          value="gpkg" />
       </bean>
     </constructor-arg>
   </bean>

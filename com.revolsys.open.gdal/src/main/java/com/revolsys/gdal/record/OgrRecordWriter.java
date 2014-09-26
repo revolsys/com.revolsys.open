@@ -62,9 +62,13 @@ public class OgrRecordWriter extends AbstractRecordWriter {
   private void delete(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final Layer layer = getLayer(recordDefinition);
-    final Integer fid = record.getInteger(OgrRecordStore.OGR_FID);
-    if (fid != null) {
-      layer.DeleteFeature(fid);
+    final String driverName = this.recordStore.getDriverName();
+    if (OgrRecordStore.SQLITE.equals(driverName)
+        || OgrRecordStore.GEO_PAKCAGE.equals(driverName)) {
+      final Integer fid = record.getInteger(OgrRecordStore.ROWID);
+      if (fid != null) {
+        layer.DeleteFeature(fid);
+      }
     }
   }
 
@@ -80,13 +84,16 @@ public class OgrRecordWriter extends AbstractRecordWriter {
     final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
     final String typePath = sourceRecordDefinition.getPath();
     final List<Attribute> attributes = recordDefinition.getAttributes();
+    final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
     for (final Attribute attribute : attributes) {
       final String name = attribute.getName();
-      if (attribute.isRequired()) {
-        final Object value = record.getValue(name);
-        if (value == null) {
-          throw new IllegalArgumentException("Atribute " + typePath + "."
-            + name + " is required");
+      if (!idAttributeNames.contains(name)) {
+        if (attribute.isRequired()) {
+          final Object value = record.getValue(name);
+          if (value == null) {
+            throw new IllegalArgumentException("Atribute " + typePath + "."
+                + name + " is required");
+          }
         }
       }
     }
@@ -98,6 +105,12 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         setFieldValues(featureDefinition, record, feature);
         setGeometries(featureDefinition, record, feature);
         layer.CreateFeature(feature);
+        final String driverName = this.recordStore.getDriverName();
+        if (OgrRecordStore.SQLITE.equals(driverName)
+            || OgrRecordStore.GEO_PAKCAGE.equals(driverName)) {
+          record.setValue(OgrRecordStore.ROWID,
+            feature.GetFieldAsInteger(OgrRecordStore.ROWID));
+        }
         record.setState(RecordState.Persisted);
       } finally {
         feature.delete();
@@ -133,32 +146,32 @@ public class OgrRecordWriter extends AbstractRecordWriter {
             if (intValue != null) {
               feature.SetField(fieldIndex, intValue);
             }
-          break;
+            break;
           case 1:
-          // value = feature.GetFieldAsIntegerList(fieldIndex);
-          break;
+            // value = feature.GetFieldAsIntegerList(fieldIndex);
+            break;
           case 2:
             final Double doubleValue = StringConverterRegistry.toObject(
               Double.class, value);
             if (doubleValue != null) {
               feature.SetField(fieldIndex, doubleValue);
             }
-          break;
+            break;
           case 3:
-          // value = feature.GetFieldAsDoubleList(fieldIndex);
-          break;
+            // value = feature.GetFieldAsDoubleList(fieldIndex);
+            break;
           case 4:
           case 6:
             final String string = StringConverterRegistry.toString(value);
             feature.SetField(fieldIndex, string);
-          break;
+            break;
           case 5:
           case 7:
-          // value = feature.GetFieldAsStringList(fieldIndex);
-          break;
+            // value = feature.GetFieldAsStringList(fieldIndex);
+            break;
           case 8:
-          // binary
-          break;
+            // binary
+            break;
           case 9:
           case 10:
           case 11:
@@ -173,12 +186,12 @@ public class OgrRecordWriter extends AbstractRecordWriter {
             final int timezoneOffset = date.getTimezoneOffset();
             feature.SetField(fieldIndex, year, month, day, hours, minutes,
               seconds, timezoneOffset);
-          break;
+            break;
 
           default:
             final String string2 = StringConverterRegistry.toString(value);
             feature.SetField(fieldIndex, string2);
-          break;
+            break;
         }
       }
     }
@@ -224,6 +237,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
           }
         }
         break;
+
         case 2:
         case 0x80000000 + 2:
           for (final Vertex vertex : geometry.vertices()) {
@@ -237,6 +251,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
             }
           }
         break;
+
         case 3:
         case 0x80000000 + 3:
           for (final LinearRing ring : ((Polygon)geometry).rings()) {
@@ -244,24 +259,27 @@ public class OgrRecordWriter extends AbstractRecordWriter {
               axisCount);
             ogrGeometry.AddGeometry(ogrRing);
           }
-
+        break;
         case 4:
           addParts(ogrGeometry, geometry, 1, axisCount);
-        break;
+          break;
+
         case 0x80000000 + 4:
           addParts(ogrGeometry, geometry, 0x80000000 + 1, axisCount);
         break;
 
         case 5:
           addParts(ogrGeometry, geometry, 2, axisCount);
-        break;
+          break;
+
         case 0x80000000 + 5:
           addParts(ogrGeometry, geometry, 0x80000000 + 2, axisCount);
         break;
 
         case 6:
           addParts(ogrGeometry, geometry, 3, axisCount);
-        break;
+          break;
+
         case 0x80000000 + 6:
           addParts(ogrGeometry, geometry, 0x80000000 + 3, axisCount);
         break;
@@ -287,7 +305,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
               ogrGeometry.AddPoint(x, y, z);
             }
           }
-        break;
+          break;
         default:
           return null;
       }
@@ -300,59 +318,22 @@ public class OgrRecordWriter extends AbstractRecordWriter {
   }
 
   private void update(final Record record) {
-    // final Object objectId = record.getValue("OBJECTID");
-    // if (objectId == null) {
-    // insert(record);
-    // } else {
-    // final RecordDefinition sourceRecordDefinition =
-    // record.getRecordDefinition();
-    // final RecordDefinition recordDefinition =
-    // this.recordStore.getRecordDefinition(sourceRecordDefinition);
-    // final String typePath = sourceRecordDefinition.getPath();
-    // final Table table = getTable(typePath);
-    // final EnumRows rows = this.recordStore.search(table, "OBJECTID",
-    // "OBJECTID=" + objectId, false);
-    // if (rows != null) {
-    // try {
-    // final Row row = this.recordStore.nextRow(rows);
-    // if (row != null) {
-    // try {
-    // final List<Object> esriValues = new ArrayList<Object>();
-    // try {
-    // for (final Attribute attribute : recordDefinition.getAttributes()) {
-    // final String name = attribute.getName();
-    // final Object value = record.getValue(name);
-    // final AbstractFileGdbAttribute esriAttribute =
-    // (AbstractFileGdbAttribute)attribute;
-    // esriValues.add(esriAttribute.setUpdateValue(record, row,
-    // value));
-    // }
-    // this.recordStore.updateRow(table, row);
-    // } finally {
-    // this.recordStore.addStatistic("Update", record);
-    // }
-    // } catch (final IllegalArgumentException e) {
-    // LoggerFactory.getLogger(OgrRecordWriter.class).error(
-    // "Unable to update row " + e.getMessage() + "\n"
-    // + record.toString(), e);
-    // } catch (final RuntimeException e) {
-    // LoggerFactory.getLogger(OgrRecordWriter.class).error(
-    // "Unable to update row \n:" + record.toString());
-    // if (LoggerFactory.getLogger(OgrRecordWriter.class)
-    // .isDebugEnabled()) {
-    // LoggerFactory.getLogger(OgrRecordWriter.class).debug(
-    // "Unable to update row \n:" + record.toString());
-    // }
-    // throw new RuntimeException("Unable to update row", e);
-    // } finally {
-    // this.recordStore.closeRow(row);
-    // }
-    // }
-    // } finally {
-    // this.recordStore.closeEnumRows(rows);
-    // }
-    // }
-    // }
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
+    final Layer layer = getLayer(recordDefinition);
+    final String driverName = this.recordStore.getDriverName();
+    if (OgrRecordStore.SQLITE.equals(driverName)
+        || OgrRecordStore.GEO_PAKCAGE.equals(driverName)) {
+      final Integer fid = record.getInteger(OgrRecordStore.ROWID);
+      if (fid != null) {
+        final Feature feature = layer.GetFeature(fid);
+        if (feature != null) {
+          final FeatureDefn featureDefinition = layer.GetLayerDefn();
+          setFieldValues(featureDefinition, record, feature);
+          layer.SetFeature(feature);
+        }
+      }
+    }
+
   }
 
   @Override
@@ -364,16 +345,16 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         switch (record.getState()) {
           case New:
             insert(record);
-          break;
+            break;
           case Modified:
             update(record);
-          break;
+            break;
           case Persisted:
-          // No action required
-          break;
+            // No action required
+            break;
           case Deleted:
             delete(record);
-          break;
+            break;
           default:
             throw new IllegalStateException("State not known");
         }

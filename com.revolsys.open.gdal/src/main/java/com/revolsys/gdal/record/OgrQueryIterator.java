@@ -46,6 +46,8 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
 
   private GeometryFactory geometryFactory;
 
+  private final String idFieldName;
+
   protected OgrQueryIterator(final OgrRecordStore recordStore, final Query query) {
     this.recordStore = recordStore;
     this.query = query;
@@ -59,6 +61,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
     this.limit = query.getLimit();
     this.statistics = query.getStatistics();
     this.geometryFactory = this.recordDefinition.getGeometryFactory();
+    this.idFieldName = recordStore.getIdFieldName(this.recordDefinition);
   }
 
   @Override
@@ -159,12 +162,12 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
           } else {
             this.statistics.add(record);
           }
-          record.setValue(OgrRecordStore.OGR_FID, feature.GetFID());
+
           final int fieldCount = feature.GetFieldCount();
           for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
+            final String fieldName = feature.GetFieldDefnRef(fieldIndex)
+                .GetName();
             if (feature.IsFieldSet(fieldIndex)) {
-              final String fieldName = feature.GetFieldDefnRef(fieldIndex)
-                  .GetName();
               final int fieldType = feature.GetFieldType(fieldIndex);
               Object value;
               switch (fieldType) {

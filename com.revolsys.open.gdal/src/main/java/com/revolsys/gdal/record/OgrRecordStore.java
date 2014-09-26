@@ -60,9 +60,15 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
+import com.revolsys.util.Property;
 
 public class OgrRecordStore extends AbstractRecordStore {
-  public static final String OGR_FID = "FID";
+
+  public static final String ROWID = "ROWID";
+
+  public static final String SQLITE = "SQLite";
+
+  public static final String GEO_PAKCAGE = "GPKG";
 
   static {
     Gdal.init();
@@ -82,6 +88,10 @@ public class OgrRecordStore extends AbstractRecordStore {
 
   private final Set<Layer> layersToClose = new HashSet<>();
 
+  private String driverName;
+
+  private final Map<String, String> idFieldNames = new HashMap<>();
+
   protected OgrRecordStore(final File file) {
     this.file = file;
   }
@@ -91,70 +101,71 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void appendQueryValue(final Query query, final StringBuilder buffer,
+  public void appendQueryValue(final Query query, final StringBuilder sql,
     final QueryValue condition) {
     if (condition instanceof Like || condition instanceof ILike) {
       final BinaryCondition like = (BinaryCondition)condition;
       final QueryValue left = like.getLeft();
       final QueryValue right = like.getRight();
-      appendQueryValue(query, buffer, left);
-      buffer.append(" ILIKE ");
+      sql.append("UPPER(");
+      appendQueryValue(query, sql, left);
+      sql.append(") LIKE ");
       if (right instanceof Value) {
         final Value valueCondition = (Value)right;
         final Object value = valueCondition.getValue();
-        buffer.append("'");
+        sql.append("'");
         if (value != null) {
           final String string = StringConverterRegistry.toString(value);
-          buffer.append(string.toUpperCase());
+          sql.append(string.toUpperCase());
         }
-        buffer.append("'");
+        sql.append("'");
       } else {
-        appendQueryValue(query, buffer, right);
+        appendQueryValue(query, sql, right);
       }
     } else if (condition instanceof LeftUnaryCondition) {
       final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
       final String operator = unaryCondition.getOperator();
       final QueryValue right = unaryCondition.getQueryValue();
-      buffer.append(operator);
-      buffer.append(" ");
-      appendQueryValue(query, buffer, right);
+      sql.append(operator);
+      sql.append(" ");
+      appendQueryValue(query, sql, right);
     } else if (condition instanceof RightUnaryCondition) {
       final RightUnaryCondition unaryCondition = (RightUnaryCondition)condition;
       final QueryValue left = unaryCondition.getValue();
       final String operator = unaryCondition.getOperator();
-      appendQueryValue(query, buffer, left);
-      buffer.append(" ");
-      buffer.append(operator);
+      appendQueryValue(query, sql, left);
+      sql.append(" ");
+      sql.append(operator);
     } else if (condition instanceof BinaryCondition) {
       final BinaryCondition binaryCondition = (BinaryCondition)condition;
       final QueryValue left = binaryCondition.getLeft();
       final String operator = binaryCondition.getOperator();
       final QueryValue right = binaryCondition.getRight();
-      appendQueryValue(query, buffer, left);
-      buffer.append(" ");
-      buffer.append(operator);
-      buffer.append(" ");
-      appendQueryValue(query, buffer, right);
+      appendQueryValue(query, sql, left);
+      sql.append(" ");
+      sql.append(operator);
+      sql.append(" ");
+      appendQueryValue(query, sql, right);
     } else if (condition instanceof AbstractMultiCondition) {
       final AbstractMultiCondition multipleCondition = (AbstractMultiCondition)condition;
-      buffer.append("(");
+      sql.append("(");
       boolean first = true;
       final String operator = multipleCondition.getOperator();
       for (final QueryValue subCondition : multipleCondition.getQueryValues()) {
         if (first) {
           first = false;
         } else {
-          buffer.append(" ");
-          buffer.append(operator);
-          buffer.append(" ");
+          sql.append(" ");
+          sql.append(operator);
+          sql.append(" ");
         }
-        appendQueryValue(query, buffer, subCondition);
+        appendQueryValue(query, sql, subCondition);
       }
-      buffer.append(")");
+      sql.append(")");
     } else if (condition instanceof Value) {
       final Value valueCondition = (Value)condition;
       final Object value = valueCondition.getValue();
-      appendValue(buffer, value);
+      appendValue(sql, value);
     } else if (condition instanceof CollectionValue) {
       final CollectionValue collectionValue = (CollectionValue)condition;
       final List<Object> values = collectionValue.getValues();
@@ -163,14 +174,14 @@ public class OgrRecordStore extends AbstractRecordStore {
         if (first) {
           first = false;
         } else {
-          buffer.append(", ");
+          sql.append(", ");
         }
-        appendValue(buffer, value);
+        appendValue(sql, value);
       }
     } else if (condition instanceof Column) {
       final Column column = (Column)condition;
       final Object name = column.getName();
-      buffer.append(name);
+      sql.append(name);
     } else if (condition instanceof SqlCondition) {
       final SqlCondition sqlCondition = (SqlCondition)condition;
       final String where = sqlCondition.getSql();
@@ -181,7 +192,7 @@ public class OgrRecordStore extends AbstractRecordStore {
             "No arguments specified for a where clause with placeholders: "
                 + where);
         } else {
-          buffer.append(where);
+          sql.append(where);
         }
       } else {
         final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
@@ -196,41 +207,78 @@ public class OgrRecordStore extends AbstractRecordStore {
           final StringBuffer replacement = new StringBuffer();
           matcher.appendReplacement(replacement,
             StringConverterRegistry.toString(argument));
-          buffer.append(replacement);
-          appendValue(buffer, argument);
+          sql.append(replacement);
+          appendValue(sql, argument);
           i++;
         }
         final StringBuffer tail = new StringBuffer();
         matcher.appendTail(tail);
-        buffer.append(tail);
+        sql.append(tail);
       }
     } else if (condition instanceof EnvelopeIntersects) {
-      buffer.append("1 = 1");
+      final EnvelopeIntersects envelopeIntersects = (EnvelopeIntersects)condition;
+      final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
+      final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
+      if (boundingBox1Value == null || boundingBox2Value == null) {
+        sql.append("1 = 0");
+      } else {
+        sql.append("Intersects(");
+        boundingBox1Value.appendSql(query, this, sql);
+        sql.append(",");
+        boundingBox2Value.appendSql(query, this, sql);
+        sql.append(")");
+      }
     } else if (condition instanceof WithinDistance) {
-      buffer.append("1 = 1");
+      final WithinDistance withinDistance = (WithinDistance)condition;
+      final QueryValue geometry1Value = withinDistance.getGeometry1Value();
+      final QueryValue geometry2Value = withinDistance.getGeometry2Value();
+      final QueryValue distanceValue = withinDistance.getDistanceValue();
+      if (geometry1Value == null || geometry2Value == null
+          || distanceValue == null) {
+        sql.append("1 = 0");
+      } else {
+        sql.append("Distance(");
+        geometry1Value.appendSql(query, this, sql);
+        sql.append(", ");
+        geometry2Value.appendSql(query, this, sql);
+        sql.append(") <= ");
+        distanceValue.appendSql(query, this, sql);
+        sql.append(")");
+      }
     } else {
-      condition.appendDefaultSql(query, this, buffer);
+      condition.appendDefaultSql(query, this, sql);
     }
   }
 
-  public void appendValue(final StringBuilder buffer, final Object value) {
+  public void appendValue(final StringBuilder sql, final Object value) {
     if (value == null) {
-      buffer.append("''");
+      sql.append("''");
     } else if (value instanceof Number) {
-      buffer.append(value);
+      sql.append(value);
     } else if (value instanceof java.sql.Date) {
       final String stringValue = DateUtil.format("yyyy-MM-dd",
         (java.util.Date)value);
-      buffer.append("CAST('" + stringValue + "' AS DATE)");
+      sql.append("CAST('" + stringValue + "' AS DATE)");
     } else if (value instanceof java.util.Date) {
       final String stringValue = DateUtil.format("yyyy-MM-dd",
         (java.util.Date)value);
-      buffer.append("CAST('" + stringValue + "' AS TIMESTAMP)");
+      sql.append("CAST('" + stringValue + "' AS TIMESTAMP)");
+    } else if (value instanceof BoundingBox) {
+      final BoundingBox boundingBox = (BoundingBox)value;
+      sql.append("BuildMbr(");
+      sql.append(boundingBox.getMinX());
+      sql.append(",");
+      sql.append(boundingBox.getMinY());
+      sql.append(",");
+      sql.append(boundingBox.getMaxX());
+      sql.append(",");
+      sql.append(boundingBox.getMaxY());
+      sql.append(")");
     } else {
       final String stringValue = StringConverterRegistry.toString(value);
-      buffer.append("'");
-      buffer.append(stringValue.replaceAll("'", "''"));
-      buffer.append("'");
+      sql.append("'");
+      sql.append(stringValue.replaceAll("'", "''"));
+      sql.append("'");
     }
   }
 
@@ -271,11 +319,21 @@ public class OgrRecordStore extends AbstractRecordStore {
     final String layerName = layer.GetName();
     final String typePath = Path.clean(layerName);
 
+    /** This primes the layer so that the fidColumn is loaded correctly. */
+    layer.GetNextFeature();
+
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
       schema, typePath);
+    String idFieldName = layer.GetFIDColumn();
+    if (!Property.hasValue(idFieldName)) {
+      idFieldName = "rowid";
+    }
+    this.idFieldNames.put(typePath.toUpperCase(), idFieldName);
     final FeatureDefn layerDefinition = layer.GetLayerDefn();
-    recordDefinition.addAttribute(OGR_FID, DataTypes.INT, true);
-    recordDefinition.setIdAttributeName(OGR_FID);
+    if (SQLITE.equals(this.driverName) || GEO_PAKCAGE.equals(this.driverName)) {
+      recordDefinition.addAttribute(idFieldName, DataTypes.LONG, true);
+      recordDefinition.setIdAttributeName(idFieldName);
+    }
     for (int fieldIndex = 0; fieldIndex < layerDefinition.GetFieldCount(); fieldIndex++) {
       final FieldDefn fieldDefinition = layerDefinition.GetFieldDefn(fieldIndex);
       final String fieldName = fieldDefinition.GetName();
@@ -408,9 +466,35 @@ public class OgrRecordStore extends AbstractRecordStore {
     } else {
       if (this.dataSource == null) {
         this.dataSource = createDataSource(false);
+        this.driverName = this.dataSource.GetDriver().getName();
       }
       return this.dataSource;
     }
+  }
+
+  public String getDriverName() {
+    return this.driverName;
+  }
+
+  public String getIdFieldName(final RecordDefinition recordDefinition) {
+    String path;
+    if (recordDefinition == null) {
+      path = null;
+    } else {
+      path = recordDefinition.getPath();
+    }
+
+    return getIdFieldName(path);
+  }
+
+  public String getIdFieldName(final String typePath) {
+    if (typePath != null) {
+      final String idFieldName = this.idFieldNames.get(typePath.toUpperCase());
+      if (idFieldName != null) {
+        return idFieldName;
+      }
+    }
+    return ROWID;
   }
 
   protected Layer getLayer(final String typePath) {
@@ -419,16 +503,24 @@ public class OgrRecordStore extends AbstractRecordStore {
       return null;
     } else {
       final String layerName = getLayerName(typePath);
-      return dataSource.GetLayer(layerName);
+      if (layerName == null) {
+        return null;
+      } else {
+        return dataSource.GetLayer(layerName);
+      }
     }
   }
 
   protected String getLayerName(final String typePath) {
-    final String layerName = this.pathToLayerNameMap.get(typePath.toUpperCase());
-    if (layerName == null) {
-      return typePath;
+    if (typePath == null) {
+      return null;
     } else {
-      return layerName;
+      final String layerName = this.pathToLayerNameMap.get(typePath.toUpperCase());
+      if (layerName == null) {
+        return typePath;
+      } else {
+        return layerName;
+      }
     }
   }
 
@@ -449,7 +541,6 @@ public class OgrRecordStore extends AbstractRecordStore {
         typePath = recordDefinition.getPath();
       }
       final StringBuilder whereClause = getWhereClause(query);
-      // final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
 
       final StringBuilder sql = new StringBuilder();
       sql.append("SELECT COUNT(*) FROM ");
@@ -486,7 +577,6 @@ public class OgrRecordStore extends AbstractRecordStore {
   protected String getSql(final Query query) {
     final RecordDefinition recordDefinition = query.getRecordDefinition();
     final String typePath = recordDefinition.getPath();
-    final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
     final Map<String, Boolean> orderBy = query.getOrderBy();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
@@ -495,7 +585,7 @@ public class OgrRecordStore extends AbstractRecordStore {
     if (attributeNames.isEmpty()) {
       attributeNames = recordDefinition.getAttributeNames();
     }
-    attributeNames.remove(OgrRecordStore.OGR_FID);
+    attributeNames.remove("ROWID");
     CollectionUtil.append(sql, attributeNames);
     sql.append(" FROM ");
     final String layerName = getLayerName(typePath);
@@ -507,21 +597,19 @@ public class OgrRecordStore extends AbstractRecordStore {
     }
     boolean first = true;
     for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
-        .iterator(); iterator.hasNext();) {
+      .iterator(); iterator.hasNext();) {
       final Entry<String, Boolean> entry = iterator.next();
       final String column = entry.getKey();
-      if (!OGR_FID.equals(column)) {
-        if (first) {
-          sql.append(" ORDER BY ");
-          first = false;
-        } else {
-          sql.append(", ");
-        }
-        sql.append(column);
-        final Boolean ascending = entry.getValue();
-        if (!ascending) {
-          sql.append(" DESC");
-        }
+      if (first) {
+        sql.append(" ORDER BY ");
+        first = false;
+      } else {
+        sql.append(", ");
+      }
+      sql.append(column);
+      final Boolean ascending = entry.getValue();
+      if (!ascending) {
+        sql.append(" DESC");
       }
     }
     return sql.toString();
@@ -549,16 +637,18 @@ public class OgrRecordStore extends AbstractRecordStore {
       if (dataSource != null) {
         for (int layerIndex = 0; layerIndex < dataSource.GetLayerCount(); layerIndex++) {
           final Layer layer = dataSource.GetLayer(layerIndex);
-          try {
-            final RecordDefinitionImpl recordDefinition = createRecordDefinition(
-              schema, layer);
-            final String typePath = recordDefinition.getPath().toUpperCase();
-            final String layerName = layer.GetName();
-            this.layerNameToPathMap.put(layerName.toUpperCase(), typePath);
-            this.pathToLayerNameMap.put(typePath, layerName);
-            elementsByPath.put(typePath, recordDefinition);
-          } finally {
-            layer.delete();
+          if (layer != null) {
+            try {
+              final RecordDefinitionImpl recordDefinition = createRecordDefinition(
+                schema, layer);
+              final String typePath = recordDefinition.getPath().toUpperCase();
+              final String layerName = layer.GetName();
+              this.layerNameToPathMap.put(layerName.toUpperCase(), typePath);
+              this.pathToLayerNameMap.put(typePath, layerName);
+              elementsByPath.put(typePath, recordDefinition);
+            } finally {
+              layer.delete();
+            }
           }
         }
       }
@@ -580,12 +670,10 @@ public class OgrRecordStore extends AbstractRecordStore {
         layer.delete();
       }
     }
-    if (this.layersToClose.isEmpty() && this.dataSource != null) {
-      try {
-        this.dataSource.delete();
-      } finally {
-        this.dataSource = null;
-      }
-    }
+  }
+
+  @Override
+  public String toString() {
+    return this.file.toString();
   }
 }
