@@ -7,26 +7,21 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.PreDestroy;
-
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.listener.InvokeMethodListener;
-import com.revolsys.swing.map.layer.record.ListRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.ListRecordLayer;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.util.Property;
 
-public class RecordListLayerTableModel extends RecordLayerTableModel
-  implements PropertyChangeListener {
-  private static final long serialVersionUID = 1L;
-
+public class RecordListLayerTableModel extends RecordLayerTableModel implements
+PropertyChangeListener {
   public static RecordLayerTable createTable(final ListRecordLayer layer) {
-    final RecordLayerTableModel model = new RecordListLayerTableModel(
-      layer);
+    final RecordLayerTableModel model = new RecordListLayerTableModel(layer);
     final RecordLayerTable table = new RecordLayerTable(model);
 
     Property.addListener(layer, "hasSelectedRecords", new InvokeMethodListener(
@@ -35,20 +30,14 @@ public class RecordListLayerTableModel extends RecordLayerTableModel
     return table;
   }
 
-  private ListRecordLayer layer;
+  private static final long serialVersionUID = 1L;
 
   private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
 
   private List<LayerRecord> records = Collections.emptyList();
 
   public RecordListLayerTableModel(final ListRecordLayer layer) {
-    this(layer, layer.getRecordDefinition().getAttributeNames());
-  }
-
-  public RecordListLayerTableModel(final ListRecordLayer layer,
-    final List<String> columnNames) {
-    super(layer, columnNames);
-    this.layer = layer;
+    super(layer);
     setEditable(false);
     setSortableModes(MODE_SELECTED, MODE_ALL);
   }
@@ -57,13 +46,6 @@ public class RecordListLayerTableModel extends RecordLayerTableModel
   public void addPropertyChangeListener(
     final PropertyChangeListener propertyChangeListener) {
     this.propertyChangeListeners.add(propertyChangeListener);
-  }
-
-  @Override
-  @PreDestroy
-  public void dispose() {
-    super.dispose();
-    this.layer = null;
   }
 
   private void firePropertyChange(final Record object, final String name,
@@ -81,10 +63,10 @@ public class RecordListLayerTableModel extends RecordLayerTableModel
 
   @Override
   public int getRowCountInternal() {
-    if (getAttributeFilterMode().equals(MODE_ALL)) {
+    if (getFieldFilterMode().equals(MODE_ALL)) {
       final Query query = getFilterQuery();
       query.setOrderBy(getOrderBy());
-      this.records = layer.query(query);
+      this.records = getLayer().query(query);
       return this.records.size();
     } else {
       return super.getRowCountInternal();
@@ -110,7 +92,7 @@ public class RecordListLayerTableModel extends RecordLayerTableModel
   @Override
   protected LayerRecord loadLayerRecord(final int row) {
     if (row >= 0 && row < this.records.size()) {
-      return records.get(row);
+      return this.records.get(row);
     } else {
       return null;
     }

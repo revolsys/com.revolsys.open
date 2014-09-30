@@ -17,7 +17,7 @@ import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.util.Property;
 
 public class RecordLayerAttributesTableModel extends
-AbstractSingleRecordTableModel implements PropertyChangeListener {
+  AbstractSingleRecordTableModel implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -32,6 +32,7 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
     this.form = new WeakReference<>(form);
     this.layer = form.getLayer();
     this.record = form.getRecord();
+    setFieldNames(this.layer.getFieldNamesSet());
     Property.addListener(this.layer, this);
   }
 
@@ -69,7 +70,8 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
     if (this.record == null) {
       return null;
     } else {
-      return this.record.getValue(rowIndex);
+      final String fieldName = getFieldName(rowIndex);
+      return this.record.getValue(fieldName);
     }
   }
 
@@ -100,7 +102,7 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
           final String idAttributeName = idAttribute.getName();
           if (attributeName.equals(idAttributeName)) {
             if (this.record != null
-              && this.record.getState() == RecordState.New) {
+                && this.record.getState() == RecordState.New) {
               if (!Number.class.isAssignableFrom(idAttribute.getTypeClass())) {
                 return true;
               }
@@ -109,7 +111,7 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
           }
         }
         if (recordDefinition.getGeometryAttributeNames()
-          .contains(attributeName)) {
+            .contains(attributeName)) {
           return false;
         } else {
           return this.form.get().isEditable(attributeName);

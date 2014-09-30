@@ -1,5 +1,7 @@
 package com.revolsys.gis.util;
 
+import java.sql.Timestamp;
+
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.gis.graph.Edge;
@@ -98,6 +100,10 @@ public class Debug {
     System.out.println(object);
   }
 
+  public static void printTime() {
+    println(new Timestamp(System.currentTimeMillis()));
+  }
+
   public static void typePath(final Edge<?> edge, final String typePath) {
     final String typePath2 = edge.getTypeName();
     equals(typePath2, typePath);
@@ -113,5 +119,4 @@ public class Debug {
       noOp();
     }
   }
-
 }

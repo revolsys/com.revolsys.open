@@ -10,8 +10,11 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import com.revolsys.util.Property;
+import com.revolsys.util.Reorderable;
+
 public class BaseListModel<T> extends ArrayList<T> implements ListModel,
-  Serializable {
+Serializable, Reorderable {
   private static final long serialVersionUID = 1L;
 
   protected EventListenerList listenerList = new EventListenerList();
@@ -39,10 +42,10 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
 
   @Override
   public boolean addAll(final Collection<? extends T> c) {
-    if (c != null) {
+    if (Property.hasValue(c)) {
       final int index = size();
       final boolean result = super.addAll(c);
-      fireIntervalAdded(this, index, index + c.size());
+      fireIntervalAdded(this, index, index + c.size() - 1);
       return result;
     }
     return false;
@@ -50,7 +53,7 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
 
   @Override
   public boolean addAll(final int index, final Collection<? extends T> c) {
-    if (c != null) {
+    if (Property.hasValue(c)) {
       final boolean result = super.addAll(index, c);
       fireIntervalAdded(this, index, index + c.size());
       return result;
@@ -65,10 +68,12 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
 
   @Override
   public void clear() {
-    final int index1 = size() - 1;
-    super.clear();
-    if (index1 >= 0) {
-      fireIntervalRemoved(this, 0, index1);
+    if (size() > 0) {
+      final int index1 = size() - 1;
+      super.clear();
+      if (index1 >= 0) {
+        fireIntervalRemoved(this, 0, index1);
+      }
     }
   }
 
@@ -188,10 +193,25 @@ public class BaseListModel<T> extends ArrayList<T> implements ListModel,
   }
 
   @Override
+  public void reorder(final int fromIndex, int toIndex) {
+    if (fromIndex < toIndex) {
+      toIndex--;
+    }
+    final T value = get(fromIndex);
+    remove(fromIndex);
+    add(toIndex, value);
+  }
+
+  @Override
   public T set(final int index, final T element) {
     final T oldValue = get(index);
-    set(index, element);
+    super.set(index, element);
     fireContentsChanged(this, index, index);
     return oldValue;
+  }
+
+  public void setAll(final Collection<? extends T> c) {
+    clear();
+    addAll(c);
   }
 }

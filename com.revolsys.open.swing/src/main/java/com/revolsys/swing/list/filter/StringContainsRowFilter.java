@@ -33,7 +33,7 @@ public class StringContainsRowFilter extends RowFilter<ListModel, Integer> {
     final String string = StringConverterRegistry.toString(value);
     if (Property.hasValue(this.filterText)) {
       if (Property.hasValue(string)) {
-        return string.contains(this.filterText) == this.match;
+        return string.toUpperCase().contains(this.filterText) == this.match;
       } else {
         return false;
       }
@@ -43,6 +43,6 @@ public class StringContainsRowFilter extends RowFilter<ListModel, Integer> {
   }
 
   public void setFilterText(final String filterText) {
-    this.filterText = filterText;
+    this.filterText = filterText.toUpperCase();
   }
 }

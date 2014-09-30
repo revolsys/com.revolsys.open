@@ -6,6 +6,10 @@ import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Collections;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
@@ -19,6 +23,7 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.InvokeMethodEnableCheck;
@@ -54,6 +59,8 @@ PropertyChangeListener {
   private final RecordLayerTableModel tableModel;
 
   private final JToggleButton selectedButton;
+
+  private final JButton fieldSetsButton;
 
   public RecordLayerTablePanel(final AbstractRecordLayer layer,
     final RecordLayerTable table) {
@@ -158,6 +165,9 @@ PropertyChangeListener {
     toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this,
         "refresh");
 
+    this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets",
+      "fields_filter", this, "actionShowFieldSetsMenu");
+
     final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
       this, this.tableModel);
     toolBar.addComponent("search", attributeFilterPanel);
@@ -175,16 +185,16 @@ PropertyChangeListener {
 
     final JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(
       FILTER_ATTRIBUTE, -1, "Show All Records", "table_filter",
-      this.tableModel, "setAttributeFilterMode", RecordLayerTableModel.MODE_ALL);
+      this.tableModel, "setFieldFilterMode", RecordLayerTableModel.MODE_ALL);
     clearFilter.doClick();
 
     toolBar.addToggleButton(FILTER_ATTRIBUTE, -1, "Show Only Changed Records",
       "change_table_filter", editableEnableCheck, this.tableModel,
-      "setAttributeFilterMode", RecordLayerTableModel.MODE_EDITS);
+      "setFieldFilterMode", RecordLayerTableModel.MODE_EDITS);
 
     this.selectedButton = toolBar.addToggleButton(FILTER_ATTRIBUTE, -1,
       "Show Only Selected Records", "filter_selected", null, this.tableModel,
-      "setAttributeFilterMode", RecordLayerTableModel.MODE_SELECTED);
+      "setFieldFilterMode", RecordLayerTableModel.MODE_SELECTED);
 
     if (hasGeometry) {
       final JToggleButton showAllGeometries = toolBar.addToggleButtonTitleIcon(
@@ -197,6 +207,29 @@ PropertyChangeListener {
         "setFilterByBoundingBox", true);
     }
     Property.addListener(layer, this);
+  }
+
+  public void actionShowFieldSetsMenu() {
+    final JPopupMenu menu = new JPopupMenu();
+
+    final JMenuItem editMenuItem = InvokeMethodAction.createMenuItem(
+      "Edit Field Sets", "fields_filter_edit", this.layer, "showProperties",
+        "Field Sets");
+    menu.add(editMenuItem);
+
+    menu.addSeparator();
+
+    final AbstractRecordLayer layer = getLayer();
+    final String fieldSetName = layer.getFieldNamesSetName();
+    for (final String fieldSetName2 : layer.getFieldNamesSetNames()) {
+      final JCheckBoxMenuItem menuItem = InvokeMethodAction.createCheckBoxMenuItem(
+        fieldSetName2, layer, "setFieldNamesSetName", fieldSetName2);
+      if (fieldSetName2.equalsIgnoreCase(fieldSetName)) {
+        menuItem.setSelected(true);
+      }
+      menu.add(menuItem);
+    }
+    MenuFactory.showMenu(menu, this.fieldSetsButton, 10, 10);
   }
 
   public boolean canPasteRecordGeometry() {
@@ -309,7 +342,7 @@ PropertyChangeListener {
     Property.removeListener(this.layer, this);
   }
 
-  public void setAttributeFilterMode(final String mode) {
+  public void setFieldFilterMode(final String mode) {
     if (RecordLayerTableModel.MODE_SELECTED.equals(mode)) {
       this.selectedButton.setSelected(true);
       this.selectedButton.doClick();

@@ -62,9 +62,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
     if (recordDefinition == null) {
       return null;
     } else {
-      final List<String> columnNames = layer.getFieldNamesSet();
-      final RecordLayerTableModel model = new RecordLayerTableModel(layer,
-        columnNames);
+      final RecordLayerTableModel model = new RecordLayerTableModel(layer);
       final RecordLayerTable table = new RecordLayerTable(model);
 
       ModifiedPredicate.add(table);
@@ -80,8 +78,8 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
 
   public static final void selectionChanged(final RecordLayerTable table,
     final RecordLayerTableModel tableModel) {
-    final String attributeFilterMode = tableModel.getAttributeFilterMode();
-    if (MODE_SELECTED.equals(attributeFilterMode)) {
+    final String fieldFilterMode = tableModel.getFieldFilterMode();
+    if (MODE_SELECTED.equals(fieldFilterMode)) {
       tableModel.refresh();
     } else {
       table.repaint();
@@ -109,7 +107,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
 
   private boolean filterByBoundingBox;
 
-  private List<String> attributeFilterModes = Arrays.asList(MODE_ALL,
+  private List<String> fieldFilterModes = Arrays.asList(MODE_ALL,
     MODE_SELECTED, MODE_EDITS);
 
   private List<String> sortableModes = Arrays.asList(MODE_SELECTED, MODE_EDITS);
@@ -119,7 +117,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
   private Map<Integer, List<LayerRecord>> pageCache = new LruMap<Integer, List<LayerRecord>>(
       5);
 
-  private String attributeFilterMode = MODE_ALL;
+  private String fieldFilterMode = MODE_ALL;
 
   private final int pageSize = 40;
 
@@ -147,9 +145,8 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
 
   private final LayerRecord loadingRecord;
 
-  public RecordLayerTableModel(final AbstractRecordLayer layer,
-    final List<String> attributeNames) {
-    super(layer.getRecordDefinition(), attributeNames);
+  public RecordLayerTableModel(final AbstractRecordLayer layer) {
+    super(layer.getRecordDefinition(), layer.getFieldNamesSet());
     this.layer = layer;
     Property.addListener(layer, this);
     setEditable(true);
@@ -157,14 +154,14 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
     this.loadingRecord = new LoadingRecord(layer);
   }
 
-  public String getAttributeFilterMode() {
-    return this.attributeFilterMode;
-  }
-
   @Override
   public String getColumnName(final int columnIndex) {
     final String fieldName = getFieldName(columnIndex);
     return this.layer.getFieldTitle(fieldName);
+  }
+
+  public String getFieldFilterMode() {
+    return this.fieldFilterMode;
   }
 
   public Condition getFilter() {
@@ -279,9 +276,9 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
   public <V extends Record> V getRecord(final int row) {
     if (row < 0) {
       return null;
-    } else if (this.attributeFilterMode.equals(MODE_SELECTED)) {
+    } else if (this.fieldFilterMode.equals(MODE_SELECTED)) {
       return (V)getSelectedRecord(row);
-    } else if (this.attributeFilterMode.equals(MODE_EDITS)) {
+    } else if (this.fieldFilterMode.equals(MODE_EDITS)) {
       final AbstractRecordLayer layer = getLayer();
       final List<LayerRecord> changes = layer.getChanges();
       if (row < changes.size()) {
@@ -300,8 +297,8 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
       synchronized (getSync()) {
         if (this.countLoaded) {
           int count = this.rowCount;
-          if (!this.attributeFilterMode.equals(MODE_SELECTED)
-              && !this.attributeFilterMode.equals(MODE_EDITS)) {
+          if (!this.fieldFilterMode.equals(MODE_SELECTED)
+              && !this.fieldFilterMode.equals(MODE_EDITS)) {
             final AbstractRecordLayer layer = getLayer();
             final int newRecordCount = layer.getNewRecordCount();
             count += newRecordCount;
@@ -320,7 +317,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
   }
 
   protected int getRowCountInternal() {
-    if (this.attributeFilterMode.equals(MODE_SELECTED)) {
+    if (this.fieldFilterMode.equals(MODE_SELECTED)) {
       synchronized (this.selectedSync) {
         this.selectedRecords = new ArrayList<LayerRecord>();
         for (final LayerRecord record : getLayerSelectedRecords()) {
@@ -330,7 +327,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
         }
         return this.selectedRecords.size();
       }
-    } else if (this.attributeFilterMode.equals(MODE_EDITS)) {
+    } else if (this.fieldFilterMode.equals(MODE_EDITS)) {
       return this.layer.getChangeCount();
     } else {
       return getLayerRowCount();
@@ -431,8 +428,12 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent e) {
-    if (e.getSource() == this.layer) {
-      final String propertyName = e.getPropertyName();
+    final String propertyName = e.getPropertyName();
+    if (propertyName.equals("fieldNamesSetName")) {
+      final AbstractRecordLayer layer = getLayer();
+      final List<String> fieldNamesSet = layer.getFieldNamesSet();
+      setFieldNames(fieldNamesSet);
+    } else if (e.getSource() == this.layer) {
       if (Arrays.asList("query", "editable", "recordInserted",
         "recordsInserted", "recordDeleted", "recordsChanged").contains(
           propertyName)) {
@@ -440,7 +441,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
       } else if ("recordUpdated".equals(propertyName)) {
         repaint();
       } else if (propertyName.equals("selectionCount")) {
-        if (MODE_SELECTED.equals(this.attributeFilterMode)) {
+        if (MODE_SELECTED.equals(this.fieldFilterMode)) {
           refresh();
         }
       }
@@ -491,7 +492,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
     }
   }
 
-  public void setAttributeFilterMode(final String mode) {
+  public void setFieldFilterMode(final String mode) {
     final RecordLayerTable table = getTable();
     if (MODE_SELECTED.equals(mode)) {
       table.setSelectionModel(this.highlightedModel);
@@ -499,9 +500,9 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
       this.selectedRecords = Collections.emptyList();
       table.setSelectionModel(this.selectionModel);
     }
-    if (this.attributeFilterModes.contains(mode)) {
-      if (!mode.equals(this.attributeFilterMode)) {
-        this.attributeFilterMode = mode;
+    if (this.fieldFilterModes.contains(mode)) {
+      if (!mode.equals(this.fieldFilterMode)) {
+        this.fieldFilterMode = mode;
         refresh();
       }
     }
@@ -513,7 +514,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
     } else {
       final Object oldValue = this.filter;
       this.filter = filter;
-      if (MODE_SELECTED.equals(getAttributeFilterMode())) {
+      if (MODE_SELECTED.equals(getFieldFilterMode())) {
         setRowSorter(filter);
       } else {
         refresh();
@@ -535,7 +536,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
   }
 
   protected void setModes(final String... modes) {
-    this.attributeFilterModes = Arrays.asList(modes);
+    this.fieldFilterModes = Arrays.asList(modes);
   }
 
   public void setRecords(final int refreshIndex, final Integer pageNumber,
@@ -658,7 +659,8 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
   public String toDisplayValueInternal(final int rowIndex,
     final int attributeIndex, final Object objectValue) {
     if (objectValue == null) {
-      if (getRecordDefinition().getIdAttributeIndex() == attributeIndex) {
+      final String fieldName = getFieldName(attributeIndex);
+      if (getRecordDefinition().getIdAttributeNames().contains(fieldName)) {
         return "NEW";
       }
     }

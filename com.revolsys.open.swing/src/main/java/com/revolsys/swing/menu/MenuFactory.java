@@ -30,7 +30,7 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.util.Property;
 
 public class MenuFactory extends AbstractObjectWithProperties implements
-  ComponentFactory<JMenuItem> {
+ComponentFactory<JMenuItem> {
 
   public static MenuFactory createMenu(final Class<?> clazz,
     final String... menuNames) {
@@ -74,6 +74,25 @@ public class MenuFactory extends AbstractObjectWithProperties implements
 
   public static void setMenuSource(final Object menuSource) {
     MenuFactory.menuSource = menuSource;
+  }
+
+  public static void showMenu(final JPopupMenu menu, final Component component,
+    final int x, final int y) {
+    if (menu != null) {
+      final int numItems = menu.getSubElements().length;
+      if (menu != null && numItems > 0) {
+        final Window window = SwingUtilities.windowForComponent(component);
+        if (window != null) {
+          if (window.isAlwaysOnTop()) {
+            window.setAlwaysOnTop(true);
+            window.setAlwaysOnTop(false);
+          }
+          window.toFront();
+        }
+        menu.validate();
+        menu.show(component, x, y);
+      }
+    }
   }
 
   public static void showMenu(final Object object, final Component component,
@@ -359,6 +378,12 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     return menu;
   }
 
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
+
   public InvokeMethodAction createMenuItem(final String name,
     final String title, final Icon icon, final EnableCheck enableCheck,
     final Object object, final String methodName, final Object... parameters) {
@@ -367,12 +392,6 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     action.setEnableCheck(enableCheck);
     return action;
   }
-
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
 
   public void deleteMenuItem(final String groupName, final String menuTitle) {
     final List<ComponentFactory<?>> items = this.groups.get(groupName);
@@ -474,21 +493,7 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     final int y) {
     setMenuSource(source);
     final JPopupMenu menu = createJPopupMenu();
-    if (menu != null) {
-      final int numItems = menu.getSubElements().length;
-      if (menu != null && numItems > 0) {
-        final Window window = SwingUtilities.windowForComponent(component);
-        if (window != null) {
-          if (window.isAlwaysOnTop()) {
-            window.setAlwaysOnTop(true);
-            window.setAlwaysOnTop(false);
-          }
-          window.toFront();
-        }
-        menu.validate();
-        menu.show(component, x, y);
-      }
-    }
+    showMenu(menu, component, x, y);
   }
 
   @Override

@@ -33,22 +33,22 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   private static final long serialVersionUID = 1L;
 
-  private List<String> attributeNames = new ArrayList<String>();
+  private List<String> fieldNames = new ArrayList<>();
 
-  private final List<String> attributeTitles = new ArrayList<String>();
+  private final List<String> fieldTitles = new ArrayList<>();
 
-  private Map<Integer, SortOrder> sortedColumns = new LinkedHashMap<Integer, SortOrder>();
+  private Map<Integer, SortOrder> sortedColumns = new LinkedHashMap<>();
 
   private RecordRowTable table;
 
   /** The columnIndex that the attribute start. Allows for extra columns in subclasses.*/
-  private int attributesOffset;
+  private int fieldsOffset;
 
   public RecordRowTableModel(final RecordDefinition recordDefinition,
-    final Collection<String> attributeNames) {
+    final Collection<String> fieldNames) {
     super(recordDefinition);
-    setAttributeNames(attributeNames);
-    setAttributeTitles(Collections.<String> emptyList());
+    setFieldNames(fieldNames);
+    setFieldTitles(Collections.<String> emptyList());
     final String idAttributeName = recordDefinition.getIdAttributeName();
     setSortOrder(idAttributeName);
   }
@@ -75,16 +75,8 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   public void editingStopped(final ChangeEvent event) {
   }
 
-  public int getAttributesOffset() {
-    return this.attributesOffset;
-  }
-
-  public List<String> getAttributeTitles() {
-    return this.attributeTitles;
-  }
-
   public Attribute getColumnAttribute(final int columnIndex) {
-    if (columnIndex < this.attributesOffset) {
+    if (columnIndex < this.fieldsOffset) {
       return null;
     } else {
       final String name = getFieldName(columnIndex);
@@ -95,7 +87,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
-    if (columnIndex < this.attributesOffset) {
+    if (columnIndex < this.fieldsOffset) {
       return Object.class;
     } else {
       final String name = getFieldName(columnIndex);
@@ -111,27 +103,27 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   @Override
   public int getColumnCount() {
-    final int numColumns = this.attributesOffset + this.attributeNames.size();
+    final int numColumns = this.fieldsOffset + this.fieldNames.size();
     return numColumns;
   }
 
   @Override
   public String getColumnName(final int columnIndex) {
-    if (columnIndex < this.attributesOffset) {
+    if (columnIndex < this.fieldsOffset) {
       return null;
     } else {
-      return this.attributeTitles.get(columnIndex - this.attributesOffset);
+      return this.fieldTitles.get(columnIndex - this.fieldsOffset);
     }
   }
 
   @Override
   public String getFieldName(final int columnIndex) {
-    if (columnIndex < this.attributesOffset) {
+    if (columnIndex < this.fieldsOffset) {
       return null;
     } else {
-      final int fieldIndex = columnIndex - this.attributesOffset;
-      if (fieldIndex < this.attributeNames.size()) {
-        final String attributeName = this.attributeNames.get(fieldIndex);
+      final int fieldIndex = columnIndex - this.fieldsOffset;
+      if (fieldIndex < this.fieldNames.size()) {
+        final String attributeName = this.fieldNames.get(fieldIndex);
         if (attributeName == null) {
           return null;
         } else {
@@ -151,6 +143,14 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   @Override
   public String getFieldName(final int rowIndex, final int columnIndex) {
     return getFieldName(columnIndex);
+  }
+
+  public int getFieldsOffset() {
+    return this.fieldsOffset;
+  }
+
+  public List<String> getFieldTitles() {
+    return this.fieldTitles;
   }
 
   public abstract <V extends Record> V getRecord(final int row);
@@ -183,7 +183,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    if (columnIndex < this.attributesOffset) {
+    if (columnIndex < this.fieldsOffset) {
       return null;
     } else {
       final Record record = getRecord(rowIndex);
@@ -206,11 +206,11 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       if (record != null) {
         final RecordState state = record.getState();
         if (state != RecordState.Initalizing && state != RecordState.Deleted) {
-          final String attributeName = getFieldName(rowIndex, columnIndex);
-          if (attributeName != null) {
-            if (!isReadOnly(attributeName)) {
+          final String fieldName = getFieldName(rowIndex, columnIndex);
+          if (fieldName != null) {
+            if (!isReadOnly(fieldName)) {
               final RecordDefinition recordDefinition = getRecordDefinition();
-              final Class<?> attributeClass = recordDefinition.getAttributeClass(attributeName);
+              final Class<?> attributeClass = recordDefinition.getAttributeClass(fieldName);
               if (!Geometry.class.isAssignableFrom(attributeClass)) {
                 return true;
               }
@@ -235,23 +235,23 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return false;
   }
 
-  public void setAttributeNames(final Collection<String> attributeNames) {
+  public void setFieldNames(final Collection<String> attributeNames) {
     if (attributeNames == null || attributeNames.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      this.attributeNames = new ArrayList<String>(
-        recordDefinition.getAttributeNames());
+      this.fieldNames = new ArrayList<>(recordDefinition.getAttributeNames());
     } else {
-      this.attributeNames = new ArrayList<String>(attributeNames);
+      this.fieldNames = new ArrayList<>(attributeNames);
     }
+    fireTableStructureChanged();
   }
 
-  public void setAttributesOffset(final int attributesOffset) {
-    this.attributesOffset = attributesOffset;
+  public void setFieldsOffset(final int attributesOffset) {
+    this.fieldsOffset = attributesOffset;
   }
 
-  public void setAttributeTitles(final List<String> attributeTitles) {
-    this.attributeTitles.clear();
-    for (int i = 0; i < this.attributeNames.size(); i++) {
+  public void setFieldTitles(final List<String> attributeTitles) {
+    this.fieldTitles.clear();
+    for (int i = 0; i < this.fieldNames.size(); i++) {
       String title;
       if (i < attributeTitles.size()) {
         title = attributeTitles.get(i);
@@ -261,7 +261,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         final Attribute attribute = recordDefinition.getAttribute(attributeName);
         title = attribute.getTitle();
       }
-      this.attributeTitles.add(title);
+      this.fieldTitles.add(title);
     }
   }
 
@@ -284,7 +284,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   public void setSortOrder(final String idAttributeName) {
     if (Property.hasValue(idAttributeName)) {
-      final int index = this.attributeNames.indexOf(idAttributeName);
+      final int index = this.fieldNames.indexOf(idAttributeName);
       if (index != -1) {
         setSortOrder(index);
       }
@@ -301,7 +301,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     final int columnIndex) {
     if (isCellEditable(rowIndex, columnIndex)) {
 
-      if (columnIndex >= this.attributesOffset) {
+      if (columnIndex >= this.fieldsOffset) {
         final Record record = getRecord(rowIndex);
         if (record != null) {
           final String name = getFieldName(columnIndex);

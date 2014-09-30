@@ -46,7 +46,8 @@ public class SingleRecordTableModel extends AbstractSingleRecordTableModel {
     if (this.record == null) {
       return "\u2026";
     } else {
-      return this.record.getValue(rowIndex);
+      final String fieldName = getFieldName(rowIndex);
+      return this.record.getValue(fieldName);
     }
   }
 

@@ -36,7 +36,7 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.toolbar.ToolBar;
 
 public class SnapLayersPanel extends ValueField implements ActionListener,
-  ListSelectionListener {
+ListSelectionListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -64,7 +64,6 @@ public class SnapLayersPanel extends ValueField implements ActionListener,
 
   private final JButton removeButton;
 
-  @SuppressWarnings("unchecked")
   public SnapLayersPanel(final AbstractRecordLayer layer) {
     super(new VerticalLayout(5));
     this.layer = layer;
@@ -75,77 +74,80 @@ public class SnapLayersPanel extends ValueField implements ActionListener,
     add(snapAllPanel);
 
     SwingUtil.addLabel(snapAllPanel, "Snap To All Visible Layers");
-    snapToAllLayers = new CheckBox("snapToAllLayers", layer.isSnapToAllLayers());
-    snapToAllLayers.addActionListener(this);
-    snapAllPanel.add(snapToAllLayers);
+    this.snapToAllLayers = new CheckBox("snapToAllLayers",
+      layer.isSnapToAllLayers());
+    this.snapToAllLayers.addActionListener(this);
+    snapAllPanel.add(this.snapToAllLayers);
     GroupLayoutUtil.makeColumns(snapAllPanel, 2, false);
 
-    filterPanel = new JPanel(new HorizontalLayout(46));
-    filterPanel.setOpaque(false);
-    add(filterPanel);
+    this.filterPanel = new JPanel(new HorizontalLayout(46));
+    this.filterPanel.setOpaque(false);
+    add(this.filterPanel);
 
     final SearchField layerPathsFilterField = new SearchField(
-      "layerPathsFilter");
+        "layerPathsFilter");
     layerPathsFilterField.setPreferredSize(new Dimension(350, 25));
     layerPathsFilterField.addActionListener(this);
-    filterPanel.add(layerPathsFilterField);
+    this.filterPanel.add(layerPathsFilterField);
 
     final SearchField snapLayerPathsFilterField = new SearchField(
-      "snapLayerPathsFilter");
+        "snapLayerPathsFilter");
     snapLayerPathsFilterField.setPreferredSize(new Dimension(350, 25));
     snapLayerPathsFilterField.addActionListener(this);
-    filterPanel.add(snapLayerPathsFilterField);
+    this.filterPanel.add(snapLayerPathsFilterField);
 
-    fieldsPanel = new JPanel(new HorizontalLayout(5));
-    fieldsPanel.setOpaque(false);
+    this.fieldsPanel = new JPanel(new HorizontalLayout(5));
+    this.fieldsPanel.setOpaque(false);
 
     final List<AbstractRecordLayer> recordLayers = layer.getProject()
-      .getDescenants(AbstractRecordLayer.class);
+        .getDescenants(AbstractRecordLayer.class);
 
-    layerPathsModel = new BaseListModel<String>();
+    this.layerPathsModel = new BaseListModel<String>();
     for (final AbstractLayer recordLayer : recordLayers) {
       final String layerPath = recordLayer.getPath();
-      layerPathsModel.add(layerPath);
+      this.layerPathsModel.add(layerPath);
     }
-    layerPathsField = new JXList(layerPathsModel);
-    layerPathsField.setAutoCreateRowSorter(true);
-    layerPathsField.setSortable(true);
-    layerPathsField.setSortOrder(SortOrder.ASCENDING);
-    layerPathsField.addListSelectionListener(this);
-    final JScrollPane layerPathsScrollPane = new JScrollPane(layerPathsField);
+    this.layerPathsField = new JXList(this.layerPathsModel);
+    this.layerPathsField.setAutoCreateRowSorter(true);
+    this.layerPathsField.setSortable(true);
+    this.layerPathsField.setSortOrder(SortOrder.ASCENDING);
+    this.layerPathsField.addListSelectionListener(this);
+    final JScrollPane layerPathsScrollPane = new JScrollPane(
+      this.layerPathsField);
     layerPathsScrollPane.setPreferredSize(new Dimension(350, 400));
-    fieldsPanel.add(layerPathsScrollPane);
+    this.fieldsPanel.add(layerPathsScrollPane);
 
     final ToolBar toolBar = new ToolBar(ToolBar.VERTICAL);
     toolBar.setOpaque(false);
     toolBar.setMinimumSize(new Dimension(25, 25));
-    fieldsPanel.add(toolBar);
+    this.fieldsPanel.add(toolBar);
 
-    addButton = toolBar.addButtonTitleIcon("default", "Add", "add", this,
-      "addSelected");
-    removeButton = toolBar.addButtonTitleIcon("default", "Remove", "delete",
-      this, "removeSelected");
+    this.addButton = toolBar.addButtonTitleIcon("default", "Add", "add", this,
+        "addSelected");
+    this.removeButton = toolBar.addButtonTitleIcon("default", "Remove",
+      "delete", this, "removeSelected");
 
     final Collection<String> snapLayerPaths = layer.getSnapLayerPaths();
-    snapLayerPathsModel = new BaseListModel<String>(snapLayerPaths);
+    this.snapLayerPathsModel = new BaseListModel<String>(snapLayerPaths);
 
-    snapLayerPathsField = new JXList(snapLayerPathsModel);
-    snapLayerPathsField.setAutoCreateRowSorter(true);
-    snapLayerPathsField.setSortable(true);
-    snapLayerPathsField.setSortOrder(SortOrder.ASCENDING);
-    snapLayerPathsField.addListSelectionListener(this);
-    snapLayerPathsTextFilter = new StringContainsRowFilter();
-    snapLayerPathsField.setRowFilter(snapLayerPathsTextFilter);
+    this.snapLayerPathsField = new JXList(this.snapLayerPathsModel);
+    this.snapLayerPathsField.setAutoCreateRowSorter(true);
+    this.snapLayerPathsField.setSortable(true);
+    this.snapLayerPathsField.setSortOrder(SortOrder.ASCENDING);
+    this.snapLayerPathsField.addListSelectionListener(this);
+    this.snapLayerPathsTextFilter = new StringContainsRowFilter();
+    this.snapLayerPathsField.setRowFilter(this.snapLayerPathsTextFilter);
 
-    final JScrollPane snapScrollPane = new JScrollPane(snapLayerPathsField);
+    final JScrollPane snapScrollPane = new JScrollPane(this.snapLayerPathsField);
     snapScrollPane.setPreferredSize(new Dimension(350, 400));
-    fieldsPanel.add(snapScrollPane);
-    add(fieldsPanel);
+    this.fieldsPanel.add(snapScrollPane);
+    add(this.fieldsPanel);
 
-    layerPathsTextFilter = new StringContainsRowFilter();
+    this.layerPathsTextFilter = new StringContainsRowFilter();
     final RowFilter<ListModel, Integer> layerPathsFilter = RowFilter.andFilter(Arrays.asList(
-      new CollectionRowFilter(snapLayerPathsModel, false), layerPathsTextFilter));
-    layerPathsField.setRowFilter(layerPathsFilter);
+      new CollectionRowFilter(this.snapLayerPathsModel, false),
+      this.layerPathsTextFilter));
+    this.layerPathsField.setRowFilter(layerPathsFilter);
     updateEnabledState();
   }
 
@@ -157,50 +159,50 @@ public class SnapLayersPanel extends ValueField implements ActionListener,
       final String fieldName = field.getFieldName();
       final String text = field.getText();
       if (fieldName.equals("layerPathsFilter")) {
-        layerPathsTextFilter.setFilterText(text);
-        sort(layerPathsField);
+        this.layerPathsTextFilter.setFilterText(text);
+        sort(this.layerPathsField);
       } else if (fieldName.equals("snapLayerPathsFilter")) {
-        snapLayerPathsTextFilter.setFilterText(text);
-        sort(snapLayerPathsField);
+        this.snapLayerPathsTextFilter.setFilterText(text);
+        sort(this.snapLayerPathsField);
       }
-    } else if (source == snapToAllLayers) {
+    } else if (source == this.snapToAllLayers) {
       updateEnabledState();
     }
   }
 
   public void addSelected() {
-    snapLayerPathsField.clearSelection();
-    for (final Object selectedValue : layerPathsField.getSelectedValues()) {
+    this.snapLayerPathsField.clearSelection();
+    for (final Object selectedValue : this.layerPathsField.getSelectedValues()) {
       final String layerPath = (String)selectedValue;
-      if (!snapLayerPathsModel.contains(layerPath)) {
-        snapLayerPathsModel.add(layerPath);
-        final RowSorter<? extends ListModel> rowSorter = layerPathsField.getRowSorter();
+      if (!this.snapLayerPathsModel.contains(layerPath)) {
+        this.snapLayerPathsModel.add(layerPath);
+        final RowSorter<? extends ListModel> rowSorter = this.layerPathsField.getRowSorter();
         if (rowSorter instanceof DefaultRowSorter) {
           final DefaultRowSorter<?, ?> sorter = (DefaultRowSorter<?, ?>)rowSorter;
           sorter.sort();
         }
-        final int index = snapLayerPathsField.convertIndexToView(snapLayerPathsModel.indexOf(layerPath));
-        snapLayerPathsField.addSelectionInterval(index, index);
+        final int index = this.snapLayerPathsField.convertIndexToView(this.snapLayerPathsModel.indexOf(layerPath));
+        this.snapLayerPathsField.addSelectionInterval(index, index);
       }
     }
   }
 
   public void removeSelected() {
-    final Object[] selectedValues = snapLayerPathsField.getSelectedValues();
-    snapLayerPathsModel.removeAll(selectedValues);
-    sort(layerPathsField);
+    final Object[] selectedValues = this.snapLayerPathsField.getSelectedValues();
+    this.snapLayerPathsModel.removeAll(selectedValues);
+    sort(this.layerPathsField);
   }
 
   @Override
   public void save() {
     super.save();
-    layer.setSnapToAllLayers(snapToAllLayers.isSelected());
+    this.layer.setSnapToAllLayers(this.snapToAllLayers.isSelected());
     final Set<String> layerPaths = new TreeSet<String>();
-    for (int i = 0; i < snapLayerPathsModel.size(); i++) {
-      final String layerPath = snapLayerPathsModel.get(i);
+    for (int i = 0; i < this.snapLayerPathsModel.size(); i++) {
+      final String layerPath = this.snapLayerPathsModel.get(i);
       layerPaths.add(layerPath);
     }
-    layer.setSnapLayerPaths(layerPaths);
+    this.layer.setSnapLayerPaths(layerPaths);
   }
 
   public void sort(final JXList list) {
@@ -212,12 +214,12 @@ public class SnapLayersPanel extends ValueField implements ActionListener,
   }
 
   public void updateEnabledState() {
-    final boolean enabled = !snapToAllLayers.isSelected();
-    SwingUtil.setDescendantsEnabled(filterPanel, enabled);
-    SwingUtil.setDescendantsEnabled(fieldsPanel, enabled);
+    final boolean enabled = !this.snapToAllLayers.isSelected();
+    SwingUtil.setDescendantsEnabled(this.filterPanel, enabled);
+    SwingUtil.setDescendantsEnabled(this.fieldsPanel, enabled);
     if (enabled) {
-      addButton.setEnabled(layerPathsField.getSelectedIndex() > -1);
-      removeButton.setEnabled(snapLayerPathsField.getSelectedIndex() > -1);
+      this.addButton.setEnabled(this.layerPathsField.getSelectedIndex() > -1);
+      this.removeButton.setEnabled(this.snapLayerPathsField.getSelectedIndex() > -1);
     }
   }
 

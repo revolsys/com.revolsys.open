@@ -34,8 +34,9 @@ public abstract class AbstractSingleRecordTableModel extends
 
     final RecordDefinition recordDefinition = model.getRecordDefinition();
 
+    final List<String> allFieldNames = recordDefinition.getAttributeNames();
     int maxTitleWidth = 100;
-    for (final String fieldName : recordDefinition.getAttributeNames()) {
+    for (final String fieldName : allFieldNames) {
       final String title = model.getFieldTitle(fieldName);
       final int titleWidth = Math.max(title.length(), fieldName.length()) * 8;
       if (titleWidth > maxTitleWidth) {
@@ -79,10 +80,13 @@ public abstract class AbstractSingleRecordTableModel extends
     "#", "Name", "Value"
   };
 
+  private List<String> fieldNames;
+
   public AbstractSingleRecordTableModel(
     final RecordDefinition recordDefinition, final boolean editable) {
     super(recordDefinition);
     setEditable(editable);
+    setFieldNames(recordDefinition.getAttributeNames());
   }
 
   @Override
@@ -96,8 +100,17 @@ public abstract class AbstractSingleRecordTableModel extends
   }
 
   @Override
+  public String getFieldName(final int attributeIndex) {
+    return this.fieldNames.get(attributeIndex);
+  }
+
+  @Override
   public String getFieldName(final int row, final int column) {
     return getFieldName(row);
+  }
+
+  public List<String> getFieldNames() {
+    return this.fieldNames;
   }
 
   public String getFieldTitle(final String fieldName) {
@@ -121,9 +134,7 @@ public abstract class AbstractSingleRecordTableModel extends
 
   @Override
   public int getRowCount() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final int attributeCount = recordDefinition.getAttributeCount();
-    return attributeCount;
+    return this.fieldNames.size();
   }
 
   @Override
@@ -178,6 +189,14 @@ public abstract class AbstractSingleRecordTableModel extends
     final Object displayValue) {
     final Object objectValue = toObjectValue(attributeIndex, displayValue);
     return setObjectValue(attributeIndex, objectValue);
+  }
+
+  public void setFieldNames(final List<String> fieldNames) {
+    if (fieldNames != null
+      && (this.fieldNames == null || !this.fieldNames.equals(fieldNames))) {
+      this.fieldNames = fieldNames;
+      fireTableDataChanged();
+    }
   }
 
   protected abstract Object setObjectValue(final int attributeIndex,

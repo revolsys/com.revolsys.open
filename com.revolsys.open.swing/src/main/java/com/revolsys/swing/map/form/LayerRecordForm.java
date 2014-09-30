@@ -36,6 +36,7 @@ import java.util.TreeSet;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -104,7 +105,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerRecordForm extends JPanel implements PropertyChangeListener,
-CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
+  CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public static final String FLIP_FIELDS_ICON = "flip_fields";
 
@@ -121,15 +122,17 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   private static final long serialVersionUID = 1L;
 
   private JButton addOkButton = InvokeMethodAction.createButton("OK", this,
-      "actionAddOk");
+    "actionAddOk");
 
   private RecordLayerAttributesTableModel allAttributes;
 
-  private RecordStore recordStore;
+  private boolean allowAddWithErrors = false;
 
   private boolean editable = true;
 
   private final Map<String, String> fieldInValidMessage = new HashMap<String, String>();
+
+  private final String fieldNamesSetName;
 
   private final Map<String, Field> fields = new LinkedHashMap<String, Field>();
 
@@ -141,24 +144,28 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   private final ThreadLocal<Boolean> fieldValidationDisabled = new ThreadLocal<Boolean>();
 
-  private final Set<String> invalidFieldNames = new HashSet<>();
-
   private final Map<String, Object> fieldValues = new HashMap<String, Object>();
 
+  private String focussedFieldName;
+
   private GeometryCoordinatesPanel geometryCoordinatesPanel;
+
+  private final Set<String> invalidFieldNames = new HashSet<>();
 
   private String lastFocussedFieldName;
 
   private AbstractRecordLayer layer;
 
-  private RecordDefinition recordDefinition;
-
-  private LayerRecord record;
-
   private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
 
   private Set<String> readOnlyFieldNames = new HashSet<String>();
+
+  private LayerRecord record;
+
+  private RecordDefinition recordDefinition;
+
+  private RecordStore recordStore;
 
   private Set<String> requiredFieldNames = new HashSet<String>();
 
@@ -170,15 +177,14 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   private UndoManager undoManager = new RecordLayerFormUndoManager(this);
 
-  private String focussedFieldName;
-
-  private boolean allowAddWithErrors = false;
+  private ComboBox fieldNameSetNamesField;
 
   public LayerRecordForm(final AbstractRecordLayer layer) {
     ProjectFrame.addSaveActions(this, layer.getProject());
     setLayout(new BorderLayout());
     setName(layer.getName());
     this.layer = layer;
+    this.fieldNamesSetName = layer.getFieldNamesSetName();
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     setRecordDefinition(recordDefinition);
     addToolBar(layer);
@@ -280,8 +286,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (field instanceof ComboBox) {
       final ComboBox comboBox = (ComboBox)field;
       comboBox.getEditor()
-      .getEditorComponent()
-      .addFocusListener(new WeakFocusListener(this));
+        .getEditorComponent()
+        .addFocusListener(new WeakFocusListener(this));
     } else {
       ((JComponent)field).addFocusListener(new WeakFocusListener(this));
     }
@@ -409,12 +415,34 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
         cellEditor.addCellEditorListener(this);
       }
     }
-
     final TablePanel tablePanel = new TablePanel(table);
-    final JScrollPane scrollPane = addTab("All Fields", tablePanel);
+
+    final List<String> fieldNamesSetNames = this.layer.getFieldNamesSetNames();
+    final DefaultComboBoxModel<String> fieldNamesSetNamesModel = ComboBox.model(fieldNamesSetNames);
+    this.fieldNameSetNamesField = new ComboBox("fieldNamesSetName",
+      fieldNamesSetNamesModel);
+    int maxLength = 3;
+    for (final String name : fieldNamesSetNames) {
+      maxLength = Math.max(maxLength, name.length());
+    }
+    this.fieldNameSetNamesField.setMaximumSize(new Dimension(Math.max(300,
+      maxLength * 11 + 40), 22));
+    this.fieldNameSetNamesField.addPropertyChangeListener("fieldNamesSetName",
+      this);
+
+    final ToolBar toolBar = new ToolBar();
+    toolBar.addComponent("default", this.fieldNameSetNamesField);
+    toolBar.addButtonTitleIcon("default", "Edit Field Sets",
+      "fields_filter_edit", this.layer, "showProperties", "Field Sets");
+
+    final JPanel panel = new JPanel(new BorderLayout());
+    panel.add(toolBar, BorderLayout.NORTH);
+    panel.add(tablePanel, BorderLayout.CENTER);
+    final JScrollPane scrollPane = addTab("All Fields", panel);
+
     int maxHeight = 500;
     for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
-        .getScreenDevices()) {
+      .getScreenDevices()) {
       final GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
       final Rectangle bounds = graphicsConfiguration.getBounds();
 
@@ -481,12 +509,12 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     }
 
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canUndo");
+      "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canRedo");
+      "canRedo");
 
     final EnableCheck modifiedOrDeleted = new ObjectPropertyEnableCheck(this,
-        "modifiedOrDeleted");
+      "modifiedOrDeleted");
 
     this.toolBar.addButton("changes", "Revert Record", "arrow_revert",
       modifiedOrDeleted, this, "revertChanges");
@@ -510,9 +538,9 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (hasGeometry) {
       final DataType geometryDataType = geometryAttribute.getType();
       if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition)
-            .hasDirectionalAttributes()) {
+          .hasDirectionalAttributes()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME,
             FLIP_RECORD_ICON, editable, this, "flipRecordOrientation");
           this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME,
@@ -1003,7 +1031,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     final AbstractLayer layer = getLayer();
     if (layer != null) {
       final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-          map);
+        map);
       final Collection<String> ignorePasteFields = layer.getProperty("ignorePasteFields");
       final Set<String> keySet = newValues.keySet();
       if (ignorePasteFields != null) {
@@ -1023,13 +1051,25 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    final AbstractLayer layer = getLayer();
+    final String propertyName = event.getPropertyName();
+    final AbstractRecordLayer layer = getLayer();
     if (layer != null) {
       final LayerRecord record = getRecord();
       if (record != null) {
         final Object source = event.getSource();
-        final String propertyName = event.getPropertyName();
-        if (source == layer) {
+
+        if (propertyName.equals("fieldNamesSets")) {
+          final Object selectedItem = this.fieldNameSetNamesField.getSelectedItem();
+          final List<String> fieldNamesSetNames = this.layer.getFieldNamesSetNames();
+          final DefaultComboBoxModel<String> fieldNamesSetNamesModel = ComboBox.model(fieldNamesSetNames);
+          this.fieldNameSetNamesField.setModel(fieldNamesSetNamesModel);
+          this.fieldNameSetNamesField.setSelectedItem(selectedItem);
+          final String fieldNamesSetName = (String)this.fieldNameSetNamesField.getSelectedItem();
+          this.allAttributes.setFieldNames(layer.getFieldNamesSet(fieldNamesSetName));
+        } else if (propertyName.equals("fieldNamesSetName")) {
+          final String fieldNamesSetName = (String)event.getNewValue();
+          this.allAttributes.setFieldNames(layer.getFieldNamesSet(fieldNamesSetName));
+        } else if (source == layer) {
           if (propertyName.equals("recordsChanged")) {
             setRecord(record);
           }
@@ -1056,7 +1096,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
               final Window window = SwingUtilities.getWindowAncestor(this);
               SwingUtil.setVisible(window, false);
             }
-            final Object value = event.getNewValue();
+            final Object value = this.fieldNamesSetName;
             final RecordDefinition recordDefinition = getRecordDefinition();
             if ("errorsUpdated".equals(propertyName)) {
               updateErrors();

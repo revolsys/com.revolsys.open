@@ -48,7 +48,7 @@ SortableTableModel, ListSelectionListener {
     final Record mergedRecord, final Collection<LayerRecord> records) {
     super(layer.getRecordDefinition(), records, layer.getFieldNames());
     this.layer = layer;
-    setAttributesOffset(1);
+    setFieldsOffset(1);
     this.mergedRecord = mergedRecord;
     setEditable(true);
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());

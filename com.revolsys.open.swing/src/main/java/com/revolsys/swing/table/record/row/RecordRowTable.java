@@ -32,6 +32,8 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
 
   private final RecordTableCellEditor tableCellEditor;
 
+  private final TableCellRenderer cellRenderer;
+
   public RecordRowTable(final RecordRowTableModel model) {
     this(model, new RecordRowTableCellRenderer());
   }
@@ -39,6 +41,7 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
   public RecordRowTable(final RecordRowTableModel model,
     final TableCellRenderer cellRenderer) {
     super(model);
+    this.cellRenderer = cellRenderer;
     setSortable(false);
 
     final JTableHeader tableHeader = getTableHeader();
@@ -48,7 +51,7 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
     this.tableCellEditor.addCellEditorListener(model);
     for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
       final TableColumn column = columnModel.getColumn(columnIndex);
-      if (columnIndex >= model.getAttributesOffset()) {
+      if (columnIndex >= model.getFieldsOffset()) {
         column.setCellEditor(this.tableCellEditor);
       }
       column.setCellRenderer(cellRenderer);
@@ -58,7 +61,6 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
 
     ModifiedAttributePredicate.add(this);
     ErrorPredicate.add(this);
-
   }
 
   public RecordDefinition getRecordDefinition() {
@@ -80,7 +82,7 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
   public ListSelectionModel getSelectionModel() {
     if (getTableModel() instanceof RecordLayerTableModel) {
       final RecordLayerTableModel layerTableModel = (RecordLayerTableModel)getTableModel();
-      if (layerTableModel.getAttributeFilterMode().equals(
+      if (layerTableModel.getFieldFilterMode().equals(
         RecordLayerTableModel.MODE_SELECTED)) {
         return layerTableModel.getHighlightedModel();
       }
@@ -98,7 +100,7 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
     final RecordRowTableModel model = getTableModel();
     final RecordDefinition recordDefinition = model.getRecordDefinition();
     final int viewIndex = column.getModelIndex();
-    final int attributesOffset = model.getAttributesOffset();
+    final int attributesOffset = model.getFieldsOffset();
     if (viewIndex < attributesOffset) {
       final String attributeName = model.getFieldName(viewIndex
         - attributesOffset);
@@ -154,20 +156,37 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
   public void tableChanged(final TableModelEvent event) {
     if (SwingUtil.isEventDispatchThread()) {
       final TableModel model = getModel();
+      int fieldsOffset = 0;
       if (model instanceof RecordLayerTableModel) {
         final RecordLayerTableModel layerModel = (RecordLayerTableModel)model;
-        final String mode = layerModel.getAttributeFilterMode();
+        final String mode = layerModel.getFieldFilterMode();
         final List<String> sortableModes = layerModel.getSortableModes();
         if (sortableModes.contains(mode)) {
           setSortable(true);
         } else {
           setSortable(false);
         }
+        fieldsOffset = layerModel.getFieldsOffset();
       }
+
       try {
         super.tableChanged(event);
       } catch (final Throwable t) {
       }
+      createDefaultColumnsFromModel();
+      if (event.getType() == TableModelEvent.UPDATE
+          && event.getColumn() == TableModelEvent.ALL_COLUMNS) {
+        final TableColumnModel columnModel = getColumnModel();
+        for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
+          final TableColumn column = columnModel.getColumn(columnIndex);
+          if (columnIndex >= fieldsOffset) {
+            column.setCellEditor(this.tableCellEditor);
+          }
+          column.setCellRenderer(this.cellRenderer);
+        }
+
+      }
+      initializeColumnWidths();
       if (this.tableHeader != null) {
         this.tableHeader.resizeAndRepaint();
       }

@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import javax.swing.ComboBoxEditor;
 import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.ListCellRenderer;
@@ -22,6 +23,11 @@ import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.undo.UndoManager;
 
 public class ComboBox extends JComboBox implements Field {
+  public static <V> DefaultComboBoxModel<V> model(final Collection<V> items) {
+    final Vector<V> vector = new Vector<V>(items);
+    return new DefaultComboBoxModel<>(vector);
+  }
+
   private static final long serialVersionUID = 1L;
 
   private final FieldSupport support;
