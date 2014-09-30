@@ -12,6 +12,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Property;
 
 public class CloseLocation implements Comparable<CloseLocation> {
 
@@ -98,7 +99,12 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public String getIdAttributeName() {
-    return getRecordDefinition().getIdAttributeName();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getIdAttributeName();
+    }
   }
 
   public String getIndexString() {
@@ -124,7 +130,11 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public RecordDefinition getRecordDefinition() {
-    return this.layer.getRecordDefinition();
+    if (this.layer == null) {
+      return null;
+    } else {
+      return this.layer.getRecordDefinition();
+    }
   }
 
   public Segment getSegment() {
@@ -142,7 +152,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
     } else if (this.segment != null) {
       return "Edge";
     } else {
-      final Vertex vertex = geometry.getVertex(getVertexIndex());
+      final Vertex vertex = geometry.getVertex(getVertexId());
       if (vertex.isFrom() || vertex.isTo()) {
         return "End-Vertex";
       } else {
@@ -153,14 +163,18 @@ public class CloseLocation implements Comparable<CloseLocation> {
 
   public String getTypePath() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getPath();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getPath();
+    }
   }
 
   public Vertex getVertex() {
     return this.vertex;
   }
 
-  public int[] getVertexIndex() {
+  public int[] getVertexId() {
     if (this.vertex == null) {
       return null;
     } else {
@@ -176,16 +190,19 @@ public class CloseLocation implements Comparable<CloseLocation> {
   @Override
   public String toString() {
     final StringBuilder string = new StringBuilder();
-    string.append(getTypePath());
-    string.append(", ");
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    string.append(recordDefinition.getIdAttributeName());
-    string.append("=");
-    final Object id = getId();
-    string.append(id);
-    string.append(", ");
+    final String typePath = getTypePath();
+    if (Property.hasValue(typePath)) {
+      string.append(typePath);
+      string.append(", ");
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      string.append(recordDefinition.getIdAttributeName());
+      string.append("=");
+      final Object id = getId();
+      string.append(id);
+      string.append(", ");
+    }
     string.append(getType());
-    int[] index = getVertexIndex();
+    int[] index = getVertexId();
     if (index != null) {
       string.append(", index=");
     } else {

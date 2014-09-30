@@ -7,6 +7,9 @@ import java.util.List;
 
 import com.revolsys.io.datastore.RecordStoreConnection;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
+import com.revolsys.swing.map.form.RecordStoreConnectionDialog;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.FileTreeNode;
@@ -14,12 +17,27 @@ import com.revolsys.swing.tree.node.file.FileTreeNode;
 public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
 implements PropertyChangeListener {
 
+  private static final MenuFactory MENU = new MenuFactory(
+    "Record Store Connections");
+
+  static {
+    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Add Connection",
+      "map_add", "addConnection"));
+  }
+
   public RecordStoreConnectionRegistryTreeNode(
     final RecordStoreConnectionRegistry registry) {
     super(registry);
-    setType("RecordStore Connections");
+    setType("Record Store Connections");
     setName(registry.getName());
     setIcon(FileTreeNode.ICON_FOLDER_LINK);
+  }
+
+  public void addConnection() {
+    final RecordStoreConnectionRegistry registry = getRegistry();
+    final RecordStoreConnectionDialog dialog = new RecordStoreConnectionDialog(
+      registry);
+    dialog.setVisible(true);
   }
 
   @Override
@@ -43,6 +61,11 @@ implements PropertyChangeListener {
         refresh();
       }
     }
+  }
+
+  @Override
+  public MenuFactory getMenu() {
+    return MENU;
   }
 
   protected RecordStoreConnectionRegistry getRegistry() {

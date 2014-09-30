@@ -2,13 +2,11 @@ package com.revolsys.swing.undo;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoableEdit;
 
-@SuppressWarnings("serial")
 public class CascadingUndoManager extends UndoManager {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 
@@ -19,12 +17,6 @@ public class CascadingUndoManager extends UndoManager {
 
   public CascadingUndoManager(final UndoManager parent) {
     this.parent = parent;
-  }
-
-  @Override
-  public synchronized boolean addEdit(final UndoableEdit edit) {
-    final boolean addEdit = super.addEdit(edit);
-    return addEdit;
   }
 
   @Override
@@ -62,6 +54,12 @@ public class CascadingUndoManager extends UndoManager {
 
   public UndoManager getParent() {
     return this.parent;
+  }
+
+  @Override
+  public boolean isEventsEnabled() {
+    return super.isEventsEnabled()
+        && (this.parent == null || this.parent.isEventsEnabled());
   }
 
   @Override

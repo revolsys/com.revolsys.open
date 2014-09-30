@@ -337,24 +337,35 @@ public class OgrRecordStore extends AbstractRecordStore {
     for (int fieldIndex = 0; fieldIndex < layerDefinition.GetFieldCount(); fieldIndex++) {
       final FieldDefn fieldDefinition = layerDefinition.GetFieldDefn(fieldIndex);
       final String fieldName = fieldDefinition.GetName();
-      final String fieldTypeName = fieldDefinition.GetFieldTypeName(fieldDefinition.GetFieldType());
+      final int fieldType = fieldDefinition.GetFieldType();
       final int fieldWidth = fieldDefinition.GetWidth();
       final int fieldPrecision = fieldDefinition.GetPrecision();
-      DataType fieldDataType = DataTypes.STRING;
-      if ("String".equals(fieldTypeName)) {
-        fieldDataType = DataTypes.STRING;
-      } else if ("Integer".equals(fieldTypeName)) {
-        fieldDataType = DataTypes.INT;
-      } else if ("Real".equals(fieldTypeName)) {
-        fieldDataType = DataTypes.DOUBLE;
-      } else if ("Date".equals(fieldTypeName)) {
-        fieldDataType = DataTypes.DATE;
-      } else if ("DateTime".equals(fieldTypeName)) {
-        fieldDataType = DataTypes.DATE_TIME;
-      } else {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unsupported field type " + this.file + " " + fieldName + ": "
-              + fieldTypeName);
+      DataType fieldDataType;
+      switch (fieldType) {
+        case 0:
+          fieldDataType = DataTypes.INT;
+          break;
+        case 2:
+          fieldDataType = DataTypes.DOUBLE;
+          break;
+        case 4:
+        case 6:
+          fieldDataType = DataTypes.STRING;
+          break;
+        case 9:
+          fieldDataType = DataTypes.DATE;
+          break;
+        case 11:
+          fieldDataType = DataTypes.DATE_TIME;
+          break;
+
+        default:
+          fieldDataType = DataTypes.STRING;
+          final String fieldTypeName = fieldDefinition.GetFieldTypeName(fieldType);
+          LoggerFactory.getLogger(getClass()).error(
+            "Unsupported field type " + this.file + " " + fieldName + ": "
+                + fieldTypeName);
+          break;
       }
       final Attribute field = new Attribute(fieldName, fieldDataType,
         fieldWidth, fieldPrecision, false);
@@ -597,7 +608,7 @@ public class OgrRecordStore extends AbstractRecordStore {
     }
     boolean first = true;
     for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
-      .iterator(); iterator.hasNext();) {
+        .iterator(); iterator.hasNext();) {
       final Entry<String, Boolean> entry = iterator.next();
       final String column = entry.getKey();
       if (first) {

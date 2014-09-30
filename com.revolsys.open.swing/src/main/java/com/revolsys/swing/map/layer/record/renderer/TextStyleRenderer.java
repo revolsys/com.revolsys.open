@@ -201,6 +201,12 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     final Graphics2D graphics, final Record object, final Geometry geometry,
     final TextStyle style) {
     final String label = getLabel(object, style);
+    renderText(viewport, graphics, label, geometry, style);
+  }
+
+  public static void renderText(final Viewport2D viewport,
+    final Graphics2D graphics, final String label, final Geometry geometry,
+    final TextStyle style) {
     if (Property.hasValue(label) && geometry != null || viewport == null) {
       final PointWithOrientation point = getTextLocation(viewport, geometry,
         style);

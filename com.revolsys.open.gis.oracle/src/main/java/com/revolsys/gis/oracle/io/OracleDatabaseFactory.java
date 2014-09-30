@@ -1,5 +1,7 @@
 package com.revolsys.gis.oracle.io;
 
+import java.io.File;
+import java.io.FileReader;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +16,7 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
 import oracle.jdbc.pool.OracleDataSource;
+import oracle.net.jdbc.nl.NLParamParser;
 
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +30,33 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
 
 public class OracleDatabaseFactory implements JdbcDatabaseFactory {
+  public static List<String> getTnsConnectionNames() {
+    File tnsFile = new File(System.getProperty("oracle.net.tns_admin"),
+        "tnsnames.ora");
+    if (!tnsFile.exists()) {
+      tnsFile = new File(System.getenv("TNS_ADMIN"), "tnsnames.ora");
+      if (!tnsFile.exists()) {
+        tnsFile = new File(System.getenv("ORACLE_HOME") + "/network/admin",
+            "tnsnames.ora");
+        if (!tnsFile.exists()) {
+          tnsFile = new File(System.getenv("ORACLE_HOME") + "/NETWORK/ADMIN",
+              "tnsnames.ora");
+
+        }
+      }
+    }
+    if (tnsFile.exists()) {
+      try {
+        final NLParamParser parser = new NLParamParser(new FileReader(tnsFile));
+        return Arrays.asList(parser.getNLPAllNames());
+      } catch (final Throwable e) {
+        LoggerFactory.getLogger(OracleDatabaseFactory.class).error(
+          "Error reading: " + tnsFile, e);
+      }
+    }
+    return Collections.emptyList();
+  }
+
   public static final String URL_REGEX = "jdbc:oracle:thin:(.+)";
 
   public static final List<String> URL_PATTERNS = Arrays.asList(URL_REGEX);

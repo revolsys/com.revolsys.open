@@ -15,8 +15,8 @@ public class RecordStoreConnectionsTreeNode extends ListTreeNode {
   public static final Icon ICON = Icons.getIcon("folder_database");
 
   public RecordStoreConnectionsTreeNode() {
-    setName("Data Stores");
-    setType("Data Stores");
+    setName("Record Stores");
+    setType("Record Stores");
     setIcon(ICON);
   }
 
@@ -32,4 +32,5 @@ public class RecordStoreConnectionsTreeNode extends ListTreeNode {
     }
     return children;
   }
+
 }

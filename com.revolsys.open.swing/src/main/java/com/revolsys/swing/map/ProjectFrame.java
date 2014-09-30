@@ -58,12 +58,14 @@ import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
+import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.overlay.MeasureOverlay;
 import com.revolsys.swing.map.print.SinglePage;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -121,9 +123,6 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  public static void init() {
-  }
-
   public static final String PROJECT_FRAME = "projectFrame";
 
   public static final String SAVE_PROJECT_KEY = "Save Project";
@@ -158,33 +157,9 @@ public class ProjectFrame extends BaseFrame {
   }
 
   public ProjectFrame(final String title, final Project project) {
-    super(title);
-    setBounds((Object)null);
-
-    final JRootPane rootPane = getRootPane();
-
-    addSaveActions(rootPane, project);
-
+    super(title, false);
     this.project = project;
-    final BoundingBox defaultBoundingBox = getDefaultBoundingBox();
-    this.project.setViewBoundingBox(defaultBoundingBox);
-    Project.set(project);
-    project.setProperty(PROJECT_FRAME, this);
-
-    this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
-    this.dockControl.getController()
-      .getProperties()
-      .set(EclipseTheme.PAINT_ICONS_WHEN_DESELECTED, true);
-    final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-        .getTheme();
-    theme.intern().setMovingImageFactory(
-      new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
-
-    final CContentArea dockContentArea = this.dockControl.getContentArea();
-    add(dockContentArea, BorderLayout.CENTER);
-    DockingFramesUtil.setFlapSizes(this.dockControl);
-
-    initUi();
+    init();
   }
 
   public void actionNewProject() {
@@ -341,6 +316,11 @@ public class ProjectFrame extends BaseFrame {
 
   protected MenuFactory createMenuTools() {
     final MenuFactory tools = new MenuFactory("Tools");
+    final MapPanel map = getMapPanel();
+    tools.addCheckboxMenuItem("map",
+      new InvokeMethodAction("Measure", Icons.getIcon("ruler"), map,
+        "toggleMode", MeasureOverlay.MEASURE), new ObjectPropertyEnableCheck(
+          map, "overlayAction", MeasureOverlay.MEASURE));
 
     tools.addMenuItem("script", "Run Script...", "Run Script",
       Icons.getIcon("script_go"), this, "runScript");
@@ -490,7 +470,32 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  protected void initUi() {
+  @Override
+  protected void init() {
+    setBounds((Object)null);
+
+    final JRootPane rootPane = getRootPane();
+
+    addSaveActions(rootPane, this.project);
+
+    final BoundingBox defaultBoundingBox = getDefaultBoundingBox();
+    this.project.setViewBoundingBox(defaultBoundingBox);
+    Project.set(this.project);
+    this.project.setProperty(PROJECT_FRAME, this);
+
+    this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
+    this.dockControl.getController()
+    .getProperties()
+    .set(EclipseTheme.PAINT_ICONS_WHEN_DESELECTED, true);
+    final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
+        .getTheme();
+    theme.intern().setMovingImageFactory(
+      new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
+
+    final CContentArea dockContentArea = this.dockControl.getContentArea();
+    add(dockContentArea, BorderLayout.CENTER);
+    DockingFramesUtil.setFlapSizes(this.dockControl);
+
     addMapPanel();
 
     addWorkingAreas();
@@ -501,7 +506,7 @@ public class ProjectFrame extends BaseFrame {
     addTasksPanel();
     addLogPanel();
 
-    createMenuBar();
+    super.init();
     toc.toFront();
   }
 

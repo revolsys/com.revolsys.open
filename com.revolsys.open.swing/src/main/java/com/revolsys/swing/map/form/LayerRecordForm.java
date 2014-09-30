@@ -467,8 +467,10 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     this.toolBar.addButton("dnd", "Copy Record", "page_copy",
       (EnableCheck)null, this, "dataTransferCopy");
 
-    this.toolBar.addButton("dnd", "Copy Geometry", "geometry_copy",
-      (EnableCheck)null, this, "copyGeometry");
+    if (hasGeometry) {
+      this.toolBar.addButton("dnd", "Copy Geometry", "geometry_copy",
+        (EnableCheck)null, this, "copyGeometry");
+    }
 
     this.toolBar.addButton("dnd", "Paste Record", "paste_plain", editable,
       this, "dataTransferPaste");
@@ -476,8 +478,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (hasGeometry) {
       this.toolBar.addButton("dnd", "Paste Geometry", "geometry_paste",
         editable, this, "pasteGeometry");
-
     }
+
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
         "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
@@ -1003,10 +1005,11 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
       final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
           map);
       final Collection<String> ignorePasteFields = layer.getProperty("ignorePasteFields");
+      final Set<String> keySet = newValues.keySet();
       if (ignorePasteFields != null) {
-        newValues.keySet().removeAll(ignorePasteFields);
+        keySet.removeAll(ignorePasteFields);
       }
-      newValues.keySet().removeAll(getReadOnlyFieldNames());
+      keySet.removeAll(getReadOnlyFieldNames());
 
       final Map<String, Object> values = getValues();
       values.putAll(newValues);

@@ -40,8 +40,10 @@ import com.revolsys.gis.algorithm.index.quadtree.GeometryVertexQuadTree;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.geom.vertex.VertexIndexComparator;
@@ -53,9 +55,11 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
+import com.revolsys.swing.map.layer.record.style.LineCap;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 
 public class AbstractOverlay extends JComponent implements
   PropertyChangeListener, MouseListener, MouseMotionListener,
@@ -82,7 +86,7 @@ public class AbstractOverlay extends JComponent implements
   private static final VertexIndexComparator VERTEX_INDEX_COMPARATOR = new VertexIndexComparator();
 
   public static final GeometryStyle XOR_LINE_STYLE = GeometryStyle.line(
-    new Color(0, 0, 255), 2);
+    new Color(0, 0, 255), 1);
 
   private GeometryFactory geometryFactory;
 
@@ -139,14 +143,21 @@ public class AbstractOverlay extends JComponent implements
         text.append("<b><i>");
         text.append(typePath);
         text.append("</i></b>\n");
-        text.append("<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">"
-          + "<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">"
-          + idAttributeName
-          + "</th><th style=\"border-right: solid black 1px\">INDEX</th><th style=\"border-right: solid black 1px\">SRID</th><th>POINT</th></tr></th><tbody>");
+        text.append("<table cellspacing=\"0\" cellpadding=\"1\" style=\"border: solid black 1px;margin: 3px 0px 3px 0px;padding: 0px;width: 100%\">");
+        text.append("<thead><tr style=\"border-bottom: solid black 3px\"><th style=\"border-right: solid black 1px\">");
+        final boolean hasId = Property.hasValue(idAttributeName);
+        if (hasId) {
+          text.append(idAttributeName);
+          text.append("</th><th style=\"border-right: solid black 1px\">");
+        }
+        text.append("INDEX</th><th style=\"border-right: solid black 1px\">SRID</th><th>POINT</th></tr></th><tbody>");
         for (final CloseLocation location : locations) {
           text.append("<tr style=\"border-bottom: solid black 1px\"><td style=\"border-right: solid black 1px\">");
-          text.append(location.getId());
-          text.append("</td><td style=\"border-right: solid black 1px\">");
+          final Object id = location.getId();
+          if (hasId) {
+            text.append(id);
+            text.append("</td><td style=\"border-right: solid black 1px\">");
+          }
           text.append(location.getIndexString());
           text.append("</td><td style=\"border-right: solid black 1px\">");
           final Point point = location.getPoint();
@@ -219,6 +230,22 @@ public class AbstractOverlay extends JComponent implements
     addUndo(edit);
   }
 
+  protected LineString createXorLine(final GeometryFactory geometryFactory,
+    final Point c0, final Point p1) {
+    final Viewport2D viewport = getViewport();
+    final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
+    final LineSegment line = viewportGeometryFactory.lineSegment(c0, p1);
+    final double length = line.getLength();
+    if (length > 0) {
+      final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
+      final Point newC1 = line.pointAlongOffset((length - cursorRadius)
+        / length, 0);
+      return geometryFactory.lineString(c0, newC1);
+    } else {
+      return null;
+    }
+  }
+
   public void destroy() {
     this.map = null;
     this.snapEventPoint = null;
@@ -247,6 +274,7 @@ public class AbstractOverlay extends JComponent implements
           graphics.setPaint(new Color(0, 0, 255));
           graphics.fill(shape);
         } else {
+          XOR_LINE_STYLE.setLineCapEnum(LineCap.BUTT);
           GeometryStyleRenderer.renderGeometry(this.viewport, graphics,
             geometry, XOR_LINE_STYLE);
         }
@@ -302,8 +330,11 @@ public class AbstractOverlay extends JComponent implements
     }
     if (closestSegment != null) {
       final Point pointOnLine = viewportGeometryFactory.point(closestSegment.project(point));
-      final GeometryFactory geometryFactory = layer.getGeometryFactory();
-      final Point closePoint = pointOnLine.convert(geometryFactory);
+      Point closePoint = pointOnLine;
+      if (layer != null) {
+        final GeometryFactory geometryFactory = layer.getGeometryFactory();
+        closePoint = pointOnLine.convert(geometryFactory);
+      }
       final int[] segmentId = closestSegment.getSegmentId();
       final Segment segment = geometry.getSegment(segmentId);
       return new CloseLocation(layer, record, segment, closePoint);
@@ -452,6 +483,14 @@ public class AbstractOverlay extends JComponent implements
     final int x = MouseOverlay.getEventX();
     final int y = MouseOverlay.getEventY();
     return getPoint(x, y);
+  }
+
+  protected Point getPoint(final GeometryFactory geometryFactory,
+    final MouseEvent event) {
+    final Viewport2D viewport = getViewport();
+    final Point point = viewport.toModelPointRounded(geometryFactory,
+      event.getX(), event.getY());
+    return point;
   }
 
   protected Point getPoint(final int x, final int y) {

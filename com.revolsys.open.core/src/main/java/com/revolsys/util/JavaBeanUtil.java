@@ -367,6 +367,16 @@ public final class JavaBeanUtil {
     return getWriteMethod(object.getClass(), name);
   }
 
+  public static void initialize(final Class<?> clazz) {
+    if (clazz != null) {
+      try {
+        Class.forName(clazz.getName(), true, clazz.getClassLoader());
+      } catch (final ClassNotFoundException e) {
+        LoggerFactory.getLogger(clazz).error("Unable to iniaitlize", e);
+      }
+    }
+  }
+
   public static <T> T invokeConstructor(
     final Constructor<? extends T> constructor, final Object... args) {
     try {

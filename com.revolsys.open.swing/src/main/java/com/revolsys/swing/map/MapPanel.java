@@ -62,6 +62,7 @@ import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.EditGeoReferencedImageOverlay;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.map.overlay.LayerRendererOverlay;
+import com.revolsys.swing.map.overlay.MeasureOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
 import com.revolsys.swing.map.overlay.SelectRecordsOverlay;
 import com.revolsys.swing.map.overlay.ToolTipOverlay;
@@ -292,6 +293,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     new EditGeometryOverlay(this);
     this.mouseOverlay = new MouseOverlay(this, this.layeredPane);
     new EditGeoReferencedImageOverlay(this);
+    new MeasureOverlay(this);
     this.toolTipOverlay = new ToolTipOverlay(this);
   }
 
@@ -339,7 +341,6 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     addUndoButtons();
 
     addLayerControls();
-
   }
 
   public void addUndo(final UndoableEdit edit) {
@@ -348,9 +349,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addUndoButtons() {
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canUndo");
+        "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canRedo");
+        "canRedo");
 
     this.toolBar.addButton("undo", "Undo", "arrow_undo", canUndo,
       this.undoManager, "undo");
@@ -451,6 +452,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
         this.overlayActionLabel.setVisible(false);
         setViewportCursor(AbstractOverlay.DEFAULT_CURSOR);
       }
+      firePropertyChange("overlayAction", overlayAction, null);
       return true;
     } else {
       return false;
@@ -671,6 +673,10 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     return !this.overlayActionStack.isEmpty();
   }
 
+  public boolean hasOverlayAction(final String overlayAction) {
+    return this.overlayActionStack.contains(overlayAction);
+  }
+
   public boolean isOverlayAction(final String overlayAction) {
     if (overlayAction == null) {
       return false;
@@ -724,7 +730,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {
         if (this.baseMapOverlay != null
-          && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
+            && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
           final Layer layer = (Layer)event.getNewValue();
           if (layer != null && layer.isVisible()) {
             this.baseMapOverlay.setLayer(layer);
@@ -837,6 +843,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public boolean setOverlayAction(final String overlayAction) {
     final String oldAction = getOverlayAction();
     if (overlayAction == null) {
+      firePropertyChange("overlayAction", oldAction, null);
       return false;
     } else if (EqualsRegistry.equal(oldAction, overlayAction)) {
       return true;
@@ -847,6 +854,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
       this.overlayActionStack.push(overlayAction);
       this.overlayActionLabel.setText(CaseConverter.toCapitalizedWords(overlayAction));
       this.overlayActionLabel.setVisible(true);
+      firePropertyChange("overlayAction", oldAction, overlayAction);
       return true;
     } else {
       return false;
@@ -958,17 +966,25 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final PopupMenu menu = new PopupMenu("Zoom Bookmark");
     final MenuFactory factory = menu.getMenu();
     factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
-      "addZoomBookmark");
+        "addZoomBookmark");
 
     final Project project = getProject();
     for (final Entry<String, BoundingBox> entry : project.getZoomBookmarks()
-      .entrySet()) {
+        .entrySet()) {
       final String name = entry.getKey();
       final BoundingBox boundingBox = entry.getValue();
       factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier",
         this, "zoomTo", boundingBox);
     }
     menu.show(this.zoomBookmarkButton, 0, 20);
+  }
+
+  public void toggleMode(final String mode) {
+    if (isOverlayAction(mode)) {
+      clearOverlayAction(mode);
+    } else {
+      setOverlayAction(mode);
+    }
   }
 
   public void zoom(final Point mapPoint, final int steps) {

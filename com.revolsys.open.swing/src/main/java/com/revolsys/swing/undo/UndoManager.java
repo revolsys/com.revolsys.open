@@ -18,12 +18,11 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.util.OS;
 
-@SuppressWarnings("serial")
 public class UndoManager extends javax.swing.undo.UndoManager implements
-  PropertyChangeSupportProxy {
+PropertyChangeSupportProxy {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 
@@ -38,24 +37,28 @@ public class UndoManager extends javax.swing.undo.UndoManager implements
       return false;
     } else {
       final boolean enabled = setEventsEnabled(false);
-      try {
-        if (edit instanceof AbstractUndoableEdit) {
-          final AbstractUndoableEdit abstractEdit = (AbstractUndoableEdit)edit;
-          if (!abstractEdit.isHasBeenDone()) {
-            if (abstractEdit.canRedo()) {
-              abstractEdit.redo();
-            } else {
-              return false;
+      if (enabled) {
+        try {
+          if (edit instanceof AbstractUndoableEdit) {
+            final AbstractUndoableEdit abstractEdit = (AbstractUndoableEdit)edit;
+            if (!abstractEdit.isHasBeenDone()) {
+              if (abstractEdit.canRedo()) {
+                abstractEdit.redo();
+              } else {
+                return false;
+              }
             }
           }
+        } finally {
+          setEventsEnabled(enabled);
         }
-      } finally {
-        setEventsEnabled(enabled);
-      }
-      if (this.eventsEnabled) {
-        final boolean added = super.addEdit(edit);
-        fireEvents();
-        return added;
+        if (this.eventsEnabled) {
+          final boolean added = super.addEdit(edit);
+          fireEvents();
+          return added;
+        } else {
+          return false;
+        }
       } else {
         return false;
       }
