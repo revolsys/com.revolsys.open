@@ -62,6 +62,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.CaseConverter;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -236,7 +237,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         extentPanel.add(new JLabel("Unknown"));
 
       } else {
-        extentPanel.add(new JLabel(
+        final JLabel extentLabel = new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
             + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
             + StringConverterRegistry.toString(boundingBox.getMaximum(1))
@@ -249,7 +250,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
             + "</td></tr>"
             + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
             + StringConverterRegistry.toString(boundingBox.getMinimum(1))
-            + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>"));
+            + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
+        extentLabel.setFont(SwingUtil.FONT);
+        extentPanel.add(extentLabel);
 
       }
       GroupLayoutUtil.makeColumns(extentPanel, 1, true);
@@ -325,8 +328,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final Field nameField = (Field)SwingUtil.addObjectField(panel, this, "name");
     Property.addListener(nameField, "name", this.beanPropertyListener);
 
-    final Field typeField = (Field)SwingUtil.addObjectField(panel, this, "type");
-    typeField.setEnabled(false);
+    final String type = Property.get(this, "type");
+    final String typeLabel = CaseConverter.toCapitalizedWords(type);
+    SwingUtil.addReadOnlyTextField(panel, "Type", typeLabel);
 
     GroupLayoutUtil.makeColumns(panel, 2, true);
 

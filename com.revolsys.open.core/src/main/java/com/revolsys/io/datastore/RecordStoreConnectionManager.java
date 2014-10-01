@@ -20,8 +20,8 @@ import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
 public class RecordStoreConnectionManager
-extends
-AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConnection> {
+  extends
+  AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConnection> {
 
   public static RecordStoreConnectionManager get() {
     return INSTANCE;
@@ -127,7 +127,7 @@ AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConn
   private static Map<Map<String, Object>, AtomicInteger> recordStoreCounts = new HashMap<Map<String, Object>, AtomicInteger>();
 
   public RecordStoreConnectionManager() {
-    super("Data Stores");
+    super("Record Stores");
   }
 
   public RecordStoreConnectionRegistry addConnectionRegistry(final String name,

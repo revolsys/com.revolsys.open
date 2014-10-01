@@ -44,7 +44,7 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class FieldNamesSetPanel extends ValueField implements ActionListener,
-  ListSelectionListener, PropertyChangeListener {
+ListSelectionListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -118,7 +118,7 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
     add(this.filterPanel);
 
     final SearchField allFieldNamesFilterField = new SearchField(
-      "allFieldNamesFilter");
+        "allFieldNamesFilter");
     allFieldNamesFilterField.setPreferredSize(new Dimension(350, 25));
     allFieldNamesFilterField.addActionListener(this);
     this.filterPanel.add(allFieldNamesFilterField);
@@ -308,7 +308,7 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
           if (fieldSetName.equalsIgnoreCase(name2)) {
             this.fieldNamesSetNames.set(i, name);
             this.fieldNamesSets.put(name, new ArrayList<>(
-              this.selectedFieldNamesModel));
+                this.selectedFieldNamesModel));
             this.fieldNamesSetNamesModel.removeElement(name2);
             this.fieldNamesSetNamesModel.insertElementAt(name, i);
             this.fieldNamesSetNamesModel.setSelectedItem(name);
@@ -330,7 +330,7 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
       final String oldFieldNamesSetName = (String)event.getOldValue();
       if (oldFieldNamesSetName != null) {
         this.fieldNamesSets.put(oldFieldNamesSetName, new ArrayList<>(
-          this.selectedFieldNamesModel));
+            this.selectedFieldNamesModel));
       }
       final String newFieldNamesSetName = (String)event.getNewValue();
       setFieldNamesSetName(newFieldNamesSetName);
@@ -391,10 +391,12 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
 
     this.addButton.setEnabled(this.allFieldNames.getSelectedIndex() > -1);
     final int selectedFieldIndex = this.selectedFieldNames.getSelectedIndex();
+    final int lastSelectedFieldIndex = this.selectedFieldNames.getSelectionModel()
+      .getMaxSelectionIndex();
     this.removeButton.setEnabled(selectedFieldIndex > -1);
     this.moveUpButton.setEnabled(selectedFieldIndex > 0);
     this.moveDownButton.setEnabled(selectedFieldIndex > -1
-      && selectedFieldIndex < this.selectedFieldNamesModel.getSize() - 1);
+      && lastSelectedFieldIndex < this.selectedFieldNamesModel.getSize() - 1);
   }
 
   @Override

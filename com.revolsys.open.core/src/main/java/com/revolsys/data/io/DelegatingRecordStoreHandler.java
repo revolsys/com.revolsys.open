@@ -29,7 +29,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
   public static <T extends RecordStore> T create(final String label,
     final Map<String, ? extends Object> config) {
     final ClassLoader classLoader = Thread.currentThread()
-      .getContextClassLoader();
+        .getContextClassLoader();
     final Class<?>[] interfaces = new Class<?>[] {
       RecordStoreFactoryRegistry.getRecordStoreInterfaceClass(config)
     };
@@ -56,32 +56,33 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
   }
 
   public DelegatingRecordStoreHandler(final String label,
-    final RecordStore recordStore) {
-    this.label = label;
-    this.recordStore = recordStore;
-  }
-
-  public DelegatingRecordStoreHandler(final String label,
     final Map<String, ? extends Object> config) {
     this.label = label;
     this.config = new HashMap<String, Object>(config);
   }
 
+  public DelegatingRecordStoreHandler(final String label,
+    final RecordStore recordStore) {
+    this.label = label;
+    this.recordStore = recordStore;
+  }
+
   protected RecordStore createRecordStore() {
-    if (config != null) {
-      final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(config);
+    if (this.config != null) {
+      final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(this.config);
       return recordStore;
     } else {
-      throw new UnsupportedOperationException("Data store must be set manually");
+      throw new UnsupportedOperationException(
+        "Record store must be set manually");
     }
   }
 
   public RecordStore getRecordStore() {
-    if (recordStore == null) {
-      recordStore = createRecordStore();
-      recordStore.initialize();
+    if (this.recordStore == null) {
+      this.recordStore = createRecordStore();
+      this.recordStore.initialize();
     }
-    return recordStore;
+    return this.recordStore;
   }
 
   @Override
@@ -94,16 +95,16 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
       numArgs = args.length;
     }
     if (method.getName().equals("toString") && numArgs == 0) {
-      return label;
+      return this.label;
     } else if (method.getName().equals("getLabel") && numArgs == 0) {
-      return label;
+      return this.label;
     } else if (method.getName().equals("hashCode") && numArgs == 0) {
-      return label.hashCode();
+      return this.label.hashCode();
     } else if (method.getName().equals("equals") && numArgs == 1) {
       final boolean equal = args[0] == proxy;
       return equal;
     } else if (method.getName().equals("close") && numArgs == 0) {
-      if (recordStore != null) {
+      if (this.recordStore != null) {
         final RecordStore recordStore = getRecordStore();
 
         recordStore.close();

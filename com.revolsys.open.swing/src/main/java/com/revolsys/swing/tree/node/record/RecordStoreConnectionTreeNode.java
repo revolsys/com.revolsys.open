@@ -86,7 +86,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
 
   public RecordStoreConnectionTreeNode(final RecordStoreConnection connection) {
     super(connection);
-    setType("Data Store Connection");
+    setType("Record Store Connection");
     setName(connection.getName());
     setIcon(ICON);
   }
@@ -94,9 +94,10 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
   public void deleteConnection() {
     final RecordStoreConnection connection = getConnection();
     final int confirm = JOptionPane.showConfirmDialog(
-      SwingUtil.getActiveWindow(), "Delete data store connection '"
+      SwingUtil.getActiveWindow(), "Delete record store connection '"
           + connection.getName() + "'? This action cannot be undone.",
-          "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+          "Delete Record Store Connection", JOptionPane.OK_CANCEL_OPTION,
+      JOptionPane.ERROR_MESSAGE);
     if (confirm == JOptionPane.OK_OPTION) {
       connection.delete();
     }

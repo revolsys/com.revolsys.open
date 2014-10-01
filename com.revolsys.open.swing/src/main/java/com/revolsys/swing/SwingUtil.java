@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
 import javax.swing.InputMap;
 import javax.swing.JCheckBox;
@@ -152,6 +153,8 @@ public class SwingUtil {
     addLabel(container, fieldName);
     final TextField field = new TextField(fieldName, value, length);
     field.setEditable(false);
+    field.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 3));
+    field.setFont(FONT);
     container.add(field);
   }
 

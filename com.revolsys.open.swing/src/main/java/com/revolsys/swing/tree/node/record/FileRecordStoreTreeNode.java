@@ -44,7 +44,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
 
   public FileRecordStoreTreeNode(final File file) {
     super(file);
-    setType("Data Store");
+    setType("Record Store");
     setName(FileUtil.getFileName(file));
     setIcon(FileTreeNode.ICON_FILE_DATABASE);
   }
@@ -57,8 +57,8 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
     final String fileName = FileUtil.getBaseName(file);
 
     final ValueField panel = new ValueField();
-    panel.setTitle("Add Data Store Connection");
-    SwingUtil.setTitledBorder(panel, "Data Store Connection");
+    panel.setTitle("Add Record Store Connection");
+    SwingUtil.setTitledBorder(panel, "Record Store Connection");
 
     SwingUtil.addLabel(panel, "File");
     final JLabel fileLabel = new JLabel(file.getAbsolutePath());
