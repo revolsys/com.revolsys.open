@@ -36,7 +36,7 @@ public class FileRecordLayer extends ListRecordLayer {
 
   public FileRecordLayer(final Map<String, ? extends Object> properties) {
     super(properties);
-    setType("recordFile");
+    setType("recordFileLayer");
   }
 
   @Override

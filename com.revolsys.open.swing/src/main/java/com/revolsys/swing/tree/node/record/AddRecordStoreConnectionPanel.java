@@ -41,11 +41,11 @@ public class AddRecordStoreConnectionPanel extends ValueField {
     add(new JLabel("Name:"));
     this.nameField = new JTextField("", 50);
     if (Property.hasValue(name)) {
-      setTitle("Add Data Store " + name);
+      setTitle("Add Record Store " + name);
       this.nameField.setText(name);
       this.nameField.setEditable(false);
     } else {
-      setTitle("Add Data Store");
+      setTitle("Add Record Store");
     }
     add(this.nameField);
     add(new JLabel("URL:"));

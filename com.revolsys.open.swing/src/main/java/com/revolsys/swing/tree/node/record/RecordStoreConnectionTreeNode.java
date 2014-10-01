@@ -27,7 +27,7 @@ import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 
 public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements
-RecordStoreProxy, RecordStoreConnectionMapProxy {
+  RecordStoreProxy, RecordStoreConnectionMapProxy {
   public static List<BaseTreeNode> getChildren(
     final Map<String, Object> connectionMap, final RecordStore recordStore) {
     if (recordStore == null) {
@@ -69,7 +69,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
   public static final Icon ICON = Icons.getIcon("database_link");
 
   private static final MenuFactory MENU = new MenuFactory(
-    "Record Store Connection");
+      "Record Store Connection");
 
   static {
     final EnableCheck notReadOnly = new TreeNodePropertyEnableCheck("readOnly",
@@ -79,9 +79,9 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
       "arrow_refresh", "refresh");
     MENU.addMenuItem("default", refresh);
 
-    MENU.addMenuItem("default",
-      TreeNodeRunnable.createAction("Delete Data Store Connection", "delete",
-        notReadOnly, "deleteConnection"));
+    MENU.addMenuItem("default", TreeNodeRunnable.createAction(
+      "Delete Record Store Connection", "delete", notReadOnly,
+      "deleteConnection"));
   }
 
   public RecordStoreConnectionTreeNode(final RecordStoreConnection connection) {
@@ -95,9 +95,9 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
     final RecordStoreConnection connection = getConnection();
     final int confirm = JOptionPane.showConfirmDialog(
       SwingUtil.getActiveWindow(), "Delete record store connection '"
-          + connection.getName() + "'? This action cannot be undone.",
-          "Delete Record Store Connection", JOptionPane.OK_CANCEL_OPTION,
-      JOptionPane.ERROR_MESSAGE);
+        + connection.getName() + "'? This action cannot be undone.",
+      "Delete Record Store Connection", JOptionPane.OK_CANCEL_OPTION,
+          JOptionPane.ERROR_MESSAGE);
     if (confirm == JOptionPane.OK_OPTION) {
       connection.delete();
     }

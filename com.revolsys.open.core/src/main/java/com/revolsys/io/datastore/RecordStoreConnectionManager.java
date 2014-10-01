@@ -20,8 +20,8 @@ import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
 public class RecordStoreConnectionManager
-  extends
-  AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConnection> {
+extends
+AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConnection> {
 
   public static RecordStoreConnectionManager get() {
     return INSTANCE;
@@ -36,7 +36,7 @@ public class RecordStoreConnectionManager
   }
 
   /**
-   * Get an initialized data store.
+   * Get an initialized record store.
    * @param connectionProperties
    * @return
    */
@@ -116,7 +116,14 @@ public class RecordStoreConnectionManager
 
   static {
     INSTANCE = new RecordStoreConnectionManager();
-    final File recordStoresDirectory = OS.getApplicationDataDirectory("com.revolsys.gis/Data Stores");
+    final File appsDirectory = OS.getApplicationDataDirectory();
+    final File oldDirectory = new File(appsDirectory,
+      "com.revolsys.gis/Data Stores");
+    if (oldDirectory.exists()) {
+      oldDirectory.renameTo(new File(appsDirectory,
+          "com.revolsys.gis/Record Stores"));
+    }
+    final File recordStoresDirectory = OS.getApplicationDataDirectory("com.revolsys.gis/Record Stores");
     INSTANCE.addConnectionRegistry("User", new FileSystemResource(
       recordStoresDirectory));
   }

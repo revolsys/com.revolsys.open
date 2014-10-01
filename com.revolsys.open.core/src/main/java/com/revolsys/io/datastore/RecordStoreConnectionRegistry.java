@@ -15,7 +15,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class RecordStoreConnectionRegistry extends
-  AbstractConnectionRegistry<RecordStoreConnection> {
+AbstractConnectionRegistry<RecordStoreConnection> {
 
   public static RecordStoreConnectionRegistry getForThread() {
     return RecordStoreConnectionRegistry.threadRegistry.get();
@@ -87,7 +87,7 @@ public class RecordStoreConnectionRegistry extends
       if (connectionProperties.isEmpty()) {
         LoggerFactory.getLogger(getClass()).error(
           "Record store must include a 'connection' map property: "
-            + recordStoreFile);
+              + recordStoreFile);
         return null;
       } else {
         final RecordStoreConnection recordStoreConnection = new RecordStoreConnection(
@@ -97,7 +97,7 @@ public class RecordStoreConnectionRegistry extends
       }
     } catch (final Throwable e) {
       LoggerFactory.getLogger(getClass()).error(
-        "Error creating data store from: " + recordStoreFile, e);
+        "Error creating record store from: " + recordStoreFile, e);
       return null;
     }
   }

@@ -29,7 +29,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
   public static <T extends RecordStore> T create(final String label,
     final Map<String, ? extends Object> config) {
     final ClassLoader classLoader = Thread.currentThread()
-        .getContextClassLoader();
+      .getContextClassLoader();
     final Class<?>[] interfaces = new Class<?>[] {
       RecordStoreFactoryRegistry.getRecordStoreInterfaceClass(config)
     };
@@ -41,7 +41,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
       proxyStore.initialize();
     } catch (final Throwable t) {
       LoggerFactory.getLogger(DelegatingRecordStoreHandler.class).error(
-        "Unable to initialize data store " + label, t);
+        "Unable to initialize record store " + label, t);
     }
     return proxyStore;
   }
@@ -73,7 +73,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
       return recordStore;
     } else {
       throw new UnsupportedOperationException(
-        "Record store must be set manually");
+          "Record store must be set manually");
     }
   }
 

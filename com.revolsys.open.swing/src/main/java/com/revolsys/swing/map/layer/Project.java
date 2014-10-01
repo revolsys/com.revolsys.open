@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer;
 
 import java.awt.Rectangle;
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -255,7 +256,18 @@ public class Project extends LayerGroup {
         final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry.getForThread();
         try {
           final Resource recordStoresDirectory = SpringUtil.getResource(
-            resource, "Data Stores");
+            resource, "Record Stores");
+          if (!recordStoresDirectory.exists()) {
+            final Resource dataStoresDirectory = SpringUtil.getResource(
+              resource, "Data Stores");
+            if (dataStoresDirectory.exists()) {
+              try {
+                final File file = dataStoresDirectory.getFile();
+                file.renameTo(new File(file.getParentFile(), "Record Stores"));
+              } catch (final IOException e) {
+              }
+            }
+          }
 
           final boolean readOnly = isReadOnly();
           final RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(

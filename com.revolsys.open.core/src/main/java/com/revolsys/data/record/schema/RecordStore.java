@@ -91,7 +91,7 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
   RecordStoreSchema getSchema(final String schemaName);
 
   /**
-   * Get the list of name space names provided by the data store.
+   * Get the list of name space names provided by the record store.
    *
    * @return The name space names.
    */

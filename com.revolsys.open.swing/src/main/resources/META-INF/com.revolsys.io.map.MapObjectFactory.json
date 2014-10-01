@@ -38,19 +38,19 @@
       "methodName": "create"
     },
     {
-      "typeName": "recordStore",
-      "description": "Data Store",
+      "typeName": "recordStoreLayer",
+      "description": "Record Store Layer",
       "typeClass": "com.revolsys.swing.map.layer.record.RecordStoreLayer",
       "methodName": "create"
     },
     {
       "typeName": "dataStore",
-      "description": "Data Store",
+      "description": "Record Store Layer",
       "typeClass": "com.revolsys.swing.map.layer.record.RecordStoreLayer",
       "methodName": "create"
     },
     {
-      "typeName": "recordFile",
+      "typeName": "recordFileLayer",
       "description": "File",
       "typeClass": "com.revolsys.swing.map.layer.record.FileRecordLayer",
       "methodName": "create"
@@ -93,6 +93,12 @@
       "methodName": "create"
     },
     {
+      "typeName": "gridLayer",
+      "description": "Grid Layer",
+      "typeClass": "com.revolsys.swing.map.layer.grid.GridLayer",
+      "methodName": "create"
+    },
+    {
       "typeName": "wikipedia",
       "description": "Wikipedia Articles",
       "typeClass": "com.revolsys.swing.map.layer.wikipedia.WikipediaBoundingBoxLayerWorker",
@@ -106,7 +112,13 @@
     },
     {
       "typeName": "geoReferencedImage",
-      "description": "Geo-referenced Image",
+      "description": "Geo-referenced Image Layer",
+      "typeClass": "com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer",
+      "methodName": "create"
+    },
+    {
+      "typeName": "geoReferencedImageLayer",
+      "description": "Geo-referenced Image Layer",
       "typeClass": "com.revolsys.swing.map.layer.raster.GeoReferencedImageLayer",
       "methodName": "create"
     }

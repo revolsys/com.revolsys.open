@@ -89,14 +89,14 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   public RecordStoreLayer(final Map<String, ? extends Object> properties) {
     super(properties);
-    setType("recordStore");
+    setType("recordStoreLayer");
   }
 
   public RecordStoreLayer(final RecordStore recordStore, final String typePath,
     final boolean exists) {
     this.recordStore = recordStore;
     setExists(exists);
-    setType("recordStore");
+    setType("recordStoreLayer");
 
     final RecordDefinition recordDefinition = recordStore.getRecordDefinition(typePath);
     setTypePath(typePath);
@@ -310,7 +310,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (connectionProperties == null) {
         LoggerFactory.getLogger(getClass())
           .error(
-            "A data store layer requires a connectionProperties entry with a name or url, username, and password: "
+            "A record store layer requires a connectionProperties entry with a name or url, username, and password: "
               + getPath());
         return false;
       } else {
@@ -320,14 +320,14 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
         if (recordStore == null) {
           LoggerFactory.getLogger(getClass()).error(
-            "Unable to create data store for layer: " + getPath());
+            "Unable to create record store for layer: " + getPath());
           return false;
         } else {
           try {
             recordStore.initialize();
           } catch (final Throwable e) {
             throw new RuntimeException(
-              "Unable to iniaitlize data store for layer " + getPath(), e);
+              "Unable to iniaitlize record store for layer " + getPath(), e);
           }
 
           setRecordStore(recordStore);

@@ -9,20 +9,7 @@ import com.revolsys.io.json.JsonMapIoFactory;
 
 public class OS {
 
-  public static final String OS_ARCH = System.getProperty("os.arch");
-
-  public final static String OS_NAME = System.getProperty("os.name");
-
-  public final static boolean IS_WINDOWS = OS_NAME.startsWith("Windows");
-
-  public final static boolean IS_SOLARIS = OS_NAME.equals("SunOS");
-
-  public final static boolean IS_LINUX = OS_NAME.equals("Linux");
-
-  public final static boolean IS_MAC = OS_NAME.contains("OS X")
-    || OS_NAME.equals("Darwin");
-
-  public static File getApplicationDataDirectory(final String applicationName) {
+  public static File getApplicationDataDirectory() {
     String path;
     if (OS.isWindows()) {
       path = System.getenv("APPDATA");
@@ -31,8 +18,13 @@ public class OS {
     } else {
       path = System.getProperty("user.home") + "/.config";
     }
-    final File directory = FileUtil.getFile(path + "/" + applicationName);
-    directory.mkdirs();
+    final File directory = FileUtil.getDirectory(path);
+    return directory;
+  }
+
+  public static File getApplicationDataDirectory(final String applicationName) {
+    final File appsDirectory = getApplicationDataDirectory();
+    final File directory = FileUtil.getDirectory(appsDirectory, applicationName);
     return directory;
   }
 
@@ -99,10 +91,10 @@ public class OS {
       path = System.getenv("APPDATA") + "/" + applicationName + "/Preferences";
     } else if (OS.isMac()) {
       path = System.getProperty("user.home") + "/Library/Preferences/"
-        + applicationName;
+          + applicationName;
     } else {
       path = System.getProperty("user.home") + "/.config/" + applicationName
-        + "/Preferences";
+          + "/Preferences";
     }
     final File directory = FileUtil.getFile(path);
     directory.mkdirs();
@@ -139,5 +131,18 @@ public class OS {
     final File file = getPreferenceFile(applicationName, path);
     JsonMapIoFactory.write(preferences, file, true);
   }
+
+  public static final String OS_ARCH = System.getProperty("os.arch");
+
+  public final static String OS_NAME = System.getProperty("os.name");
+
+  public final static boolean IS_WINDOWS = OS_NAME.startsWith("Windows");
+
+  public final static boolean IS_SOLARIS = OS_NAME.equals("SunOS");
+
+  public final static boolean IS_LINUX = OS_NAME.equals("Linux");
+
+  public final static boolean IS_MAC = OS_NAME.contains("OS X")
+      || OS_NAME.equals("Darwin");
 
 }
