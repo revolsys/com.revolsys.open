@@ -152,6 +152,11 @@ public class BaseJxTable extends JXTable {
   }
 
   @Override
+  public void initializeColumnWidths() {
+    super.initializeColumnWidths();
+  }
+
+  @Override
   public boolean isCellEditable(final int row, final int column) {
     try {
       return super.isCellEditable(row, column);

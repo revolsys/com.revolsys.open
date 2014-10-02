@@ -173,9 +173,13 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
         super.tableChanged(event);
       } catch (final Throwable t) {
       }
-      createDefaultColumnsFromModel();
-      if (event.getType() == TableModelEvent.UPDATE
-          && event.getColumn() == TableModelEvent.ALL_COLUMNS) {
+      final int type = event.getType();
+      final int eventColumn = event.getColumn();
+      final int row = event.getFirstRow();
+      if (type == TableModelEvent.UPDATE
+          && eventColumn == TableModelEvent.ALL_COLUMNS
+          && row == TableModelEvent.HEADER_ROW) {
+        createDefaultColumnsFromModel();
         final TableColumnModel columnModel = getColumnModel();
         for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
           final TableColumn column = columnModel.getColumn(columnIndex);
@@ -184,14 +188,18 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
           }
           column.setCellRenderer(this.cellRenderer);
         }
-
+        initializeColumnWidths();
       }
-      initializeColumnWidths();
       if (this.tableHeader != null) {
         this.tableHeader.resizeAndRepaint();
       }
     } else {
       Invoke.later(this, "tableChanged", event);
     }
+  }
+
+  @Override
+  public String toString() {
+    return getRecordDefinition().getPath();
   }
 }

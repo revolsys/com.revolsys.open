@@ -27,7 +27,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public abstract class RecordRowTableModel extends AbstractRecordTableModel
-  implements SortableTableModel, CellEditorListener {
+implements SortableTableModel, CellEditorListener {
 
   public static final String LOADING_VALUE = "\u2026";
 
@@ -44,11 +44,16 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   /** The columnIndex that the attribute start. Allows for extra columns in subclasses.*/
   private int fieldsOffset;
 
+  public RecordRowTableModel(final RecordDefinition recordDefinition) {
+    this(recordDefinition, Collections.<String> emptyList());
+  }
+
   public RecordRowTableModel(final RecordDefinition recordDefinition,
     final Collection<String> fieldNames) {
     super(recordDefinition);
-    setFieldNames(fieldNames);
-    setFieldTitles(Collections.<String> emptyList());
+    if (Property.hasValue(fieldNames)) {
+      setFieldNamesAndTitles(fieldNames, Collections.<String> emptyList());
+    }
     final String idAttributeName = recordDefinition.getIdAttributeName();
     setSortOrder(idAttributeName);
   }
@@ -109,11 +114,13 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   @Override
   public String getColumnName(final int columnIndex) {
-    if (columnIndex < this.fieldsOffset) {
-      return null;
-    } else {
-      return this.fieldTitles.get(columnIndex - this.fieldsOffset);
+    if (columnIndex >= this.fieldsOffset) {
+      final int fieldIndex = columnIndex - this.fieldsOffset;
+      if (fieldIndex < this.fieldTitles.size()) {
+        return this.fieldTitles.get(fieldIndex);
+      }
     }
+    return null;
   }
 
   @Override
@@ -245,16 +252,19 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     fireTableStructureChanged();
   }
 
-  public void setFieldsOffset(final int attributesOffset) {
-    this.fieldsOffset = attributesOffset;
-  }
-
-  public void setFieldTitles(final List<String> attributeTitles) {
+  public void setFieldNamesAndTitles(final Collection<String> fieldNames,
+    final List<String> fieldTitles) {
+    if (fieldNames == null || fieldNames.isEmpty()) {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      this.fieldNames = new ArrayList<>(recordDefinition.getAttributeNames());
+    } else {
+      this.fieldNames = new ArrayList<>(fieldNames);
+    }
     this.fieldTitles.clear();
     for (int i = 0; i < this.fieldNames.size(); i++) {
       String title;
-      if (i < attributeTitles.size()) {
-        title = attributeTitles.get(i);
+      if (i < fieldTitles.size()) {
+        title = fieldTitles.get(i);
       } else {
         final String attributeName = getFieldName(i);
         final RecordDefinition recordDefinition = getRecordDefinition();
@@ -263,6 +273,28 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       }
       this.fieldTitles.add(title);
     }
+    fireTableStructureChanged();
+  }
+
+  public void setFieldsOffset(final int attributesOffset) {
+    this.fieldsOffset = attributesOffset;
+  }
+
+  public void setFieldTitles(final List<String> fieldTitles) {
+    this.fieldTitles.clear();
+    for (int i = 0; i < this.fieldNames.size(); i++) {
+      String title;
+      if (i < fieldTitles.size()) {
+        title = fieldTitles.get(i);
+      } else {
+        final String attributeName = getFieldName(i);
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        final Attribute attribute = recordDefinition.getAttribute(attributeName);
+        title = attribute.getTitle();
+      }
+      this.fieldTitles.add(title);
+    }
+    fireTableStructureChanged();
   }
 
   @Override

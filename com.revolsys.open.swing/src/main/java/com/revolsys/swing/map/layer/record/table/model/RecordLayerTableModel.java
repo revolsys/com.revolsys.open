@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -146,8 +147,9 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
   private final LayerRecord loadingRecord;
 
   public RecordLayerTableModel(final AbstractRecordLayer layer) {
-    super(layer.getRecordDefinition(), layer.getFieldNamesSet());
+    super(layer.getRecordDefinition());
     this.layer = layer;
+    setFieldNames(layer.getFieldNamesSet());
     Property.addListener(layer, this);
     setEditable(true);
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
@@ -156,8 +158,9 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
 
   @Override
   public String getColumnName(final int columnIndex) {
-    final String fieldName = getFieldName(columnIndex);
-    return this.layer.getFieldTitle(fieldName);
+    // final String fieldName = getFieldName(columnIndex);
+    // return this.layer.getFieldTitle(fieldName);
+    return super.getColumnName(columnIndex);
   }
 
   public String getFieldFilterMode() {
@@ -506,6 +509,16 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
         refresh();
       }
     }
+  }
+
+  @Override
+  public void setFieldNames(final Collection<String> fieldNames) {
+    final List<String> fieldTitles = new ArrayList<>();
+    for (final String fieldName : fieldNames) {
+      final String fieldTitle = this.layer.getFieldTitle(fieldName);
+      fieldTitles.add(fieldTitle);
+    }
+    super.setFieldNamesAndTitles(fieldNames, fieldTitles);
   }
 
   public boolean setFilter(final Condition filter) {
