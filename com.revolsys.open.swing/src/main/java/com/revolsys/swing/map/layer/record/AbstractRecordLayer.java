@@ -42,12 +42,6 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.event.CDockableStateListener;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.common.mode.ExtendedMode;
-
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
@@ -82,7 +76,6 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.spring.ByteArrayResource;
-import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -750,13 +743,18 @@ RecordFactory, AddGeometryCompleteAction {
     }
   }
 
-  public Component createTablePanel() {
+  public RecordLayerTablePanel createTablePanel() {
     final RecordLayerTable table = RecordLayerTableModel.createTable(this);
     if (table == null) {
       return null;
     } else {
       return new RecordLayerTablePanel(this, table);
     }
+  }
+
+  @Override
+  protected Component createTableViewComponent() {
+    return createTablePanel();
   }
 
   @Override
@@ -2628,56 +2626,8 @@ RecordFactory, AddGeometryCompleteAction {
 
   public void showRecordsTable(String fieldFilterMode) {
     if (SwingUtilities.isEventDispatchThread()) {
-      final Object tableView = getProperty("TableView");
-      DefaultSingleCDockable dockable = null;
-      if (tableView instanceof DefaultSingleCDockable) {
-        dockable = (DefaultSingleCDockable)tableView;
-      }
-      final Component component;
-      if (dockable == null) {
-        final LayerGroup project = getProject();
-
-        component = createTablePanel();
-
-        if (component != null) {
-          final String id = getClass().getName() + "." + getId();
-          dockable = DockingFramesUtil.addDockable(project,
-            MapPanel.MAP_TABLE_WORKING_AREA, id, getName(), component);
-          dockable.setTitleIcon(getIcon());
-
-          if (dockable != null) {
-            dockable.setCloseable(true);
-            setProperty("TableView", dockable);
-            dockable.addCDockableStateListener(new CDockableStateListener() {
-
-              @Override
-              public void extendedModeChanged(final CDockable dockable,
-                final ExtendedMode mode) {
-              }
-
-              @Override
-              public void visibilityChanged(final CDockable dockable) {
-                final boolean visible = dockable.isVisible();
-                if (!visible) {
-                  dockable.getControl()
-                  .getOwner()
-                  .remove((SingleCDockable)dockable);
-                  setProperty("TableView", null);
-                }
-              }
-            });
-            dockable.toFront();
-          }
-        }
-      } else {
-        component = dockable.getContentPane().getComponent(0);
-        dockable.toFront();
-      }
-
-      if (component instanceof RecordLayerTablePanel) {
-        final RecordLayerTablePanel tablePanel = (RecordLayerTablePanel)component;
-        tablePanel.setFieldFilterMode(fieldFilterMode);
-      }
+      final RecordLayerTablePanel panel = showTableView();
+      panel.setFieldFilterMode(fieldFilterMode);
     } else {
       if (!Property.hasValue(fieldFilterMode)) {
         fieldFilterMode = RecordLayerTableModel.MODE_ALL;

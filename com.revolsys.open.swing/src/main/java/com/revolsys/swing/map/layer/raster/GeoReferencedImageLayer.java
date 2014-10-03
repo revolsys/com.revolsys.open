@@ -11,12 +11,6 @@ import javax.swing.SwingUtilities;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.event.CDockableStateListener;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.common.mode.ExtendedMode;
-
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
@@ -32,7 +26,6 @@ import com.revolsys.raster.GeoReferencedImage;
 import com.revolsys.raster.GeoReferencedImageFactory;
 import com.revolsys.raster.MappedLocation;
 import com.revolsys.spring.SpringUtil;
-import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
@@ -41,9 +34,7 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
-import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
-import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -69,9 +60,9 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       false);
     final EnableCheck editable = new MenuSourcePropertyEnableCheck("editable");
     final EnableCheck showOriginalImage = new MenuSourcePropertyEnableCheck(
-      "showOriginalImage");
+        "showOriginalImage");
     final EnableCheck hasTransform = new MenuSourcePropertyEnableCheck(
-      "hasTransform");
+        "hasTransform");
 
     menu.addMenuItem("table", MenuSourceRunnable.createAction(
       "View Tie-Points", "table_go", "showTiePointsTable"));
@@ -139,7 +130,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   @Override
   public TabbedValuePanel createPropertiesPanel() {
     final TabbedValuePanel propertiesPanel = super.createPropertiesPanel();
-    final TiePointsPanel tiePointsPanel = new TiePointsPanel(this);
+    final TiePointsPanel tiePointsPanel = createTableViewComponent();
     SwingUtil.setTitledBorder(tiePointsPanel, "Tie Points");
 
     propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
@@ -161,8 +152,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     if (Property.hasValue(fileNameExtension)) {
       SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
       final GeoReferencedImageFactory factory = IoFactoryRegistry.getInstance()
-        .getFactoryByFileExtension(GeoReferencedImageFactory.class,
-          fileNameExtension);
+          .getFactoryByFileExtension(GeoReferencedImageFactory.class,
+            fileNameExtension);
       if (factory != null) {
         SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
       }
@@ -171,12 +162,17 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     return panel;
   }
 
+  @Override
+  protected TiePointsPanel createTableViewComponent() {
+    return new TiePointsPanel(this);
+  }
+
   public void deleteTiePoint(final MappedLocation tiePoint) {
     if (isEditable()) {
       this.image.deleteTiePoint(tiePoint);
     } else {
       LoggerFactory.getLogger("Cannot delete tie-point. Layer " + getClass())
-        .error(getPath() + " is not editable");
+      .error(getPath() + " is not editable");
     }
   }
 
@@ -190,7 +186,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       return true;
     } else {
       LoggerFactory.getLogger(getClass()).error(
-        "Layer definition does not contain a 'url' property");
+          "Layer definition does not contain a 'url' property");
       return false;
     }
   }
@@ -392,49 +388,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   public void showTiePointsTable() {
     if (SwingUtilities.isEventDispatchThread()) {
-      final Object tableView = getProperty("TableView");
-      DefaultSingleCDockable dockable = null;
-      if (tableView instanceof DefaultSingleCDockable) {
-        dockable = (DefaultSingleCDockable)tableView;
-      }
-      final TiePointsPanel tiePointsPanel;
-      if (dockable == null) {
-        final LayerGroup project = getProject();
-
-        tiePointsPanel = new TiePointsPanel(this);
-
-        if (tiePointsPanel != null) {
-          final String id = getClass().getName() + "." + getId();
-          dockable = DockingFramesUtil.addDockable(project,
-            MapPanel.MAP_TABLE_WORKING_AREA, id, getName(), tiePointsPanel);
-
-          if (dockable != null) {
-            dockable.setCloseable(true);
-            setProperty("TableView", dockable);
-            dockable.addCDockableStateListener(new CDockableStateListener() {
-              @Override
-              public void extendedModeChanged(final CDockable dockable,
-                final ExtendedMode mode) {
-              }
-
-              @Override
-              public void visibilityChanged(final CDockable dockable) {
-                final boolean visible = dockable.isVisible();
-                if (!visible) {
-                  dockable.getControl()
-                    .getOwner()
-                    .remove((SingleCDockable)dockable);
-                  setProperty("TableView", null);
-                }
-              }
-            });
-            dockable.toFront();
-          }
-        }
-      } else {
-        dockable.toFront();
-      }
-
+      showTableView();
     } else {
       Invoke.later(this, "showTiePointsTable");
     }
@@ -546,8 +500,8 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       boundingBox = boundingBox.expandToInclude(line);
     }
     boundingBox = boundingBox.convert(geometryFactory)
-      .expandPercent(0.1)
-      .clipToCoordinateSystem();
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
 
     project.setViewBoundingBox(boundingBox);
   }

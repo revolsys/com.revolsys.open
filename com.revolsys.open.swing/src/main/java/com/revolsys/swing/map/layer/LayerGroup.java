@@ -39,7 +39,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerGroup extends AbstractLayer implements Parent<Layer>,
-  Iterable<Layer> {
+Iterable<Layer> {
 
   public static LayerGroup create(final Map<String, Object> properties) {
     final LayerGroup layerGroup = new LayerGroup();
@@ -536,7 +536,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>,
           } else if (object != null) {
             LoggerFactory.getLogger(LayerGroup.class).error(
               "Unexpected object type " + object.getClass() + " in "
-                + childResource);
+                  + childResource);
           }
         } else {
           LoggerFactory.getLogger(LayerGroup.class).error(
@@ -650,22 +650,26 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>,
   }
 
   public boolean saveAllSettings(final File directory) {
-    boolean saved = true;
-    final File groupDirectory = getGroupSettingsDirectory(directory);
-    if (canSaveSettings(directory)) {
-      saved &= saveSettings(directory);
-      for (final Layer layer : this) {
-        if (layer instanceof LayerGroup) {
-          final LayerGroup layerGroup = (LayerGroup)layer;
-          saved &= layerGroup.saveAllSettings(groupDirectory);
-        } else {
-          saved &= layer.saveSettings(groupDirectory);
-        }
-      }
+    if (directory == null) {
+      return false;
     } else {
-      saved = false;
+      boolean saved = true;
+      final File groupDirectory = getGroupSettingsDirectory(directory);
+      if (canSaveSettings(directory)) {
+        saved &= saveSettings(directory);
+        for (final Layer layer : this) {
+          if (layer instanceof LayerGroup) {
+            final LayerGroup layerGroup = (LayerGroup)layer;
+            saved &= layerGroup.saveAllSettings(groupDirectory);
+          } else {
+            saved &= layer.saveSettings(groupDirectory);
+          }
+        }
+      } else {
+        saved = false;
+      }
+      return saved;
     }
-    return saved;
   }
 
   @Override

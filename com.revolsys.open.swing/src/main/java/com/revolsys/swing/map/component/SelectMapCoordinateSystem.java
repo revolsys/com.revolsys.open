@@ -31,7 +31,7 @@ ItemListener, PropertyChangeListener {
     "unchecked"
   })
   public SelectMapCoordinateSystem(final MapPanel map) {
-    super(3857, 3005, 26907, 26908, 26909, 26910, 26911, 4326);
+    super(3857, 3005, 26907, 26908, 26909, 26910, 26911, 4326, 4269, 4267);
 
     this.map = new WeakReference<MapPanel>(map);
     setSelectedItem(map.getGeometryFactory().getSrid());

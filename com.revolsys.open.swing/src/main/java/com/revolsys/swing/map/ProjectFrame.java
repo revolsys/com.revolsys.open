@@ -4,6 +4,7 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -25,26 +26,14 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
 import org.springframework.core.io.FileSystemResource;
-
-import bibliothek.extension.gui.dock.theme.EclipseTheme;
-import bibliothek.gui.dock.common.CContentArea;
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.CLocation;
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.MultipleCDockable;
-import bibliothek.gui.dock.common.SingleCDockable;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.common.location.TreeLocationRoot;
-import bibliothek.gui.dock.common.mode.ExtendedMode;
-import bibliothek.gui.dock.common.theme.CEclipseTheme;
-import bibliothek.gui.dock.common.theme.ThemeMap;
-import bibliothek.gui.dock.dockable.ScreencaptureMovingImageFactory;
 
 import com.revolsys.io.datastore.RecordStoreConnectionManager;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
@@ -54,7 +43,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.net.urlcache.FileResponseCache;
-import com.revolsys.swing.DockingFramesUtil;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -137,7 +125,9 @@ public class ProjectFrame extends BaseFrame {
 
   private Project project;
 
-  private CControl dockControl = new CControl(this);
+  private JTabbedPane leftTabs = new JTabbedPane();
+
+  private JTabbedPane bottomTabs = new JTabbedPane();
 
   private MapPanel mapPanel;
 
@@ -146,6 +136,8 @@ public class ProjectFrame extends BaseFrame {
   private boolean exitOnClose = true;
 
   private BaseTree tocTree;
+
+  private JSplitPane leftRightSplit;
 
   public ProjectFrame(final String title) {
     this(title, new Project());
@@ -186,44 +178,20 @@ public class ProjectFrame extends BaseFrame {
     folderConnections.expandChildren();
 
     this.catalogTree = tree;
-    final LayerGroup project = getProject();
 
-    final DefaultSingleCDockable dockable = DockingFramesUtil.addDockable(
-      project, MapPanel.MAP_CONTROLS_WORKING_AREA, "catalog", "Catalog",
-      new JScrollPane(this.catalogTree));
-    dockable.setTitleIcon(Icons.getIcon("tree_catalog"));
-    dockable.setTitleText(null);
-    dockable.setTitleToolTip("Catalog");
-  }
-
-  protected void addControlWorkingArea() {
-    final CLocation location = CLocation.base().normalWest(getControlWidth());
-    DockingFramesUtil.createCWorkingArea(this.dockControl, this.project,
-      MapPanel.MAP_CONTROLS_WORKING_AREA, location);
+    this.leftTabs.addTab(null, Icons.getIcon("tree_catalog"), new JScrollPane(
+      this.catalogTree));
+    this.leftTabs.setToolTipTextAt(this.leftTabs.getTabCount() - 1, "Catalog");
   }
 
   protected void addLogPanel() {
     final JPanel panel = Log4jTableModel.createPanel();
-    final DefaultSingleCDockable dockable = DockingFramesUtil.addDockable(
-      this.project, MapPanel.MAP_TABLE_WORKING_AREA, "log4j", "Logging", panel);
-    dockable.setTitleIcon(Icons.getIcon("error"));
-    dockable.setTitleText(null);
-    dockable.setTitleToolTip("Log Messages");
+    addTabIcon(this.bottomTabs, "error", "Logging", panel);
   }
 
   protected MapPanel addMapPanel() {
     this.mapPanel = new MapPanel(this.project);
 
-    final DefaultSingleCDockable dockable = new DefaultSingleCDockable("map",
-      "Map", this.mapPanel);
-    dockable.setTitleIcon(Icons.getIcon("map"));
-    dockable.setStackable(false);
-    dockable.setCloseable(false);
-    dockable.setDefaultLocation(ExtendedMode.MINIMIZED, CLocation.base()
-      .minimalWest());
-
-    this.dockControl.addDockable(dockable);
-    dockable.setVisible(true);
     return this.mapPanel;
   }
 
@@ -232,7 +200,15 @@ public class ProjectFrame extends BaseFrame {
     menuBar.add(menu, menuBar.getMenuCount() - 1);
   }
 
-  protected DefaultSingleCDockable addTableOfContents() {
+  public int addTabIcon(final JTabbedPane tabs, final String iconName,
+    final String toolTipText, final Component component) {
+    tabs.addTab(null, Icons.getIcon(iconName), new JScrollPane(component));
+    final int tabIndex = tabs.getTabCount() - 1;
+    tabs.setToolTipTextAt(tabIndex, toolTipText);
+    return tabIndex;
+  }
+
+  protected void addTableOfContents() {
     final Project project = getProject();
     this.tocTree = ProjectTreeNode.createTree(project);
 
@@ -240,44 +216,22 @@ public class ProjectFrame extends BaseFrame {
       new InvokeMethodPropertyChangeListener(true, this, "expandLayers",
         PropertyChangeEvent.class));
 
-    final DefaultSingleCDockable tableOfContents = DockingFramesUtil.addDockable(
-      project, MapPanel.MAP_CONTROLS_WORKING_AREA, "toc", "TOC",
-      new JScrollPane(this.tocTree));
-    tableOfContents.setTitleIcon(Icons.getIcon("tree_layers"));
-    tableOfContents.setTitleText(null);
-    tableOfContents.setTitleToolTip("Layers (Table of Contents)");
+    addTabIcon(this.leftTabs, "tree_layers", "TOC", this.tocTree);
 
-    tableOfContents.toFront();
-    return tableOfContents;
-  }
-
-  protected void addTableWorkingArea() {
-    final TreeLocationRoot location = CLocation.base().normalSouth(0.25);
-    DockingFramesUtil.createCWorkingArea(this.dockControl, this.project,
-      MapPanel.MAP_TABLE_WORKING_AREA, location);
   }
 
   protected void addTasksPanel() {
     final JPanel panel = SwingWorkerTableModel.createPanel();
-    final DefaultSingleCDockable dockable = DockingFramesUtil.addDockable(
-      this.project, MapPanel.MAP_TABLE_WORKING_AREA, "tasks",
+    final int tabIndex = addTabIcon(this.bottomTabs, "time",
       "Background Tasks", panel);
-
-    dockable.setTitleText("");
-    dockable.setTitleIcon(Icons.getIcon("time"));
-    dockable.setTitleToolTip("Background Tasks");
 
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = InvokeMethodAction.createButton(null,
-      "View Running Tasks", Icons.getIcon("time_go"), dockable, "toFront");
+      "View Running Tasks", Icons.getIcon("time_go"), this.bottomTabs,
+      "setSelectedIndex", tabIndex);
     viewTasksAction.setBorderPainted(false);
     viewTasksAction.setBorder(null);
     progressBar.add(viewTasksAction, BorderLayout.EAST);
-  }
-
-  protected void addWorkingAreas() {
-    addControlWorkingArea();
-    addTableWorkingArea();
   }
 
   @Override
@@ -298,17 +252,20 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory createMenuFile() {
     final MenuFactory file = new MenuFactory("File");
 
-    file.addMenuItem("project", "New Project", "New Project",
-      Icons.getIcon("layout_add"), this, "actionNewProject");
+    file.addMenuItemTitleIcon("project", "New Project", "layout_add", this,
+      "actionNewProject");
 
-    file.addMenuItem("project", "Save Project", "Save Project",
-      Icons.getIcon("layout_save"), this.project, "saveAllSettings");
+    file.addMenuItemTitleIcon("project", "Save Project", "layout_save",
+      this.project, "saveAllSettings");
+
+    file.addMenuItemTitleIcon("project", "Save Project As...", "layout_save",
+      this.project, "saveAllSettingsAs");
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
-        "save");
+      "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-        "print");
+      "print");
 
     file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
     return file;
@@ -320,7 +277,7 @@ public class ProjectFrame extends BaseFrame {
     tools.addCheckboxMenuItem("map",
       new InvokeMethodAction("Measure", Icons.getIcon("ruler"), map,
         "toggleMode", MeasureOverlay.MEASURE), new ObjectPropertyEnableCheck(
-          map, "overlayAction", MeasureOverlay.MEASURE));
+        map, "overlayAction", MeasureOverlay.MEASURE));
 
     tools.addMenuItem("script", "Run Script...", "Run Script",
       Icons.getIcon("script_go"), this, "runScript");
@@ -343,26 +300,10 @@ public class ProjectFrame extends BaseFrame {
       }
       this.tocTree = null;
       this.project = null;
-      if (this.dockControl != null) {
-        int i = 0;
-        while (i < this.dockControl.getCDockableCount()) {
-          final CDockable dockable = this.dockControl.getCDockable(i);
-          if (dockable instanceof MultipleCDockable) {
-            final MultipleCDockable multiple = (MultipleCDockable)dockable;
-            this.dockControl.remove(multiple);
+      this.leftTabs = null;
+      this.leftRightSplit = null;
+      this.bottomTabs = null;
 
-          } else if (dockable instanceof SingleCDockable) {
-            final SingleCDockable multiple = (SingleCDockable)dockable;
-            this.dockControl.remove(multiple);
-
-          } else {
-            i++;
-          }
-        }
-        this.dockControl.destroy();
-        this.dockControl.setRootWindow(null);
-        this.dockControl = null;
-      }
       if (this.mapPanel != null) {
         this.mapPanel.destroy();
         this.mapPanel = null;
@@ -419,20 +360,16 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
+  public JTabbedPane getBottomTabs() {
+    return this.bottomTabs;
+  }
+
   public double getControlWidth() {
     return 0.20;
   }
 
   protected BoundingBox getDefaultBoundingBox() {
     return new BoundingBoxDoubleGf();
-  }
-
-  public CControl getDockControl() {
-    return this.dockControl;
-  }
-
-  public MapPanel getMapPanel() {
-    return this.mapPanel;
   }
 
   // public void expandConnectionManagers(final PropertyChangeEvent event) {
@@ -451,6 +388,14 @@ public class ProjectFrame extends BaseFrame {
   // }
   // }
   // }
+
+  public JTabbedPane getLeftTabs() {
+    return this.leftTabs;
+  }
+
+  public MapPanel getMapPanel() {
+    return this.mapPanel;
+  }
 
   public Project getProject() {
     return this.project;
@@ -472,6 +417,7 @@ public class ProjectFrame extends BaseFrame {
 
   @Override
   protected void init() {
+    setMinimumSize(new Dimension(600, 500));
     setBounds((Object)null);
 
     final JRootPane rootPane = getRootPane();
@@ -483,31 +429,33 @@ public class ProjectFrame extends BaseFrame {
     Project.set(this.project);
     this.project.setProperty(PROJECT_FRAME, this);
 
-    this.dockControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
-    this.dockControl.getController()
-    .getProperties()
-    .set(EclipseTheme.PAINT_ICONS_WHEN_DESELECTED, true);
-    final CEclipseTheme theme = (CEclipseTheme)this.dockControl.getController()
-        .getTheme();
-    theme.intern().setMovingImageFactory(
-      new ScreencaptureMovingImageFactory(new Dimension(2000, 2000)));
-
-    final CContentArea dockContentArea = this.dockControl.getContentArea();
-    add(dockContentArea, BorderLayout.CENTER);
-    DockingFramesUtil.setFlapSizes(this.dockControl);
-
     addMapPanel();
 
-    addWorkingAreas();
+    this.leftTabs.setMinimumSize(new Dimension(100, 300));
+    this.leftTabs.setPreferredSize(new Dimension(300, 700));
 
-    final DefaultSingleCDockable toc = addTableOfContents();
+    this.mapPanel.setMinimumSize(new Dimension(300, 300));
+    this.mapPanel.setPreferredSize(new Dimension(700, 700));
+    this.leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+      this.leftTabs, this.mapPanel);
+
+    final JSplitPane topBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+      this.leftRightSplit, this.bottomTabs);
+    this.bottomTabs.setMinimumSize(new Dimension(600, 100));
+
+    topBottom.setDividerLocation(600);
+    this.leftRightSplit.setDividerLocation(300);
+    this.leftRightSplit.setResizeWeight(1);
+
+    add(topBottom, BorderLayout.CENTER);
+
+    addTableOfContents();
     addCatalogPanel();
 
     addTasksPanel();
     addLogPanel();
 
     super.init();
-    toc.toFront();
   }
 
   public void loadProject(final File projectDirectory) {

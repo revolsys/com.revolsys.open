@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -33,11 +35,16 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.spring.SpringUtil;
+import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.component.BasePanel;
+import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.PreferencesUtil;
 
 public class Project extends LayerGroup {
 
@@ -79,6 +86,7 @@ public class Project extends LayerGroup {
 
   public Project(final String name) {
     super(name);
+    setType("Project");
     this.baseMapLayers.setLayerGroup(this);
     setGeometryFactory(GeometryFactory.worldMercator());
   }
@@ -100,6 +108,21 @@ public class Project extends LayerGroup {
     if (name != null && boundingBox != null) {
       this.zoomBookmarks.put(name, boundingBox);
     }
+  }
+
+  @Override
+  protected ValueField createPropertiesTabGeneralPanelSource(
+    final BasePanel parent) {
+    final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
+    if (this.resource != null) {
+      try {
+        SwingUtil.addReadOnlyTextField(panel, "URL", this.resource.getURL());
+        GroupLayoutUtil.makeColumns(panel, 2, true);
+      } catch (final IOException e) {
+      }
+
+    }
+    return panel;
   }
 
   @Override
@@ -174,6 +197,10 @@ public class Project extends LayerGroup {
   }
 
   public File getProjectDirectory() {
+    if (this.resource == null) {
+      final File directory = getSaveAsDirectory();
+      return directory;
+    }
     if (this.resource instanceof FileSystemResource) {
       final FileSystemResource fileResource = (FileSystemResource)this.resource;
       final File directory = fileResource.getFile();
@@ -184,11 +211,38 @@ public class Project extends LayerGroup {
         return directory;
       }
     }
+
     return null;
   }
 
   public RecordStoreConnectionRegistry getRecordStores() {
     return this.recordStores;
+  }
+
+  public File getSaveAsDirectory() {
+    File directory = null;
+    final JFileChooser fileChooser = SwingUtil.createFileChooser(
+      "Save Project", "com.revolsys.swing.map.project", "directory");
+    fileChooser.setFileFilter(new FileNameExtensionFilter("Project", "rgmap"));
+    fileChooser.setMultiSelectionEnabled(false);
+    final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+      directory = fileChooser.getSelectedFile();
+      final String fileExtension = FileUtil.getFileNameExtension(directory);
+      if (!"rgmap".equals(fileExtension)) {
+        directory = new File(directory.getParentFile(), directory.getName()
+          + ".rgmap");
+      }
+      PreferencesUtil.setUserString("com.revolsys.swing.map.project",
+        "directory", directory.getParent());
+
+      if (directory.exists()) {
+        FileUtil.deleteDirectory(directory);
+      }
+      directory.mkdirs();
+      this.resource = new FileSystemResource(directory);
+    }
+    return directory;
   }
 
   public BoundingBox getViewBoundingBox() {
@@ -339,6 +393,22 @@ public class Project extends LayerGroup {
     } else {
       final File directory = getDirectory();
       return super.saveAllSettings(directory);
+    }
+  }
+
+  public void saveAllSettingsAs() {
+    final Resource resource = this.resource;
+    try {
+      this.resource = null;
+      final File directory = getSaveAsDirectory();
+      if (directory != null) {
+        setName(FileUtil.getBaseName(directory));
+        saveAllSettings();
+      }
+    } finally {
+      if (this.resource == null) {
+        this.resource = resource;
+      }
     }
   }
 

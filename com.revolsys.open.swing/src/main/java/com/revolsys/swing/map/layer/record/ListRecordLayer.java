@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.record;
 
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -81,7 +80,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public Component createTablePanel() {
+  public RecordLayerTablePanel createTablePanel() {
     final RecordLayerTable table = RecordListLayerTableModel.createTable(this);
     return new RecordLayerTablePanel(this, table);
   }

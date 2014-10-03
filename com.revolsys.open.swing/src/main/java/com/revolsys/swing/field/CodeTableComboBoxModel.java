@@ -12,6 +12,8 @@ import javax.swing.ComboBoxModel;
 
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
+import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
@@ -60,6 +62,12 @@ public class CodeTableComboBoxModel extends AbstractListModel<Object> implements
   }
 
   @Override
+  public void fireContentsChanged(final Object source, final int index0,
+    final int index1) {
+    super.fireContentsChanged(source, index0, index1);
+  }
+
+  @Override
   public Object getElementAt(int index) {
     if (this.allowNull) {
       if (index == 0) {
@@ -102,7 +110,11 @@ public class CodeTableComboBoxModel extends AbstractListModel<Object> implements
   public void propertyChange(final PropertyChangeEvent event) {
     if (event.getPropertyName().equals("valuesChanged")) {
       final int size = getSize();
-      fireContentsChanged(this, 0, size);
+      if (SwingUtil.isEventDispatchThread()) {
+        fireContentsChanged(this, 0, size);
+      } else {
+        Invoke.later(this, "fireContentsChanged", this, 0, size);
+      }
     }
   }
 

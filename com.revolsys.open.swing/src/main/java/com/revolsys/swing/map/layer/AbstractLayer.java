@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.TextArea;
 import java.awt.Window;
+import java.awt.event.ContainerAdapter;
+import java.awt.event.ContainerEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -25,14 +27,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import bibliothek.gui.dock.common.DefaultSingleCDockable;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -53,12 +54,14 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.border.TitledBorder;
 import com.revolsys.swing.component.BasePanel;
+import com.revolsys.swing.component.ButtonTabComponent;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -68,7 +71,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
-  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
+implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   public static final ImageIcon ICON_LAYER = Icons.getIcon("map");
 
   private static final AtomicLong ID_GEN = new AtomicLong();
@@ -239,18 +242,18 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       } else {
         final JLabel extentLabel = new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
-            + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-            + StringConverterRegistry.toString(boundingBox.getMaximum(1))
-            + "</td><td>&nbsp;</td></tr><tr>"
-            + "<td><b>Left</b>: "
-            + StringConverterRegistry.toString(boundingBox.getMinimum(0))
-            + "</td><td>&nbsp;</td><td>&nbsp;</td>"
-            + "<td><b>Right</b>: "
-            + StringConverterRegistry.toString(boundingBox.getMaximum(0))
-            + "</td></tr>"
-            + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-            + StringConverterRegistry.toString(boundingBox.getMinimum(1))
-            + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
+              + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+              + StringConverterRegistry.toString(boundingBox.getMaximum(1))
+              + "</td><td>&nbsp;</td></tr><tr>"
+              + "<td><b>Left</b>: "
+              + StringConverterRegistry.toString(boundingBox.getMinimum(0))
+              + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+              + "<td><b>Right</b>: "
+              + StringConverterRegistry.toString(boundingBox.getMaximum(0))
+              + "</td></tr>"
+              + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+              + StringConverterRegistry.toString(boundingBox.getMinimum(1))
+              + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
         extentLabel.setFont(SwingUtil.FONT);
         extentPanel.add(extentLabel);
 
@@ -347,14 +350,18 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     return panel;
   }
 
+  protected Component createTableViewComponent() {
+    return null;
+  }
+
   @Override
   public void delete() {
     setExists(false);
     this.beanPropertyListener = null;
-    final DefaultSingleCDockable dockable = getProperty("TableView");
-    if (dockable != null) {
-      // TODO all this should be done by listeners
-      dockable.setVisible(false);
+    final Component component = getProperty("TableView");
+    if (component != null) {
+      ProjectFrame.get(this).getBottomTabs().remove(component);
+      setProperty("TableView", null);
     }
     firePropertyChange("deleted", false, true);
     setEventsEnabled(false);
@@ -571,7 +578,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         setExists(exists);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to initialize layer: "
-          + getPath(), e);
+            + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -645,7 +652,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public boolean isSelectable() {
     return isExists() && isVisible()
-      && (isSelectSupported() && this.selectable || isEditable());
+        && (isSelectSupported() && this.selectable || isEditable());
   }
 
   @Override
@@ -668,7 +675,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public boolean isVisible(final double scale) {
     final LayerGroup parent = getParent();
     if (isExists() && isVisible()
-      && (parent == null || parent.isVisible(scale))) {
+        && (parent == null || parent.isVisible(scale))) {
       final long longScale = (long)scale;
       final long minimumScale = getMinimumScale();
       final long maximumScale = getMaximumScale();
@@ -741,8 +748,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
 
   @Override
   public boolean saveSettings(final File directory) {
-    if (canSaveSettings(directory)) {
-      return doSaveSettings(directory);
+    if (directory != null) {
+      if (canSaveSettings(directory)) {
+        return doSaveSettings(directory);
+      }
     }
     return false;
   }
@@ -973,6 +982,45 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     }
   }
 
+  protected <C extends Component> C showTableView() {
+    final JTabbedPane tabs = ProjectFrame.get(this).getBottomTabs();
+    final Object tableView = getProperty("TableView");
+    Component component = null;
+    if (tableView instanceof Component) {
+      component = (Component)tableView;
+      if (component.getParent() != tabs) {
+        component = null;
+      }
+    }
+    if (component == null) {
+      component = createTableViewComponent();
+
+      if (component != null) {
+        final int tabIndex = tabs.getTabCount();
+        final String name = getName();
+        tabs.addTab(name, getIcon(), component);
+        tabs.setTabComponentAt(tabIndex, new ButtonTabComponent(tabs));
+        if (component != null) {
+          final Component tabComponent = component;
+          setPropertyWeak("TableView", tabComponent);
+          tabs.addContainerListener(new ContainerAdapter() {
+            @Override
+            public void componentRemoved(final ContainerEvent e) {
+              final Component eventComponent = e.getChild();
+              if (eventComponent == tabComponent) {
+                setProperty("TableView", null);
+              }
+            }
+          });
+          tabs.setSelectedIndex(tabIndex);
+        }
+      }
+    } else {
+      tabs.setSelectedComponent(component);
+    }
+    return (C)component;
+  }
+
   public void toggleEditable() {
     final boolean editable = isEditable();
     setEditable(!editable);
@@ -1025,8 +1073,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
     final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-      .expandPercent(0.1)
-      .clipToCoordinateSystem();
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
     project.setViewBoundingBox(boundingBox);
   }
 }
