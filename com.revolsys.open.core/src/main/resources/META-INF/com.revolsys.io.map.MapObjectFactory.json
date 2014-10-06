@@ -7,7 +7,7 @@
       "methodName": "create"
     },
     {
-      "typeName": "dataRecordDefinition",
+      "typeName": "recordDefinition",
       "description": "Data Record Definition",
       "typeClass": "com.revolsys.data.record.schema.RecordDefinitionImpl",
       "methodName": "create"
@@ -15,7 +15,7 @@
     {
       "typeName": "field",
       "description": "Data Record Field",
-      "typeClass": "com.revolsys.data.record.schema.Attribute",
+      "typeClass": "com.revolsys.data.record.schema.FieldDefinition",
       "methodName": "create"
     }
   ]

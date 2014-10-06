@@ -22,17 +22,17 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
 
   @Override
   public void clearProperties() {
-    properties.clear();
+    this.properties.clear();
   }
 
   @PreDestroy
   public void close() {
-    properties = null;
+    this.properties = null;
   }
 
   @Override
   public Map<String, Object> getProperties() {
-    return properties;
+    return this.properties;
   }
 
   @Override
@@ -71,7 +71,7 @@ public class AbstractObjectWithProperties implements ObjectWithProperties {
 
   @Override
   public void removeProperty(final String propertyName) {
-    properties.remove(propertyName);
+    this.properties.remove(propertyName);
   }
 
   @Override
