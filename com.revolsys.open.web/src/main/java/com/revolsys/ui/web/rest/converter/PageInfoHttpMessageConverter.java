@@ -75,7 +75,7 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
     if (Property.hasValue(description)) {
       pageMap.put("description", description);
     }
-    for (final Entry<String, Object> attribute : pageInfo.getAttributes()
+    for (final Entry<String, Object> attribute : pageInfo.getFields()
         .entrySet()) {
       final String key = attribute.getKey();
       final Object value = attribute.getValue();

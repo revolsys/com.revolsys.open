@@ -18,7 +18,7 @@ public final class HttpServletLogUtil {
     final HttpServletRequest request, final Throwable exception,
     final String[] headerNames) {
     if (!(exception instanceof IOException)
-      && !exception.getMessage().contains("Broken pipe")) {
+        && !exception.getMessage().contains("Broken pipe")) {
       if (request.getAttribute("LogException") != exception) {
         final StringBuilder text = new StringBuilder();
         final String message = exception.getMessage();

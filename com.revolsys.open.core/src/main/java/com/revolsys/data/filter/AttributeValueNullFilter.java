@@ -32,7 +32,7 @@ public class AttributeValueNullFilter implements Filter<Record> {
     return propertyValue == null;
   }
 
-  public String getAttributeName() {
+  public String getFieldName() {
     return this.attributeName;
   }
 

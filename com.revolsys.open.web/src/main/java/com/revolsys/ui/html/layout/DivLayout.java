@@ -15,12 +15,10 @@
  */
 package com.revolsys.ui.html.layout;
 
-import java.util.Iterator;
-
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
+import com.revolsys.util.HtmlUtil;
 
 public class DivLayout implements ElementContainerLayout {
   private String cssClass;

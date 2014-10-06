@@ -27,8 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
+import com.revolsys.util.HtmlUtil;
 
 public class DateSelectField extends Field {
 

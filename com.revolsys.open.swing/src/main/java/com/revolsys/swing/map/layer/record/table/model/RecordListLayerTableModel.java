@@ -78,7 +78,7 @@ PropertyChangeListener {
     if (isEditable()) {
       final String columnName = getColumnName(columnIndex);
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final DataType dataType = recordDefinition.getAttributeType(columnName);
+      final DataType dataType = recordDefinition.getFieldType(columnName);
       if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
         return false;
       } else {

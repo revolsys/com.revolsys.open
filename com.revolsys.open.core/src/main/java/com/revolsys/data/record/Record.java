@@ -20,7 +20,7 @@ Identifiable {
 
   void delete();
 
-  String getAttributeTitle(String fieldName);
+  String getFieldTitle(String fieldName);
 
   Byte getByte(final CharSequence name);
 
@@ -107,7 +107,7 @@ Identifiable {
    * @param name The name of the attribute.
    * @return True if the Record has an attribute with the specified name.
    */
-  boolean hasAttribute(CharSequence name);
+  boolean hasField(CharSequence name);
 
   boolean hasValue(CharSequence name);
 

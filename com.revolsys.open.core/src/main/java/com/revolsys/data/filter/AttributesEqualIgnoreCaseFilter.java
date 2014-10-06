@@ -11,9 +11,9 @@ public class AttributesEqualIgnoreCaseFilter implements Filter<Record> {
   public static boolean accept(final Record object1,
     final Record object2, final Collection<String> attributeNames) {
     for (final String attributeName : attributeNames) {
-      final String value1 = RecordUtil.getAttributeByPath(object1,
+      final String value1 = RecordUtil.getFieldByPath(object1,
         attributeName);
-      final String value2 = RecordUtil.getAttributeByPath(object2,
+      final String value2 = RecordUtil.getFieldByPath(object2,
         attributeName);
 
       if (value1 == null) {

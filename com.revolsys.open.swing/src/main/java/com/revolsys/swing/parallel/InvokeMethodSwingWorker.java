@@ -8,7 +8,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.parallel.ThreadInterruptedException;

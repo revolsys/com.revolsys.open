@@ -18,8 +18,8 @@ package com.revolsys.ui.html.fields;
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.form.Form;
+import com.revolsys.util.HtmlUtil;
 
 public class ErrorField extends Field {
   private String message;

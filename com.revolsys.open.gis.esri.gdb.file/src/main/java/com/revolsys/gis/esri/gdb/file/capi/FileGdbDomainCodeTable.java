@@ -52,8 +52,8 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public List<String> getAttributeAliases() {
-    return this.domain.getAttributeAliases();
+  public List<String> getFieldAliases() {
+    return this.domain.getFieldAliases();
   }
 
   @Override
@@ -84,8 +84,8 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public String getIdAttributeName() {
-    return this.domain.getIdAttributeName();
+  public String getIdFieldName() {
+    return this.domain.getIdFieldName();
   }
 
   @Override

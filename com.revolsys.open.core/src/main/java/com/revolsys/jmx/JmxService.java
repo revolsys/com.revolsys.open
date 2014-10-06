@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanInfo;
@@ -18,6 +17,7 @@ import javax.management.ObjectName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.io.MapWriter;
 import com.revolsys.util.ExceptionUtil;
 
@@ -29,7 +29,7 @@ import com.revolsys.util.ExceptionUtil;
  * server has a list of object names and labels and the list of attributes and
  * operations to be exposed on that server. The only servers, objects,
  * attributes and operations to be exposed are those in the configuration.
- * 
+ *
  * @author Paul Austin paul.austin@revolsys.com
  */
 public class JmxService {
@@ -41,7 +41,7 @@ public class JmxService {
 
   /**
    * Construct a new JmxService.
-   * 
+   *
    * @param jmxServers The list of JMX server configurations.
    */
   public JmxService(final List<Map<String, Object>> jmxServers) {
@@ -56,7 +56,7 @@ public class JmxService {
 
   /**
    * Get the value for the attribute for an object on a server.
-   * 
+   *
    * @param mapWriter The writer to write the attributes to.
    * @param serverId The name of the server.
    * @param objectId The name of the object.
@@ -78,7 +78,7 @@ public class JmxService {
           + " " + objectId);
       } catch (final AttributeNotFoundException e) {
         throw new IllegalArgumentException("MBean attribute not found "
-          + serverId + " " + objectId + "." + attributeId);
+            + serverId + " " + objectId + "." + attributeId);
       } catch (final Throwable e) {
         return ExceptionUtil.throwUncheckedException(e);
       }
@@ -90,7 +90,7 @@ public class JmxService {
 
   /**
    * Get all the attributes names for an object on a server.
-   * 
+   *
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    * @return The attribute names.
@@ -113,27 +113,27 @@ public class JmxService {
 
   /**
    * Get the values for all attributes for an object on a server.
-   * 
+   *
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    * @return The attribute values.
    */
-  public List<Attribute> getAttributes(final String serverId,
+  public List<FieldDefinition> getAttributes(final String serverId,
     final String objectId) {
     final MBeanServerConnection connection = getConnection(serverId);
     try {
       final String[] attributeNames = getAttributeNames(serverId, objectId).toArray(
         new String[0]);
       final ObjectName objectName = getObjectName(serverId, objectId);
-      final List<Attribute> attributeValues = new ArrayList<Attribute>();
+      final List<FieldDefinition> attributeValues = new ArrayList<>();
       for (final Object attribute : connection.getAttributes(objectName,
         attributeNames)) {
-        attributeValues.add((Attribute)attribute);
+        attributeValues.add((FieldDefinition)attribute);
       }
       return attributeValues;
     } catch (final InstanceNotFoundException e) {
       throw new IllegalArgumentException("MBean not found " + serverId + " "
-        + objectId);
+          + objectId);
     } catch (final MalformedObjectNameException e) {
       throw new IllegalArgumentException("MBean name not valid " + serverId
         + " " + objectId);
@@ -146,7 +146,7 @@ public class JmxService {
    * Get a connection to the specified serverId. Returns an
    * {@link IllegalArgumentException} if the host or connection could not be
    * found.
-   * 
+   *
    * @param serverId The name of the server.
    * @return The JMX connection.
    */
@@ -164,7 +164,7 @@ public class JmxService {
   /**
    * Get the object name for object on a server. Throws an
    * IllegalArgumentException if the object does not have a configuration.
-   * 
+   *
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    * @return The server parameters.
@@ -172,7 +172,7 @@ public class JmxService {
    *           valid.
    */
   private ObjectName getObjectName(final String serverId, final String objectId)
-    throws MalformedObjectNameException {
+      throws MalformedObjectNameException {
     final Map<String, Object> object = getObjectParams(serverId, objectId);
     final String objectName = (String)object.get("objectName");
     return new ObjectName(objectName);
@@ -181,7 +181,7 @@ public class JmxService {
   /**
    * Get the configuration parameters for all objects on a server. Throws an
    * IllegalArgumentException if there are no objects configured.
-   * 
+   *
    * @param serverId The name of the server.
    * @return The server parameters.
    */
@@ -199,7 +199,7 @@ public class JmxService {
   /**
    * Get the configuration parameters for an object on a server. Throws an
    * IllegalArgumentException if the object does not have a configuration.
-   * 
+   *
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    * @return The server parameters.
@@ -215,12 +215,12 @@ public class JmxService {
     }
 
     throw new IllegalArgumentException("Object for server " + serverId + " "
-      + objectId + " not found");
+        + objectId + " not found");
   }
 
   /**
    * Get the description for the operation for an object on a server.
-   * 
+   *
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    * @param operationId The name of the operation.
@@ -241,10 +241,10 @@ public class JmxService {
           }
         }
         throw new IllegalArgumentException("MBean Operation not found "
-          + serverId + " " + objectId + "." + operationId);
+            + serverId + " " + objectId + "." + operationId);
       } catch (final InstanceNotFoundException e) {
         throw new IllegalArgumentException("MBean not found " + serverId + " "
-          + objectId);
+            + objectId);
       } catch (final MalformedObjectNameException e) {
         throw new IllegalArgumentException("MBean name not valid " + serverId
           + " " + objectId);
@@ -259,7 +259,7 @@ public class JmxService {
 
   /**
    * Get all the operations names for an object on a server.
-   * 
+   *
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    * @return The attribute names.
@@ -286,7 +286,7 @@ public class JmxService {
 
   /**
    * Get the description for all operations for an object on a server.
-   * 
+   *
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    * @return The operations values.
@@ -308,7 +308,7 @@ public class JmxService {
       return operations;
     } catch (final InstanceNotFoundException e) {
       throw new IllegalArgumentException("MBean not found " + serverId + " "
-        + objectId);
+          + objectId);
     } catch (final MalformedObjectNameException e) {
       throw new IllegalArgumentException("MBean name not valid " + serverId
         + " " + objectId);
@@ -320,12 +320,12 @@ public class JmxService {
   /**
    * Get the configuration parameters for a server. Throws an
    * IllegalArgumentException if the server does not have a configuration.
-   * 
+   *
    * @param serverId The name of the server.
    * @return The server parameters.
    */
   private Map<String, Object> getServerParams(final String serverId) {
-    final Map<String, Object> server = jmxServers.get(serverId);
+    final Map<String, Object> server = this.jmxServers.get(serverId);
     if (server == null) {
       throw new IllegalArgumentException("Server " + serverId + " not found");
     } else {
@@ -336,7 +336,7 @@ public class JmxService {
   /**
    * Check to see if the object has been configured to have the specified
    * attribute.
-   * 
+   *
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    * @param attributeId The name of the attribute.
@@ -350,7 +350,7 @@ public class JmxService {
   /**
    * Check to see if the object has been configured to have the specified
    * operation.
-   * 
+   *
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    * @param operationId The name of the operation.
@@ -363,7 +363,7 @@ public class JmxService {
 
   /**
    * Invoke the operation with the specified parameters.
-   * 
+   *
    * @param serverId The name of the server.
    * @param objectId The name of the object.
    * @param operationId The name of the operation.
@@ -392,7 +392,7 @@ public class JmxService {
         signature);
     } catch (final InstanceNotFoundException e) {
       throw new IllegalArgumentException("MBean not found " + serverId + " "
-        + objectId);
+          + objectId);
     } catch (final MalformedObjectNameException e) {
       throw new IllegalArgumentException("MBean name not valid " + serverId
         + " " + objectId);
@@ -403,7 +403,7 @@ public class JmxService {
 
   /**
    * Write the attribute for the attribute for an object on a server.
-   * 
+   *
    * @param mapWriter The writer to write the attributes to.
    * @param serverId The name of the server.
    * @param objectId The name of the object.
@@ -422,7 +422,7 @@ public class JmxService {
 
   /**
    * Write the attribute for the attribute for an object on a server.
-   * 
+   *
    * @param mapWriter The writer to write the attributes to.
    * @param serverId The name of the server.
    * @param objectId The name of the object.
@@ -442,18 +442,18 @@ public class JmxService {
 
   /**
    * Write the attributes for all servers and objects.
-   * 
+   *
    * @param mapWriter The writer to write the attributes to.
    */
   public void writeAttributes(final MapWriter mapWriter) {
-    for (final String serverId : jmxServers.keySet()) {
+    for (final String serverId : this.jmxServers.keySet()) {
       writeAttributes(mapWriter, serverId);
     }
   }
 
   /**
    * Write the attributes for all objects for a server.
-   * 
+   *
    * @param mapWriter The writer to write the attributes to.
    * @param serverId The name of the server.
    */
@@ -467,7 +467,7 @@ public class JmxService {
 
   /**
    * Write the attributes for the objects on a server.
-   * 
+   *
    * @param mapWriter The writer to write the attributes to.
    * @param serverId The name of the server.
    * @param objectId The name of the object.
@@ -483,7 +483,7 @@ public class JmxService {
 
   /**
    * Write the operation for the operation for an object on a server.
-   * 
+   *
    * @param mapWriter The writer to write the operation to.
    * @param serverId The name of the server.
    * @param objectId The name of the object.
@@ -516,7 +516,7 @@ public class JmxService {
 
   /**
    * Write the operation for the operation for an object on a server.
-   * 
+   *
    * @param mapWriter The writer to write the operation to.
    * @param serverId The name of the server.
    * @param objectId The name of the object.
@@ -531,7 +531,7 @@ public class JmxService {
 
   /**
    * Write the operation for the operation for an object on a server.
-   * 
+   *
    * @param mapWriter The writer to write the operation to.
    * @param serverId The name of the server.
    * @param objectId The name of the object.
@@ -547,18 +547,18 @@ public class JmxService {
 
   /**
    * Write the operations for all servers and objects.
-   * 
+   *
    * @param mapWriter The writer to write the operations to.
    */
   public void writeOperations(final MapWriter mapWriter) {
-    for (final String serverId : jmxServers.keySet()) {
+    for (final String serverId : this.jmxServers.keySet()) {
       writeOperations(mapWriter, serverId);
     }
   }
 
   /**
    * Write the operations for all objects for a server.
-   * 
+   *
    * @param mapWriter The writer to write the operations to.
    * @param serverId The name of the server.
    */
@@ -575,7 +575,7 @@ public class JmxService {
 
   /**
    * Write the operations for the objects on a server.
-   * 
+   *
    * @param mapWriter The writer to write the operations to.
    * @param serverId The name of the server.
    * @param objectId The name of the object.

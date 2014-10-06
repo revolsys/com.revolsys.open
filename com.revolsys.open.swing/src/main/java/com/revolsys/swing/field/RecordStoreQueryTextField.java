@@ -72,7 +72,7 @@ HighlightPredicate {
 
   private final String displayAttributeName;
 
-  private final String idAttributeName;
+  private final String idFieldName;
 
   private final JXList list;
 
@@ -106,7 +106,7 @@ HighlightPredicate {
     super(displayAttributeName);
     this.recordDefinition = recordDefinition;
     this.recordStore = recordDefinition.getRecordStore();
-    this.idAttributeName = recordDefinition.getIdAttributeName();
+    this.idFieldName = recordDefinition.getIdFieldName();
     this.displayAttributeName = displayAttributeName;
 
     final Document document = getDocument();
@@ -209,7 +209,7 @@ HighlightPredicate {
     String displayText = this.valueToDisplayMap.get(stringValue);
     if (!Property.hasValue(displayText) && Property.hasValue(stringValue)) {
       final Record record = this.recordStore.queryFirst(Query.equal(
-        this.recordDefinition, this.idAttributeName, stringValue));
+        this.recordDefinition, this.idFieldName, stringValue));
       if (record == null) {
         displayText = stringValue;
       } else {

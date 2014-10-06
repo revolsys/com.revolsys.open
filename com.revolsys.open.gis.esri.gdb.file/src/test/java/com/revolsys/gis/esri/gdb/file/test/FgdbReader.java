@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
@@ -119,8 +119,8 @@ public class FgdbReader {
       record.setIdValue(objectId++);
       int fieldIndex = 0;
       int optionalFieldIndex = 0;
-      final int idIndex = recordDefinition.getIdAttributeIndex();
-      for (final Attribute field : recordDefinition.getAttributes()) {
+      final int idIndex = recordDefinition.getIdFieldIndex();
+      for (final FieldDefinition field : recordDefinition.getFields()) {
         if (fieldIndex != idIndex) {
           if (field.isRequired() || !isNull(nullFields, optionalFieldIndex++)) {
             final FgdbField fgdbField = (FgdbField)field;
@@ -330,10 +330,10 @@ public class FgdbReader {
     for (int i = 0; i < numFields; i++) {
       final FgdbField field = readFieldDescription();
       if (field != null) {
-        recordDefinition.addAttribute(field);
+        recordDefinition.addField(field);
         if (field instanceof ObjectIdField) {
           final String fieldName = field.getName();
-          recordDefinition.setIdAttributeName(fieldName);
+          recordDefinition.setIdFieldName(fieldName);
         }
         if (!field.isRequired()) {
           optionalFieldCount++;

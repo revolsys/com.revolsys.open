@@ -46,9 +46,9 @@ public class RecordAttributeComparator implements Comparator<Record> {
 
   public int compare(final Record object1, final Record object2,
     final String attributeName) {
-    final Comparable<Object> value1 = RecordUtil.getAttributeByPath(
+    final Comparable<Object> value1 = RecordUtil.getFieldByPath(
       object1, attributeName);
-    final Comparable<Object> value2 = RecordUtil.getAttributeByPath(
+    final Comparable<Object> value2 = RecordUtil.getFieldByPath(
       object2, attributeName);
     if (value1 == null) {
       if (value2 == null) {
@@ -76,7 +76,7 @@ public class RecordAttributeComparator implements Comparator<Record> {
     }
   }
 
-  public List<String> getAttributeNames() {
+  public List<String> getFieldNames() {
     return attributeNames;
   }
 

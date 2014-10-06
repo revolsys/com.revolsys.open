@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.ThreadSharedAttributes;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
@@ -33,7 +33,7 @@ public class RecordLog {
   }
 
   public static RecordLog getForThread() {
-    final RecordLog recordLog = ThreadSharedAttributes.getAttribute(KEY);
+    final RecordLog recordLog = ThreadSharedAttributes.getField(KEY);
     return recordLog;
   }
 
@@ -116,12 +116,12 @@ public class RecordLog {
       }
       final String logTypeName = Path.toPath(parentPath, logTableName);
       logRecordDefinition = new RecordDefinitionImpl(logTypeName);
-      logRecordDefinition.addAttribute("LOGMESSAGE", DataTypes.STRING, 255,
+      logRecordDefinition.addField("LOGMESSAGE", DataTypes.STRING, 255,
         true);
-      logRecordDefinition.addAttribute("LOGLEVEL", DataTypes.STRING, 10, true);
-      for (final Attribute attribute : recordDefinition.getAttributes()) {
-        final Attribute logAttribute = new Attribute(attribute);
-        logRecordDefinition.addAttribute(logAttribute);
+      logRecordDefinition.addField("LOGLEVEL", DataTypes.STRING, 10, true);
+      for (final FieldDefinition attribute : recordDefinition.getFields()) {
+        final FieldDefinition logAttribute = new FieldDefinition(attribute);
+        logRecordDefinition.addField(logAttribute);
 
       }
       this.logRecordDefinitionMap.put(recordDefinition, logRecordDefinition);

@@ -98,12 +98,12 @@ public class CloseLocation implements Comparable<CloseLocation> {
     return id;
   }
 
-  public String getIdAttributeName() {
+  public String getIdFieldName() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
       return null;
     } else {
-      return recordDefinition.getIdAttributeName();
+      return recordDefinition.getIdFieldName();
     }
   }
 
@@ -195,7 +195,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
       string.append(typePath);
       string.append(", ");
       final RecordDefinition recordDefinition = getRecordDefinition();
-      string.append(recordDefinition.getIdAttributeName());
+      string.append(recordDefinition.getIdFieldName());
       string.append("=");
       final Object id = getId();
       string.append(id);

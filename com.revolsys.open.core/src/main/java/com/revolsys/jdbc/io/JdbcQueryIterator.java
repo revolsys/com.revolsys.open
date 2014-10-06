@@ -18,30 +18,30 @@ import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 
 public class JdbcQueryIterator extends AbstractIterator<Record> implements
 RecordIterator {
 
   public static Record getNextObject(final JdbcRecordStore recordStore,
-    final RecordDefinition recordDefinition, final List<Attribute> attributes,
+    final RecordDefinition recordDefinition, final List<FieldDefinition> attributes,
     final RecordFactory recordFactory, final ResultSet resultSet) {
     final Record object = recordFactory.createRecord(recordDefinition);
     if (object != null) {
       object.setState(RecordState.Initalizing);
       int columnIndex = 1;
 
-      for (final Attribute attribute : attributes) {
-        final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
+      for (final FieldDefinition attribute : attributes) {
+        final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
         try {
-          columnIndex = jdbcAttribute.setAttributeValueFromResultSet(resultSet,
+          columnIndex = jdbcAttribute.setFieldValueFromResultSet(resultSet,
             columnIndex, object);
         } catch (final SQLException e) {
           throw new RuntimeException("Unable to get value " + (columnIndex + 1)
@@ -79,7 +79,7 @@ RecordIterator {
 
   private PreparedStatement statement;
 
-  private List<Attribute> attributes = new ArrayList<Attribute>();
+  private List<FieldDefinition> attributes = new ArrayList<FieldDefinition>();
 
   private Query query;
 
@@ -195,15 +195,15 @@ RecordIterator {
           resultSetMetaData);
       }
       final List<String> attributeNames = new ArrayList<String>(
-          this.query.getAttributeNames());
+          this.query.getFieldNames());
       if (attributeNames.isEmpty()) {
-        this.attributes.addAll(this.recordDefinition.getAttributes());
+        this.attributes.addAll(this.recordDefinition.getFields());
       } else {
         for (final String attributeName : attributeNames) {
           if (attributeName.equals("*")) {
-            this.attributes.addAll(this.recordDefinition.getAttributes());
+            this.attributes.addAll(this.recordDefinition.getFields());
           } else {
-            final Attribute attribute = this.recordDefinition.getAttribute(attributeName);
+            final FieldDefinition attribute = this.recordDefinition.getField(attributeName);
             if (attribute != null) {
               this.attributes.add(attribute);
             }

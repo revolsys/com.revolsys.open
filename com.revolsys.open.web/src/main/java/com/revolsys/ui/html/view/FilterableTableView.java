@@ -21,13 +21,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.fields.TextAreaField;
 import com.revolsys.ui.html.fields.TextField;
 import com.revolsys.ui.html.layout.TableBodyLayout;
 import com.revolsys.ui.html.serializer.KeySerializerTableSerializer;
 import com.revolsys.ui.html.serializer.key.KeySerializer;
+import com.revolsys.util.HtmlUtil;
 
 public class FilterableTableView extends ElementContainer {
   private String cssClass = "table";

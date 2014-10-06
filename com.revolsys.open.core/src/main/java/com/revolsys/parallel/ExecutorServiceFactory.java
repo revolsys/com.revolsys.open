@@ -14,7 +14,7 @@ public class ExecutorServiceFactory {
 
   public static ExecutorService getExecutorService() {
     synchronized (SYNC) {
-      ExecutorService executorService = ThreadSharedAttributes.getAttribute(KEY);
+      ExecutorService executorService = ThreadSharedAttributes.getField(KEY);
       if (executorService == null) {
         executorService = Executors.newCachedThreadPool();
         ThreadSharedAttributes.setDefaultAttribute(KEY, executorService);

@@ -14,8 +14,8 @@ import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.property.AttributeProperties;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.property.FieldProperties;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStoreSchema;
@@ -30,7 +30,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class CsvRecordIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
 
   private final char fieldSeparator;
 
@@ -75,17 +75,17 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
   }
 
   private void createRecordDefinition(final String[] fieldNames)
-    throws IOException {
+      throws IOException {
     this.hasPointFields = Property.hasValue(this.pointXAttributeName)
-      && Property.hasValue(this.pointYAttributeName);
+        && Property.hasValue(this.pointYAttributeName);
     if (this.hasPointFields) {
       this.geometryType = DataTypes.POINT;
     } else {
       this.pointXAttributeName = null;
       this.pointYAttributeName = null;
     }
-    final List<Attribute> attributes = new ArrayList<>();
-    Attribute geometryAttribute = null;
+    final List<FieldDefinition> attributes = new ArrayList<>();
+    FieldDefinition geometryField = null;
     for (final String name : fieldNames) {
       DataType type = DataTypes.STRING;
       boolean isGeometryAttribute = false;
@@ -99,11 +99,11 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
         type = DataTypes.MULTI_POINT;
         isGeometryAttribute = true;
       } else if ("LINESTRING".equalsIgnoreCase(name)
-        || "LINE".equalsIgnoreCase(name)) {
+          || "LINE".equalsIgnoreCase(name)) {
         type = DataTypes.LINE_STRING;
         isGeometryAttribute = true;
       } else if ("MULTILINESTRING".equalsIgnoreCase(name)
-        || "MULTILINE".equalsIgnoreCase(name)) {
+          || "MULTILINE".equalsIgnoreCase(name)) {
         type = DataTypes.MULTI_LINE_STRING;
         isGeometryAttribute = true;
       } else if ("POLYGON".equalsIgnoreCase(name)) {
@@ -113,21 +113,21 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
         type = DataTypes.MULTI_POLYGON;
         isGeometryAttribute = true;
       }
-      final Attribute attribute = new Attribute(name, type, false);
+      final FieldDefinition attribute = new FieldDefinition(name, type, false);
       if (isGeometryAttribute) {
-        geometryAttribute = attribute;
+        geometryField = attribute;
       }
       attributes.add(attribute);
     }
     if (this.hasPointFields) {
-      if (geometryAttribute == null) {
-        geometryAttribute = new Attribute(this.geometryColumnName,
+      if (geometryField == null) {
+        geometryField = new FieldDefinition(this.geometryColumnName,
           this.geometryType, true);
-        attributes.add(geometryAttribute);
+        attributes.add(geometryField);
       }
     }
-    if (geometryAttribute != null) {
-      geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+    if (geometryField != null) {
+      geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY,
         this.geometryFactory);
     }
     final RecordStoreSchema schema = getProperty("schema");
@@ -239,7 +239,7 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
    * @throws IOException if bad things happen during the read
    */
   private String[] parseLine(final String nextLine, final boolean readLine)
-    throws IOException {
+      throws IOException {
     String line = nextLine;
     if (line.length() == 0) {
       return new String[0];
@@ -262,14 +262,14 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
           if (c == CsvConstants.QUOTE_CHARACTER) {
             hadQuotes = true;
             if (inQuotes && line.length() > i + 1
-              && line.charAt(i + 1) == CsvConstants.QUOTE_CHARACTER) {
+                && line.charAt(i + 1) == CsvConstants.QUOTE_CHARACTER) {
               sb.append(line.charAt(i + 1));
               i++;
             } else {
               inQuotes = !inQuotes;
               if (i > 2 && line.charAt(i - 1) != this.fieldSeparator
-                && line.length() > i + 1
-                && line.charAt(i + 1) != this.fieldSeparator) {
+                  && line.length() > i + 1
+                  && line.charAt(i + 1) != this.fieldSeparator) {
                 sb.append(c);
               }
             }
@@ -306,12 +306,12 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
    */
   private Record parseRecord(final String[] record) {
     final Record object = this.recordFactory.createRecord(this.recordDefinition);
-    for (int i = 0; i < this.recordDefinition.getAttributeCount(); i++) {
+    for (int i = 0; i < this.recordDefinition.getFieldCount(); i++) {
       String value = null;
       if (i < record.length) {
         value = record[i];
         if (value != null) {
-          final DataType dataType = this.recordDefinition.getAttributeType(i);
+          final DataType dataType = this.recordDefinition.getFieldType(i);
           final Object convertedValue = StringConverterRegistry.toObject(
             dataType, value);
           object.setValue(i, convertedValue);

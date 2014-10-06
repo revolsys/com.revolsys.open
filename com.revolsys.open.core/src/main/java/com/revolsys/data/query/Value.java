@@ -13,11 +13,11 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.codes.CodeTableProperty;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
-import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.Property;
@@ -42,22 +42,22 @@ public class Value extends QueryValue {
     return newValue;
   }
 
-  private JdbcAttribute jdbcAttribute;
+  private JdbcFieldDefinition jdbcAttribute;
 
   private Object queryValue;
 
   private Object displayValue;
 
-  private Attribute attribute;
+  private FieldDefinition attribute;
 
-  public Value(final Attribute attribute, final Object value) {
+  public Value(final FieldDefinition attribute, final Object value) {
     setQueryValue(value);
     this.displayValue = this.queryValue;
     setAttribute(attribute);
   }
 
   public Value(final Object value) {
-    this(JdbcAttribute.createAttribute(value), value);
+    this(JdbcFieldDefinition.createAttribute(value), value);
   }
 
   @Override
@@ -85,9 +85,9 @@ public class Value extends QueryValue {
     return (Value)super.clone();
   }
 
-  public void convert(final Attribute attribute) {
-    if (attribute instanceof JdbcAttribute) {
-      this.jdbcAttribute = (JdbcAttribute)attribute;
+  public void convert(final FieldDefinition attribute) {
+    if (attribute instanceof JdbcFieldDefinition) {
+      this.jdbcAttribute = (JdbcFieldDefinition)attribute;
     }
     convert(attribute.getType());
   }
@@ -120,7 +120,7 @@ public class Value extends QueryValue {
     return this.displayValue;
   }
 
-  public JdbcAttribute getJdbcAttribute() {
+  public JdbcFieldDefinition getJdbcAttribute() {
     return this.jdbcAttribute;
   }
 
@@ -149,13 +149,13 @@ public class Value extends QueryValue {
     return (V)this.queryValue;
   }
 
-  public void setAttribute(final Attribute attribute) {
+  public void setAttribute(final FieldDefinition attribute) {
     this.attribute = attribute;
     if (attribute != null) {
-      if (attribute instanceof JdbcAttribute) {
-        this.jdbcAttribute = (JdbcAttribute)attribute;
+      if (attribute instanceof JdbcFieldDefinition) {
+        this.jdbcAttribute = (JdbcFieldDefinition)attribute;
       } else {
-        this.jdbcAttribute = JdbcAttribute.createAttribute(this.queryValue);
+        this.jdbcAttribute = JdbcFieldDefinition.createAttribute(this.queryValue);
       }
 
       CodeTable codeTable = null;
@@ -197,7 +197,7 @@ public class Value extends QueryValue {
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     final String attributeName = this.attribute.getName();
     if (Property.hasValue(attributeName)) {
-      final Attribute attribute = recordDefinition.getAttribute(attributeName);
+      final FieldDefinition attribute = recordDefinition.getField(attributeName);
       setAttribute(attribute);
     }
   }

@@ -263,7 +263,7 @@ public final class HttpServletUtils {
     if (charset == null) {
       charset = FileUtil.UTF8;
       final Map<String, String> params = Collections.singletonMap("charset",
-          "utf-8");
+        "utf-8");
       mediaType = new MediaType(mediaType, params);
     }
     headers.setContentType(mediaType);

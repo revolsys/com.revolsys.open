@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
@@ -109,11 +109,11 @@ public class RecordValidator {
       boolean valid = true;
 
       final RecordDefinition type = record.getRecordDefinition();
-      for (int i = 0; i < type.getAttributeCount(); i++) {
+      for (int i = 0; i < type.getFieldCount(); i++) {
         final Object value = record.getValue(i);
-        final DataType dataType = type.getAttributeType(i);
-        final Attribute attribDef = type.getAttribute(i);
-        final String attributeName = type.getAttributeName(i);
+        final DataType dataType = type.getFieldType(i);
+        final FieldDefinition attribDef = type.getField(i);
+        final String attributeName = type.getFieldName(i);
 
         if (value == null) {
           if (attribDef.isRequired()) {
@@ -133,7 +133,7 @@ public class RecordValidator {
                   + "' is not a valid value for type '" + dataType + "'");
               }
               valid = (i == record.getRecordDefinition()
-                .getGeometryAttributeIndex());
+                .getGeometryFieldIndex());
             }
           }
         }

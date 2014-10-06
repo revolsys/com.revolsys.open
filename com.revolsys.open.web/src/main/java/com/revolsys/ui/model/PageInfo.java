@@ -40,7 +40,7 @@ public class PageInfo extends AbstractDocumentedObject {
     this.mediaTypes.addAll(pageInfo.getMediaTypes());
     this.inputContentTypes.addAll(pageInfo.getInputContentTypes());
     this.attributes = new LinkedHashMap<String, Object>(
-      pageInfo.getAttributes());
+      pageInfo.getFields());
   }
 
   public PageInfo(final String title, final String description) {
@@ -85,7 +85,7 @@ public class PageInfo extends AbstractDocumentedObject {
     return new PageInfo(this);
   }
 
-  public Map<String, Object> getAttributes() {
+  public Map<String, Object> getFields() {
     return attributes;
   }
 

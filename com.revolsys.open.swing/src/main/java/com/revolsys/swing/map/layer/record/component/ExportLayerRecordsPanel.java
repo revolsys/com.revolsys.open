@@ -98,8 +98,8 @@ public class ExportLayerRecordsPanel extends BasePanel {
 
     final RecordDefinition recordDefinition = getRecordDefinition();
     final Query query = new Query(recordDefinition);
-    final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
-    query.setOrderByColumns(idAttributeNames);
+    final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+    query.setOrderByColumns(idFieldNames);
 
     final Object filterType = this.recordsFilterType.getFieldValue();
     if ("allRecords".equals(filterType)) {

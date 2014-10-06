@@ -48,7 +48,7 @@ public class ArrayRecord extends BaseRecord {
     if (recordDefinition == null) {
       this.attributes = new Object[0];
     } else {
-      final int attributeCount = recordDefinition.getAttributeCount();
+      final int attributeCount = recordDefinition.getFieldCount();
       this.attributes = new Object[attributeCount];
       final Map<String, Object> defaultValues = recordDefinition.getDefaultValues();
       setValuesByPath(defaultValues);

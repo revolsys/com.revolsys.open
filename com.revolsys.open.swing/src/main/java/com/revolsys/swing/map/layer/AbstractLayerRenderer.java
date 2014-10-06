@@ -11,8 +11,6 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.swing.Icons;

@@ -16,8 +16,8 @@
 package com.revolsys.ui.html.view;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.decorator.Decorator;
+import com.revolsys.util.HtmlUtil;
 
 public class ElementLabel implements Decorator {
   private String label = "";

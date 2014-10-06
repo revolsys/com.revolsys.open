@@ -66,7 +66,7 @@ import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.property.DirectionalAttributes;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
@@ -202,7 +202,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     final boolean editable = layer.isEditable();
     setEditable(editable);
     getAllAttributes().setEditable(isEditable());
-    if (recordDefinition.getGeometryAttributeName() != null) {
+    if (recordDefinition.getGeometryFieldName() != null) {
       addTabGeometry();
     }
     Property.addListener(layer, this);
@@ -456,11 +456,11 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
   }
 
   protected void addTabGeometry() {
-    final String geometryAttributeName = this.recordDefinition.getGeometryAttributeName();
-    if (this.geometryCoordinatesPanel == null && geometryAttributeName != null) {
+    final String geometryFieldName = this.recordDefinition.getGeometryFieldName();
+    if (this.geometryCoordinatesPanel == null && geometryFieldName != null) {
       this.geometryCoordinatesPanel = new GeometryCoordinatesPanel(this,
-        geometryAttributeName);
-      addField(geometryAttributeName, this.geometryCoordinatesPanel);
+        geometryFieldName);
+      addField(geometryFieldName, this.geometryCoordinatesPanel);
       final JPanel panel = new JPanel(new GridLayout(1, 1));
 
       SwingUtil.setTitledBorder(this.geometryCoordinatesPanel, "Coordinates");
@@ -474,8 +474,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     this.toolBar = new ToolBar();
     add(this.toolBar, BorderLayout.NORTH);
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-    final boolean hasGeometry = geometryAttribute != null;
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+    final boolean hasGeometry = geometryField != null;
     final EnableCheck editable = new ObjectPropertyEnableCheck(this, "editable");
 
     if (layer != null) {
@@ -536,7 +536,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
 
     // Geometry manipulation
     if (hasGeometry) {
-      final DataType geometryDataType = geometryAttribute.getType();
+      final DataType geometryDataType = geometryField.getType();
       if (geometryDataType == DataTypes.LINE_STRING
         || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition)
@@ -675,7 +675,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
   @Override
   public void editingStopped(final ChangeEvent e) {
     final RecordTableCellEditor editor = (RecordTableCellEditor)e.getSource();
-    final String name = editor.getAttributeName();
+    final String name = editor.getFieldName();
     final Object value = editor.getCellEditorValue();
     setFieldValue(name, value, true);
   }
@@ -814,8 +814,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     }
   }
 
-  public String getGeometryAttributeName() {
-    return getRecordDefinition().getGeometryAttributeName();
+  public String getGeometryFieldName() {
+    return getRecordDefinition().getGeometryFieldName();
   }
 
   public GeometryCoordinatesPanel getGeometryCoordinatesPanel() {
@@ -936,7 +936,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
   }
 
   public boolean hasOriginalValue(final String name) {
-    return getRecordDefinition().hasAttribute(name);
+    return getRecordDefinition().hasField(name);
   }
 
   protected void invokeAction(final String actionName) {
@@ -1100,7 +1100,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
             final RecordDefinition recordDefinition = getRecordDefinition();
             if ("errorsUpdated".equals(propertyName)) {
               updateErrors();
-            } else if (recordDefinition.hasAttribute(propertyName)) {
+            } else if (recordDefinition.hasField(propertyName)) {
               setFieldValue(propertyName, value, isFieldValidationEnabled());
             }
             final boolean modifiedOrDeleted = isModifiedOrDeleted();
@@ -1244,7 +1244,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition != null) {
       try {
-        final Class<?> attributeClass = recordDefinition.getAttributeClass(fieldName);
+        final Class<?> attributeClass = recordDefinition.getFieldClass(fieldName);
         value = StringConverterRegistry.toObject(attributeClass, value);
       } catch (final Throwable e) {
       }
@@ -1300,11 +1300,11 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = recordDefinition;
     setRecordStore(recordDefinition.getRecordStore());
-    final String idAttributeName = recordDefinition.getIdAttributeName();
-    if (Property.hasValue(idAttributeName)) {
-      this.readOnlyFieldNames.add(idAttributeName);
+    final String idFieldName = recordDefinition.getIdFieldName();
+    if (Property.hasValue(idFieldName)) {
+      this.readOnlyFieldNames.add(idFieldName);
     }
-    for (final Attribute attribute : recordDefinition.getAttributes()) {
+    for (final FieldDefinition attribute : recordDefinition.getFields()) {
       if (attribute.isRequired()) {
         final String name = attribute.getName();
         addRequiredFieldNames(name);
@@ -1458,8 +1458,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
       if (requiredFieldNames.contains(fieldName)) {
         boolean run = true;
         if (this.record.getState() == RecordState.New) {
-          final String idAttributeName = getRecordDefinition().getIdAttributeName();
-          if (fieldName.equals(idAttributeName)) {
+          final String idFieldName = getRecordDefinition().getIdFieldName();
+          if (fieldName.equals(idFieldName)) {
             run = false;
           }
         }

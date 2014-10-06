@@ -6,13 +6,13 @@
  You may obtain a copy of the License at
 
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- 
+
  $URL:$
  $Author:$
  $Date:$
@@ -34,8 +34,8 @@ import com.revolsys.ui.html.view.Element;
 
 public class ViewAttributeController implements Controller {
 
-  public ModelAndView handleRequest(
-    final HttpServletRequest request,
+  @Override
+  public ModelAndView handleRequest(final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
     final String attributeName = request.getParameter("attributeName");
     if (attributeName != null) {
@@ -53,7 +53,7 @@ public class ViewAttributeController implements Controller {
   }
 
   private void render(final HttpServletResponse response, final Object object)
-    throws IOException {
+      throws IOException {
     if (object != null) {
       final PrintWriter out = response.getWriter();
       if (object instanceof Element) {

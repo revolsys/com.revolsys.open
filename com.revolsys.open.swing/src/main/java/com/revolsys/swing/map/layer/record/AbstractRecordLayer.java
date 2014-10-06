@@ -58,7 +58,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.property.DirectionalAttributes;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
@@ -335,9 +335,9 @@ RecordFactory, AddGeometryCompleteAction {
   public void addComplete(final AbstractOverlay overlay, final Geometry geometry) {
     if (geometry != null) {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final String geometryAttributeName = recordDefinition.getGeometryAttributeName();
+      final String geometryFieldName = recordDefinition.getGeometryFieldName();
       final Map<String, Object> parameters = new HashMap<String, Object>();
-      parameters.put(geometryAttributeName, geometry);
+      parameters.put(geometryFieldName, geometry);
       showAddForm(parameters);
     }
   }
@@ -368,8 +368,8 @@ RecordFactory, AddGeometryCompleteAction {
 
   public void addNewRecord() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-    if (geometryAttribute == null) {
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+    if (geometryField == null) {
       showAddForm(null);
     } else {
       final MapPanel map = MapPanel.get(this);
@@ -1134,17 +1134,17 @@ RecordFactory, AddGeometryCompleteAction {
   public String getFieldTitle(final String fieldName) {
     if (isUseFieldTitles()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      return recordDefinition.getAttributeTitle(fieldName);
+      return recordDefinition.getFieldTitle(fieldName);
     } else {
       return fieldName;
     }
   }
 
-  public String getGeometryAttributeName() {
+  public String getGeometryFieldName() {
     if (this.recordDefinition == null) {
       return "";
     } else {
-      return getRecordDefinition().getGeometryAttributeName();
+      return getRecordDefinition().getGeometryFieldName();
     }
   }
 
@@ -1153,11 +1153,11 @@ RecordFactory, AddGeometryCompleteAction {
     if (recordDefinition == null) {
       return null;
     } else {
-      final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-      if (geometryAttribute == null) {
+      final FieldDefinition geometryField = recordDefinition.getGeometryField();
+      if (geometryField == null) {
         return null;
       } else {
-        return geometryAttribute.getType();
+        return geometryField.getType();
       }
     }
   }
@@ -1180,8 +1180,8 @@ RecordFactory, AddGeometryCompleteAction {
     return getCachedRecords(this.cacheIdHighlighted);
   }
 
-  public String getIdAttributeName() {
-    return getRecordDefinition().getIdAttributeName();
+  public String getIdFieldName() {
+    return getRecordDefinition().getIdFieldName();
   }
 
   protected Collection<String> getIgnorePasteFields() {
@@ -1238,7 +1238,7 @@ RecordFactory, AddGeometryCompleteAction {
     if (record1 == record2) {
       return record1;
     } else {
-      final String sourceIdAttributeName = getIdAttributeName();
+      final String sourceIdAttributeName = getIdFieldName();
       final Object id1 = record1.getValue(sourceIdAttributeName);
       final Object id2 = record2.getValue(sourceIdAttributeName);
       int compare = 0;
@@ -1268,7 +1268,7 @@ RecordFactory, AddGeometryCompleteAction {
         final DirectionalAttributes property = DirectionalAttributes.getProperty(getRecordDefinition());
         final Map<String, Object> newValues = property.getMergedMap(point,
           record1, record2);
-        newValues.remove(getIdAttributeName());
+        newValues.remove(getIdFieldName());
         return new ArrayRecord(getRecordDefinition(), newValues);
       }
     }
@@ -1297,14 +1297,14 @@ RecordFactory, AddGeometryCompleteAction {
         return null;
       } else {
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-        if (geometryAttribute != null) {
+        final FieldDefinition geometryField = recordDefinition.getGeometryField();
+        if (geometryField != null) {
           final MapPanel parentComponent = MapPanel.get(getProject());
           Geometry geometry = null;
           DataType geometryDataType = null;
           Class<?> layerGeometryClass = null;
           final GeometryFactory geometryFactory = getGeometryFactory();
-          geometryDataType = geometryAttribute.getType();
+          geometryDataType = geometryField.getType();
           layerGeometryClass = geometryDataType.getJavaClass();
           RecordReader reader = ClipboardUtil.getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
           if (reader == null) {
@@ -1501,7 +1501,7 @@ RecordFactory, AddGeometryCompleteAction {
   }
 
   public boolean hasGeometryAttribute() {
-    return getRecordDefinition().getGeometryAttribute() != null;
+    return getRecordDefinition().getGeometryField() != null;
   }
 
   protected boolean hasPermission(final String permission) {
@@ -1651,7 +1651,7 @@ RecordFactory, AddGeometryCompleteAction {
               if (fieldName.endsWith("\"")) {
                 fieldName = fieldName.substring(0, fieldName.length() - 1);
               }
-              if (getRecordDefinition().hasAttribute(fieldName)) {
+              if (getRecordDefinition().hasField(fieldName)) {
                 return true;
               }
             }
@@ -1704,7 +1704,7 @@ RecordFactory, AddGeometryCompleteAction {
 
   @Override
   public boolean isHasGeometry() {
-    return getGeometryAttributeName() != null;
+    return getGeometryFieldName() != null;
   }
 
   public boolean isHasSelectedRecords() {
@@ -1837,12 +1837,12 @@ RecordFactory, AddGeometryCompleteAction {
       final List<Record> regectedRecords = new ArrayList<Record>();
       if (reader != null) {
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
+        final FieldDefinition geometryField = recordDefinition.getGeometryField();
         DataType geometryDataType = null;
         Class<?> layerGeometryClass = null;
         final GeometryFactory geometryFactory = getGeometryFactory();
-        if (geometryAttribute != null) {
-          geometryDataType = geometryAttribute.getType();
+        if (geometryField != null) {
+          geometryDataType = geometryField.getType();
           layerGeometryClass = geometryDataType.getJavaClass();
         }
         final Collection<String> ignorePasteFields = getIgnorePasteFields();
@@ -1853,7 +1853,7 @@ RecordFactory, AddGeometryCompleteAction {
           Geometry sourceGeometry = sourceRecord.getGeometryValue();
           for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator.hasNext();) {
             final String attributeName = iterator.next();
-            final Attribute attribute = recordDefinition.getAttribute(attributeName);
+            final FieldDefinition attribute = recordDefinition.getField(attributeName);
             if (attribute == null) {
               iterator.remove();
             } else if (ignorePasteFields != null) {
@@ -1864,7 +1864,7 @@ RecordFactory, AddGeometryCompleteAction {
           }
           if (geometryDataType != null) {
             if (sourceGeometry == null) {
-              final Object value = sourceRecord.getValue(geometryAttribute.getName());
+              final Object value = sourceRecord.getValue(geometryField.getName());
               sourceGeometry = StringConverterRegistry.toObject(Geometry.class,
                 value);
             }
@@ -1873,8 +1873,8 @@ RecordFactory, AddGeometryCompleteAction {
             if (geometry == null) {
               newValues.clear();
             } else {
-              final String geometryAttributeName = geometryAttribute.getName();
-              newValues.put(geometryAttributeName, geometry);
+              final String geometryFieldName = geometryField.getName();
+              newValues.put(geometryFieldName, geometry);
             }
           }
           LayerRecord newRecord = null;
@@ -1956,7 +1956,7 @@ RecordFactory, AddGeometryCompleteAction {
         if (source instanceof LayerRecord) {
           final LayerRecord record = (LayerRecord)source;
           if (record.getLayer() == this) {
-            if (EqualsRegistry.equal(propertyName, getGeometryAttributeName())) {
+            if (EqualsRegistry.equal(propertyName, getGeometryFieldName())) {
               final Geometry oldGeometry = (Geometry)event.getOldValue();
               updateSpatialIndex(record, oldGeometry);
               clearSelectedRecordsIndex();
@@ -2396,22 +2396,22 @@ RecordFactory, AddGeometryCompleteAction {
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = recordDefinition;
     if (recordDefinition != null) {
-      final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
+      final FieldDefinition geometryField = recordDefinition.getGeometryField();
       String geometryType = null;
       GeometryFactory geometryFactory;
-      if (geometryAttribute == null) {
+      if (geometryField == null) {
         geometryFactory = null;
         setVisible(false);
         setSelectSupported(false);
         setRenderer(null);
       } else {
         geometryFactory = recordDefinition.getGeometryFactory();
-        geometryType = geometryAttribute.getType().toString();
+        geometryType = geometryField.getType().toString();
       }
       setGeometryFactory(geometryFactory);
       final Icon icon = RecordStoreTableTreeNode.getIcon(geometryType);
       setIcon(icon);
-      this.fieldNames = recordDefinition.getAttributeNames();
+      this.fieldNames = recordDefinition.getFieldNames();
       List<String> allFieldNames = this.fieldNamesSets.get(ALL.toUpperCase());
       if (Property.hasValue(allFieldNames)) {
         final Set<String> mergedFieldNames = new LinkedHashSet<>(allFieldNames);
@@ -2475,11 +2475,11 @@ RecordFactory, AddGeometryCompleteAction {
   public void setSelectedRecordsById(final Object id) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition != null) {
-      final String idAttributeName = recordDefinition.getIdAttributeName();
-      if (idAttributeName == null) {
+      final String idFieldName = recordDefinition.getIdFieldName();
+      if (idFieldName == null) {
         clearSelectedRecords();
       } else {
-        final Query query = Query.equal(recordDefinition, idAttributeName, id);
+        final Query query = Query.equal(recordDefinition, idFieldName, id);
         final List<LayerRecord> records = query(query);
         setSelectedRecords(records);
       }

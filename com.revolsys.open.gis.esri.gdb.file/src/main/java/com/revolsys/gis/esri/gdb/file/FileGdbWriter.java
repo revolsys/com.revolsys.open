@@ -11,14 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
-import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbAttribute;
-import com.revolsys.gis.esri.gdb.file.capi.type.OidAttribute;
+import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
+import com.revolsys.gis.esri.gdb.file.capi.type.OidFieldDefinition;
 import com.revolsys.io.AbstractRecordWriter;
 
 public class FileGdbWriter extends AbstractRecordWriter {
@@ -101,11 +101,11 @@ public class FileGdbWriter extends AbstractRecordWriter {
     final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
     final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
     final String typePath = sourceRecordDefinition.getPath();
-    for (final Attribute attribute : recordDefinition.getAttributes()) {
+    for (final FieldDefinition attribute : recordDefinition.getFields()) {
       final String name = attribute.getName();
       if (attribute.isRequired()) {
         final Object value = record.getValue(name);
-        if (value == null && !(attribute instanceof OidAttribute)) {
+        if (value == null && !(attribute instanceof OidFieldDefinition)) {
           throw new IllegalArgumentException("Atribute " + typePath + "."
               + name + " is required");
         }
@@ -116,17 +116,17 @@ public class FileGdbWriter extends AbstractRecordWriter {
       final Row row = this.recordStore.createRowObject(table);
       try {
         final List<Object> values = new ArrayList<Object>();
-        for (final Attribute attribute : recordDefinition.getAttributes()) {
+        for (final FieldDefinition attribute : recordDefinition.getFields()) {
           final String name = attribute.getName();
           final Object value = record.getValue(name);
-          final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+          final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
           final Object esriValue = esriAttribute.setInsertValue(record, row,
             value);
           values.add(esriValue);
         }
         this.recordStore.insertRow(table, row);
-        for (final Attribute attribute : recordDefinition.getAttributes()) {
-          final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+        for (final FieldDefinition attribute : recordDefinition.getFields()) {
+          final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
           esriAttribute.setPostInsertValue(record, row);
         }
         record.setState(RecordState.Persisted);
@@ -169,10 +169,10 @@ public class FileGdbWriter extends AbstractRecordWriter {
             try {
               final List<Object> esriValues = new ArrayList<Object>();
               try {
-                for (final Attribute attribute : recordDefinition.getAttributes()) {
+                for (final FieldDefinition attribute : recordDefinition.getFields()) {
                   final String name = attribute.getName();
                   final Object value = record.getValue(name);
-                  final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+                  final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
                   esriValues.add(esriAttribute.setUpdateValue(record, row,
                     value));
                 }

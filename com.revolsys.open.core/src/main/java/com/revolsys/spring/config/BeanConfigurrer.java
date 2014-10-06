@@ -113,7 +113,7 @@ ApplicationContextAware, BeanNameAware, PriorityOrdered {
     setAttributes(attributes);
   }
 
-  public Map<String, Object> getAttributes() {
+  public Map<String, Object> getFields() {
     return this.attributes;
   }
 

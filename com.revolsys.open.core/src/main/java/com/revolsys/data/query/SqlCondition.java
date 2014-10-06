@@ -7,13 +7,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 
 // TODO accept (how?)
 public class SqlCondition extends Condition {
-  private List<Attribute> parameterAttributes = new ArrayList<Attribute>();
+  private List<FieldDefinition> parameterAttributes = new ArrayList<FieldDefinition>();
 
   private List<Object> parameterValues = new ArrayList<Object>();
 
@@ -23,17 +23,17 @@ public class SqlCondition extends Condition {
     this.sql = sql;
   }
 
-  public SqlCondition(final String sql, final Attribute parameterAttribute,
+  public SqlCondition(final String sql, final FieldDefinition parameterAttribute,
     final Object parameterValue) {
     this(sql, Arrays.asList(parameterAttribute), Arrays.asList(parameterValue));
   }
 
   public SqlCondition(final String sql,
-    final List<Attribute> parameterAttributes,
+    final List<FieldDefinition> parameterAttributes,
     final List<Object> parameterValues) {
     this.sql = sql;
     this.parameterValues = new ArrayList<Object>(parameterValues);
-    this.parameterAttributes = new ArrayList<Attribute>(parameterAttributes);
+    this.parameterAttributes = new ArrayList<FieldDefinition>(parameterAttributes);
   }
 
   public SqlCondition(final String sql, final Object... parameters) {
@@ -46,7 +46,7 @@ public class SqlCondition extends Condition {
     parameterAttributes.add(null);
   }
 
-  public void addParameter(final Object value, final Attribute attribute) {
+  public void addParameter(final Object value, final FieldDefinition attribute) {
     addParameter(value);
     parameterAttributes.set(parameterAttributes.size() - 1, attribute);
   }
@@ -65,17 +65,17 @@ public class SqlCondition extends Condition {
   public int appendParameters(int index, final PreparedStatement statement) {
     for (int i = 0; i < parameterValues.size(); i++) {
       final Object value = parameterValues.get(i);
-      JdbcAttribute jdbcAttribute = null;
+      JdbcFieldDefinition jdbcAttribute = null;
       if (i < parameterAttributes.size()) {
-        final Attribute attribute = parameterAttributes.get(i);
-        if (attribute instanceof JdbcAttribute) {
-          jdbcAttribute = (JdbcAttribute)attribute;
+        final FieldDefinition attribute = parameterAttributes.get(i);
+        if (attribute instanceof JdbcFieldDefinition) {
+          jdbcAttribute = (JdbcFieldDefinition)attribute;
 
         }
       }
 
       if (jdbcAttribute == null) {
-        jdbcAttribute = JdbcAttribute.createAttribute(value);
+        jdbcAttribute = JdbcFieldDefinition.createAttribute(value);
       }
       try {
         index = jdbcAttribute.setPreparedStatementValue(statement, index, value);

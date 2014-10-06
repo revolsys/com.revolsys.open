@@ -31,7 +31,7 @@ public class Parser extends XmlProcessor {
   }
 
   public Attribution processAttribution(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final Attribution attribution = new Attribution();
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
 
@@ -58,7 +58,7 @@ public class Parser extends XmlProcessor {
   }
 
   public AuthorityUrl processAuthorityURL(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final AuthorityUrl authorityUrl = new AuthorityUrl();
     final String name = parser.getAttributeValue(null, "name");
     authorityUrl.setName(name);
@@ -72,14 +72,14 @@ public class Parser extends XmlProcessor {
   }
 
   public BoundingBox processBoundingBox(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final BoundingBox boundingBox = new BoundingBox();
     final double minX = StaxUtils.getDoubleAttribute(parser, null, "minx");
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final com.revolsys.jts.geom.BoundingBox envelope = new BoundingBoxDoubleGf(2, minX,
-      minY, maxX, maxY);
+    final com.revolsys.jts.geom.BoundingBox envelope = new BoundingBoxDoubleGf(
+      2, minX, minY, maxX, maxY);
     boundingBox.setEnvelope(envelope);
     final double resX = StaxUtils.getDoubleAttribute(parser, null, "resx");
     boundingBox.setResX(resX);
@@ -93,7 +93,7 @@ public class Parser extends XmlProcessor {
   }
 
   public Capability processCapability(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final Capability capability = new Capability();
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (parser.getName().getLocalPart().equals("Request")) {
@@ -120,7 +120,7 @@ public class Parser extends XmlProcessor {
   }
 
   public ContactAddress processContactAddress(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final ContactAddress contactAddress = new ContactAddress();
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
 
@@ -203,7 +203,7 @@ public class Parser extends XmlProcessor {
   }
 
   public DcpType processDCPType(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     DcpType type = null;
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final Object object = process(parser);
@@ -215,7 +215,7 @@ public class Parser extends XmlProcessor {
   }
 
   public Dimension processDimension(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final Dimension dimension = new Dimension();
     final String name = parser.getAttributeValue(null, "name");
     dimension.setName(name);
@@ -229,7 +229,7 @@ public class Parser extends XmlProcessor {
   }
 
   public Extent processExtent(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final Extent extent = new Extent();
     final String name = parser.getAttributeValue(null, "name");
     extent.setName(name);
@@ -241,7 +241,7 @@ public class Parser extends XmlProcessor {
     extent.setNearestValue("1".equals(nearestValue));
     StaxUtils.skipSubTree(parser);
     final String multipleValues = parser.getAttributeValue(null,
-      "multipleValues");
+        "multipleValues");
     extent.setMultipleValues("1".equals(multipleValues));
     StaxUtils.skipSubTree(parser);
     final String current = parser.getAttributeValue(null, "current");
@@ -252,7 +252,7 @@ public class Parser extends XmlProcessor {
   }
 
   public FormatUrl processFormatUrl(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final FormatUrl formatUrl = new FormatUrl();
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final String tagName = parser.getName().getLocalPart();
@@ -270,7 +270,7 @@ public class Parser extends XmlProcessor {
   }
 
   public HttpDcpType processHTTP(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final HttpDcpType type = new HttpDcpType();
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final String name = parser.getName().getLocalPart();
@@ -288,7 +288,7 @@ public class Parser extends XmlProcessor {
   }
 
   public Identifier processIdentifier(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final Identifier identifier = new Identifier();
     final String authority = parser.getAttributeValue(null, "authority");
     identifier.setAuthority(authority);
@@ -298,7 +298,7 @@ public class Parser extends XmlProcessor {
   }
 
   public ImageUrl processImageUrl(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final ImageUrl imageUrl = new ImageUrl();
     final int width = StaxUtils.getIntAttribute(parser, null, "width");
     imageUrl.setWidth(width);
@@ -320,7 +320,7 @@ public class Parser extends XmlProcessor {
   }
 
   public List<String> processKeywordList(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final List<String> keywords = new ArrayList<String>();
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
 
@@ -341,15 +341,15 @@ public class Parser extends XmlProcessor {
     final double maxX = StaxUtils.getDoubleAttribute(parser, null, "maxx");
     final double minY = StaxUtils.getDoubleAttribute(parser, null, "miny");
     final double maxY = StaxUtils.getDoubleAttribute(parser, null, "maxy");
-    final com.revolsys.jts.geom.BoundingBox envelope = new BoundingBoxDoubleGf(2, minX,
-      minY, maxX, maxY);
+    final com.revolsys.jts.geom.BoundingBox envelope = new BoundingBoxDoubleGf(
+      2, minX, minY, maxX, maxY);
     StaxUtils.skipSubTree(parser);
     return envelope;
 
   }
 
   public WmsLayer processLayer(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final WmsLayer layer = new WmsLayer();
     final String queryable = parser.getAttributeValue(null, "queryable");
     layer.setQueryable("1".equals(queryable));
@@ -362,7 +362,7 @@ public class Parser extends XmlProcessor {
     final int fixedWidth = StaxUtils.getIntAttribute(parser, null, "fixedWidth");
     layer.setFixedWidth(fixedWidth);
     final int fixedHeight = StaxUtils.getIntAttribute(parser, null,
-      "fixedHeight");
+        "fixedHeight");
     layer.setFixedHeight(fixedHeight);
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final String tagName = parser.getName().getLocalPart();
@@ -417,7 +417,7 @@ public class Parser extends XmlProcessor {
   }
 
   public MetadataUrl processMetadataURL(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final MetadataUrl recordDefinitionUrl = new MetadataUrl();
     final String type = parser.getAttributeValue(null, "type");
     recordDefinitionUrl.setType(type);
@@ -437,15 +437,15 @@ public class Parser extends XmlProcessor {
   }
 
   public URL processOnlineResource(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final String url = parser.getAttributeValue("http://www.w3.org/1999/xlink",
-      "href");
+        "href");
     StaxUtils.skipSubTree(parser);
     return new URL(url);
   }
 
   public List<Request> processRequest(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final List<Request> requests = new ArrayList<Request>();
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final Request request = new Request();
@@ -468,7 +468,7 @@ public class Parser extends XmlProcessor {
   }
 
   public ScaleHint processScaleHint(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final double min = StaxUtils.getDoubleAttribute(parser, null, "min");
     final double max = StaxUtils.getDoubleAttribute(parser, null, "max");
     final ScaleHint scaleHint = new ScaleHint();
@@ -480,7 +480,7 @@ public class Parser extends XmlProcessor {
   }
 
   public Service processService(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final Service service = new Service();
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
 
@@ -518,7 +518,7 @@ public class Parser extends XmlProcessor {
   }
 
   public Style processStyle(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
+      throws XMLStreamException, IOException {
     final Style style = new Style();
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
 
@@ -551,40 +551,40 @@ public class Parser extends XmlProcessor {
   }
 
   public WmsCapabilities processWMS_Capabilities(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
-    capabilities = new WmsCapabilities();
+      throws XMLStreamException, IOException {
+    this.capabilities = new WmsCapabilities();
     final String version = parser.getAttributeValue(null, "version");
     final String updateSequence = parser.getAttributeValue(null,
-      "updateSequence");
-    capabilities.setVersion(version);
-    capabilities.setUpdateSequence(updateSequence);
+        "updateSequence");
+    this.capabilities.setVersion(version);
+    this.capabilities.setUpdateSequence(updateSequence);
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final Object object = process(parser);
       if (object instanceof Service) {
-        capabilities.setService((Service)object);
+        this.capabilities.setService((Service)object);
       } else if (object instanceof Capability) {
-        capabilities.setCapability((Capability)object);
+        this.capabilities.setCapability((Capability)object);
       }
     }
-    return capabilities;
+    return this.capabilities;
   }
 
   public WmsCapabilities processWMT_MS_Capabilities(final XMLStreamReader parser)
-    throws XMLStreamException, IOException {
-    capabilities = new WmsCapabilities();
+      throws XMLStreamException, IOException {
+    this.capabilities = new WmsCapabilities();
     final String version = parser.getAttributeValue(null, "version");
     final String updateSequence = parser.getAttributeValue(null,
-      "updateSequence");
-    capabilities.setVersion(version);
-    capabilities.setUpdateSequence(updateSequence);
+        "updateSequence");
+    this.capabilities.setVersion(version);
+    this.capabilities.setUpdateSequence(updateSequence);
     while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
       final Object object = process(parser);
       if (object instanceof Service) {
-        capabilities.setService((Service)object);
+        this.capabilities.setService((Service)object);
       } else if (object instanceof Capability) {
-        capabilities.setCapability((Capability)object);
+        this.capabilities.setCapability((Capability)object);
       }
     }
-    return capabilities;
+    return this.capabilities;
   }
 }

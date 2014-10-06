@@ -19,7 +19,7 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStore;
@@ -29,7 +29,7 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.gis.oracle.io.OracleRecordStore;
 import com.revolsys.io.FileUtil;
-import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
@@ -85,31 +85,31 @@ public class ArcSdeBinaryGeometryRecordStoreUtil {
     final RecordStoreSchema schema, final RecordDefinition recordDefinition,
     final String typePath, final String columnName,
     final Map<String, Object> columnProperties) {
-    final Attribute attribute = recordDefinition.getAttribute(columnName);
+    final FieldDefinition attribute = recordDefinition.getField(columnName);
 
-    DataType dataType = JdbcAttributeAdder.getColumnProperty(schema, typePath,
-      columnName, JdbcAttributeAdder.GEOMETRY_TYPE);
+    DataType dataType = JdbcFieldAdder.getColumnProperty(schema, typePath,
+      columnName, JdbcFieldAdder.GEOMETRY_TYPE);
     if (dataType == null) {
       dataType = DataTypes.GEOMETRY;
     }
 
-    GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
-      schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
+    GeometryFactory geometryFactory = JdbcFieldAdder.getColumnProperty(
+      schema, typePath, columnName, JdbcFieldAdder.GEOMETRY_FACTORY);
     if (geometryFactory == null) {
       geometryFactory = schema.getGeometryFactory();
     }
 
-    final ArcSdeBinaryGeometryAttribute sdeAttribute = new ArcSdeBinaryGeometryAttribute(
+    final ArcSdeBinaryGeometryFieldDefinition sdeAttribute = new ArcSdeBinaryGeometryFieldDefinition(
       this, columnName, columnName, dataType, attribute.isRequired(),
       "The GEOMETRY reference", attribute.getProperties(), geometryFactory);
-    ((RecordDefinitionImpl)recordDefinition).replaceAttribute(attribute,
+    ((RecordDefinitionImpl)recordDefinition).replaceField(attribute,
       sdeAttribute);
     sdeAttribute.setRecordDefinition(recordDefinition);
 
     recordDefinition.setProperty("recordStoreIteratorFactory",
       this.iteratorFactory);
 
-    ((RecordDefinitionImpl)recordDefinition).setGeometryAttributeName(columnName);
+    ((RecordDefinitionImpl)recordDefinition).setGeometryFieldName(columnName);
   }
 
   public AbstractIterator<Record> createIterator(

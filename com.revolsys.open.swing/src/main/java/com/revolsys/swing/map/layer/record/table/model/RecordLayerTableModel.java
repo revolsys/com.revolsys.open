@@ -35,7 +35,7 @@ import com.revolsys.data.query.Value;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.query.functions.Function;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.swing.listener.InvokeMethodListener;
@@ -183,9 +183,9 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
         final Project project = this.layer.getProject();
         final BoundingBox viewBoundingBox = project.getViewBoundingBox();
         final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
-        final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-        if (geometryAttribute != null) {
-          query.and(F.envelopeIntersects(geometryAttribute, viewBoundingBox));
+        final FieldDefinition geometryField = recordDefinition.getGeometryField();
+        if (geometryField != null) {
+          query.and(F.envelopeIntersects(geometryField, viewBoundingBox));
         }
       }
       return query;
@@ -594,7 +594,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
           if (left instanceof Column) {
             final Column column = (Column)left;
             final String columnName = column.getName();
-            columnIndex = getRecordDefinition().getAttributeIndex(columnName);
+            columnIndex = getRecordDefinition().getFieldIndex(columnName);
           } else if (left instanceof Function) {
             final Function function = (Function)left;
             left = function.getQueryValues().get(0);
@@ -673,7 +673,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
     final int attributeIndex, final Object objectValue) {
     if (objectValue == null) {
       final String fieldName = getFieldName(attributeIndex);
-      if (getRecordDefinition().getIdAttributeNames().contains(fieldName)) {
+      if (getRecordDefinition().getIdFieldNames().contains(fieldName)) {
         return "NEW";
       }
     }

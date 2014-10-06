@@ -26,14 +26,14 @@ public class ThreadSharedAttributes {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T getAttribute(final Object name) {
+  public static <T> T getField(final Object name) {
     final Map<Object, Object> attributes = getLocalAttributes();
     synchronized (attributes) {
       return (T)attributes.get(name);
     }
   }
 
-  public static Map<String, Object> getAttributes() {
+  public static Map<String, Object> getFields() {
     final Map<Object, Object> attributes = getLocalAttributes();
     synchronized (attributes) {
       final HashMap<String, Object> map = new HashMap<String, Object>();

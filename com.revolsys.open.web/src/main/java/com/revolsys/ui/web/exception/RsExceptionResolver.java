@@ -10,9 +10,6 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.revolsys.ui.web.exception.PageNotFoundException;
-import com.revolsys.ui.web.exception.RedirectException;
-
 @Controller
 public class RsExceptionResolver implements HandlerExceptionResolver {
 

@@ -68,7 +68,7 @@ public class OsnReader implements RecordIterator {
    * @return The attribute definition.
    * @throws IOException If an I/O error occurs.
    */
-  private void addAttribute(final Record record) {
+  private void addField(final Record record) {
     if (osnIterator.getEventType() != OsnIterator.START_ATTRIBUTE) {
       if (osnIterator.next() != OsnIterator.START_ATTRIBUTE) {
         osnIterator.throwParseError("Excepecting an attribute name");
@@ -97,7 +97,7 @@ public class OsnReader implements RecordIterator {
       final RecordDefinition type = recordDefinitionFactory.getRecordDefinition(typePath);
       final Record record = factory.createRecord(type);
       while (osnIterator.next() != OsnIterator.END_OBJECT) {
-        addAttribute(record);
+        addField(record);
       }
       return record;
     }

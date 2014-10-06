@@ -23,7 +23,7 @@ import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.gis.io.Statistics;
@@ -43,7 +43,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends AbstractIterator<Record> 
 
   private SeQuery seQuery;
 
-  private List<Attribute> attributes = new ArrayList<Attribute>();
+  private List<FieldDefinition> attributes = new ArrayList<FieldDefinition>();
 
   private Query query;
 
@@ -102,17 +102,17 @@ public class ArcSdeBinaryGeometryQueryIterator extends AbstractIterator<Record> 
     try {
 
       final List<String> attributeNames = new ArrayList<String>(
-          this.query.getAttributeNames());
+          this.query.getFieldNames());
       if (attributeNames.isEmpty()) {
-        this.attributes.addAll(this.recordDefinition.getAttributes());
-        attributeNames.addAll(this.recordDefinition.getAttributeNames());
+        this.attributes.addAll(this.recordDefinition.getFields());
+        attributeNames.addAll(this.recordDefinition.getFieldNames());
       } else {
         for (final String attributeName : attributeNames) {
           if (attributeName.equals("*")) {
-            this.attributes.addAll(this.recordDefinition.getAttributes());
-            attributeNames.addAll(this.recordDefinition.getAttributeNames());
+            this.attributes.addAll(this.recordDefinition.getFields());
+            attributeNames.addAll(this.recordDefinition.getFieldNames());
           } else {
-            final Attribute attribute = this.recordDefinition.getAttribute(attributeName);
+            final FieldDefinition attribute = this.recordDefinition.getField(attributeName);
             if (attribute != null) {
               this.attributes.add(attribute);
             }
@@ -128,7 +128,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends AbstractIterator<Record> 
       BoundingBox boundingBox = QueryValue.getBoundingBox(this.query);
       if (boundingBox != null) {
         final SeLayer layer = new SeLayer(this.connection, tableName,
-          this.recordDefinition.getGeometryAttributeName());
+          this.recordDefinition.getGeometryFieldName());
 
         final GeometryFactory geometryFactory = this.recordDefinition.getGeometryFactory();
         boundingBox = boundingBox.convert(geometryFactory);
@@ -137,7 +137,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends AbstractIterator<Record> 
         final SeShape shape = new SeShape(layer.getCoordRef());
         shape.generateRectangle(envelope);
         final SeShapeFilter filter = new SeShapeFilter(tableName,
-          this.recordDefinition.getGeometryAttributeName(), shape,
+          this.recordDefinition.getGeometryFieldName(), shape,
           SeFilter.METHOD_ENVP);
         this.seQuery.setSpatialConstraints(SeQuery.SE_SPATIAL_FIRST, false,
           new SeFilter[] {

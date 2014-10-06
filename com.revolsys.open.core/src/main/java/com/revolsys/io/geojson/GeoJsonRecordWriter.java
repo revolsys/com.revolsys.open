@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.Writer;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
@@ -329,7 +329,7 @@ GeoJsonConstants {
     }
     writeSrid(mainGeometry);
     final RecordDefinition recordDefinition = object.getRecordDefinition();
-    final int geometryIndex = recordDefinition.getGeometryAttributeIndex();
+    final int geometryIndex = recordDefinition.getGeometryFieldIndex();
     boolean geometryWritten = false;
     this.out.endAttribute();
     this.out.label(GEOMETRY);
@@ -343,7 +343,7 @@ GeoJsonConstants {
     this.out.endAttribute();
     this.out.label(PROPERTIES);
     this.out.startObject();
-    final int numAttributes = recordDefinition.getAttributeCount();
+    final int numAttributes = recordDefinition.getFieldCount();
     boolean hasValue = false;
     for (int i = 0; i < numAttributes; i++) {
       if (i != geometryIndex) {
@@ -354,7 +354,7 @@ GeoJsonConstants {
           } else {
             hasValue = true;
           }
-          final Attribute attribute = recordDefinition.getAttribute(i);
+          final FieldDefinition attribute = recordDefinition.getField(i);
           final String name = attribute.getName();
           this.out.label(name);
           if (value instanceof Geometry) {

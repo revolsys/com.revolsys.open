@@ -17,12 +17,12 @@ public class SetCodeTableId extends
 
   private final Map<String, Converter<Record, Object>> codeTableValueConverters = new HashMap<String, Converter<Record, Object>>();
 
-  private final String targetAttributeName;
+  private final String targetFieldName;
 
   public SetCodeTableId(final CodeTable codeTable,
-    final String targetAttributeName) {
+    final String targetFieldName) {
     this.codeTable = codeTable;
-    this.targetAttributeName = targetAttributeName;
+    this.targetFieldName = targetFieldName;
   }
 
   @Override
@@ -54,7 +54,7 @@ public class SetCodeTableId extends
       codeTableValues.put(codeTableAttributeName, sourceValue);
     }
     final Object codeId = codeTable.getId(codeTableValues);
-    target.setValue(targetAttributeName, codeId);
+    target.setValue(targetFieldName, codeId);
   }
 
   public void setValueMapping(final String codeTableAttribute,

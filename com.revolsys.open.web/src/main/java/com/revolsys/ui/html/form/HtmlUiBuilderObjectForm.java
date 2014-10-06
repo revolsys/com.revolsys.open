@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -64,11 +64,11 @@ public class HtmlUiBuilderObjectForm extends Form {
   @Override
   public Object getInitialValue(final Field field,
     final HttpServletRequest request) {
-    if (object != null) {
+    if (this.object != null) {
       final String propertyName = field.getName();
       if (propertyName != Form.FORM_TASK_PARAM) {
         try {
-          return Property.get(object, propertyName);
+          return Property.get(this.object, propertyName);
         } catch (final IllegalArgumentException e) {
           return null;
         }
@@ -78,27 +78,27 @@ public class HtmlUiBuilderObjectForm extends Form {
   }
 
   public Object getObject() {
-    return object;
+    return this.object;
   }
 
   @Override
   public void initialize(final HttpServletRequest request) {
-    for (final String key : fieldKeys) {
+    for (final String key : this.fieldKeys) {
       if (!getFieldNames().contains(key)) {
-        final Element field = builder.getField(request, key);
+        final Element field = this.builder.getAttribute(request, key);
         if (field instanceof SetObject) {
-          ((SetObject)field).setObject(object);
+          ((SetObject)field).setObject(this.object);
         }
         if (field != null) {
           if (!getElements().contains(field)) {
-            final Decorator label = builder.getFieldLabel(key, field);
+            final Decorator label = this.builder.getAttributeLabel(key, field);
 
             add(field, label);
           }
         }
       }
     }
-    builder.initializeForm(this, request);
+    this.builder.initializeForm(this, request);
     super.initialize(request);
   }
 
@@ -109,15 +109,15 @@ public class HtmlUiBuilderObjectForm extends Form {
   @Override
   public boolean validate() {
     boolean valid = true;
-    if (object != null) {
+    if (this.object != null) {
       for (final Field field : getFields().values()) {
         if (!field.hasValidationErrors() && !field.isReadOnly()) {
           final String propertyName = field.getName();
           if (propertyName != Form.FORM_TASK_PARAM
-            && fieldKeys.contains(propertyName)) {
+              && this.fieldKeys.contains(propertyName)) {
             final Object value = field.getValue();
             try {
-              builder.setValue(object, propertyName, value);
+              this.builder.setValue(this.object, propertyName, value);
             } catch (final IllegalArgumentException e) {
               field.addValidationError(e.getMessage());
               valid = false;
@@ -126,7 +126,7 @@ public class HtmlUiBuilderObjectForm extends Form {
         }
       }
       if (valid) {
-        valid &= builder.validateForm(this);
+        valid &= this.builder.validateForm(this);
       }
     }
     valid &= super.validate();

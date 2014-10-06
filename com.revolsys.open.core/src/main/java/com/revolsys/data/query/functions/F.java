@@ -3,13 +3,13 @@ package com.revolsys.data.query.functions;
 import com.revolsys.data.query.Column;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.query.Value;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 
 public class F {
-  public static WithinDistance dWithin(final Attribute attribute,
+  public static WithinDistance dWithin(final FieldDefinition attribute,
     final Geometry geometry, final double distance) {
     return new WithinDistance(new Column(attribute), new Value(attribute,
       geometry), new Value(distance));
@@ -25,7 +25,7 @@ public class F {
   }
 
   public static EnvelopeIntersects envelopeIntersects(
-    final Attribute attribute, final BoundingBox boundingBox) {
+    final FieldDefinition attribute, final BoundingBox boundingBox) {
     if (attribute == null) {
       return null;
     } else {
@@ -36,14 +36,14 @@ public class F {
   }
 
   public static EnvelopeIntersects envelopeIntersects(
-    final Attribute attribute, final Geometry geometry) {
+    final FieldDefinition attribute, final Geometry geometry) {
     return new EnvelopeIntersects(new Column(attribute), new Value(attribute,
       geometry.getBoundingBox()));
   }
 
   public static EnvelopeIntersects envelopeIntersects(
     final RecordDefinition recordDefinition, final BoundingBox boundingBox) {
-    final Attribute attribute = recordDefinition.getGeometryAttribute();
+    final FieldDefinition attribute = recordDefinition.getGeometryField();
     return envelopeIntersects(attribute, boundingBox);
   }
 

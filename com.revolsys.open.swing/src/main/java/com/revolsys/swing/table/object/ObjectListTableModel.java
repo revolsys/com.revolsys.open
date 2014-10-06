@@ -10,9 +10,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PreDestroy;
-import com.revolsys.swing.table.AbstractTableModel;
 
 import com.revolsys.collection.PropertyChangeArrayList;
+import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -102,7 +102,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
     this.objects.getPropertyChangeSupport().firePropertyChange(event);
   }
 
-  public String getAttributeName(final int columnIndex) {
+  public String getFieldName(final int columnIndex) {
     return this.columnNames.get(columnIndex);
   }
 
@@ -160,7 +160,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
       return null;
     } else {
       try {
-        final String name = getAttributeName(columnIndex);
+        final String name = getFieldName(columnIndex);
         return Property.get(object, name);
       } catch (final Throwable t) {
         return null;

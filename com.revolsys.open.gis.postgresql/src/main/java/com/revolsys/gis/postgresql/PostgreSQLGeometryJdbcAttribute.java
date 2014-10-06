@@ -19,14 +19,14 @@ import org.postgis.Polygon;
 import org.postgresql.geometric.PGbox;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
+public class PostgreSQLGeometryJdbcAttribute extends JdbcFieldDefinition {
   private final GeometryFactory geometryFactory;
 
   private final int srid;
@@ -40,12 +40,12 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
     super(dbName, name, type, -1, 0, 0, required, description, properties);
     this.srid = srid;
     this.geometryFactory = geometryFactory;
-    setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
+    setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
     this.axisCount = axisCount;
   }
 
   @Override
-  public JdbcAttribute clone() {
+  public JdbcFieldDefinition clone() {
     return new PostgreSQLGeometryJdbcAttribute(getDbName(), getName(),
       getType(), isRequired(), getDescription(), getProperties(), srid,
       axisCount, geometryFactory);
@@ -104,7 +104,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcAttribute {
   }
 
   @Override
-  public int setAttributeValueFromResultSet(final ResultSet resultSet,
+  public int setFieldValueFromResultSet(final ResultSet resultSet,
     final int columnIndex, final Record object) throws SQLException {
     final Object oracleValue = resultSet.getObject(columnIndex);
     final Object value = toJava(oracleValue);

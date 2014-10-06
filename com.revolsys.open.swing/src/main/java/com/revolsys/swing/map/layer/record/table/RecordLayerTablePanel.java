@@ -77,7 +77,7 @@ PropertyChangeListener {
     table.getTableCellEditor().addMouseListener(this);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
-    final boolean hasGeometry = recordDefinition.getGeometryAttributeIndex() != -1;
+    final boolean hasGeometry = recordDefinition.getGeometryFieldIndex() != -1;
     final EnableCheck deletableEnableCheck = new RecordRowPropertyEnableCheck(
         "deletable");
 
@@ -129,7 +129,7 @@ PropertyChangeListener {
           this, "canPasteRecordGeometry")), this, "pasteGeometry");
 
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
-      final DataType geometryDataType = recordDefinition.getGeometryAttribute()
+      final DataType geometryDataType = recordDefinition.getGeometryField()
           .getType();
       if (geometryDataType == DataTypes.LINE_STRING
           || geometryDataType == DataTypes.MULTI_LINE_STRING) {

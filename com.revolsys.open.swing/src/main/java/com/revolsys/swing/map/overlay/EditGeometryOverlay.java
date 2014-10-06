@@ -28,7 +28,7 @@ import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.data.equals.GeometryEqualsExact3d;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
@@ -181,8 +181,8 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     final AddGeometryCompleteAction addCompleteAction) {
     if (layer != null) {
       final RecordDefinition recordDefinition = layer.getRecordDefinition();
-      final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-      if (geometryAttribute != null) {
+      final FieldDefinition geometryField = recordDefinition.getGeometryField();
+      if (geometryField != null) {
         this.addLayer = layer;
         this.addCompleteAction = addCompleteAction;
         final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
@@ -190,7 +190,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
         clearUndoHistory();
         this.addGeometry = geometryFactory.geometry();
         setOverlayAction(ACTION_ADD_GEOMETRY);
-        setAddGeometryDataType(geometryAttribute.getType());
+        setAddGeometryDataType(geometryField.getType());
         setMapCursor(CURSOR_NODE_ADD);
 
         if (Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING).contains(
@@ -1246,13 +1246,13 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
     } else {
       final LayerRecord object = location.getRecord();
       final RecordDefinition recordDefinition = location.getRecordDefinition();
-      final String geometryAttributeName = recordDefinition.getGeometryAttributeName();
-      final Geometry oldValue = object.getValue(geometryAttributeName);
+      final String geometryFieldName = recordDefinition.getGeometryFieldName();
+      final Geometry oldValue = object.getValue(geometryFieldName);
       if (GeometryEqualsExact3d.equal(newGeometry, oldValue)) {
         return null;
       } else {
         final AbstractRecordLayer layer = location.getLayer();
-        return layer.createPropertyEdit(object, geometryAttributeName,
+        return layer.createPropertyEdit(object, geometryFieldName,
           oldValue, newGeometry);
       }
     }

@@ -378,7 +378,7 @@ public class GeometryGraph extends Graph<LineSegment> {
   }
 
   private boolean isLineString(final Edge<LineSegment> edge) {
-    if ("LineString".equals(edge.getAttribute("type"))) {
+    if ("LineString".equals(edge.getField("type"))) {
       return true;
     } else {
       return false;

@@ -1,8 +1,8 @@
 package com.revolsys.ui.html.view;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.serializer.TableSerializer;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
 public class TableView extends Element {

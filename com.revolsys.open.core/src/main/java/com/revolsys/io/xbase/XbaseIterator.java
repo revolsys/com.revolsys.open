@@ -32,10 +32,10 @@ import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class XbaseIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
   public static final char CHARACTER_TYPE = 'C';
 
-  private static final Map<Character, DataType> DATA_TYPES = new HashMap<Character, DataType>();
+  private static final Map<Character, DataType> DATA_TYPES = new HashMap<>();
 
   public static final char DATE_TYPE = 'D';
 
@@ -101,7 +101,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
     final Resource codePageResource = SpringUtil.getResourceWithExtension(
       resource, "cpg");
     if (!(codePageResource instanceof NonExistingResource)
-      && codePageResource.exists()) {
+        && codePageResource.exists()) {
       final String charsetName = SpringUtil.getContents(codePageResource);
       try {
         this.charset = Charset.forName(charsetName);
@@ -199,7 +199,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
   }
 
   private Object getMemo(final int startIndex, final int len)
-    throws IOException {
+      throws IOException {
     return null;
     /*
      * String memoIndexString = new String(record, startIndex, len).trim(); if
@@ -311,9 +311,9 @@ public class XbaseIterator extends AbstractIterator<Record> implements
     }
     final Record object = this.recordFactory.createRecord(this.recordDefinition);
     int startIndex = 0;
-    for (int i = 0; i < this.recordDefinition.getAttributeCount(); i++) {
-      int len = this.recordDefinition.getAttributeLength(i);
-      final DataType type = this.recordDefinition.getAttributeType(i);
+    for (int i = 0; i < this.recordDefinition.getFieldCount(); i++) {
+      int len = this.recordDefinition.getFieldLength(i);
+      final DataType type = this.recordDefinition.getFieldType(i);
       Object value = null;
 
       if (type == DataTypes.STRING) {
@@ -363,7 +363,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
       if (fieldType == MEMO_TYPE) {
         length = Integer.MAX_VALUE;
       }
-      this.recordDefinition.addAttribute(fieldName.toString(), dataType,
+      this.recordDefinition.addField(fieldName.toString(), dataType,
         length, decimalCount, false);
     }
     if (this.mappedFile) {
@@ -387,7 +387,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
       this.position = position;
       try {
         final long offset = this.firstIndex + (long)(this.recordSize + 1)
-            * position;
+          * position;
         file.seek(offset);
         setLoadNext(true);
       } catch (final IOException e) {
@@ -396,7 +396,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
 
     } else {
       throw new UnsupportedOperationException(
-        "The position can only be set on files");
+          "The position can only be set on files");
     }
   }
 

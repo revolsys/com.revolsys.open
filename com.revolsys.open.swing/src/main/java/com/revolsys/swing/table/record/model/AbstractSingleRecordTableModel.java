@@ -34,7 +34,7 @@ public abstract class AbstractSingleRecordTableModel extends
 
     final RecordDefinition recordDefinition = model.getRecordDefinition();
 
-    final List<String> allFieldNames = recordDefinition.getAttributeNames();
+    final List<String> allFieldNames = recordDefinition.getFieldNames();
     int maxTitleWidth = 100;
     for (final String fieldName : allFieldNames) {
       final String title = model.getFieldTitle(fieldName);
@@ -86,7 +86,7 @@ public abstract class AbstractSingleRecordTableModel extends
     final RecordDefinition recordDefinition, final boolean editable) {
     super(recordDefinition);
     setEditable(editable);
-    setFieldNames(recordDefinition.getAttributeNames());
+    setFieldNames(recordDefinition.getFieldNames());
   }
 
   @Override
@@ -115,7 +115,7 @@ public abstract class AbstractSingleRecordTableModel extends
 
   public String getFieldTitle(final String fieldName) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getAttributeTitle(fieldName);
+    return recordDefinition.getFieldTitle(fieldName);
   }
 
   public abstract <V extends Map<String, Object>> V getMap(int columnIndex);
@@ -158,13 +158,13 @@ public abstract class AbstractSingleRecordTableModel extends
     if (columnIndex == 2) {
       if (isEditable()) {
         final RecordDefinition recordDefinition = getRecordDefinition();
-        if (rowIndex == recordDefinition.getIdAttributeIndex()) {
+        if (rowIndex == recordDefinition.getIdFieldIndex()) {
           return false;
         } else {
           final String attributeName = getFieldName(rowIndex);
-          if (recordDefinition.getIdAttributeNames().contains(attributeName)) {
+          if (recordDefinition.getIdFieldNames().contains(attributeName)) {
             return false;
-          } else if (recordDefinition.getGeometryAttributeNames().contains(
+          } else if (recordDefinition.getGeometryFieldNames().contains(
             attributeName)) {
             return false;
           } else {
@@ -228,7 +228,7 @@ public abstract class AbstractSingleRecordTableModel extends
     } else {
       String text;
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final String idFieldName = recordDefinition.getIdAttributeName();
+      final String idFieldName = recordDefinition.getIdFieldName();
       final String name = getFieldName(rowIndex);
       if (objectValue instanceof Geometry) {
         final Geometry geometry = (Geometry)objectValue;

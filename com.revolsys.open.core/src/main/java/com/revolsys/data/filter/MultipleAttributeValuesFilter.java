@@ -34,7 +34,7 @@ public class MultipleAttributeValuesFilter implements Filter<Record> {
     for (final Entry<String, ? extends Object> entry : this.values.entrySet()) {
       final String attributeName = entry.getKey();
       final Object value = entry.getValue();
-      final Object objectValue = RecordUtil.getAttributeByPath(object,
+      final Object objectValue = RecordUtil.getFieldByPath(object,
         attributeName);
       if (objectValue == null) {
         if (value != null) {

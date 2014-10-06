@@ -22,7 +22,7 @@ package com.revolsys.data.validator;
 
 import java.math.BigDecimal;
 
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 
 public class BigDecimalAttributeValidator implements AttributeValueValidator {
   private boolean decimal = true;
@@ -59,7 +59,7 @@ public class BigDecimalAttributeValidator implements AttributeValueValidator {
   }
 
   @Override
-  public boolean isValid(final Attribute attributeDefinition, final Object value) {
+  public boolean isValid(final FieldDefinition attributeDefinition, final Object value) {
     if (value instanceof BigDecimal) {
       final BigDecimal number = (BigDecimal)value;
       if (!decimal && number.scale() > 0) {

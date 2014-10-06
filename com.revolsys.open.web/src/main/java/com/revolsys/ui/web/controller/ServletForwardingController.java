@@ -30,7 +30,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 import org.springframework.web.util.WebUtils;
 
 public class ServletForwardingController extends AbstractController implements
-  BeanNameAware {
+BeanNameAware {
 
   private String servletName;
 
@@ -39,8 +39,8 @@ public class ServletForwardingController extends AbstractController implements
   @PreDestroy
   public void destroy() {
     setApplicationContext(null);
-    servletName = null;
-    beanName = null;
+    this.servletName = null;
+    this.beanName = null;
   }
 
   @Override
@@ -103,7 +103,7 @@ public class ServletForwardingController extends AbstractController implements
    * indicating an include request, and whether the response has already been
    * committed. In both cases, an include will be performed, as a forward is not
    * possible anymore.
-   * 
+   *
    * @param request current HTTP request
    * @param response current HTTP response
    * @return <code>true</code> for include, <code>false</code> for forward
@@ -114,7 +114,7 @@ public class ServletForwardingController extends AbstractController implements
    */
   protected boolean useInclude(final HttpServletRequest request,
     final HttpServletResponse response) {
-    return (WebUtils.isIncludeRequest(request) || response.isCommitted());
+    return WebUtils.isIncludeRequest(request) || response.isCommitted();
   }
 
 }

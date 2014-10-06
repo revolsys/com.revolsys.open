@@ -8,7 +8,7 @@ import javax.swing.JComponent;
 import com.revolsys.data.identifier.Identifier;
 
 public interface CodeTable extends Cloneable {
-  List<String> getAttributeAliases();
+  List<String> getFieldAliases();
 
   Map<Identifier, List<Object>> getCodes();
 
@@ -16,7 +16,7 @@ public interface CodeTable extends Cloneable {
 
   Identifier getId(final Object... values);
 
-  String getIdAttributeName();
+  String getIdFieldName();
 
   Identifier getIdExact(final Object... values);
 

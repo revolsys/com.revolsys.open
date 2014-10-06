@@ -3,11 +3,11 @@ package com.revolsys.gis.esri.gdb.file.test.field;
 import java.io.IOException;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.io.EndianInput;
 
-public class FgdbField extends Attribute {
+public class FgdbField extends FieldDefinition {
 
   public FgdbField(final String name, final DataType type,
     final boolean required) {

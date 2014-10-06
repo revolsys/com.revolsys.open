@@ -40,7 +40,7 @@ import com.revolsys.data.query.functions.EnvelopeIntersects;
 import com.revolsys.data.query.functions.Function;
 import com.revolsys.data.query.functions.GetMapValue;
 import com.revolsys.data.query.functions.WithinDistance;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.jts.geom.BoundingBox;
@@ -163,7 +163,7 @@ public abstract class QueryValue implements Cloneable {
       final Column column = toQueryValue(recordDefinition, leftValueNode);
       final Value min = toQueryValue(recordDefinition, betweenExpressionStart);
       final Value max = toQueryValue(recordDefinition, betweenExpressionEnd);
-      final Attribute attribute = recordDefinition.getAttribute(column.getName());
+      final FieldDefinition attribute = recordDefinition.getField(column.getName());
       min.convert(attribute);
       max.convert(attribute);
       return (V)new Between(column, min, max);
@@ -200,7 +200,7 @@ public abstract class QueryValue implements Cloneable {
             final Column column = (Column)leftCondition;
 
             final String name = column.getName();
-            final Attribute attribute = recordDefinition.getAttribute(name);
+            final FieldDefinition attribute = recordDefinition.getField(name);
             final Object value = ((Value)rightCondition).getValue();
             if (value == null) {
               throw new IllegalArgumentException("Values can't be null for "
@@ -208,7 +208,7 @@ public abstract class QueryValue implements Cloneable {
             } else {
               final CodeTable codeTable = recordDefinition.getCodeTableByColumn(name);
               if (codeTable == null
-                  || attribute == recordDefinition.getIdAttribute()) {
+                  || attribute == recordDefinition.getIdField()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
                   final Object convertedValue = StringConverterRegistry.toObject(
@@ -261,7 +261,7 @@ public abstract class QueryValue implements Cloneable {
       final ColumnReference column = (ColumnReference)expression;
       String columnName = column.getColumnName();
       columnName = columnName.replaceAll("\"", "");
-      final Attribute attribute = recordDefinition.getAttribute(columnName);
+      final FieldDefinition attribute = recordDefinition.getField(columnName);
       if (attribute == null) {
         throw new IllegalArgumentException("Invalid column name " + columnName);
       } else {

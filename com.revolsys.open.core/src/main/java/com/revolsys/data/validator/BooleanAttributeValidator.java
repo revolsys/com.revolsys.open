@@ -20,12 +20,12 @@
  */
 package com.revolsys.data.validator;
 
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 
 public class BooleanAttributeValidator implements AttributeValueValidator {
 
   @Override
-  public boolean isValid(final Attribute attributeDefinition, final Object value) {
+  public boolean isValid(final FieldDefinition attributeDefinition, final Object value) {
     if (value instanceof Boolean) {
       return true;
     } else if (value instanceof String) {

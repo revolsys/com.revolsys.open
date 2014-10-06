@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.property.AttributeProperties;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.property.FieldProperties;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.AbstractRecordWriter;
@@ -83,11 +83,11 @@ public class OgrRecordWriter extends AbstractRecordWriter {
     final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
     final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
     final String typePath = sourceRecordDefinition.getPath();
-    final List<Attribute> attributes = recordDefinition.getAttributes();
-    final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
-    for (final Attribute attribute : attributes) {
+    final List<FieldDefinition> attributes = recordDefinition.getFields();
+    final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+    for (final FieldDefinition attribute : attributes) {
       final String name = attribute.getName();
-      if (!idAttributeNames.contains(name)) {
+      if (!idFieldNames.contains(name)) {
         if (attribute.isRequired()) {
           final Object value = record.getValue(name);
           if (value == null) {
@@ -206,8 +206,8 @@ public class OgrRecordWriter extends AbstractRecordWriter {
       final String name = fieldDefinition.GetName();
       Geometry geometry = record.getValue(name);
       if (geometry != null) {
-        final Attribute attribute = recordDefinition.getAttribute(name);
-        final GeometryFactory geometryFactory = attribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+        final FieldDefinition attribute = recordDefinition.getField(name);
+        final GeometryFactory geometryFactory = attribute.getProperty(FieldProperties.GEOMETRY_FACTORY);
         geometry = geometry.convert(geometryFactory);
         final int geometryType = fieldDefinition.GetFieldType();
         final int axisCount = geometryFactory.getAxisCount();

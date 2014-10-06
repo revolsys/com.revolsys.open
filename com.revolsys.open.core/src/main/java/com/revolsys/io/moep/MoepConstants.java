@@ -61,31 +61,31 @@ public final class MoepConstants {
 
   public static RecordDefinitionImpl createRecordDefinition(final String typePath) {
     final RecordDefinitionImpl type = new RecordDefinitionImpl(typePath);
-    type.addAttribute(FEATURE_CODE, DataTypes.STRING, 10, true);
-    type.addAttribute(MAPSHEET_NAME, DataTypes.STRING, 7, false);
-    type.addAttribute(DISPLAY_TYPE, DataTypes.STRING, 20, true);
-    type.addAttribute(ANGLE, DataTypes.DECIMAL, false);
-    type.addAttribute(ELEVATION, DataTypes.DECIMAL, false);
-    type.addAttribute(TEXT_GROUP, DataTypes.DECIMAL, false);
-    type.addAttribute(TEXT_INDEX, DataTypes.DECIMAL, false);
-    type.addAttribute(TEXT, DataTypes.STRING, 200, false);
-    type.addAttribute(FONT_NAME, DataTypes.STRING, 10, false);
-    type.addAttribute(FONT_SIZE, DataTypes.DECIMAL, false);
-    type.addAttribute(FONT_WEIGHT, DataTypes.STRING, 10, false);
-    type.addAttribute(ORIGINAL_FILE_TYPE, DataTypes.STRING, 20, false);
-    type.addAttribute(ADMIT_SOURCE_DATE, DataTypes.DATE, false);
-    type.addAttribute(ADMIT_REASON_FOR_CHANGE, DataTypes.STRING, 1, false);
-    type.addAttribute(ADMIT_INTEGRATION_DATE, DataTypes.DATE, false);
-    type.addAttribute(ADMIT_REVISION_KEY, DataTypes.STRING, 10, false);
-    type.addAttribute(ADMIT_SPECIFICATIONS_RELEASE, DataTypes.STRING, 10, false);
-    type.addAttribute(RETIRE_SOURCE_DATE, DataTypes.DATE, false);
-    type.addAttribute(RETIRE_REASON_FOR_CHANGE, DataTypes.STRING, 1, false);
-    type.addAttribute(RETIRE_INTEGRATION_DATE, DataTypes.DATE, false);
-    type.addAttribute(RETIRE_REVISION_KEY, DataTypes.STRING, 10, false);
-    type.addAttribute(RETIRE_SPECIFICATIONS_RELEASE, DataTypes.STRING, 10,
+    type.addField(FEATURE_CODE, DataTypes.STRING, 10, true);
+    type.addField(MAPSHEET_NAME, DataTypes.STRING, 7, false);
+    type.addField(DISPLAY_TYPE, DataTypes.STRING, 20, true);
+    type.addField(ANGLE, DataTypes.DECIMAL, false);
+    type.addField(ELEVATION, DataTypes.DECIMAL, false);
+    type.addField(TEXT_GROUP, DataTypes.DECIMAL, false);
+    type.addField(TEXT_INDEX, DataTypes.DECIMAL, false);
+    type.addField(TEXT, DataTypes.STRING, 200, false);
+    type.addField(FONT_NAME, DataTypes.STRING, 10, false);
+    type.addField(FONT_SIZE, DataTypes.DECIMAL, false);
+    type.addField(FONT_WEIGHT, DataTypes.STRING, 10, false);
+    type.addField(ORIGINAL_FILE_TYPE, DataTypes.STRING, 20, false);
+    type.addField(ADMIT_SOURCE_DATE, DataTypes.DATE, false);
+    type.addField(ADMIT_REASON_FOR_CHANGE, DataTypes.STRING, 1, false);
+    type.addField(ADMIT_INTEGRATION_DATE, DataTypes.DATE, false);
+    type.addField(ADMIT_REVISION_KEY, DataTypes.STRING, 10, false);
+    type.addField(ADMIT_SPECIFICATIONS_RELEASE, DataTypes.STRING, 10, false);
+    type.addField(RETIRE_SOURCE_DATE, DataTypes.DATE, false);
+    type.addField(RETIRE_REASON_FOR_CHANGE, DataTypes.STRING, 1, false);
+    type.addField(RETIRE_INTEGRATION_DATE, DataTypes.DATE, false);
+    type.addField(RETIRE_REVISION_KEY, DataTypes.STRING, 10, false);
+    type.addField(RETIRE_SPECIFICATIONS_RELEASE, DataTypes.STRING, 10,
       false);
-    type.addAttribute(GEOMETRY, DataTypes.GEOMETRY, true);
-    type.setGeometryAttributeName(GEOMETRY);
+    type.addField(GEOMETRY, DataTypes.GEOMETRY, true);
+    type.setGeometryFieldName(GEOMETRY);
     return type;
   }
 

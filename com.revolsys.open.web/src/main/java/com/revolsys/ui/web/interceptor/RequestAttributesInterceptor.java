@@ -24,36 +24,34 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
   private PathMatcher pathMatcher = new AntPathMatcher();
 
   public RequestAttributesInterceptor() {
-    urlPathHelper.setAlwaysUseFullPath(true);
+    this.urlPathHelper.setAlwaysUseFullPath(true);
   }
 
-  public void afterCompletion(
-    final HttpServletRequest request,
-    final HttpServletResponse response,
-    final Object handler,
-    final Exception ex) throws Exception {
+  @Override
+  public void afterCompletion(final HttpServletRequest request,
+    final HttpServletResponse response, final Object handler, final Exception ex)
+    throws Exception {
   }
 
   public Map<String, Map<String, Object>> getAttributeMappings() {
-    return attributeMappings;
+    return this.attributeMappings;
   }
 
-  public void postHandle(
-    final HttpServletRequest request,
-    final HttpServletResponse response,
-    final Object handler,
+  @Override
+  public void postHandle(final HttpServletRequest request,
+    final HttpServletResponse response, final Object handler,
     final ModelAndView modelAndView) throws Exception {
 
   }
 
-  public boolean preHandle(
-    final HttpServletRequest request,
-    final HttpServletResponse response,
-    final Object handler) throws ServletException {
-    final String path = urlPathHelper.getLookupPathForRequest(request);
-    for (final Entry<String, Map<String, Object>> mapping : attributeMappings.entrySet()) {
+  @Override
+  public boolean preHandle(final HttpServletRequest request,
+    final HttpServletResponse response, final Object handler)
+    throws ServletException {
+    final String path = this.urlPathHelper.getLookupPathForRequest(request);
+    for (final Entry<String, Map<String, Object>> mapping : this.attributeMappings.entrySet()) {
       final String pattern = mapping.getKey();
-      if (pathMatcher.match(pattern, path)) {
+      if (this.pathMatcher.match(pattern, path)) {
         final Map<String, Object> attributes = mapping.getValue();
         for (final Entry<String, Object> attribute : attributes.entrySet()) {
           final String name = attribute.getKey();
@@ -74,7 +72,7 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
    * Default is "false".
    * <p>
    * Only relevant for the "cacheMappings" setting.
-   * 
+   *
    * @see #setCacheMappings
    * @see org.springframework.web.util.UrlPathHelper#setAlwaysUseFullPath
    */
@@ -106,7 +104,7 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
    * Servlet spec (ISO-8859-1).
    * <p>
    * Only relevant for the "cacheMappings" setting.
-   * 
+   *
    * @see #setCacheMappings
    * @see org.springframework.web.util.UrlPathHelper#setUrlDecode
    */
@@ -116,7 +114,7 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
 
   /**
    * Set the UrlPathHelper to use for resolution of lookup paths.
-   * 
+   *
    * @param urlPathHelper The UrlPathHelper to use for resolution of lookup
    *          paths.
    */

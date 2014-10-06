@@ -20,7 +20,7 @@ import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.AbstractRecordStore;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStore;
@@ -124,9 +124,9 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       }
       final RecordDefinitionImpl newRecordDefinition = new RecordDefinitionImpl(
         schema, typePath);
-      for (final Attribute attribute : recordDefinition.getAttributes()) {
-        final Attribute newAttribute = new Attribute(attribute);
-        newRecordDefinition.addAttribute(newAttribute);
+      for (final FieldDefinition attribute : recordDefinition.getFields()) {
+        final FieldDefinition newAttribute = new FieldDefinition(attribute);
+        newRecordDefinition.addField(newAttribute);
       }
       schema.addElement(newRecordDefinition);
     }
@@ -182,7 +182,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       final File subDirectory = new File(getDirectory(), schemaName);
       final String fileExtension = getFileExtension();
       final File file = new File(subDirectory, recordDefinition.getName() + "."
-          + fileExtension);
+        + fileExtension);
       final Resource resource = new FileSystemResource(file);
       writer = RecordIo.recordWriter(recordDefinition, resource);
       if (writer instanceof ObjectWithProperties) {
@@ -207,7 +207,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final RecordStoreSchema schema, final String schemaName,
     final Resource resource) {
     try (
-        RecordReader recordReader = RecordIo.recordReader(resource)) {
+      RecordReader recordReader = RecordIo.recordReader(resource)) {
       final String typePath = Path.toPath(schemaName,
         SpringUtil.getBaseName(resource));
       recordReader.setProperty("schema", schema);
@@ -316,14 +316,14 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     if (recordStore == this) {
       switch (record.getState()) {
         case Deleted:
-          break;
+        break;
         case Persisted:
-          break;
+        break;
         case Modified:
           throw new UnsupportedOperationException();
         default:
           insert(record);
-          break;
+        break;
       }
     } else {
       insert(record);

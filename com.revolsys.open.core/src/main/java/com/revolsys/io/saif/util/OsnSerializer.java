@@ -316,12 +316,12 @@ public class OsnSerializer {
 
   public void serializeAttributes(final Record object) throws IOException {
     final RecordDefinition type = object.getRecordDefinition();
-    final int attributeCount = type.getAttributeCount();
+    final int attributeCount = type.getFieldCount();
     for (int i = 0; i < attributeCount; i++) {
       final Object value = object.getValue(i);
       if (value != null) {
-        final String name = type.getAttributeName(i);
-        final DataType dataType = type.getAttributeType(i);
+        final String name = type.getFieldName(i);
+        final DataType dataType = type.getFieldType(i);
         if (dataType instanceof EnumerationDataType) {
           attributeName(name);
           write(value.toString());

@@ -37,9 +37,9 @@ import java.util.TreeSet;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.data.record.schema.RecordDefinitionFactoryImpl;
@@ -99,39 +99,39 @@ public class SaifSchemaReader {
     final RecordDefinitionImpl exportedObjectHandle = new RecordDefinitionImpl(
       "ExportedObjectHandle");
     this.schema.addRecordDefinition(exportedObjectHandle);
-    exportedObjectHandle.addAttribute("referenceID", DataTypes.STRING, true);
-    exportedObjectHandle.addAttribute("type", DataTypes.STRING, true);
-    exportedObjectHandle.addAttribute("offset", DataTypes.INTEGER, true);
-    exportedObjectHandle.addAttribute("sharable", DataTypes.BOOLEAN, true);
+    exportedObjectHandle.addField("referenceID", DataTypes.STRING, true);
+    exportedObjectHandle.addField("type", DataTypes.STRING, true);
+    exportedObjectHandle.addField("offset", DataTypes.INTEGER, true);
+    exportedObjectHandle.addField("sharable", DataTypes.BOOLEAN, true);
   }
 
   public void addSuperClass(final RecordDefinitionImpl currentClass,
     final RecordDefinition superClass) {
     currentClass.addSuperClass(superClass);
-    for (final String name : superClass.getAttributeNames()) {
-      final Attribute attribute = superClass.getAttribute(name);
-      currentClass.addAttribute(attribute.clone());
+    for (final String name : superClass.getFieldNames()) {
+      final FieldDefinition attribute = superClass.getField(name);
+      currentClass.addField(attribute.clone());
     }
     for (final Entry<String, Object> defaultValue : superClass.getDefaultValues()
       .entrySet()) {
       final String name = defaultValue.getKey();
       final Object value = defaultValue.getValue();
-      if (!currentClass.hasAttribute(name)) {
+      if (!currentClass.hasField(name)) {
         currentClass.addDefaultValue(name, value);
       }
     }
-    final String idAttributeName = superClass.getIdAttributeName();
-    if (idAttributeName != null) {
-      currentClass.setIdAttributeName(idAttributeName);
+    final String idFieldName = superClass.getIdFieldName();
+    if (idFieldName != null) {
+      currentClass.setIdFieldName(idFieldName);
 
     }
-    String geometryAttributeName = superClass.getGeometryAttributeName();
+    String geometryFieldName = superClass.getGeometryFieldName();
     final String path = currentClass.getPath();
     if (path.equals("/TRIM/TrimText")) {
-      geometryAttributeName = "textOrSymbol";
+      geometryFieldName = "textOrSymbol";
     }
-    if (geometryAttributeName != null) {
-      currentClass.setGeometryAttributeName(geometryAttributeName);
+    if (geometryFieldName != null) {
+      currentClass.setGeometryFieldName(geometryFieldName);
     }
   }
 
@@ -153,12 +153,12 @@ public class SaifSchemaReader {
               if (typePath.equals(SPATIAL_OBJECT)
                 || typePath.equals(TEXT_OR_SYMBOL_OBJECT)) {
                 dataType = DataTypes.GEOMETRY;
-                this.currentClass.setGeometryAttributeIndex(this.currentClass.getAttributeCount());
+                this.currentClass.setGeometryFieldIndex(this.currentClass.getFieldCount());
               } else if (dataType == null) {
                 dataType = new SimpleDataType(typePath, Record.class);
               }
 
-              this.currentClass.addAttribute(attributeName, dataType, required);
+              this.currentClass.addField(attributeName, dataType, required);
 
             break;
             case CsnIterator.COLLECTION_ATTRIBUTE:
@@ -170,7 +170,7 @@ public class SaifSchemaReader {
                 if (contentDataType == null) {
                   contentDataType = DataTypes.DATA_OBJECT;
                 }
-                this.currentClass.addAttribute(attributeName,
+                this.currentClass.addField(attributeName,
                   new CollectionDataType(collectionDataType.getName(),
                     collectionDataType.getJavaClass(), contentDataType),
                   required);
@@ -183,7 +183,7 @@ public class SaifSchemaReader {
               if (iterator.getEventType() == CsnIterator.STRING_ATTRIBUTE_LENGTH) {
                 length = iterator.getIntegerValue();
               }
-              this.currentClass.addAttribute(attributeName, DataTypes.STRING,
+              this.currentClass.addField(attributeName, DataTypes.STRING,
                 length, required);
             break;
             default:
@@ -405,36 +405,36 @@ public class SaifSchemaReader {
         "position");
       final int dotIndex = attributeName.indexOf('.');
       if (dotIndex == -1) {
-        final Attribute attribute = type.getAttribute(attributeName);
+        final FieldDefinition attribute = type.getField(attributeName);
         if (attribute != null) {
           if (!typePaths.isEmpty()) {
-            attribute.setProperty(AttributeProperties.ALLOWED_TYPE_NAMES,
+            attribute.setProperty(FieldProperties.ALLOWED_TYPE_NAMES,
               typePaths);
           }
           if (!values.isEmpty()) {
-            attribute.setProperty(AttributeProperties.ALLOWED_VALUES, values);
+            attribute.setProperty(FieldProperties.ALLOWED_VALUES, values);
           }
         }
       } else {
         final String key = attributeName.substring(0, dotIndex);
         final String subKey = attributeName.substring(dotIndex + 1);
-        final Attribute attribute = type.getAttribute(key);
+        final FieldDefinition attribute = type.getField(key);
         if (attribute != null) {
           if (!typePaths.isEmpty()) {
-            Map<String, List<String>> allowedValues = attribute.getProperty(AttributeProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES);
+            Map<String, List<String>> allowedValues = attribute.getProperty(FieldProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES);
             if (allowedValues == null) {
               allowedValues = new HashMap<String, List<String>>();
               attribute.setProperty(
-                AttributeProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES, allowedValues);
+                FieldProperties.ATTRIBUTE_ALLOWED_TYPE_NAMES, allowedValues);
             }
             allowedValues.put(subKey, typePaths);
           }
           if (!values.isEmpty()) {
-            Map<String, List<Object>> allowedValues = attribute.getProperty(AttributeProperties.ATTRIBUTE_ALLOWED_VALUES);
+            Map<String, List<Object>> allowedValues = attribute.getProperty(FieldProperties.ATTRIBUTE_ALLOWED_VALUES);
             if (allowedValues == null) {
               allowedValues = new HashMap<String, List<Object>>();
               attribute.setProperty(
-                AttributeProperties.ATTRIBUTE_ALLOWED_VALUES, allowedValues);
+                FieldProperties.ATTRIBUTE_ALLOWED_VALUES, allowedValues);
             }
             allowedValues.put(subKey, values);
           }

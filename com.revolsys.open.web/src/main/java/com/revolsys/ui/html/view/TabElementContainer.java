@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.layout.DivLayout;
+import com.revolsys.util.HtmlUtil;
 
 public class TabElementContainer extends ElementContainer {
 

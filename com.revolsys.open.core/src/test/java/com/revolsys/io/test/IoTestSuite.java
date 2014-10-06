@@ -105,8 +105,8 @@ public class IoTestSuite {
     final String geometryTypeString = dataType.toString();
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
       geometryTypeString);
-    recordDefinition.addAttribute("ID", DataTypes.INT, true);
-    recordDefinition.addAttribute("GEOMETRY", dataType, true);
+    recordDefinition.addField("ID", DataTypes.INT, true);
+    recordDefinition.addField("GEOMETRY", dataType, true);
     recordDefinition.setGeometryFactory(geometryFactory);
     final File file = new File("/tmp/revolsystest/io/" + fileExtension + "/"
       + geometryTypeString + "_" + geometryFactory.getAxisCount() + "_"

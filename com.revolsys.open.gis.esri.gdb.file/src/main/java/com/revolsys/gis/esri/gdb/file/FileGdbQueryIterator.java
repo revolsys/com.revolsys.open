@@ -9,13 +9,13 @@ import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.property.AttributeProperties;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.property.FieldProperties;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.swig.EnumRows;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Table;
-import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbAttribute;
+import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.jts.geom.BoundingBox;
@@ -164,9 +164,9 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
             this.statistics.add(record);
           }
           record.setState(RecordState.Initalizing);
-          for (final Attribute attribute : this.recordDefinition.getAttributes()) {
+          for (final FieldDefinition attribute : this.recordDefinition.getFields()) {
             final String name = attribute.getName();
-            final AbstractFileGdbAttribute esriAttribute = (AbstractFileGdbAttribute)attribute;
+            final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
             final Object value;
             synchronized (this.recordStore) {
               value = esriAttribute.getValue(row);
@@ -200,9 +200,9 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
       this.boundingBox = boundingBox;
 
       if (boundingBox != null) {
-        final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-        if (geometryAttribute != null) {
-          final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+        final FieldDefinition geometryField = recordDefinition.getGeometryField();
+        if (geometryField != null) {
+          final GeometryFactory geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
           if (geometryFactory != null) {
             this.boundingBox = boundingBox.convert(geometryFactory);
           }

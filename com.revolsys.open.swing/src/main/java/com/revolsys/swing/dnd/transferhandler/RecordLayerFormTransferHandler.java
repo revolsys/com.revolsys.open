@@ -12,8 +12,8 @@ import javax.swing.TransferHandler;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.swing.dnd.transferable.RecordTransferable;
 import com.revolsys.swing.dnd.transferable.MapTransferable;
+import com.revolsys.swing.dnd.transferable.RecordTransferable;
 import com.revolsys.swing.map.form.LayerRecordForm;
 
 public class RecordLayerFormTransferHandler extends TransferHandler {

@@ -31,39 +31,39 @@ public class GeoNamesService {
   static {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
       Path.toPath("/geoname.org", "name"));
-    recordDefinition.addAttribute("geonameId", DataTypes.STRING, false);
-    recordDefinition.addAttribute("name", DataTypes.STRING, false);
-    recordDefinition.addAttribute("fcode", DataTypes.STRING, false);
-    recordDefinition.addAttribute("fcodeName", DataTypes.STRING, false);
-    recordDefinition.addAttribute("fcl", DataTypes.STRING, false);
-    recordDefinition.addAttribute("fclName", DataTypes.STRING, false);
-    recordDefinition.addAttribute("adminName1", DataTypes.STRING, false);
-    recordDefinition.addAttribute("adminName2", DataTypes.STRING, false);
-    recordDefinition.addAttribute("adminName3", DataTypes.STRING, false);
-    recordDefinition.addAttribute("adminName4", DataTypes.STRING, false);
-    recordDefinition.addAttribute("adminCode1", DataTypes.STRING, false);
-    recordDefinition.addAttribute("population", DataTypes.INTEGER, false);
-    recordDefinition.addAttribute("countryCode", DataTypes.STRING, false);
-    recordDefinition.addAttribute("countryName", DataTypes.STRING, false);
-    recordDefinition.addAttribute("timeZoneId", DataTypes.STRING, false);
-    recordDefinition.addAttribute("geometry", DataTypes.POINT, false);
+    recordDefinition.addField("geonameId", DataTypes.STRING, false);
+    recordDefinition.addField("name", DataTypes.STRING, false);
+    recordDefinition.addField("fcode", DataTypes.STRING, false);
+    recordDefinition.addField("fcodeName", DataTypes.STRING, false);
+    recordDefinition.addField("fcl", DataTypes.STRING, false);
+    recordDefinition.addField("fclName", DataTypes.STRING, false);
+    recordDefinition.addField("adminName1", DataTypes.STRING, false);
+    recordDefinition.addField("adminName2", DataTypes.STRING, false);
+    recordDefinition.addField("adminName3", DataTypes.STRING, false);
+    recordDefinition.addField("adminName4", DataTypes.STRING, false);
+    recordDefinition.addField("adminCode1", DataTypes.STRING, false);
+    recordDefinition.addField("population", DataTypes.INTEGER, false);
+    recordDefinition.addField("countryCode", DataTypes.STRING, false);
+    recordDefinition.addField("countryName", DataTypes.STRING, false);
+    recordDefinition.addField("timeZoneId", DataTypes.STRING, false);
+    recordDefinition.addField("geometry", DataTypes.POINT, false);
     NAME_RECORD_DEFINITION = recordDefinition;
 
     final RecordDefinitionImpl wikipediaRecordDefinition = new RecordDefinitionImpl(
       Path.toPath("/geoname.org", "wikipedia"));
-    wikipediaRecordDefinition.addAttribute("summary", DataTypes.STRING, false);
-    wikipediaRecordDefinition.addAttribute("title", DataTypes.STRING, false);
-    wikipediaRecordDefinition.addAttribute("wikipediaUrl", DataTypes.STRING,
+    wikipediaRecordDefinition.addField("summary", DataTypes.STRING, false);
+    wikipediaRecordDefinition.addField("title", DataTypes.STRING, false);
+    wikipediaRecordDefinition.addField("wikipediaUrl", DataTypes.STRING,
       false);
-    wikipediaRecordDefinition.addAttribute("countryCode", DataTypes.STRING,
+    wikipediaRecordDefinition.addField("countryCode", DataTypes.STRING,
       false);
-    wikipediaRecordDefinition.addAttribute("feature", DataTypes.STRING, false);
-    wikipediaRecordDefinition.addAttribute("thumbnailImg", DataTypes.STRING,
+    wikipediaRecordDefinition.addField("feature", DataTypes.STRING, false);
+    wikipediaRecordDefinition.addField("thumbnailImg", DataTypes.STRING,
       false);
-    wikipediaRecordDefinition.addAttribute("lang", DataTypes.STRING, false);
-    wikipediaRecordDefinition.addAttribute("population", DataTypes.INTEGER,
+    wikipediaRecordDefinition.addField("lang", DataTypes.STRING, false);
+    wikipediaRecordDefinition.addField("population", DataTypes.INTEGER,
       false);
-    wikipediaRecordDefinition.addAttribute("geometry", DataTypes.POINT, false);
+    wikipediaRecordDefinition.addField("geometry", DataTypes.POINT, false);
 
     WIKIPEDIA_RECORD_DEFINITION = wikipediaRecordDefinition;
   }
@@ -157,7 +157,7 @@ public class GeoNamesService {
     final List<Map<String, Object>> names = (List<Map<String, Object>>)result.get("geonames");
     for (final Map<String, Object> name : names) {
       final Record record = recordDefinition.createRecord();
-      for (final String attributeName : recordDefinition.getAttributeNames()) {
+      for (final String attributeName : recordDefinition.getFieldNames()) {
         final Object value = name.get(attributeName);
         if (value != null) {
           record.setValue(attributeName, value);

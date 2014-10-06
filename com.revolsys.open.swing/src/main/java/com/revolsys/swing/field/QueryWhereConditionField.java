@@ -81,7 +81,7 @@ import com.revolsys.data.query.Q;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.query.Value;
 import com.revolsys.data.query.functions.Function;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.spring.SpelUtil;
 import com.revolsys.swing.Icons;
@@ -97,9 +97,9 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class QueryWhereConditionField extends ValueField implements
-MouseListener, CaretListener, ItemListener {
+  MouseListener, CaretListener, ItemListener {
 
-  public static JComponent createSearchField(final Attribute attribute,
+  public static JComponent createSearchField(final FieldDefinition attribute,
     final CodeTable codeTable) {
     if (attribute == null) {
       return new TextField(20);
@@ -112,7 +112,7 @@ MouseListener, CaretListener, ItemListener {
         return new TextField(20);
       } else {
         JComponent field;
-        if (attribute.equals(recordDefinition.getIdAttribute())) {
+        if (attribute.equals(recordDefinition.getIdField())) {
           field = new TextField(20);
         } else if (Property.hasValue(searchFieldFactory)) {
           final Map<String, Object> searchFieldFactoryParameters = attribute.getProperty("searchFieldFactoryParameters");
@@ -121,7 +121,7 @@ MouseListener, CaretListener, ItemListener {
         } else {
           if (codeTable == null) {
             if (Number.class.isAssignableFrom(typeClass)
-                || String.class.isAssignableFrom(typeClass)) {
+              || String.class.isAssignableFrom(typeClass)) {
               field = new TextField(20);
             } else {
               field = SwingUtil.createField(typeClass, name, null);
@@ -190,7 +190,7 @@ MouseListener, CaretListener, ItemListener {
     this.originalFilter = filter;
     this.listener = listener;
     this.recordDefinition = layer.getRecordDefinition();
-    final List<Attribute> attributes = this.recordDefinition.getAttributes();
+    final List<FieldDefinition> attributes = this.recordDefinition.getFields();
 
     this.fieldNamesList = new ComboBox(new AttributeTitleStringConveter(layer),
       false, attributes);
@@ -218,8 +218,8 @@ MouseListener, CaretListener, ItemListener {
       "Add Unary Condition", ICON, this, "actionAddLikeCondition");
     this.likeConditionField = new TextField(20);
     this.likePanel = new BasePanel(SwingUtil.createLabel("LIKE"), new JLabel(
-      " '%"), this.likeConditionField, new JLabel("%' "),
-      likeConditionAddButton);
+        " '%"), this.likeConditionField, new JLabel("%' "),
+        likeConditionAddButton);
     GroupLayoutUtil.makeColumns(this.likePanel, false);
 
     final JButton inConditionAddButton = InvokeMethodAction.createButton("",
@@ -240,21 +240,21 @@ MouseListener, CaretListener, ItemListener {
     final ToolBar buttonsPanel = new ToolBar();
     buttonsPanel.setBorderPainted(true);
     buttonsPanel.addButton("relational", "AND", this, "insertText", "AND")
-    .setBorderPainted(true);
+      .setBorderPainted(true);
     buttonsPanel.addButton("relational", "OR", this, "insertText", "OR")
-    .setBorderPainted(true);
+      .setBorderPainted(true);
     buttonsPanel.addButton("relational", "NOT", this, "insertText", "NOT")
-    .setBorderPainted(true);
+      .setBorderPainted(true);
     buttonsPanel.addButton("grouping", "( )", this, "insertText", "( )")
-    .setBorderPainted(true);
+      .setBorderPainted(true);
     buttonsPanel.addButton("math", "+", this, "insertText", "+")
-    .setBorderPainted(true);
+      .setBorderPainted(true);
     buttonsPanel.addButton("math", "-", this, "insertText", "-")
-    .setBorderPainted(true);
+      .setBorderPainted(true);
     buttonsPanel.addButton("math", "*", this, "insertText", "*")
-    .setBorderPainted(true);
+      .setBorderPainted(true);
     buttonsPanel.addButton("math", "/", this, "insertText", "/")
-    .setBorderPainted(true);
+      .setBorderPainted(true);
 
     final BasePanel widgetPanel = new BasePanel(new VerticalLayout(5),
       fieldConditions, buttonsPanel);
@@ -269,8 +269,8 @@ MouseListener, CaretListener, ItemListener {
     // pane
 
     this.sqlPrefix = "SELECT * FROM "
-        + this.recordDefinition.getPath().substring(1).replace('/', '.')
-      + " WHERE";
+      + this.recordDefinition.getPath().substring(1).replace('/', '.')
+        + " WHERE";
 
     final JPanel filterTextPanel = new JPanel(new BorderLayout());
     filterTextPanel.setOpaque(false);
@@ -317,7 +317,7 @@ MouseListener, CaretListener, ItemListener {
       this.whereTextField.setText(query);
     }
     final String searchField = layer.getProperty("searchField");
-    final Attribute searchAttribute = this.recordDefinition.getAttribute(searchField);
+    final FieldDefinition searchAttribute = this.recordDefinition.getField(searchField);
     if (searchAttribute == null) {
       this.fieldNamesList.setSelectedIndex(0);
     } else {
@@ -331,7 +331,7 @@ MouseListener, CaretListener, ItemListener {
   }
 
   public void actionAddBinaryCondition() {
-    final Attribute attribute = (Attribute)this.fieldNamesList.getSelectedItem();
+    final FieldDefinition attribute = (FieldDefinition)this.fieldNamesList.getSelectedItem();
     if (attribute != null) {
       final String operator = (String)this.binaryConditionOperator.getSelectedItem();
       if (Property.hasValue(operator)) {
@@ -345,7 +345,7 @@ MouseListener, CaretListener, ItemListener {
                 fieldValue);
             } catch (final Throwable e) {
               setInvalidMessage(fieldValue + " is not a valid "
-                  + attribute.getType());
+                + attribute.getType());
               return;
             }
           } else {
@@ -385,7 +385,7 @@ MouseListener, CaretListener, ItemListener {
   }
 
   public void actionAddInCondition() {
-    final Attribute attribute = (Attribute)this.fieldNamesList.getSelectedItem();
+    final FieldDefinition attribute = (FieldDefinition)this.fieldNamesList.getSelectedItem();
     if (attribute != null) {
       Object fieldValue = ((Field)this.inConditionField).getFieldValue();
       if (fieldValue != null) {
@@ -398,7 +398,7 @@ MouseListener, CaretListener, ItemListener {
                 fieldValue);
             } catch (final Throwable e) {
               setInvalidMessage(fieldValue + " is not a valid "
-                  + attribute.getType());
+                + attribute.getType());
               return;
             }
           } else {
@@ -440,7 +440,7 @@ MouseListener, CaretListener, ItemListener {
   }
 
   public void actionAddLikeCondition() {
-    final Attribute attribute = (Attribute)this.fieldNamesList.getSelectedItem();
+    final FieldDefinition attribute = (FieldDefinition)this.fieldNamesList.getSelectedItem();
     if (attribute != null) {
       final Object fieldValue = ((Field)this.likeConditionField).getFieldValue();
       if (fieldValue != null) {
@@ -473,7 +473,7 @@ MouseListener, CaretListener, ItemListener {
   }
 
   public void actionAddRightUnaryCondition() {
-    final Attribute attribute = (Attribute)this.fieldNamesList.getSelectedItem();
+    final FieldDefinition attribute = (FieldDefinition)this.fieldNamesList.getSelectedItem();
     if (attribute != null) {
       final String operator = (String)this.rightUnaryConditionOperator.getSelectedItem();
       if (Property.hasValue(operator)) {
@@ -537,16 +537,16 @@ MouseListener, CaretListener, ItemListener {
         previousText = "";
       }
       if (!Property.hasValue(previousText)
-          || !previousText.matches(".*"
-              + operator.replaceAll("\\(", "\\\\(")
-              .replaceAll("\\)", "\\\\)")
-              .replaceAll("\\*", "\\\\*")
-              .replaceAll("\\+", "\\\\+") + "\\s*$")) {
+        || !previousText.matches(".*"
+          + operator.replaceAll("\\(", "\\\\(")
+            .replaceAll("\\)", "\\\\)")
+            .replaceAll("\\*", "\\\\*")
+            .replaceAll("\\+", "\\\\+") + "\\s*$")) {
         final Document document = this.whereTextField.getDocument();
         try {
           if (Property.hasValue(previousText)
-              && !previousText.substring(previousText.length() - 1).matches(
-                  "\\s$")) {
+            && !previousText.substring(previousText.length() - 1).matches(
+              "\\s$")) {
             document.insertString(position++, " ", null);
           }
           document.insertString(position, operator + " ", null);
@@ -561,7 +561,7 @@ MouseListener, CaretListener, ItemListener {
   public void itemStateChanged(final ItemEvent event) {
     if (event.getSource() == this.fieldNamesList) {
       if (event.getStateChange() == ItemEvent.SELECTED) {
-        final Attribute attribute = (Attribute)event.getItem();
+        final FieldDefinition attribute = (FieldDefinition)event.getItem();
         final String name = attribute.getName();
         this.codeTable = this.recordDefinition.getCodeTableByColumn(name);
         final JComponent binaryConditionField = createSearchField(attribute,
@@ -606,12 +606,12 @@ MouseListener, CaretListener, ItemListener {
             previousText = "";
           }
           if (!Property.hasValue(previousText)
-              || !previousText.matches(".*\"?" + fieldName + "\"?\\s*$")) {
+            || !previousText.matches(".*\"?" + fieldName + "\"?\\s*$")) {
             final Document document = this.whereTextField.getDocument();
             try {
               if (Property.hasValue(previousText)
-                  && !previousText.substring(previousText.length() - 1).matches(
-                      "\\s$")) {
+                && !previousText.substring(previousText.length() - 1).matches(
+                  "\\s$")) {
                 document.insertString(position++, " ", null);
               }
 
@@ -727,24 +727,24 @@ MouseListener, CaretListener, ItemListener {
       final ValueNode betweenExpressionEnd = rightOperandList.get(1);
       if (!(leftValueNode instanceof ColumnReference)) {
         setInvalidMessage("Between operator must use a column name not: "
-            + leftValueNode);
+          + leftValueNode);
         return null;
       }
 
       if (!(betweenExpressionStart instanceof NumericConstantNode)) {
         setInvalidMessage("Between min value must be a number not: "
-            + betweenExpressionStart);
+          + betweenExpressionStart);
         return null;
       }
       if (!(betweenExpressionEnd instanceof NumericConstantNode)) {
         setInvalidMessage("Between max value must be a number not: "
-            + betweenExpressionEnd);
+          + betweenExpressionEnd);
         return null;
       }
       final Column column = toQueryValue(leftValueNode);
       final Value min = toQueryValue(betweenExpressionStart);
       final Value max = toQueryValue(betweenExpressionEnd);
-      final Attribute attribute = this.recordDefinition.getAttribute(column.getName());
+      final FieldDefinition attribute = this.recordDefinition.getField(column.getName());
       min.convert(attribute);
       max.convert(attribute);
       return (V)new Between(column, min, max);
@@ -783,25 +783,25 @@ MouseListener, CaretListener, ItemListener {
               final Column column = (Column)leftCondition;
 
               final String name = column.getName();
-              final Attribute attribute = this.recordDefinition.getAttribute(name);
+              final FieldDefinition attribute = this.recordDefinition.getField(name);
               final CodeTable codeTable = this.recordDefinition.getCodeTableByColumn(name);
               if (codeTable == null
-                || attribute == this.recordDefinition.getIdAttribute()) {
+                  || attribute == this.recordDefinition.getIdField()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
                   final Object convertedValue = StringConverterRegistry.toObject(
                     typeClass, value);
                   if (convertedValue == null
-                      || !typeClass.isAssignableFrom(typeClass)) {
+                    || !typeClass.isAssignableFrom(typeClass)) {
                     setInvalidMessage(name + "='" + value + "' is not a valid "
-                        + attribute.getType());
+                      + attribute.getType());
                     return null;
                   } else {
                     rightCondition = new Value(attribute, convertedValue);
                   }
                 } catch (final Throwable t) {
                   setInvalidMessage(name + "='" + value + "' is not a valid "
-                      + attribute.getType());
+                    + attribute.getType());
                 }
               } else {
                 Object id;
@@ -841,7 +841,7 @@ MouseListener, CaretListener, ItemListener {
       final ColumnReference column = (ColumnReference)expression;
       String columnName = column.getColumnName();
       columnName = columnName.replaceAll("\"", "");
-      final Attribute attribute = this.recordDefinition.getAttribute(columnName);
+      final FieldDefinition attribute = this.recordDefinition.getField(columnName);
       if (attribute == null) {
         setInvalidMessage("Invalid column name " + columnName);
       } else {
@@ -921,7 +921,7 @@ MouseListener, CaretListener, ItemListener {
       return null;
     } else {
       setInvalidMessage("Unsupported expression" + expression.getClass() + " "
-          + expression);
+        + expression);
     }
     return null;
   }

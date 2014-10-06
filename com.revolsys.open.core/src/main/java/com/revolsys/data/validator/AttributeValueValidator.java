@@ -20,8 +20,8 @@
  */
 package com.revolsys.data.validator;
 
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 
 public interface AttributeValueValidator {
-  boolean isValid(Attribute attributeDefinition, Object value);
+  boolean isValid(FieldDefinition attributeDefinition, Object value);
 }

@@ -42,9 +42,9 @@ import com.revolsys.data.query.Value;
 import com.revolsys.data.query.functions.EnvelopeIntersects;
 import com.revolsys.data.query.functions.WithinDistance;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.record.schema.AbstractRecordStore;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStoreSchema;
@@ -331,8 +331,8 @@ public class OgrRecordStore extends AbstractRecordStore {
     this.idFieldNames.put(typePath.toUpperCase(), idFieldName);
     final FeatureDefn layerDefinition = layer.GetLayerDefn();
     if (SQLITE.equals(this.driverName) || GEO_PAKCAGE.equals(this.driverName)) {
-      recordDefinition.addAttribute(idFieldName, DataTypes.LONG, true);
-      recordDefinition.setIdAttributeName(idFieldName);
+      recordDefinition.addField(idFieldName, DataTypes.LONG, true);
+      recordDefinition.setIdFieldName(idFieldName);
     }
     for (int fieldIndex = 0; fieldIndex < layerDefinition.GetFieldCount(); fieldIndex++) {
       final FieldDefn fieldDefinition = layerDefinition.GetFieldDefn(fieldIndex);
@@ -367,9 +367,9 @@ public class OgrRecordStore extends AbstractRecordStore {
                 + fieldTypeName);
           break;
       }
-      final Attribute field = new Attribute(fieldName, fieldDataType,
+      final FieldDefinition field = new FieldDefinition(fieldName, fieldDataType,
         fieldWidth, fieldPrecision, false);
-      recordDefinition.addAttribute(field);
+      recordDefinition.addField(field);
     }
     for (int fieldIndex = 0; fieldIndex < layerDefinition.GetGeomFieldCount(); fieldIndex++) {
       final GeomFieldDefn fieldDefinition = layerDefinition.GetGeomFieldDefn(fieldIndex);
@@ -439,9 +439,9 @@ public class OgrRecordStore extends AbstractRecordStore {
       final CoordinateSystem coordinateSystem = Gdal.getCoordinateSystem(spatialReference);
       final GeometryFactory geometryFactory = GeometryFactory.floating(
         coordinateSystem, axisCount);
-      final Attribute field = new Attribute(fieldName, fieldDataType, false);
-      field.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
-      recordDefinition.addAttribute(field);
+      final FieldDefinition field = new FieldDefinition(fieldName, fieldDataType, false);
+      field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+      recordDefinition.addField(field);
     }
     return recordDefinition;
   }
@@ -592,9 +592,9 @@ public class OgrRecordStore extends AbstractRecordStore {
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
 
-    List<String> attributeNames = query.getAttributeNames();
+    List<String> attributeNames = query.getFieldNames();
     if (attributeNames.isEmpty()) {
-      attributeNames = recordDefinition.getAttributeNames();
+      attributeNames = recordDefinition.getFieldNames();
     }
     attributeNames.remove("ROWID");
     CollectionUtil.append(sql, attributeNames);

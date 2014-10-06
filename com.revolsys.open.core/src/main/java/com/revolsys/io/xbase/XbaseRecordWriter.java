@@ -52,7 +52,7 @@ import com.revolsys.util.Property;
 public class XbaseRecordWriter extends AbstractRecordWriter {
   private static final Logger log = Logger.getLogger(XbaseRecordWriter.class);
 
-  private final List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
+  private final List<XBaseFieldDefinition> fields = new ArrayList<>();
 
   private final List<String> fieldNames = new ArrayList<String>();
 
@@ -80,11 +80,11 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
   protected int addDbaseField(final String fullName, final DataType dataType,
     final Class<?> typeJavaClass, int length, int scale) {
-    char type = FieldDefinition.NUMBER_TYPE;
+    char type = XBaseFieldDefinition.NUMBER_TYPE;
     if (typeJavaClass == Boolean.class) {
-      type = FieldDefinition.LOGICAL_TYPE;
+      type = XBaseFieldDefinition.LOGICAL_TYPE;
     } else if (Date.class.isAssignableFrom(typeJavaClass)) {
-      type = FieldDefinition.DATE_TYPE;
+      type = XBaseFieldDefinition.DATE_TYPE;
     } else if (typeJavaClass == Long.class || typeJavaClass == BigInteger.class) {
       length = 18;
       scale = 0;
@@ -99,16 +99,16 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       scale = 0;
     } else if (Number.class.isAssignableFrom(typeJavaClass)) {
     } else {
-      type = FieldDefinition.CHARACTER_TYPE;
+      type = XBaseFieldDefinition.CHARACTER_TYPE;
     }
-    final FieldDefinition field = addFieldDefinition(fullName, type, length,
-      scale);
+    final XBaseFieldDefinition field = addFieldDefinition(fullName, type,
+      length, scale);
     return field.getLength();
   }
 
-  protected FieldDefinition addFieldDefinition(final String fullName,
+  protected XBaseFieldDefinition addFieldDefinition(final String fullName,
     final char type, int length, int scale) {
-    if (type == FieldDefinition.NUMBER_TYPE) {
+    if (type == XBaseFieldDefinition.NUMBER_TYPE) {
       if (length < 1) {
         length = 18;
       } else {
@@ -121,15 +121,15 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       scale = Math.min(length - 3, scale);
       scale = Math.max(0, scale);
     } else {
-      if (type == FieldDefinition.CHARACTER_TYPE) {
+      if (type == XBaseFieldDefinition.CHARACTER_TYPE) {
         if (length < 1) {
           length = 254;
         } else {
           length = Math.min(254, length);
         }
-      } else if (type == FieldDefinition.LOGICAL_TYPE) {
+      } else if (type == XBaseFieldDefinition.LOGICAL_TYPE) {
         length = 1;
-      } else if (type == FieldDefinition.DATE_TYPE) {
+      } else if (type == XBaseFieldDefinition.DATE_TYPE) {
         length = 8;
       }
       scale = 0;
@@ -148,8 +148,8 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       i++;
     }
 
-    final FieldDefinition field = new FieldDefinition(name, fullName, type,
-      length, scale);
+    final XBaseFieldDefinition field = new XBaseFieldDefinition(name, fullName,
+      type, length, scale);
     this.fieldNames.add(name);
     this.fields.add(field);
     return field;
@@ -266,7 +266,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       if (this.out != null) {
         this.out.write(' ');
       }
-      for (final FieldDefinition field : this.fields) {
+      for (final XBaseFieldDefinition field : this.fields) {
         if (!writeField(object, field)) {
           final String attributeName = field.getFullName();
           log.warn("Unable to write attribute '" + attributeName
@@ -279,8 +279,8 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
     }
   }
 
-  protected boolean writeField(final Record object, final FieldDefinition field)
-      throws IOException {
+  protected boolean writeField(final Record object,
+    final XBaseFieldDefinition field) throws IOException {
     if (this.out == null) {
       return true;
     } else {
@@ -288,7 +288,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       final Object value = object.getValue(attributeName);
       final int fieldLength = field.getLength();
       switch (field.getType()) {
-        case FieldDefinition.NUMBER_TYPE:
+        case XBaseFieldDefinition.NUMBER_TYPE:
           String numString = "";
           final DecimalFormat numberFormat = field.getNumberFormat();
           if (value == null) {
@@ -326,7 +326,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
             this.out.writeBytes(numString);
           }
           return true;
-        case FieldDefinition.FLOAT_TYPE:
+        case XBaseFieldDefinition.FLOAT_TYPE:
           String floatString = "";
           if (value != null) {
             floatString = value.toString();
@@ -344,7 +344,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
           }
           return true;
 
-        case FieldDefinition.CHARACTER_TYPE:
+        case XBaseFieldDefinition.CHARACTER_TYPE:
           String string = "";
           if (value != null) {
             string = StringConverterRegistry.toString(value);
@@ -360,7 +360,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
           }
           return true;
 
-        case FieldDefinition.DATE_TYPE:
+        case XBaseFieldDefinition.DATE_TYPE:
           if (value instanceof Date) {
             final Date date = (Date)value;
             final String dateString = DateUtil.format("yyyyMMdd", date);
@@ -373,7 +373,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
           }
           return true;
 
-        case FieldDefinition.LOGICAL_TYPE:
+        case XBaseFieldDefinition.LOGICAL_TYPE:
           boolean logical = false;
           if (value instanceof Boolean) {
             final Boolean boolVal = (Boolean)value;
@@ -401,11 +401,11 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
       this.fields.clear();
       int numFields = 0;
-      for (final String name : this.recordDefinition.getAttributeNames()) {
-        final int index = this.recordDefinition.getAttributeIndex(name);
-        final int length = this.recordDefinition.getAttributeLength(index);
-        final int scale = this.recordDefinition.getAttributeScale(index);
-        final DataType attributeType = this.recordDefinition.getAttributeType(index);
+      for (final String name : this.recordDefinition.getFieldNames()) {
+        final int index = this.recordDefinition.getFieldIndex(name);
+        final int length = this.recordDefinition.getFieldLength(index);
+        final int scale = this.recordDefinition.getFieldScale(index);
+        final DataType attributeType = this.recordDefinition.getFieldType(index);
         final Class<?> typeJavaClass = attributeType.getJavaClass();
         final int fieldLength = addDbaseField(name, attributeType,
           typeJavaClass, length, scale);
@@ -435,7 +435,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       this.out.write(1);
       this.out.writeLEShort((short)0);
       int offset = 1;
-      for (final FieldDefinition field : this.fields) {
+      for (final XBaseFieldDefinition field : this.fields) {
         if (field.getDataType() != DataTypes.OBJECT) {
           String name = field.getName();
           if (name.length() > 10) {

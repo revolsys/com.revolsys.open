@@ -17,7 +17,7 @@ public class ExcludeGeometryRowFilter extends RowFilter<TableModel, Integer> {
       final AbstractRecordTableModel recordModel = (AbstractRecordTableModel)entry.getModel();
       final Integer identifier = entry.getIdentifier();
       final RecordDefinition recordDefinition = recordModel.getRecordDefinition();
-      final Class<?> clazz = recordDefinition.getAttributeClass(identifier);
+      final Class<?> clazz = recordDefinition.getFieldClass(identifier);
       if (Geometry.class.isAssignableFrom(clazz)) {
         return false;
       }

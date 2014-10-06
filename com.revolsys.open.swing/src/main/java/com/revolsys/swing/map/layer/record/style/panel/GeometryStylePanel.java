@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
@@ -41,10 +41,10 @@ public class GeometryStylePanel extends BaseStylePanel implements
     this.geometryStyle = geometryStyleRenderer.getStyle().clone();
     final AbstractRecordLayer layer = geometryStyleRenderer.getLayer();
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
-    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
 
-    if (geometryAttribute != null) {
-      this.geometryDataType = geometryAttribute.getType();
+    if (geometryField != null) {
+      this.geometryDataType = geometryField.getType();
       if (DataTypes.GEOMETRY_COLLECTION.equals(this.geometryDataType)) {
         this.geometryDataType = DataTypes.GEOMETRY;
       } else if (DataTypes.MULTI_POINT.equals(this.geometryDataType)) {

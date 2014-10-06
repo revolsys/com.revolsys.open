@@ -110,10 +110,10 @@ public final class StaxUtils {
       switch (parser.getEventType()) {
         case XMLStreamConstants.CHARACTERS:
           text.append(parser.getText());
-        break;
+          break;
         case XMLStreamConstants.START_ELEMENT:
           text.append(getElementText(parser));
-        break;
+          break;
       }
     }
     return text.toString();
@@ -394,10 +394,10 @@ public final class StaxUtils {
   public static void skipToEndElementByLocalName(final XMLStreamReader parser,
     final QName name) {
     while (!parser.isEndElement()
-      || !parser.getName().getLocalPart().equals(name.getLocalPart())) {
+        || !parser.getName().getLocalPart().equals(name.getLocalPart())) {
       next(parser);
       if (parser.getEventType() == XMLStreamConstants.START_ELEMENT
-        || parser.getEventType() == XMLStreamConstants.END_ELEMENT) {
+          || parser.getEventType() == XMLStreamConstants.END_ELEMENT) {
       }
     }
     skipWhitespace(parser);
@@ -464,7 +464,7 @@ public final class StaxUtils {
    */
   public static int skipWhitespace(final XMLStreamReader parser) {
     while (next(parser) == XMLStreamConstants.CHARACTERS
-      && parser.isWhiteSpace()) {
+        && parser.isWhiteSpace()) {
       switch (parser.getEventType()) {
         case XMLStreamConstants.END_DOCUMENT:
         case XMLStreamConstants.START_ELEMENT:

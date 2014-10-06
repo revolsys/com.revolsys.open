@@ -380,7 +380,7 @@ RecordIterator {
     if (this.xbaseIterator != null) {
       final RecordDefinitionImpl recordDefinition = this.xbaseIterator.getRecordDefinition();
       this.recordDefinition = recordDefinition;
-      if (recordDefinition.getGeometryAttributeIndex() == -1) {
+      if (recordDefinition.getGeometryFieldIndex() == -1) {
         DataType geometryType = DataTypes.GEOMETRY;
         switch (this.shapeType) {
           case ShapefileConstants.POINT_SHAPE:
@@ -414,7 +414,7 @@ RecordIterator {
           default:
             break;
         }
-        recordDefinition.addAttribute("geometry", geometryType, true);
+        recordDefinition.addField("geometry", geometryType, true);
       }
     }
   }

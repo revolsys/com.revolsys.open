@@ -14,19 +14,19 @@ public abstract class BaseController extends AbstractController {
   @PreDestroy
   public void destroy() {
     setApplicationContext(null);
-    actionMenu = null;
+    this.actionMenu = null;
   }
 
   public Menu getActionMenu() {
-    return actionMenu;
+    return this.actionMenu;
   }
 
   public Menu getActionMenu(final HttpServletRequest request) {
     final Menu requestMenu = (Menu)request.getAttribute("actionMenu");
     if (requestMenu == null) {
-      return actionMenu;
+      return this.actionMenu;
     } else {
-      final Menu newMenu = actionMenu.clone();
+      final Menu newMenu = this.actionMenu.clone();
       newMenu.addAllMenuItems(requestMenu);
       return newMenu;
     }

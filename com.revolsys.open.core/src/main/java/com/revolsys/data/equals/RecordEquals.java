@@ -42,7 +42,7 @@ public class RecordEquals implements Equals<Record> {
       return false;
     } else {
       for (final String attributeName : object1.getRecordDefinition()
-        .getAttributeNames()) {
+        .getFieldNames()) {
         if (!MapEquals.equals(object1, values2, attributeName)) {
           return false;
         }
@@ -58,10 +58,10 @@ public class RecordEquals implements Equals<Record> {
     if (excludedAttributes.contains(attributeName)) {
       return true;
     } else if (excludedAttributes.contains(EXCLUDE_ID)
-      && attributeName.equals(recordDefinition.getIdAttributeName())) {
+      && attributeName.equals(recordDefinition.getIdFieldName())) {
       return true;
     } else if (excludedAttributes.contains(EXCLUDE_GEOMETRY)
-      && attributeName.equals(recordDefinition.getGeometryAttributeName())) {
+      && attributeName.equals(recordDefinition.getGeometryFieldName())) {
       return true;
     } else {
       final Object value1 = object1.getValue(attributeName);
@@ -82,10 +82,10 @@ public class RecordEquals implements Equals<Record> {
     if (excludedAttributes.contains(attributeName)) {
       return true;
     } else if (excludedAttributes.contains(EXCLUDE_ID)
-      && attributeName.equals(recordDefinition.getIdAttributeName())) {
+      && attributeName.equals(recordDefinition.getIdFieldName())) {
       return true;
     } else if (excludedAttributes.contains(EXCLUDE_GEOMETRY)
-      && attributeName.equals(recordDefinition.getGeometryAttributeName())) {
+      && attributeName.equals(recordDefinition.getGeometryFieldName())) {
       return true;
     } else {
       return false;
@@ -101,12 +101,12 @@ public class RecordEquals implements Equals<Record> {
       final RecordDefinition recordDefinition1 = object1.getRecordDefinition();
       final RecordDefinition recordDefinition2 = object2.getRecordDefinition();
       if (recordDefinition1.getPath().equals(recordDefinition2.getPath())) {
-        if (recordDefinition1.getAttributeCount() == recordDefinition2.getAttributeCount()) {
-          final int idIndex = recordDefinition1.getIdAttributeIndex();
-          final int geometryIndex = recordDefinition1.getGeometryAttributeIndex();
-          final int objectIdIndex = recordDefinition1.getAttributeIndex("OBJECTID");
-          for (int i = 0; i < recordDefinition1.getAttributeCount(); i++) {
-            final String name = recordDefinition1.getAttributeName(i);
+        if (recordDefinition1.getFieldCount() == recordDefinition2.getFieldCount()) {
+          final int idIndex = recordDefinition1.getIdFieldIndex();
+          final int geometryIndex = recordDefinition1.getGeometryFieldIndex();
+          final int objectIdIndex = recordDefinition1.getFieldIndex("OBJECTID");
+          for (int i = 0; i < recordDefinition1.getFieldCount(); i++) {
+            final String name = recordDefinition1.getFieldName(i);
             if (excludedAttributes.contains(name)) {
             } else if (i == idIndex && excludedAttributes.contains(EXCLUDE_ID)) {
             } else if (i == geometryIndex

@@ -19,7 +19,7 @@ import com.revolsys.io.MapWriterFactory;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class ListOfMapHttpMessageConverter extends
-  AbstractHttpMessageConverter<ArrayListOfMap> {
+AbstractHttpMessageConverter<ArrayListOfMap> {
 
   private final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
 
@@ -38,7 +38,7 @@ public class ListOfMapHttpMessageConverter extends
         outputMessage, mediaType);
       final OutputStream body = outputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"
-        + mediaType.getSubtype();
+          + mediaType.getSubtype();
       final MapWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
         MapWriterFactory.class, mediaTypeString);
       final MapWriter writer = writerFactory.getMapWriter(body, charset);

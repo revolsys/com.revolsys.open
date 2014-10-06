@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,13 +28,13 @@ import javax.xml.stream.XMLReporter;
  * an {@link XMLReporter} for recording errors from the
  * {@link javax.xml.stream.XMLStreamReader}.
  * </p>
- * 
+ *
  * @author Paul Austin
  */
 public interface XmlProcessorContext extends XMLReporter {
   /**
    * Add the error to the list of errors in processing the XML Document.
-   * 
+   *
    * @param message The error message.
    * @param relatedInformation Additional information about the error.
    * @param location The location of the error.
@@ -44,14 +44,14 @@ public interface XmlProcessorContext extends XMLReporter {
 
   /**
    * Add the error to the list of errors in processing the XML Document.
-   * 
+   *
    * @param error The error.
    */
   void addError(final XmlProcessorError error);
 
   /**
    * Get the value of an attribute.
-   * 
+   *
    * @param name The name of the attribute.
    * @return The attribute value.
    */
@@ -59,7 +59,7 @@ public interface XmlProcessorContext extends XMLReporter {
 
   /**
    * Get the list of {@link XmlProcessorError}s in processing the XML Document.
-   * 
+   *
    * @return The list of {@link XmlProcessorError}s in processing the XML
    *         Document.
    */
@@ -68,7 +68,7 @@ public interface XmlProcessorContext extends XMLReporter {
   /**
    * Set the value of an attribute. Attributes can be used to share objects
    * between the methods
-   * 
+   *
    * @param name The name of the attribute.
    * @param value The value of the attribute.
    */

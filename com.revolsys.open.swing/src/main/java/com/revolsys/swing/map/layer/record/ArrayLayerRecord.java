@@ -6,15 +6,13 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.util.Property;
@@ -141,7 +139,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     if (this.originalValues == null) {
       return false;
     } else {
-      final String attributeName = getRecordDefinition().getAttributeName(index);
+      final String attributeName = getRecordDefinition().getFieldName(index);
       return isModified(attributeName);
     }
   }
@@ -185,7 +183,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
       return true;
     } else {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final String name = recordDefinition.getAttributeName(index);
+      final String name = recordDefinition.getFieldName(index);
       return isValid(name);
     }
   }
@@ -195,7 +193,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     if (getState() == RecordState.Initalizing) {
       return true;
     } else {
-      final Attribute attribute = getRecordDefinition().getAttribute(name);
+      final FieldDefinition attribute = getRecordDefinition().getField(name);
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
@@ -235,7 +233,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
 
   @Override
   public void revertEmptyFields() {
-    for (final String fieldName : getRecordDefinition().getAttributeNames()) {
+    for (final String fieldName : getRecordDefinition().getFieldNames()) {
       final Object value = getValue(fieldName);
       if (Property.isEmpty(value)) {
         if (!this.layer.isFieldUserReadOnly(fieldName)) {
@@ -251,7 +249,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   public void setValue(final int index, final Object value) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final String attributeName = recordDefinition.getAttributeName(index);
+    final String attributeName = recordDefinition.getFieldName(index);
 
     final Object oldValue = getValue(index);
     if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {

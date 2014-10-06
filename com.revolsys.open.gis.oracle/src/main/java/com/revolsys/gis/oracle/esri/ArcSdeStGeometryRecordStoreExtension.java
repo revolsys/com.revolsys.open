@@ -15,7 +15,7 @@ import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.gis.oracle.io.OracleRecordStore;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
 
@@ -29,10 +29,10 @@ public class ArcSdeStGeometryRecordStoreExtension implements
   public void initialize(final RecordStore recordStore,
     final Map<String, Object> connectionProperties) {
     final OracleRecordStore oracleRecordStore = (OracleRecordStore)recordStore;
-    final JdbcAttributeAdder stGeometryAttributeAdder = new ArcSdeStGeometryAttributeAdder(
+    final JdbcFieldAdder stGeometryAttributeAdder = new ArcSdeStGeometryAttributeAdder(
       oracleRecordStore);
-    oracleRecordStore.addAttributeAdder("ST_GEOMETRY", stGeometryAttributeAdder);
-    oracleRecordStore.addAttributeAdder("SDE.ST_GEOMETRY",
+    oracleRecordStore.addFieldAdder("ST_GEOMETRY", stGeometryAttributeAdder);
+    oracleRecordStore.addFieldAdder("SDE.ST_GEOMETRY",
       stGeometryAttributeAdder);
   }
 
@@ -56,21 +56,21 @@ public class ArcSdeStGeometryRecordStoreExtension implements
           final String typePath = Path.toPath(schemaName, tableName);
 
           final int esriSrid = resultSet.getInt(3);
-          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
+          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
             ArcSdeConstants.ESRI_SRID_PROPERTY, esriSrid);
 
           int axisCount = resultSet.getInt(5);
           axisCount = Math.max(axisCount, 2);
-          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
-            JdbcAttributeAdder.NUM_AXIS, axisCount);
+          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
+            JdbcFieldAdder.NUM_AXIS, axisCount);
 
           final ArcSdeSpatialReference spatialReference = ArcSdeSpatialReferenceCache.getSpatialReference(
             schema, esriSrid);
-          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
+          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
             ArcSdeConstants.SPATIAL_REFERENCE, spatialReference);
 
-          GeometryFactory geometryFactory = JdbcAttributeAdder.getColumnProperty(
-            schema, typePath, columnName, JdbcAttributeAdder.GEOMETRY_FACTORY);
+          GeometryFactory geometryFactory = JdbcFieldAdder.getColumnProperty(
+            schema, typePath, columnName, JdbcFieldAdder.GEOMETRY_FACTORY);
           int srid = spatialReference.getSrid();
           final double scaleXy = spatialReference.getXyScale();
           final double scaleZ = spatialReference.getZScale();
@@ -81,19 +81,19 @@ public class ArcSdeStGeometryRecordStoreExtension implements
           geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy,
             scaleZ);
 
-          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
-            JdbcAttributeAdder.GEOMETRY_FACTORY, geometryFactory);
+          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
+            JdbcFieldAdder.GEOMETRY_FACTORY, geometryFactory);
 
           final int geometryType = resultSet.getInt(4);
-          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
-            JdbcAttributeAdder.GEOMETRY_TYPE,
+          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
+            JdbcFieldAdder.GEOMETRY_TYPE,
             ArcSdeConstants.getGeometryDataType(geometryType));
 
           String geometryColumnType = resultSet.getString(6);
           if (!Property.hasValue(geometryColumnType)) {
             geometryColumnType = ArcSdeConstants.SDEBINARY;
           }
-          JdbcAttributeAdder.setColumnProperty(schema, typePath, columnName,
+          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
             ArcSdeConstants.GEOMETRY_COLUMN_TYPE, geometryColumnType);
         }
       } finally {
@@ -119,11 +119,11 @@ public class ArcSdeStGeometryRecordStoreExtension implements
           .toUpperCase();
 
         final int registrationId = resultSet.getInt(1);
-        JdbcAttributeAdder.setTableProperty(schema, typePath,
+        JdbcFieldAdder.setTableProperty(schema, typePath,
           ArcSdeConstants.REGISTRATION_ID, registrationId);
 
         final String rowidColumn = resultSet.getString(3);
-        JdbcAttributeAdder.setTableProperty(schema, typePath,
+        JdbcFieldAdder.setTableProperty(schema, typePath,
           ArcSdeConstants.ROWID_COLUMN, rowidColumn);
       }
     } catch (final Throwable e) {
@@ -139,12 +139,12 @@ public class ArcSdeStGeometryRecordStoreExtension implements
     final String schemaName = schema.getName();
     for (final RecordDefinition recordDefinition : schema.getRecordDefinitions()) {
       final String typePath = recordDefinition.getPath();
-      final Integer registrationId = JdbcAttributeAdder.getTableProperty(
+      final Integer registrationId = JdbcFieldAdder.getTableProperty(
         schema, typePath, ArcSdeConstants.REGISTRATION_ID);
-      final String rowIdColumn = JdbcAttributeAdder.getTableProperty(schema,
+      final String rowIdColumn = JdbcFieldAdder.getTableProperty(schema,
         typePath, ArcSdeConstants.ROWID_COLUMN);
       if (registrationId != null && rowIdColumn != null) {
-        ArcSdeObjectIdJdbcAttribute.replaceAttribute(schemaName,
+        ArcSdeObjectIdJdbcFieldDefinition.replaceAttribute(schemaName,
           recordDefinition, registrationId, rowIdColumn);
       }
     }

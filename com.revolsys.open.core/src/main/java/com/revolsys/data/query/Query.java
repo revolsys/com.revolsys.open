@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 
 import com.revolsys.data.query.functions.EnvelopeIntersects;
 import com.revolsys.data.query.functions.F;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.AbstractObjectWithProperties;
@@ -25,7 +25,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     if (filter != null && !filter.isEmpty()) {
       for (final Entry<String, ?> entry : filter.entrySet()) {
         final String name = entry.getKey();
-        final Attribute attribute = recordDefinition.getAttribute(name);
+        final FieldDefinition attribute = recordDefinition.getField(name);
         if (attribute == null) {
           final Object value = entry.getValue();
           if (value == null) {
@@ -63,7 +63,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   public static Query equal(final RecordDefinition recordDefinition,
     final String name, final Object value) {
-    final Attribute attribute = recordDefinition.getAttribute(name);
+    final FieldDefinition attribute = recordDefinition.getField(name);
     if (attribute == null) {
       return null;
     } else {
@@ -77,12 +77,12 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   public static Query intersects(final RecordDefinition recordDefinition,
     final BoundingBox boundingBox) {
-    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-    if (geometryAttribute == null) {
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+    if (geometryField == null) {
       return null;
     } else {
       final EnvelopeIntersects intersects = F.envelopeIntersects(
-        geometryAttribute, boundingBox);
+        geometryField, boundingBox);
       final Query query = new Query(recordDefinition, intersects);
       return query;
     }
@@ -175,7 +175,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
       if (this.whereCondition != null) {
         clone.whereCondition = this.whereCondition.clone();
       }
-      if (!clone.getAttributeNames().isEmpty() || clone.whereCondition != null) {
+      if (!clone.getFieldNames().isEmpty() || clone.whereCondition != null) {
         clone.sql = null;
       }
       return clone;
@@ -184,7 +184,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     }
   }
 
-  public List<String> getAttributeNames() {
+  public List<String> getFieldNames() {
     return this.attributeNames;
   }
 
@@ -192,8 +192,8 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     return this.fromClause;
   }
 
-  public Attribute getGeometryAttribute() {
-    return getRecordDefinition().getGeometryAttribute();
+  public FieldDefinition getGeometryField() {
+    return getRecordDefinition().getGeometryField();
   }
 
   public int getLimit() {

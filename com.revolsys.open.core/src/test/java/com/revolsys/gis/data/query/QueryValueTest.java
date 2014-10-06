@@ -8,7 +8,7 @@ import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Q;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
 
@@ -19,21 +19,22 @@ public class QueryValueTest {
 
   private final RecordDefinitionImpl recordDefinition;
 
-  private final Attribute idAttribute;
+  private final FieldDefinition idField;
 
   private final Record record;
 
-  private final Attribute nameAttribute;
+  private final FieldDefinition nameAttribute;
 
-  private final Attribute descriptionAttribute;
+  private final FieldDefinition descriptionAttribute;
 
   public QueryValueTest() {
     this.recordDefinition = new RecordDefinitionImpl("Test");
-    this.idAttribute = this.recordDefinition.addAttribute("ID", DataTypes.INT, true);
-    this.nameAttribute = this.recordDefinition.addAttribute("NAME", DataTypes.STRING,
-      255, true);
-    this.descriptionAttribute = this.recordDefinition.addAttribute("DESCRIPTION",
-      DataTypes.STRING, 255, false);
+    this.idField = this.recordDefinition.addField("ID", DataTypes.INT,
+      true);
+    this.nameAttribute = this.recordDefinition.addField("NAME",
+      DataTypes.STRING, 255, true);
+    this.descriptionAttribute = this.recordDefinition.addField(
+      "DESCRIPTION", DataTypes.STRING, 255, false);
 
     this.record = new ArrayRecord(this.recordDefinition);
     this.record.setValue("ID", 10);
@@ -71,66 +72,66 @@ public class QueryValueTest {
   }
 
   private void testAnd() {
-    final Condition trueCondition1 = Q.and(Q.equal(this.idAttribute, 10));
+    final Condition trueCondition1 = Q.and(Q.equal(this.idField, 10));
     assertConditionTrue(trueCondition1, this.record);
-    final Condition trueCondition2 = Q.and(Q.equal(this.idAttribute, 10),
+    final Condition trueCondition2 = Q.and(Q.equal(this.idField, 10),
       Q.equal(this.nameAttribute, "foobar"));
     assertConditionTrue(trueCondition2, this.record);
 
-    final Condition falseCondition1 = Q.and(Q.equal(this.idAttribute, 10),
+    final Condition falseCondition1 = Q.and(Q.equal(this.idField, 10),
       Q.equal(this.nameAttribute, "foobar1"));
     assertConditionFalse(falseCondition1, this.record);
   }
 
   private void testBetween() {
-    final Condition trueCondition1 = Q.between(this.idAttribute, 9, 10);
+    final Condition trueCondition1 = Q.between(this.idField, 9, 10);
     assertConditionTrue(trueCondition1, this.record);
-    final Condition trueCondition2 = Q.between(this.idAttribute, 10, 10);
+    final Condition trueCondition2 = Q.between(this.idField, 10, 10);
     assertConditionTrue(trueCondition2, this.record);
-    final Condition trueCondition3 = Q.between(this.idAttribute, 10, 11);
+    final Condition trueCondition3 = Q.between(this.idField, 10, 11);
     assertConditionTrue(trueCondition3, this.record);
-    final Condition trueCondition4 = Q.between(this.idAttribute, 9, 10);
+    final Condition trueCondition4 = Q.between(this.idField, 9, 10);
     assertConditionTrue(trueCondition4, this.record);
 
-    final Condition falseCondition1 = Q.between(this.idAttribute, 11, 12);
+    final Condition falseCondition1 = Q.between(this.idField, 11, 12);
     assertConditionFalse(falseCondition1, this.record);
   }
 
   private void testEqual() {
-    final Condition trueCondition1 = Q.equal(this.idAttribute, 10);
+    final Condition trueCondition1 = Q.equal(this.idField, 10);
     assertConditionTrue(trueCondition1, this.record);
-    final Condition trueCondition2 = Q.equal(this.idAttribute, "10");
+    final Condition trueCondition2 = Q.equal(this.idField, "10");
     assertConditionTrue(trueCondition2, this.record);
 
-    final Condition falseCondition1 = Q.equal(this.idAttribute, 11);
+    final Condition falseCondition1 = Q.equal(this.idField, 11);
     assertConditionFalse(falseCondition1, this.record);
   }
 
   private void testGreaterThan() {
-    final Condition trueCondition1 = Q.greaterThan(this.idAttribute, 9);
+    final Condition trueCondition1 = Q.greaterThan(this.idField, 9);
     assertConditionTrue(trueCondition1, this.record);
-    final Condition trueCondition2 = Q.greaterThan(this.idAttribute, "9");
+    final Condition trueCondition2 = Q.greaterThan(this.idField, "9");
     assertConditionTrue(trueCondition2, this.record);
 
-    final Condition falseCondition1 = Q.greaterThan(this.idAttribute, 10);
+    final Condition falseCondition1 = Q.greaterThan(this.idField, 10);
     assertConditionFalse(falseCondition1, this.record);
   }
 
   private void testGreaterThanEqual() {
-    final Condition trueCondition1 = Q.greaterThanEqual(this.idAttribute, 10);
+    final Condition trueCondition1 = Q.greaterThanEqual(this.idField, 10);
     assertConditionTrue(trueCondition1, this.record);
-    final Condition trueCondition2 = Q.greaterThanEqual(this.idAttribute, "10");
+    final Condition trueCondition2 = Q.greaterThanEqual(this.idField, "10");
     assertConditionTrue(trueCondition2, this.record);
 
-    final Condition falseCondition1 = Q.greaterThanEqual(this.idAttribute, 11);
+    final Condition falseCondition1 = Q.greaterThanEqual(this.idField, 11);
     assertConditionFalse(falseCondition1, this.record);
   }
 
   @SuppressWarnings("unchecked")
   private void testILike() {
     for (final Object like : Arrays.asList(10, "%10", "10%", "%10%", "%1%",
-      "%0%")) {
-      final Condition trueCondition = Q.iLike(this.idAttribute, like);
+        "%0%")) {
+      final Condition trueCondition = Q.iLike(this.idField, like);
       assertConditionTrue(trueCondition, this.record);
     }
     for (final String like : Arrays.asList("%Foobar", "fooBar%", "%foObar%",
@@ -147,17 +148,17 @@ public class QueryValueTest {
   }
 
   private void testIn() {
-    final Condition trueCondition1 = Q.in(this.idAttribute, 10, 11);
+    final Condition trueCondition1 = Q.in(this.idField, 10, 11);
     assertConditionTrue(trueCondition1, this.record);
-    final Condition trueCondition2 = Q.in(this.idAttribute, "10");
+    final Condition trueCondition2 = Q.in(this.idField, "10");
     assertConditionTrue(trueCondition2, this.record);
 
-    final Condition falseCondition1 = Q.in(this.idAttribute, 11);
+    final Condition falseCondition1 = Q.in(this.idField, 11);
     assertConditionFalse(falseCondition1, this.record);
   }
 
   private void testIsNotNull() {
-    final Condition trueCondition1 = Q.isNotNull(this.idAttribute);
+    final Condition trueCondition1 = Q.isNotNull(this.idField);
     assertConditionTrue(trueCondition1, this.record);
 
     final Condition falseCondition1 = Q.isNotNull(this.descriptionAttribute);
@@ -168,35 +169,35 @@ public class QueryValueTest {
     final Condition trueCondition1 = Q.isNull(this.descriptionAttribute);
     assertConditionTrue(trueCondition1, this.record);
 
-    final Condition falseCondition1 = Q.isNull(this.idAttribute);
+    final Condition falseCondition1 = Q.isNull(this.idField);
     assertConditionFalse(falseCondition1, this.record);
   }
 
   private void testLessThan() {
-    final Condition trueCondition1 = Q.lessThan(this.idAttribute, 11);
+    final Condition trueCondition1 = Q.lessThan(this.idField, 11);
     assertConditionTrue(trueCondition1, this.record);
-    final Condition trueCondition2 = Q.lessThan(this.idAttribute, "11");
+    final Condition trueCondition2 = Q.lessThan(this.idField, "11");
     assertConditionTrue(trueCondition2, this.record);
 
-    final Condition falseCondition1 = Q.lessThan(this.idAttribute, 10);
+    final Condition falseCondition1 = Q.lessThan(this.idField, 10);
     assertConditionFalse(falseCondition1, this.record);
   }
 
   private void testLessThanEqual() {
-    final Condition trueCondition1 = Q.lessThanEqual(this.idAttribute, 10);
+    final Condition trueCondition1 = Q.lessThanEqual(this.idField, 10);
     assertConditionTrue(trueCondition1, this.record);
-    final Condition trueCondition2 = Q.lessThanEqual(this.idAttribute, "10");
+    final Condition trueCondition2 = Q.lessThanEqual(this.idField, "10");
     assertConditionTrue(trueCondition2, this.record);
 
-    final Condition falseCondition1 = Q.lessThanEqual(this.idAttribute, 9);
+    final Condition falseCondition1 = Q.lessThanEqual(this.idField, 9);
     assertConditionFalse(falseCondition1, this.record);
   }
 
   @SuppressWarnings("unchecked")
   private void testLike() {
     for (final Object like : Arrays.asList(10, "%10", "10%", "%10%", "%1%",
-      "%0%")) {
-      final Condition trueCondition = Q.like(this.idAttribute, like);
+        "%0%")) {
+      final Condition trueCondition = Q.like(this.idField, like);
       assertConditionTrue(trueCondition, this.record);
     }
     for (final String like : Arrays.asList("%foobar", "foobar%", "%foobar%",
@@ -213,31 +214,31 @@ public class QueryValueTest {
   }
 
   private void testNot() {
-    final Condition trueCondition1 = Q.not(Q.equal(this.idAttribute, 11));
+    final Condition trueCondition1 = Q.not(Q.equal(this.idField, 11));
     assertConditionTrue(trueCondition1, this.record);
 
-    final Condition falseCondition1 = Q.not(Q.equal(this.idAttribute, 10));
+    final Condition falseCondition1 = Q.not(Q.equal(this.idField, 10));
     assertConditionFalse(falseCondition1, this.record);
   }
 
   private void testNotEqual() {
-    final Condition trueCondition1 = Q.notEqual(this.idAttribute, 11);
+    final Condition trueCondition1 = Q.notEqual(this.idField, 11);
     assertConditionTrue(trueCondition1, this.record);
-    final Condition trueCondition2 = Q.notEqual(this.idAttribute, "11");
+    final Condition trueCondition2 = Q.notEqual(this.idField, "11");
     assertConditionTrue(trueCondition2, this.record);
 
-    final Condition falseCondition1 = Q.notEqual(this.idAttribute, 10);
+    final Condition falseCondition1 = Q.notEqual(this.idField, 10);
     assertConditionFalse(falseCondition1, this.record);
   }
 
   private void testOr() {
-    final Condition trueCondition1 = Q.or(Q.equal(this.idAttribute, 10));
+    final Condition trueCondition1 = Q.or(Q.equal(this.idField, 10));
     assertConditionTrue(trueCondition1, this.record);
-    final Condition trueCondition2 = Q.or(Q.equal(this.idAttribute, 11),
+    final Condition trueCondition2 = Q.or(Q.equal(this.idField, 11),
       Q.equal(this.nameAttribute, "foobar"));
     assertConditionTrue(trueCondition2, this.record);
 
-    final Condition falseCondition1 = Q.or(Q.equal(this.idAttribute, 11),
+    final Condition falseCondition1 = Q.or(Q.equal(this.idField, 11),
       Q.equal(this.nameAttribute, "foobar1"));
     assertConditionFalse(falseCondition1, this.record);
   }

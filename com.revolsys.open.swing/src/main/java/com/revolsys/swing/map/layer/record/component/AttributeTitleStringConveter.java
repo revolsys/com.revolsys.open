@@ -9,11 +9,11 @@ import javax.swing.ListCellRenderer;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 
 public class AttributeTitleStringConveter extends ObjectToStringConverter
-  implements ListCellRenderer {
+implements ListCellRenderer {
   private final AbstractRecordLayer layer;
 
   private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
@@ -33,12 +33,12 @@ public class AttributeTitleStringConveter extends ObjectToStringConverter
 
   @Override
   public String getPreferredStringForItem(final Object item) {
-    if (item instanceof Attribute) {
-      final Attribute attribute = (Attribute)item;
-      return layer.getFieldTitle(attribute.getName());
+    if (item instanceof FieldDefinition) {
+      final FieldDefinition attribute = (FieldDefinition)item;
+      return this.layer.getFieldTitle(attribute.getName());
     } else if (item instanceof String) {
       final String attributeName = (String)item;
-      return layer.getFieldTitle(attributeName);
+      return this.layer.getFieldTitle(attributeName);
     }
     return StringConverterRegistry.toString(item);
   }

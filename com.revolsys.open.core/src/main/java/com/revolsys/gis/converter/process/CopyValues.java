@@ -20,14 +20,14 @@ public class CopyValues extends
   }
 
   public CopyValues(final String sourceName, final String targetName) {
-    addAttributeName(sourceName, targetName);
+    addFieldName(sourceName, targetName);
   }
 
-  public void addAttributeName(final String sourceName, final String targetName) {
+  public void addFieldName(final String sourceName, final String targetName) {
     attributeNames.put(sourceName, targetName);
   }
 
-  public Map<String, String> getAttributeNames() {
+  public Map<String, String> getFieldNames() {
     return attributeNames;
   }
 

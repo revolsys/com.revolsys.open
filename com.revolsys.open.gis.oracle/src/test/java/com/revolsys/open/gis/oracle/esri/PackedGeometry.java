@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.revolsys.data.equals.GeometryEqualsExact3d;
 import com.revolsys.gis.oracle.esri.ArcSdeConstants;
-import com.revolsys.gis.oracle.esri.ArcSdeStGeometryAttribute;
+import com.revolsys.gis.oracle.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.gis.oracle.esri.PackedCoordinateUtil;
 import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Geometry;
@@ -24,7 +24,7 @@ public class PackedGeometry {
     final Double mScale = null;
     final Double mOffset = null;
 
-    final List<List<Geometry>> parts = ArcSdeStGeometryAttribute.getParts(
+    final List<List<Geometry>> parts = ArcSdeStGeometryFieldDefinition.getParts(
       geometry, false);
 
     final int numPoints = PackedCoordinateUtil.getNumPoints(parts);

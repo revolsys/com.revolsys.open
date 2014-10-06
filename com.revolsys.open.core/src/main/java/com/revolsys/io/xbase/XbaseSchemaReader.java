@@ -8,7 +8,7 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.io.EndianInput;
 
 public class XbaseSchemaReader {
-  private final List<FieldDefinition> fieldDefinitions;
+  private final List<XBaseFieldDefinition> fieldDefinitions;
 
   private final EndianInput in;
 
@@ -17,16 +17,16 @@ public class XbaseSchemaReader {
   private final String typePath;
 
   public XbaseSchemaReader(final EndianInput in, final String typePath,
-    final List<FieldDefinition> fieldDefinitions) {
+    final List<XBaseFieldDefinition> fieldDefinitions) {
     this.in = in;
     this.typePath = typePath;
     this.fieldDefinitions = fieldDefinitions;
   }
 
   protected RecordDefinition getRecordDefinition() throws IOException {
-    if (recordDefinition == null) {
-      recordDefinition = new RecordDefinitionImpl(typePath);
-      int b = in.read();
+    if (this.recordDefinition == null) {
+      this.recordDefinition = new RecordDefinitionImpl(this.typePath);
+      int b = this.in.read();
       while (b != 0x0D) {
         final StringBuilder fieldName = new StringBuilder();
         boolean endOfName = false;
@@ -38,24 +38,24 @@ public class XbaseSchemaReader {
             endOfName = true;
           }
           if (i != 10) {
-            b = in.read();
+            b = this.in.read();
           }
         }
-        final char fieldType = (char)in.read();
-        in.skipBytes(4);
-        final int length = in.read();
-        in.skipBytes(15);
-        b = in.read();
-        final FieldDefinition field = new FieldDefinition(fieldName.toString(),
-          fieldName.toString(), fieldType, length);
-        if (fieldDefinitions != null) {
-          fieldDefinitions.add(field);
+        final char fieldType = (char)this.in.read();
+        this.in.skipBytes(4);
+        final int length = this.in.read();
+        this.in.skipBytes(15);
+        b = this.in.read();
+        final XBaseFieldDefinition field = new XBaseFieldDefinition(
+          fieldName.toString(), fieldName.toString(), fieldType, length);
+        if (this.fieldDefinitions != null) {
+          this.fieldDefinitions.add(field);
         }
-        recordDefinition.addAttribute(fieldName.toString(), field.getDataType(),
-          length, true);
+        this.recordDefinition.addField(fieldName.toString(),
+          field.getDataType(), length, true);
       }
     }
-    return recordDefinition;
+    return this.recordDefinition;
   }
 
 }

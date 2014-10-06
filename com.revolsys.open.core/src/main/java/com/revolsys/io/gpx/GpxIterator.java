@@ -129,8 +129,8 @@ public class GpxIterator implements RecordIterator {
       do {
         this.currentRecord = parseRecord();
       } while (this.currentRecord != null
-        && this.typePath != null
-        && !this.currentRecord.getRecordDefinition()
+          && this.typePath != null
+          && !this.currentRecord.getRecordDefinition()
           .getPath()
           .equals(this.typePath));
       this.loadNextObject = false;
@@ -200,14 +200,14 @@ public class GpxIterator implements RecordIterator {
   // // assert false : in.getText();
   // break;
   // }
-  // SimpleAttribute attribute = new SimpleAttribute(propertyName, value);
+  // SimpleFieldDefinition attribute = new SimpleAttribute(propertyName, value);
   // in.requireLocalPart(XMLStreamReader.END_ELEMENT, propertySchemaName,
   // propertyName);
   // return attribute;
   // }
 
   protected Record parsePoint(final String featureType, final double index)
-    throws XMLStreamException {
+      throws XMLStreamException {
     final Record record = this.recordFactory.createRecord(GpxConstants.GPX_TYPE);
     record.setValue("dataset_name", this.baseName);
     record.setValue("index", index);
@@ -275,7 +275,7 @@ public class GpxIterator implements RecordIterator {
         StaxUtils.skipSubTree(this.in);
       } else if (this.in.getName().equals(GpxConstants.ROUTE_POINT_ELEMENT)) {
         final double pointIndex = this.index + (pointObjects.size() + 1.0)
-          / 10000;
+            / 10000;
         final Record pointObject = parseRoutPoint(pointIndex);
         pointObjects.add(pointObject);
         final Point point = pointObject.getGeometryValue();
@@ -330,13 +330,13 @@ public class GpxIterator implements RecordIterator {
       }
     }
     final Geometry geometry = this.geometryFactory.convertAxisCount(axisCount)
-      .geometry(parts);
+        .geometry(parts);
     record.setGeometryValue(geometry);
     return record;
   }
 
   private int parseTrackPoint(final List<Double> points)
-    throws XMLStreamException {
+      throws XMLStreamException {
     final String lonText = this.in.getAttributeValue("", "lon");
     final double lon = Double.parseDouble(lonText);
     points.add(lon);
@@ -351,7 +351,7 @@ public class GpxIterator implements RecordIterator {
     double m = Double.NaN;
     while (this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (this.in.getName().equals(GpxConstants.EXTENSION_ELEMENT)
-        || this.in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
+          || this.in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
         StaxUtils.skipSubTree(this.in);
       } else {
         if (this.in.getName().equals(GpxConstants.ELEVATION_ELEMENT)) {

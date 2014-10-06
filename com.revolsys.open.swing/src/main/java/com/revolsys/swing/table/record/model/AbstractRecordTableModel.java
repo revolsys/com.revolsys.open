@@ -85,7 +85,7 @@ PropertyChangeSupportProxy {
 
   public String getFieldName(final int attributeIndex) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getAttributeName(attributeIndex);
+    return recordDefinition.getFieldName(attributeIndex);
   }
 
   public abstract String getFieldName(int rowIndex, int columnIndex);
@@ -142,7 +142,7 @@ PropertyChangeSupportProxy {
     final Object objectValue) {
     String text;
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final String idFieldName = recordDefinition.getIdAttributeName();
+    final String idFieldName = recordDefinition.getIdFieldName();
     final String name = getFieldName(attributeIndex);
     if (objectValue == null || name == null) {
       if (name.equals(idFieldName)) {
@@ -185,7 +185,7 @@ PropertyChangeSupportProxy {
     final String name = getFieldName(attributeIndex);
     final CodeTable codeTable = recordDefinition.getCodeTableByColumn(name);
     if (codeTable == null) {
-      final Class<?> fieldClass = recordDefinition.getAttributeClass(name);
+      final Class<?> fieldClass = recordDefinition.getFieldClass(name);
       final Object objectValue = StringConverterRegistry.toObject(fieldClass,
         displayValue);
       return objectValue;

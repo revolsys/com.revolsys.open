@@ -8,7 +8,7 @@ import java.util.Map;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 
 public class In extends Condition {
@@ -17,7 +17,7 @@ public class In extends Condition {
 
   private CollectionValue values;
 
-  public In(final Attribute attribute, final Collection<? extends Object> values) {
+  public In(final FieldDefinition attribute, final Collection<? extends Object> values) {
     this(attribute.getName(), new CollectionValue(attribute, values));
   }
 
@@ -25,7 +25,7 @@ public class In extends Condition {
     this.left = left;
     if (left instanceof Column) {
       final Column column = (Column)left;
-      final Attribute attribute = column.getAttribute();
+      final FieldDefinition attribute = column.getField();
       if (attribute != null) {
         values.setAttribute(attribute);
       }

@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.AttributeProperties;
+import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.record.property.ShortNameProperty;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
@@ -55,12 +55,12 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       schemaName = "public";
     }
     final String tableName = Path.getName(typePath);
-    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-    if (geometryAttribute != null) {
-      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-      final String name = geometryAttribute.getName();
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+    if (geometryField != null) {
+      final GeometryFactory geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final String name = geometryField.getName();
       String geometryType = "GEOMETRY";
-      final DataType dataType = geometryAttribute.getType();
+      final DataType dataType = geometryField.getType();
       if (dataType == DataTypes.POINT) {
         geometryType = "POINT";
       } else if (dataType == DataTypes.LINE_STRING) {
@@ -117,7 +117,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
   }
 
   @Override
-  public void writeColumnDataType(final Attribute attribute) {
+  public void writeColumnDataType(final FieldDefinition attribute) {
     final PrintWriter out = getOut();
     final DataType dataType = attribute.getType();
     if (dataType == DataTypes.BOOLEAN) {
@@ -175,12 +175,12 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     final String typePath = recordDefinition.getPath();
     final String schemaName = JdbcUtils.getSchemaName(typePath);
     final String tableName = Path.getName(typePath);
-    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-    if (geometryAttribute != null) {
-      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
-      final String name = geometryAttribute.getName();
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+    if (geometryField != null) {
+      final GeometryFactory geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final String name = geometryField.getName();
       final int axisCount = geometryFactory.getAxisCount();
-      final DataType dataType = geometryAttribute.getType();
+      final DataType dataType = geometryField.getType();
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       final int srid = coordinateSystem.getId();
 

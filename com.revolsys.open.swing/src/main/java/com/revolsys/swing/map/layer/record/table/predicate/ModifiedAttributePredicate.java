@@ -67,7 +67,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
           highlighted = layerRecord.isModified(attributeName);
           if (highlighted) {
             final RecordDefinition recordDefinition = layerRecord.getRecordDefinition();
-            final String fieldName = recordDefinition.getAttributeName(columnIndex);
+            final String fieldName = recordDefinition.getFieldName(columnIndex);
             final Object originalValue = layerRecord.getOriginalValue(fieldName);
             final CodeTable codeTable = recordDefinition.getCodeTableByColumn(fieldName);
             String text;

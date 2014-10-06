@@ -267,7 +267,7 @@ public class MediaTypeUtil {
         if (acceptedMediaType.includes(mediaType)) {
           return true;
         } else if (!acceptedMediaType.isWildcardType()
-            && !acceptedMediaType.isWildcardSubtype()) {
+          && !acceptedMediaType.isWildcardSubtype()) {
           return false;
         }
       }
@@ -288,8 +288,8 @@ public class MediaTypeUtil {
 
   static {
     for (final Entry<String, String> entry : IoFactoryRegistry.getInstance()
-        .getExtensionMimeTypeMap()
-        .entrySet()) {
+      .getExtensionMimeTypeMap()
+      .entrySet()) {
       final String exetension = entry.getKey();
       final String mimeType = entry.getValue();
       final MediaType mediaType = MediaType.parseMediaType(mimeType);

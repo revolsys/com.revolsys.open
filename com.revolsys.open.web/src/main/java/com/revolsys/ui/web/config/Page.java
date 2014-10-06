@@ -36,7 +36,7 @@ public class Page extends Component {
 
   private final Map<String, Argument> argumentsMap = new HashMap<String, Argument>();
 
-  private final List<Attribute> attributes = new ArrayList<Attribute>();
+  private final List<Attribute> attributes = new ArrayList<>();
 
   private final Map<String, Attribute> attributesMap = new HashMap<String, Attribute>();
 
@@ -105,14 +105,14 @@ public class Page extends Component {
     }
   }
 
-  public void addAttribute(final Attribute attribute) {
+  public void addField(final Attribute attribute) {
     if (!hasArgument(attribute.getName())) {
       this.attributes.add(attribute);
       this.attributesMap.put(attribute.getName(), attribute);
     }
     if (attribute.isInheritable()) {
       for (final Page page : this.pages.values()) {
-        page.addAttribute(attribute);
+        page.addField(attribute);
       }
     }
   }
@@ -138,7 +138,7 @@ public class Page extends Component {
     }
     for (final Attribute attribute : this.attributes) {
       if (attribute.isInheritable()) {
-        page.addAttribute(attribute);
+        page.addField(attribute);
       }
     }
   }
@@ -177,11 +177,11 @@ public class Page extends Component {
     if (o instanceof Page) {
       final Page p = (Page)o;
       if (super.equals(o)
-          && p.menuId == this.menuId
-          && p.path.equals(this.path)
-          && (p.title == this.title || p.title != null && this.title != null
+        && p.menuId == this.menuId
+        && p.path.equals(this.path)
+        && (p.title == this.title || p.title != null && this.title != null
           && p.title.equals(this.title))
-        && p.properties.equals(this.properties)) {
+          && p.properties.equals(this.properties)) {
         return true;
       }
     }
@@ -210,7 +210,7 @@ public class Page extends Component {
     return this.arguments;
   }
 
-  public List<Attribute> getAttributes() {
+  public List<Attribute> getFields() {
     return this.attributes;
   }
 
@@ -234,7 +234,7 @@ public class Page extends Component {
 
   public String getFullUrl(final Map<String, ? extends Object> parameters) {
     final Map<String, Object> uriParameters = new HashMap<String, Object>(
-        parameters);
+      parameters);
     final HttpServletRequest request = HttpServletUtils.getRequest();
     if (request != null) {
 

@@ -145,7 +145,7 @@ BeanFactoryAware {
   @Override
   public void setBeanFactory(final BeanFactory beanFactory)
       throws BeansException {
-    this.attributes.putAll(ThreadSharedAttributes.getAttributes());
+    this.attributes.putAll(ThreadSharedAttributes.getFields());
   }
 
   public void setExecutor(final ExecutorService executor) {

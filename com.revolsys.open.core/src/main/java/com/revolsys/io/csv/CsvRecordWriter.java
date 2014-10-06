@@ -39,11 +39,11 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     this.fieldSeparator = fieldSeparator;
     this.useQuotes = useQuotes;
     this.ewkt = ewkt;
-    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
+    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
       if (i > 0) {
         this.out.print(fieldSeparator);
       }
-      final String name = recordDefinition.getAttributeName(i);
+      final String name = recordDefinition.getFieldName(i);
       string(name);
     }
     this.out.println();
@@ -76,7 +76,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   @Override
   public void write(final Record object) {
-    for (int i = 0; i < this.recordDefinition.getAttributeCount(); i++) {
+    for (int i = 0; i < this.recordDefinition.getFieldCount(); i++) {
       if (i > 0) {
         this.out.print(this.fieldSeparator);
       }
@@ -86,8 +86,8 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         final String text = EWktWriter.toString(geometry, this.ewkt);
         string(text);
       } else if (value != null) {
-        final String name = this.recordDefinition.getAttributeName(i);
-        final DataType dataType = this.recordDefinition.getAttributeType(name);
+        final String name = this.recordDefinition.getFieldName(i);
+        final DataType dataType = this.recordDefinition.getFieldType(name);
 
         @SuppressWarnings("unchecked")
         final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();

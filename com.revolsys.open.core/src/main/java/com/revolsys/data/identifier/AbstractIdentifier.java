@@ -14,14 +14,14 @@ import com.revolsys.util.CompareUtil;
 public abstract class AbstractIdentifier implements Identifier {
 
   public static void setIdentifier(final Map<String, Object> record,
-    final List<String> idAttributeNames, final Identifier identifier) {
+    final List<String> idFieldNames, final Identifier identifier) {
     if (identifier == null) {
-      for (int i = 0; i < idAttributeNames.size(); i++) {
-        final String attributeName = idAttributeNames.get(0);
+      for (int i = 0; i < idFieldNames.size(); i++) {
+        final String attributeName = idFieldNames.get(0);
         record.put(attributeName, null);
       }
     } else {
-      identifier.setIdentifier(record, idAttributeNames);
+      identifier.setIdentifier(record, idFieldNames);
     }
   }
 
@@ -159,7 +159,7 @@ public abstract class AbstractIdentifier implements Identifier {
 
   @Override
   public void setIdentifier(final Record record) {
-    setIdentifier(record, record.getRecordDefinition().getAttributeNames());
+    setIdentifier(record, record.getRecordDefinition().getFieldNames());
   }
 
   @Override

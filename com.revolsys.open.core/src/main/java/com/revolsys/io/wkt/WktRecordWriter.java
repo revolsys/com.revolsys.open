@@ -5,8 +5,8 @@ import java.io.PrintWriter;
 import java.io.Writer;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.AttributeProperties;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.property.FieldProperties;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
@@ -25,9 +25,9 @@ public class WktRecordWriter extends AbstractRecordWriter {
     final Writer out) {
     this.recordDefinition = recordDefinition;
     this.out = new PrintWriter(new BufferedWriter(out));
-    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-    if (geometryAttribute != null) {
-      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+    if (geometryField != null) {
+      final GeometryFactory geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
       setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
     }
 

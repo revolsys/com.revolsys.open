@@ -26,20 +26,20 @@ import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.Path;
-import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.util.Property;
 
 public final class JdbcUtils {
-  public static void addAttributeName(final StringBuilder sql,
-    final String tablePrefix, final Attribute attribute) {
-    if (attribute instanceof JdbcAttribute) {
-      final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
+  public static void addFieldName(final StringBuilder sql,
+    final String tablePrefix, final FieldDefinition attribute) {
+    if (attribute instanceof JdbcFieldDefinition) {
+      final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
       jdbcAttribute.addColumnName(sql, tablePrefix);
     } else {
       sql.append(attribute.getName());
@@ -48,12 +48,12 @@ public final class JdbcUtils {
 
   public static void addColumnNames(final StringBuilder sql,
     final RecordDefinition recordDefinition, final String tablePrefix) {
-    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
+    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
       if (i > 0) {
         sql.append(", ");
       }
-      final Attribute attribute = recordDefinition.getAttribute(i);
-      addAttributeName(sql, tablePrefix, attribute);
+      final FieldDefinition attribute = recordDefinition.getField(i);
+      addFieldName(sql, tablePrefix, attribute);
     }
   }
 
@@ -64,11 +64,11 @@ public final class JdbcUtils {
       if (hasColumns) {
         sql.append(", ");
       }
-      final Attribute attribute = recordDefinition.getAttribute(attributeName);
+      final FieldDefinition attribute = recordDefinition.getField(attributeName);
       if (attribute == null) {
         sql.append(attributeName);
       } else {
-        addAttributeName(sql, tablePrefix, attribute);
+        addFieldName(sql, tablePrefix, attribute);
       }
       hasColumns = true;
     }
@@ -328,9 +328,9 @@ public final class JdbcUtils {
         // tableName);
       }
       final List<String> attributeNames = new ArrayList<String>(
-          query.getAttributeNames());
+          query.getFieldNames());
       if (attributeNames.isEmpty()) {
-        final List<String> recordDefinitionAttributeNames = recordDefinition.getAttributeNames();
+        final List<String> recordDefinitionAttributeNames = recordDefinition.getFieldNames();
         if (recordDefinitionAttributeNames.isEmpty()) {
           attributeNames.add("T.*");
         } else {
@@ -711,7 +711,7 @@ public final class JdbcUtils {
     final PreparedStatement statement, final Query query) {
     int index = 1;
     for (final Object parameter : query.getParameters()) {
-      final JdbcAttribute attribute = JdbcAttribute.createAttribute(parameter);
+      final JdbcFieldDefinition attribute = JdbcFieldDefinition.createAttribute(parameter);
       try {
         index = attribute.setPreparedStatementValue(statement, index, parameter);
       } catch (final SQLException e) {
@@ -726,7 +726,7 @@ public final class JdbcUtils {
 
   public static int setValue(final PreparedStatement statement,
     final int index, final Object value) throws SQLException {
-    final JdbcAttribute attribute = JdbcAttribute.createAttribute(value);
+    final JdbcFieldDefinition attribute = JdbcFieldDefinition.createAttribute(value);
     return attribute.setPreparedStatementValue(statement, index, value);
   }
 

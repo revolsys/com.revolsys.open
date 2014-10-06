@@ -2,7 +2,7 @@ package com.revolsys.gis.oracle.io;
 
 import java.io.PrintWriter;
 
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
@@ -18,11 +18,11 @@ public class OracleDdlUtil {
     final String tableName = JdbcUtils.getQualifiedTableName(typePath);
     out.print(tableName);
     out.println(" (");
-    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
+    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
       if (i > 1) {
         out.println(",");
       }
-      final Attribute attribute = recordDefinition.getAttribute(i);
+      final FieldDefinition attribute = recordDefinition.getField(i);
       final String name = attribute.getName();
       out.print("  ");
       out.print(name);

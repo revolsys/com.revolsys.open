@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.functions.F;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -31,11 +31,11 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
     final GeometryFactory geometryFactory = this.layer.getGeometryFactory();
     final BoundingBox queryBoundingBox = this.viewportBoundingBox.convert(geometryFactory);
     Query query = this.layer.getQuery();
-    final Attribute geometryAttribute = this.layer.getGeometryAttribute();
-    if (query != null && geometryAttribute != null
+    final FieldDefinition geometryField = this.layer.getGeometryField();
+    if (query != null && geometryField != null
       && !queryBoundingBox.isEmpty()) {
       query = query.clone();
-      query.and(F.envelopeIntersects(geometryAttribute, queryBoundingBox));
+      query.and(F.envelopeIntersects(geometryField, queryBoundingBox));
       final List<LayerRecord> records = this.layer.query(query);
       return records;
     }

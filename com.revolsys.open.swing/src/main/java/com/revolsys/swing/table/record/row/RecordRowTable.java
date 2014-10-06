@@ -14,7 +14,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.SwingUtil;
@@ -104,7 +104,7 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
     if (viewIndex < attributesOffset) {
       final String attributeName = model.getFieldName(viewIndex
         - attributesOffset);
-      final Attribute attribute = recordDefinition.getAttribute(attributeName);
+      final FieldDefinition attribute = recordDefinition.getField(attributeName);
       if (attribute != null) {
         Integer columnWidth = attribute.getProperty("tableColumnWidth");
         final String columnName = attribute.getTitle();
@@ -128,7 +128,7 @@ public class RecordRowTable extends BaseJxTable implements MouseListener {
       final int column = columnAtPoint(e.getPoint());
       if (column > -1 && SwingUtilities.isLeftMouseButton(e)) {
         final int index = convertColumnIndexToModel(column);
-        final Class<?> attributeClass = recordDefinition.getAttributeClass(index);
+        final Class<?> attributeClass = recordDefinition.getFieldClass(index);
         if (!Geometry.class.isAssignableFrom(attributeClass)) {
           model.setSortOrder(index);
         }

@@ -38,7 +38,7 @@ public class LengthAttributeName extends AbstractRecordDefinitionProperty {
     this.attributeName = attributeName;
   }
 
-  public String getAttributeName() {
+  public String getFieldName() {
     return this.attributeName;
   }
 

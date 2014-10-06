@@ -6,7 +6,7 @@ import javax.xml.namespace.QName;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.RecordProperties;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -122,7 +122,7 @@ GmlConstants {
     }
     this.out.startTag(qualifiedName);
 
-    for (final Attribute attribute : recordDefinition.getAttributes()) {
+    for (final FieldDefinition attribute : recordDefinition.getFields()) {
       final String attributeName = attribute.getName();
       final Object value = object.getValue(attributeName);
       if (isWritable(value)) {

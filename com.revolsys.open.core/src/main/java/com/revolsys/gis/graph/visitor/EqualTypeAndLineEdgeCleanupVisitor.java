@@ -216,7 +216,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
 
   @Override
   public boolean visit(final Edge<Record> edge) {
-    if (edge.getAttribute(EDGE_PROCESSED) == null) {
+    if (edge.getField(EDGE_PROCESSED) == null) {
       final String typePath = edge.getTypeName();
       final Graph<Record> graph = edge.getGraph();
       final LineString line = edge.getLine();

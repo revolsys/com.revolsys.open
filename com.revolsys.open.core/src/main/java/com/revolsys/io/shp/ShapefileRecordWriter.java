@@ -35,7 +35,7 @@ import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.io.EndianOutput;
 import com.revolsys.gis.io.ResourceEndianOutput;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.xbase.FieldDefinition;
+import com.revolsys.io.xbase.XBaseFieldDefinition;
 import com.revolsys.io.xbase.XbaseRecordWriter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -87,7 +87,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         return super.addDbaseField(name, DataTypes.STRING, String.class, 254, 0);
       } else {
         this.hasGeometry = true;
-        addFieldDefinition(name, FieldDefinition.OBJECT_TYPE, 0, 0);
+        addFieldDefinition(name, XBaseFieldDefinition.OBJECT_TYPE, 0, 0);
         return 0;
       }
     } else {
@@ -112,7 +112,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   }
 
   private void doubleNotNaN(final ResourceEndianOutput out, final double value)
-    throws IOException {
+      throws IOException {
     if (MathUtil.isNanOrInfinite(value)) {
       out.writeLEDouble(0);
     } else {
@@ -125,7 +125,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
     super.init();
     final RecordDefinitionImpl recordDefinition = (RecordDefinitionImpl)getRecordDefinition();
     if (recordDefinition != null) {
-      this.geometryPropertyName = recordDefinition.getGeometryAttributeName();
+      this.geometryPropertyName = recordDefinition.getGeometryFieldName();
       if (this.geometryPropertyName != null) {
 
         this.out = new ResourceEndianOutput(this.resource);
@@ -133,7 +133,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
         if (!hasField(this.geometryPropertyName)) {
           addFieldDefinition(this.geometryPropertyName,
-            FieldDefinition.OBJECT_TYPE, 0, 0);
+            XBaseFieldDefinition.OBJECT_TYPE, 0, 0);
         }
 
         final Resource indexResource = SpringUtil.getResourceWithExtension(
@@ -161,8 +161,8 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         }
         if (this.geometryDataType == null) {
           this.geometryDataType = object.getRecordDefinition()
-            .getGeometryAttribute()
-            .getType();
+              .getGeometryField()
+              .getType();
           if (DataTypes.GEOMETRY.equals(this.geometryDataType)) {
             final String geometryType = geometry.getGeometryType();
             this.geometryDataType = DataTypes.getType(geometryType);
@@ -203,8 +203,8 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   }
 
   @Override
-  protected boolean writeField(final Record object, final FieldDefinition field)
-    throws IOException {
+  protected boolean writeField(final Record object,
+    final XBaseFieldDefinition field) throws IOException {
     if (field.getFullName().equals(this.geometryPropertyName)) {
       final long recordIndex = this.out.getFilePointer();
       Geometry geometry = object.getGeometryValue();

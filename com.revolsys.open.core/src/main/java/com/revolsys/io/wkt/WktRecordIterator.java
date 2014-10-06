@@ -11,8 +11,8 @@ import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.RecordUtil;
-import com.revolsys.data.record.property.AttributeProperties;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.property.FieldProperties;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
@@ -50,17 +50,17 @@ public class WktRecordIterator extends AbstractIterator<Record>
   @Override
   protected void doInit() {
     GeometryFactory geometryFactory;
-    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-    if (geometryAttribute == null) {
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+    if (geometryField == null) {
       geometryFactory = GeometryFactory.floating3();
     } else {
-      geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
       if (geometryFactory == null) {
         geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
         if (geometryFactory == null) {
           geometryFactory = GeometryFactory.floating3();
         }
-        geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+        geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY,
           geometryFactory);
       }
     }

@@ -13,19 +13,19 @@ import oracle.sql.STRUCT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.record.property.AttributeProperties;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.property.FieldProperties;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcConnection;
-import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
+public class OracleSdoGeometryAttributeAdder extends JdbcFieldAdder {
 
   private static void addGeometryType(final DataType dataType,
     final String name, final Integer id) {
@@ -116,10 +116,11 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public Attribute addAttribute(final RecordDefinitionImpl recordDefinition,
-    final String dbName, final String name, final String dataTypeName,
-    final int sqlType, final int length, final int scale,
-    final boolean required, final String description) {
+  public FieldDefinition addField(
+    final RecordDefinitionImpl recordDefinition, final String dbName,
+    final String name, final String dataTypeName, final int sqlType,
+    final int length, final int scale, final boolean required,
+    final String description) {
     final String typePath = recordDefinition.getPath();
     final String columnName = name.toUpperCase();
     final RecordStoreSchema schema = recordDefinition.getSchema();
@@ -146,17 +147,17 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
     if (oracleSrid == -1) {
       oracleSrid = 0;
     }
-    final Attribute attribute = new OracleSdoGeometryJdbcAttribute(dbName,
-      name, dataType, sqlType, required, description, null, geometryFactory,
-      axisCount, oracleSrid);
-    recordDefinition.addAttribute(attribute);
-    attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY, geometryFactory);
+    final FieldDefinition attribute = new OracleSdoGeometryJdbcAttribute(
+      dbName, name, dataType, sqlType, required, description, null,
+      geometryFactory, axisCount, oracleSrid);
+    recordDefinition.addField(attribute);
+    attribute.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
     return attribute;
 
   }
 
   protected double getScale(final Datum[] values, final int axisIndex)
-      throws SQLException {
+    throws SQLException {
     if (axisIndex >= values.length) {
       return 0;
     } else {
@@ -174,17 +175,17 @@ public class OracleSdoGeometryAttributeAdder extends JdbcAttributeAdder {
   @Override
   public void initialize(final RecordStoreSchema schema) {
     try (
-        final JdbcConnection connection = this.recordStore.getJdbcConnection()) {
+      final JdbcConnection connection = this.recordStore.getJdbcConnection()) {
       final String schemaName = this.recordStore.getDatabaseSchemaName(schema);
       final String sridSql = "select M.TABLE_NAME, M.COLUMN_NAME, M.SRID, M.DIMINFO, C.GEOMETRY_TYPE "
-          + "from ALL_SDO_GEOM_METADATA M "
-          + "LEFT OUTER JOIN ALL_GEOMETRY_COLUMNS C ON (M.OWNER = C.F_TABLE_SCHEMA AND M.TABLE_NAME = C.F_TABLE_NAME AND M.COLUMN_NAME = C.F_GEOMETRY_COLUMN) "
-          + "where OWNER = ?";
+        + "from ALL_SDO_GEOM_METADATA M "
+        + "LEFT OUTER JOIN ALL_GEOMETRY_COLUMNS C ON (M.OWNER = C.F_TABLE_SCHEMA AND M.TABLE_NAME = C.F_TABLE_NAME AND M.COLUMN_NAME = C.F_GEOMETRY_COLUMN) "
+        + "where OWNER = ?";
       try (
-          final PreparedStatement statement = connection.prepareStatement(sridSql)) {
+        final PreparedStatement statement = connection.prepareStatement(sridSql)) {
         statement.setString(1, schemaName);
         try (
-            final ResultSet resultSet = statement.executeQuery()) {
+          final ResultSet resultSet = statement.executeQuery()) {
           while (resultSet.next()) {
             final String tableName = resultSet.getString(1);
             final String columnName = resultSet.getString(2);

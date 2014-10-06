@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,7 +59,7 @@ public final class IafServlet extends HttpServlet {
 
   /**
    * Handle the GET request. Calls processRequest to handle the request.
-   * 
+   *
    * @param request the parameters of the client request
    * @param response the response sent back to the client
    * @exception ServletException if there was a problem handling the request
@@ -67,15 +67,14 @@ public final class IafServlet extends HttpServlet {
    *              request
    */
   @Override
-  public void doGet(
-    final HttpServletRequest request,
+  public void doGet(final HttpServletRequest request,
     final HttpServletResponse response) throws ServletException, IOException {
     processRequest(request, response);
   }
 
   /**
    * Handle the POST request. Calls processRequest to handle the request.
-   * 
+   *
    * @param request the parameters of the client request
    * @param response the response sent back to the client
    * @exception ServletException if there was a problem handling the request
@@ -83,15 +82,14 @@ public final class IafServlet extends HttpServlet {
    *              request
    */
   @Override
-  public void doPost(
-    final HttpServletRequest request,
+  public void doPost(final HttpServletRequest request,
     final HttpServletResponse response) throws ServletException, IOException {
     processRequest(request, response);
   }
 
   /**
    * Forward the request to the specified resource.
-   * 
+   *
    * @param path the path to the resource to forward to
    * @param request the parameters of the client request
    * @param response the response sent back to the client
@@ -99,9 +97,7 @@ public final class IafServlet extends HttpServlet {
    * @exception IOException if an input output error occurs when handling the
    *              request
    */
-  public void forward(
-    final String path,
-    final HttpServletRequest request,
+  public void forward(final String path, final HttpServletRequest request,
     final HttpServletResponse response) throws ServletException, IOException {
     if (!response.isCommitted()) {
       getServletConfig().getServletContext()
@@ -113,7 +109,7 @@ public final class IafServlet extends HttpServlet {
   /**
    * Initialise the servlet. Loads the configuration from the
    * /WEB-INF/nice-config.xml file.
-   * 
+   *
    * @param config The servlet configuration parameters
    * @exception ServletException if there was a problem initialising the servlet
    */
@@ -121,13 +117,13 @@ public final class IafServlet extends HttpServlet {
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
     try {
-      servletContext = config.getServletContext();
-      final URL configResource = servletContext.getResource("/WEB-INF/iaf-config.xml");
-      WebUiContext.setServletContext(servletContext);
+      this.servletContext = config.getServletContext();
+      final URL configResource = this.servletContext.getResource("/WEB-INF/iaf-config.xml");
+      WebUiContext.setServletContext(this.servletContext);
       final XmlConfigLoader configLoader = new XmlConfigLoader(configResource,
-        servletContext);
-      applicationConfig = configLoader.loadConfig();
-      servletContext.setAttribute("rsWebUiConfig", applicationConfig);
+        this.servletContext);
+      this.applicationConfig = configLoader.loadConfig();
+      this.servletContext.setAttribute("rsWebUiConfig", this.applicationConfig);
     } catch (final InvalidConfigException ice) {
       ice.printStackTrace();
       log.fatal(ice.getErrors());
@@ -147,8 +143,7 @@ public final class IafServlet extends HttpServlet {
    * @param request
    * @throws PageNotFoundException
    */
-  private void processArguments(
-    final Page page,
+  private void processArguments(final Page page,
     final HttpServletRequest request) throws ActionException {
     for (final Iterator arguments = page.getArguments().iterator(); arguments.hasNext();) {
       final Argument argument = (Argument)arguments.next();
@@ -180,10 +175,9 @@ public final class IafServlet extends HttpServlet {
    * @param request
    * @throws PageNotFoundException
    */
-  private void processAttributes(
-    final Page page,
+  private void processAttributes(final Page page,
     final HttpServletRequest request) throws ActionException {
-    for (final Iterator attributes = page.getAttributes().iterator(); attributes.hasNext();) {
+    for (final Iterator attributes = page.getFields().iterator(); attributes.hasNext();) {
       final Attribute attribute = (Attribute)attributes.next();
       final String name = attribute.getName();
       final AttributeLoader loader = attribute.getLoader();
@@ -207,7 +201,7 @@ public final class IafServlet extends HttpServlet {
    * processors a 404 response error code is set and no further processing is
    * performed. If a RedirectException is thrown the response is redirected to
    * the url from the exception.
-   * 
+   *
    * @param request the servlet request
    * @param response the servlet response
    * @exception ServletException if any unhandled exceptions occured during the
@@ -216,8 +210,7 @@ public final class IafServlet extends HttpServlet {
    * @see PageNotFoundException
    * @see RedirectException
    */
-  public void processRequest(
-    final HttpServletRequest request,
+  public void processRequest(final HttpServletRequest request,
     final HttpServletResponse response) throws ServletException, IOException {
     try {
       String path = request.getServletPath();
@@ -234,22 +227,22 @@ public final class IafServlet extends HttpServlet {
         secure = true;
         path = path.substring(0, path.length() - 4);
       }
-      final Page page = applicationConfig.getPage(contextPath + path);
-      WebUiContext.set(new WebUiContext(applicationConfig, contextPath, page,
-        request, response));
+      final Page page = this.applicationConfig.getPage(contextPath + path);
+      WebUiContext.set(new WebUiContext(this.applicationConfig, contextPath,
+        page, request, response));
       if (page.isSecure() && !secure) {
         response.sendRedirect(page.getFullUrl());
         return;
       }
       processArguments(page, request);
       processAttributes(page, request);
-      request.setAttribute("niceConfig", applicationConfig);
+      request.setAttribute("niceConfig", this.applicationConfig);
       request.setAttribute("nicePage", page);
 
       final String menuName = request.getParameter("menuName");
       request.setAttribute("menuSelected", menuName);
       request.setAttribute("title", page.getTitle());
-      page.invokeActions(servletContext, request, response);
+      page.invokeActions(this.servletContext, request, response);
 
       final Layout layout = page.getLayout();
       if (layout != null) {

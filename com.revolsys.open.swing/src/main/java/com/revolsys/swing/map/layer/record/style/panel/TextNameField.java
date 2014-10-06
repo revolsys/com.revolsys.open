@@ -12,8 +12,6 @@ import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -41,7 +39,7 @@ public class TextNameField extends ValueField {
     final ArrayList<String> fieldNames = new ArrayList<String>(
       layer.getFieldNames());
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
-    fieldNames.remove(recordDefinition.getGeometryAttributeName());
+    fieldNames.remove(recordDefinition.getGeometryFieldName());
     final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
       layer);
     this.fieldNamesField = new ComboBox(converter, false, fieldNames.toArray());

@@ -12,12 +12,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import com.revolsys.swing.table.AbstractTableModel;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.jdesktop.swingx.table.TableColumnExt;
 
+import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJxTable;
 
 public class Log4jTableModel extends AbstractTableModel {

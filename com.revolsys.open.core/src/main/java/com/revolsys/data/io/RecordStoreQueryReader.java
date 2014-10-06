@@ -14,7 +14,7 @@ import com.revolsys.data.query.SqlCondition;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.AbstractRecordStore;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.util.Property;
@@ -63,9 +63,9 @@ RecordReader {
         query.and(new SqlCondition(this.whereClause));
       }
       if (this.boundingBox != null) {
-        final Attribute geometryAttribute = query.getRecordDefinition()
-          .getGeometryAttribute();
-        query.and(F.envelopeIntersects(geometryAttribute, this.boundingBox));
+        final FieldDefinition geometryField = query.getRecordDefinition()
+          .getGeometryField();
+        query.and(F.envelopeIntersects(geometryField, this.boundingBox));
       }
 
       final AbstractIterator<Record> iterator = this.recordStore.createIterator(

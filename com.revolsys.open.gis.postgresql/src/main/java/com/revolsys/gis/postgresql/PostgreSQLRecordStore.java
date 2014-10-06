@@ -21,8 +21,8 @@ import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.attribute.JdbcFieldAdder;
+import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.util.Property;
@@ -70,12 +70,12 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  protected JdbcAttribute addAttribute(
+  protected JdbcFieldDefinition addField(
     final RecordDefinitionImpl recordDefinition, final String dbColumnName,
     final String name, final String dataType, final int sqlType,
     final int length, final int scale, final boolean required,
     final String description) {
-    final JdbcAttribute attribute = super.addAttribute(recordDefinition,
+    final JdbcFieldDefinition attribute = super.addField(recordDefinition,
       dbColumnName, name, dataType, sqlType, length, scale, required,
       description);
     if (!dbColumnName.matches("[a-z_]")) {
@@ -138,13 +138,13 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       }
     } else {
       final String tableName = getDatabaseTableName(typePath);
-      final String idAttributeName = recordDefinition.getIdAttributeName()
+      final String idFieldName = recordDefinition.getIdFieldName()
         .toLowerCase();
       if (this.useSchemaSequencePrefix) {
-        sequenceName = schema + "." + tableName + "_" + idAttributeName
+        sequenceName = schema + "." + tableName + "_" + idFieldName
           + "_seq";
       } else {
-        sequenceName = tableName + "_" + idAttributeName + "_seq";
+        sequenceName = tableName + "_" + idFieldName + "_seq";
       }
     }
     return sequenceName;
@@ -155,52 +155,52 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   @PostConstruct
   public void initialize() {
     super.initialize();
-    final JdbcAttributeAdder numberAttributeAdder = new JdbcAttributeAdder(
+    final JdbcFieldAdder numberAttributeAdder = new JdbcFieldAdder(
       DataTypes.DECIMAL);
-    addAttributeAdder("numeric", numberAttributeAdder);
+    addFieldAdder("numeric", numberAttributeAdder);
 
-    final JdbcAttributeAdder stringAttributeAdder = new JdbcAttributeAdder(
+    final JdbcFieldAdder stringAttributeAdder = new JdbcFieldAdder(
       DataTypes.STRING);
-    addAttributeAdder("varchar", stringAttributeAdder);
-    addAttributeAdder("text", stringAttributeAdder);
-    addAttributeAdder("name", stringAttributeAdder);
-    addAttributeAdder("bpchar", stringAttributeAdder);
+    addFieldAdder("varchar", stringAttributeAdder);
+    addFieldAdder("text", stringAttributeAdder);
+    addFieldAdder("name", stringAttributeAdder);
+    addFieldAdder("bpchar", stringAttributeAdder);
 
-    final JdbcAttributeAdder longAttributeAdder = new JdbcAttributeAdder(
+    final JdbcFieldAdder longAttributeAdder = new JdbcFieldAdder(
       DataTypes.LONG);
-    addAttributeAdder("int8", longAttributeAdder);
-    addAttributeAdder("bigint", longAttributeAdder);
-    addAttributeAdder("bigserial", longAttributeAdder);
-    addAttributeAdder("serial8", longAttributeAdder);
+    addFieldAdder("int8", longAttributeAdder);
+    addFieldAdder("bigint", longAttributeAdder);
+    addFieldAdder("bigserial", longAttributeAdder);
+    addFieldAdder("serial8", longAttributeAdder);
 
-    final JdbcAttributeAdder intAttributeAdder = new JdbcAttributeAdder(
+    final JdbcFieldAdder intAttributeAdder = new JdbcFieldAdder(
       DataTypes.INT);
-    addAttributeAdder("int4", intAttributeAdder);
-    addAttributeAdder("integer", intAttributeAdder);
-    addAttributeAdder("serial", intAttributeAdder);
-    addAttributeAdder("serial4", intAttributeAdder);
+    addFieldAdder("int4", intAttributeAdder);
+    addFieldAdder("integer", intAttributeAdder);
+    addFieldAdder("serial", intAttributeAdder);
+    addFieldAdder("serial4", intAttributeAdder);
 
-    final JdbcAttributeAdder shortAttributeAdder = new JdbcAttributeAdder(
+    final JdbcFieldAdder shortAttributeAdder = new JdbcFieldAdder(
       DataTypes.SHORT);
-    addAttributeAdder("int2", shortAttributeAdder);
-    addAttributeAdder("smallint", shortAttributeAdder);
+    addFieldAdder("int2", shortAttributeAdder);
+    addFieldAdder("smallint", shortAttributeAdder);
 
-    final JdbcAttributeAdder floatAttributeAdder = new JdbcAttributeAdder(
+    final JdbcFieldAdder floatAttributeAdder = new JdbcFieldAdder(
       DataTypes.FLOAT);
-    addAttributeAdder("float4", floatAttributeAdder);
+    addFieldAdder("float4", floatAttributeAdder);
 
-    final JdbcAttributeAdder doubleAttributeAdder = new JdbcAttributeAdder(
+    final JdbcFieldAdder doubleAttributeAdder = new JdbcFieldAdder(
       DataTypes.DOUBLE);
-    addAttributeAdder("float8", doubleAttributeAdder);
-    addAttributeAdder("double precision", doubleAttributeAdder);
+    addFieldAdder("float8", doubleAttributeAdder);
+    addFieldAdder("double precision", doubleAttributeAdder);
 
-    addAttributeAdder("date", new JdbcAttributeAdder(DataTypes.DATE_TIME));
+    addFieldAdder("date", new JdbcFieldAdder(DataTypes.DATE_TIME));
 
-    addAttributeAdder("bool", new JdbcAttributeAdder(DataTypes.BOOLEAN));
+    addFieldAdder("bool", new JdbcFieldAdder(DataTypes.BOOLEAN));
 
-    final JdbcAttributeAdder geometryAttributeAdder = new PostgreSQLGeometryAttributeAdder(
+    final JdbcFieldAdder geometryFieldAdder = new PostgreSQLGeometryAttributeAdder(
       this);
-    addAttributeAdder("geometry", geometryAttributeAdder);
+    addFieldAdder("geometry", geometryFieldAdder);
     setPrimaryKeySql("SELECT t.relname \"TABLE_NAME\", c.attname \"COLUMN_NAME\"" //
       + " FROM pg_namespace s" //
       + " join pg_class t on t.relnamespace = s.oid" //

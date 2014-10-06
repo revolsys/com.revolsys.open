@@ -10,20 +10,24 @@ import java.util.Map;
 import com.ctc.wstx.util.ExceptionUtil;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 import com.revolsys.util.CollectionUtil;
 
 public class CollectionValue extends QueryValue {
   private List<QueryValue> queryValues = new ArrayList<QueryValue>();
 
-  private JdbcAttribute jdbcAttribute;
+  private JdbcFieldDefinition jdbcAttribute;
 
-  private Attribute attribute;
+  private FieldDefinition attribute;
 
-  public CollectionValue(final Attribute attribute,
+  public CollectionValue(final Collection<? extends Object> values) {
+    this(null, values);
+  }
+
+  public CollectionValue(final FieldDefinition attribute,
     final Collection<? extends Object> values) {
     setAttribute(attribute);
     for (final Object value : values) {
@@ -36,10 +40,6 @@ public class CollectionValue extends QueryValue {
       this.queryValues.add(queryValue);
 
     }
-  }
-
-  public CollectionValue(final Collection<? extends Object> values) {
-    this(null, values);
   }
 
   @Override
@@ -69,12 +69,12 @@ public class CollectionValue extends QueryValue {
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
     for (final QueryValue queryValue : this.queryValues) {
-      JdbcAttribute jdbcAttribute = this.jdbcAttribute;
+      JdbcFieldDefinition jdbcAttribute = this.jdbcAttribute;
       if (queryValue instanceof Value) {
         final Value valueWrapper = (Value)queryValue;
         final Object value = valueWrapper.getQueryValue();
         if (jdbcAttribute == null) {
-          jdbcAttribute = JdbcAttribute.createAttribute(value);
+          jdbcAttribute = JdbcFieldDefinition.createAttribute(value);
         }
         try {
           index = jdbcAttribute.setPreparedStatementValue(statement, index,
@@ -107,7 +107,7 @@ public class CollectionValue extends QueryValue {
     }
   }
 
-  public Attribute getAttribute() {
+  public FieldDefinition getField() {
     return this.attribute;
   }
 
@@ -154,13 +154,13 @@ public class CollectionValue extends QueryValue {
     return values;
   }
 
-  public void setAttribute(final Attribute attribute) {
+  public void setAttribute(final FieldDefinition attribute) {
     this.attribute = attribute;
     if (attribute == null) {
       this.jdbcAttribute = null;
     } else {
-      if (attribute instanceof JdbcAttribute) {
-        this.jdbcAttribute = (JdbcAttribute)attribute;
+      if (attribute instanceof JdbcFieldDefinition) {
+        this.jdbcAttribute = (JdbcFieldDefinition)attribute;
       } else {
         this.jdbcAttribute = null;
       }

@@ -73,7 +73,7 @@ public class XmlWriter extends Writer {
      *
      * @param namespaceUri The namespace URI to add.
      */
-    public void addAttributeDefinedNamespace(final String namespaceUri) {
+    public void addFieldDefinedNamespace(final String namespaceUri) {
       this.attributeDefinedNamespaces.add(namespaceUri);
     }
 
@@ -82,7 +82,7 @@ public class XmlWriter extends Writer {
      *
      * @return The namespaces defined on the element.
      */
-    public List<String> getAttributeDefinedNamespaces() {
+    public List<String> getFieldDefinedNamespaces() {
       return this.attributeDefinedNamespaces;
     }
 
@@ -311,7 +311,7 @@ public class XmlWriter extends Writer {
             prefix = "p" + ++this.prefixNum;
           }
           this.namespacePrefixMap.put(namespaceUri, prefix);
-          this.elementStack.getFirst().addAttributeDefinedNamespace(
+          this.elementStack.getFirst().addFieldDefinedNamespace(
             namespaceUri);
           writeNamespaceAttribute(namespaceUri, prefix);
         }
@@ -785,7 +785,7 @@ public class XmlWriter extends Writer {
   private void removeCurrentTag() {
     if (!this.endingDocument) {
       final TagConfiguration tag = this.elementStack.removeFirst();
-      final Iterator<String> namespaceUris = tag.getAttributeDefinedNamespaces()
+      final Iterator<String> namespaceUris = tag.getFieldDefinedNamespaces()
         .iterator();
       while (namespaceUris.hasNext()) {
         final String namespaceUri = namespaceUris.next();
@@ -834,7 +834,7 @@ public class XmlWriter extends Writer {
     }
     final TagConfiguration currentTag = getCurrentTag();
     if (currentTag != null) {
-      currentTag.addAttributeDefinedNamespace(namespaceUri);
+      currentTag.addFieldDefinedNamespace(namespaceUri);
     }
   }
 

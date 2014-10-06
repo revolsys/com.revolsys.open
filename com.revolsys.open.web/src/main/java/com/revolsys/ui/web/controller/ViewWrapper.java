@@ -15,7 +15,7 @@ public class ViewWrapper implements Controller {
 
   private String suffix = ".jsp";
 
-  public String getAttributeName() {
+  public String getFieldName() {
     return attributeName;
   }
 

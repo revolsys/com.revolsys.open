@@ -15,10 +15,10 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.web.util.Log4jWebConfigurer;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.jdbc.io.JdbcFactoryRegistry;
+import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.JavaBeanUtil;
 
 public class ContextCleanupListener implements ServletContextListener {
@@ -35,7 +35,7 @@ public class ContextCleanupListener implements ServletContextListener {
             ((DisposableBean)attrValue).destroy();
           } catch (final Throwable e) {
             System.err.println("Couldn't invoke destroy method of attribute with name '"
-              + attrName + "'");
+                + attrName + "'");
           }
         } else {
           servletContext.removeAttribute(attrName);
@@ -47,7 +47,7 @@ public class ContextCleanupListener implements ServletContextListener {
   @Override
   public void contextDestroyed(final ServletContextEvent event) {
     final ClassLoader contextClassLoader = Thread.currentThread()
-      .getContextClassLoader();
+        .getContextClassLoader();
     IoFactoryRegistry.clearInstance();
     JdbcFactoryRegistry.clearInstance();
     StringConverterRegistry.clearInstance();

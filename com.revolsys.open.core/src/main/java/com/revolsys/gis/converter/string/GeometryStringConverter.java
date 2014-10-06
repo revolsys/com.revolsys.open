@@ -1,8 +1,8 @@
 package com.revolsys.gis.converter.string;
 
 import com.revolsys.converter.string.StringConverter;
-import com.revolsys.io.wkt.WktParser;
 import com.revolsys.io.wkt.EWktWriter;
+import com.revolsys.io.wkt.WktParser;
 import com.revolsys.jts.geom.Geometry;
 
 public class GeometryStringConverter implements StringConverter<Geometry> {

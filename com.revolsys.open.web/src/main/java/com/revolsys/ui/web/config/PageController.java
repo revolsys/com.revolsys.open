@@ -72,28 +72,28 @@ public class PageController implements SiteNodeController {
   }
 
   public PageController(final PageController page) {
-    node.setNodes(page.getNodes());
+    this.node.setNodes(page.getNodes());
     // TODO clone
-    actions.addAll(page.getActions());
+    this.actions.addAll(page.getActions());
     setPath(page.getPath());
 
     // TODO do a deep clone
-    menus.putAll(page.getMenus());
-    styles.addAll(page.getStyles());
-    scripts.addAll(page.getScripts());
-    menuId = page.menuId;
-    title = page.title;
-    properties.putAll(page.properties);
-    arguments.addAll(page.arguments);
-    argumentsMap.putAll(page.argumentsMap);
-    attributes.addAll(page.attributes);
-    attributesMap.putAll(page.attributesMap);
+    this.menus.putAll(page.getMenus());
+    this.styles.addAll(page.getStyles());
+    this.scripts.addAll(page.getScripts());
+    this.menuId = page.menuId;
+    this.title = page.title;
+    this.properties.putAll(page.properties);
+    this.arguments.addAll(page.arguments);
+    this.argumentsMap.putAll(page.argumentsMap);
+    this.attributes.addAll(page.attributes);
+    this.attributesMap.putAll(page.attributesMap);
   }
 
   public void addArgument(final Argument argument) {
     if (!hasArgument(argument.getName())) {
-      arguments.add(argument);
-      argumentsMap.put(argument.getName(), argument);
+      this.arguments.add(argument);
+      this.argumentsMap.put(argument.getName(), argument);
     }
     if (argument.isInheritable()) {
       // TODOhow to add this to sub pages
@@ -105,10 +105,10 @@ public class PageController implements SiteNodeController {
     }
   }
 
-  public void addAttribute(final Attribute attribute) {
+  public void addField(final Attribute attribute) {
     if (!hasArgument(attribute.getName())) {
-      attributes.add(attribute);
-      attributesMap.put(attribute.getName(), attribute);
+      this.attributes.add(attribute);
+      this.attributesMap.put(attribute.getName(), attribute);
     }
     if (attribute.isInheritable()) {
       // TODO deal with inheritance
@@ -116,11 +116,11 @@ public class PageController implements SiteNodeController {
   }
 
   public void addMenu(final com.revolsys.ui.model.Menu menu) {
-    menus.put(menu.getName(), menu);
+    this.menus.put(menu.getName(), menu);
   }
 
   public void addProperty(final String name, final String value) {
-    properties.put(name, value);
+    this.properties.put(name, value);
   }
 
   @Override
@@ -133,10 +133,11 @@ public class PageController implements SiteNodeController {
     if (o instanceof PageController) {
       final PageController p = (PageController)o;
       if (super.equals(o)
-        && p.menuId == menuId
+        && p.menuId == this.menuId
         && p.getPath().equals(getPath())
-        && (p.title == title || p.title != null && title != null
-          && p.title.equals(title)) && p.properties.equals(properties)) {
+        && (p.title == this.title || p.title != null && this.title != null
+          && p.title.equals(this.title))
+          && p.properties.equals(this.properties)) {
         return true;
       }
     }
@@ -145,7 +146,7 @@ public class PageController implements SiteNodeController {
 
   /**
    * Forward the request to the specified resource.
-   * 
+   *
    * @param servletContext The servlet context.
    * @param request the parameters of the client request
    * @param response the response sent back to the client
@@ -154,10 +155,8 @@ public class PageController implements SiteNodeController {
    * @exception IOException if an input output error occurs when handling the
    *              request
    */
-  public void forward(
-    final ServletContext servletContext,
-    final HttpServletRequest request,
-    final HttpServletResponse response,
+  public void forward(final ServletContext servletContext,
+    final HttpServletRequest request, final HttpServletResponse response,
     final String path) throws ServletException, IOException {
     if (!response.isCommitted()) {
       servletContext.getRequestDispatcher(path).forward(request, response);
@@ -165,33 +164,34 @@ public class PageController implements SiteNodeController {
   }
 
   public String getAbsolutePath() {
-    return WebUiContext.get().getConfig().getBasePath() + node.getFullPath();
+    return WebUiContext.get().getConfig().getBasePath()
+        + this.node.getFullPath();
   }
 
   /**
    * @return Returns the actions.
    */
   public Collection getActions() {
-    return actions;
+    return this.actions;
   }
 
   public List getArguments() {
-    return arguments;
+    return this.arguments;
   }
 
-  public List getAttributes() {
-    return attributes;
+  public List getFields() {
+    return this.attributes;
   }
 
   /**
    * @return Returns the config.
    */
   public Config getConfig() {
-    return config;
+    return this.config;
   }
 
   public String getFullPath() {
-    if (secure) {
+    if (this.secure) {
       return getAbsolutePath() + ".wps";
     } else {
       return getAbsolutePath() + ".wp";
@@ -224,83 +224,85 @@ public class PageController implements SiteNodeController {
   }
 
   public Layout getLayout() {
-    return layout;
+    return this.layout;
   }
 
   public Menu getMenu(final String name) {
-    return (Menu)menus.get(name);
+    return (Menu)this.menus.get(name);
   }
 
   public long getMenuId() {
-    return menuId;
+    return this.menuId;
   }
 
   public Collection getMenuList() {
-    return menus.values();
+    return this.menus.values();
   }
 
   /**
    * @return Returns the menus.
    */
   public Map getMenus() {
-    return menus;
+    return this.menus;
   }
 
   /**
    * @return Returns the node.
    */
+  @Override
   public SiteNode getNode() {
-    return node;
+    return this.node;
   }
 
   public Collection getNodes() {
-    return node.getNodes();
+    return this.node.getNodes();
   }
 
+  @Override
   public String getPath() {
-    return node.getPath();
+    return this.node.getPath();
   }
 
   public String getProperty(final String name) {
-    return (String)properties.get(name);
+    return (String)this.properties.get(name);
   }
 
   /**
    * @return Returns the scripts.
    */
   public Collection getScripts() {
-    return scripts;
+    return this.scripts;
   }
 
   /**
    * @return Returns the styles.
    */
   public Collection getStyles() {
-    return styles;
+    return this.styles;
   }
 
   public String getTitle() {
-    if (titleExpression != null) {
+    if (this.titleExpression != null) {
       final WebUiContext context = WebUiContext.get();
-      return (String)context.evaluateExpression(titleExpression);
+      return (String)context.evaluateExpression(this.titleExpression);
     } else {
-      return title;
+      return this.title;
     }
   }
 
   // TODO deal with inheritable arguments and attributes
 
   public boolean hasArgument(final String name) {
-    return argumentsMap.containsKey(name);
+    return this.argumentsMap.containsKey(name);
   }
 
   public boolean hasAttribute(final String name) {
-    return attributesMap.containsKey(name);
+    return this.attributesMap.containsKey(name);
   }
 
   /**
    * Generate the hash code for the object.
-   * 
+   *
    * @return The hashCode.
    */
   @Override
@@ -308,10 +310,9 @@ public class PageController implements SiteNodeController {
     return super.hashCode() + (getPath().hashCode() << 2);
   }
 
-  public void invokeActions(
-    final ServletContext servletContext,
-    final HttpServletRequest request,
-    final HttpServletResponse response) throws IOException, ServletException {
+  public void invokeActions(final ServletContext servletContext,
+    final HttpServletRequest request, final HttpServletResponse response)
+        throws IOException, ServletException {
     final Iterator actions = getActions().iterator();
     while (actions.hasNext()) {
       final Action action = (Action)actions.next();
@@ -320,22 +321,22 @@ public class PageController implements SiteNodeController {
   }
 
   public final boolean isSecure() {
-    return secure;
+    return this.secure;
   }
 
-  public void process(
-    final ServletContext servletContext,
-    final HttpServletRequest request,
-    final HttpServletResponse response) throws IOException, ServletException {
+  @Override
+  public void process(final ServletContext servletContext,
+    final HttpServletRequest request, final HttpServletResponse response)
+        throws IOException, ServletException {
     // WebUiContext.set(new WebUiContext(config, request.getContextPath(), this,
     // request, response, null));
-    if (isSecure() && !secure) {
+    if (isSecure() && !this.secure) {
       response.sendRedirect(getFullUrl());
       return;
     }
     processArguments(request);
     processAttributes(request);
-    request.setAttribute("niceConfig", config);
+    request.setAttribute("niceConfig", this.config);
 
     final String menuName = request.getParameter("menuName");
     request.setAttribute("menuSelected", menuName);
@@ -390,7 +391,7 @@ public class PageController implements SiteNodeController {
    */
   private void processAttributes(final HttpServletRequest request)
     throws ActionException {
-    for (final Iterator attributes = getAttributes().iterator(); attributes.hasNext();) {
+    for (final Iterator attributes = getFields().iterator(); attributes.hasNext();) {
       final Attribute attribute = (Attribute)attributes.next();
       final String name = attribute.getName();
       final AttributeLoader loader = attribute.getLoader();
@@ -449,16 +450,17 @@ public class PageController implements SiteNodeController {
   /**
    * @param node The node to set.
    */
+  @Override
   public void setNode(final SiteNode node) {
     this.node = node;
   }
 
   public void setNodes(final Collection nodes) {
-    node.setNodes(nodes);
+    this.node.setNodes(nodes);
   }
 
   public void setPath(final String path) {
-    node.setPath(path);
+    this.node.setPath(path);
   }
 
   /**
@@ -502,7 +504,7 @@ public class PageController implements SiteNodeController {
     if (title != null) {
       this.title = title;
       try {
-        titleExpression = JexlUtil.createExpression(title);
+        this.titleExpression = JexlUtil.createExpression(title);
       } catch (final Exception e) {
         log.error(e.getMessage(), e);
       }

@@ -11,8 +11,6 @@ import java.util.TreeMap;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;

@@ -207,12 +207,12 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V> V getAttribute(final String name) {
+  public <V> V getField(final String name) {
     return (V)graph.getNodeAttribute(id, name);
   }
 
   @Override
-  public Map<String, Object> getAttributes() {
+  public Map<String, Object> getFields() {
     return graph.getNodeAttributes(id);
   }
 
@@ -321,7 +321,7 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
   public List<Edge<T>> getEdgesWithoutAttribute(final String attributeName) {
     final List<Edge<T>> edges = new ArrayList<Edge<T>>();
     for (final Edge<T> edge : getEdges()) {
-      if (edge.getAttribute(attributeName) == null) {
+      if (edge.getField(attributeName) == null) {
         edges.add(edge);
       }
     }
@@ -391,7 +391,7 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
   }
 
   public boolean hasAttribute(final String name) {
-    return getAttributes().containsKey(name);
+    return getFields().containsKey(name);
   }
 
   public boolean hasEdge(final Edge<T> edge) {
@@ -550,7 +550,7 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
   }
 
   private void updateAttributes() {
-    for (final Object attribute : getAttributes().values()) {
+    for (final Object attribute : getFields().values()) {
       if (attribute instanceof ObjectAttributeProxy) {
         @SuppressWarnings("unchecked")
         final ObjectAttributeProxy<Object, Node<T>> proxy = (ObjectAttributeProxy<Object, Node<T>>)attribute;

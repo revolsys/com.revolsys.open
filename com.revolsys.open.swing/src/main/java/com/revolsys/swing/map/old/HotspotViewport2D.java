@@ -6,7 +6,6 @@ import javax.swing.JComponent;
 
 import com.revolsys.gis.algorithm.index.quadtree.QuadTree;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;

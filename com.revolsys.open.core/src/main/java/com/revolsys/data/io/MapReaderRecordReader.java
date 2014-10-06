@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.io.AbstractReader;
@@ -58,11 +58,11 @@ public class MapReaderRecordReader extends AbstractReader<Record> implements
     if (hasNext()) {
       final Map<String, Object> source = this.mapIterator.next();
       final Record target = new ArrayRecord(this.recordDefinition);
-      for (final Attribute attribute : this.recordDefinition.getAttributes()) {
+      for (final FieldDefinition attribute : this.recordDefinition.getFields()) {
         final String name = attribute.getName();
         final Object value = source.get(name);
         if (value != null) {
-          final DataType dataType = this.recordDefinition.getAttributeType(name);
+          final DataType dataType = this.recordDefinition.getFieldType(name);
           final Object convertedValue = StringConverterRegistry.toObject(
             dataType, value);
           target.setValue(name, convertedValue);

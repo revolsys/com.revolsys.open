@@ -15,7 +15,7 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.SingleIdentifier;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
@@ -55,9 +55,9 @@ public final class RecordUtil {
   }
 
   public static RecordDefinition createGeometryRecordDefinition() {
-    final Attribute geometryAttribute = new Attribute("geometry",
+    final FieldDefinition geometryField = new FieldDefinition("geometry",
       DataTypes.GEOMETRY, true);
-    return new RecordDefinitionImpl("Feature", geometryAttribute);
+    return new RecordDefinitionImpl("Feature", geometryField);
   }
 
   public static <D extends Record> List<D> filter(final Collection<D> objects,
@@ -74,7 +74,7 @@ public final class RecordUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T getAttributeByPath(final Record object, final String path) {
+  public static <T> T getFieldByPath(final Record object, final String path) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
 
     final String[] propertyPath = path.split("\\.");
@@ -84,7 +84,7 @@ public final class RecordUtil {
       if (propertyValue instanceof Record) {
         final Record record = (Record)propertyValue;
 
-        if (record.hasAttribute(propertyName)) {
+        if (record.hasField(propertyName)) {
           propertyValue = record.getValue(propertyName);
           if (propertyValue == null) {
             return null;
@@ -218,7 +218,7 @@ public final class RecordUtil {
     final Record object = new ArrayRecord(recordDefinition);
     for (final Entry<String, Object> entry : values.entrySet()) {
       final String name = entry.getKey();
-      final Attribute attribute = recordDefinition.getAttribute(name);
+      final FieldDefinition attribute = recordDefinition.getField(name);
       if (attribute != null) {
         final Object value = entry.getValue();
         if (value != null) {
@@ -229,7 +229,7 @@ public final class RecordUtil {
             object.setValue(name, value);
           } else {
             final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-                .getConverter(dataTypeClass);
+              .getConverter(dataTypeClass);
             if (converter == null) {
               object.setValue(name, value);
             } else {

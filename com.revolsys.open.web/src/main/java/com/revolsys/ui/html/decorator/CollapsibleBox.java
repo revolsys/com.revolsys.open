@@ -1,8 +1,8 @@
 package com.revolsys.ui.html.decorator;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.view.Element;
+import com.revolsys.util.HtmlUtil;
 
 public class CollapsibleBox implements Decorator {
 

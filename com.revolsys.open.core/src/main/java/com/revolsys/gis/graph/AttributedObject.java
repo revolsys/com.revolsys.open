@@ -4,9 +4,9 @@ import java.util.Map;
 
 public interface AttributedObject {
 
-  <A> A getAttribute(final String name);
+  <A> A getField(final String name);
 
-  Map<String, Object> getAttributes();
+  Map<String, Object> getFields();
 
   void setAttribute(final String name, final Object value);
 

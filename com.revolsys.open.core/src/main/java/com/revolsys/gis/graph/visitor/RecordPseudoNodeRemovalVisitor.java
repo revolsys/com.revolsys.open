@@ -100,7 +100,7 @@ AbstractNodeListenerVisitor<Record> implements FilterProxy<Node<Record>>,
     for (final RecordDefinition recordDefinition : NodeAttributes.getEdgeRecordDefinitions(node)) {
       final PseudoNodeProperty property = PseudoNodeProperty.getProperty(recordDefinition);
 
-      final PseudoNodeAttribute pseudoNodeAttribute = property.getAttribute(node);
+      final PseudoNodeAttribute pseudoNodeAttribute = property.getField(node);
       processPseudoNodesForType(node, pseudoNodeAttribute);
     }
   }

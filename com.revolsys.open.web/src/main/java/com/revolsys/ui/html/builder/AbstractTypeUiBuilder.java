@@ -13,7 +13,7 @@ public class AbstractTypeUiBuilder extends HtmlUiBuilder {
   }
 
   @Override
-  public Element getField(final HttpServletRequest request, final String key) {
+  public Element getAttribute(final HttpServletRequest request, final String key) {
     if (key.equals("active")) {
       return new CheckBoxField(key, true);
     } else if (key.equals("name")) {
@@ -21,6 +21,6 @@ public class AbstractTypeUiBuilder extends HtmlUiBuilder {
     } else if (key.equals("description")) {
       return new TextAreaField(key, 40, 4, false);
     }
-    return super.getField(request, key);
+    return super.getAttribute(request, key);
   }
 }

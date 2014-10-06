@@ -154,7 +154,7 @@ import com.revolsys.util.Property;
  * @since 2.5
  */
 public class AnnotationMethodHandlerAdapter extends WebContentGenerator
-  implements HandlerAdapter, Ordered, BeanFactoryAware {
+implements HandlerAdapter, Ordered, BeanFactoryAware {
 
   /**
    * Holder for request mapping metadata. Allows for finding a best matching
@@ -180,16 +180,16 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     public boolean equals(final Object obj) {
       final RequestMappingInfo other = (RequestMappingInfo)obj;
       return Arrays.equals(this.paths, other.paths)
-        && Arrays.equals(this.methods, other.methods)
-        && Arrays.equals(this.params, other.params)
-          && Arrays.equals(this.headers, other.headers);
+          && Arrays.equals(this.methods, other.methods)
+          && Arrays.equals(this.params, other.params)
+        && Arrays.equals(this.headers, other.headers);
     }
 
     @Override
     public int hashCode() {
       return Arrays.hashCode(this.paths) * 23 + Arrays.hashCode(this.methods)
-        * 29 + Arrays.hashCode(this.params) * 31
-          + Arrays.hashCode(this.headers);
+          * 29 + Arrays.hashCode(this.params) * 31
+        + Arrays.hashCode(this.headers);
     }
 
     public boolean matches(final HttpServletRequest request) {
@@ -216,7 +216,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
    * parameters} will be ordered before those with less parameters</li> </ol>
    */
   static class RequestMappingInfoComparator implements
-    Comparator<RequestMappingInfo> {
+  Comparator<RequestMappingInfo> {
 
     private final Comparator<String> pathComparator;
 
@@ -311,7 +311,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       }
       for (final MediaType mediaType : supportedMediaTypes) {
         if (acceptedMediaType.isWildcardType()
-          || mediaType.includes(acceptedMediaType)) {
+            || mediaType.includes(acceptedMediaType)) {
           return mediaType;
         }
       }
@@ -322,7 +322,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     public ModelAndView getModelAndView(final Method handlerMethod,
       final Class handlerType, final Object returnValue,
       final ExtendedModelMap implicitModel, final ServletWebRequest webRequest)
-      throws Exception {
+          throws Exception {
 
       final ResponseStatus responseStatusAnn = AnnotationUtils.findAnnotation(
         handlerMethod, ResponseStatus.class);
@@ -347,7 +347,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       }
 
       if (returnValue != null
-        && AnnotationUtils.findAnnotation(handlerMethod, ResponseBody.class) != null) {
+          && AnnotationUtils.findAnnotation(handlerMethod, ResponseBody.class) != null) {
         final View view = handleResponseBody(returnValue, webRequest);
         return new ModelAndView(view).addAllObjects(implicitModel);
       }
@@ -425,7 +425,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
         }
       }
       throw new HttpMediaTypeNotAcceptableException(new ArrayList<MediaType>(
-        allSupportedMediaTypes));
+          allSupportedMediaTypes));
     }
 
     @Override
@@ -437,14 +437,14 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
 
     @Override
     protected void raiseSessionRequiredException(final String message)
-      throws Exception {
+        throws Exception {
       throw new HttpSessionRequiredException(message);
     }
 
     @Override
     protected Object resolveCookieValue(final String cookieName,
       final Class paramType, final NativeWebRequest webRequest)
-      throws Exception {
+          throws Exception {
 
       final HttpServletRequest servletRequest = (HttpServletRequest)webRequest.getNativeRequest();
       final Cookie cookieValue = WebUtils.getCookie(servletRequest, cookieName);
@@ -477,14 +477,14 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     })
     protected String resolvePathVariable(final String pathVarName,
       final Class paramType, final NativeWebRequest webRequest)
-      throws Exception {
+          throws Exception {
 
       final HttpServletRequest servletRequest = (HttpServletRequest)webRequest.getNativeRequest();
       final Map<String, String> uriTemplateVariables = (Map<String, String>)servletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
       if (uriTemplateVariables == null
-        || !uriTemplateVariables.containsKey(pathVarName)) {
+          || !uriTemplateVariables.containsKey(pathVarName)) {
         throw new IllegalStateException("Could not find @PathVariable ["
-          + pathVarName + "] in @RequestMapping");
+            + pathVarName + "] in @RequestMapping");
       }
       return uriTemplateVariables.get(pathVarName);
     }
@@ -506,7 +506,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
         contentType = MediaType.APPLICATION_FORM_URLENCODED;
       }
       if (!MediaType.APPLICATION_FORM_URLENCODED.includes(contentType)
-        && !MediaType.MULTIPART_FORM_DATA.includes(contentType)) {
+          && !MediaType.MULTIPART_FORM_DATA.includes(contentType)) {
         contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
           AnnotationMethodHandlerAdapter.this.mediaTypes,
           AnnotationMethodHandlerAdapter.this.mediaTypeOrder,
@@ -526,7 +526,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
         }
         throw new HttpMediaTypeNotSupportedException(
           "Cannot extract @RequestBody parameter (" + builder.toString()
-            + "): no Content-Type found");
+          + "): no Content-Type found");
       } else {
         HttpServletUtils.setContentTypeWithCharset(headers, contentType);
       }
@@ -550,7 +550,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
           final String[] pairs = StringUtils.tokenizeToStringArray(urlBody, "&");
 
           final MultiValueMap<String, String> values = new LinkedMultiValueMap<String, String>(
-            pairs.length);
+              pairs.length);
 
           for (final String pair : pairs) {
             final int idx = pair.indexOf('=');
@@ -680,8 +680,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
       Map<String, String> variables = null;
       final boolean hasSuffix = mappedPath.indexOf('.') != -1;
       if (!hasSuffix
-          && AnnotationMethodHandlerAdapter.this.pathMatcher.match(mappedPath
-            + ".*", lookupPath)) {
+        && AnnotationMethodHandlerAdapter.this.pathMatcher.match(mappedPath
+          + ".*", lookupPath)) {
         final String realPath = mappedPath + ".*";
         if (AnnotationMethodHandlerAdapter.this.pathMatcher.match(realPath,
           lookupPath)) {
@@ -730,7 +730,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     private String getMatchedPattern(final String methodLevelPattern,
       final String lookupPath, final HttpServletRequest request) {
       if (hasTypeLevelMapping()
-        && !ObjectUtils.isEmpty(getTypeLevelMapping().value())) {
+          && !ObjectUtils.isEmpty(getTypeLevelMapping().value())) {
         final String[] typeLevelPatterns = getTypeLevelMapping().value();
         for (String typeLevelPattern : typeLevelPatterns) {
           if (!typeLevelPattern.startsWith("/")) {
@@ -749,7 +749,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
         final String combinedPattern = AnnotationMethodHandlerAdapter.this.pathMatcher.combine(
           bestMatchingPattern, methodLevelPattern);
         if (!combinedPattern.equals(bestMatchingPattern)
-          && isPathMatchInternal(combinedPattern, lookupPath)) {
+            && isPathMatchInternal(combinedPattern, lookupPath)) {
           return combinedPattern;
         }
       }
@@ -762,27 +762,27 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
     private boolean isPathMatchInternal(final String pattern,
       final String lookupPath) {
       if (pattern.equals(lookupPath)
-          || AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern,
-            lookupPath)) {
+        || AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern,
+          lookupPath)) {
         return true;
       }
       final boolean hasSuffix = pattern.indexOf('.') != -1;
       if (!hasSuffix
-          && AnnotationMethodHandlerAdapter.this.pathMatcher.match(
-            pattern + ".*", lookupPath)) {
+        && AnnotationMethodHandlerAdapter.this.pathMatcher.match(
+          pattern + ".*", lookupPath)) {
         return true;
       }
       final boolean endsWithSlash = pattern.endsWith("/");
       if (!endsWithSlash
-          && AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern + "/",
-            lookupPath)) {
+        && AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern + "/",
+          lookupPath)) {
         return true;
       }
       return false;
     }
 
     public Method resolveHandlerMethod(final HttpServletRequest request)
-      throws ServletException {
+        throws ServletException {
       final String lookupPath = AnnotationMethodHandlerAdapter.this.urlPathHelper.getLookupPathForRequest(request);
       final Comparator<String> pathComparator = AnnotationMethodHandlerAdapter.this.pathMatcher.getPatternComparator(lookupPath);
       final Map<RequestMappingInfo, Method> targetHandlerMethods = new LinkedHashMap<RequestMappingInfo, Method>();
@@ -794,21 +794,21 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
           handlerMethod, RequestMapping.class);
         mappingInfo.paths = mapping.value();
         if (!hasTypeLevelMapping()
-          || !Arrays.equals(mapping.method(), getTypeLevelMapping().method())) {
+            || !Arrays.equals(mapping.method(), getTypeLevelMapping().method())) {
           mappingInfo.methods = mapping.method();
         }
         if (!hasTypeLevelMapping()
-          || !Arrays.equals(mapping.params(), getTypeLevelMapping().params())) {
+            || !Arrays.equals(mapping.params(), getTypeLevelMapping().params())) {
           mappingInfo.params = mapping.params();
         }
         if (!hasTypeLevelMapping()
-          || !Arrays.equals(mapping.headers(), getTypeLevelMapping().headers())) {
+            || !Arrays.equals(mapping.headers(), getTypeLevelMapping().headers())) {
           mappingInfo.headers = mapping.headers();
         }
         boolean match = false;
         if (mappingInfo.paths.length > 0) {
           final List<String> matchedPaths = new ArrayList<String>(
-            mappingInfo.paths.length);
+              mappingInfo.paths.length);
           for (final String methodLevelPattern : mappingInfo.paths) {
             final String matchedPattern = getMatchedPattern(methodLevelPattern,
               lookupPath, request);
@@ -830,8 +830,8 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
           // No paths specified: parameter match sufficient.
           match = mappingInfo.matches(request);
           if (match && mappingInfo.methods.length == 0
-            && mappingInfo.params.length == 0 && resolvedMethodName != null
-            && !resolvedMethodName.equals(handlerMethod.getName())) {
+              && mappingInfo.params.length == 0 && resolvedMethodName != null
+              && !resolvedMethodName.equals(handlerMethod.getName())) {
             match = false;
           } else {
             for (final RequestMethod requestMethod : mappingInfo.methods) {
@@ -844,7 +844,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
             handlerMethod);
           if (oldMappedMethod != null && oldMappedMethod != handlerMethod) {
             if (AnnotationMethodHandlerAdapter.this.methodNameResolver != null
-                && mappingInfo.paths.length == 0) {
+              && mappingInfo.paths.length == 0) {
               if (!oldMappedMethod.getName().equals(handlerMethod.getName())) {
                 if (resolvedMethodName == null) {
                   resolvedMethodName = AnnotationMethodHandlerAdapter.this.methodNameResolver.getHandlerMethodName(request);
@@ -865,20 +865,20 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
             if (oldMappedMethod != null) {
               throw new IllegalStateException(
                 "Ambiguous handler methods mapped for HTTP path '"
-                  + lookupPath
-                  + "': {"
-                  + oldMappedMethod
-                  + ", "
-                  + handlerMethod
-                  + "}. If you intend to handle the same path in multiple methods, then factor "
-                  + "them out into a dedicated handler class with that path mapped at the type level!");
+                    + lookupPath
+                    + "': {"
+                    + oldMappedMethod
+                    + ", "
+                    + handlerMethod
+                    + "}. If you intend to handle the same path in multiple methods, then factor "
+                    + "them out into a dedicated handler class with that path mapped at the type level!");
             }
           }
         }
       }
       if (!targetHandlerMethods.isEmpty()) {
         final List<RequestMappingInfo> matches = new ArrayList<RequestMappingInfo>(
-          targetHandlerMethods.keySet());
+            targetHandlerMethods.keySet());
         final RequestMappingInfoComparator requestMappingInfoComparator = new RequestMappingInfoComparator(
           pathComparator);
         Collections.sort(matches, requestMappingInfoComparator);
@@ -1285,7 +1285,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator
   public void setSessionAttributeStore(
     final SessionAttributeStore sessionAttributeStore) {
     Assert.notNull(sessionAttributeStore,
-      "SessionAttributeStore must not be null");
+        "SessionAttributeStore must not be null");
     this.sessionAttributeStore = sessionAttributeStore;
   }
 

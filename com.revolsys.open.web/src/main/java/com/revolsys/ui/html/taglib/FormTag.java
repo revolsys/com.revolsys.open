@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,17 +39,17 @@ public class FormTag extends BodyTagSupport {
   @Override
   public int doEndTag() throws JspException {
     try {
-      if (name != null) {
-        if (form != null) {
-          final Writer out = pageContext.getOut();
+      if (this.name != null) {
+        if (this.form != null) {
+          final Writer out = this.pageContext.getOut();
           out.flush();
           final XmlWriter xmlOut = new XmlWriter(out);
-          form.serializeStartTag(xmlOut);
-          bodyContent.writeOut(xmlOut);
-          form.serializeEndTag(xmlOut);
+          this.form.serializeStartTag(xmlOut);
+          this.bodyContent.writeOut(xmlOut);
+          this.form.serializeEndTag(xmlOut);
           xmlOut.flush();
         }
-        request.setAttribute("form", oldFormAttribute);
+        this.request.setAttribute("form", this.oldFormAttribute);
       }
       return EVAL_PAGE;
     } catch (final Throwable t) {
@@ -59,17 +59,17 @@ public class FormTag extends BodyTagSupport {
 
   @Override
   public int doStartTag() throws JspException {
-    if (name != null) {
-      request = pageContext.getRequest();
-      form = (Form)request.getAttribute(name);
-      oldFormAttribute = request.getAttribute("form");
-      request.setAttribute("form", form);
+    if (this.name != null) {
+      this.request = this.pageContext.getRequest();
+      this.form = (Form)this.request.getAttribute(this.name);
+      this.oldFormAttribute = this.request.getAttribute("form");
+      this.request.setAttribute("form", this.form);
     }
-    return (EVAL_BODY_INCLUDE);
+    return EVAL_BODY_INCLUDE;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public void setName(final String name) {

@@ -10,7 +10,7 @@ import java.util.Map;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.io.JdbcQueryIterator;
@@ -47,7 +47,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
             final JdbcRecordStore recordStore = getRecordStore();
             try (
                 JdbcConnection connection = recordStore.getJdbcConnection()) {
-              final List<Attribute> attributes = recordDefinition.getAttributes();
+              final List<FieldDefinition> attributes = recordDefinition.getFields();
 
               try (
                   final PreparedStatement statement = connection.prepareStatement(sql);

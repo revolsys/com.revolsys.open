@@ -34,7 +34,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecord extends AbstractMap<String, Object>
-implements Record, Cloneable {
+  implements Record, Cloneable {
 
   /**
    * Create a clone of the object.
@@ -102,7 +102,7 @@ implements Record, Cloneable {
   @Override
   public Set<Entry<String, Object>> entrySet() {
     final Set<Entry<String, Object>> entries = new LinkedHashSet<Entry<String, Object>>();
-    for (int i = 0; i < this.getRecordDefinition().getAttributeCount(); i++) {
+    for (int i = 0; i < this.getRecordDefinition().getFieldCount(); i++) {
       entries.add(new RecordMapEntry(this, i));
     }
     return entries;
@@ -124,9 +124,9 @@ implements Record, Cloneable {
   }
 
   @Override
-  public String getAttributeTitle(final String name) {
+  public String getFieldTitle(final String name) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getAttributeTitle(name);
+    return recordDefinition.getFieldTitle(name);
   }
 
   @Override
@@ -186,7 +186,7 @@ implements Record, Cloneable {
     if (recordDefinition == null) {
       return null;
     } else {
-      final int index = recordDefinition.getGeometryAttributeIndex();
+      final int index = recordDefinition.getGeometryFieldIndex();
       return (T)getValue(index);
     }
   }
@@ -194,13 +194,13 @@ implements Record, Cloneable {
   @Override
   public Identifier getIdentifier() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final List<Integer> idAttributeIndexes = recordDefinition.getIdAttributeIndexes();
-    final int idCount = idAttributeIndexes.size();
+    final List<Integer> idFieldIndexes = recordDefinition.getIdFieldIndexes();
+    final int idCount = idFieldIndexes.size();
     if (idCount == 0) {
       return null;
     } else if (idCount == 1) {
-      final Integer idAttributeIndex = idAttributeIndexes.get(0);
-      final Object idValue = getValue(idAttributeIndex);
+      final Integer idFieldIndex = idFieldIndexes.get(0);
+      final Object idValue = getValue(idFieldIndex);
       if (idValue == null) {
         return null;
       } else {
@@ -210,8 +210,8 @@ implements Record, Cloneable {
       boolean notNull = false;
       final Object[] idValues = new Object[idCount];
       for (int i = 0; i < idValues.length; i++) {
-        final Integer idAttributeIndex = idAttributeIndexes.get(i);
-        final Object value = getValue(idAttributeIndex);
+        final Integer idFieldIndex = idFieldIndexes.get(i);
+        final Object value = getValue(idFieldIndex);
         if (value != null) {
           notNull = true;
         }
@@ -231,8 +231,8 @@ implements Record, Cloneable {
     if (idCount == 0) {
       return null;
     } else if (idCount == 1) {
-      final String idAttributeName = attributeNames.get(0);
-      final Object idValue = getValue(idAttributeName);
+      final String idFieldName = attributeNames.get(0);
+      final Object idValue = getValue(idFieldName);
       if (idValue == null) {
         return null;
       } else {
@@ -242,8 +242,8 @@ implements Record, Cloneable {
       boolean notNull = false;
       final Object[] idValues = new Object[idCount];
       for (int i = 0; i < idValues.length; i++) {
-        final String idAttributeName = attributeNames.get(i);
-        final Object value = getValue(idAttributeName);
+        final String idFieldName = attributeNames.get(i);
+        final Object value = getValue(idFieldName);
         if (value != null) {
           notNull = true;
         }
@@ -270,7 +270,7 @@ implements Record, Cloneable {
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Object> T getIdValue() {
-    final int index = this.getRecordDefinition().getIdAttributeIndex();
+    final int index = this.getRecordDefinition().getIdFieldIndex();
     return (T)getValue(index);
   }
 
@@ -342,12 +342,12 @@ implements Record, Cloneable {
   public <T extends Object> T getValue(final CharSequence name) {
     final RecordDefinition recordDefinition = this.getRecordDefinition();
     try {
-      final int index = recordDefinition.getAttributeIndex(name);
+      final int index = recordDefinition.getFieldIndex(name);
       return (T)getValue(index);
     } catch (final NullPointerException e) {
       LoggerFactory.getLogger(getClass()).warn(
         "Attribute " + recordDefinition.getPath() + "." + name
-        + " does not exist");
+          + " does not exist");
       return null;
     }
   }
@@ -362,13 +362,13 @@ implements Record, Cloneable {
       if (propertyValue instanceof Record) {
         final Record record = (Record)propertyValue;
 
-        if (record.hasAttribute(propertyName)) {
+        if (record.hasField(propertyName)) {
           propertyValue = record.getValue(propertyName);
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
             final CodeTable codeTable = this.getRecordDefinition()
-                .getCodeTableByColumn(propertyName);
+              .getCodeTableByColumn(propertyName);
             if (codeTable != null) {
               propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
             }
@@ -387,7 +387,7 @@ implements Record, Cloneable {
           return null;
         } else if (i + 1 < propertyPath.length) {
           final CodeTable codeTable = this.getRecordDefinition()
-              .getCodeTableByColumn(propertyName);
+            .getCodeTableByColumn(propertyName);
           if (codeTable != null) {
             propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
           }
@@ -421,7 +421,7 @@ implements Record, Cloneable {
   @Override
   public List<Object> getValues() {
     final List<Object> values = new ArrayList<Object>();
-    for (int i = 0; i < this.getRecordDefinition().getAttributeCount(); i++) {
+    for (int i = 0; i < this.getRecordDefinition().getFieldCount(); i++) {
       final Object value = getValue(i);
       values.add(value);
     }
@@ -436,8 +436,8 @@ implements Record, Cloneable {
    * @return True if the Record has an attribute with the specified name.
    */
   @Override
-  public boolean hasAttribute(final CharSequence name) {
-    return this.getRecordDefinition().hasAttribute(name);
+  public boolean hasField(final CharSequence name) {
+    return this.getRecordDefinition().hasField(name);
   }
 
   @Override
@@ -481,15 +481,15 @@ implements Record, Cloneable {
    */
   @Override
   public void setGeometryValue(final Geometry geometry) {
-    final int index = this.getRecordDefinition().getGeometryAttributeIndex();
+    final int index = this.getRecordDefinition().getGeometryFieldIndex();
     setValue(index, geometry);
   }
 
   @Override
   public void setIdentifier(final Identifier identifier) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
-    AbstractIdentifier.setIdentifier(this, idAttributeNames, identifier);
+    final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+    AbstractIdentifier.setIdentifier(this, idFieldNames, identifier);
   }
 
   /**
@@ -500,15 +500,15 @@ implements Record, Cloneable {
    */
   @Override
   public void setIdValue(final Object id) {
-    final int index = this.getRecordDefinition().getIdAttributeIndex();
+    final int index = this.getRecordDefinition().getIdFieldIndex();
     if (this.getState() == RecordState.New
-        || this.getState() == RecordState.Initalizing) {
+      || this.getState() == RecordState.Initalizing) {
       setValue(index, id);
     } else {
       final Object oldId = getValue(index);
       if (oldId != null && !EqualsRegistry.equal(id, oldId)) {
         throw new IllegalStateException(
-            "Cannot change the ID on a persisted object");
+          "Cannot change the ID on a persisted object");
       }
     }
   }
@@ -521,7 +521,7 @@ implements Record, Cloneable {
    */
   @Override
   public void setValue(final CharSequence name, final Object value) {
-    final int index = this.getRecordDefinition().getAttributeIndex(name);
+    final int index = this.getRecordDefinition().getFieldIndex(name);
     if (index >= 0) {
       setValue(index, value);
     } else {
@@ -536,12 +536,12 @@ implements Record, Cloneable {
         final Object objectValue = getValue(key);
         if (objectValue == null) {
           final DataType attributeType = this.getRecordDefinition()
-              .getAttributeType(key);
+            .getFieldType(key);
           if (attributeType != null) {
             if (attributeType.getJavaClass() == Record.class) {
               final String typePath = attributeType.getName();
               final RecordDefinitionFactory recordDefinitionFactory = this.getRecordDefinition()
-                  .getRecordDefinitionFactory();
+                .getRecordDefinitionFactory();
               final RecordDefinition subRecordDefinition = recordDefinitionFactory.getRecordDefinition(typePath);
               final RecordFactory recordFactory = subRecordDefinition.getRecordFactory();
               final Record subRecord = recordFactory.createRecord(subRecordDefinition);
@@ -572,7 +572,7 @@ implements Record, Cloneable {
     String codeTableAttributeName;
     String codeTableValueName = null;
     if (dotIndex == -1) {
-      if (name.equals(getRecordDefinition().getIdAttributeName())) {
+      if (name.equals(getRecordDefinition().getIdFieldName())) {
         codeTableAttributeName = null;
       } else {
         codeTableAttributeName = name;
@@ -582,12 +582,12 @@ implements Record, Cloneable {
       codeTableValueName = name.substring(dotIndex + 1);
     }
     final CodeTable codeTable = this.getRecordDefinition()
-        .getCodeTableByColumn(codeTableAttributeName);
+      .getCodeTableByColumn(codeTableAttributeName);
     if (codeTable == null) {
       if (dotIndex != -1) {
         LoggerFactory.getLogger(getClass()).debug(
           "Cannot get code table for " + this.getRecordDefinition().getPath()
-          + "." + name);
+            + "." + name);
         return;
       }
       setValue(name, value);
@@ -632,7 +632,7 @@ implements Record, Cloneable {
   public void setValues(final Map<String, ? extends Object> values) {
     if (values != null) {
       for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
-          values).entrySet()) {
+        values).entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValue(name, value);
@@ -661,7 +661,7 @@ implements Record, Cloneable {
 
   @Override
   public void setValues(final Record object) {
-    for (final String name : this.getRecordDefinition().getAttributeNames()) {
+    for (final String name : this.getRecordDefinition().getFieldNames()) {
       final Object value = JavaBeanUtil.clone(object.getValue(name));
       setValue(name, value);
     }
@@ -672,7 +672,7 @@ implements Record, Cloneable {
   public void setValuesByPath(final Map<String, ? extends Object> values) {
     if (values != null) {
       for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
-          values).entrySet()) {
+        values).entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValueByPath(name, value);
@@ -690,13 +690,13 @@ implements Record, Cloneable {
   public String toString() {
     final StringBuilder s = new StringBuilder();
     s.append(this.getRecordDefinition().getPath()).append("(\n");
-    for (int i = 0; i < this.getRecordDefinition().getAttributeCount(); i++) {
+    for (int i = 0; i < this.getRecordDefinition().getFieldCount(); i++) {
       final Object value = getValue(i);
       if (value != null) {
-        s.append(this.getRecordDefinition().getAttributeName(i))
-        .append('=')
-        .append(value)
-        .append('\n');
+        s.append(this.getRecordDefinition().getFieldName(i))
+          .append('=')
+          .append(value)
+          .append('\n');
       }
     }
     s.append(')');
@@ -708,10 +708,10 @@ implements Record, Cloneable {
     switch (this.getState()) {
       case Persisted:
         this.setState(RecordState.Modified);
-        break;
+      break;
       case Deleted:
         throw new IllegalStateException(
-            "Cannot modify an object which has been deleted");
+          "Cannot modify an object which has been deleted");
     }
   }
 

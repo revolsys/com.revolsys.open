@@ -149,7 +149,7 @@ public class JdbcCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  public String getIdAttributeName() {
+  public String getIdFieldName() {
     return this.idColumn;
   }
 

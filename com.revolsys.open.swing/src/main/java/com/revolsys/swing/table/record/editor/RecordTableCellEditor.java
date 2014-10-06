@@ -67,7 +67,7 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
     }
   }
 
-  public String getAttributeName() {
+  public String getFieldName() {
     return this.attributeName;
   }
 
@@ -105,7 +105,7 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
     final AbstractRecordTableModel model = (AbstractRecordTableModel)table.getModel();
     this.attributeName = model.getFieldName(rowIndex, columnIndex);
     final RecordDefinition recordDefinition = model.getRecordDefinition();
-    this.dataType = recordDefinition.getAttributeType(this.attributeName);
+    this.dataType = recordDefinition.getFieldType(this.attributeName);
     this.editorComponent = (JComponent)SwingUtil.createField(recordDefinition,
       this.attributeName, true);
     if (this.editorComponent instanceof JTextField) {

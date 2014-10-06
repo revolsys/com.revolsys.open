@@ -6,18 +6,18 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.record.property.AttributeProperties;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.property.FieldProperties;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
 
-public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
+public class PostgreSQLGeometryAttributeAdder extends JdbcFieldAdder {
 
   private static final Logger LOG = LoggerFactory.getLogger(PostgreSQLGeometryAttributeAdder.class);
 
@@ -41,7 +41,7 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
   }
 
   @Override
-  public Attribute addAttribute(final RecordDefinitionImpl recordDefinition,
+  public FieldDefinition addField(final RecordDefinitionImpl recordDefinition,
     final String dbName, final String name, final String dataTypeName,
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
@@ -77,11 +77,11 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcAttributeAdder {
         geometryFactory = GeometryFactory.fixed(srid, axisCount,
           storeGeometryFactory.getScaleXY(), storeGeometryFactory.getScaleZ());
       }
-      final Attribute attribute = new PostgreSQLGeometryJdbcAttribute(dbName,
+      final FieldDefinition attribute = new PostgreSQLGeometryJdbcAttribute(dbName,
         name, dataType, required, description, null, srid, axisCount,
         geometryFactory);
-      recordDefinition.addAttribute(attribute);
-      attribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+      recordDefinition.addField(attribute);
+      attribute.setProperty(FieldProperties.GEOMETRY_FACTORY,
         geometryFactory);
       return attribute;
     } catch (final Throwable e) {

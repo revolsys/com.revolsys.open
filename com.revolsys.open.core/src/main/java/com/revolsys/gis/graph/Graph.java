@@ -766,8 +766,8 @@ public class Graph<T> {
   public Edge<T> merge(final Node<T> node, final Edge<T> edge1,
     final Edge<T> edge2) {
     if (edge1 != edge2 && edge1.hasNode(node) && edge2.hasNode(node)) {
-      final Map<String, Object> attributes1 = edge1.getAttributes();
-      final Map<String, Object> attributes2 = edge2.getAttributes();
+      final Map<String, Object> attributes1 = edge1.getFields();
+      final Map<String, Object> attributes2 = edge2.getFields();
       final T object1 = edge1.getObject();
       final LineString line1 = edge1.getLine();
       final LineString line2 = edge2.getLine();

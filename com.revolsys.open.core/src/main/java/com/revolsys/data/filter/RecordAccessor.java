@@ -29,7 +29,7 @@ public class RecordAccessor implements PropertyAccessor {
   public boolean canRead(final EvaluationContext context, final Object target,
     final String name) throws AccessException {
     final Record object = (Record)target;
-    return object.hasAttribute(name);
+    return object.hasField(name);
   }
 
   @Override
@@ -51,7 +51,7 @@ public class RecordAccessor implements PropertyAccessor {
     final String name) throws AccessException {
     final Record object = (Record)target;
     final Object value = object.getValue(name);
-    if (value == null && !object.hasAttribute(name)) {
+    if (value == null && !object.hasField(name)) {
       throw new RecordAccessException(name);
     }
     return new TypedValue(value);

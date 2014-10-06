@@ -41,7 +41,7 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
     executor.run();
   }
 
-  public Map<String, Object> getAttributes() {
+  public Map<String, Object> getFields() {
     return attributes;
   }
 

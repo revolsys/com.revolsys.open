@@ -58,9 +58,9 @@ public class FileGdbIoTest {
       final String typePath = "/" + geometryTypeString;
       final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
         typePath);
-      recordDefinition.addAttribute("ID", DataTypes.INT, true);
-      recordDefinition.addAttribute("NAME", DataTypes.STRING, 50, false);
-      recordDefinition.addAttribute("GEOMETRY", dataType, true);
+      recordDefinition.addField("ID", DataTypes.INT, true);
+      recordDefinition.addField("NAME", DataTypes.STRING, 50, false);
+      recordDefinition.addField("GEOMETRY", dataType, true);
       recordDefinition.setGeometryFactory(geometryFactory);
       recordStore.getRecordDefinition(recordDefinition);
       try (

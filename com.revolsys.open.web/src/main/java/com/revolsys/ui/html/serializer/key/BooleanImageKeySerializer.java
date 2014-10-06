@@ -1,8 +1,8 @@
 package com.revolsys.ui.html.serializer.key;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.web.utils.HttpServletUtils;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 public class BooleanImageKeySerializer extends AbstractKeySerializer {

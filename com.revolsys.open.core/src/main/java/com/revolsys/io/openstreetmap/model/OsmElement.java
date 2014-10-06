@@ -22,16 +22,16 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   static {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
         "/osm/record");
-    recordDefinition.addAttribute("id", DataTypes.LONG);
-    recordDefinition.addAttribute("visible", DataTypes.BOOLEAN);
-    recordDefinition.addAttribute("version", DataTypes.INT);
-    recordDefinition.addAttribute("changeset", DataTypes.LONG);
-    recordDefinition.addAttribute("timestamp", DataTypes.DATE_TIME);
-    recordDefinition.addAttribute("user", DataTypes.STRING);
-    recordDefinition.addAttribute("uid", DataTypes.INT);
-    recordDefinition.addAttribute("tags", DataTypes.MAP);
-    recordDefinition.addAttribute("geometry", DataTypes.GEOMETRY);
-    recordDefinition.setGeometryAttributeName("geometry");
+    recordDefinition.addField("id", DataTypes.LONG);
+    recordDefinition.addField("visible", DataTypes.BOOLEAN);
+    recordDefinition.addField("version", DataTypes.INT);
+    recordDefinition.addField("changeset", DataTypes.LONG);
+    recordDefinition.addField("timestamp", DataTypes.DATE_TIME);
+    recordDefinition.addField("user", DataTypes.STRING);
+    recordDefinition.addField("uid", DataTypes.INT);
+    recordDefinition.addField("tags", DataTypes.MAP);
+    recordDefinition.addField("geometry", DataTypes.GEOMETRY);
+    recordDefinition.setGeometryFieldName("geometry");
     recordDefinition.setGeometryFactory(WGS84_2D);
     RECORD_DEFINITION = recordDefinition;
   }
@@ -295,7 +295,7 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
 
   @Override
   public void setValue(final int index, final Object value) {
-    final String propertyName = getRecordDefinition().getAttributeName(index);
+    final String propertyName = getRecordDefinition().getFieldName(index);
     Property.set(this, propertyName, value);
   }
 

@@ -34,7 +34,7 @@ public class AttributeMap extends LinkedHashMap<String, Object> {
     super(m);
   }
 
-  public Map<String, Object> getAttributes() {
+  public Map<String, Object> getFields() {
     return this;
   }
 

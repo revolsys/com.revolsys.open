@@ -5,8 +5,8 @@ import java.io.File;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.AttributeProperties;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.property.FieldProperties;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
@@ -37,12 +37,12 @@ public class GeometryTest {
     FileUtil.deleteDirectory(file);
 
     RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(name);
-    recordDefinition.addAttribute("ID", DataTypes.INT, true);
-    final Attribute geometryAttribute = recordDefinition.addAttribute("Geometry",
+    recordDefinition.addField("ID", DataTypes.INT, true);
+    final FieldDefinition geometryField = recordDefinition.addField("Geometry",
       geometryDataType, true);
-    geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+    geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY,
       geometryFactory);
-    recordDefinition.setIdAttributeName("ID");
+    recordDefinition.setIdFieldName("ID");
 
     final FileGdbRecordStore recordStore = FileGdbRecordStoreFactory.create(file);
     recordStore.initialize();

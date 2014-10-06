@@ -41,7 +41,7 @@ import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.property.GlobalIdProperty;
 import com.revolsys.data.record.schema.AbstractRecordStore;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.record.schema.RecordStore;
@@ -51,8 +51,8 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.attribute.JdbcAttribute;
-import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.attribute.JdbcFieldAdder;
+import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 
@@ -66,7 +66,7 @@ implements JdbcRecordStore, RecordStoreExtension {
 
   public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
 
-  private final Map<String, JdbcAttributeAdder> attributeAdders = new HashMap<String, JdbcAttributeAdder>();
+  private final Map<String, JdbcFieldAdder> attributeAdders = new HashMap<String, JdbcFieldAdder>();
 
   private int batchSize;
 
@@ -136,21 +136,21 @@ implements JdbcRecordStore, RecordStoreExtension {
     this.allSchemaNames.add(schemaName.toUpperCase());
   }
 
-  protected JdbcAttribute addAttribute(
+  protected JdbcFieldDefinition addField(
     final RecordDefinitionImpl recordDefinition, final String dbColumnName,
     final String name, final String dataType, final int sqlType,
     final int length, final int scale, final boolean required,
     final String description) {
-    JdbcAttributeAdder attributeAdder = this.attributeAdders.get(dataType);
+    JdbcFieldAdder attributeAdder = this.attributeAdders.get(dataType);
     if (attributeAdder == null) {
-      attributeAdder = new JdbcAttributeAdder(DataTypes.OBJECT);
+      attributeAdder = new JdbcFieldAdder(DataTypes.OBJECT);
     }
-    return (JdbcAttribute)attributeAdder.addAttribute(recordDefinition,
+    return (JdbcFieldDefinition)attributeAdder.addField(recordDefinition,
       dbColumnName, name, dataType, sqlType, length, scale, required,
       description);
   }
 
-  protected void addAttribute(final ResultSetMetaData resultSetMetaData,
+  protected void addField(final ResultSetMetaData resultSetMetaData,
     final RecordDefinitionImpl recordDefinition, final String name,
     final int i, final String description) throws SQLException {
     final String dataType = resultSetMetaData.getColumnTypeName(i);
@@ -158,12 +158,12 @@ implements JdbcRecordStore, RecordStoreExtension {
     final int length = resultSetMetaData.getPrecision(i);
     final int scale = resultSetMetaData.getScale(i);
     final boolean required = false;
-    addAttribute(recordDefinition, name, name.toUpperCase(), dataType, sqlType,
+    addField(recordDefinition, name, name.toUpperCase(), dataType, sqlType,
       length, scale, required, description);
   }
 
-  public void addAttributeAdder(final String sqlTypeName,
-    final JdbcAttributeAdder adder) {
+  public void addFieldAdder(final String sqlTypeName,
+    final JdbcFieldAdder adder) {
     this.attributeAdders.put(sqlTypeName, adder);
   }
 
@@ -281,15 +281,15 @@ implements JdbcRecordStore, RecordStoreExtension {
     return this.allSchemaNames;
   }
 
-  public JdbcAttribute getAttribute(final String schemaName,
+  public JdbcFieldDefinition getField(final String schemaName,
     final String tableName, final String columnName) {
     final String typePath = Path.toPath(schemaName, tableName);
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null) {
       return null;
     } else {
-      final Attribute attribute = recordDefinition.getAttribute(columnName);
-      return (JdbcAttribute)attribute;
+      final FieldDefinition attribute = recordDefinition.getField(columnName);
+      return (JdbcFieldDefinition)attribute;
     }
   }
 
@@ -352,7 +352,7 @@ implements JdbcRecordStore, RecordStoreExtension {
 
   public List<String> getColumnNames(final String typePath) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    return recordDefinition.getAttributeNames();
+    return recordDefinition.getFieldNames();
   }
 
   @Override
@@ -417,12 +417,12 @@ implements JdbcRecordStore, RecordStoreExtension {
     return this.hints;
   }
 
-  public String getIdAttributeName(final String typePath) {
+  public String getIdFieldName(final String typePath) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null) {
       return null;
     } else {
-      return recordDefinition.getIdAttributeName();
+      return recordDefinition.getIdFieldName();
     }
   }
 
@@ -445,13 +445,13 @@ implements JdbcRecordStore, RecordStoreExtension {
       final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
         schema, typePath);
 
-      final String idAttributeName = getIdAttributeName(typePath);
+      final String idFieldName = getIdFieldName(typePath);
       for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
         final String name = resultSetMetaData.getColumnName(i).toUpperCase();
-        if (name.equals(idAttributeName)) {
-          recordDefinition.setIdAttributeIndex(i - 1);
+        if (name.equals(idFieldName)) {
+          recordDefinition.setIdFieldIndex(i - 1);
         }
-        addAttribute(resultSetMetaData, recordDefinition, name, i, null);
+        addField(resultSetMetaData, recordDefinition, name, i, null);
       }
 
       addRecordDefinitionProperties(recordDefinition);
@@ -502,14 +502,14 @@ implements JdbcRecordStore, RecordStoreExtension {
       sqlBuffer.append(tableName);
       sqlBuffer.append(" (");
       sqlBuffer.append('"')
-      .append(recordDefinition.getIdAttributeName())
+      .append(recordDefinition.getIdFieldName())
       .append('"');
       sqlBuffer.append(",");
-      for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
-        if (i != recordDefinition.getIdAttributeIndex()) {
-          final String attributeName = recordDefinition.getAttributeName(i);
+      for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
+        if (i != recordDefinition.getIdFieldIndex()) {
+          final String attributeName = recordDefinition.getFieldName(i);
           sqlBuffer.append('"').append(attributeName).append('"');
-          if (i < recordDefinition.getAttributeCount() - 1) {
+          if (i < recordDefinition.getFieldCount() - 1) {
             sqlBuffer.append(", ");
           }
         }
@@ -517,10 +517,10 @@ implements JdbcRecordStore, RecordStoreExtension {
       sqlBuffer.append(") VALUES (");
       sqlBuffer.append(getGeneratePrimaryKeySql(recordDefinition));
       sqlBuffer.append(",");
-      for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
-        if (i != recordDefinition.getIdAttributeIndex()) {
+      for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
+        if (i != recordDefinition.getIdFieldIndex()) {
           sqlBuffer.append("?");
-          if (i < recordDefinition.getAttributeCount() - 1) {
+          if (i < recordDefinition.getFieldCount() - 1) {
             sqlBuffer.append(", ");
           }
         }
@@ -632,7 +632,7 @@ implements JdbcRecordStore, RecordStoreExtension {
   @Override
   public boolean isEditable(final String typePath) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    return recordDefinition.getIdAttributeIndex() != -1;
+    return recordDefinition.getIdFieldIndex() != -1;
   }
 
   @Override
@@ -674,9 +674,9 @@ implements JdbcRecordStore, RecordStoreExtension {
             final ResultSet rs = statement.executeQuery()) {
           while (rs.next()) {
             final String tableName = rs.getString("TABLE_NAME").toUpperCase();
-            final String idAttributeName = rs.getString("COLUMN_NAME");
+            final String idFieldName = rs.getString("COLUMN_NAME");
             CollectionUtil.addToList(idColumnNames, schemaName + "/"
-                + tableName, idAttributeName);
+                + tableName, idFieldName);
           }
         }
       }
@@ -725,7 +725,7 @@ implements JdbcRecordStore, RecordStoreExtension {
 
   @Override
   public void preProcess(final RecordStoreSchema schema) {
-    for (final JdbcAttributeAdder attributeAdder : this.attributeAdders.values()) {
+    for (final JdbcFieldAdder attributeAdder : this.attributeAdders.values()) {
       attributeAdder.initialize(schema);
     }
   }
@@ -766,7 +766,7 @@ implements JdbcRecordStore, RecordStoreExtension {
             final Connection connection = getJdbcConnection()) {
           final DatabaseMetaData databaseMetaData = connection.getMetaData();
           final List<String> removedPaths = schema.getTypeNames();
-          final Map<String, List<String>> idAttributeNameMap = loadIdColumnNames(dbSchemaName);
+          final Map<String, List<String>> idFieldNameMap = loadIdColumnNames(dbSchemaName);
           final Set<String> tableNames = tablePermissionsMap.keySet();
           for (final String dbTableName : tableNames) {
             final String tableName = dbTableName.toUpperCase();
@@ -804,15 +804,15 @@ implements JdbcRecordStore, RecordStoreExtension {
                 final boolean required = !columnsRs.getString("IS_NULLABLE")
                     .equals("YES");
                 final String description = columnsRs.getString("REMARKS");
-                addAttribute(recordDefinition, dbColumnName, name, dataType,
+                addField(recordDefinition, dbColumnName, name, dataType,
                   sqlType, length, scale, required, description);
               }
             }
 
             for (final RecordDefinition recordDefinition : recordDefinitionMap.values()) {
               final String typePath = recordDefinition.getPath();
-              final List<String> idAttributeNames = idAttributeNameMap.get(typePath);
-              ((RecordDefinitionImpl)recordDefinition).setIdAttributeNames(idAttributeNames);
+              final List<String> idFieldNames = idFieldNameMap.get(typePath);
+              ((RecordDefinitionImpl)recordDefinition).setIdFieldNames(idFieldNames);
             }
 
           }

@@ -86,10 +86,10 @@ implements RecordStore {
 
   @Override
   public void addCodeTable(final CodeTable codeTable) {
-    final String idColumn = codeTable.getIdAttributeName();
+    final String idColumn = codeTable.getIdFieldName();
     addCodeTable(idColumn, codeTable);
-    final List<String> attributeAliases = codeTable.getAttributeAliases();
-    for (final String alias : attributeAliases) {
+    final List<String> fieldAliases = codeTable.getFieldAliases();
+    for (final String alias : fieldAliases) {
       addCodeTable(alias, codeTable);
     }
     final String codeTableName = codeTable.getName();
@@ -107,8 +107,8 @@ implements RecordStore {
       for (final RecordStoreSchema schema : getSchemas()) {
         if (schema.isInitialized()) {
           for (final RecordDefinition recordDefinition : schema.getRecordDefinitions()) {
-            final String idFieldName = recordDefinition.getIdAttributeName();
-            for (final Attribute attribute : recordDefinition.getAttributes()) {
+            final String idFieldName = recordDefinition.getIdFieldName();
+            for (final FieldDefinition attribute : recordDefinition.getFields()) {
               final String fieldName = attribute.getName();
               if (fieldName.equals(columnName)
                   && !fieldName.equals(idFieldName)) {
@@ -129,8 +129,8 @@ implements RecordStore {
   }
 
   protected void addRecordDefinition(final RecordDefinition recordDefinition) {
-    final String idFieldName = recordDefinition.getIdAttributeName();
-    for (final Attribute attribute : recordDefinition.getAttributes()) {
+    final String idFieldName = recordDefinition.getIdFieldName();
+    for (final FieldDefinition attribute : recordDefinition.getFields()) {
       final String fieldName = attribute.getName();
       if (!fieldName.equals(idFieldName)) {
         final CodeTable codeTable = this.columnToTableMap.get(fieldName);
@@ -255,9 +255,9 @@ implements RecordStore {
       final Record record = create(recordDefinition);
       if (record != null) {
         record.setValues(values);
-        final String idAttributeName = recordDefinition.getIdAttributeName();
-        if (Property.hasValue(idAttributeName)) {
-          if (values.get(idAttributeName) == null) {
+        final String idFieldName = recordDefinition.getIdFieldName();
+        if (Property.hasValue(idFieldName)) {
+          if (values.get(idFieldName) == null) {
             final Object id = createPrimaryIdValue(typePath);
             record.setIdValue(id);
           }
@@ -317,8 +317,8 @@ implements RecordStore {
   public Record createWithId(final RecordDefinition recordDefinition) {
     final Record record = create(recordDefinition);
     if (record != null) {
-      final String idAttributeName = recordDefinition.getIdAttributeName();
-      if (Property.hasValue(idAttributeName)) {
+      final String idFieldName = recordDefinition.getIdFieldName();
+      if (Property.hasValue(idFieldName)) {
         final String typePath = recordDefinition.getPath();
         final Object id = createPrimaryIdValue(typePath);
         record.setIdValue(id);
@@ -463,7 +463,7 @@ implements RecordStore {
   }
 
   protected Map<String, Object> getSharedAttributes() {
-    Map<String, Object> sharedAttributes = ThreadSharedAttributes.getAttribute(this);
+    Map<String, Object> sharedAttributes = ThreadSharedAttributes.getField(this);
     if (sharedAttributes == null) {
       sharedAttributes = new HashMap<String, Object>();
       ThreadSharedAttributes.setAttribute(this, sharedAttributes);
@@ -568,19 +568,19 @@ implements RecordStore {
       return null;
     } else {
       final List<Object> values = id.getValues();
-      final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
-      if (idAttributeNames.isEmpty()) {
+      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+      if (idFieldNames.isEmpty()) {
         throw new IllegalArgumentException(typePath
           + " does not have a primary key");
-      } else if (values.size() != idAttributeNames.size()) {
+      } else if (values.size() != idFieldNames.size()) {
         throw new IllegalArgumentException(id + " not a valid id for "
-            + typePath + " requires " + idAttributeNames);
+            + typePath + " requires " + idFieldNames);
       } else {
         final Query query = new Query(recordDefinition);
-        for (int i = 0; i < idAttributeNames.size(); i++) {
-          final String name = idAttributeNames.get(i);
+        for (int i = 0; i < idFieldNames.size(); i++) {
+          final String name = idFieldNames.get(i);
           final Object value = values.get(i);
-          final Attribute attribute = recordDefinition.getAttribute(name);
+          final FieldDefinition attribute = recordDefinition.getField(name);
           query.and(Q.equal(attribute, value));
         }
         return queryFirst(query);
@@ -594,19 +594,19 @@ implements RecordStore {
     if (recordDefinition == null) {
       return null;
     } else {
-      final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
-      if (idAttributeNames.isEmpty()) {
+      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+      if (idFieldNames.isEmpty()) {
         throw new IllegalArgumentException(typePath
           + " does not have a primary key");
-      } else if (id.length != idAttributeNames.size()) {
+      } else if (id.length != idFieldNames.size()) {
         throw new IllegalArgumentException(Arrays.toString(id)
-          + " not a valid id for " + typePath + " requires " + idAttributeNames);
+          + " not a valid id for " + typePath + " requires " + idFieldNames);
       } else {
         final Query query = new Query(recordDefinition);
-        for (int i = 0; i < idAttributeNames.size(); i++) {
-          final String name = idAttributeNames.get(i);
+        for (int i = 0; i < idFieldNames.size(); i++) {
+          final String name = idFieldNames.get(i);
           final Object value = id[i];
-          final Attribute attribute = recordDefinition.getAttribute(name);
+          final FieldDefinition attribute = recordDefinition.getField(name);
           query.and(Q.equal(attribute, value));
         }
         return queryFirst(query);
@@ -620,12 +620,12 @@ implements RecordStore {
     if (recordDefinition == null) {
       return null;
     } else {
-      final String idAttributeName = recordDefinition.getIdAttributeName();
-      if (idAttributeName == null) {
+      final String idFieldName = recordDefinition.getIdFieldName();
+      if (idFieldName == null) {
         throw new IllegalArgumentException(typePath
           + " does not have a primary key");
       } else {
-        final Query query = Query.equal(recordDefinition, idAttributeName, id);
+        final Query query = Query.equal(recordDefinition, idFieldName, id);
         query.setLockResults(true);
         return queryFirst(query);
       }

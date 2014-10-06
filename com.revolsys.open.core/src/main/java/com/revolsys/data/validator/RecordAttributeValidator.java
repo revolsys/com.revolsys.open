@@ -21,7 +21,7 @@
 package com.revolsys.data.validator;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 
 public class RecordAttributeValidator implements AttributeValueValidator {
   private final RecordValidator validator;
@@ -35,7 +35,7 @@ public class RecordAttributeValidator implements AttributeValueValidator {
   }
 
   @Override
-  public boolean isValid(final Attribute attributeDefinition, final Object value) {
+  public boolean isValid(final FieldDefinition attributeDefinition, final Object value) {
     if (value instanceof Record) {
       return validator.isValid(value);
     } else {

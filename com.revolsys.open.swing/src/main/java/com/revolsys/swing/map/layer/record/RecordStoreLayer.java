@@ -29,7 +29,7 @@ import com.revolsys.data.query.functions.F;
 import com.revolsys.data.query.functions.WithinDistance;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.filter.Filter;
@@ -378,8 +378,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       return Collections.emptyList();
     } else {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final Attribute geometryAttribute = getGeometryAttribute();
-      final WithinDistance where = F.dWithin(geometryAttribute, geometry,
+      final FieldDefinition geometryField = getGeometryField();
+      final WithinDistance where = F.dWithin(geometryField, geometry,
         distance);
       final Query query = new Query(recordDefinition, where);
       return query(query);
@@ -499,12 +499,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
                 try {
                   Identifier identifier = record.getIdentifier();
                   final RecordDefinition recordDefinition = getRecordDefinition();
-                  final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
-                  if (identifier == null && !idAttributeNames.isEmpty()) {
+                  final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+                  if (identifier == null && !idFieldNames.isEmpty()) {
                     final Object idValue = recordStore.createPrimaryIdValue(this.typePath);
                     if (idValue != null) {
                       identifier = SingleIdentifier.create(idValue);
-                      identifier.setIdentifier(record, idAttributeNames);
+                      identifier.setIdentifier(record, idFieldNames);
                     }
                   }
                   writer.write(record);
@@ -542,15 +542,15 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   public <V extends LayerRecord> V getCachedRecord(final Identifier identifier) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
-    if (idAttributeNames.isEmpty()) {
+    final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+    if (idFieldNames.isEmpty()) {
       LoggerFactory.getLogger(getClass()).error(
         this.typePath + " does not have a primary key");
       return null;
     } else {
       LayerRecord record = this.recordIdToRecordMap.get(identifier);
       if (record == null) {
-        final Condition where = Q.equalId(idAttributeNames, identifier);
+        final Condition where = Q.equalId(idFieldNames, identifier);
         final Query query = new Query(recordDefinition, where);
         query.setProperty("recordFactory", this);
         final RecordStore recordStore = getRecordStore();
@@ -613,12 +613,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  public Attribute getGeometryAttribute() {
+  public FieldDefinition getGeometryField() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
       return null;
     } else {
-      return recordDefinition.getGeometryAttribute();
+      return recordDefinition.getGeometryField();
     }
   }
 
@@ -637,15 +637,15 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   public LayerRecord getRecordById(final Identifier id) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final List<String> idAttributeNames = recordDefinition.getIdAttributeNames();
-    if (idAttributeNames.isEmpty()) {
+    final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+    if (idFieldNames.isEmpty()) {
       LoggerFactory.getLogger(getClass()).error(
         this.typePath + " does not have a primary key");
       return null;
     } else {
       LayerRecord record = this.recordIdToRecordMap.get(id);
       if (record == null) {
-        final Condition where = Q.equalId(idAttributeNames, id);
+        final Condition where = Q.equalId(idFieldNames, id);
         final Query query = new Query(recordDefinition, where);
         query.setProperty("recordFactory", this);
         final RecordStore recordStore = getRecordStore();

@@ -41,15 +41,15 @@ public class EqualIgnoreAttributes extends AbstractRecordDefinitionProperty {
     this(Arrays.asList(attributeNames));
   }
 
-  public void addAttributeNames(final Collection<String> attributeNames) {
+  public void addFieldNames(final Collection<String> attributeNames) {
     this.attributeNames.addAll(attributeNames);
   }
 
-  public void addAttributeNames(final String... attributeNames) {
-    addAttributeNames(Arrays.asList(attributeNames));
+  public void addFieldNames(final String... attributeNames) {
+    addFieldNames(Arrays.asList(attributeNames));
   }
 
-  public Set<String> getAttributeNames() {
+  public Set<String> getFieldNames() {
     return this.attributeNames;
   }
 
@@ -78,12 +78,12 @@ public class EqualIgnoreAttributes extends AbstractRecordDefinitionProperty {
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     super.setRecordDefinition(recordDefinition);
     if (this.attributeNames.contains(RecordEquals.EXCLUDE_ID)) {
-      final String idAttributeName = recordDefinition.getIdAttributeName();
-      this.attributeNames.add(idAttributeName);
+      final String idFieldName = recordDefinition.getIdFieldName();
+      this.attributeNames.add(idFieldName);
     }
     if (this.attributeNames.contains(RecordEquals.EXCLUDE_GEOMETRY)) {
-      final String geometryAttributeName = recordDefinition.getGeometryAttributeName();
-      this.attributeNames.add(geometryAttributeName);
+      final String geometryFieldName = recordDefinition.getGeometryFieldName();
+      this.attributeNames.add(geometryFieldName);
     }
   }
 

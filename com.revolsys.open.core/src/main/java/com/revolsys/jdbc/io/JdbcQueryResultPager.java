@@ -340,7 +340,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
           do {
             final Record object = JdbcQueryIterator.getNextObject(
               this.recordStore, this.recordDefinition,
-              this.recordDefinition.getAttributes(), this.recordFactory,
+              this.recordDefinition.getFields(), this.recordFactory,
               this.resultSet);
             this.results.add(object);
             i++;

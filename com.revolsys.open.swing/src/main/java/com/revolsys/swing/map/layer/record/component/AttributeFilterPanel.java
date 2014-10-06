@@ -40,7 +40,7 @@ import com.revolsys.data.query.Q;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.query.RightUnaryCondition;
 import com.revolsys.data.query.Value;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.ComboBox;
@@ -105,7 +105,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   private boolean settingFilter = false;
 
-  private Attribute attribute;
+  private FieldDefinition attribute;
 
   public AttributeFilterPanel(final TablePanel tablePanel,
     final RecordLayerTableModel tableModel) {
@@ -124,7 +124,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
     add(this.whereLabel);
 
     this.attributeNames = new ArrayList<String>(this.layer.getFieldNamesSet());
-    this.attributeNames.remove(this.recordDefinition.getGeometryAttributeName());
+    this.attributeNames.remove(this.recordDefinition.getGeometryFieldName());
     final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
       this.layer);
     this.nameField = new ComboBox(converter, false,
@@ -193,7 +193,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
       if (!Property.hasValue(searchField)) {
         searchField = this.layer.getProperty("searchField");
         if (!Property.hasValue(searchField)) {
-          searchField = this.recordDefinition.getAttributeNames().get(0);
+          searchField = this.recordDefinition.getFieldNames().get(0);
         }
       }
       setSearchFieldName(searchField);
@@ -217,7 +217,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
     }
   }
 
-  public List<String> getAttributeNames() {
+  public List<String> getFieldNames() {
     return this.attributeNames;
   }
 
@@ -473,13 +473,13 @@ ItemListener, DocumentListener, PropertyChangeListener {
       this.previousSearchFieldName = searchFieldName;
       this.layer.setProperty("searchField", searchFieldName);
       final RecordDefinition recordDefinition = this.tableModel.getRecordDefinition();
-      this.attribute = recordDefinition.getAttribute(searchFieldName);
+      this.attribute = recordDefinition.getField(searchFieldName);
       final Class<?> attributeClass = this.attribute.getTypeClass();
       if (!EqualsRegistry.equal(searchFieldName,
         this.nameField.getSelectedItem())) {
         this.nameField.setFieldValue(searchFieldName);
       }
-      if (searchFieldName.equals(recordDefinition.getIdAttributeName())) {
+      if (searchFieldName.equals(recordDefinition.getIdFieldName())) {
         this.codeTable = null;
       } else {
         this.codeTable = this.recordDefinition.getCodeTableByColumn(searchFieldName);

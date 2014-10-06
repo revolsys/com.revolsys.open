@@ -9,12 +9,12 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public final class GpxConstants {
 
-  private static void addAttribute(final String name, final DataType type,
+  private static void addField(final String name, final DataType type,
     final boolean required) {
-    GPX_TYPE.addAttribute(name, type, required);
-    GPX_WAYPOINT.addAttribute(name, type, required);
-    GPX_TRACK.addAttribute(name, type, required);
-    GPX_ROUTE.addAttribute(name, type, required);
+    GPX_TYPE.addField(name, type, required);
+    GPX_WAYPOINT.addField(name, type, required);
+    GPX_TRACK.addField(name, type, required);
+    GPX_ROUTE.addField(name, type, required);
   }
 
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
@@ -82,34 +82,34 @@ public final class GpxConstants {
   public static final String MEDIA_TYPE = "application/gpx+xml";
 
   static {
-    addAttribute("dataset_name", DataTypes.STRING, false);
-    addAttribute("index", DataTypes.DOUBLE, false);
-    addAttribute("feature_type", DataTypes.STRING, false);
-    addAttribute("time", DataTypes.DATE_TIME, false);
-    addAttribute("magvar", DataTypes.DOUBLE, false);
-    addAttribute("geoidheight", DataTypes.DOUBLE, false);
-    addAttribute("name", DataTypes.STRING, false);
-    addAttribute("cmt", DataTypes.STRING, false);
-    addAttribute("desc", DataTypes.STRING, false);
-    addAttribute("src", DataTypes.STRING, false);
-    addAttribute("number", DataTypes.INT, false);
-    addAttribute("link", DataTypes.STRING, false);
-    addAttribute("sym", DataTypes.STRING, false);
-    addAttribute("type", DataTypes.STRING, false);
-    addAttribute("fix", DataTypes.STRING, false);
-    addAttribute("sat", DataTypes.INT, false);
-    addAttribute("hdop", DataTypes.DOUBLE, false);
-    addAttribute("vdop", DataTypes.DOUBLE, false);
-    addAttribute("pdop", DataTypes.DOUBLE, false);
-    addAttribute("ageofdgpsdata", DataTypes.DOUBLE, false);
-    addAttribute("dgpsid", DataTypes.STRING, false);
-    GPX_TYPE.addAttribute("location", DataTypes.GEOMETRY, true);
+    addField("dataset_name", DataTypes.STRING, false);
+    addField("index", DataTypes.DOUBLE, false);
+    addField("feature_type", DataTypes.STRING, false);
+    addField("time", DataTypes.DATE_TIME, false);
+    addField("magvar", DataTypes.DOUBLE, false);
+    addField("geoidheight", DataTypes.DOUBLE, false);
+    addField("name", DataTypes.STRING, false);
+    addField("cmt", DataTypes.STRING, false);
+    addField("desc", DataTypes.STRING, false);
+    addField("src", DataTypes.STRING, false);
+    addField("number", DataTypes.INT, false);
+    addField("link", DataTypes.STRING, false);
+    addField("sym", DataTypes.STRING, false);
+    addField("type", DataTypes.STRING, false);
+    addField("fix", DataTypes.STRING, false);
+    addField("sat", DataTypes.INT, false);
+    addField("hdop", DataTypes.DOUBLE, false);
+    addField("vdop", DataTypes.DOUBLE, false);
+    addField("pdop", DataTypes.DOUBLE, false);
+    addField("ageofdgpsdata", DataTypes.DOUBLE, false);
+    addField("dgpsid", DataTypes.STRING, false);
+    GPX_TYPE.addField("location", DataTypes.GEOMETRY, true);
     GPX_TYPE.setGeometryFactory(GEOMETRY_FACTORY);
-    GPX_WAYPOINT.addAttribute("geometry", DataTypes.POINT, true);
+    GPX_WAYPOINT.addField("geometry", DataTypes.POINT, true);
     GPX_WAYPOINT.setGeometryFactory(GEOMETRY_FACTORY);
-    GPX_TRACK.addAttribute("geometry", DataTypes.GEOMETRY, true);
+    GPX_TRACK.addField("geometry", DataTypes.GEOMETRY, true);
     GPX_TRACK.setGeometryFactory(GEOMETRY_FACTORY);
-    GPX_ROUTE.addAttribute("geometry", DataTypes.LINE_STRING, true);
+    GPX_ROUTE.addField("geometry", DataTypes.LINE_STRING, true);
     GPX_ROUTE.setGeometryFactory(GEOMETRY_FACTORY);
   }
 

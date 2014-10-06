@@ -23,18 +23,18 @@ import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.property.ShortNameProperty;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.gis.oracle.esri.ArcSdeBinaryGeometryRecordStoreExtension;
-import com.revolsys.gis.oracle.esri.ArcSdeStGeometryAttribute;
+import com.revolsys.gis.oracle.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryRecordStoreExtension;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.attribute.JdbcAttributeAdder;
+import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.jts.geom.BoundingBox;
@@ -88,9 +88,9 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
   private void appendEnvelopeIntersects(final Query query,
     final StringBuilder sql, final EnvelopeIntersects envelopeIntersects) {
-    final Attribute geometryAttribute = query.getGeometryAttribute();
+    final FieldDefinition geometryField = query.getGeometryField();
 
-    if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
+    if (geometryField instanceof OracleSdoGeometryJdbcAttribute) {
       sql.append("SDO_RELATE(");
       final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
       if (boundingBox1Value == null) {
@@ -106,7 +106,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
         boundingBox2Value.appendSql(query, this, sql);
       }
       sql.append(",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
-    } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
+    } else if (geometryField instanceof ArcSdeStGeometryFieldDefinition) {
       sql.append("SDE.ST_ENVINTERSECTS(");
       final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
       if (boundingBox1Value == null) {
@@ -124,15 +124,15 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(") = 1");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryAttribute.getClass());
+        + geometryField.getClass());
     }
   }
 
   private void appendGeometryEqual2d(final Query query, final StringBuilder sql,
     final GeometryEqual2d equals) {
-    final Attribute geometryAttribute = query.getGeometryAttribute();
+    final FieldDefinition geometryField = query.getGeometryField();
 
-    if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
+    if (geometryField instanceof OracleSdoGeometryJdbcAttribute) {
       sql.append("MDSYS.SDO_EQUALS(");
       final QueryValue geometry1Value = equals.getGeometry1Value();
       if (geometry1Value == null) {
@@ -148,7 +148,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
         geometry2Value.appendSql(query, this, sql);
       }
       sql.append(") = 'TRUE'");
-    } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
+    } else if (geometryField instanceof ArcSdeStGeometryFieldDefinition) {
       sql.append("SDE.ST_EQUALS(");
       final QueryValue geometry1Value = equals.getGeometry1Value();
       if (geometry1Value == null) {
@@ -166,7 +166,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(") = 1");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryAttribute.getClass());
+        + geometryField.getClass());
     }
   }
 
@@ -186,8 +186,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
   private void appendWithinDistance(final Query query, final StringBuilder sql,
     final WithinDistance withinDistance) {
-    final Attribute geometryAttribute = query.getGeometryAttribute();
-    if (geometryAttribute instanceof OracleSdoGeometryJdbcAttribute) {
+    final FieldDefinition geometryField = query.getGeometryField();
+    if (geometryField instanceof OracleSdoGeometryJdbcAttribute) {
       sql.append("MDSYS.SDO_WITHIN_DISTANCE(");
       final QueryValue geometry1Value = withinDistance.getGeometry1Value();
       if (geometry1Value == null) {
@@ -210,9 +210,9 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
         distanceValue.appendSql(query, this, sql);
       }
       sql.append("') = 'TRUE'");
-    } else if (geometryAttribute instanceof ArcSdeStGeometryAttribute) {
+    } else if (geometryField instanceof ArcSdeStGeometryFieldDefinition) {
       final Column column = (Column)withinDistance.getGeometry1Value();
-      final GeometryFactory geometryFactory = column.getAttribute()
+      final GeometryFactory geometryFactory = column.getField()
         .getRecordDefinition()
         .getGeometryFactory();
       final Value geometry2Value = (Value)withinDistance.getGeometry2Value();
@@ -249,7 +249,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(")");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryAttribute.getClass());
+        + geometryField.getClass());
     }
   }
 
@@ -347,31 +347,31 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     super.initialize();
     if (!this.initialized) {
       this.initialized = true;
-      final JdbcAttributeAdder attributeAdder = new JdbcAttributeAdder();
-      addAttributeAdder("NUMBER", attributeAdder);
+      final JdbcFieldAdder attributeAdder = new JdbcFieldAdder();
+      addFieldAdder("NUMBER", attributeAdder);
 
-      addAttributeAdder("CHAR", attributeAdder);
-      addAttributeAdder("NCHAR", attributeAdder);
-      addAttributeAdder("VARCHAR", attributeAdder);
-      addAttributeAdder("VARCHAR2", attributeAdder);
-      addAttributeAdder("NVARCHAR2", new JdbcAttributeAdder(DataTypes.STRING));
-      addAttributeAdder("LONG", attributeAdder);
-      addAttributeAdder("CLOB", attributeAdder);
-      addAttributeAdder("NCLOB", attributeAdder);
+      addFieldAdder("CHAR", attributeAdder);
+      addFieldAdder("NCHAR", attributeAdder);
+      addFieldAdder("VARCHAR", attributeAdder);
+      addFieldAdder("VARCHAR2", attributeAdder);
+      addFieldAdder("NVARCHAR2", new JdbcFieldAdder(DataTypes.STRING));
+      addFieldAdder("LONG", attributeAdder);
+      addFieldAdder("CLOB", attributeAdder);
+      addFieldAdder("NCLOB", attributeAdder);
 
-      addAttributeAdder("DATE", attributeAdder);
-      addAttributeAdder("TIMESTAMP", attributeAdder);
+      addFieldAdder("DATE", attributeAdder);
+      addFieldAdder("TIMESTAMP", attributeAdder);
 
       final OracleSdoGeometryAttributeAdder sdoGeometryAttributeAdder = new OracleSdoGeometryAttributeAdder(
         this);
-      addAttributeAdder("SDO_GEOMETRY", sdoGeometryAttributeAdder);
-      addAttributeAdder("MDSYS.SDO_GEOMETRY", sdoGeometryAttributeAdder);
+      addFieldAdder("SDO_GEOMETRY", sdoGeometryAttributeAdder);
+      addFieldAdder("MDSYS.SDO_GEOMETRY", sdoGeometryAttributeAdder);
 
       final OracleBlobAttributeAdder blobAdder = new OracleBlobAttributeAdder();
-      addAttributeAdder("BLOB", blobAdder);
+      addFieldAdder("BLOB", blobAdder);
 
       final OracleClobAttributeAdder clobAdder = new OracleClobAttributeAdder();
-      addAttributeAdder("CLOB", clobAdder);
+      addFieldAdder("CLOB", clobAdder);
       setPrimaryKeySql("SELECT distinct cols.table_name, cols.column_name FROM all_constraints cons, all_cons_columns cols WHERE cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner AND cons.owner =?");
 
       setSchemaPermissionsSql("select distinct p.owner \"SCHEMA_NAME\" "

@@ -231,7 +231,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     }
     startObject();
     boolean hasValue = false;
-    final int attributeCount = this.recordDefinition.getAttributeCount();
+    final int attributeCount = this.recordDefinition.getFieldCount();
     for (int i = 0; i < attributeCount; i++) {
       final Object value = object.getValue(i);
       if (isWritable(value)) {
@@ -240,8 +240,8 @@ public class JsonRecordWriter extends AbstractRecordWriter {
         } else {
           hasValue = true;
         }
-        final String name = this.recordDefinition.getAttributeName(i);
-        final DataType dataType = this.recordDefinition.getAttributeType(i);
+        final String name = this.recordDefinition.getFieldName(i);
+        final DataType dataType = this.recordDefinition.getFieldType(i);
         label(name);
         value(dataType, value);
       }

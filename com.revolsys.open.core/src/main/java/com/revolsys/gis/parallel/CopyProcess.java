@@ -34,15 +34,15 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
       targetObject = object;
     } else {
       targetObject = new ArrayRecord(recordDefinition);
-      for (final String attributeName : recordDefinition.getAttributeNames()) {
+      for (final String attributeName : recordDefinition.getFieldNames()) {
         copyAttribute(object, attributeName, targetObject, attributeName);
       }
       if (attributeMap != null) {
         for (final Entry<String, String> mapping : attributeMap.entrySet()) {
           final String sourceAttributeName = mapping.getKey();
-          final String targetAttributeName = mapping.getValue();
+          final String targetFieldName = mapping.getValue();
           copyAttribute(object, sourceAttributeName, targetObject,
-            targetAttributeName);
+            targetFieldName);
         }
       }
     }
@@ -51,19 +51,19 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
 
   private void copyAttribute(final Record sourceObject,
     final String sourceAttributeName, final Record targetObject,
-    final String targetAttributeName) {
+    final String targetFieldName) {
     Object value = sourceObject.getValueByPath(sourceAttributeName);
-    final Map<Object, Object> valueMap = valueMaps.get(targetAttributeName);
+    final Map<Object, Object> valueMap = valueMaps.get(targetFieldName);
     if (valueMap != null) {
       final Object mappedValue = valueMap.get(value);
       if (mappedValue != null) {
         value = mappedValue;
       }
     }
-    targetObject.setValue(targetAttributeName, value);
+    targetObject.setValue(targetFieldName, value);
   }
 
-  public Map<String, String> getAttributeMap() {
+  public Map<String, String> getFieldMap() {
     return attributeMap;
   }
 

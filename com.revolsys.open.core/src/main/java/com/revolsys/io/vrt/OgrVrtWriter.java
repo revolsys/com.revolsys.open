@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
@@ -34,7 +34,7 @@ public class OgrVrtWriter {
 
       writer.element(new QName("SrcLayer"), typeName);
 
-      for (final Attribute attribute : recordDefinition.getAttributes()) {
+      for (final FieldDefinition attribute : recordDefinition.getFields()) {
         final String fieldName = attribute.getName();
         final DataType fieldType = attribute.getType();
         final Class<?> typeClass = attribute.getTypeClass();

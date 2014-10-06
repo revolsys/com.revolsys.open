@@ -8,7 +8,7 @@ import java.util.Map;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -17,7 +17,7 @@ import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.util.Property;
 
 public class RecordLayerAttributesTableModel extends
-  AbstractSingleRecordTableModel implements PropertyChangeListener {
+AbstractSingleRecordTableModel implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -97,21 +97,21 @@ public class RecordLayerAttributesTableModel extends
       if (this.form.get().isEditable()) {
         final String attributeName = getFieldName(rowIndex);
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final Attribute idAttribute = recordDefinition.getIdAttribute();
-        if (idAttribute != null) {
-          final String idAttributeName = idAttribute.getName();
-          if (attributeName.equals(idAttributeName)) {
+        final FieldDefinition idField = recordDefinition.getIdField();
+        if (idField != null) {
+          final String idFieldName = idField.getName();
+          if (attributeName.equals(idFieldName)) {
             if (this.record != null
-                && this.record.getState() == RecordState.New) {
-              if (!Number.class.isAssignableFrom(idAttribute.getTypeClass())) {
+              && this.record.getState() == RecordState.New) {
+              if (!Number.class.isAssignableFrom(idField.getTypeClass())) {
                 return true;
               }
             }
             return false;
           }
         }
-        if (recordDefinition.getGeometryAttributeNames()
-            .contains(attributeName)) {
+        if (recordDefinition.getGeometryFieldNames()
+          .contains(attributeName)) {
           return false;
         } else {
           return this.form.get().isEditable(attributeName);
@@ -137,7 +137,7 @@ public class RecordLayerAttributesTableModel extends
     if (source == this.record) {
       final String propertyName = event.getPropertyName();
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final int index = recordDefinition.getAttributeIndex(propertyName);
+      final int index = recordDefinition.getFieldIndex(propertyName);
       if (index > -1) {
         try {
           fireTableRowsUpdated(index, index);

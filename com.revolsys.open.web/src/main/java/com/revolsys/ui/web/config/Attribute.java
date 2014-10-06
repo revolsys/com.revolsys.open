@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -69,7 +69,7 @@ public class Attribute {
       } catch (final NoSuchMethodException e) {
         throw new IllegalArgumentException(
           type.getName()
-            + " must have a constructor that takes a java.lang.String as an argument");
+          + " must have a constructor that takes a java.lang.String as an argument");
       }
     }
     this.loaderClass = loaderClass;
@@ -77,53 +77,53 @@ public class Attribute {
 
   /**
    * Add a new parameter to the action.
-   * 
+   *
    * @param parameter The parameter.
    */
   public void addParameter(final Parameter parameter) {
-    parameters.put(parameter.getName(), parameter.getValue());
+    this.parameters.put(parameter.getName(), parameter.getValue());
   }
 
   /**
    * Add a new parameter to the action.
-   * 
+   *
    * @param name The parameter name.
    * @param value The parameter value.
    */
   public void addParameter(final String name, final String value) {
-    parameters.put(name, value);
+    this.parameters.put(name, value);
   }
 
   public Config getConfig() {
-    return config;
+    return this.config;
   }
 
   public AttributeLoader getLoader() {
-    return loader;
+    return this.loader;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   /**
    * Get the parameter value.
-   * 
+   *
    * @param name The parameter name.
    * @return The parameter value.
    */
   public Object getParameter(final String name) {
-    return parameters.get(name);
+    return this.parameters.get(name);
   }
 
   public Object getValue() {
-    return value;
+    return this.value;
   }
 
   public void init() {
-    if (loaderClass != null) {
+    if (this.loaderClass != null) {
       try {
-        this.loader = (AttributeLoader)loaderClass.newInstance();
+        this.loader = (AttributeLoader)this.loaderClass.newInstance();
         this.loader.init(this);
       } catch (final Exception e) {
         throw new RuntimeException(e.getMessage(), e);
@@ -132,7 +132,7 @@ public class Attribute {
   }
 
   public boolean isInheritable() {
-    return inheritable;
+    return this.inheritable;
   }
 
 }

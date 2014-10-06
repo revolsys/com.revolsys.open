@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 
 import com.revolsys.data.io.RecordStoreConnectionMapProxy;
 import com.revolsys.data.io.RecordStoreProxy;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
@@ -53,9 +53,9 @@ public class RecordStoreConnectionTreeNode extends LazyLoadTreeNode implements
         } else if (element instanceof RecordDefinition) {
           final RecordDefinition recordDefinition = (RecordDefinition)element;
           String geometryType = null;
-          final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-          if (geometryAttribute != null) {
-            geometryType = geometryAttribute.getType().toString();
+          final FieldDefinition geometryField = recordDefinition.getGeometryField();
+          if (geometryField != null) {
+            geometryType = geometryField.getType().toString();
           }
           final RecordStoreTableTreeNode childNode = new RecordStoreTableTreeNode(
             connectionMap, path, geometryType);

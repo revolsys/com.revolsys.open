@@ -7,7 +7,7 @@ import java.util.List;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.query.functions.F;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
@@ -26,7 +26,7 @@ public class Q {
     return new And(conditions);
   }
 
-  public static QueryValue arithmatic(final Attribute field,
+  public static QueryValue arithmatic(final FieldDefinition field,
     final String operator, final Object value) {
     final Column column = new Column(field);
     final Value queryValue = new Value(field, value);
@@ -59,16 +59,16 @@ public class Q {
 
   }
 
-  public static Between between(final Attribute attribute, final Object min,
-    final Object max) {
+  public static Between between(final FieldDefinition attribute,
+    final Object min, final Object max) {
     final Column column = new Column(attribute);
     final Value minCondition = new Value(attribute, min);
     final Value maxCondition = new Value(attribute, max);
     return new Between(column, minCondition, maxCondition);
   }
 
-  public static Condition binary(final Attribute field, final String operator,
-    final Object value) {
+  public static Condition binary(final FieldDefinition field,
+    final String operator, final Object value) {
     final Column column = new Column(field);
     final Value queryValue = new Value(field, value);
     return binary(column, operator, queryValue);
@@ -106,7 +106,7 @@ public class Q {
     return new Divide(left, right);
   }
 
-  public static Equal equal(final Attribute attribute, final Object value) {
+  public static Equal equal(final FieldDefinition attribute, final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
     return equal(name, valueCondition);
@@ -147,14 +147,14 @@ public class Q {
 
         Condition condition;
         if (value == null) {
-          if (attributeKey instanceof Attribute) {
-            condition = isNull((Attribute)attributeKey);
+          if (attributeKey instanceof FieldDefinition) {
+            condition = isNull((FieldDefinition)attributeKey);
           } else {
             condition = isNull(attributeKey.toString());
           }
         } else {
-          if (attributeKey instanceof Attribute) {
-            final Attribute attribute = (Attribute)attributeKey;
+          if (attributeKey instanceof FieldDefinition) {
+            final FieldDefinition attribute = (FieldDefinition)attributeKey;
             value = attribute.convert(value);
             condition = equal(attribute, value);
           } else {
@@ -164,13 +164,13 @@ public class Q {
         and.add(condition);
       }
     } else {
-      throw new IllegalArgumentException("Attribute count for " + attributes
+      throw new IllegalArgumentException("Field count for " + attributes
         + " != count for values " + values);
     }
     return and;
   }
 
-  public static GreaterThan greaterThan(final Attribute attribute,
+  public static GreaterThan greaterThan(final FieldDefinition attribute,
     final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
@@ -193,8 +193,8 @@ public class Q {
     return new GreaterThan(column, right);
   }
 
-  public static GreaterThanEqual greaterThanEqual(final Attribute attribute,
-    final Object value) {
+  public static GreaterThanEqual greaterThanEqual(
+    final FieldDefinition attribute, final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
     return greaterThanEqual(name, valueCondition);
@@ -217,7 +217,7 @@ public class Q {
     return greaterThanEqual(column, right);
   }
 
-  public static ILike iLike(final Attribute attribute, final Object value) {
+  public static ILike iLike(final FieldDefinition attribute, final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
     return iLike(name, valueCondition);
@@ -243,12 +243,12 @@ public class Q {
       ("%" + right + "%").toUpperCase());
   }
 
-  public static In in(final Attribute attribute,
+  public static In in(final FieldDefinition attribute,
     final Collection<? extends Object> values) {
     return new In(attribute, values);
   }
 
-  public static In in(final Attribute attribute, final Object... values) {
+  public static In in(final FieldDefinition attribute, final Object... values) {
     final List<Object> list = Arrays.asList(values);
     return new In(attribute, list);
   }
@@ -260,7 +260,7 @@ public class Q {
     return new In(left, collectionValue);
   }
 
-  public static IsNotNull isNotNull(final Attribute attribute) {
+  public static IsNotNull isNotNull(final FieldDefinition attribute) {
     final String name = attribute.getName();
     return isNotNull(name);
   }
@@ -270,7 +270,7 @@ public class Q {
     return new IsNotNull(condition);
   }
 
-  public static IsNull isNull(final Attribute attribute) {
+  public static IsNull isNull(final FieldDefinition attribute) {
     final String name = attribute.getName();
     return isNull(name);
   }
@@ -280,7 +280,8 @@ public class Q {
     return new IsNull(condition);
   }
 
-  public static LessThan lessThan(final Attribute attribute, final Object value) {
+  public static LessThan lessThan(final FieldDefinition attribute,
+    final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
     return lessThan(name, valueCondition);
@@ -300,7 +301,7 @@ public class Q {
     return lessThan(column, right);
   }
 
-  public static LessThanEqual lessThanEqual(final Attribute attribute,
+  public static LessThanEqual lessThanEqual(final FieldDefinition attribute,
     final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
@@ -324,7 +325,7 @@ public class Q {
     return new LessThanEqual(column, right);
   }
 
-  public static Like like(final Attribute attribute, final Object value) {
+  public static Like like(final FieldDefinition attribute, final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
     return like(name, valueCondition);
@@ -354,7 +355,7 @@ public class Q {
       left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "", "g");
     }
     final String right = "%"
-        + StringConverterRegistry.toString(value)
+      + StringConverterRegistry.toString(value)
         .toUpperCase()
         .replaceAll("[^A-Z0-9]", "") + "%";
     return Q.like(left, right);
@@ -372,7 +373,8 @@ public class Q {
     return new Not(condition);
   }
 
-  public static NotEqual notEqual(final Attribute attribute, final Object value) {
+  public static NotEqual notEqual(final FieldDefinition attribute,
+    final Object value) {
     final String name = attribute.getName();
     final Value valueCondition = new Value(attribute, value);
     return notEqual(name, valueCondition);

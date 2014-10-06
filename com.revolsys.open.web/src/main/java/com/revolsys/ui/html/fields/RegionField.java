@@ -7,9 +7,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.domain.Region;
 import com.revolsys.ui.html.form.Form;
+import com.revolsys.util.HtmlUtil;
 
 public class RegionField extends Field {
 

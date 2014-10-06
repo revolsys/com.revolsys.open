@@ -23,7 +23,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   public static RecordDefinitionImpl createRecordDefinition(final String name,
     final GeometryFactory geometryFactory, final DataType geometryType) {
     final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(name);
-    recordDefinition.addAttribute("GEOMETRY", geometryType, true);
+    recordDefinition.addField("GEOMETRY", geometryType, true);
     recordDefinition.setGeometryFactory(geometryFactory);
     return recordDefinition;
   }

@@ -18,7 +18,7 @@ import com.revolsys.data.query.Q;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.Path;
@@ -26,7 +26,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
 
 public class CodeTableProperty extends AbstractCodeTable implements
-RecordDefinitionProperty {
+  RecordDefinitionProperty {
 
   public static final CodeTableProperty getProperty(
     final RecordDefinition recordDefinition) {
@@ -35,7 +35,7 @@ RecordDefinitionProperty {
   }
 
   private static final ArrayList<String> DEFAULT_ATTRIBUTE_NAMES = new ArrayList<String>(
-      Arrays.asList("VALUE"));
+    Arrays.asList("VALUE"));
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
 
@@ -43,7 +43,7 @@ RecordDefinitionProperty {
 
   private String modificationTimestampAttributeName;
 
-  private List<String> attributeAliases = new ArrayList<String>();
+  private List<String> fieldAliases = new ArrayList<String>();
 
   private RecordStore recordStore;
 
@@ -57,7 +57,7 @@ RecordDefinitionProperty {
 
   private String typePath;
 
-  private String idAttributeName;
+  private String idFieldName;
 
   private boolean createMissingCodes = true;
 
@@ -70,12 +70,12 @@ RecordDefinitionProperty {
   public CodeTableProperty() {
   }
 
-  public void addAttributeAlias(final String columnName) {
-    this.attributeAliases.add(columnName);
+  public void addFieldAlias(final String columnName) {
+    this.fieldAliases.add(columnName);
   }
 
   public void addValue(final Record code) {
-    final Identifier id = code.getIdentifier(getIdAttributeName());
+    final Identifier id = code.getIdentifier(getIdFieldName());
     final List<Object> values = new ArrayList<Object>();
     for (final String attributeName : this.valueAttributeNames) {
       final Object value = code.getValue(attributeName);
@@ -99,7 +99,7 @@ RecordDefinitionProperty {
   public CodeTableProperty clone() {
     final CodeTableProperty clone = (CodeTableProperty)super.clone();
     clone.recordDefinition = null;
-    clone.attributeAliases = new ArrayList<String>(this.attributeAliases);
+    clone.fieldAliases = new ArrayList<String>(this.fieldAliases);
     clone.valueAttributeNames = new ArrayList<String>(this.valueAttributeNames);
     return clone;
   }
@@ -111,9 +111,9 @@ RecordDefinitionProperty {
       final RecordDefinition recordDefinition = code.getRecordDefinition();
       Object id = this.recordStore.createPrimaryIdValue(this.typePath);
       if (id == null) {
-        final Attribute idAttribute = recordDefinition.getIdAttribute();
-        if (idAttribute != null) {
-          if (Number.class.isAssignableFrom(idAttribute.getType()
+        final FieldDefinition idField = recordDefinition.getIdField();
+        if (idField != null) {
+          if (Number.class.isAssignableFrom(idField.getType()
             .getJavaClass())) {
             id = getNextId();
           } else {
@@ -144,8 +144,8 @@ RecordDefinitionProperty {
   }
 
   @Override
-  public List<String> getAttributeAliases() {
-    return this.attributeAliases;
+  public List<String> getFieldAliases() {
+    return this.fieldAliases;
   }
 
   @Override
@@ -164,17 +164,17 @@ RecordDefinitionProperty {
   }
 
   @Override
-  public String getIdAttributeName() {
-    if (Property.hasValue(this.idAttributeName)) {
-      return this.idAttributeName;
+  public String getIdFieldName() {
+    if (Property.hasValue(this.idFieldName)) {
+      return this.idFieldName;
     } else if (this.recordDefinition == null) {
       return "";
     } else {
-      final String idAttributeName = this.recordDefinition.getIdAttributeName();
-      if (Property.hasValue(idAttributeName)) {
-        return idAttributeName;
+      final String idFieldName = this.recordDefinition.getIdFieldName();
+      if (Property.hasValue(idFieldName)) {
+        return idFieldName;
       } else {
-        return this.recordDefinition.getAttributeName(0);
+        return this.recordDefinition.getFieldName(0);
       }
     }
   }
@@ -258,16 +258,16 @@ RecordDefinitionProperty {
         try {
           final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(this.typePath);
           final Query query = new Query(this.typePath);
-          query.setAttributeNames(recordDefinition.getAttributeNames());
+          query.setAttributeNames(recordDefinition.getFieldNames());
           for (final String order : this.orderBy) {
             query.addOrderBy(order, true);
           }
           try (
-              Reader<Record> reader = this.recordStore.query(query)) {
+            Reader<Record> reader = this.recordStore.query(query)) {
             final List<Record> codes = reader.read();
             this.recordStore.getStatistics()
-            .getStatistics("query")
-            .add(this.typePath, -codes.size());
+              .getStatistics("query")
+              .add(this.typePath, -codes.size());
             Collections.sort(codes, new RecordAttributeComparator(this.orderBy));
             addValues(codes);
           }
@@ -300,7 +300,7 @@ RecordDefinitionProperty {
           if (value == null) {
             and.add(Q.isNull(attributeName));
           } else {
-            final Attribute attribute = this.recordDefinition.getAttribute(attributeName);
+            final FieldDefinition attribute = this.recordDefinition.getField(attributeName);
             and.add(Q.equal(attribute, value));
           }
           i++;
@@ -311,8 +311,8 @@ RecordDefinitionProperty {
       try {
         final List<Record> codes = reader.read();
         this.recordStore.getStatistics()
-        .getStatistics("query")
-        .add(this.typePath, -codes.size());
+          .getStatistics("query")
+          .add(this.typePath, -codes.size());
         addValues(codes);
         id = getIdByValue(values);
         Property.firePropertyChange(this, "valuesChanged", false, true);
@@ -351,8 +351,8 @@ RecordDefinitionProperty {
     }
   }
 
-  public void setAttributeAliases(final List<String> columnAliases) {
-    this.attributeAliases = columnAliases;
+  public void setFieldAliases(final List<String> columnAliases) {
+    this.fieldAliases = columnAliases;
   }
 
   public void setCreateMissingCodes(final boolean createMissingCodes) {
@@ -364,8 +364,8 @@ RecordDefinitionProperty {
     this.creationTimestampAttributeName = creationTimestampAttributeName;
   }
 
-  public void setIdAttributeName(final String idAttributeName) {
-    this.idAttributeName = idAttributeName;
+  public void setIdFieldName(final String idFieldName) {
+    this.idFieldName = idFieldName;
   }
 
   public void setLoadAll(final boolean loadAll) {
@@ -422,8 +422,8 @@ RecordDefinitionProperty {
 
   @Override
   public String toString() {
-    return this.typePath + " " + getIdAttributeName() + " "
-        + this.valueAttributeNames;
+    return this.typePath + " " + getIdFieldName() + " "
+      + this.valueAttributeNames;
 
   }
 

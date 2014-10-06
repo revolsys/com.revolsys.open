@@ -123,7 +123,7 @@ public class RecordListTableModel extends RecordRowTableModel implements
         return false;
       } else {
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final DataType dataType = recordDefinition.getAttributeType(attributeName);
+        final DataType dataType = recordDefinition.getFieldType(attributeName);
         if (dataType == null) {
           return false;
         } else if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {

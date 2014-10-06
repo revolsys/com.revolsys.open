@@ -288,7 +288,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V> V getAttribute(final String name) {
+  public <V> V getField(final String name) {
     if (graph == null) {
       return null;
     } else {
@@ -297,7 +297,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
   }
 
   @Override
-  public Map<String, Object> getAttributes() {
+  public Map<String, Object> getFields() {
     return graph.getEdgeAttributes(id);
   }
 

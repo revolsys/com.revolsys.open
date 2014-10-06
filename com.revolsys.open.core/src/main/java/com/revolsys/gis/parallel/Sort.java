@@ -18,7 +18,7 @@ public class Sort extends BaseInOutProcess<Record, Record> {
 
   private String attributeName;
 
-  public String getAttributeName() {
+  public String getFieldName() {
     return attributeName;
   }
 

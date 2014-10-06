@@ -3,8 +3,8 @@ package com.revolsys.gis.postgresql;
 import java.util.Map;
 
 import com.revolsys.data.query.Query;
-import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcQueryIterator;
+import com.revolsys.jdbc.io.JdbcRecordStore;
 
 public class PostgreSQLJdbcQueryIterator extends JdbcQueryIterator {
 

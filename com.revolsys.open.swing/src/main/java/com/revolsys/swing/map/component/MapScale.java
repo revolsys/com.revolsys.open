@@ -10,8 +10,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.border.BevelBorder;
 
-import org.springframework.util.StringUtils;
-
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 

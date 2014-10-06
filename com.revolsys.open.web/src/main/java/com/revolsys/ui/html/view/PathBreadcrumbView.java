@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,10 +16,10 @@
 package com.revolsys.ui.html.view;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.HtmlUtil;
 
 public class PathBreadcrumbView extends Element {
 
@@ -43,9 +43,9 @@ public class PathBreadcrumbView extends Element {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    String path = this.path.substring(contextPath.length());
+    String path = this.path.substring(this.contextPath.length());
     final String pathPrefix = HttpServletUtils.getAttribute(PathAliasController.PATH_PREFIX);
-    String crumbPath = contextPath;
+    String crumbPath = this.contextPath;
     if (pathPrefix != null && path.startsWith(pathPrefix)) {
       path = path.substring(pathPrefix.length());
       crumbPath += pathPrefix;
@@ -79,12 +79,12 @@ public class PathBreadcrumbView extends Element {
       HtmlUtil.serializeA(out, null, crumbPath + "/", "HOME");
       out.endTag(HtmlUtil.LI);
       final String[] segments = path.split("/");
-      if (addSlash) {
+      if (this.addSlash) {
         crumbPath += "/";
       }
       for (int i = 0; i < segments.length - 1; i++) {
         final String segment = segments[i];
-        if (addSlash) {
+        if (this.addSlash) {
           crumbPath += segment + "/";
         } else {
           crumbPath += "/" + segment;

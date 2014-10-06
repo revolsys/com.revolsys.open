@@ -49,10 +49,10 @@ public class LineStringGraph extends Graph<LineSegment> {
     final Iterator<Edge<LineSegment>> iterator = edges.iterator();
     if (iterator.hasNext()) {
       Edge<LineSegment> edge = iterator.next();
-      List<Integer> index = edge.getAttribute(INDEX);
+      List<Integer> index = edge.getField(INDEX);
       while (iterator.hasNext()) {
         final Edge<LineSegment> edge2 = iterator.next();
-        final List<Integer> index2 = edge2.getAttribute(INDEX);
+        final List<Integer> index2 = edge2.getField(INDEX);
         if (INDEX_COMPARATOR.compare(index, index2) > 0) {
           edge = edge2;
           index = index2;
@@ -485,7 +485,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       }
       newPoints.add(toNode);
 
-      final List<Integer> index = edge.getAttribute(INDEX);
+      final List<Integer> index = edge.getField(INDEX);
       int i = 0;
       Point previousPoint = fromNode;
       for (final Point point : newPoints) {

@@ -62,7 +62,7 @@ import com.revolsys.beans.MethodInvoker;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
@@ -298,14 +298,14 @@ public class SwingUtil {
     final RecordDefinition recordDefinition, final String fieldName,
     final boolean editable) {
     Field field;
-    final Attribute attribute = recordDefinition.getAttribute(fieldName);
+    final FieldDefinition attribute = recordDefinition.getField(fieldName);
     if (attribute == null) {
       throw new IllegalArgumentException("Cannot find field " + fieldName);
     } else {
       final boolean required = attribute.isRequired();
       final int length = attribute.getLength();
       CodeTable codeTable;
-      if (recordDefinition.getIdAttributeNames().contains(fieldName)) {
+      if (recordDefinition.getIdFieldNames().contains(fieldName)) {
         codeTable = null;
       } else {
         codeTable = recordDefinition.getCodeTableByColumn(fieldName);

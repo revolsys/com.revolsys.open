@@ -12,7 +12,7 @@ public class MapValues extends
   AbstractSourceToTargetProcess<Record, Record> {
   private String sourceAttributeName;
 
-  private String targetAttributeName;
+  private String targetFieldName;
 
   private Map<Object, Object> valueMap = new LinkedHashMap<Object, Object>();
 
@@ -20,15 +20,15 @@ public class MapValues extends
   }
 
   public MapValues(final String sourceAttributeName,
-    final String targetAttributeName) {
+    final String targetFieldName) {
     this.sourceAttributeName = sourceAttributeName;
-    this.targetAttributeName = targetAttributeName;
+    this.targetFieldName = targetFieldName;
   }
 
   public MapValues(final String sourceAttributeName,
-    final String targetAttributeName, final Map<Object, Object> valueMap) {
+    final String targetFieldName, final Map<Object, Object> valueMap) {
     this.sourceAttributeName = sourceAttributeName;
-    this.targetAttributeName = targetAttributeName;
+    this.targetFieldName = targetFieldName;
     this.valueMap = valueMap;
   }
 
@@ -40,8 +40,8 @@ public class MapValues extends
     return sourceAttributeName;
   }
 
-  public String getTargetAttributeName() {
-    return targetAttributeName;
+  public String getTargetFieldName() {
+    return targetFieldName;
   }
 
   public Map<Object, Object> getValueMap() {
@@ -50,18 +50,18 @@ public class MapValues extends
 
   @Override
   public void process(final Record source, final Record target) {
-    final Object sourceValue = RecordUtil.getAttributeByPath(source,
+    final Object sourceValue = RecordUtil.getFieldByPath(source,
       sourceAttributeName);
     if (sourceValue != null) {
       final Object targetValue = valueMap.get(sourceValue);
       if (targetValue != null) {
         final RecordDefinition targetRecordDefinition = target.getRecordDefinition();
-        final CodeTable codeTable = targetRecordDefinition.getCodeTableByColumn(targetAttributeName);
+        final CodeTable codeTable = targetRecordDefinition.getCodeTableByColumn(targetFieldName);
         if (codeTable == null) {
-          target.setValue(targetAttributeName, targetValue);
+          target.setValue(targetFieldName, targetValue);
         } else {
           final Object codeId = codeTable.getId(targetValue);
-          target.setValue(targetAttributeName, codeId);
+          target.setValue(targetFieldName, codeId);
         }
       }
     }
@@ -71,8 +71,8 @@ public class MapValues extends
     this.sourceAttributeName = sourceAttributeName;
   }
 
-  public void setTargetAttributeName(final String targetAttributeName) {
-    this.targetAttributeName = targetAttributeName;
+  public void setTargetFieldName(final String targetFieldName) {
+    this.targetFieldName = targetFieldName;
   }
 
   public void setValueMap(final Map<Object, Object> attributeNames) {

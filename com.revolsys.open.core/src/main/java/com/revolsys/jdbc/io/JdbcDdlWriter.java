@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.ShortNameProperty;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Path;
 import com.revolsys.util.CollectionUtil;
@@ -86,21 +86,23 @@ public abstract class JdbcDdlWriter implements Cloneable {
     final RecordDefinition referencedRecordDefinition) {
     final String typePath = recordDefinition.getPath();
     final String referencedTypeName = referencedRecordDefinition.getPath();
-    final String referencedAttributeName = referencedRecordDefinition.getIdAttributeName();
+    final String referencedAttributeName = referencedRecordDefinition.getIdFieldName();
     final String constraintName = getTableAlias(recordDefinition) + "_"
-        + getTableAlias(referencedRecordDefinition) + "_FK";
+      + getTableAlias(referencedRecordDefinition) + "_FK";
     writeAddForeignKeyConstraint(typePath, constraintName, attributeName,
       referencedTypeName, referencedAttributeName);
   }
 
   public void writeAddForeignKeyConstraint(
     final RecordDefinition recordDefinition, final String attributeName,
-    final String referenceTablePrefix, final RecordDefinition referencedRecordDefinition) {
+    final String referenceTablePrefix,
+    final RecordDefinition referencedRecordDefinition) {
     final String typePath = recordDefinition.getPath();
     final String referencedTypeName = referencedRecordDefinition.getPath();
-    final String referencedAttributeName = referencedRecordDefinition.getIdAttributeName();
+    final String referencedAttributeName = referencedRecordDefinition.getIdFieldName();
     final String constraintName = getTableAlias(recordDefinition) + "_"
-        + referenceTablePrefix + "_" + getTableAlias(referencedRecordDefinition) + "_FK";
+      + referenceTablePrefix + "_" + getTableAlias(referencedRecordDefinition)
+      + "_FK";
     writeAddForeignKeyConstraint(typePath, constraintName, attributeName,
       referencedTypeName, referencedAttributeName);
   }
@@ -123,11 +125,11 @@ public abstract class JdbcDdlWriter implements Cloneable {
 
   public void writeAddPrimaryKeyConstraint(
     final RecordDefinition recordDefinition) {
-    final String idAttributeName = recordDefinition.getIdAttributeName();
-    if (idAttributeName != null) {
+    final String idFieldName = recordDefinition.getIdFieldName();
+    if (idFieldName != null) {
       final String typePath = recordDefinition.getPath();
       final String constraintName = getTableAlias(recordDefinition) + "_PK";
-      writeAddPrimaryKeyConstraint(typePath, constraintName, idAttributeName);
+      writeAddPrimaryKeyConstraint(typePath, constraintName, idFieldName);
     }
   }
 
@@ -142,7 +144,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
     this.out.println(");");
   }
 
-  public abstract void writeColumnDataType(final Attribute attribute);
+  public abstract void writeColumnDataType(final FieldDefinition attribute);
 
   public void writeCreateSchema(final String schemaName) {
   }
@@ -165,8 +167,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
     this.out.print("CREATE TABLE ");
     writeTableName(typePath);
     this.out.println(" (");
-    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
-      final Attribute attribute = recordDefinition.getAttribute(i);
+    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
+      final FieldDefinition attribute = recordDefinition.getField(i);
       if (i > 0) {
         this.out.println(",");
       }
@@ -188,9 +190,9 @@ public abstract class JdbcDdlWriter implements Cloneable {
 
     writeGeometryRecordDefinition(recordDefinition);
 
-    final Attribute idAttribute = recordDefinition.getIdAttribute();
-    if (idAttribute != null) {
-      if (Number.class.isAssignableFrom(idAttribute.getType().getJavaClass())) {
+    final FieldDefinition idField = recordDefinition.getIdField();
+    if (idField != null) {
+      if (Number.class.isAssignableFrom(idField.getType().getJavaClass())) {
         writeCreateSequence(recordDefinition);
       }
     }
@@ -247,14 +249,14 @@ public abstract class JdbcDdlWriter implements Cloneable {
     this.out.print("INSERT INTO ");
     writeTableName(typePath);
     this.out.print(" (");
-    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
+    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
       if (i > 0) {
         this.out.print(", ");
       }
-      this.out.print(recordDefinition.getAttributeName(i));
+      this.out.print(recordDefinition.getFieldName(i));
     }
     this.out.print(" ) VALUES (");
-    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
+    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
       if (i > 0) {
         this.out.print(", ");
       }

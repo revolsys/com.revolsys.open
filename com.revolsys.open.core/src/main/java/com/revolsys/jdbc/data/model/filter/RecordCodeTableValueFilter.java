@@ -73,7 +73,7 @@ public class RecordCodeTableValueFilter implements Filter<Record> {
    *
    * @return The attributeName name, or path to match.
    */
-  public String getAttributeName() {
+  public String getFieldName() {
     return this.attributeName;
   }
 

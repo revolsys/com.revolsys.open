@@ -33,7 +33,7 @@ public class TemplateController extends AbstractController {
     urlPathHelper = null;
   }
 
-  public Map<String, Object> getAttributes() {
+  public Map<String, Object> getFields() {
     return attributes;
   }
 

@@ -72,7 +72,7 @@ public class ObjectPropertyComparator<V> implements Comparator<V> {
     }
   }
 
-  public List<String> getAttributeNames() {
+  public List<String> getFieldNames() {
     return attributeNames;
   }
 

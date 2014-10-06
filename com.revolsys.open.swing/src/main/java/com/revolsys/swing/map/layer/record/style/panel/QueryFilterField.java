@@ -8,7 +8,6 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 
 import org.jdesktop.swingx.VerticalLayout;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.data.query.Condition;
 import com.revolsys.swing.component.ValueField;

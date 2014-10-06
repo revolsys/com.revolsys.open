@@ -107,7 +107,7 @@ public class AddDefaultValuesProcess extends
       processDefaultValues(record, getDefaultValues(type));
     }
 
-    for (int i = 0; i < type.getAttributeCount(); i++) {
+    for (int i = 0; i < type.getFieldCount(); i++) {
       final Object value = record.getValue(i);
       if (value instanceof Record) {
         process((Record)value);
@@ -151,8 +151,8 @@ public class AddDefaultValuesProcess extends
         final Object attributeValue = record.getValue(attributeName);
         if (attributeValue == null) {
           final RecordDefinition type = record.getRecordDefinition();
-          final int attrIndex = type.getAttributeIndex(attributeName);
-          final DataType dataType = type.getAttributeType(attrIndex);
+          final int attrIndex = type.getFieldIndex(attributeName);
+          final DataType dataType = type.getFieldType(attrIndex);
           final Class<?> typeClass = dataType.getJavaClass();
           if (typeClass == Record.class) {
 
@@ -166,7 +166,7 @@ public class AddDefaultValuesProcess extends
           final Record subObject = (Record)attributeValue;
           setDefaultValue(subObject, subKey, value);
         } else if (!attributeName.equals(record.getRecordDefinition()
-          .getGeometryAttributeName())) {
+          .getGeometryFieldName())) {
           log.error("Attribute '" + attributeName + "' must be a Record");
         }
       } finally {

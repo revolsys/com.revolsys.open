@@ -17,7 +17,7 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.Geometry;
@@ -54,8 +54,8 @@ implements SortableTableModel, CellEditorListener {
     if (Property.hasValue(fieldNames)) {
       setFieldNamesAndTitles(fieldNames, Collections.<String> emptyList());
     }
-    final String idAttributeName = recordDefinition.getIdAttributeName();
-    setSortOrder(idAttributeName);
+    final String idFieldName = recordDefinition.getIdFieldName();
+    setSortOrder(idFieldName);
   }
 
   public void clearSortedColumns() {
@@ -80,13 +80,13 @@ implements SortableTableModel, CellEditorListener {
   public void editingStopped(final ChangeEvent event) {
   }
 
-  public Attribute getColumnAttribute(final int columnIndex) {
+  public FieldDefinition getColumnAttribute(final int columnIndex) {
     if (columnIndex < this.fieldsOffset) {
       return null;
     } else {
       final String name = getFieldName(columnIndex);
       final RecordDefinition recordDefinition = getRecordDefinition();
-      return recordDefinition.getAttribute(name);
+      return recordDefinition.getField(name);
     }
   }
 
@@ -97,7 +97,7 @@ implements SortableTableModel, CellEditorListener {
     } else {
       final String name = getFieldName(columnIndex);
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final DataType type = recordDefinition.getAttributeType(name);
+      final DataType type = recordDefinition.getFieldType(name);
       if (type == null) {
         return Object.class;
       } else {
@@ -217,7 +217,7 @@ implements SortableTableModel, CellEditorListener {
           if (fieldName != null) {
             if (!isReadOnly(fieldName)) {
               final RecordDefinition recordDefinition = getRecordDefinition();
-              final Class<?> attributeClass = recordDefinition.getAttributeClass(fieldName);
+              final Class<?> attributeClass = recordDefinition.getFieldClass(fieldName);
               if (!Geometry.class.isAssignableFrom(attributeClass)) {
                 return true;
               }
@@ -245,7 +245,7 @@ implements SortableTableModel, CellEditorListener {
   public void setFieldNames(final Collection<String> attributeNames) {
     if (attributeNames == null || attributeNames.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      this.fieldNames = new ArrayList<>(recordDefinition.getAttributeNames());
+      this.fieldNames = new ArrayList<>(recordDefinition.getFieldNames());
     } else {
       this.fieldNames = new ArrayList<>(attributeNames);
     }
@@ -256,7 +256,7 @@ implements SortableTableModel, CellEditorListener {
     final List<String> fieldTitles) {
     if (fieldNames == null || fieldNames.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      this.fieldNames = new ArrayList<>(recordDefinition.getAttributeNames());
+      this.fieldNames = new ArrayList<>(recordDefinition.getFieldNames());
     } else {
       this.fieldNames = new ArrayList<>(fieldNames);
     }
@@ -268,7 +268,7 @@ implements SortableTableModel, CellEditorListener {
       } else {
         final String attributeName = getFieldName(i);
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final Attribute attribute = recordDefinition.getAttribute(attributeName);
+        final FieldDefinition attribute = recordDefinition.getField(attributeName);
         title = attribute.getTitle();
       }
       this.fieldTitles.add(title);
@@ -289,7 +289,7 @@ implements SortableTableModel, CellEditorListener {
       } else {
         final String attributeName = getFieldName(i);
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final Attribute attribute = recordDefinition.getAttribute(attributeName);
+        final FieldDefinition attribute = recordDefinition.getField(attributeName);
         title = attribute.getTitle();
       }
       this.fieldTitles.add(title);
@@ -314,9 +314,9 @@ implements SortableTableModel, CellEditorListener {
     }
   }
 
-  public void setSortOrder(final String idAttributeName) {
-    if (Property.hasValue(idAttributeName)) {
-      final int index = this.fieldNames.indexOf(idAttributeName);
+  public void setSortOrder(final String idFieldName) {
+    if (Property.hasValue(idFieldName)) {
+      final int index = this.fieldNames.indexOf(idFieldName);
       if (index != -1) {
         setSortOrder(index);
       }
@@ -350,7 +350,7 @@ implements SortableTableModel, CellEditorListener {
     final Object objectValue) {
     String text;
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final String idFieldName = recordDefinition.getIdAttributeName();
+    final String idFieldName = recordDefinition.getIdFieldName();
     final String name = getFieldName(attributeIndex);
     if (objectValue == null) {
       return null;

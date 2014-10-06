@@ -18,7 +18,7 @@ import org.springframework.dao.DataAccessException;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.property.GlobalIdProperty;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.io.StatisticsMap;
@@ -26,7 +26,7 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.attribute.JdbcAttribute;
+import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 import com.revolsys.transaction.Transaction;
 
 public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
@@ -103,7 +103,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
   }
 
   private void addSqlColumEqualsPlaceholder(final StringBuilder sqlBuffer,
-    final JdbcAttribute attribute) {
+    final JdbcFieldDefinition attribute) {
     final String attributeName = attribute.getName();
     if (this.quoteColumnNames) {
       sqlBuffer.append('"').append(attributeName).append('"');
@@ -162,8 +162,8 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       }
     }
     int parameterIndex = 1;
-    final JdbcAttribute idAttribute = (JdbcAttribute)recordDefinition.getIdAttribute();
-    parameterIndex = idAttribute.setInsertPreparedStatementValue(statement,
+    final JdbcFieldDefinition idField = (JdbcFieldDefinition)recordDefinition.getIdField();
+    parameterIndex = idField.setInsertPreparedStatementValue(statement,
       parameterIndex, object);
     statement.addBatch();
     Integer batchCount = this.typeDeleteBatchCountMap.get(typePath);
@@ -292,11 +292,11 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       sqlBuffer.append(" from ");
       sqlBuffer.append(tableName);
       sqlBuffer.append(" where ");
-      final JdbcAttribute idAttribute = (JdbcAttribute)type.getIdAttribute();
-      if (idAttribute == null) {
+      final JdbcFieldDefinition idField = (JdbcFieldDefinition)type.getIdField();
+      if (idField == null) {
         throw new RuntimeException("No primary key found for " + type);
       }
-      addSqlColumEqualsPlaceholder(sqlBuffer, idAttribute);
+      addSqlColumEqualsPlaceholder(sqlBuffer, idField);
 
       sqlBuffer.append(" ");
       if (this.sqlSuffix != null) {
@@ -344,23 +344,23 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       sqlBuffer.append(tableName);
       sqlBuffer.append(" (");
       if (generatePrimaryKey) {
-        final String idAttributeName = type.getIdAttributeName();
+        final String idFieldName = type.getIdFieldName();
         if (this.quoteColumnNames) {
-          sqlBuffer.append('"').append(idAttributeName).append('"');
+          sqlBuffer.append('"').append(idFieldName).append('"');
         } else {
-          sqlBuffer.append(idAttributeName);
+          sqlBuffer.append(idFieldName);
         }
         sqlBuffer.append(",");
       }
-      for (int i = 0; i < type.getAttributeCount(); i++) {
-        if (!generatePrimaryKey || i != type.getIdAttributeIndex()) {
-          final String attributeName = type.getAttributeName(i);
+      for (int i = 0; i < type.getFieldCount(); i++) {
+        if (!generatePrimaryKey || i != type.getIdFieldIndex()) {
+          final String attributeName = type.getFieldName(i);
           if (this.quoteColumnNames) {
             sqlBuffer.append('"').append(attributeName).append('"');
           } else {
             sqlBuffer.append(attributeName);
           }
-          if (i < type.getAttributeCount() - 1) {
+          if (i < type.getFieldCount() - 1) {
             sqlBuffer.append(", ");
           }
         }
@@ -370,11 +370,11 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
         sqlBuffer.append(getGeneratePrimaryKeySql(type));
         sqlBuffer.append(",");
       }
-      for (int i = 0; i < type.getAttributeCount(); i++) {
-        if (!generatePrimaryKey || i != type.getIdAttributeIndex()) {
-          final JdbcAttribute attribute = (JdbcAttribute)type.getAttribute(i);
+      for (int i = 0; i < type.getFieldCount(); i++) {
+        if (!generatePrimaryKey || i != type.getIdFieldIndex()) {
+          final JdbcFieldDefinition attribute = (JdbcFieldDefinition)type.getField(i);
           attribute.addInsertStatementPlaceHolder(sqlBuffer, generatePrimaryKey);
-          if (i < type.getAttributeCount() - 1) {
+          if (i < type.getFieldCount() - 1) {
             sqlBuffer.append(", ");
           }
         }
@@ -429,11 +429,11 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       }
       sqlBuffer.append(tableName);
       sqlBuffer.append(" set ");
-      final List<Attribute> idAttributes = type.getIdAttributes();
+      final List<FieldDefinition> idFields = type.getIdFields();
       boolean first = true;
-      for (final Attribute attribute : type.getAttributes()) {
-        if (!idAttributes.contains(attribute)) {
-          final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
+      for (final FieldDefinition attribute : type.getFields()) {
+        if (!idFields.contains(attribute)) {
+          final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
           if (first) {
             first = false;
           } else {
@@ -444,13 +444,13 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       }
       sqlBuffer.append(" where ");
       first = true;
-      for (final Attribute idAttribute : idAttributes) {
+      for (final FieldDefinition idField : idFields) {
         if (first) {
           first = false;
         } else {
           sqlBuffer.append(" AND ");
         }
-        final JdbcAttribute idJdbcAttribute = (JdbcAttribute)idAttribute;
+        final JdbcFieldDefinition idJdbcAttribute = (JdbcFieldDefinition)idField;
         addSqlColumEqualsPlaceholder(sqlBuffer, idJdbcAttribute);
       }
 
@@ -470,19 +470,19 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
     final String typePath = objectType.getPath();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     flushIfRequired(recordDefinition);
-    final String idAttributeName = recordDefinition.getIdAttributeName();
-    final boolean hasId = idAttributeName != null;
+    final String idFieldName = recordDefinition.getIdFieldName();
+    final boolean hasId = idFieldName != null;
 
     final GlobalIdProperty globalIdProperty = GlobalIdProperty.getProperty(object);
     if (globalIdProperty != null) {
-      if (object.getValue(globalIdProperty.getAttributeName()) == null) {
-        object.setValue(globalIdProperty.getAttributeName(), UUID.randomUUID()
+      if (object.getValue(globalIdProperty.getFieldName()) == null) {
+        object.setValue(globalIdProperty.getFieldName(), UUID.randomUUID()
           .toString());
       }
     }
 
     final boolean hasIdValue = hasId
-        && object.getValue(idAttributeName) != null;
+      && object.getValue(idFieldName) != null;
 
     if (!hasId || hasIdValue) {
       insert(object, typePath, recordDefinition);
@@ -506,8 +506,8 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       }
     }
     int parameterIndex = 1;
-    for (final Attribute attribute : recordDefinition.getAttributes()) {
-      final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
+    for (final FieldDefinition attribute : recordDefinition.getFields()) {
+      final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
       parameterIndex = jdbcAttribute.setInsertPreparedStatementValue(statement,
         parameterIndex, object);
     }
@@ -540,10 +540,10 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       }
     }
     int parameterIndex = 1;
-    final Attribute idAttribute = recordDefinition.getIdAttribute();
-    for (final Attribute attribute : recordDefinition.getAttributes()) {
-      if (attribute != idAttribute) {
-        final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
+    final FieldDefinition attribute = recordDefinition.getIdField();
+    for (final FieldDefinition idField : recordDefinition.getFields()) {
+      if (attribute != idField) {
+        final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
         parameterIndex = jdbcAttribute.setInsertPreparedStatementValue(
           statement, parameterIndex, object);
       }
@@ -661,16 +661,16 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       }
     }
     int parameterIndex = 1;
-    final List<Attribute> idAttributes = recordDefinition.getIdAttributes();
-    for (final Attribute attribute : recordDefinition.getAttributes()) {
-      if (!idAttributes.contains(attribute)) {
-        final JdbcAttribute jdbcAttribute = (JdbcAttribute)attribute;
+    final List<FieldDefinition> idFields = recordDefinition.getIdFields();
+    for (final FieldDefinition attribute : recordDefinition.getFields()) {
+      if (!idFields.contains(attribute)) {
+        final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
         parameterIndex = jdbcAttribute.setInsertPreparedStatementValue(
           statement, parameterIndex, object);
       }
     }
-    for (final Attribute idAttribute : idAttributes) {
-      final JdbcAttribute jdbcAttribute = (JdbcAttribute)idAttribute;
+    for (final FieldDefinition idField : idFields) {
+      final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)idField;
       parameterIndex = jdbcAttribute.setInsertPreparedStatementValue(statement,
         parameterIndex, object);
 
@@ -706,16 +706,16 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
         switch (state) {
           case New:
             insert(object);
-            break;
+          break;
           case Modified:
             update(object);
-            break;
+          break;
           case Persisted:
-            // No action required
-            break;
+          // No action required
+          break;
           case Deleted:
             delete(object);
-            break;
+          break;
           default:
             throw new IllegalStateException("State not known");
         }

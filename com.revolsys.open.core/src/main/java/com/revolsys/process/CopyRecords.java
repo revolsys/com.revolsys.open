@@ -81,10 +81,10 @@ public class CopyRecords extends AbstractProcess {
               "Cannot find target table: " + this.typePath);
           } else {
             if (this.hasSequence) {
-              final String idAttributeName = targetRecordDefinition.getIdAttributeName();
+              final String idFieldName = targetRecordDefinition.getIdFieldName();
               Object maxId = this.targetRecordStore.createPrimaryIdValue(this.typePath);
               for (final Record sourceRecord : reader) {
-                final Object sourceId = sourceRecord.getValue(idAttributeName);
+                final Object sourceId = sourceRecord.getValue(idFieldName);
                 while (CompareUtil.compare(maxId, sourceId) < 0) {
                   maxId = this.targetRecordStore.createPrimaryIdValue(this.typePath);
                 }

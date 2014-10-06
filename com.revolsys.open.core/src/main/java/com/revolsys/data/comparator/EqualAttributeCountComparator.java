@@ -30,7 +30,7 @@ public class EqualAttributeCountComparator implements Comparator<Record> {
     final boolean invert) {
     this.object = object;
     final RecordDefinition recordDefinition = object.getRecordDefinition();
-    attributeNames = recordDefinition.getAttributeNames();
+    attributeNames = recordDefinition.getFieldNames();
     this.invert = invert;
   }
 

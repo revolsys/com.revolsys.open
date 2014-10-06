@@ -101,8 +101,8 @@ import com.revolsys.util.CaseConverter;
  * <pre>
  * public Person processPerson(final XMLStreamReader parser)
  *   throws XMLStreamException, IOException {
- *   String firstName = parser.getAttributeValue(null, &quot;firstName&quot;);
- *   String lastName = parser.getAttributeValue(null, &quot;lastName&quot;);
+ *   String firstName = parser.getFieldValue(null, &quot;firstName&quot;);
+ *   String lastName = parser.getFieldValue(null, &quot;lastName&quot;);
  *   Person person = new Person(firstName, lastName);
  *   StaxUtils.skipSubTree(parser);
  *   return person;

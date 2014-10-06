@@ -24,7 +24,7 @@ public class AttributeValueClassFilter implements Filter<Record> {
    */
   @Override
   public boolean accept(final Record object) {
-    final Object propertyValue = RecordUtil.getAttributeByPath(object,
+    final Object propertyValue = RecordUtil.getFieldByPath(object,
       this.attributeName);
     return this.type.isInstance(propertyValue);
   }
@@ -34,7 +34,7 @@ public class AttributeValueClassFilter implements Filter<Record> {
    *
    * @return The attributeName name, or path to match.
    */
-  public String getAttributeName() {
+  public String getFieldName() {
     return this.attributeName;
   }
 

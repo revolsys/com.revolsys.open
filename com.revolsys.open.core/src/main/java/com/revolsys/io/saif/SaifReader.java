@@ -45,8 +45,8 @@ import org.springframework.core.io.Resource;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.property.AttributeProperties;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.property.FieldProperties;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.data.record.schema.RecordDefinitionFactoryImpl;
@@ -596,9 +596,9 @@ public class SaifReader extends AbstractReader<Record> implements
           this.srid, 1.0, 1.0);
 
         for (final RecordDefinition recordDefinition : ((RecordDefinitionFactoryImpl)this.recordDefinitionFactory).getRecordDefinitions()) {
-          final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
-          if (geometryAttribute != null) {
-            geometryAttribute.setProperty(AttributeProperties.GEOMETRY_FACTORY,
+          final FieldDefinition geometryField = recordDefinition.getGeometryField();
+          if (geometryField != null) {
+            geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY,
               geometryFactory);
           }
         }

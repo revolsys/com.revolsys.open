@@ -9,12 +9,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
-import com.revolsys.swing.table.AbstractTableModel;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJxTable;
 
 public class SwingWorkerTableModel extends AbstractTableModel {

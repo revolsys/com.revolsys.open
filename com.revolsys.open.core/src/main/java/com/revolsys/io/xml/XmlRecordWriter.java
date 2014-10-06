@@ -125,11 +125,11 @@ public class XmlRecordWriter extends AbstractRecordWriter {
 
     this.out.startTag(qualifiedName);
 
-    final int attributeCount = this.recordDefinition.getAttributeCount();
+    final int attributeCount = this.recordDefinition.getFieldCount();
     for (int i = 0; i < attributeCount; i++) {
       final Object value = object.getValue(i);
       if (isWritable(value)) {
-        final String name = this.recordDefinition.getAttributeName(i);
+        final String name = this.recordDefinition.getFieldName(i);
         final QName tagName = new QName(name);
         if (value instanceof Map) {
           @SuppressWarnings("unchecked")
@@ -143,7 +143,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
           list(list);
           this.out.endTag();
         } else {
-          final DataType dataType = this.recordDefinition.getAttributeType(i);
+          final DataType dataType = this.recordDefinition.getFieldType(i);
           final String string = StringConverterRegistry.toString(dataType,
             value);
           this.out.nillableElement(tagName, string);

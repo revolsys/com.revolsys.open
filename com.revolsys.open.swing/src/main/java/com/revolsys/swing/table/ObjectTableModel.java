@@ -3,8 +3,6 @@ package com.revolsys.swing.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.swing.table.AbstractTableModel;
-
 import com.revolsys.util.JavaBeanUtil;
 
 public class ObjectTableModel<T> extends AbstractTableModel {

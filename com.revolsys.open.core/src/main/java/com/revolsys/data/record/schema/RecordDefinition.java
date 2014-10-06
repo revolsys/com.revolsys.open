@@ -31,8 +31,8 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public interface RecordDefinition extends RecordStoreSchemaElement,
-  MapSerializer {
-  void addDefaultValue(String attributeName, Object defaultValue);
+MapSerializer {
+  void addDefaultValue(String fieldName, Object defaultValue);
 
   Record createRecord();
 
@@ -40,146 +40,146 @@ public interface RecordDefinition extends RecordStoreSchemaElement,
 
   void destroy();
 
-  Attribute getAttribute(CharSequence name);
-
-  Attribute getAttribute(int index);
-
-  Class<?> getAttributeClass(CharSequence name);
-
-  Class<?> getAttributeClass(int index);
-
-  /**
-   * Get the number of attributes supported by the type.
-   *
-   * @return The number of attributes.
-   */
-  int getAttributeCount();
-
-  /**
-   * Get the index of the named attribute within the list of attributes for the
-   * type.
-   *
-   * @param name The attribute name.
-   * @return The index.
-   */
-  int getAttributeIndex(CharSequence name);
-
-  /**
-   * Get the maximum length of the attribute.
-   *
-   * @param index The attribute index.
-   * @return The maximum length.
-   */
-  int getAttributeLength(int index);
-
-  /**
-   * Get the name of the attribute at the specified index.
-   *
-   * @param index The attribute index.
-   * @return The attribute name.
-   */
-  String getAttributeName(int index);
-
-  /**
-   * Get the names of all the attributes supported by the type.
-   *
-   * @return The attribute names.
-   */
-  List<String> getAttributeNames();
-
-  List<Attribute> getAttributes();
-
-  /**
-   * Get the maximum number of decimal places of the attribute
-   *
-   * @param index The attribute index.
-   * @return The maximum number of decimal places.
-   */
-  int getAttributeScale(int index);
-
-  String getAttributeTitle(String fieldName);
-
-  List<String> getAttributeTitles();
-
-  DataType getAttributeType(CharSequence name);
-
-  /**
-   * Get the type name of the attribute at the specified index.
-   *
-   * @param index The attribute index.
-   * @return The attribute type name.
-   */
-  DataType getAttributeType(int index);
-
   CodeTable getCodeTableByColumn(String column);
 
-  Object getDefaultValue(String attributeName);
+  Object getDefaultValue(String fieldName);
 
   Map<String, Object> getDefaultValues();
 
-  Attribute getGeometryAttribute();
+  FieldDefinition getField(CharSequence name);
+
+  FieldDefinition getField(int index);
+
+  Class<?> getFieldClass(CharSequence name);
+
+  Class<?> getFieldClass(int index);
 
   /**
-   * Get the index of the primary Geometry attribute.
+   * Get the number of fields supported by the type.
    *
-   * @return The primary geometry index.
+   * @return The number of fieldibutes.
    */
-  int getGeometryAttributeIndex();
+  int getFieldCount();
 
   /**
-   * Get the index of all Geometry attributes.
+   * Get the index of the named field within the list of fields for the
+   * type.
    *
-   * @return The geometry indexes.
+   * @param name The field name.
+   * @return The index.
    */
-  List<Integer> getGeometryAttributeIndexes();
+  int getFieldIndex(CharSequence name);
 
   /**
-   * Get the name of the primary Geometry attribute.
+   * Get the maximum length of the field.
    *
-   * @return The primary geometry name.
+   * @param index The field index.
+   * @return The maximum length.
    */
-  String getGeometryAttributeName();
+  int getFieldLength(int index);
 
   /**
-   * Get the name of the all Geometry attributes.
+   * Get the name of the field at the specified index.
    *
-   * @return The geometry names.
+   * @param index The field index.
+   * @return The field name.
    */
-  List<String> getGeometryAttributeNames();
+  String getFieldName(int index);
+
+  /**
+   * Get the names of all the fields supported by the type.
+   *
+   * @return The field names.
+   */
+  List<String> getFieldNames();
+
+  List<FieldDefinition> getFields();
+
+  /**
+   * Get the maximum number of decimal places of the field
+   *
+   * @param index The field index.
+   * @return The maximum number of decimal places.
+   */
+  int getFieldScale(int index);
+
+  String getFieldTitle(String fieldName);
+
+  List<String> getFieldTitles();
+
+  DataType getFieldType(CharSequence name);
+
+  /**
+   * Get the type name of the field at the specified index.
+   *
+   * @param index The field index.
+   * @return The field type name.
+   */
+  DataType getFieldType(int index);
 
   GeometryFactory getGeometryFactory();
 
-  Attribute getIdAttribute();
+  FieldDefinition getGeometryField();
 
   /**
-   * Get the index of the Unique identifier attribute.
+   * Get the index of the primary Geometry field.
+   *
+   * @return The primary geometry index.
+   */
+  int getGeometryFieldIndex();
+
+  /**
+   * Get the index of all Geometry fields.
+   *
+   * @return The geometry indexes.
+   */
+  List<Integer> getGeometryFieldIndexes();
+
+  /**
+   * Get the name of the primary Geometry field.
+   *
+   * @return The primary geometry name.
+   */
+  String getGeometryFieldName();
+
+  /**
+   * Get the name of the all Geometry fields.
+   *
+   * @return The geometry names.
+   */
+  List<String> getGeometryFieldNames();
+
+  FieldDefinition getIdField();
+
+  /**
+   * Get the index of the Unique identifier field.
    *
    * @return The unique id index.
    */
-  int getIdAttributeIndex();
+  int getIdFieldIndex();
 
   /**
-   * Get the index of all ID attributes.
+   * Get the index of all ID fields.
    *
    * @return The ID indexes.
    */
-  List<Integer> getIdAttributeIndexes();
+  List<Integer> getIdFieldIndexes();
 
   /**
-   * Get the name of the Unique identifier attribute.
+   * Get the name of the Unique identifier field.
    *
    * @return The unique id name.
    */
-  String getIdAttributeName();
+  String getIdFieldName();
 
   /**
-   * Get the name of the all ID attributes.
+   * Get the name of the all ID fields.
    *
    * @return The id names.
    */
-  List<String> getIdAttributeNames();
+  List<String> getIdFieldNames();
 
-  List<Attribute> getIdAttributes();
+  List<FieldDefinition> getIdFields();
 
   int getInstanceId();
 
@@ -188,22 +188,22 @@ public interface RecordDefinition extends RecordStoreSchemaElement,
   RecordFactory getRecordFactory();
 
   /**
-   * Check to see if the type has the specified attribute name.
+   * Check to see if the type has the specified field name.
    *
-   * @param name The name of the attribute.
-   * @return True id the type has the attribute, false otherwise.
+   * @param name The name of the field.
+   * @return True id the type has the field, false otherwise.
    */
-  boolean hasAttribute(CharSequence name);
+  boolean hasField(CharSequence name);
 
-  boolean isAttributeRequired(CharSequence name);
+  boolean isFieldDefinition(CharSequence name);
 
   /**
-   * Return true if a value for the attribute is required.
+   * Return true if a value for the field is required.
    *
-   * @param index The attribute index.
-   * @return True if the attribute is required, false otherwise.
+   * @param index The field index.
+   * @return True if the field is required, false otherwise.
    */
-  boolean isAttributeRequired(int index);
+  boolean isFieldDefinition(int index);
 
   boolean isInstanceOf(RecordDefinition classDefinition);
 

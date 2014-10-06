@@ -8,7 +8,6 @@ import java.util.Date;
 import javax.swing.JFormattedTextField;
 
 import org.jdesktop.swingx.JXDatePicker;
-import org.springframework.util.StringUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;

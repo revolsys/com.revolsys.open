@@ -105,8 +105,8 @@ Kml22Constants {
     open();
     this.writer.startTag(PLACEMARK);
     final RecordDefinition recordDefinition = object.getRecordDefinition();
-    final int geometryIndex = recordDefinition.getGeometryAttributeIndex();
-    final int idIndex = recordDefinition.getIdAttributeIndex();
+    final int geometryIndex = recordDefinition.getGeometryFieldIndex();
+    final int idIndex = recordDefinition.getIdFieldIndex();
 
     final String nameAttribute = getProperty(PLACEMARK_NAME_ATTRIBUTE_PROPERTY);
     String name = null;
@@ -143,9 +143,9 @@ Kml22Constants {
       this.writer.element(STYLE_URL, this.defaultStyleUrl);
     }
     boolean hasValues = false;
-    for (int i = 0; i < recordDefinition.getAttributeCount(); i++) {
+    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
       if (i != geometryIndex) {
-        final String attributeName = recordDefinition.getAttributeName(i);
+        final String attributeName = recordDefinition.getFieldName(i);
         final Object value = object.getValue(i);
         if (isWritable(value)) {
           if (!hasValues) {
@@ -162,15 +162,15 @@ Kml22Constants {
     if (hasValues) {
       this.writer.endTag(EXTENDED_DATA);
     }
-    final List<Integer> geometryAttributeIndexes = recordDefinition.getGeometryAttributeIndexes();
-    if (!geometryAttributeIndexes.isEmpty()) {
+    final List<Integer> geometryFieldIndexes = recordDefinition.getGeometryFieldIndexes();
+    if (!geometryFieldIndexes.isEmpty()) {
       Geometry geometry = null;
-      if (geometryAttributeIndexes.size() == 1) {
-        geometry = object.getValue(geometryAttributeIndexes.get(0));
+      if (geometryFieldIndexes.size() == 1) {
+        geometry = object.getValue(geometryFieldIndexes.get(0));
       } else {
         final List<Geometry> geometries = new ArrayList<Geometry>();
-        for (final Integer geometryAttributeIndex : geometryAttributeIndexes) {
-          final Geometry part = object.getValue(geometryAttributeIndex);
+        for (final Integer geometryFieldIndex : geometryFieldIndexes) {
+          final Geometry part = object.getValue(geometryFieldIndex);
           if (part != null) {
             geometries.add(part);
           }

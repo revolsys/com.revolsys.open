@@ -23,10 +23,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.revolsys.io.xml.XmlWriter;
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.web.config.Menu;
 import com.revolsys.ui.web.config.MenuItem;
 import com.revolsys.ui.web.config.WebUiContext;
+import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
 public class MenuView extends ObjectView {

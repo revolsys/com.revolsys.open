@@ -10,7 +10,7 @@ import java.util.Map;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.io.JdbcQueryIterator;
@@ -50,17 +50,17 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
             final JdbcConnection connection = getRecordStore().getJdbcConnection()) {
           final RecordFactory recordFactory = getRecordFactory();
           final RecordDefinition recordDefinition = getRecordDefinition();
-          final List<Attribute> attributes = new ArrayList<>();
+          final List<FieldDefinition> attributes = new ArrayList<>();
 
-          final List<String> attributeNames = query.getAttributeNames();
+          final List<String> attributeNames = query.getFieldNames();
           if (attributeNames.isEmpty()) {
-            attributes.addAll(recordDefinition.getAttributes());
+            attributes.addAll(recordDefinition.getFields());
           } else {
             for (final String attributeName : attributeNames) {
               if (attributeName.equals("*")) {
-                attributes.addAll(recordDefinition.getAttributes());
+                attributes.addAll(recordDefinition.getFields());
               } else {
-                final Attribute attribute = recordDefinition.getAttribute(attributeName);
+                final FieldDefinition attribute = recordDefinition.getField(attributeName);
                 if (attribute != null) {
                   attributes.add(attribute);
                 }

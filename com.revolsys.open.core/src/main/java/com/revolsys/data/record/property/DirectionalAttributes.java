@@ -159,7 +159,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
    * @param fromAttributeName The from attribute name.
    * @param toAttributeName The to attribute name.
    */
-  private void addAttributeNamePair(final Map<String, String> namePairs,
+  private void addFieldNamePair(final Map<String, String> namePairs,
     final String fromAttributeName, final String toAttributeName) {
     final String fromPair = namePairs.get(fromAttributeName);
     if (fromPair == null) {
@@ -196,22 +196,22 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
       startRightAttributeName, endLeftAttributeName, endRightAttributeName));
     addEndAttributePairInternal(startLeftAttributeName, endLeftAttributeName);
     addEndAttributePairInternal(startRightAttributeName, endRightAttributeName);
-    addAttributeNamePair(reverseAttributeNameMap, startLeftAttributeName,
+    addFieldNamePair(reverseAttributeNameMap, startLeftAttributeName,
       endRightAttributeName);
-    addAttributeNamePair(reverseAttributeNameMap, endLeftAttributeName,
+    addFieldNamePair(reverseAttributeNameMap, endLeftAttributeName,
       startRightAttributeName);
   }
 
   public void addEndAttributePair(final String startAttributeName,
     final String endAttributeName) {
     addEndAttributePairInternal(startAttributeName, endAttributeName);
-    addAttributeNamePair(reverseAttributeNameMap, startAttributeName,
+    addFieldNamePair(reverseAttributeNameMap, startAttributeName,
       endAttributeName);
   }
 
   private void addEndAttributePairInternal(final String startAttributeName,
     final String endAttributeName) {
-    addAttributeNamePair(endAttributeNamePairs, startAttributeName,
+    addFieldNamePair(endAttributeNamePairs, startAttributeName,
       endAttributeName);
     startAttributeNames.add(startAttributeName);
     endAttributeNames.add(endAttributeName);
@@ -219,11 +219,11 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
   public void addSideAttributePair(final String leftAttributeName,
     final String rightAttributeName) {
-    addAttributeNamePair(sideAttributeNamePairs, leftAttributeName,
+    addFieldNamePair(sideAttributeNamePairs, leftAttributeName,
       rightAttributeName);
     sideAttributeNames.add(leftAttributeName);
     sideAttributeNames.add(rightAttributeName);
-    addAttributeNamePair(reverseAttributeNameMap, leftAttributeName,
+    addFieldNamePair(reverseAttributeNameMap, leftAttributeName,
       rightAttributeName);
   }
 
@@ -245,7 +245,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     if (forwardsIndicators != null) {
       final RecordDefinition recordDefinition = getRecordDefinition();
       final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(recordDefinition);
-      for (final String attributeName : recordDefinition.getAttributeNames()) {
+      for (final String attributeName : recordDefinition.getFieldNames()) {
         if (!RecordEquals.isAttributeIgnored(recordDefinition,
           equalExcludeAttributes, attributeName)
           && !equalIgnore.isAttributeIgnored(attributeName)) {
@@ -266,7 +266,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     final Collection<String> equalExcludeAttributes,
     final boolean[] forwardsIndicators) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    if (attributeName.equals(recordDefinition.getGeometryAttributeName())) {
+    if (attributeName.equals(recordDefinition.getGeometryFieldName())) {
       final LineString line1 = object1.getGeometryValue();
       final LineString line2 = object2.getGeometryValue();
       return !line1.equals(line2);
@@ -386,7 +386,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     final Collection<String> equalExcludeAttributes) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(recordDefinition);
-    for (final String attributeName : recordDefinition.getAttributeNames()) {
+    for (final String attributeName : recordDefinition.getFieldNames()) {
       if (!equalExcludeAttributes.contains(attributeName)
         && !equalIgnore.isAttributeIgnored(attributeName)) {
         if (!equals(attributeName, object1, object2, equalExcludeAttributes)) {
@@ -421,7 +421,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     final LineString line1 = object1.getGeometryValue();
     final LineString line2 = object2.getGeometryValue();
     final RecordDefinition recordDefinition = getRecordDefinition();
-    if (attributeName.equals(recordDefinition.getGeometryAttributeName())) {
+    if (attributeName.equals(recordDefinition.getGeometryFieldName())) {
       return line1.equals(line2);
     }
 
@@ -482,7 +482,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     if (forwardsIndicators != null) {
       final Set<String> attributeNames = new LinkedHashSet<String>();
       final EqualIgnoreAttributes equalIgnore = EqualIgnoreAttributes.getProperty(recordDefinition);
-      for (final String attributeName : recordDefinition.getAttributeNames()) {
+      for (final String attributeName : recordDefinition.getFieldNames()) {
         if (!equalExcludeAttributes.contains(attributeName)
           && !equalIgnore.isAttributeIgnored(attributeName)) {
           if (!canMerge(attributeName, point, object1, object2,
@@ -493,8 +493,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
       }
       return attributeNames;
     } else {
-      final String geometryAttributeName = recordDefinition.getGeometryAttributeName();
-      return Collections.singleton(geometryAttributeName);
+      final String geometryFieldName = recordDefinition.getGeometryFieldName();
+      return Collections.singleton(geometryFieldName);
     }
   }
 
@@ -607,8 +607,8 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
     setStartAttributes(startObject, newValues);
     setEndAttributes(endObject, newValues);
     final RecordDefinition recordDefinition = object1.getRecordDefinition();
-    final String geometryAttributeName = recordDefinition.getGeometryAttributeName();
-    newValues.put(geometryAttributeName, newLine);
+    final String geometryFieldName = recordDefinition.getGeometryFieldName();
+    newValues.put(geometryFieldName, newLine);
     return newValues;
   }
 
@@ -796,10 +796,10 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
   public Map<String, Object> getReverseAttributesAndGeometry(
     final Map<String, Object> object) {
     final Map<String, Object> reverse = getReverseAttributes(object);
-    final String geometryAttributeName = getRecordDefinition().getGeometryAttributeName();
-    if (geometryAttributeName != null) {
+    final String geometryFieldName = getRecordDefinition().getGeometryFieldName();
+    if (geometryFieldName != null) {
       final Geometry geometry = getReverseLine(object);
-      reverse.put(geometryAttributeName, geometry);
+      reverse.put(geometryFieldName, geometry);
     }
     return reverse;
   }
@@ -807,17 +807,17 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
   public Map<String, Object> getReverseGeometry(final Map<String, Object> object) {
     final Map<String, Object> reverse = new LinkedHashMap<String, Object>(
       object);
-    final String geometryAttributeName = getRecordDefinition().getGeometryAttributeName();
-    if (geometryAttributeName != null) {
+    final String geometryFieldName = getRecordDefinition().getGeometryFieldName();
+    if (geometryFieldName != null) {
       final Geometry geometry = getReverseLine(object);
-      reverse.put(geometryAttributeName, geometry);
+      reverse.put(geometryFieldName, geometry);
     }
     return reverse;
   }
 
   protected Geometry getReverseLine(final Map<String, Object> object) {
-    final String geometryAttributeName = getRecordDefinition().getGeometryAttributeName();
-    final LineString line = (LineString)object.get(geometryAttributeName);
+    final String geometryFieldName = getRecordDefinition().getGeometryFieldName();
+    final LineString line = (LineString)object.get(geometryFieldName);
     if (line == null) {
       return null;
     } else {

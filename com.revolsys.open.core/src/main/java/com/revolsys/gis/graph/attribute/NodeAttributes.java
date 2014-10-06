@@ -154,23 +154,23 @@ public class NodeAttributes {
   }
 
   @SuppressWarnings("unchecked")
-  private static <T, V> V getAttribute(final Node<T> node, final String name) {
+  private static <T, V> V getField(final Node<T> node, final String name) {
     final String attributeName = NodeAttributes.class.getName() + "." + name;
     if (!node.hasAttribute(attributeName)) {
       final ObjectAttributeProxy<T, V> proxy = new InvokeMethodObjectAttributeProxy<T, V>(
           Methods.class, name, Node.class);
       node.setAttribute(attributeName, proxy);
     }
-    final V value = (V)node.getAttribute(attributeName);
+    final V value = (V)node.getField(attributeName);
     return value;
   }
 
   public static Set<Double> getEdgeAngles(final Node<?> node) {
-    return getAttribute(node, EDGE_ANGLES);
+    return getField(node, EDGE_ANGLES);
   }
 
   public static Map<String, Set<Double>> getEdgeAnglesByType(final Node<?> node) {
-    return getAttribute(node, EDGE_ANGLES_BY_TYPE);
+    return getField(node, EDGE_ANGLES_BY_TYPE);
   }
 
   public static <T> Set<Double> getEdgeAnglesByType(final Node<T> node,
@@ -182,7 +182,7 @@ public class NodeAttributes {
 
   public static Set<RecordDefinition> getEdgeRecordDefinitions(
     final Node<? extends Object> node) {
-    return getAttribute(node, EDGE_RECORD_DEFINITIONS);
+    return getField(node, EDGE_RECORD_DEFINITIONS);
   }
 
   /**
@@ -195,11 +195,11 @@ public class NodeAttributes {
    */
   public static <T> Map<LineString, Map<String, Set<Edge<T>>>> getEdgesByLineAndTypeName(
     final Node<T> node) {
-    return getAttribute(node, EDGES_BY_LINE_AND_TYPE_NAME);
+    return getField(node, EDGES_BY_LINE_AND_TYPE_NAME);
   }
 
   public static <T> Map<String, List<Edge<T>>> getEdgesByType(final Node<T> node) {
-    return getAttribute(node, EDGES_BY_TYPE);
+    return getField(node, EDGES_BY_TYPE);
   }
 
   public static <T> List<Edge<T>> getEdgesByType(final Node<T> node,
@@ -214,11 +214,11 @@ public class NodeAttributes {
 
   public static <T> Map<String, Map<LineString, Set<Edge<T>>>> getEdgesByTypeNameAndLine(
     final Node<T> node) {
-    return getAttribute(node, EDGES_BY_TYPE_NAME_AND_LINE);
+    return getField(node, EDGES_BY_TYPE_NAME_AND_LINE);
   }
 
   public static Set<String> getEdgeTypeNames(final Node<? extends Object> node) {
-    return getAttribute(node, EDGE_TYPE_NAMES);
+    return getField(node, EDGE_TYPE_NAMES);
   }
 
   private static String EDGE_ANGLES = "edgeAngles";

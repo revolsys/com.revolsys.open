@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.property.AttributeProperties;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.property.FieldProperties;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
@@ -87,7 +87,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     this.out.startTag(VALUES);
     this.out.attribute(XsiConstants.TYPE, VALUES_TYPE);
 
-    for (final Attribute attribute : this.recordDefinition.getAttributes()) {
+    for (final FieldDefinition attribute : this.recordDefinition.getFields()) {
       final String attributeName = attribute.getName();
       final Object value = object.getValue(attributeName);
       final DataType type = attribute.getType();
@@ -96,7 +96,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
         fieldType.writeValue(this.out, value);
       }
     }
-    if (this.recordDefinition.getAttribute("OBJECTID") == null) {
+    if (this.recordDefinition.getField("OBJECTID") == null) {
       final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(DataTypes.INTEGER);
       fieldType.writeValue(this.out, this.objectId++);
     }
@@ -109,11 +109,11 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
   private void writeDataElement(final RecordDefinition recordDefinition,
     final Geometry geometry) {
     final String dataElementType;
-    final Attribute geometryAttribute = recordDefinition.getGeometryAttribute();
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
     boolean hasGeometry = false;
     DataType geometryDataType = null;
-    if (geometryAttribute != null) {
-      geometryDataType = geometryAttribute.getType();
+    if (geometryField != null) {
+      geometryDataType = geometryField.getType();
       if (this.fieldTypes.getFieldType(geometryDataType) != null) {
         hasGeometry = true;
 
@@ -214,8 +214,8 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     if (hasGeometry) {
       this.out.element(FEATURE_TYPE, FEATURE_TYPE_SIMPLE);
       this.out.element(SHAPE_TYPE, this.geometryType);
-      this.out.element(SHAPE_FIELD_NAME, geometryAttribute.getName());
-      final GeometryFactory geometryFactory = geometryAttribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+      this.out.element(SHAPE_FIELD_NAME, geometryField.getName());
+      final GeometryFactory geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
       this.out.element(HAS_M, false);
       this.out.element(HAS_Z, geometryFactory.hasZ());
       this.out.element(HAS_SPATIAL_INDEX, false);
@@ -248,7 +248,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     }
   }
 
-  private void writeField(final Attribute attribute) {
+  private void writeField(final FieldDefinition attribute) {
     final String fieldName = attribute.getName();
     if (fieldName.equals("OBJECTID")) {
       writeOidField();
@@ -277,7 +277,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
         this.out.element(PRECISION, precision);
         this.out.element(SCALE, attribute.getScale());
 
-        final GeometryFactory geometryFactory = attribute.getProperty(AttributeProperties.GEOMETRY_FACTORY);
+        final GeometryFactory geometryFactory = attribute.getProperty(FieldProperties.GEOMETRY_FACTORY);
         if (geometryFactory != null) {
           this.out.startTag(GEOMETRY_DEF);
           this.out.attribute(XsiConstants.TYPE, GEOMETRY_DEF_TYPE);
@@ -304,10 +304,10 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     this.out.startTag(FIELD_ARRAY);
     this.out.attribute(XsiConstants.TYPE, FIELD_ARRAY_TYPE);
 
-    for (final Attribute attribute : recordDefinition.getAttributes()) {
+    for (final FieldDefinition attribute : recordDefinition.getFields()) {
       writeField(attribute);
     }
-    if (recordDefinition.getAttribute("OBJECTID") == null) {
+    if (recordDefinition.getField("OBJECTID") == null) {
       writeOidField();
     }
     this.out.endTag(FIELD_ARRAY);

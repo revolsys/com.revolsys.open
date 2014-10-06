@@ -14,7 +14,7 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.spring.SpringUtil;
@@ -92,7 +92,7 @@ public class JsonSchemaWriter {
 
     final List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
     recordDefinitionMap.put("fields", fields);
-    for (final Attribute attribute : recordDefinition.getAttributes()) {
+    for (final FieldDefinition attribute : recordDefinition.getFields()) {
       final Map<String, Object> field = new LinkedHashMap<String, Object>();
       final String name = attribute.getName();
       field.put("name", name);

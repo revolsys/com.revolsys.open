@@ -83,7 +83,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
       writeHeader();
     }
     if (this.singleObject) {
-      for (final String key : this.recordDefinition.getAttributeNames()) {
+      for (final String key : this.recordDefinition.getFieldNames()) {
         final Object value = object.getValue(key);
         if (isWritable(value)) {
           this.out.startTag(HtmlUtil.TR);
@@ -103,7 +103,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
       }
     } else {
       this.out.startTag(HtmlUtil.TR);
-      for (final String key : this.recordDefinition.getAttributeNames()) {
+      for (final String key : this.recordDefinition.getFieldNames()) {
         final Object value = object.getValue(key);
         this.out.startTag(HtmlUtil.TD);
         if (value == null) {
@@ -195,7 +195,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
 
       this.out.startTag(HtmlUtil.THEAD);
       this.out.startTag(HtmlUtil.TR);
-      for (final String name : this.recordDefinition.getAttributeNames()) {
+      for (final String name : this.recordDefinition.getFieldNames()) {
         this.out.element(HtmlUtil.TH, name);
       }
       this.out.endTag(HtmlUtil.TR);
@@ -207,7 +207,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
   }
 
   public void writeValue(final String name, final Object value) {
-    final DataType dataType = this.recordDefinition.getAttributeType(name);
+    final DataType dataType = this.recordDefinition.getFieldType(name);
 
     @SuppressWarnings("unchecked")
     final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();

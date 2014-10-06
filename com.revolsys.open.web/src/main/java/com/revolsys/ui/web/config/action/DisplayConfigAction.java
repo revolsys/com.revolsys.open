@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.util.HtmlUtil;
 import com.revolsys.ui.html.layout.DefinitionListLayout;
 import com.revolsys.ui.html.layout.UnorderedListLayout;
 import com.revolsys.ui.html.view.DivElementContainer;
@@ -26,14 +25,13 @@ import com.revolsys.ui.web.config.PageController;
 import com.revolsys.ui.web.config.Site;
 import com.revolsys.ui.web.config.SiteNode;
 import com.revolsys.ui.web.config.SiteNodeController;
+import com.revolsys.util.HtmlUtil;
 
 public class DisplayConfigAction implements Action {
 
   private static final Logger log = Logger.getLogger(DisplayConfigAction.class);
 
-  private void addMenu(
-    final ElementContainer menusView,
-    final String name,
+  private void addMenu(final ElementContainer menusView, final String name,
     final Menu menu) {
     // TODO Auto-generated method stub
 
@@ -75,8 +73,8 @@ public class DisplayConfigAction implements Action {
           new UnorderedListLayout());
         pageView.add(menusView);
         for (final Iterator menus = pageController.getMenus()
-          .entrySet()
-          .iterator(); menus.hasNext();) {
+            .entrySet()
+            .iterator(); menus.hasNext();) {
           final Map.Entry entry = (Entry)menus.next();
           final String name = (String)entry.getKey();
           final Menu menu = (Menu)entry.getValue();
@@ -107,11 +105,12 @@ public class DisplayConfigAction implements Action {
     // }
   }
 
+  @Override
   public void init(final ServletContext context) throws ServletException {
   }
 
-  public void process(
-    final HttpServletRequest request,
+  @Override
+  public void process(final HttpServletRequest request,
     final HttpServletResponse response) throws IOException, ServletException {
     final DivElementContainer view = new DivElementContainer();
     addSite(view, (Site)request.getAttribute("site"));

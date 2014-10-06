@@ -33,7 +33,7 @@ public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
     return (GlobalIdProperty)super.clone();
   }
 
-  public String getAttributeName() {
+  public String getFieldName() {
     return attributeName;
   }
 
@@ -49,7 +49,7 @@ public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     if (attributeName == null) {
-      attributeName = recordDefinition.getIdAttributeName();
+      attributeName = recordDefinition.getIdFieldName();
     }
     super.setRecordDefinition(recordDefinition);
   }

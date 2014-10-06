@@ -54,7 +54,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends
     this.recordDefinitionGeometryMap = null;
   }
 
-  public Map<String, Object> getAttributes() {
+  public Map<String, Object> getFields() {
     return this.attributes;
   }
 
@@ -92,7 +92,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends
           final String typePath = (String)JexlUtil.evaluateExpression(context,
             this.typePathTemplateExpression);
           newRecordDefinition = new RecordDefinitionImpl(typePath,
-            recordDefinition.getAttributes());
+            recordDefinition.getFields());
           if (this.distance > 0) {
             final BufferParameters parameters = new BufferParameters(1, 3, 2,
               1.0D);

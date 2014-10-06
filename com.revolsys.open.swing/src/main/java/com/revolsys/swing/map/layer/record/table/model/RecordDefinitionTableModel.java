@@ -3,10 +3,9 @@ package com.revolsys.swing.map.layer.record.table.model;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.swing.table.AbstractTableModel;
-
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJxTable;
 
 public class RecordDefinitionTableModel extends AbstractTableModel {
@@ -54,12 +53,12 @@ public class RecordDefinitionTableModel extends AbstractTableModel {
 
   @Override
   public int getRowCount() {
-    return this.recordDefinition.getAttributeCount();
+    return this.recordDefinition.getFieldCount();
   }
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final Attribute attribute = this.recordDefinition.getAttribute(rowIndex);
+    final FieldDefinition attribute = this.recordDefinition.getField(rowIndex);
     if (attribute == null) {
       return "...";
     } else {

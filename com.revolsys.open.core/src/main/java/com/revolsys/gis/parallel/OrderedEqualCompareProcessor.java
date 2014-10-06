@@ -77,7 +77,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
     return equals(geometry1, geometry2);
   }
 
-  public String getAttributeName() {
+  public String getFieldName() {
     return this.attributeName;
   }
 
@@ -88,12 +88,12 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
   protected Set<String> getNotEqualAttributeNames(final Record object1,
     final Record object2) {
     final Set<String> notEqualAttributeNames = new LinkedHashSet<String>();
-    final String geometryAttributeName1 = this.recordDefinition1.getGeometryAttributeName();
-    final String geometryAttributeName2 = this.recordDefinition2.getGeometryAttributeName();
+    final String geometryFieldName1 = this.recordDefinition1.getGeometryFieldName();
+    final String geometryFieldName2 = this.recordDefinition2.getGeometryFieldName();
     for (final String attributeName : this.attributeNames) {
       if (!this.equalExclude.contains(attributeName)
-          && !attributeName.equals(geometryAttributeName1)
-          && !attributeName.equals(geometryAttributeName2)) {
+          && !attributeName.equals(geometryFieldName1)
+          && !attributeName.equals(geometryFieldName2)) {
         final Object value1 = object1.getValue(attributeName);
         final Object value2 = object2.getValue(attributeName);
         if (!valueEquals(value1, value2)) {
@@ -133,19 +133,19 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
   private void initAttributes() {
     final List<String> attributeNames1 = new ArrayList<>(
-        this.recordDefinition1.getAttributeNames());
+        this.recordDefinition1.getFieldNames());
     final List<String> attributeNames2 = new ArrayList<>(
-        this.recordDefinition2.getAttributeNames());
+        this.recordDefinition2.getFieldNames());
     this.attributeNames.addAll(attributeNames1);
     this.attributeNames.retainAll(attributeNames2);
     attributeNames1.removeAll(this.attributeNames);
-    attributeNames1.remove(this.recordDefinition1.getGeometryAttributeName());
+    attributeNames1.remove(this.recordDefinition1.getGeometryFieldName());
     if (!attributeNames1.isEmpty()) {
       LoggerFactory.getLogger(getClass()).error(
         "Extra columns in file 1: " + attributeNames1);
     }
     attributeNames2.removeAll(this.attributeNames);
-    attributeNames2.remove(this.recordDefinition2.getGeometryAttributeName());
+    attributeNames2.remove(this.recordDefinition2.getGeometryFieldName());
     if (!attributeNames2.isEmpty()) {
       LoggerFactory.getLogger(getClass()).error(
         "Extra columns in file 2: " + attributeNames2);
@@ -280,9 +280,9 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
                 final boolean geometryEquals = geometryEquals(sourceObject,
                   otherObject);
                 if (!geometryEquals) {
-                  final String geometryAttributeName = sourceObject.getRecordDefinition()
-                      .getGeometryAttributeName();
-                  notEqualAttributeNames.add(geometryAttributeName);
+                  final String geometryFieldName = sourceObject.getRecordDefinition()
+                      .getGeometryFieldName();
+                  notEqualAttributeNames.add(geometryFieldName);
                 }
                 if (!notEqualAttributeNames.isEmpty()) {
                   logNotEqual(sourceObject, otherObject,

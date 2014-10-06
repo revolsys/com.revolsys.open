@@ -12,7 +12,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.Attribute;
+import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.io.FileUtil;
@@ -61,7 +61,7 @@ public class JsonRecordIterator extends AbstractIterator<Record>
     if (iterator.hasNext()) {
       final Map<String, Object> map = iterator.next();
       final Record object = new ArrayRecord(recordDefinition);
-      for (final Attribute attribute : recordDefinition.getAttributes()) {
+      for (final FieldDefinition attribute : recordDefinition.getFields()) {
         final String name = attribute.getName();
         final Object value = map.get(name);
         if (value != null) {
