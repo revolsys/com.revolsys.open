@@ -13,6 +13,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.filechooser.FileSystemView;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.io.RecordIo;
@@ -38,6 +39,7 @@ import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.FileRecordStoreTreeNode;
+import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlProxy;
 import com.revolsys.util.UrlUtil;
@@ -78,12 +80,12 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     if (file == null) {
       return ICON_FOLDER_MISSING;
     } else {
-      final boolean exists = file.exists();
       if (FileUtil.isRoot(file)) {
-        if (exists) {
+        if (OS.isMac()) {
           return ICON_DRIVE;
         } else {
-          return ICON_DRIVE_MISSING;
+          final FileSystemView view = FileSystemView.getFileSystemView();
+          return view.getSystemIcon(file);
         }
       } else if (isRecordStore(file)) {
         return ICON_FILE_DATABASE;
@@ -203,7 +205,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
       SwingUtil.addLabel(panel, "Folder Connections");
       final List<FolderConnectionRegistry> registries = FolderConnectionManager.get()
-        .getVisibleConnectionRegistries();
+          .getVisibleConnectionRegistries();
       final JComboBox registryField = new JComboBox(
         new Vector<FolderConnectionRegistry>(registries));
 
@@ -277,7 +279,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       final String extension = FileUtil.getFileNameExtension(file);
       if (Property.hasValue(extension)) {
         final IoFactory factory = IoFactoryRegistry.getInstance()
-          .getFactoryByFileExtension(IoFactory.class, extension);
+            .getFactoryByFileExtension(IoFactory.class, extension);
         if (factory != null) {
           return factory.getName();
         }
