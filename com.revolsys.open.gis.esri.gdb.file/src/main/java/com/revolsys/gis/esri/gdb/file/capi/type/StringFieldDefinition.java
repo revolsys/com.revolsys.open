@@ -19,7 +19,7 @@ public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore recordStore = getRecordStore();
+    final CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
@@ -30,8 +30,7 @@ public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setValue(final Record object, final Row row,
-    final Object value) {
+  public Object setValue(final Record object, final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
@@ -44,7 +43,7 @@ public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else {
       String string = value.toString();
       if (string.length() > getLength()) {
-        LoggerFactory.getLogger(getClass()).error(
+        LoggerFactory.getLogger(getClass()).warn(
           "Value is to long for: " + this + ":" + string);
         string = string.substring(0, getLength());
       }

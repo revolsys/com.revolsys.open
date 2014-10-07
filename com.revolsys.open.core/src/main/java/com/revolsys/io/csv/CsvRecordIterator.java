@@ -30,7 +30,7 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class CsvRecordIterator extends AbstractIterator<Record> implements
-RecordIterator {
+  RecordIterator {
 
   private final char fieldSeparator;
 
@@ -75,9 +75,9 @@ RecordIterator {
   }
 
   private void createRecordDefinition(final String[] fieldNames)
-      throws IOException {
+    throws IOException {
     this.hasPointFields = Property.hasValue(this.pointXAttributeName)
-        && Property.hasValue(this.pointYAttributeName);
+      && Property.hasValue(this.pointYAttributeName);
     if (this.hasPointFields) {
       this.geometryType = DataTypes.POINT;
     } else {
@@ -89,29 +89,31 @@ RecordIterator {
     for (final String name : fieldNames) {
       DataType type = DataTypes.STRING;
       boolean isGeometryAttribute = false;
-      if (name.equalsIgnoreCase(this.geometryColumnName)) {
-        type = this.geometryType;
-        isGeometryAttribute = true;
-      } else if ("POINT".equalsIgnoreCase(name)) {
-        type = DataTypes.POINT;
-        isGeometryAttribute = true;
-      } else if ("MULTIPOINT".equalsIgnoreCase(name)) {
-        type = DataTypes.MULTI_POINT;
-        isGeometryAttribute = true;
-      } else if ("LINESTRING".equalsIgnoreCase(name)
+      if (name != null) {
+        if (name.equalsIgnoreCase(this.geometryColumnName)) {
+          type = this.geometryType;
+          isGeometryAttribute = true;
+        } else if ("POINT".equalsIgnoreCase(name)) {
+          type = DataTypes.POINT;
+          isGeometryAttribute = true;
+        } else if ("MULTIPOINT".equalsIgnoreCase(name)) {
+          type = DataTypes.MULTI_POINT;
+          isGeometryAttribute = true;
+        } else if ("LINESTRING".equalsIgnoreCase(name)
           || "LINE".equalsIgnoreCase(name)) {
-        type = DataTypes.LINE_STRING;
-        isGeometryAttribute = true;
-      } else if ("MULTILINESTRING".equalsIgnoreCase(name)
+          type = DataTypes.LINE_STRING;
+          isGeometryAttribute = true;
+        } else if ("MULTILINESTRING".equalsIgnoreCase(name)
           || "MULTILINE".equalsIgnoreCase(name)) {
-        type = DataTypes.MULTI_LINE_STRING;
-        isGeometryAttribute = true;
-      } else if ("POLYGON".equalsIgnoreCase(name)) {
-        type = DataTypes.POLYGON;
-        isGeometryAttribute = true;
-      } else if ("MULTIPOLYGON".equalsIgnoreCase(name)) {
-        type = DataTypes.MULTI_POLYGON;
-        isGeometryAttribute = true;
+          type = DataTypes.MULTI_LINE_STRING;
+          isGeometryAttribute = true;
+        } else if ("POLYGON".equalsIgnoreCase(name)) {
+          type = DataTypes.POLYGON;
+          isGeometryAttribute = true;
+        } else if ("MULTIPOLYGON".equalsIgnoreCase(name)) {
+          type = DataTypes.MULTI_POLYGON;
+          isGeometryAttribute = true;
+        }
       }
       final FieldDefinition attribute = new FieldDefinition(name, type, false);
       if (isGeometryAttribute) {
@@ -239,7 +241,7 @@ RecordIterator {
    * @throws IOException if bad things happen during the read
    */
   private String[] parseLine(final String nextLine, final boolean readLine)
-      throws IOException {
+    throws IOException {
     String line = nextLine;
     if (line.length() == 0) {
       return new String[0];
@@ -262,14 +264,14 @@ RecordIterator {
           if (c == CsvConstants.QUOTE_CHARACTER) {
             hadQuotes = true;
             if (inQuotes && line.length() > i + 1
-                && line.charAt(i + 1) == CsvConstants.QUOTE_CHARACTER) {
+              && line.charAt(i + 1) == CsvConstants.QUOTE_CHARACTER) {
               sb.append(line.charAt(i + 1));
               i++;
             } else {
               inQuotes = !inQuotes;
               if (i > 2 && line.charAt(i - 1) != this.fieldSeparator
-                  && line.length() > i + 1
-                  && line.charAt(i + 1) != this.fieldSeparator) {
+                && line.length() > i + 1
+                && line.charAt(i + 1) != this.fieldSeparator) {
                 sb.append(c);
               }
             }

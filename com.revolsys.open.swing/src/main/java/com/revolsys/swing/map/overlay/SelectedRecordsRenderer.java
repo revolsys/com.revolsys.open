@@ -135,25 +135,27 @@ public class SelectedRecordsRenderer {
         }
       }
 
-      try {
-        final IsValidOp validOp = new IsValidOp(geometry, false);
-        if (validOp.isValid()) {
-          final IsSimpleOp simpleOp = new IsSimpleOp(geometry, false);
-          if (!simpleOp.isSimple()) {
-            for (final Point coordinates : simpleOp.getNonSimplePoints()) {
-              final Point point = viewportGeometryFactory.point(coordinates);
+      if (geometry.getVertexCount() < 100) {
+        try {
+          final IsValidOp validOp = new IsValidOp(geometry, false);
+          if (validOp.isValid()) {
+            final IsSimpleOp simpleOp = new IsSimpleOp(geometry, false);
+            if (!simpleOp.isSimple()) {
+              for (final Point coordinates : simpleOp.getNonSimplePoints()) {
+                final Point point = viewportGeometryFactory.point(coordinates);
+                MarkerStyleRenderer.renderMarker(viewport, graphics, point,
+                  this.erroStyle);
+              }
+            }
+          } else {
+            for (final TopologyValidationError error : validOp.getErrors()) {
+              final Point point = viewportGeometryFactory.point(error.getCoordinate());
               MarkerStyleRenderer.renderMarker(viewport, graphics, point,
                 this.erroStyle);
             }
           }
-        } else {
-          for (final TopologyValidationError error : validOp.getErrors()) {
-            final Point point = viewportGeometryFactory.point(error.getCoordinate());
-            MarkerStyleRenderer.renderMarker(viewport, graphics, point,
-              this.erroStyle);
-          }
+        } catch (final Throwable e) {
         }
-      } catch (final Throwable e) {
       }
     }
   }

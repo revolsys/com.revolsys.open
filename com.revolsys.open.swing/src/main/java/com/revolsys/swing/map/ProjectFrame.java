@@ -140,6 +140,8 @@ public class ProjectFrame extends BaseFrame {
 
   private JSplitPane leftRightSplit;
 
+  private JSplitPane topBottomSplit;
+
   public ProjectFrame(final String title) {
     this(title, new Project());
   }
@@ -191,9 +193,8 @@ public class ProjectFrame extends BaseFrame {
   protected MapPanel addMapPanel() {
     this.mapPanel = new MapPanel(this.project);
     if (OS.isMac()) {
+      // Make border on right/bottom to match the JTabbedPane UI on a mac
       this.mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 9, 9));
-    } else {
-      this.mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
     }
     return this.mapPanel;
   }
@@ -424,7 +425,6 @@ public class ProjectFrame extends BaseFrame {
   @Override
   protected void init() {
     setMinimumSize(new Dimension(600, 500));
-    setBounds((Object)null);
 
     final JRootPane rootPane = getRootPane();
 
@@ -448,20 +448,20 @@ public class ProjectFrame extends BaseFrame {
     this.leftRightSplit.setBorder(BorderFactory.createEmptyBorder());
     this.bottomTabs.setBorder(BorderFactory.createEmptyBorder());
 
-    final JSplitPane topBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+    this.topBottomSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
       this.leftRightSplit, this.bottomTabs);
     this.bottomTabs.setMinimumSize(new Dimension(600, 100));
 
-    topBottom.setDividerLocation(600);
-    topBottom.setResizeWeight(1);
+    this.topBottomSplit.setResizeWeight(1);
 
-    add(topBottom, BorderLayout.CENTER);
+    add(this.topBottomSplit, BorderLayout.CENTER);
 
     addTableOfContents();
     addCatalogPanel();
 
     addTasksPanel();
     addLogPanel();
+    setBounds((Object)null);
 
     super.init();
   }
@@ -522,6 +522,7 @@ public class ProjectFrame extends BaseFrame {
 
   public void setBounds(final Object frameBoundsObject) {
     if (SwingUtilities.isEventDispatchThread()) {
+      boolean sizeSet = false;
       if (frameBoundsObject instanceof List) {
         try {
           @SuppressWarnings("unchecked")
@@ -549,14 +550,21 @@ public class ProjectFrame extends BaseFrame {
               y = Math.min(y, screenBounds.y + screenBounds.height - height);
             }
             setLocation(x, y);
-            return;
+            sizeSet = true;
           }
         } catch (final Throwable t) {
         }
       }
-      final Rectangle screenBounds = SwingUtil.getScreenBounds();
-      setLocation(screenBounds.x + 10, screenBounds.y + 10);
-      setSize(screenBounds.width - 20, screenBounds.height - 20);
+      if (!sizeSet) {
+        final Rectangle screenBounds = SwingUtil.getScreenBounds();
+        setLocation(screenBounds.x + 10, screenBounds.y + 10);
+        setSize(screenBounds.width - 20, screenBounds.height - 20);
+      }
+      final int leftRightDividerLocation = (int)(getWidth() * 0.2);
+      this.leftRightSplit.setDividerLocation(leftRightDividerLocation);
+
+      final int topBottomDividerLocation = (int)(getHeight() * 0.75);
+      this.topBottomSplit.setDividerLocation(topBottomDividerLocation);
     } else {
       if (frameBoundsObject == null) {
         Invoke.later(this, "setBounds", new Object());
