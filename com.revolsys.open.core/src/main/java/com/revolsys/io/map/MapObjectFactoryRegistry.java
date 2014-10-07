@@ -49,7 +49,7 @@ public class MapObjectFactoryRegistry {
       final MapObjectFactory objectFactory = TYPE_NAME_TO_FACTORY.get(type);
       if (objectFactory == null) {
         LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(
-          "No layer factory for " + type);
+          "No factory for " + type);
         return null;
       } else {
         return (V)objectFactory.toObject(map);
@@ -94,7 +94,7 @@ public class MapObjectFactoryRegistry {
     try {
       final ClassLoader classLoader = MapObjectFactoryRegistry.class.getClassLoader();
       final String resourceName = "META-INF/"
-        + MapObjectFactory.class.getName() + ".json";
+          + MapObjectFactory.class.getName() + ".json";
       final Enumeration<URL> resources = classLoader.getResources(resourceName);
       while (resources.hasMoreElements()) {
         final URL resource = resources.nextElement();

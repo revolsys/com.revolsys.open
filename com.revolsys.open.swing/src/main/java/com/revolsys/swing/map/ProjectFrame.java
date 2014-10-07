@@ -17,6 +17,7 @@ import java.net.ResponseCache;
 import java.util.List;
 
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -179,9 +180,7 @@ public class ProjectFrame extends BaseFrame {
 
     this.catalogTree = tree;
 
-    this.leftTabs.addTab(null, Icons.getIcon("tree_catalog"), new JScrollPane(
-      this.catalogTree));
-    this.leftTabs.setToolTipTextAt(this.leftTabs.getTabCount() - 1, "Catalog");
+    addTabIcon(this.leftTabs, "tree_catalog", "Catalog", this.catalogTree);
   }
 
   protected void addLogPanel() {
@@ -191,7 +190,11 @@ public class ProjectFrame extends BaseFrame {
 
   protected MapPanel addMapPanel() {
     this.mapPanel = new MapPanel(this.project);
-
+    if (OS.isMac()) {
+      this.mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 9, 9));
+    } else {
+      this.mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+    }
     return this.mapPanel;
   }
 
@@ -202,7 +205,10 @@ public class ProjectFrame extends BaseFrame {
 
   public int addTabIcon(final JTabbedPane tabs, final String iconName,
     final String toolTipText, final Component component) {
-    tabs.addTab(null, Icons.getIcon(iconName), new JScrollPane(component));
+    final JScrollPane scrollPane = new JScrollPane(component);
+    scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+    tabs.addTab(null, Icons.getIcon(iconName), scrollPane);
     final int tabIndex = tabs.getTabCount() - 1;
     tabs.setToolTipTextAt(tabIndex, toolTipText);
     return tabIndex;
@@ -439,13 +445,15 @@ public class ProjectFrame extends BaseFrame {
     this.leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
       this.leftTabs, this.mapPanel);
 
+    this.leftRightSplit.setBorder(BorderFactory.createEmptyBorder());
+    this.bottomTabs.setBorder(BorderFactory.createEmptyBorder());
+
     final JSplitPane topBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
       this.leftRightSplit, this.bottomTabs);
     this.bottomTabs.setMinimumSize(new Dimension(600, 100));
 
     topBottom.setDividerLocation(600);
-    this.leftRightSplit.setDividerLocation(300);
-    this.leftRightSplit.setResizeWeight(1);
+    topBottom.setResizeWeight(1);
 
     add(topBottom, BorderLayout.CENTER);
 
