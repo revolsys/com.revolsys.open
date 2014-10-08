@@ -360,7 +360,13 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     this.beanPropertyListener = null;
     final Component component = getProperty("TableView");
     if (component != null) {
-      ProjectFrame.get(this).getBottomTabs().remove(component);
+      final ProjectFrame projectFrame = ProjectFrame.get(this);
+      if (projectFrame != null) {
+        final JTabbedPane bottomTabs = projectFrame.getBottomTabs();
+        if (bottomTabs != null) {
+          bottomTabs.remove(component);
+        }
+      }
       setProperty("TableView", null);
     }
     firePropertyChange("deleted", false, true);

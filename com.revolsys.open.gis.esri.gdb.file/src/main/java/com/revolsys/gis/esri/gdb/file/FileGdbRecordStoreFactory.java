@@ -27,7 +27,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
           new AtomicInteger());
         count.incrementAndGet();
         CapiFileGdbRecordStore recordStore = DATA_STORES.get(fileName);
-        if (recordStore == null) {
+        if (recordStore == null || recordStore.isClosed()) {
           recordStore = new CapiFileGdbRecordStore(file);
           recordStore.setCreateMissingRecordStore(false);
           DATA_STORES.put(fileName, recordStore);
@@ -76,7 +76,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
   public FileGdbRecordStore createRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
     final Map<String, Object> properties = new LinkedHashMap<String, Object>(
-        connectionProperties);
+      connectionProperties);
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);
 
