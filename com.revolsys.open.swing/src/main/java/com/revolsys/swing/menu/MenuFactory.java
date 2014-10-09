@@ -30,7 +30,7 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.util.Property;
 
 public class MenuFactory extends AbstractObjectWithProperties implements
-ComponentFactory<JMenuItem> {
+  ComponentFactory<JMenuItem> {
 
   public static MenuFactory createMenu(final Class<?> clazz,
     final String... menuNames) {
@@ -278,13 +278,14 @@ ComponentFactory<JMenuItem> {
       parameters);
   }
 
-  public void addMenuItemTitleIcon(final String groupName, final String title,
-    final String iconName, final Object object, final String methodName,
-    final Object... parameters) {
+  public InvokeMethodAction addMenuItemTitleIcon(final String groupName,
+    final String title, final String iconName, final Object object,
+    final String methodName, final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
-    final InvokeMethodAction menuItem = createMenuItem(title, null, icon, null,
+    final InvokeMethodAction action = createMenuItem(title, null, icon, null,
       object, methodName, parameters);
-    addComponentFactory(groupName, menuItem);
+    addComponentFactory(groupName, action);
+    return action;
   }
 
   @Override

@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -186,37 +185,8 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     return this.iconName;
   }
 
-  @Override
-  public Integer getMnemonic() {
-    return (Integer)getValue(Action.MNEMONIC_KEY);
-  }
-
-  @Override
-  public String getName() {
-    return (String)getValue(Action.NAME);
-  }
-
-  @Override
-  public String getToolTip() {
-    return (String)getValue(Action.SHORT_DESCRIPTION);
-  }
-
-  @Override
-  protected void setIcon(final Icon icon) {
-    putValue(Action.SMALL_ICON, icon);
-  }
-
   public void setIconName(final String iconName) {
     this.iconName = iconName;
-  }
-
-  @Override
-  protected void setName(final String name) {
-    putValue(Action.NAME, name);
-  }
-
-  protected void setToolTip(final CharSequence toolTip) {
-    putValue(Action.SHORT_DESCRIPTION, toolTip.toString());
   }
 
   @Override

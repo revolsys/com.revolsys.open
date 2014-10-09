@@ -1,22 +1,21 @@
 package com.revolsys.swing.action;
 
+import java.awt.event.KeyEvent;
+
 import javax.swing.AbstractButton;
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.util.OS;
 
 public abstract class AbstractAction extends javax.swing.AbstractAction {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final ActionEnabledPropertyChangeListener enabledListener = new ActionEnabledPropertyChangeListener(
@@ -41,6 +40,7 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
 
   public JMenuItem createMenuItem() {
     final JMenuItem menuItem = new JMenuItem(this);
+
     final Icon disabledIcon = getDisabledIcon();
     menuItem.setDisabledIcon(disabledIcon);
     return menuItem;
@@ -62,7 +62,7 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   }
 
   public Icon getIcon() {
-    return (Icon)getValue(Action.SMALL_ICON);
+    return (Icon)getValue(SMALL_ICON);
   }
 
   public Object getLargeIcon() {
@@ -70,15 +70,15 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   }
 
   public Integer getMnemonic() {
-    return (Integer)getValue(Action.MNEMONIC_KEY);
+    return (Integer)getValue(MNEMONIC_KEY);
   }
 
   public String getName() {
-    return (String)getValue(Action.NAME);
+    return (String)getValue(NAME);
   }
 
   public String getToolTip() {
-    return (String)getValue(Action.SHORT_DESCRIPTION);
+    return (String)getValue(SHORT_DESCRIPTION);
   }
 
   protected void initButton(final AbstractButton button) {
@@ -106,6 +106,31 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     return super.isEnabled();
   }
 
+  public void setAcceleratorControlKey(final int keyCode) {
+    int modifiers;
+    if (OS.isMac()) {
+      modifiers = KeyEvent.META_MASK;
+    } else {
+      modifiers = KeyEvent.CTRL_MASK;
+    }
+    setAcceleratorKey(KeyStroke.getKeyStroke(keyCode, modifiers));
+    setMnemonicKey(keyCode);
+  }
+
+  public void setAcceleratorKey(final KeyStroke keyStroke) {
+    putValue(ACCELERATOR_KEY, keyStroke);
+  }
+
+  public void setAcceleratorShiftControlKey(final int keyCode) {
+    int modifiers = KeyEvent.SHIFT_MASK;
+    if (OS.isMac()) {
+      modifiers |= KeyEvent.META_MASK;
+    } else {
+      modifiers |= KeyEvent.CTRL_MASK;
+    }
+    setAcceleratorKey(KeyStroke.getKeyStroke(keyCode, modifiers));
+  }
+
   protected void setCheckBox(final boolean checkBox) {
     this.checkBox = checkBox;
   }
@@ -121,15 +146,27 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     }
   }
 
-  protected void setIcon(final Icon icon) {
-    putValue(Action.SMALL_ICON, icon);
+  public void setIcon(final Icon icon) {
+    putValue(SMALL_ICON, icon);
   }
 
-  protected void setName(final String name) {
-    putValue(Action.NAME, name);
+  public void setMnemonicKey(final int key) {
+    putValue(MNEMONIC_KEY, key);
   }
 
-  protected void setToolTip(final String toolTip) {
-    putValue(Action.SHORT_DESCRIPTION, toolTip);
+  public void setName(final String name) {
+    putValue(NAME, name);
+  }
+
+  public void setToolTip(final CharSequence toolTip) {
+    if (toolTip == null) {
+      setToolTip(null);
+    } else {
+      setToolTip(toolTip.toString());
+    }
+  }
+
+  public void setToolTip(final String toolTip) {
+    putValue(SHORT_DESCRIPTION, toolTip);
   }
 }

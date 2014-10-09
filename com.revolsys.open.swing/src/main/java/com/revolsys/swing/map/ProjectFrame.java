@@ -200,8 +200,10 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected void addMenu(final JMenuBar menuBar, final MenuFactory menuFactory) {
-    final JMenu menu = menuFactory.createComponent();
-    menuBar.add(menu, menuBar.getMenuCount() - 1);
+    if (menuFactory != null) {
+      final JMenu menu = menuFactory.createComponent();
+      menuBar.add(menu, menuBar.getMenuCount() - 1);
+    }
   }
 
   public int addTabIcon(final JTabbedPane tabs, final String iconName,
@@ -259,22 +261,32 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory createMenuFile() {
     final MenuFactory file = new MenuFactory("File");
 
-    file.addMenuItemTitleIcon("project", "New Project", "layout_add", this,
-      "actionNewProject");
+    file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", this,
+        "actionNewProject").setAcceleratorControlKey(KeyEvent.VK_N);
 
-    file.addMenuItemTitleIcon("project", "Save Project", "layout_save",
-      this.project, "saveAllSettings");
+    file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
+      this.project, "saveAllSettings").setAcceleratorControlKey(KeyEvent.VK_S);
 
-    file.addMenuItemTitleIcon("project", "Save Project As...", "layout_save",
-      this.project, "saveAllSettingsAs");
+    file.addMenuItemTitleIcon("projectSave", "Save Project As...",
+      "layout_save", this.project, "saveAllSettingsAs")
+      .setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
-      "save");
+        "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-      "print");
+        "print").setAcceleratorControlKey(KeyEvent.VK_P);
 
-    file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit");
+    if (OS.isWindows()) {
+      file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit")
+      .setAcceleratorKey(
+        KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK));
+    } else if (OS.isUnix()) {
+      file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit")
+      .setAcceleratorKey(
+        KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK));
+    }
+
     return file;
   }
 
@@ -284,7 +296,7 @@ public class ProjectFrame extends BaseFrame {
     tools.addCheckboxMenuItem("map",
       new InvokeMethodAction("Measure", Icons.getIcon("ruler"), map,
         "toggleMode", MeasureOverlay.MEASURE), new ObjectPropertyEnableCheck(
-        map, "overlayAction", MeasureOverlay.MEASURE));
+          map, "overlayAction", MeasureOverlay.MEASURE));
 
     tools.addMenuItem("script", "Run Script...", "Run Script",
       Icons.getIcon("script_go"), this, "runScript");
