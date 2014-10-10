@@ -23,7 +23,7 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
 public class NumberTextField extends JXTextField implements Field,
-  DocumentListener, FocusListener {
+DocumentListener, FocusListener {
 
   public static Number createMaximumValue(final DataType dataType,
     final int length, final int scale) {
@@ -377,10 +377,10 @@ public class NumberTextField extends JXTextField implements Field,
         if (number.scale() > this.scale) {
           message = "Number of decimal places must be < " + this.scale;
         } else if (this.minimumValue != null
-          && this.minimumValue.compareTo(number) > 0) {
+            && this.minimumValue.compareTo(number) > 0) {
           message = "Value must be >= " + this.minimumValue;
         } else if (this.maximumValue != null
-          && this.maximumValue.compareTo(number) < 0) {
+            && this.maximumValue.compareTo(number) < 0) {
           message = "Value must be <= " + this.maximumValue;
         } else {
           // number = number.setScale(scale);
@@ -391,7 +391,8 @@ public class NumberTextField extends JXTextField implements Field,
           message = null;
         }
       } catch (final Throwable t) {
-        message = "Not a valid number";
+        message = "'" + text + "' is not a valid "
+            + this.dataType.getValidationName() + ".";
       }
     }
     final boolean valid = !Property.hasValue(message);

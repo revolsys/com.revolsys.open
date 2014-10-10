@@ -206,8 +206,8 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
     } catch (final Throwable t) {
       final int result = JOptionPane.showConfirmDialog(this.editorComponent,
         "<html><p><b>'" + getCellEditorValue() + "' is not a valid "
-          + this.dataType
-            + ".</b></p><p>Discard changes (Yes) or edit field (No).</p></html>",
+          + this.dataType.getValidationName()
+        + ".</b></p><p>Discard changes (Yes) or edit field (No).</p></html>",
         "Invalid value", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
       if (result == JOptionPane.YES_OPTION) {
         cancelCellEditing();

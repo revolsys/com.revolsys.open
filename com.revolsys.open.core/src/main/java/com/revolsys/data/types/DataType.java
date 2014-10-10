@@ -6,4 +6,5 @@ public interface DataType {
 
   String getName();
 
+  String getValidationName();
 }

@@ -32,7 +32,7 @@ import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class XbaseIterator extends AbstractIterator<Record> implements
-RecordIterator {
+  RecordIterator {
   public static final char CHARACTER_TYPE = 'C';
 
   private static final Map<Character, DataType> DATA_TYPES = new HashMap<>();
@@ -101,7 +101,7 @@ RecordIterator {
     final Resource codePageResource = SpringUtil.getResourceWithExtension(
       resource, "cpg");
     if (!(codePageResource instanceof NonExistingResource)
-        && codePageResource.exists()) {
+      && codePageResource.exists()) {
       final String charsetName = SpringUtil.getContents(codePageResource);
       try {
         this.charset = Charset.forName(charsetName);
@@ -199,7 +199,7 @@ RecordIterator {
   }
 
   private Object getMemo(final int startIndex, final int len)
-      throws IOException {
+    throws IOException {
     return null;
     /*
      * String memoIndexString = new String(record, startIndex, len).trim(); if
@@ -253,7 +253,8 @@ RecordIterator {
       try {
         number = new BigDecimal(numberString.trim());
       } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "Not a valid number: " + numberString, e);
+        ExceptionUtil.log(getClass(), "'" + numberString
+          + " 'is not a valid number", e);
       }
     }
     return number;
@@ -363,8 +364,8 @@ RecordIterator {
       if (fieldType == MEMO_TYPE) {
         length = Integer.MAX_VALUE;
       }
-      this.recordDefinition.addField(fieldName.toString(), dataType,
-        length, decimalCount, false);
+      this.recordDefinition.addField(fieldName.toString(), dataType, length,
+        decimalCount, false);
     }
     if (this.mappedFile) {
       final EndianMappedByteBuffer file = (EndianMappedByteBuffer)this.in;
@@ -387,7 +388,7 @@ RecordIterator {
       this.position = position;
       try {
         final long offset = this.firstIndex + (long)(this.recordSize + 1)
-          * position;
+            * position;
         file.seek(offset);
         setLoadNext(true);
       } catch (final IOException e) {
@@ -396,7 +397,7 @@ RecordIterator {
 
     } else {
       throw new UnsupportedOperationException(
-          "The position can only be set on files");
+        "The position can only be set on files");
     }
   }
 

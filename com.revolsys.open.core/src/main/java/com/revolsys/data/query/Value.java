@@ -85,25 +85,25 @@ public class Value extends QueryValue {
     return (Value)super.clone();
   }
 
-  public void convert(final FieldDefinition attribute) {
-    if (attribute instanceof JdbcFieldDefinition) {
-      this.jdbcAttribute = (JdbcFieldDefinition)attribute;
-    }
-    convert(attribute.getType());
-  }
-
   public void convert(final DataType dataType) {
     if (this.queryValue != null) {
       final Object newValue = StringConverterRegistry.toObject(dataType,
         this.queryValue);
       final Class<?> typeClass = dataType.getJavaClass();
       if (newValue == null || !typeClass.isAssignableFrom(newValue.getClass())) {
-        throw new IllegalArgumentException(this.queryValue + " is not a valid "
-            + typeClass);
+        throw new IllegalArgumentException("'" + this.queryValue
+          + "' is not a valid " + dataType.getValidationName());
       } else {
         setQueryValue(newValue);
       }
     }
+  }
+
+  public void convert(final FieldDefinition attribute) {
+    if (attribute instanceof JdbcFieldDefinition) {
+      this.jdbcAttribute = (JdbcFieldDefinition)attribute;
+    }
+    convert(attribute.getType());
   }
 
   @Override

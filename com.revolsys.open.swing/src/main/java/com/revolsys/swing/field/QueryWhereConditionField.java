@@ -97,7 +97,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class QueryWhereConditionField extends ValueField implements
-  MouseListener, CaretListener, ItemListener {
+MouseListener, CaretListener, ItemListener {
 
   public static JComponent createSearchField(final FieldDefinition attribute,
     final CodeTable codeTable) {
@@ -121,7 +121,7 @@ public class QueryWhereConditionField extends ValueField implements
         } else {
           if (codeTable == null) {
             if (Number.class.isAssignableFrom(typeClass)
-              || String.class.isAssignableFrom(typeClass)) {
+                || String.class.isAssignableFrom(typeClass)) {
               field = new TextField(20);
             } else {
               field = SwingUtil.createField(typeClass, name, null);
@@ -218,8 +218,8 @@ public class QueryWhereConditionField extends ValueField implements
       "Add Unary Condition", ICON, this, "actionAddLikeCondition");
     this.likeConditionField = new TextField(20);
     this.likePanel = new BasePanel(SwingUtil.createLabel("LIKE"), new JLabel(
-        " '%"), this.likeConditionField, new JLabel("%' "),
-        likeConditionAddButton);
+      " '%"), this.likeConditionField, new JLabel("%' "),
+      likeConditionAddButton);
     GroupLayoutUtil.makeColumns(this.likePanel, false);
 
     final JButton inConditionAddButton = InvokeMethodAction.createButton("",
@@ -240,21 +240,21 @@ public class QueryWhereConditionField extends ValueField implements
     final ToolBar buttonsPanel = new ToolBar();
     buttonsPanel.setBorderPainted(true);
     buttonsPanel.addButton("relational", "AND", this, "insertText", "AND")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("relational", "OR", this, "insertText", "OR")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("relational", "NOT", this, "insertText", "NOT")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("grouping", "( )", this, "insertText", "( )")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("math", "+", this, "insertText", "+")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("math", "-", this, "insertText", "-")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("math", "*", this, "insertText", "*")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
     buttonsPanel.addButton("math", "/", this, "insertText", "/")
-      .setBorderPainted(true);
+    .setBorderPainted(true);
 
     final BasePanel widgetPanel = new BasePanel(new VerticalLayout(5),
       fieldConditions, buttonsPanel);
@@ -269,8 +269,8 @@ public class QueryWhereConditionField extends ValueField implements
     // pane
 
     this.sqlPrefix = "SELECT * FROM "
-      + this.recordDefinition.getPath().substring(1).replace('/', '.')
-        + " WHERE";
+        + this.recordDefinition.getPath().substring(1).replace('/', '.')
+      + " WHERE";
 
     final JPanel filterTextPanel = new JPanel(new BorderLayout());
     filterTextPanel.setOpaque(false);
@@ -344,8 +344,8 @@ public class QueryWhereConditionField extends ValueField implements
               fieldValue = StringConverterRegistry.toObject(attributeClass,
                 fieldValue);
             } catch (final Throwable e) {
-              setInvalidMessage(fieldValue + " is not a valid "
-                + attribute.getType());
+              setInvalidMessage("'" + fieldValue + "' is not a valid "
+                  + attribute.getType().getValidationName());
               return;
             }
           } else {
@@ -397,8 +397,8 @@ public class QueryWhereConditionField extends ValueField implements
               fieldValue = StringConverterRegistry.toObject(attributeClass,
                 fieldValue);
             } catch (final Throwable e) {
-              setInvalidMessage(fieldValue + " is not a valid "
-                + attribute.getType());
+              setInvalidMessage("'" + fieldValue + "' is not a valid "
+                  + attribute.getType().getValidationName());
               return;
             }
           } else {
@@ -537,16 +537,16 @@ public class QueryWhereConditionField extends ValueField implements
         previousText = "";
       }
       if (!Property.hasValue(previousText)
-        || !previousText.matches(".*"
-          + operator.replaceAll("\\(", "\\\\(")
-            .replaceAll("\\)", "\\\\)")
-            .replaceAll("\\*", "\\\\*")
-            .replaceAll("\\+", "\\\\+") + "\\s*$")) {
+          || !previousText.matches(".*"
+              + operator.replaceAll("\\(", "\\\\(")
+              .replaceAll("\\)", "\\\\)")
+              .replaceAll("\\*", "\\\\*")
+              .replaceAll("\\+", "\\\\+") + "\\s*$")) {
         final Document document = this.whereTextField.getDocument();
         try {
           if (Property.hasValue(previousText)
-            && !previousText.substring(previousText.length() - 1).matches(
-              "\\s$")) {
+              && !previousText.substring(previousText.length() - 1).matches(
+                  "\\s$")) {
             document.insertString(position++, " ", null);
           }
           document.insertString(position, operator + " ", null);
@@ -606,12 +606,12 @@ public class QueryWhereConditionField extends ValueField implements
             previousText = "";
           }
           if (!Property.hasValue(previousText)
-            || !previousText.matches(".*\"?" + fieldName + "\"?\\s*$")) {
+              || !previousText.matches(".*\"?" + fieldName + "\"?\\s*$")) {
             final Document document = this.whereTextField.getDocument();
             try {
               if (Property.hasValue(previousText)
-                && !previousText.substring(previousText.length() - 1).matches(
-                  "\\s$")) {
+                  && !previousText.substring(previousText.length() - 1).matches(
+                      "\\s$")) {
                 document.insertString(position++, " ", null);
               }
 
@@ -727,18 +727,18 @@ public class QueryWhereConditionField extends ValueField implements
       final ValueNode betweenExpressionEnd = rightOperandList.get(1);
       if (!(leftValueNode instanceof ColumnReference)) {
         setInvalidMessage("Between operator must use a column name not: "
-          + leftValueNode);
+            + leftValueNode);
         return null;
       }
 
       if (!(betweenExpressionStart instanceof NumericConstantNode)) {
         setInvalidMessage("Between min value must be a number not: "
-          + betweenExpressionStart);
+            + betweenExpressionStart);
         return null;
       }
       if (!(betweenExpressionEnd instanceof NumericConstantNode)) {
         setInvalidMessage("Between max value must be a number not: "
-          + betweenExpressionEnd);
+            + betweenExpressionEnd);
         return null;
       }
       final Column column = toQueryValue(leftValueNode);
@@ -786,22 +786,22 @@ public class QueryWhereConditionField extends ValueField implements
               final FieldDefinition attribute = this.recordDefinition.getField(name);
               final CodeTable codeTable = this.recordDefinition.getCodeTableByColumn(name);
               if (codeTable == null
-                  || attribute == this.recordDefinition.getIdField()) {
+                || attribute == this.recordDefinition.getIdField()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
                   final Object convertedValue = StringConverterRegistry.toObject(
                     typeClass, value);
                   if (convertedValue == null
-                    || !typeClass.isAssignableFrom(typeClass)) {
+                      || !typeClass.isAssignableFrom(typeClass)) {
                     setInvalidMessage(name + "='" + value + "' is not a valid "
-                      + attribute.getType());
+                        + attribute.getType().getValidationName());
                     return null;
                   } else {
                     rightCondition = new Value(attribute, convertedValue);
                   }
                 } catch (final Throwable t) {
                   setInvalidMessage(name + "='" + value + "' is not a valid "
-                    + attribute.getType());
+                      + attribute.getType().getValidationName());
                 }
               } else {
                 Object id;
@@ -921,7 +921,7 @@ public class QueryWhereConditionField extends ValueField implements
       return null;
     } else {
       setInvalidMessage("Unsupported expression" + expression.getClass() + " "
-        + expression);
+          + expression);
     }
     return null;
   }
