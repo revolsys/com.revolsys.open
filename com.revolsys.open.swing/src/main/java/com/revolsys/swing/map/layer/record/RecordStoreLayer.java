@@ -246,15 +246,15 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       }
     }
     if (connectionName != null) {
-      SwingUtil.addReadOnlyTextField(panel, "Record Store Name", connectionName);
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store Name", connectionName);
     }
     if (url != null) {
-      SwingUtil.addReadOnlyTextField(panel, "Record Store URL", url);
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store URL", url);
     }
     if (username != null) {
-      SwingUtil.addReadOnlyTextField(panel, "Record Store Username", username);
+      SwingUtil.addLabelledReadOnlyTextField(panel, "Record Store Username", username);
     }
-    SwingUtil.addReadOnlyTextField(panel, "Type Path", this.typePath);
+    SwingUtil.addLabelledReadOnlyTextField(panel, "Type Path", this.typePath);
 
     GroupLayoutUtil.makeColumns(panel, 2, true);
     return panel;

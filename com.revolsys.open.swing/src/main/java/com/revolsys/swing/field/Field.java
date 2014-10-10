@@ -21,7 +21,7 @@ public interface Field {
 
   boolean isFieldValid();
 
-  void setEnabled(boolean enabled);
+  void setEditable(boolean editable);
 
   void setFieldBackgroundColor(Color color);
 

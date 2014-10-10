@@ -43,7 +43,7 @@ import java.util.List;
  */
 public interface MultiPoint extends GeometryCollection, Puntal {
 
-  double getCoordinate(final int partIndex, final int vertexIndex);
+  double getCoordinate(final int partIndex, final int axisIndex);
 
   Point getPoint(final int partIndex);
 

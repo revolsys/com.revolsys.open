@@ -13,9 +13,9 @@ public class MultiPointVertex extends AbstractVertex {
   }
 
   @Override
-  public double getCoordinate(final int vertexIndex) {
+  public double getCoordinate(final int axisIndex) {
     final MultiPoint geometry = getGeometry();
-    return geometry.getCoordinate(this.partIndex, vertexIndex);
+    return geometry.getCoordinate(this.partIndex, axisIndex);
   }
 
   public MultiPoint getMultiPoint() {

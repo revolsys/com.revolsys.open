@@ -188,9 +188,10 @@ public class StringListField extends ValueField {
     }
   }
 
-  private void setSelectedButtonsEnabled(final boolean enabled) {
+  private void setSelectedButtonsEnabled(final boolean editable) {
     for (final Component component : this.toolBar.getGroup(SELECTED)) {
-      component.setEnabled(enabled);
+      component.setEnabled(editable);
+      this.valueEntry.setEditable(editable);
     }
   }
 

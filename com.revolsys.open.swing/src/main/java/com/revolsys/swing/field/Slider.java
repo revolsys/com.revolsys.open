@@ -17,7 +17,7 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
 public class Slider extends JSlider implements Field, FocusListener,
-  ChangeListener {
+ChangeListener {
 
   public static final Color DEFAULT_BACKGROUND = new JTextField().getBackground();
 
@@ -115,6 +115,11 @@ public class Slider extends JSlider implements Field, FocusListener,
   @Override
   public boolean isFieldValid() {
     return true;
+  }
+
+  @Override
+  public void setEditable(final boolean editable) {
+    setEnabled(editable);
   }
 
   @Override

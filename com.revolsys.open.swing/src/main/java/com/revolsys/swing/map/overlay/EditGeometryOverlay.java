@@ -193,12 +193,12 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
         setAddGeometryDataType(geometryField.getType());
         setMapCursor(CURSOR_NODE_ADD);
 
-        if (Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING).contains(
-          this.addGeometryDataType)) {
-          this.addGeometryPartIndex = new int[0];
-        } else if (Arrays.asList(DataTypes.MULTI_POINT,
-          DataTypes.MULTI_LINE_STRING, DataTypes.POLYGON).contains(
+        if (Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING,
+          DataTypes.MULTI_POINT, DataTypes.MULTI_LINE_STRING).contains(
             this.addGeometryDataType)) {
+          this.addGeometryPartIndex = new int[0];
+        } else if (Arrays.asList(DataTypes.MULTI_POLYGON, DataTypes.POLYGON)
+            .contains(this.addGeometryDataType)) {
           this.addGeometryPartIndex = new int[] {
             0
           };
@@ -288,7 +288,7 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
           final Point point = (Point)geometry;
           geometry = geometryFactory.multiPoint(point, newPoint);
         } else {
-          geometry = geometry.appendVertex(newPoint, geometryPartIndex);
+          geometry = geometry.appendVertex(newPoint, this.addGeometryPartIndex);
         }
       } else if (DataTypes.LINE_STRING.equals(geometryDataType)) {
         if (geometry instanceof Point) {
@@ -1252,8 +1252,8 @@ PropertyChangeListener, MouseListener, MouseMotionListener {
         return null;
       } else {
         final AbstractRecordLayer layer = location.getLayer();
-        return layer.createPropertyEdit(object, geometryFieldName,
-          oldValue, newGeometry);
+        return layer.createPropertyEdit(object, geometryFieldName, oldValue,
+          newGeometry);
       }
     }
   }

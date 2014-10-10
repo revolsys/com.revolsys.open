@@ -142,6 +142,11 @@ public class ValueField extends JPanel implements Field {
   }
 
   @Override
+  public void setEditable(final boolean editable) {
+    setEnabled(editable);
+  }
+
+  @Override
   public void setFieldBackgroundColor(Color color) {
     if (color == null) {
       color = this.defaultBackground;

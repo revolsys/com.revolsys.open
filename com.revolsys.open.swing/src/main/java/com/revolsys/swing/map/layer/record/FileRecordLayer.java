@@ -47,16 +47,16 @@ public class FileRecordLayer extends ListRecordLayer {
     final String url = getUrl();
     if (url.startsWith("file:")) {
       final String fileName = url.replaceFirst("file:(//)?", "");
-      SwingUtil.addReadOnlyTextField(panel, "File", fileName);
+      SwingUtil.addLabelledReadOnlyTextField(panel, "File", fileName);
     } else {
-      SwingUtil.addReadOnlyTextField(panel, "URL", url);
+      SwingUtil.addLabelledReadOnlyTextField(panel, "URL", url);
     }
     final String fileNameExtension = FileUtil.getFileNameExtension(url);
     if (Property.hasValue(fileNameExtension)) {
-      SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
+      SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
       final RecordReaderFactory factory = RecordIo.recordReaderFactory(fileNameExtension);
       if (factory != null) {
-        SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
+        SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }
     }
     GroupLayoutUtil.makeColumns(panel, 2, true);

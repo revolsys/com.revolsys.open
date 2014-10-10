@@ -4,18 +4,28 @@ import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTextField;
+import javax.swing.border.CompoundBorder;
 
 import org.jdesktop.swingx.JXTextField;
 
+import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
 public class TextField extends JXTextField implements Field, FocusListener {
+  public static final CompoundBorder READ_ONLY_BORDER = BorderFactory.createCompoundBorder(
+    BorderFactory.createEmptyBorder(0, 3, 0, 3),
+    BorderFactory.createCompoundBorder(
+      BorderFactory.createLineBorder(new Color(224, 224, 224), 1),
+      BorderFactory.createEmptyBorder(1, 2, 1, 2)));
+
   public static final Color DEFAULT_BACKGROUND = new JTextField().getBackground();
 
   public static final Color DEFAULT_FOREGROUND = new JTextField().getForeground();
@@ -41,6 +51,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   public TextField(String fieldName, final Object fieldValue) {
+    setFont(SwingUtil.FONT);
     setDocument(new PropertyChangeDocument(this));
     if (!Property.hasValue(fieldName)) {
       fieldName = "fieldValue";
@@ -101,6 +112,20 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   @Override
+  public void setEditable(final boolean editable) {
+    final boolean oldEditable = isEditable();
+    if (editable != oldEditable) {
+      if (editable) {
+        setBorder(new JTextField().getBorder());
+      } else {
+        setBorder(READ_ONLY_BORDER);
+      }
+      super.setEditable(editable);
+      setForeground(getForeground());
+    }
+  }
+
+  @Override
   public void setFieldBackgroundColor(Color color) {
     if (color == null) {
       color = DEFAULT_BACKGROUND;
@@ -148,6 +173,14 @@ public class TextField extends JXTextField implements Field, FocusListener {
       this.support.discardAllEdits();
     }
     this.support.setValue(newText);
+  }
+
+  @Override
+  public void setForeground(Color color) {
+    if (!isEditable()) {
+      color = WebColors.setAlpha(color, 191);
+    }
+    super.setForeground(color);
   }
 
   @Override

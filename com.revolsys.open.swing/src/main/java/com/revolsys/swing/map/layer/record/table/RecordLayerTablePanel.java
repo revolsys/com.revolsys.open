@@ -47,7 +47,7 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class RecordLayerTablePanel extends TablePanel implements
-PropertyChangeListener {
+  PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   public static final String FILTER_GEOMETRY = "filter_geometry";
@@ -79,12 +79,12 @@ PropertyChangeListener {
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     final boolean hasGeometry = recordDefinition.getGeometryFieldIndex() != -1;
     final EnableCheck deletableEnableCheck = new RecordRowPropertyEnableCheck(
-        "deletable");
+      "deletable");
 
     final EnableCheck modifiedEnableCheck = new RecordRowPropertyEnableCheck(
-        "modified");
+      "modified");
     final EnableCheck deletedEnableCheck = new RecordRowPropertyEnableCheck(
-        "deleted");
+      "deleted");
     final EnableCheck notEnableCheck = new RecordRowPropertyEnableCheck(
       "deleted", false);
     final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(
@@ -118,10 +118,10 @@ PropertyChangeListener {
 
     menu.addMenuItem("record", RecordRowRunnable.createAction(
       "Revert Empty Fields", "field_empty_revert", modifiedEnableCheck,
-        "revertEmptyFields"));
+      "revertEmptyFields"));
 
     menu.addMenuItemTitleIcon("dnd", "Copy Record", "page_copy", this,
-        "copyRecord");
+      "copyRecord");
 
     if (hasGeometry) {
       menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "geometry_paste",
@@ -130,11 +130,11 @@ PropertyChangeListener {
 
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
       final DataType geometryDataType = recordDefinition.getGeometryField()
-          .getType();
+        .getType();
       if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition)
-            .hasDirectionalAttributes()) {
+          .hasDirectionalAttributes()) {
           editMenu.addMenuItemTitleIcon("geometry",
             LayerRecordForm.FLIP_RECORD_NAME, LayerRecordForm.FLIP_RECORD_ICON,
             editableEnableCheck, this, "flipRecordOrientation");
@@ -163,7 +163,7 @@ PropertyChangeListener {
     toolBar.addComponent("count", new TableRowCount(this.tableModel));
 
     toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this,
-        "refresh");
+      "refresh");
 
     this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets",
       "fields_filter", this, "actionShowFieldSetsMenu");
@@ -214,7 +214,7 @@ PropertyChangeListener {
 
     final JMenuItem editMenuItem = InvokeMethodAction.createMenuItem(
       "Edit Field Sets", "fields_filter_edit", this.layer, "showProperties",
-        "Field Sets");
+      "Field Sets");
     menu.add(editMenuItem);
 
     menu.addSeparator();
@@ -301,6 +301,11 @@ PropertyChangeListener {
   }
 
   @Override
+  public boolean isCurrentCellEditable() {
+    return super.isCurrentCellEditable() && this.layer.isCanEditRecords();
+  }
+
+  @Override
   public void mouseClicked(final MouseEvent e) {
     super.mouseClicked(e);
     if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
@@ -356,8 +361,8 @@ PropertyChangeListener {
     if (geometry != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()
-          .convert(geometryFactory)
-          .expandPercent(0.1);
+        .convert(geometryFactory)
+        .expandPercent(0.1);
       project.setViewBoundingBox(boundingBox);
     }
   }

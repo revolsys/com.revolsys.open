@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
 import javax.swing.InputMap;
 import javax.swing.JCheckBox;
@@ -130,6 +129,19 @@ public class SwingUtil {
     return label;
   }
 
+  public static void addLabelledReadOnlyTextField(final JPanel container,
+    final String fieldName, final Object value) {
+    final String string = StringConverterRegistry.toString(value);
+    final int length = Math.max(1, string.length());
+    addLabelledReadOnlyTextField(container, fieldName, value, length);
+  }
+
+  public static void addLabelledReadOnlyTextField(final JPanel container,
+    final String fieldName, final Object value, final int length) {
+    addLabel(container, fieldName);
+    addReadOnlyTextField(container, fieldName, value, length);
+  }
+
   public static JComponent addObjectField(final Container container,
     final Object object, final String fieldName) {
     return addObjectField(container, object, fieldName, fieldName);
@@ -142,19 +154,9 @@ public class SwingUtil {
   }
 
   public static void addReadOnlyTextField(final JPanel container,
-    final String fieldName, final Object value) {
-    final String string = StringConverterRegistry.toString(value);
-    final int length = Math.max(1, string.length());
-    addReadOnlyTextField(container, fieldName, value, length);
-  }
-
-  public static void addReadOnlyTextField(final JPanel container,
     final String fieldName, final Object value, final int length) {
-    addLabel(container, fieldName);
     final TextField field = new TextField(fieldName, value, length);
     field.setEditable(false);
-    field.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 3));
-    field.setFont(FONT);
     container.add(field);
   }
 
@@ -313,23 +315,27 @@ public class SwingUtil {
 
       final DataType type = attribute.getType();
       int columns = length;
-      if (columns == 0) {
+      if (columns <= 0) {
         columns = 10;
       } else if (columns > 50) {
         columns = 50;
       }
       final Class<?> javaClass = type.getJavaClass();
-      if (!editable) {
+      if (codeTable != null) {
+        if (editable) {
+          final JComponent component = codeTable.getSwingEditor();
+          if (component == null) {
+            field = createComboBox(fieldName, codeTable, required, -1);
+          } else {
+            field = (Field)component;
+          }
+        } else {
+          field = new ObjectLabelField(fieldName, columns, codeTable);
+        }
+      } else if (!editable) {
         final TextField textField = createTextField(fieldName, columns);
         textField.setEditable(false);
         field = textField;
-      } else if (codeTable != null) {
-        final JComponent component = codeTable.getSwingEditor();
-        if (component == null) {
-          field = createComboBox(fieldName, codeTable, required, -1);
-        } else {
-          field = (Field)component;
-        }
       } else if (Number.class.isAssignableFrom(javaClass)) {
         final int scale = attribute.getScale();
         final Number minValue = attribute.getMinValue();

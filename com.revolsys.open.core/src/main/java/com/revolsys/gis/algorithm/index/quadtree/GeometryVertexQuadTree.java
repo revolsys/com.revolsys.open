@@ -54,8 +54,12 @@ public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
   @Override
   protected double[] getBounds(final Object id) {
     final Vertex vertex = getItem(id);
-    final BoundingBox boundingBox = vertex.getBoundingBox();
-    return boundingBox.getBounds(2);
+    if (vertex == null) {
+      return null;
+    } else {
+      final BoundingBox boundingBox = vertex.getBoundingBox();
+      return boundingBox.getBounds(2);
+    }
   }
 
   @Override

@@ -17,8 +17,8 @@ import com.revolsys.beans.NonWeakListener;
 import com.revolsys.swing.parallel.Invoke;
 
 public class EnableComponentListener implements ItemListener,
-  ListSelectionListener, PropertyChangeListener, DocumentListener,
-  NonWeakListener {
+ListSelectionListener, PropertyChangeListener, DocumentListener,
+NonWeakListener {
   private final Component component;
 
   public EnableComponentListener(final Component component) {
@@ -58,7 +58,7 @@ public class EnableComponentListener implements ItemListener,
       if (SwingUtilities.isEventDispatchThread()) {
         this.component.setEnabled(enabled);
       } else {
-        Invoke.later(component, "setEnabled", enabled);
+        Invoke.later(this.component, "setEnabled", enabled);
       }
 
     }

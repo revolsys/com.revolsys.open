@@ -268,27 +268,27 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
         coordinateSystemPanel.add(new JLabel("Unknown"));
       } else {
         final int axisCount = geometryFactory.getAxisCount();
-        SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "ID",
+        SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "ID",
           coordinateSystem.getId(), 10);
-        SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "axisCount",
+        SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "axisCount",
           axisCount, 10);
 
         final double scaleXY = geometryFactory.getScaleXY();
         if (scaleXY > 0) {
-          SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "scaleXy",
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy",
             scaleXY, 10);
         } else {
-          SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "scaleXy",
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy",
             "Floating", 10);
         }
 
         if (axisCount > 2) {
           final double scaleZ = geometryFactory.getScaleZ();
           if (scaleZ > 0) {
-            SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "scaleZ",
+            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleZ",
               scaleZ, 10);
           } else {
-            SwingUtil.addReadOnlyTextField(coordinateSystemPanel, "scaleZ",
+            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleZ",
               "Floating", 10);
           }
         }
@@ -333,7 +333,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
 
     final String type = Property.get(this, "type");
     final String typeLabel = CaseConverter.toCapitalizedWords(type);
-    SwingUtil.addReadOnlyTextField(panel, "Type", typeLabel);
+    SwingUtil.addLabelledReadOnlyTextField(panel, "Type", typeLabel);
 
     GroupLayoutUtil.makeColumns(panel, 2, true);
 

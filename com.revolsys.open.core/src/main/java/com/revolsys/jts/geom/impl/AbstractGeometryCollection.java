@@ -61,7 +61,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *@version 1.7
  */
 public abstract class AbstractGeometryCollection extends AbstractGeometry
-  implements GeometryCollection {
+implements GeometryCollection {
   private static final long serialVersionUID = -8159852648192400768L;
 
   @SuppressWarnings("unchecked")
@@ -70,7 +70,7 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
     final int... geometryId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
-    } else if (geometryId.length > 1) {
+    } else if (geometryId.length > 0) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (isEmpty()) {
         return newPoint.copy(geometryFactory);
@@ -89,13 +89,13 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not "
-              + partIndex);
+                + partIndex);
         }
       }
     } else {
       throw new IllegalArgumentException(
         "Vertex id's for GeometryCollection must have length > 1. "
-          + Arrays.toString(geometryId));
+            + Arrays.toString(geometryId));
     }
   }
 
@@ -143,7 +143,7 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
     if (vertexId.length > 1) {
       if (isEmpty()) {
         throw new IllegalArgumentException(
-          "Cannot delete vertex for empty MultiPoint");
+            "Cannot delete vertex for empty MultiPoint");
       } else {
         final int partIndex = vertexId[0];
         final int partCount = getGeometryCount();
@@ -161,13 +161,13 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not "
-              + partIndex);
+                + partIndex);
         }
       }
     } else {
       throw new IllegalArgumentException(
         "Vertex id's for GeometryCollection must have length > 1. "
-          + Arrays.toString(vertexId));
+            + Arrays.toString(vertexId));
     }
   }
 
@@ -229,7 +229,7 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
   @Override
   public Geometry getBoundary() {
     throw new IllegalArgumentException(
-      "This method does not support GeometryCollection arguments");
+        "This method does not support GeometryCollection arguments");
   }
 
   @Override
@@ -347,7 +347,7 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not "
-              + partIndex);
+                + partIndex);
         }
       }
     } else {
@@ -413,7 +413,7 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
     } else if (vertexId.length > 1) {
       if (isEmpty()) {
         throw new IllegalArgumentException("Cannot move vertex for empty "
-          + getGeometryType());
+            + getGeometryType());
       } else {
         final int partIndex = vertexId[0];
         final int partCount = getGeometryCount();
@@ -431,7 +431,7 @@ public abstract class AbstractGeometryCollection extends AbstractGeometry
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not "
-              + partIndex);
+                + partIndex);
         }
       }
     } else {

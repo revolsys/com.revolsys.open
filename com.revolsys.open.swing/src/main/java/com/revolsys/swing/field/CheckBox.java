@@ -83,6 +83,11 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
   }
 
   @Override
+  public void setEditable(final boolean editable) {
+    setEnabled(editable);
+  }
+
+  @Override
   public void setFieldBackgroundColor(Color color) {
     if (color == null) {
       color = DEFAULT_BACKGROUND;

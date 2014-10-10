@@ -142,6 +142,8 @@ public class ProjectFrame extends BaseFrame {
 
   private JSplitPane topBottomSplit;
 
+  private final String frameTitle;
+
   public ProjectFrame(final String title) {
     this(title, new Project());
   }
@@ -153,6 +155,7 @@ public class ProjectFrame extends BaseFrame {
 
   public ProjectFrame(final String title, final Project project) {
     super(title, false);
+    this.frameTitle = title;
     this.project = project;
     init();
   }
@@ -160,6 +163,60 @@ public class ProjectFrame extends BaseFrame {
   public void actionNewProject() {
     if (this.project != null && this.project.saveWithPrompt()) {
       this.project.reset();
+      super.setTitle("NEW - " + this.frameTitle);
+    }
+  }
+
+  public void actionOpenProject() {
+    if (this.project != null && this.project.saveWithPrompt()) {
+
+      final JFileChooser fileChooser = SwingUtil.createFileChooser(
+        "Open Project", "com.revolsys.swing.map.project", "directory");
+
+      final FileNameExtensionFilter filter = new FileNameExtensionFilter(
+        "RevolutionGIS Project (*.rgmap)", "rgmap");
+      fileChooser.setAcceptAllFileFilterUsed(false);
+      fileChooser.addChoosableFileFilter(filter);
+      fileChooser.setFileFilter(filter);
+
+      final int returnVal = fileChooser.showOpenDialog(this);
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+        final File projectDirectory = fileChooser.getSelectedFile();
+        try {
+          PreferencesUtil.setUserString("com.revolsys.swing.map.project",
+            "directory", projectDirectory.getParent());
+          this.project.reset();
+          Invoke.background("Load project", this, "loadProject",
+            projectDirectory);
+        } catch (final Throwable e) {
+          ExceptionUtil.log(getClass(), "Unable to open project:"
+            + projectDirectory, e);
+        }
+      }
+    }
+  }
+
+  public void actionRunScript() {
+    final JFileChooser fileChooser = SwingUtil.createFileChooser(
+      "Select Script", "com.revolsys.swing.tools.script", "directory");
+    final FileNameExtensionFilter groovyFilter = new FileNameExtensionFilter(
+      "Groovy Script", "groovy");
+    fileChooser.addChoosableFileFilter(groovyFilter);
+    fileChooser.setMultiSelectionEnabled(false);
+    final int returnVal = fileChooser.showOpenDialog(this);
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+      final Binding binding = new Binding();
+      final GroovyShell shell = new GroovyShell(binding);
+      final File scriptFile = fileChooser.getSelectedFile();
+      final String[] args = new String[0];
+      try {
+        PreferencesUtil.setUserString("com.revolsys.swing.tools.script",
+          "directory", scriptFile.getParent());
+        shell.run(scriptFile, args);
+      } catch (final Throwable e) {
+        ExceptionUtil.log(getClass(), "Unable to run script:" + scriptFile, e);
+      }
     }
   }
 
@@ -262,7 +319,10 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory file = new MenuFactory("File");
 
     file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", this,
-        "actionNewProject").setAcceleratorControlKey(KeyEvent.VK_N);
+      "actionNewProject").setAcceleratorControlKey(KeyEvent.VK_N);
+
+    file.addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add",
+      this, "actionOpenProject").setAcceleratorControlKey(KeyEvent.VK_O);
 
     file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
       this.project, "saveAllSettings").setAcceleratorControlKey(KeyEvent.VK_S);
@@ -272,19 +332,19 @@ public class ProjectFrame extends BaseFrame {
       .setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
-        "save");
+      "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-        "print").setAcceleratorControlKey(KeyEvent.VK_P);
+      "print").setAcceleratorControlKey(KeyEvent.VK_P);
 
     if (OS.isWindows()) {
       file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit")
-      .setAcceleratorKey(
-        KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK));
+        .setAcceleratorKey(
+          KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK));
     } else if (OS.isUnix()) {
       file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit")
-      .setAcceleratorKey(
-        KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK));
+        .setAcceleratorKey(
+          KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK));
     }
 
     return file;
@@ -296,10 +356,10 @@ public class ProjectFrame extends BaseFrame {
     tools.addCheckboxMenuItem("map",
       new InvokeMethodAction("Measure", Icons.getIcon("ruler"), map,
         "toggleMode", MeasureOverlay.MEASURE), new ObjectPropertyEnableCheck(
-          map, "overlayAction", MeasureOverlay.MEASURE));
+        map, "overlayAction", MeasureOverlay.MEASURE));
 
-    tools.addMenuItem("script", "Run Script...", "Run Script",
-      Icons.getIcon("script_go"), this, "runScript");
+    tools.addMenuItemTitleIcon("script", "Run Script...", "script_go", this,
+      "actionRunScript");
     return tools;
   }
 
@@ -387,10 +447,6 @@ public class ProjectFrame extends BaseFrame {
     return 0.20;
   }
 
-  protected BoundingBox getDefaultBoundingBox() {
-    return new BoundingBoxDoubleGf();
-  }
-
   // public void expandConnectionManagers(final PropertyChangeEvent event) {
   // final Object newValue = event.getNewValue();
   // if (newValue instanceof ConnectionRegistry) {
@@ -407,6 +463,10 @@ public class ProjectFrame extends BaseFrame {
   // }
   // }
   // }
+
+  protected BoundingBox getDefaultBoundingBox() {
+    return new BoundingBoxDoubleGf();
+  }
 
   public JTabbedPane getLeftTabs() {
     return this.leftTabs;
@@ -481,6 +541,7 @@ public class ProjectFrame extends BaseFrame {
   public void loadProject(final File projectDirectory) {
     final FileSystemResource resource = new FileSystemResource(projectDirectory);
     this.project.readProject(resource);
+    super.setTitle(this.project.getName() + " - " + this.frameTitle);
 
     final Object frameBoundsObject = this.project.getProperty("frameBounds");
     setBounds(frameBoundsObject);
@@ -506,30 +567,6 @@ public class ProjectFrame extends BaseFrame {
 
     }
     viewport.setInitialized(true);
-  }
-
-  public void runScript() {
-    final JFileChooser fileChooser = SwingUtil.createFileChooser(
-      "Select Script", "com.revolsys.swing.tools.script", "directory");
-    final FileNameExtensionFilter groovyFilter = new FileNameExtensionFilter(
-      "Groovy Script", "groovy");
-    fileChooser.addChoosableFileFilter(groovyFilter);
-    fileChooser.setMultiSelectionEnabled(false);
-    final int returnVal = fileChooser.showOpenDialog(this);
-    if (returnVal == JFileChooser.APPROVE_OPTION) {
-
-      final Binding binding = new Binding();
-      final GroovyShell shell = new GroovyShell(binding);
-      final File scriptFile = fileChooser.getSelectedFile();
-      final String[] args = new String[0];
-      try {
-        PreferencesUtil.setUserString("com.revolsys.swing.tools.script",
-          "directory", scriptFile.getParent());
-        shell.run(scriptFile, args);
-      } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "Unable to run script:" + scriptFile, e);
-      }
-    }
   }
 
   public void setBounds(final Object frameBoundsObject) {

@@ -349,9 +349,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addUndoButtons() {
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canUndo");
+      "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canRedo");
+      "canRedo");
 
     this.toolBar.addButton("undo", "Undo", "arrow_undo", canUndo,
       this.undoManager, "undo");
@@ -730,7 +730,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {
         if (this.baseMapOverlay != null
-            && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
+          && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
           final Layer layer = (Layer)event.getNewValue();
           if (layer != null && layer.isVisible()) {
             this.baseMapOverlay.setLayer(layer);
@@ -966,11 +966,11 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final PopupMenu menu = new PopupMenu("Zoom Bookmark");
     final MenuFactory factory = menu.getMenu();
     factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
-        "addZoomBookmark");
+      "addZoomBookmark");
 
     final Project project = getProject();
     for (final Entry<String, BoundingBox> entry : project.getZoomBookmarks()
-        .entrySet()) {
+      .entrySet()) {
       final String name = entry.getKey();
       final BoundingBox boundingBox = entry.getValue();
       factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier",

@@ -116,7 +116,7 @@ public class Project extends LayerGroup {
     final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
     if (this.resource != null) {
       try {
-        SwingUtil.addReadOnlyTextField(panel, "URL", this.resource.getURL());
+        SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.resource.getURL());
         GroupLayoutUtil.makeColumns(panel, 2, true);
       } catch (final IOException e) {
       }

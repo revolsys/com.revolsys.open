@@ -56,7 +56,7 @@ import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.util.Property;
 
 public class RecordLayerTableModel extends RecordRowTableModel implements
-  SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
+SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
 
   public static RecordLayerTable createTable(final AbstractRecordLayer layer) {
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
@@ -116,7 +116,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
   private SwingWorker<?, ?> loadObjectsWorker;
 
   private Map<Integer, List<LayerRecord>> pageCache = new LruMap<Integer, List<LayerRecord>>(
-      5);
+    5);
 
   private String fieldFilterMode = MODE_ALL;
 
@@ -250,7 +250,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
           this.loadingPageNumbersToProcess.add(pageNumber);
           if (this.loadObjectsWorker == null) {
             this.loadObjectsWorker = Invoke.background("Loading records "
-                + getTypeName(), this, "loadPages", this.refreshIndex);
+              + getTypeName(), this, "loadPages", this.refreshIndex);
           }
         }
         return this.loadingRecord;
@@ -301,7 +301,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
         if (this.countLoaded) {
           int count = this.rowCount;
           if (!this.fieldFilterMode.equals(MODE_SELECTED)
-              && !this.fieldFilterMode.equals(MODE_EDITS)) {
+            && !this.fieldFilterMode.equals(MODE_EDITS)) {
             final AbstractRecordLayer layer = getLayer();
             final int newRecordCount = layer.getNewRecordCount();
             count += newRecordCount;
@@ -311,7 +311,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
         } else {
           if (this.rowCountWorker == null) {
             this.rowCountWorker = Invoke.background("Query row count "
-                + this.layer.getName(), this, "loadRowCount", this.refreshIndex);
+              + this.layer.getName(), this, "loadRowCount", this.refreshIndex);
           }
           return 0;
         }
@@ -366,7 +366,8 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
 
   @Override
   public boolean isEditable() {
-    return super.isEditable() && this.layer.isEditable();
+    return super.isEditable() && this.layer.isEditable()
+      && this.layer.isCanEditRecords();
   }
 
   public boolean isFilterByBoundingBox() {
@@ -439,7 +440,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
     } else if (e.getSource() == this.layer) {
       if (Arrays.asList("query", "editable", "recordInserted",
         "recordsInserted", "recordDeleted", "recordsChanged").contains(
-          propertyName)) {
+        propertyName)) {
         refresh();
       } else if ("recordUpdated".equals(propertyName)) {
         repaint();

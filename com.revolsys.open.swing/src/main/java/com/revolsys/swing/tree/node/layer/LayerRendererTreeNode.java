@@ -29,7 +29,7 @@ import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.util.Property;
 
 public class LayerRendererTreeNode extends ListTreeNode implements
-MouseListener {
+  MouseListener {
   public static final Icon ICON = Icons.getIcon("folder");
 
   public LayerRendererTreeNode(final LayerRenderer<?> renderer) {

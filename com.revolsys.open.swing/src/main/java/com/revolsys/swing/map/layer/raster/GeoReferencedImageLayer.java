@@ -144,18 +144,18 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
     if (this.url.startsWith("file:")) {
       final String fileName = this.url.replaceFirst("file:(//)?", "");
-      SwingUtil.addReadOnlyTextField(panel, "File", fileName);
+      SwingUtil.addLabelledReadOnlyTextField(panel, "File", fileName);
     } else {
-      SwingUtil.addReadOnlyTextField(panel, "URL", this.url);
+      SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.url);
     }
     final String fileNameExtension = FileUtil.getFileNameExtension(this.url);
     if (Property.hasValue(fileNameExtension)) {
-      SwingUtil.addReadOnlyTextField(panel, "File Extension", fileNameExtension);
+      SwingUtil.addLabelledReadOnlyTextField(panel, "File Extension", fileNameExtension);
       final GeoReferencedImageFactory factory = IoFactoryRegistry.getInstance()
           .getFactoryByFileExtension(GeoReferencedImageFactory.class,
             fileNameExtension);
       if (factory != null) {
-        SwingUtil.addReadOnlyTextField(panel, "File Type", factory.getName());
+        SwingUtil.addLabelledReadOnlyTextField(panel, "File Type", factory.getName());
       }
     }
     GroupLayoutUtil.makeColumns(panel, 2, true);

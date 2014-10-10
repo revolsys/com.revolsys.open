@@ -146,7 +146,7 @@ public class BaseStylePanel extends ValueField implements
       SwingUtil.addLabel(container, fieldName);
       final Field field = createField(fieldName, fieldClass, value);
       if (this.readOnlyFieldNames.contains(fieldName)) {
-        field.setEnabled(false);
+        field.setEditable(false);
       }
       if (field instanceof JTextArea) {
         container.add(new JScrollPane((Component)field));
