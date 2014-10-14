@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.net.ResponseCache;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ActionMap;
@@ -36,6 +37,7 @@ import javax.swing.tree.TreePath;
 
 import org.springframework.core.io.FileSystemResource;
 
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.datastore.RecordStoreConnectionManager;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.io.file.FolderConnectionManager;
@@ -144,13 +146,17 @@ public class ProjectFrame extends BaseFrame {
 
   private final String frameTitle;
 
+  private final JMenu openRecentMenu = new JMenu("Open Recent Project");
+
   public ProjectFrame(final String title) {
     this(title, new Project());
   }
 
   public ProjectFrame(final String title, final File projectDirectory) {
     this(title);
-    Invoke.background("Load project", this, "loadProject", projectDirectory);
+    if (projectDirectory != null) {
+      Invoke.background("Load project", this, "loadProject", projectDirectory);
+    }
   }
 
   public ProjectFrame(final String title, final Project project) {
@@ -182,16 +188,7 @@ public class ProjectFrame extends BaseFrame {
       final int returnVal = fileChooser.showOpenDialog(this);
       if (returnVal == JFileChooser.APPROVE_OPTION) {
         final File projectDirectory = fileChooser.getSelectedFile();
-        try {
-          PreferencesUtil.setUserString("com.revolsys.swing.map.project",
-            "directory", projectDirectory.getParent());
-          this.project.reset();
-          Invoke.background("Load project", this, "loadProject",
-            projectDirectory);
-        } catch (final Throwable e) {
-          ExceptionUtil.log(getClass(), "Unable to open project:"
-            + projectDirectory, e);
-        }
+        openProject(projectDirectory);
       }
     }
   }
@@ -217,6 +214,15 @@ public class ProjectFrame extends BaseFrame {
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to run script:" + scriptFile, e);
       }
+    }
+  }
+
+  public void actionSaveProjectAs() {
+    final File directory = this.project.saveAllSettingsAs();
+    if (directory != null) {
+      addToRecentProjects(directory);
+      Invoke.later(this, "setTitle", this.project.getName() + " - "
+          + this.frameTitle);
     }
   }
 
@@ -300,6 +306,21 @@ public class ProjectFrame extends BaseFrame {
     progressBar.add(viewTasksAction, BorderLayout.EAST);
   }
 
+  private void addToRecentProjects(final File projectDirectory) {
+    final List<String> recentProjects = getRecentProjectPaths();
+    final String filePath = FileUtil.getCanonicalPath(projectDirectory);
+    recentProjects.remove(filePath);
+    recentProjects.add(0, filePath);
+    while (recentProjects.size() > 10) {
+      recentProjects.remove(recentProjects.size() - 1);
+    }
+    OS.setPreference("com.revolsys.gis", "/com/revolsys/gis/project",
+      "recentProjects", recentProjects);
+    OS.setPreference("com.revolsys.gis", "/com/revolsys/gis/project",
+      "recentProject", filePath);
+    updateRecentMenu();
+  }
+
   @Override
   protected JMenuBar createMenuBar() {
     final JMenuBar menuBar = super.createMenuBar();
@@ -319,32 +340,35 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory file = new MenuFactory("File");
 
     file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", this,
-      "actionNewProject").setAcceleratorControlKey(KeyEvent.VK_N);
+        "actionNewProject").setAcceleratorControlKey(KeyEvent.VK_N);
 
     file.addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add",
       this, "actionOpenProject").setAcceleratorControlKey(KeyEvent.VK_O);
+
+    file.addComponent("projectOpen", this.openRecentMenu);
+    updateRecentMenu();
 
     file.addMenuItemTitleIcon("projectSave", "Save Project", "layout_save",
       this.project, "saveAllSettings").setAcceleratorControlKey(KeyEvent.VK_S);
 
     file.addMenuItemTitleIcon("projectSave", "Save Project As...",
-      "layout_save", this.project, "saveAllSettingsAs")
+      "layout_save", this, "actionSaveProjectAs")
       .setAcceleratorShiftControlKey(KeyEvent.VK_S);
 
     file.addMenuItemTitleIcon("save", "Save as PDF", "save", SaveAsPdf.class,
-      "save");
+        "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-      "print").setAcceleratorControlKey(KeyEvent.VK_P);
+        "print").setAcceleratorControlKey(KeyEvent.VK_P);
 
     if (OS.isWindows()) {
       file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit")
-        .setAcceleratorKey(
-          KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK));
+      .setAcceleratorKey(
+        KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK));
     } else if (OS.isUnix()) {
       file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit")
-        .setAcceleratorKey(
-          KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK));
+      .setAcceleratorKey(
+        KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK));
     }
 
     return file;
@@ -356,10 +380,10 @@ public class ProjectFrame extends BaseFrame {
     tools.addCheckboxMenuItem("map",
       new InvokeMethodAction("Measure", Icons.getIcon("ruler"), map,
         "toggleMode", MeasureOverlay.MEASURE), new ObjectPropertyEnableCheck(
-        map, "overlayAction", MeasureOverlay.MEASURE));
+          map, "overlayAction", MeasureOverlay.MEASURE));
 
     tools.addMenuItemTitleIcon("script", "Run Script...", "script_go", this,
-      "actionRunScript");
+        "actionRunScript");
     return tools;
   }
 
@@ -443,10 +467,6 @@ public class ProjectFrame extends BaseFrame {
     return this.bottomTabs;
   }
 
-  public double getControlWidth() {
-    return 0.20;
-  }
-
   // public void expandConnectionManagers(final PropertyChangeEvent event) {
   // final Object newValue = event.getNewValue();
   // if (newValue instanceof ConnectionRegistry) {
@@ -464,6 +484,10 @@ public class ProjectFrame extends BaseFrame {
   // }
   // }
 
+  public double getControlWidth() {
+    return 0.20;
+  }
+
   protected BoundingBox getDefaultBoundingBox() {
     return new BoundingBoxDoubleGf();
   }
@@ -478,6 +502,23 @@ public class ProjectFrame extends BaseFrame {
 
   public Project getProject() {
     return this.project;
+  }
+
+  private List<String> getRecentProjectPaths() {
+    final List<String> recentProjects = OS.getPreference("com.revolsys.gis",
+      "/com/revolsys/gis/project", "recentProjects", new ArrayList<String>());
+    for (int i = 0; i < recentProjects.size();) {
+      final String filePath = recentProjects.get(i);
+      final File file = FileUtil.getFile(filePath);
+      if (file.exists()) {
+        i++;
+      } else {
+        recentProjects.remove(i);
+      }
+    }
+    OS.setPreference("com.revolsys.gis", "/com/revolsys/gis/project",
+      "recentProjects", recentProjects);
+    return recentProjects;
   }
 
   public BaseTree getTocTree() {
@@ -541,7 +582,8 @@ public class ProjectFrame extends BaseFrame {
   public void loadProject(final File projectDirectory) {
     final FileSystemResource resource = new FileSystemResource(projectDirectory);
     this.project.readProject(resource);
-    super.setTitle(this.project.getName() + " - " + this.frameTitle);
+    Invoke.later(this, "setTitle", this.project.getName() + " - "
+      + this.frameTitle);
 
     final Object frameBoundsObject = this.project.getProperty("frameBounds");
     setBounds(frameBoundsObject);
@@ -567,6 +609,22 @@ public class ProjectFrame extends BaseFrame {
 
     }
     viewport.setInitialized(true);
+  }
+
+  public void openProject(final File projectDirectory) {
+    if (projectDirectory.exists()) {
+      try {
+        addToRecentProjects(projectDirectory);
+
+        PreferencesUtil.setUserString("com.revolsys.swing.map.project",
+          "directory", projectDirectory.getParent());
+        this.project.reset();
+        Invoke.background("Load project", this, "loadProject", projectDirectory);
+      } catch (final Throwable e) {
+        ExceptionUtil.log(getClass(), "Unable to open project:"
+            + projectDirectory, e);
+      }
+    }
   }
 
   public void setBounds(final Object frameBoundsObject) {
@@ -637,6 +695,19 @@ public class ProjectFrame extends BaseFrame {
       }
       this.project = project;
       firePropertyChange("project", oldProject, project);
+    }
+  }
+
+  public void updateRecentMenu() {
+    final List<String> recentProjects = getRecentProjectPaths();
+
+    this.openRecentMenu.removeAll();
+    for (final String filePath : recentProjects) {
+      final File file = FileUtil.getFile(filePath);
+      final String fileName = FileUtil.getFileName(file);
+      final String path = file.getParent();
+      this.openRecentMenu.add(InvokeMethodAction.createMenuItem(fileName
+        + " - " + path, "layout_add", this, "openProject", file));
     }
   }
 

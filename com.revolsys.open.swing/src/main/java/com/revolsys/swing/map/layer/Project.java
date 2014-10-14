@@ -116,7 +116,8 @@ public class Project extends LayerGroup {
     final ValueField panel = super.createPropertiesTabGeneralPanelSource(parent);
     if (this.resource != null) {
       try {
-        SwingUtil.addLabelledReadOnlyTextField(panel, "URL", this.resource.getURL());
+        SwingUtil.addLabelledReadOnlyTextField(panel, "URL",
+          this.resource.getURL());
         GroupLayoutUtil.makeColumns(panel, 2, true);
       } catch (final IOException e) {
       }
@@ -303,6 +304,7 @@ public class Project extends LayerGroup {
     this.resource = resource;
     if (resource.exists()) {
       setEventsEnabled(false);
+      String name;
       try {
         final Resource layersDir = SpringUtil.getResource(resource, "Layers");
         readProperties(layersDir);
@@ -340,9 +342,12 @@ public class Project extends LayerGroup {
         } finally {
           RecordStoreConnectionRegistry.setForThread(oldRecordStoreConnections);
         }
+        name = getName();
+        setName(null);
       } finally {
         setEventsEnabled(true);
       }
+      setName(name);
     }
   }
 
@@ -396,7 +401,7 @@ public class Project extends LayerGroup {
     }
   }
 
-  public void saveAllSettingsAs() {
+  public File saveAllSettingsAs() {
     final Resource resource = this.resource;
     try {
       this.resource = null;
@@ -405,6 +410,7 @@ public class Project extends LayerGroup {
         setName(FileUtil.getBaseName(directory));
         saveAllSettings();
       }
+      return directory;
     } finally {
       if (this.resource == null) {
         this.resource = resource;
