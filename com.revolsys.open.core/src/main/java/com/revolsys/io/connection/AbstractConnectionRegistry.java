@@ -15,11 +15,13 @@ import org.springframework.core.io.Resource;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.io.map.MapSerializer;
+import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractConnectionRegistry<T> implements
-ConnectionRegistry<T>, PropertyChangeListener {
+public abstract class AbstractConnectionRegistry<T extends MapSerializer>
+  implements ConnectionRegistry<T>, PropertyChangeListener {
 
   private Map<String, T> connections;
 
@@ -42,7 +44,7 @@ ConnectionRegistry<T>, PropertyChangeListener {
 
   public AbstractConnectionRegistry(
     final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager,
-      final String name) {
+    final String name) {
     this.name = name;
     setConnectionManager(connectionManager);
   }
@@ -198,8 +200,10 @@ ConnectionRegistry<T>, PropertyChangeListener {
         this.propertyChangeSupport.fireIndexedPropertyChange("connections",
           index, connection, null);
         if (this.directory != null && !this.readOnly) {
-          final File file = getConnectionFile(name);
-          file.delete();
+          final Map<String, Object> connectionParameters = existingConnection.toMap();
+          final String connectionName = (String)connectionParameters.get("name");
+          final File file = getConnectionFile(connectionName);
+          FileUtil.deleteDirectory(file);
         }
         return true;
       }
@@ -208,6 +212,29 @@ ConnectionRegistry<T>, PropertyChangeListener {
   }
 
   protected abstract boolean removeConnection(T connection);
+
+  public void save() {
+    for (final MapSerializer connection : this.connections.values()) {
+      final Map<String, Object> connectionParameters = connection.toMap();
+      final String name = CollectionUtil.getString(connectionParameters, "name");
+      final File file = getConnectionFile(name);
+      if (file != null) {
+        final FileSystemResource resource = new FileSystemResource(file);
+        JsonMapIoFactory.write(connectionParameters, resource, true);
+      }
+    }
+  }
+
+  public void saveAs(final Resource directory) {
+    setDirectory(directory);
+    save();
+  }
+
+  public void saveAs(final Resource parentDirectory, final String directoryName) {
+    final Resource connectionsDirectory = SpringUtil.getResource(
+      parentDirectory, directoryName);
+    saveAs(connectionsDirectory);
+  }
 
   @Override
   public void setConnectionManager(
@@ -248,7 +275,7 @@ ConnectionRegistry<T>, PropertyChangeListener {
   public void setReadOnly(final boolean readOnly) {
     if (this.isReadOnly() && !readOnly) {
       throw new IllegalArgumentException(
-          "Cannot make a read only registry not read only");
+        "Cannot make a read only registry not read only");
     }
     this.readOnly = readOnly;
   }

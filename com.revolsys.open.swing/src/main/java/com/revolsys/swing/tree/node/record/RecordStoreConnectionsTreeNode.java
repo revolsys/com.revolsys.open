@@ -20,9 +20,9 @@ public class RecordStoreConnectionsTreeNode extends ListTreeNode {
     setName("Record Stores");
     setType("Record Stores");
     setIcon(ICON);
-    final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager.get();
-    Property.addListener(recordStoreConnectionManager,
-      new InvokeMethodListener(this, "refresh"));
+    final RecordStoreConnectionManager connectionManager = RecordStoreConnectionManager.get();
+    Property.addListener(connectionManager, new InvokeMethodListener(this,
+      "refresh"));
   }
 
   @Override

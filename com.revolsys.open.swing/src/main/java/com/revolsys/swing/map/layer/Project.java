@@ -25,7 +25,9 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.datastore.RecordStoreConnectionManager;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
+import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.map.MapSerializerUtil;
@@ -397,7 +399,17 @@ public class Project extends LayerGroup {
       return true;
     } else {
       final File directory = getDirectory();
-      return super.saveAllSettings(directory);
+      final boolean saveAllSettings = super.saveAllSettings(directory);
+      if (saveAllSettings) {
+        final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager.get();
+        final RecordStoreConnectionRegistry recordStoreConnections = recordStoreConnectionManager.getConnectionRegistry("Project");
+        recordStoreConnections.saveAs(this.resource, "Record Stores");
+
+        final FolderConnectionManager folderConnectionManager = FolderConnectionManager.get();
+        final FolderConnectionRegistry folderConnections = folderConnectionManager.getConnectionRegistry("Project");
+        folderConnections.saveAs(this.resource, "Folder Connections");
+      }
+      return saveAllSettings;
     }
   }
 
