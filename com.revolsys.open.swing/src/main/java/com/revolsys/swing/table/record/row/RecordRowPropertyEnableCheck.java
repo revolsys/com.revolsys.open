@@ -43,8 +43,8 @@ public class RecordRowPropertyEnableCheck extends AbstractEnableCheck {
       final int eventRow = TablePanel.getEventRow();
       if (eventRow != -1) {
         final RecordRowTableModel model = (RecordRowTableModel)table.getModel();
-        final Record object = model.getRecord(eventRow);
-        return object;
+        final Record record = model.getRecord(eventRow);
+        return record;
       }
     }
     return null;
@@ -58,13 +58,13 @@ public class RecordRowPropertyEnableCheck extends AbstractEnableCheck {
         this.propertyName);
       final boolean equal = EqualsRegistry.equal(value, this.value);
       if (equal) {
-        if (invert) {
+        if (this.invert) {
           return disabled();
         } else {
           return enabled();
         }
       } else {
-        if (invert) {
+        if (this.invert) {
           return enabled();
         } else {
           return disabled();

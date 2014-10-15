@@ -30,7 +30,7 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.util.Property;
 
 public class MenuFactory extends AbstractObjectWithProperties implements
-  ComponentFactory<JMenuItem> {
+ComponentFactory<JMenuItem> {
 
   public static MenuFactory createMenu(final Class<?> clazz,
     final String... menuNames) {
@@ -104,6 +104,8 @@ public class MenuFactory extends AbstractObjectWithProperties implements
       }
     }
   }
+
+  private EnableCheck enableCheck;
 
   private static Object menuSource;
 
@@ -315,6 +317,10 @@ public class MenuFactory extends AbstractObjectWithProperties implements
 
   public JMenu createJMenu(final String name, final boolean forceEnable) {
     final JMenu menu = new JMenu(name);
+    if (this.enableCheck != null) {
+      final boolean enabled = this.enableCheck.isEnabled();
+      menu.setEnabled(enabled);
+    }
     boolean first = true;
     for (final String groupName : this.groupNames) {
       final List<ComponentFactory<?>> factories = this.groups.get(groupName);
@@ -344,6 +350,10 @@ public class MenuFactory extends AbstractObjectWithProperties implements
 
   public JPopupMenu createJPopupMenu(final boolean forceEnable) {
     final JPopupMenu menu = new JPopupMenu(this.name);
+    if (this.enableCheck != null) {
+      final boolean enabled = this.enableCheck.isEnabled();
+      menu.setEnabled(enabled);
+    }
     boolean first = true;
     for (final String groupName : this.groupNames) {
       boolean groupHasItem = false;
@@ -378,12 +388,6 @@ public class MenuFactory extends AbstractObjectWithProperties implements
     }
     return menu;
   }
-
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
 
   public InvokeMethodAction createMenuItem(final String name,
     final String title, final Icon icon, final EnableCheck enableCheck,
@@ -421,6 +425,16 @@ public class MenuFactory extends AbstractObjectWithProperties implements
         }
       }
     }
+  }
+
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
+
+  public EnableCheck getEnableCheck() {
+    return this.enableCheck;
   }
 
   public MenuFactory getFactory(final String name) {
@@ -484,6 +498,10 @@ public class MenuFactory extends AbstractObjectWithProperties implements
   @Override
   public String getToolTip() {
     return null;
+  }
+
+  public void setEnableCheck(final EnableCheck enableCheck) {
+    this.enableCheck = enableCheck;
   }
 
   public void setName(final String name) {

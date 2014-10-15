@@ -943,6 +943,8 @@ DataTypeProxy {
   @Override
   int hashCode();
 
+  boolean hasInvalidXyCoordinates();
+
   <V extends Geometry> V insertVertex(Point newPoint, int... vertexId);
 
   /**

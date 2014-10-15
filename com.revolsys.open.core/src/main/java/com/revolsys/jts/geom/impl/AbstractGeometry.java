@@ -369,7 +369,7 @@ public abstract class AbstractGeometry implements Geometry {
     final DataType dataType = geometry.getDataType();
     if (dataType.equals(DataTypes.GEOMETRY_COLLECTION)) {
       throw new IllegalArgumentException(
-          "This method does not support GeometryCollection arguments");
+        "This method does not support GeometryCollection arguments");
     }
   }
 
@@ -1371,6 +1371,20 @@ public abstract class AbstractGeometry implements Geometry {
     return getBoundingBox().hashCode();
   }
 
+  public boolean hasInvalidXyCoordinates() {
+    for (final Vertex vertex : vertices()) {
+      for (int axisIndex = 0; axisIndex < 2; axisIndex++) {
+        final double value = vertex.getCoordinate(axisIndex);
+        if (Double.isNaN(value)) {
+          return true;
+        } else if (Double.isInfinite(value)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   /**
    * Computes a <code>Geometry</code> representing the point-set which is
    * common to both this <code>Geometry</code> and the <code>other</code> Geometry.
@@ -1408,11 +1422,11 @@ public abstract class AbstractGeometry implements Geometry {
       final Geometry g2 = other;
       return GeometryCollectionMapper.map((GeometryCollection)this,
         new GeometryMapper.MapOp() {
-        @Override
-        public Geometry map(final Geometry g) {
-          return g.intersection(g2);
-        }
-      });
+          @Override
+          public Geometry map(final Geometry g) {
+            return g.intersection(g2);
+          }
+        });
     }
     // if (isGeometryCollection(other))
     // return other.intersection(this);

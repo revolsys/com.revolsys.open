@@ -112,6 +112,20 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     return this.axisNames.get(column);
   }
 
+  public double getCoordinate(final int rowIndex, final int columnIndex) {
+    if (rowIndex < getRowCount()) {
+      final int axisIndex = columnIndex - this.numIndexItems;
+      if (axisIndex > -1) {
+        final Point point = getVertex(rowIndex);
+        if (point != null) {
+          final double coordinate = point.getCoordinate(axisIndex);
+          return coordinate;
+        }
+      }
+    }
+    return Double.NaN;
+  }
+
   @Override
   public JComponent getEditorField(final int rowIndex, final int columnIndex,
     final Object value) {

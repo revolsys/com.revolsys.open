@@ -157,7 +157,7 @@ public class WktParser {
           } else {
             throw new IllegalArgumentException(
               "Too many coordinates, vertex must have " + axisCount
-              + " coordinates not " + (axisNum + 1));
+                + " coordinates not " + (axisNum + 1));
           }
           if (c == ')') {
             finished = true;
@@ -173,7 +173,7 @@ public class WktParser {
           } else {
             throw new IllegalArgumentException(
               "Too many coordinates, vertex must have " + axisCount
-              + " coordinates not " + (axisNum + 1));
+                + " coordinates not " + (axisNum + 1));
 
           }
         }
@@ -247,7 +247,7 @@ public class WktParser {
     }
   }
 
-  private LineString parseLineString(GeometryFactory geometryFactory,
+  private Geometry parseLineString(GeometryFactory geometryFactory,
     final boolean useAxisCountFromGeometryFactory, final StringBuilder text) {
     final int axisCount = getAxisCount(text);
     if (!useAxisCountFromGeometryFactory) {
@@ -264,7 +264,11 @@ public class WktParser {
     } else {
       final LineString points = parseCoordinates(geometryFactory, text,
         axisCount);
-      return geometryFactory.lineString(points);
+      if (points.getVertexCount() == 1) {
+        return geometryFactory.point(points);
+      } else {
+        return geometryFactory.lineString(points);
+      }
     }
   }
 
@@ -350,10 +354,10 @@ public class WktParser {
         } else {
           throw new IllegalArgumentException("Expecting ) not" + text);
         }
-        break;
+      break;
       case ')':
         text.delete(0, 2);
-        break;
+      break;
 
       default:
         throw new IllegalArgumentException("Expecting ( not" + text);
@@ -379,10 +383,10 @@ public class WktParser {
         } else {
           throw new IllegalArgumentException("Expecting ) not" + text);
         }
-        break;
+      break;
       case ')':
         text.delete(0, 2);
-        break;
+      break;
 
       default:
         throw new IllegalArgumentException("Expecting ( not" + text);
