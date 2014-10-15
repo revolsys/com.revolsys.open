@@ -18,7 +18,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.jdesktop.swingx.table.TableColumnExt;
 
 import com.revolsys.swing.table.AbstractTableModel;
-import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.BaseJTable;
 
 public class Log4jTableModel extends AbstractTableModel {
   private static final long serialVersionUID = 1L;
@@ -28,15 +28,15 @@ public class Log4jTableModel extends AbstractTableModel {
 
   public static JPanel createPanel() {
     final JPanel taskPanel = new JPanel(new BorderLayout());
-    final BaseJxTable table = createTable();
+    final BaseJTable table = createTable();
     final JScrollPane scrollPane = new JScrollPane(table);
     taskPanel.add(scrollPane, BorderLayout.CENTER);
     return taskPanel;
   }
 
-  public static BaseJxTable createTable() {
+  public static BaseJTable createTable() {
     final Log4jTableModel model = new Log4jTableModel();
-    final BaseJxTable table = new BaseJxTable(model);
+    final BaseJTable table = new BaseJTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
     for (int i = 0; i < model.getColumnCount(); i++) {

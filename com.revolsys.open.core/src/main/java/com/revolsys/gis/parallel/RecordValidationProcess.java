@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataType;
-import com.revolsys.data.validator.AttributeValueValidator;
+import com.revolsys.data.validator.FieldValueValidator;
 import com.revolsys.data.validator.RecordValidator;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
@@ -21,7 +21,7 @@ public class RecordValidationProcess extends
   }
 
   public void setValidators(
-    final Map<DataType, AttributeValueValidator> validators) {
+    final Map<DataType, FieldValueValidator> validators) {
     validator.addValidators(validators);
   }
 }

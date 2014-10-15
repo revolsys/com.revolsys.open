@@ -15,11 +15,11 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerAttributesTableModel;
-import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.BaseJTable;
 
 public class FormAllFieldsErrorPredicate implements HighlightPredicate {
 
-  public static void add(final LayerRecordForm form, final BaseJxTable table) {
+  public static void add(final LayerRecordForm form, final BaseJTable table) {
     final RecordLayerAttributesTableModel model = table.getTableModel();
     final FormAllFieldsErrorPredicate predicate = new FormAllFieldsErrorPredicate(
       form, model);

@@ -25,7 +25,7 @@ import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class OracleSdoGeometryAttributeAdder extends JdbcFieldAdder {
+public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
 
   private static void addGeometryType(final DataType dataType,
     final String name, final Integer id) {
@@ -106,11 +106,11 @@ public class OracleSdoGeometryAttributeAdder extends JdbcFieldAdder {
     addGeometryType(null, "POLYHEDRALSURFACEZM", 3015);
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryAttributeAdder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OracleSdoGeometryFieldAdder.class);
 
   private final AbstractJdbcRecordStore recordStore;
 
-  public OracleSdoGeometryAttributeAdder(
+  public OracleSdoGeometryFieldAdder(
     final AbstractJdbcRecordStore recordStore) {
     this.recordStore = recordStore;
   }
@@ -147,7 +147,7 @@ public class OracleSdoGeometryAttributeAdder extends JdbcFieldAdder {
     if (oracleSrid == -1) {
       oracleSrid = 0;
     }
-    final FieldDefinition attribute = new OracleSdoGeometryJdbcAttribute(
+    final FieldDefinition attribute = new OracleSdoGeometryJdbcFieldDefinition(
       dbName, name, dataType, sqlType, required, description, null,
       geometryFactory, axisCount, oracleSrid);
     recordDefinition.addField(attribute);

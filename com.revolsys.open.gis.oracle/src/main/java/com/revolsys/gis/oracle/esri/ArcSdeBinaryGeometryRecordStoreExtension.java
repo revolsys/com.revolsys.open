@@ -10,7 +10,7 @@ import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
-import com.revolsys.gis.oracle.io.OracleSdoGeometryJdbcAttribute;
+import com.revolsys.gis.oracle.io.OracleSdoGeometryJdbcFieldDefinition;
 import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 
@@ -50,7 +50,7 @@ public class ArcSdeBinaryGeometryRecordStoreExtension implements
         final Map<String, Object> columnProperties = columnEntry.getValue();
         if (ArcSdeConstants.SDEBINARY.equals(columnProperties.get(ArcSdeConstants.GEOMETRY_COLUMN_TYPE))) {
           final FieldDefinition attribute = recordDefinition.getField(columnName);
-          if (!(attribute instanceof OracleSdoGeometryJdbcAttribute)) {
+          if (!(attribute instanceof OracleSdoGeometryJdbcFieldDefinition)) {
             if (sdeUtil == null) {
               LoggerFactory.getLogger(getClass())
                 .error(

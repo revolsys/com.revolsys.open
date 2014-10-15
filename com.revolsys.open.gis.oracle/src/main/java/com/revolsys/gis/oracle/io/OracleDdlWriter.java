@@ -196,7 +196,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print("),");
       out.println("3005);");
 
-      final int geometryType = OracleSdoGeometryAttributeAdder.getGeometryTypeId(
+      final int geometryType = OracleSdoGeometryFieldAdder.getGeometryTypeId(
         dataType, axisCount);
       out.print("INSERT INTO OGIS_GEOMETRY_COLUMNS(F_TABLE_SCHEMA,F_TABLE_NAME,F_GEOMETRY_COLUMN,G_TABLE_SCHEMA,G_TABLE_NAME,GEOMETRY_TYPE,COORD_DIMENSION,SRID) VALUES ('");
       out.print(schemaName.toUpperCase());

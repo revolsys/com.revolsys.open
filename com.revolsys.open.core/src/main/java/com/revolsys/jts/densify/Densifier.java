@@ -177,7 +177,7 @@ public class Densifier {
 
     for (final Segment segment : line.segments()) {
       if (points.isEmpty()) {
-        points.add(segment.getPoint(0).cloneCoordinates());
+        points.add(segment.getPoint(0).clonePoint());
       }
       final double length = segment.getLength();
       if (length > 0) {
@@ -188,11 +188,11 @@ public class Densifier {
             final double segFract = (j * densifiedSegLen) / length;
             final Point point = segment.pointAlong(segFract);
             if (!segment.isEndPoint(point)) {
-              points.add(point.cloneCoordinates());
+              points.add(point.clonePoint());
             }
           }
         }
-        points.add(segment.getPoint(1).cloneCoordinates());
+        points.add(segment.getPoint(1).clonePoint());
       }
     }
     return points;

@@ -30,7 +30,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 
-public class OracleSdoGeometryJdbcAttribute extends JdbcFieldDefinition {
+public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   private final int axisCount;
 
@@ -38,7 +38,7 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcFieldDefinition {
 
   private final int oracleSrid;
 
-  public OracleSdoGeometryJdbcAttribute(final String dbName, final String name,
+  public OracleSdoGeometryJdbcFieldDefinition(final String dbName, final String name,
     final DataType type, final int sqlType, final boolean required,
     final String description, final Map<String, Object> properties,
     final GeometryFactory geometryFactory, final int axisCount,
@@ -67,8 +67,8 @@ public class OracleSdoGeometryJdbcAttribute extends JdbcFieldDefinition {
   }
 
   @Override
-  public OracleSdoGeometryJdbcAttribute clone() {
-    return new OracleSdoGeometryJdbcAttribute(getDbName(), getName(),
+  public OracleSdoGeometryJdbcFieldDefinition clone() {
+    return new OracleSdoGeometryJdbcFieldDefinition(getDbName(), getName(),
       getType(), getSqlType(), isRequired(), getDescription(), getProperties(),
       geometryFactory, axisCount, oracleSrid);
   }

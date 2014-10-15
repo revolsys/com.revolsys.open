@@ -105,7 +105,7 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
-  public Point cloneCoordinates() {
+  public Point clonePoint() {
     return new PointDouble(this);
   }
 

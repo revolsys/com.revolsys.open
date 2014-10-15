@@ -29,7 +29,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements
   public void initialize(final RecordStore recordStore,
     final Map<String, Object> connectionProperties) {
     final OracleRecordStore oracleRecordStore = (OracleRecordStore)recordStore;
-    final JdbcFieldAdder stGeometryAttributeAdder = new ArcSdeStGeometryAttributeAdder(
+    final JdbcFieldAdder stGeometryAttributeAdder = new ArcSdeStGeometryFieldAdder(
       oracleRecordStore);
     oracleRecordStore.addFieldAdder("ST_GEOMETRY", stGeometryAttributeAdder);
     oracleRecordStore.addFieldAdder("SDE.ST_GEOMETRY",

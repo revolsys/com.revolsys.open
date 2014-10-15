@@ -18,7 +18,7 @@ import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.field.Slider;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.NumberTableCellRenderer;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.object.ObjectListTable;
@@ -47,7 +47,7 @@ public class TiePointsPanel extends TablePanel implements
 
     this.layer = layer;
 
-    final BaseJxTable table = getTable();
+    final BaseJTable table = getTable();
     for (int i = 0; i < table.getColumnCount(); i++) {
       final TableColumnExt column = table.getColumnExt(i);
       column.setMinWidth(150);

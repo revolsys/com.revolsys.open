@@ -69,7 +69,7 @@ public class PolygonGenerator extends GeometryGenerator {
         gf.makePrecise(1, cy + fy));
     }
 
-    coords[npoints] = coords[0].cloneCoordinates();
+    coords[npoints] = coords[0].clonePoint();
 
     return gf.linearRing(coords);
   }

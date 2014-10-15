@@ -12,8 +12,8 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.operation.IsSimpleOp;
+import com.revolsys.jts.operation.valid.GeometryValidationError;
 import com.revolsys.jts.operation.valid.IsValidOp;
-import com.revolsys.jts.operation.valid.TopologyValidationError;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
@@ -148,8 +148,8 @@ public class SelectedRecordsRenderer {
               }
             }
           } else {
-            for (final TopologyValidationError error : validOp.getErrors()) {
-              final Point point = viewportGeometryFactory.point(error.getCoordinate());
+            for (final GeometryValidationError error : validOp.getErrors()) {
+              final Point point = viewportGeometryFactory.point(error.getErrorPoint());
               MarkerStyleRenderer.renderMarker(viewport, graphics, point,
                 this.erroStyle);
             }

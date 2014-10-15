@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 
 import com.revolsys.data.record.schema.FieldDefinition;
 
-public class BigDecimalAttributeValidator implements AttributeValueValidator {
+public class BigDecimalAttributeValidator implements FieldValueValidator {
   private boolean decimal = true;
 
   private BigDecimal maxValue;
@@ -59,7 +59,7 @@ public class BigDecimalAttributeValidator implements AttributeValueValidator {
   }
 
   @Override
-  public boolean isValid(final FieldDefinition attributeDefinition, final Object value) {
+  public boolean isValid(final FieldDefinition fieldDefinition, final Object value) {
     if (value instanceof BigDecimal) {
       final BigDecimal number = (BigDecimal)value;
       if (!decimal && number.scale() > 0) {

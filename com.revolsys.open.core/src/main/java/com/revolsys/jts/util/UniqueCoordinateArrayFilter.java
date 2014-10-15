@@ -22,7 +22,7 @@ public class UniqueCoordinateArrayFilter {
     final List<Point> points = new ArrayList<>();
     for (final Point point : coordinates) {
       if (!set.contains(point)) {
-        final Point clone = point.cloneCoordinates();
+        final Point clone = point.clonePoint();
         points.add(clone);
         set.add(clone);
       }

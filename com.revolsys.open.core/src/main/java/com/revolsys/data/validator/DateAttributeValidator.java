@@ -24,10 +24,10 @@ import java.util.Date;
 
 import com.revolsys.data.record.schema.FieldDefinition;
 
-public class DateAttributeValidator implements AttributeValueValidator {
+public class DateAttributeValidator implements FieldValueValidator {
 
   @Override
-  public boolean isValid(final FieldDefinition attributeDefinition, final Object value) {
+  public boolean isValid(final FieldDefinition fieldDefinition, final Object value) {
     return (value instanceof Date);
 
   }

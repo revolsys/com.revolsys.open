@@ -631,11 +631,11 @@ public final class CollectionUtil {
                 }
               }
             }
-          break;
+            break;
 
           default:
             buffer.append(c);
-          break;
+            break;
         }
       }
       return buffer.toString();
@@ -659,7 +659,7 @@ public final class CollectionUtil {
   public static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
     final Map<K, V> map) {
     final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(
-      map);
+        map);
     final Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
     sortedMap.putAll(map);
     return new LinkedHashMap<K, V>(sortedMap);
@@ -780,6 +780,24 @@ public final class CollectionUtil {
     } else {
       final StringBuilder string = new StringBuilder();
       append(string, values, separator);
+      return string.toString();
+    }
+  }
+
+  public static String toString(final String separator, final int... values) {
+    if (values == null) {
+      return null;
+    } else {
+      final StringBuilder string = new StringBuilder();
+      boolean first = true;
+      for (final int value : values) {
+        if (first) {
+          first = false;
+        } else {
+          string.append(separator);
+        }
+        string.append(value);
+      }
       return string.toString();
     }
   }

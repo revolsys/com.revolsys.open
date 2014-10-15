@@ -194,7 +194,7 @@ public class GeometrySnapper {
     // KDTree for uniqueness & queries
     final Set<Point> points = new TreeSet<Point>();
     for (final Vertex vertex : geometry.vertices()) {
-      points.add(vertex.cloneCoordinates());
+      points.add(vertex.clonePoint());
     }
     return points.toArray(new Point[points.size()]);
   }

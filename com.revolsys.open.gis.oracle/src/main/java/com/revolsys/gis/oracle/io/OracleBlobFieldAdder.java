@@ -4,9 +4,9 @@ import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 
-public class OracleClobAttributeAdder extends JdbcFieldAdder {
+public class OracleBlobFieldAdder extends JdbcFieldAdder {
 
-  public OracleClobAttributeAdder() {
+  public OracleBlobFieldAdder() {
   }
 
   @Override
@@ -14,7 +14,7 @@ public class OracleClobAttributeAdder extends JdbcFieldAdder {
     final String dbName, final String name, final String dataTypeName,
     final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    final OracleJdbcClobFieldDefinition attribute = new OracleJdbcClobFieldDefinition(
+    final OracleJdbcBlobFieldDefinition attribute = new OracleJdbcBlobFieldDefinition(
       dbName, name, sqlType, length, required, description);
     recordDefinition.addField(attribute);
     return attribute;

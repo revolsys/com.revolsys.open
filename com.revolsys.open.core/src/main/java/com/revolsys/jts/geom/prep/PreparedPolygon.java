@@ -199,7 +199,7 @@ public class PreparedPolygon extends AbstractPolygon {
   public List<Point> getRepresentativePoints() {
     final List<Point> points = new ArrayList<Point>();
     for (final Vertex vertex : vertices()) {
-      points.add(vertex.cloneCoordinates());
+      points.add(vertex.clonePoint());
     }
     return points;
   }

@@ -125,7 +125,7 @@ class TaggedLineString {
     int i = 0;
     for (final Segment segment : parentLine.segments()) {
       final TaggedLineSegment seg = new TaggedLineSegment(segment.getPoint(0)
-        .cloneCoordinates(), segment.getPoint(1).cloneCoordinates(),
+        .clonePoint(), segment.getPoint(1).clonePoint(),
         parentLine, i);
       segs[i] = seg;
       i++;

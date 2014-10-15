@@ -26,14 +26,14 @@ import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class PostgreSQLGeometryJdbcAttribute extends JdbcFieldDefinition {
+public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   private final GeometryFactory geometryFactory;
 
   private final int srid;
 
   private final int axisCount;
 
-  public PostgreSQLGeometryJdbcAttribute(final String dbName,
+  public PostgreSQLGeometryJdbcFieldDefinition(final String dbName,
     final String name, final DataType type, final boolean required,
     final String description, final Map<String, Object> properties,
     final int srid, final int axisCount, final GeometryFactory geometryFactory) {
@@ -46,7 +46,7 @@ public class PostgreSQLGeometryJdbcAttribute extends JdbcFieldDefinition {
 
   @Override
   public JdbcFieldDefinition clone() {
-    return new PostgreSQLGeometryJdbcAttribute(getDbName(), getName(),
+    return new PostgreSQLGeometryJdbcFieldDefinition(getDbName(), getName(),
       getType(), isRequired(), getDescription(), getProperties(), srid,
       axisCount, geometryFactory);
   }

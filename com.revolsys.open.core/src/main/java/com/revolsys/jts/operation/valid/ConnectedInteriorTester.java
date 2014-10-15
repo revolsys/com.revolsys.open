@@ -75,7 +75,7 @@ public class ConnectedInteriorTester {
     final Point point) {
     for (final Vertex vertex : line.vertices()) {
       if (!vertex.equals(point)) {
-        return vertex.cloneCoordinates();
+        return vertex.clonePoint();
       }
     }
     return null;
@@ -199,7 +199,7 @@ public class ConnectedInteriorTester {
   }
 
   private void visitInteriorRing(final LineString ring, final PlanarGraph graph) {
-    final Point pt0 = ring.getVertex(0).cloneCoordinates();
+    final Point pt0 = ring.getVertex(0).clonePoint();
     /**
      * Find first point in coord list different to initial point.
      * Need special check since the first point may be repeated.

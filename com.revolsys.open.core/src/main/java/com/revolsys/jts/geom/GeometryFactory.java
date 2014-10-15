@@ -1517,4 +1517,19 @@ public class GeometryFactory implements Serializable, MapSerializer {
     string.append(Arrays.toString(this.scales));
     return string.toString();
   }
+
+  public static String getAxisName(final int axisIndex) {
+    switch (axisIndex) {
+      case 0:
+        return "X";
+      case 1:
+        return "Y";
+      case 2:
+        return "Z";
+      case 3:
+        return "M";
+      default:
+        return String.valueOf(axisIndex);
+    }
+  }
 }

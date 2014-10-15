@@ -114,7 +114,7 @@ import com.revolsys.swing.map.overlay.CloseLocation;
 import com.revolsys.swing.map.overlay.EditGeometryOverlay;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.tree.MenuSourcePropertyEnableCheck;
 import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.swing.tree.node.record.RecordStoreTableTreeNode;
@@ -655,7 +655,7 @@ RecordFactory, AddGeometryCompleteAction {
   protected void createPropertiesPanelFields(
     final TabbedValuePanel propertiesPanel) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final BaseJxTable fieldTable = RecordDefinitionTableModel.createTable(recordDefinition);
+    final BaseJTable fieldTable = RecordDefinitionTableModel.createTable(recordDefinition);
 
     final BasePanel fieldPanel = new BasePanel(new BorderLayout());
     fieldPanel.setPreferredSize(new Dimension(500, 400));

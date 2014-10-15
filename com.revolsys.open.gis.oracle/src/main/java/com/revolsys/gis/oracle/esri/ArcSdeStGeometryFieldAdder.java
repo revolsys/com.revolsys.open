@@ -12,12 +12,12 @@ import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public class ArcSdeStGeometryAttributeAdder extends JdbcFieldAdder {
-  private static final Logger LOG = LoggerFactory.getLogger(ArcSdeStGeometryAttributeAdder.class);
+public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
+  private static final Logger LOG = LoggerFactory.getLogger(ArcSdeStGeometryFieldAdder.class);
 
   private final AbstractJdbcRecordStore recordStore;
 
-  public ArcSdeStGeometryAttributeAdder(
+  public ArcSdeStGeometryFieldAdder(
     final AbstractJdbcRecordStore recordStore) {
     this.recordStore = recordStore;
 

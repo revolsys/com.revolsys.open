@@ -81,7 +81,7 @@ public interface Point extends Geometry, Puntal, Serializable {
   @Override
   Point clone();
 
-  Point cloneCoordinates();
+  Point clonePoint();
 
   /**
    *  Compares this {@link Coordinates} with the specified {@link Coordinates} for order.

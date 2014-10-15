@@ -2,6 +2,7 @@ package com.revolsys.swing.table.renderer;
 
 import java.awt.Component;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
 
 import org.jdesktop.swingx.renderer.ComponentProvider;
@@ -48,6 +49,15 @@ public class BaseTableCellRenderer extends DefaultTableRenderer {
     final String text = StringConverterRegistry.toString(value);
     final Component component = super.getTableCellRendererComponent(table,
       text, isSelected, hasFocus, row, columnIndex);
+    if (Number.class.isAssignableFrom(table.getModel().getColumnClass(
+      columnIndex))) {
+      if (component instanceof JLabel) {
+        final JLabel label = (JLabel)component;
+        label.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
+        label.setHorizontalTextPosition(JLabel.RIGHT);
+        label.setHorizontalAlignment(JLabel.RIGHT);
+      }
+    }
     return component;
   }
 }

@@ -198,7 +198,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
     addFieldAdder("bool", new JdbcFieldAdder(DataTypes.BOOLEAN));
 
-    final JdbcFieldAdder geometryFieldAdder = new PostgreSQLGeometryAttributeAdder(
+    final JdbcFieldAdder geometryFieldAdder = new PostgreSQLGeometryFieldAdder(
       this);
     addFieldAdder("geometry", geometryFieldAdder);
     setPrimaryKeySql("SELECT t.relname \"TABLE_NAME\", c.attname \"COLUMN_NAME\"" //

@@ -30,7 +30,7 @@ import com.revolsys.swing.field.Field;
 import com.revolsys.swing.listener.Listener;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.PopupMenu;
-import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.record.model.AbstractRecordTableModel;
 
 public class RecordTableCellEditor extends AbstractCellEditor implements
@@ -42,7 +42,7 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
 
   private String attributeName;
 
-  private final BaseJxTable table;
+  private final BaseJTable table;
 
   private int rowIndex;
 
@@ -56,7 +56,7 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
 
   private MouseListener mouseListener;
 
-  public RecordTableCellEditor(final BaseJxTable table) {
+  public RecordTableCellEditor(final BaseJTable table) {
     this.table = table;
     table.getModel().addTableModelListener(this);
   }

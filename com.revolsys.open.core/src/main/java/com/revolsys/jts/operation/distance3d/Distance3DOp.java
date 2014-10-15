@@ -265,8 +265,8 @@ public class Distance3DOp {
           // TODO: compute closest pts in 3D
           final Point[] closestPt = segment1.closestPoints(segment2);
           updateDistance(distance,
-            new GeometryLocation(line0, i, closestPt[0].cloneCoordinates()),
-            new GeometryLocation(line1, j, closestPt[1].cloneCoordinates()),
+            new GeometryLocation(line0, i, closestPt[0].clonePoint()),
+            new GeometryLocation(line1, j, closestPt[1].clonePoint()),
             flip);
         }
         if (isDone) {
@@ -289,7 +289,7 @@ public class Distance3DOp {
       if (dist < minDistance) {
         final Point segClosestPoint = segment.closestPoint(coord);
         updateDistance(dist,
-          new GeometryLocation(line, i, segClosestPoint.cloneCoordinates()),
+          new GeometryLocation(line, i, segClosestPoint.clonePoint()),
           new GeometryLocation(point, 0, coord), flip);
       }
       if (isDone) {

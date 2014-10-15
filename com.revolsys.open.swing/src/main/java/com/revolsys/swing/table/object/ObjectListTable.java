@@ -8,9 +8,9 @@ import javax.swing.event.TableModelEvent;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
-import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.BaseJTable;
 
-public class ObjectListTable<T> extends BaseJxTable implements Iterable<T> {
+public class ObjectListTable<T> extends BaseJTable implements Iterable<T> {
   private static final long serialVersionUID = 1L;
 
   public ObjectListTable(final List<String> columnNames,

@@ -17,9 +17,9 @@ import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
 
-public class PostgreSQLGeometryAttributeAdder extends JdbcFieldAdder {
+public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(PostgreSQLGeometryAttributeAdder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PostgreSQLGeometryFieldAdder.class);
 
   private static final Map<String, DataType> DATA_TYPE_MAP = new HashMap<String, DataType>();
 
@@ -35,8 +35,7 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcFieldAdder {
 
   private final PostgreSQLRecordStore recordStore;
 
-  public PostgreSQLGeometryAttributeAdder(
-    final PostgreSQLRecordStore recordStore) {
+  public PostgreSQLGeometryFieldAdder(final PostgreSQLRecordStore recordStore) {
     this.recordStore = recordStore;
   }
 
@@ -65,7 +64,7 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcFieldAdder {
         axisCount = (Integer)values.get("coord_dimension");
       } catch (final IllegalArgumentException e) {
         LOG.warn("Cannot get geometry column metadata for " + typePath + "."
-          + columnName);
+            + columnName);
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
@@ -77,13 +76,12 @@ public class PostgreSQLGeometryAttributeAdder extends JdbcFieldAdder {
         geometryFactory = GeometryFactory.fixed(srid, axisCount,
           storeGeometryFactory.getScaleXY(), storeGeometryFactory.getScaleZ());
       }
-      final FieldDefinition attribute = new PostgreSQLGeometryJdbcAttribute(dbName,
-        name, dataType, required, description, null, srid, axisCount,
+      final FieldDefinition field = new PostgreSQLGeometryJdbcFieldDefinition(
+        dbName, name, dataType, required, description, null, srid, axisCount,
         geometryFactory);
-      recordDefinition.addField(attribute);
-      attribute.setProperty(FieldProperties.GEOMETRY_FACTORY,
-        geometryFactory);
-      return attribute;
+      recordDefinition.addField(field);
+      field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+      return field;
     } catch (final Throwable e) {
       LOG.error("Attribute not registered in GEOMETRY_COLUMN table " + owner
         + "." + tableName + "." + name, e);

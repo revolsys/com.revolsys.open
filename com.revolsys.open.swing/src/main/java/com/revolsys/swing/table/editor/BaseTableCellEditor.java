@@ -31,7 +31,7 @@ import com.revolsys.swing.listener.Listener;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.table.AbstractTableModel;
-import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.BaseJTable;
 
 public class BaseTableCellEditor extends AbstractCellEditor implements
 TableCellEditor, KeyListener, MouseListener, TableModelListener {
@@ -40,7 +40,7 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
 
   private JComponent editorComponent;
 
-  private final BaseJxTable table;
+  private final BaseJTable table;
 
   private int rowIndex;
 
@@ -52,7 +52,7 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
 
   private MouseListener mouseListener;
 
-  public BaseTableCellEditor(final BaseJxTable table) {
+  public BaseTableCellEditor(final BaseJTable table) {
     this.table = table;
     final TableModel model = table.getModel();
     model.addTableModelListener(this);

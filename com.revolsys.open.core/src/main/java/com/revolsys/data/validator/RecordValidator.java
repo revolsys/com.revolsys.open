@@ -36,10 +36,10 @@ import com.revolsys.data.types.EnumerationDataType;
 public class RecordValidator {
   private static final Logger log = Logger.getLogger(RecordValidator.class);
 
-  private final AttributeValueValidator recordAttributeValidator = new RecordAttributeValidator(
+  private final FieldValueValidator recordAttributeValidator = new RecordAttributeValidator(
     this);
 
-  private final Map<DataType, AttributeValueValidator> objectValidators = new HashMap<DataType, AttributeValueValidator>();
+  private final Map<DataType, FieldValueValidator> objectValidators = new HashMap<DataType, FieldValueValidator>();
 
   public RecordValidator() {
     setObjectValidator(DataTypes.BOOLEAN, new BooleanAttributeValidator());
@@ -60,28 +60,28 @@ public class RecordValidator {
     setObjectValidator(DataTypes.FLOAT, new BigDecimalAttributeValidator(true));
     setObjectValidator(DataTypes.DOUBLE, new BigDecimalAttributeValidator(true));
     setObjectValidator(DataTypes.DATE, new DateAttributeValidator());
-    setObjectValidator(DataTypes.GEOMETRY, new GeometryAttributeValidator());
-    setObjectValidator(DataTypes.POINT, new GeometryAttributeValidator());
+    setObjectValidator(DataTypes.GEOMETRY, new GeometryFieldValidator());
+    setObjectValidator(DataTypes.POINT, new GeometryFieldValidator());
     setObjectValidator(DataTypes.MULTI_LINE_STRING,
-      new GeometryAttributeValidator());
-    setObjectValidator(DataTypes.POLYGON, new GeometryAttributeValidator());
-    setObjectValidator(DataTypes.MULTI_POINT, new GeometryAttributeValidator());
+      new GeometryFieldValidator());
+    setObjectValidator(DataTypes.POLYGON, new GeometryFieldValidator());
+    setObjectValidator(DataTypes.MULTI_POINT, new GeometryFieldValidator());
     setObjectValidator(DataTypes.MULTI_POLYGON,
-      new GeometryAttributeValidator());
+      new GeometryFieldValidator());
   }
 
   public void addValidators(
-    final Map<DataType, AttributeValueValidator> validators) {
-    for (final Entry<DataType, AttributeValueValidator> entry : validators.entrySet()) {
+    final Map<DataType, FieldValueValidator> validators) {
+    for (final Entry<DataType, FieldValueValidator> entry : validators.entrySet()) {
       final DataType dataType = entry.getKey();
-      final AttributeValueValidator validator = entry.getValue();
+      final FieldValueValidator validator = entry.getValue();
       setObjectValidator(dataType, validator);
     }
 
   }
 
-  public AttributeValueValidator getObjectValidator(final DataType dataType) {
-    AttributeValueValidator validator = this.objectValidators.get(dataType);
+  public FieldValueValidator getObjectValidator(final DataType dataType) {
+    FieldValueValidator validator = this.objectValidators.get(dataType);
     if (validator == null) {
       if (dataType instanceof EnumerationDataType) {
         final EnumerationDataType enumerationDataType = (EnumerationDataType)dataType;
@@ -92,7 +92,7 @@ public class RecordValidator {
           + "AttributeValidator";
         try {
           final Class<?> validatorClass = Class.forName(className);
-          validator = (AttributeValueValidator)validatorClass.newInstance();
+          validator = (FieldValueValidator)validatorClass.newInstance();
         } catch (final Throwable e) {
           validator = this.recordAttributeValidator;
         }
@@ -125,7 +125,7 @@ public class RecordValidator {
             }
           }
         } else {
-          final AttributeValueValidator validator = getObjectValidator(dataType);
+          final FieldValueValidator validator = getObjectValidator(dataType);
           if (validator != null) {
             if (!validator.isValid(attribDef, value)) {
               if (!(validator instanceof RecordAttributeValidator)) {
@@ -145,7 +145,7 @@ public class RecordValidator {
   }
 
   public void setObjectValidator(final DataType dataType,
-    final AttributeValueValidator validator) {
+    final FieldValueValidator validator) {
     this.objectValidators.put(dataType, validator);
   }
 }

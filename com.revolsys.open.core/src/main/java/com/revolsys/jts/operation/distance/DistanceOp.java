@@ -274,9 +274,9 @@ public class DistanceOp {
             minDistance = dist;
             final Point[] closestPt = segment1.closestPoints(segment2);
             locGeom[0] = new GeometryLocation(line1, i,
-              closestPt[0].cloneCoordinates());
+              closestPt[0].clonePoint());
             locGeom[1] = new GeometryLocation(line2, j,
-              closestPt[1].cloneCoordinates());
+              closestPt[1].clonePoint());
           }
           if (minDistance <= terminateDistance) {
             return;
@@ -301,7 +301,7 @@ public class DistanceOp {
         minDistance = distance;
         final Point segClosestPoint = segment.closestPoint(point);
         locGeom[0] = new GeometryLocation(line, i,
-          segClosestPoint.cloneCoordinates());
+          segClosestPoint.clonePoint());
         locGeom[1] = new GeometryLocation(point, 0, point);
       }
       if (minDistance <= terminateDistance) {

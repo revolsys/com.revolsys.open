@@ -119,7 +119,7 @@ public class GeometricShapeFactory {
       this.width = env.getWidth();
       this.height = env.getHeight();
       this.base = new PointDouble(env.getMinX(), env.getMinY());
-      this.centre = env.getCentre().cloneCoordinates();
+      this.centre = env.getCentre().clonePoint();
     }
 
     public void setHeight(final double height) {
@@ -289,7 +289,7 @@ public class GeometricShapeFactory {
       final double y = yRadius * Math.sin(ang) + centreY;
       pts[iPt++] = coord(x, y);
     }
-    pts[iPt] = pts[0].cloneCoordinates();
+    pts[iPt] = pts[0].clonePoint();
 
     final LinearRing ring = geomFact.linearRing(pts);
     final Polygon poly = geomFact.polygon(ring);
@@ -338,7 +338,7 @@ public class GeometricShapeFactory {
       final double y = env.getMaxY() - i * YsegLen;
       pts[ipt++] = coord(x, y);
     }
-    pts[ipt++] = pts[0].cloneCoordinates();
+    pts[ipt++] = pts[0].clonePoint();
 
     final LinearRing ring = geomFact.linearRing(pts);
     final Polygon poly = geomFact.polygon(ring);
@@ -402,7 +402,7 @@ public class GeometricShapeFactory {
       pts[6 * nSegsInOct + i] = coordTrans(-y, x, centre);
       pts[8 * nSegsInOct - i] = coordTrans(-x, y, centre);
     }
-    pts[pts.length - 1] = pts[0].cloneCoordinates();
+    pts[pts.length - 1] = pts[0].clonePoint();
 
     final LinearRing ring = geomFact.linearRing(pts);
     final Polygon poly = geomFact.polygon(ring);

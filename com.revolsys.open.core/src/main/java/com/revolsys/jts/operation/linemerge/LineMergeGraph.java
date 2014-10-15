@@ -64,15 +64,15 @@ public class LineMergeGraph extends PlanarGraph {
     final LineString points = CleanDuplicatePoints.clean(line);
     final int vertexCount = points.getVertexCount();
     if (vertexCount > 1) {
-      final Point startCoordinate = points.getPoint(0).cloneCoordinates();
+      final Point startCoordinate = points.getPoint(0).clonePoint();
       final Point endCoordinate = points.getPoint(vertexCount - 1)
-        .cloneCoordinates();
+        .clonePoint();
       final Node startNode = getNode(startCoordinate);
       final Node endNode = getNode(endCoordinate);
       final DirectedEdge directedEdge0 = new LineMergeDirectedEdge(startNode,
-        endNode, points.getPoint(1).cloneCoordinates(), true);
+        endNode, points.getPoint(1).clonePoint(), true);
       final DirectedEdge directedEdge1 = new LineMergeDirectedEdge(endNode,
-        startNode, points.getPoint(vertexCount - 2).cloneCoordinates(), false);
+        startNode, points.getPoint(vertexCount - 2).clonePoint(), false);
       final Edge edge = new LineMergeEdge(line);
       edge.setDirectedEdges(directedEdge0, directedEdge1);
       add(edge);

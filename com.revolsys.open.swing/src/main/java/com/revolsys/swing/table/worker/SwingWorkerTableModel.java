@@ -15,22 +15,22 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
-import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.BaseJTable;
 
 public class SwingWorkerTableModel extends AbstractTableModel {
   private static final long serialVersionUID = 1L;
 
   public static JPanel createPanel() {
     final JPanel taskPanel = new JPanel(new BorderLayout());
-    final BaseJxTable table = SwingWorkerTableModel.createTable();
+    final BaseJTable table = SwingWorkerTableModel.createTable();
     final JScrollPane scrollPane = new JScrollPane(table);
     taskPanel.add(scrollPane, BorderLayout.CENTER);
     return taskPanel;
   }
 
-  public static BaseJxTable createTable() {
+  public static BaseJTable createTable() {
     final SwingWorkerTableModel model = new SwingWorkerTableModel();
-    final BaseJxTable table = new BaseJxTable(model);
+    final BaseJTable table = new BaseJTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
     table.setAutoCreateColumnsFromModel(false);
 

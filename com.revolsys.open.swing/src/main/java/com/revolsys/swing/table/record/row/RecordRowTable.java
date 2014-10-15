@@ -22,12 +22,12 @@ import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.predicate.ErrorPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.ModifiedAttributePredicate;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.renderer.RecordRowTableCellRenderer;
 
-public class RecordRowTable extends BaseJxTable implements MouseListener {
+public class RecordRowTable extends BaseJTable implements MouseListener {
   private static final long serialVersionUID = 1L;
 
   private final RecordTableCellEditor tableCellEditor;

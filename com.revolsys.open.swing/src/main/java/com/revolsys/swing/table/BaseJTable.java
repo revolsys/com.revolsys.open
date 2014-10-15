@@ -20,14 +20,14 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.SwingUtil;
 
-public class BaseJxTable extends JXTable {
+public class BaseJTable extends JXTable {
   private static final long serialVersionUID = 1L;
 
-  public BaseJxTable() {
+  public BaseJTable() {
 
   }
 
-  public BaseJxTable(final TableModel model) {
+  public BaseJTable(final TableModel model) {
     super(model);
     setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 

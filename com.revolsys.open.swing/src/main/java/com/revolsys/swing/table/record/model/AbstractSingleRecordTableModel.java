@@ -14,16 +14,16 @@ import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.renderer.SingleRecordTableCellRenderer;
 import com.revolsys.util.CollectionUtil;
 
 public abstract class AbstractSingleRecordTableModel extends
   AbstractRecordTableModel {
-  public static BaseJxTable createTable(
+  public static BaseJTable createTable(
     final AbstractSingleRecordTableModel model) {
-    final BaseJxTable table = new BaseJxTable(model);
+    final BaseJTable table = new BaseJTable(model);
     table.setModel(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     table.setAutoCreateColumnsFromModel(false);

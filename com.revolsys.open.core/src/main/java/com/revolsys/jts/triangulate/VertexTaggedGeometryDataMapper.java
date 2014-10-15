@@ -83,7 +83,7 @@ public class VertexTaggedGeometryDataMapper {
   private void loadVertices(final Iterable<? extends Point> points,
     final Object data) {
     for (final Point point : points) {
-      coordDataMap.put(point.cloneCoordinates(), data);
+      coordDataMap.put(point.clonePoint(), data);
     }
   }
 

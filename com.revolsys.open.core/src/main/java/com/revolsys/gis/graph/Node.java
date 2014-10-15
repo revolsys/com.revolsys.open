@@ -30,7 +30,7 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
     final Collection<Node<Record>> nodes) {
     final List<Point> points = new ArrayList<Point>(nodes.size());
     for (final Node<Record> node : nodes) {
-      final Point point = node.cloneCoordinates();
+      final Point point = node.clonePoint();
       points.add(point);
     }
     return points;
@@ -154,7 +154,7 @@ public class Node<T> extends AbstractPoint implements AttributedObject,
   }
 
   @Override
-  public PointDouble cloneCoordinates() {
+  public PointDouble clonePoint() {
     return new PointDouble(x, y);
   }
 

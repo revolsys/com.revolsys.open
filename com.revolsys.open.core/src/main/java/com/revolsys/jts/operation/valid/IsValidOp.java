@@ -46,11 +46,11 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
-import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.EdgeIntersection;
@@ -83,7 +83,7 @@ public class IsValidOp {
     // instance?)
     for (final Point testPoint : testPoints) {
       if (!eiList.isIntersection(testPoint)) {
-        return testPoint.cloneCoordinates();
+        return testPoint.clonePoint();
       }
     }
     return null;
@@ -99,30 +99,6 @@ public class IsValidOp {
     return isValidOp.isValid();
   }
 
-  /**
-   * Checks whether a coordinate is valid for processing.
-   * Point are valid iff their x and y ordinates are in the
-   * range of the floating point representation.
-   *
-   * @param vertex the coordinate to validate
-   * @return <code>true</code> if the coordinate is valid
-   */
-  public static boolean isValid(final Vertex vertex) {
-    if (Double.isNaN(vertex.getX())) {
-      return false;
-    }
-    if (Double.isInfinite(vertex.getX())) {
-      return false;
-    }
-    if (Double.isNaN(vertex.getY())) {
-      return false;
-    }
-    if (Double.isInfinite(vertex.getY())) {
-      return false;
-    }
-    return true;
-  }
-
   private final Geometry geometry; // the base Geometry to be validated
 
   /**
@@ -131,7 +107,7 @@ public class IsValidOp {
    */
   private boolean isSelfTouchingRingFormingHoleValid = false;
 
-  private final List<TopologyValidationError> errors = new ArrayList<TopologyValidationError>();
+  private final List<GeometryValidationError> errors = new ArrayList<>();
 
   private boolean shortCircuit = true;
 
@@ -144,8 +120,8 @@ public class IsValidOp {
     this.shortCircuit = shortCircuit;
   }
 
-  private void addError(final TopologyValidationError error) {
-    errors.add(error);
+  private void addError(final GeometryValidationError error) {
+    this.errors.add(error);
   }
 
   private boolean checkClosedRing(final LinearRing ring) {
@@ -284,12 +260,22 @@ public class IsValidOp {
   private boolean checkInvalidCoordinates(final Geometry geometry) {
     boolean valid = true;
     for (final Vertex vertex : geometry.vertices()) {
-      if (!isValid(vertex)) {
-        addError(new TopologyValidationError(
-          TopologyValidationError.INVALID_COORDINATE, vertex.cloneCoordinates()));
-        valid = false;
-        if (isErrorReturn()) {
-          return false;
+      for (int axisIndex = 0; axisIndex < 2; axisIndex++) {
+        final double value = vertex.getCoordinate(axisIndex);
+        if (Double.isNaN(value)) {
+          addError(new CoordinateNaNError(vertex, axisIndex));
+          if (isErrorReturn()) {
+            return false;
+          } else {
+            valid = false;
+          }
+        } else if (Double.isInfinite(value)) {
+          addError(new CoordinateInfiniteError(vertex, axisIndex));
+          if (isErrorReturn()) {
+            return false;
+          } else {
+            valid = false;
+          }
         }
       }
     }
@@ -471,14 +457,9 @@ public class IsValidOp {
     }
   }
 
-  private boolean checkTooFewPoints(final LineString line,
+  private boolean checkTooFewVertices(final LineString line,
     final int minVertexCount) {
-    int vertexCount = 1;
-    for (final Segment segment : line.segments()) {
-      if (segment.getLength() > 0) {
-        vertexCount++;
-      }
-    }
+    final int vertexCount = line.getVertexCount();
     if (vertexCount < minVertexCount) {
       addError(new TopologyValidationError(
         TopologyValidationError.TOO_FEW_POINTS, line.getPoint(0)));
@@ -488,33 +469,48 @@ public class IsValidOp {
     }
   }
 
-  private boolean checkValid(final Geometry geometry) {
-    errors.clear();
+  /**
+   * Check geometries to see if they are valid.
+   *
+   * <ul>
+   *   <li>Empty geometries are valid</li>
+   *   <li>Geometries with x,y coordinates that are NaN or Infinity are invalid. Any other validation will not be performed for those geometries.</li>
+   *   <li>Other validation checks are performed based on the type of geometry.</li>
+   * </ul>
+   * @param geometry
+   * @return If the geometry is valid.
+   */
+  private boolean checkValidGeometry(final Geometry geometry) {
     if (geometry.isEmpty()) {
       return true;
+    } else if (!checkInvalidCoordinates(geometry)) {
+      return false;
     } else if (geometry instanceof Point) {
-      return checkValid((Point)geometry);
+      return checkValidPoint((Point)geometry);
     } else if (geometry instanceof MultiPoint) {
-      return checkValid((MultiPoint)geometry);
+      return checkValidMultiPoint((MultiPoint)geometry);
     } else if (geometry instanceof LinearRing) {
-      return checkValid((LinearRing)geometry);
+      return checkValidLinearRing((LinearRing)geometry);
     } else if (geometry instanceof LineString) {
-      return checkValid((LineString)geometry);
+      return checkValidLineString((LineString)geometry);
+    } else if (geometry instanceof MultiLineString) {
+      return checkValidMultiLineString((MultiLineString)geometry);
     } else if (geometry instanceof Polygon) {
-      return checkValid((Polygon)geometry);
+      return checkValidPolygon((Polygon)geometry);
     } else if (geometry instanceof MultiPolygon) {
-      return checkValid((MultiPolygon)geometry);
+      return checkValidMultiPolygon((MultiPolygon)geometry);
     } else if (geometry instanceof GeometryCollection) {
-      return checkValid((GeometryCollection)geometry);
+      return checkValidGeometryCollection((GeometryCollection)geometry);
     } else {
       throw new UnsupportedOperationException(geometry.getClass().getName());
     }
   }
 
-  private boolean checkValid(final GeometryCollection geometryCollection) {
+  private boolean checkValidGeometryCollection(
+    final GeometryCollection geometryCollection) {
     boolean valid = true;
     for (final Geometry geometry : geometryCollection.geometries()) {
-      valid &= checkValid(geometry);
+      valid &= checkValidGeometry(geometry);
       if (isErrorReturn()) {
         return false;
       }
@@ -525,51 +521,52 @@ public class IsValidOp {
   /**
    * Checks validity of a LinearRing.
    */
-  private boolean checkValid(final LinearRing ring) {
-    boolean valid = checkInvalidCoordinates(ring);
-    if (valid) {
-      if (checkTooFewPoints(ring, 4)) {
-        valid &= checkClosedRing(ring);
-        if (isErrorReturn()) {
-          return false;
-        }
-
-        final GeometryGraph graph = new GeometryGraph(0, ring);
-        final LineIntersector li = new RobustLineIntersector();
-        graph.computeSelfNodes(li, true);
-        valid &= checkNoSelfIntersectingRings(graph);
-        return valid;
+  private boolean checkValidLinearRing(final LinearRing ring) {
+    boolean valid = true;
+    if (checkTooFewVertices(ring, 4)) {
+      valid &= checkClosedRing(ring);
+      if (isErrorReturn()) {
+        return false;
       }
+
+      final GeometryGraph graph = new GeometryGraph(0, ring);
+      final LineIntersector li = new RobustLineIntersector();
+      graph.computeSelfNodes(li, true);
+      valid &= checkNoSelfIntersectingRings(graph);
+      return valid;
     }
     return false;
   }
 
   /**
-   * Checks validity of a LineString.  Almost anything goes for linestrings!
+   * {@link LineString} geometries require a minimum of 2 vertices.
    */
-  private boolean checkValid(final LineString line) {
-    final boolean valid = checkInvalidCoordinates(line);
-    if (valid) {
-      return checkTooFewPoints(line, 2);
-    } else {
-      return false;
-    }
+  private boolean checkValidLineString(final LineString line) {
+    return checkTooFewVertices(line, 2);
   }
 
-  /**
-   * Checks validity of a MultiPoint.
-   */
-  private boolean checkValid(final MultiPoint multiPoint) {
-    return checkInvalidCoordinates(multiPoint);
-  }
-
-  private boolean checkValid(final MultiPolygon multiPolygon) {
+  private boolean checkValidMultiLineString(
+    final MultiLineString multiLineString) {
     boolean valid = true;
-    for (final Polygon polygon : multiPolygon.getPolygons()) {
-      valid &= checkInvalidCoordinates(polygon);
+    for (final LineString lineString : multiLineString.getLineStrings()) {
+      valid &= checkValidLineString(lineString);
       if (isErrorReturn()) {
         return false;
       }
+    }
+    return valid;
+  }
+
+  /**
+   * {@link MultiPoint} geometries require no additional validation.
+   */
+  private boolean checkValidMultiPoint(final MultiPoint multiPoint) {
+    return true;
+  }
+
+  private boolean checkValidMultiPolygon(final MultiPolygon multiPolygon) {
+    boolean valid = true;
+    for (final Polygon polygon : multiPolygon.getPolygons()) {
       valid &= checkClosedRings(polygon);
       if (isErrorReturn()) {
         return false;
@@ -586,7 +583,7 @@ public class IsValidOp {
     if (isErrorReturn()) {
       return false;
     }
-    if (!isSelfTouchingRingFormingHoleValid) {
+    if (!this.isSelfTouchingRingFormingHoleValid) {
       valid &= checkNoSelfIntersectingRings(graph);
       if (isErrorReturn()) {
         return false;
@@ -613,22 +610,18 @@ public class IsValidOp {
   }
 
   /**
-   * Checks validity of a Point.
+   * {@link Point} geometries require no additional validation.
    */
-  private boolean checkValid(final Point point) {
-    return checkInvalidCoordinates(point);
+  private boolean checkValidPoint(final Point point) {
+    return true;
   }
 
   /**
    * Checks the validity of a polygon.
    * Sets the validErr flag.
    */
-  private boolean checkValid(final Polygon g) {
+  private boolean checkValidPolygon(final Polygon g) {
     boolean valid = true;
-    valid &= checkInvalidCoordinates(g);
-    if (isErrorReturn()) {
-      return false;
-    }
     valid &= checkClosedRings(g);
     if (isErrorReturn()) {
       return false;
@@ -645,7 +638,7 @@ public class IsValidOp {
       return false;
     }
 
-    if (!isSelfTouchingRingFormingHoleValid) {
+    if (!this.isSelfTouchingRingFormingHoleValid) {
       valid &= checkNoSelfIntersectingRings(graph);
       if (isErrorReturn()) {
         return false;
@@ -664,29 +657,28 @@ public class IsValidOp {
     return valid;
   }
 
-  public List<TopologyValidationError> getErrors() {
-    return errors;
+  public List<GeometryValidationError> getErrors() {
+    return this.errors;
   }
 
   /**
    * Computes the validity of the geometry,
    * and if not valid returns the validation error for the geometry,
    * or null if the geometry is valid.
-   * 
+   *
    * @return the validation error, if the geometry is invalid
    * or null if the geometry is valid
    */
-  public TopologyValidationError getValidationError() {
-    checkValid(geometry);
-    if (isErrorReturn()) {
-      return errors.get(0);
-    } else {
+  public GeometryValidationError getValidationError() {
+    if (isValid()) {
       return null;
+    } else {
+      return this.errors.get(0);
     }
   }
 
   public boolean hasError() {
-    if (errors.isEmpty()) {
+    if (this.errors.isEmpty()) {
       return false;
     } else {
       return true;
@@ -694,17 +686,18 @@ public class IsValidOp {
   }
 
   private boolean isErrorReturn() {
-    return shortCircuit && hasError();
+    return this.shortCircuit && hasError();
   }
 
   /**
    * Computes the validity of the geometry,
    * and returns <tt>true</tt> if it is valid.
-   * 
+   *
    * @return true if the geometry is valid
    */
   public boolean isValid() {
-    return checkValid(geometry);
+    this.errors.clear();
+    return checkValidGeometry(this.geometry);
   }
 
   /**
@@ -732,13 +725,13 @@ public class IsValidOp {
    * @param isValid states whether geometry with this condition is valid
    */
   public void setSelfTouchingRingFormingHoleValid(final boolean isValid) {
-    isSelfTouchingRingFormingHoleValid = isValid;
+    this.isSelfTouchingRingFormingHoleValid = isValid;
   }
 
   @Override
   public String toString() {
     if (isErrorReturn()) {
-      return CollectionUtil.toString("\n" + errors);
+      return CollectionUtil.toString("\n", this.errors);
     } else {
       return "Valid";
     }

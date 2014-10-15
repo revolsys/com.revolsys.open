@@ -46,7 +46,7 @@ public class BaseMain implements UncaughtExceptionHandler {
       }
       final Class<?> quitStrategyClass = Class.forName("com.apple.eawt.QuitStrategy");
       final Object closeAllWindows = quitStrategyClass.getField(
-        "CLOSE_ALL_WINDOWS").get(quitStrategyClass);
+          "CLOSE_ALL_WINDOWS").get(quitStrategyClass);
       MethodUtils.invokeExactMethod(application, "setQuitStrategy",
         closeAllWindows);
       MacApplicationListenerHandler.init(application);
@@ -127,13 +127,13 @@ public class BaseMain implements UncaughtExceptionHandler {
       if (e instanceof NullPointerException) {
         message = "Null pointer";
       } else {
-        message = "Unknow error";
+        message = "Unknown error";
       }
     }
     ExceptionUtil.log(logClass, message, e);
     @SuppressWarnings("unchecked")
     final Enumeration<Appender> allAppenders = Logger.getRootLogger()
-      .getAllAppenders();
+    .getAllAppenders();
     while (allAppenders.hasMoreElements()) {
       final Appender appender = allAppenders.nextElement();
       if (appender instanceof ListLog4jAppender) {

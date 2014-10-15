@@ -6,14 +6,7 @@ import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.UndoManager;
 
-@SuppressWarnings("serial")
 public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 1L;
-
   public static SetFieldValueUndoableEdit create(final UndoManager undoManager,
     final Field field, final Object oldValue, final Object newValue) {
     if (undoManager == null) {
@@ -25,6 +18,8 @@ public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
       return edit;
     }
   }
+
+  private static final long serialVersionUID = 1L;
 
   private final Field field;
 
@@ -77,6 +72,6 @@ public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
   @Override
   public String toString() {
     return this.field.getFieldName() + " old=" + this.oldValue + ", new="
-      + this.newValue;
+        + this.newValue;
   }
 }

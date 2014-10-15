@@ -90,7 +90,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     final StringBuilder sql, final EnvelopeIntersects envelopeIntersects) {
     final FieldDefinition geometryField = query.getGeometryField();
 
-    if (geometryField instanceof OracleSdoGeometryJdbcAttribute) {
+    if (geometryField instanceof OracleSdoGeometryJdbcFieldDefinition) {
       sql.append("SDO_RELATE(");
       final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
       if (boundingBox1Value == null) {
@@ -132,7 +132,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     final GeometryEqual2d equals) {
     final FieldDefinition geometryField = query.getGeometryField();
 
-    if (geometryField instanceof OracleSdoGeometryJdbcAttribute) {
+    if (geometryField instanceof OracleSdoGeometryJdbcFieldDefinition) {
       sql.append("MDSYS.SDO_EQUALS(");
       final QueryValue geometry1Value = equals.getGeometry1Value();
       if (geometry1Value == null) {
@@ -187,7 +187,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   private void appendWithinDistance(final Query query, final StringBuilder sql,
     final WithinDistance withinDistance) {
     final FieldDefinition geometryField = query.getGeometryField();
-    if (geometryField instanceof OracleSdoGeometryJdbcAttribute) {
+    if (geometryField instanceof OracleSdoGeometryJdbcFieldDefinition) {
       sql.append("MDSYS.SDO_WITHIN_DISTANCE(");
       final QueryValue geometry1Value = withinDistance.getGeometry1Value();
       if (geometry1Value == null) {
@@ -362,15 +362,15 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       addFieldAdder("DATE", attributeAdder);
       addFieldAdder("TIMESTAMP", attributeAdder);
 
-      final OracleSdoGeometryAttributeAdder sdoGeometryAttributeAdder = new OracleSdoGeometryAttributeAdder(
+      final OracleSdoGeometryFieldAdder sdoGeometryAttributeAdder = new OracleSdoGeometryFieldAdder(
         this);
       addFieldAdder("SDO_GEOMETRY", sdoGeometryAttributeAdder);
       addFieldAdder("MDSYS.SDO_GEOMETRY", sdoGeometryAttributeAdder);
 
-      final OracleBlobAttributeAdder blobAdder = new OracleBlobAttributeAdder();
+      final OracleBlobFieldAdder blobAdder = new OracleBlobFieldAdder();
       addFieldAdder("BLOB", blobAdder);
 
-      final OracleClobAttributeAdder clobAdder = new OracleClobAttributeAdder();
+      final OracleClobFieldAdder clobAdder = new OracleClobFieldAdder();
       addFieldAdder("CLOB", clobAdder);
       setPrimaryKeySql("SELECT distinct cols.table_name, cols.column_name FROM all_constraints cons, all_cons_columns cols WHERE cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner AND cons.owner =?");
 

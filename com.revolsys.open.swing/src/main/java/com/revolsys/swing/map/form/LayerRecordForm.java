@@ -71,6 +71,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.jts.geom.Geometry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -92,7 +93,7 @@ import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsErrorPre
 import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsModifiedPredicate;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.swing.table.BaseJxTable;
+import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
@@ -105,7 +106,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerRecordForm extends JPanel implements PropertyChangeListener,
-  CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
+CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public static final String FLIP_FIELDS_ICON = "flip_fields";
 
@@ -122,7 +123,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
   private static final long serialVersionUID = 1L;
 
   private JButton addOkButton = InvokeMethodAction.createButton("OK", this,
-    "actionAddOk");
+      "actionAddOk");
 
   private RecordLayerAttributesTableModel allAttributes;
 
@@ -283,8 +284,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     if (field instanceof ComboBox) {
       final ComboBox comboBox = (ComboBox)field;
       comboBox.getEditor()
-        .getEditorComponent()
-        .addFocusListener(new WeakFocusListener(this));
+      .getEditorComponent()
+      .addFocusListener(new WeakFocusListener(this));
     } else {
       ((JComponent)field).addFocusListener(new WeakFocusListener(this));
     }
@@ -400,7 +401,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
 
   protected void addTabAllFields() {
     this.allAttributes = new RecordLayerAttributesTableModel(this);
-    final BaseJxTable table = AbstractSingleRecordTableModel.createTable(this.allAttributes);
+    final BaseJTable table = AbstractSingleRecordTableModel.createTable(this.allAttributes);
     final TableColumnModel columnModel = table.getColumnModel();
     FormAllFieldsModifiedPredicate.add(this, table);
     FormAllFieldsErrorPredicate.add(this, table);
@@ -439,7 +440,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
 
     int maxHeight = 500;
     for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
-      .getScreenDevices()) {
+        .getScreenDevices()) {
       final GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
       final Rectangle bounds = graphicsConfiguration.getBounds();
 
@@ -506,12 +507,12 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     }
 
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canUndo");
+        "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canRedo");
+        "canRedo");
 
     final EnableCheck modifiedOrDeleted = new ObjectPropertyEnableCheck(this,
-      "modifiedOrDeleted");
+        "modifiedOrDeleted");
 
     this.toolBar.addButton("changes", "Revert Record", "arrow_revert",
       modifiedOrDeleted, this, "revertChanges");
@@ -535,9 +536,9 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     if (hasGeometry) {
       final DataType geometryDataType = geometryField.getType();
       if (geometryDataType == DataTypes.LINE_STRING
-        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition)
-          .hasDirectionalAttributes()) {
+            .hasDirectionalAttributes()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME,
             FLIP_RECORD_ICON, editable, this, "flipRecordOrientation");
           this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME,
@@ -1032,7 +1033,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     final AbstractLayer layer = getLayer();
     if (layer != null) {
       final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-        map);
+          map);
       final Collection<String> ignorePasteFields = layer.getProperty("ignorePasteFields");
       final Set<String> keySet = newValues.keySet();
       if (ignorePasteFields != null) {
@@ -1059,7 +1060,11 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
       if (record != null) {
         final Object source = event.getSource();
 
-        if (propertyName.equals("fieldNamesSets")) {
+        if (source == this.geometryCoordinatesPanel.getTable().getModel()) {
+          if (propertyName.equals("geometry")) {
+            record.setGeometryValue((Geometry)event.getNewValue());
+          }
+        } else if (propertyName.equals("fieldNamesSets")) {
           final Object selectedItem = this.fieldNameSetNamesField.getSelectedItem();
           final List<String> fieldNamesSetNames = this.layer.getFieldNamesSetNames();
           final DefaultComboBoxModel<String> fieldNamesSetNamesModel = ComboBox.model(fieldNamesSetNames);
@@ -1084,7 +1089,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
           final Object fieldValue = field.getFieldValue();
           final Object objectValue = this.record.getValue(fieldName);
           if (field.isFieldValid()
-            && !EqualsRegistry.equal(objectValue, fieldValue)) {
+              && !EqualsRegistry.equal(objectValue, fieldValue)) {
             boolean equal = false;
             if (fieldValue instanceof String) {
               final String string = (String)fieldValue;
@@ -1093,8 +1098,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
               }
             }
             if (!equal
-              && layer.isEditable()
-              && (record.getState() == RecordState.New
+                && layer.isEditable()
+                && (record.getState() == RecordState.New
                 && layer.isCanAddRecords() || layer.isCanEditRecords())) {
               record.setValueByPath(fieldName, fieldValue);
             }

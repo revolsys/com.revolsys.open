@@ -286,7 +286,7 @@ public class CoordinatesListUtil {
       if (i > vertexCount) {
         break;
       }
-      coordinates.add(vertex.cloneCoordinates());
+      coordinates.add(vertex.clonePoint());
     }
     return coordinates.toArray(new Point[coordinates.size()]);
   }
@@ -381,13 +381,13 @@ public class CoordinatesListUtil {
           node2);
         if (!node1.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node1.cloneCoordinates(), midPoint);
+            movedNodes.put(node1.clonePoint(), midPoint);
           }
           node1.move(midPoint);
         }
         if (!node2.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node2.cloneCoordinates(), midPoint);
+            movedNodes.put(node2.clonePoint(), midPoint);
           }
           node2.move(midPoint);
         }

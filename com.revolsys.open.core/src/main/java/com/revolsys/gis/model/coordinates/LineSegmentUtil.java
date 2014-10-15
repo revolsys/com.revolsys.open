@@ -618,7 +618,7 @@ public class LineSegmentUtil {
   public static Point project(final GeometryFactory precisionModel,
     final Point lineStart, final Point lineEnd, final Point point) {
     if (point.equals(2, lineStart) || point.equals(2, lineEnd)) {
-      return point.cloneCoordinates();
+      return point.clonePoint();
     } else {
       final double r = projectionFactor(lineStart, lineEnd, point);
       final int axisCount = CoordinatesUtil.getAxisCount(point, lineStart,

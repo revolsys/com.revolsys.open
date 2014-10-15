@@ -22,6 +22,6 @@ package com.revolsys.data.validator;
 
 import com.revolsys.data.record.schema.FieldDefinition;
 
-public interface AttributeValueValidator {
-  boolean isValid(FieldDefinition attributeDefinition, Object value);
+public interface FieldValueValidator {
+  boolean isValid(FieldDefinition fieldDefinition, Object value);
 }

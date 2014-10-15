@@ -40,8 +40,9 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTReader;
+import com.revolsys.jts.operation.valid.CoordinateNaNError;
+import com.revolsys.jts.operation.valid.GeometryValidationError;
 import com.revolsys.jts.operation.valid.IsValidOp;
-import com.revolsys.jts.operation.valid.TopologyValidationError;
 
 /**
  * @version 1.7
@@ -52,8 +53,7 @@ public class IsValidTest extends TestCase {
     TestRunner.run(IsValidTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.floating(0,
-    2);
+  private final GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -61,19 +61,18 @@ public class IsValidTest extends TestCase {
     super(name);
   }
 
-  public void testInvalidCoordinate() throws Exception {
-    final Point badCoord = new PointDouble(1.0, Double.NaN,
-      Point.NULL_ORDINATE);
+  public void testNaNCoordinate() throws Exception {
+    final Point badCoord = new PointDouble(1.0, Double.NaN, Point.NULL_ORDINATE);
     final Point[] pts = {
       new PointDouble(0.0, 0.0, Point.NULL_ORDINATE), badCoord
     };
     final Geometry line = this.geometryFactory.lineString(pts);
     final IsValidOp isValidOp = new IsValidOp(line);
     final boolean valid = isValidOp.isValid();
-    final TopologyValidationError err = isValidOp.getValidationError();
-    final Point errCoord = err.getCoordinate();
+    final GeometryValidationError err = isValidOp.getValidationError();
+    final Point errCoord = err.getErrorPoint();
 
-    assertEquals(TopologyValidationError.INVALID_COORDINATE, err.getErrorType());
+    assertTrue(err instanceof CoordinateNaNError);
     assertTrue(Double.isNaN(errCoord.getY()));
     assertEquals(false, valid);
   }

@@ -95,7 +95,7 @@ Polygon {
     int minIndex = 0;
     for (final Vertex vertex : ring.vertices()) {
       if (minCoord == null || minCoord.compareTo(vertex) > 0) {
-        minCoord = vertex.cloneCoordinates();
+        minCoord = vertex.clonePoint();
         minIndex = vertex.getVertexIndex();
       }
     }

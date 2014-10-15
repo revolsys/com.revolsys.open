@@ -218,7 +218,7 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
   public List<Point> getRepresentativePoints() {
     final List<Point> points = new ArrayList<Point>();
     for (final Vertex vertex : vertices()) {
-      points.add(vertex.cloneCoordinates());
+      points.add(vertex.clonePoint());
     }
     return points;
   }

@@ -365,7 +365,7 @@ public class GeometryGraph extends PlanarGraph {
     final Point[] points = new Point[nodes.size()];
     int i = 0;
     for (final Node node : nodes) {
-      points[i++] = node.getCoordinate().cloneCoordinates();
+      points[i++] = node.getCoordinate().clonePoint();
     }
     return points;
   }

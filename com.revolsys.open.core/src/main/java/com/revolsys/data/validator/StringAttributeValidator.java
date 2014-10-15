@@ -22,12 +22,12 @@ package com.revolsys.data.validator;
 
 import com.revolsys.data.record.schema.FieldDefinition;
 
-public class StringAttributeValidator implements AttributeValueValidator {
+public class StringAttributeValidator implements FieldValueValidator {
 
   @Override
-  public boolean isValid(final FieldDefinition attributeDefinition, final Object value) {
+  public boolean isValid(final FieldDefinition fieldDefinition, final Object value) {
     if (value instanceof String) {
-      return ((String)value).length() < attributeDefinition.getLength();
+      return ((String)value).length() < fieldDefinition.getLength();
     } else {
       return false;
     }

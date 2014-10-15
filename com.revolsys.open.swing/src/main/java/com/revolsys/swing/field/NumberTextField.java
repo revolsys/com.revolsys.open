@@ -16,10 +16,13 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.types.DataType;
+import com.revolsys.data.types.DataTypes;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class NumberTextField extends JXTextField implements Field,
@@ -178,6 +181,7 @@ DocumentListener, FocusListener {
     getDocument().addDocumentListener(this);
     addFocusListener(new WeakFocusListener(this));
     PopupMenu.getPopupMenuFactory(this);
+    setFont(SwingUtil.FONT);
   }
 
   @Override
@@ -237,6 +241,13 @@ DocumentListener, FocusListener {
     if (value == null) {
       return null;
     } else {
+      if ("NaN".equalsIgnoreCase(value.toString())) {
+        return Double.NaN;
+      } else if ("-Infinity".equalsIgnoreCase(value.toString())) {
+        return Double.NEGATIVE_INFINITY;
+      } else if ("Infinity".equalsIgnoreCase(value.toString())) {
+        return Double.POSITIVE_INFINITY;
+      }
       try {
         final BigDecimal bigNumber = new BigDecimal(value.toString());
         return StringConverterRegistry.toObject(this.dataType, bigNumber);
@@ -302,15 +313,24 @@ DocumentListener, FocusListener {
       final Object newValue = getTypedValue(value);
       final Object oldValue = getFieldValue();
       if (!EqualsRegistry.equal(oldValue, newValue)) {
-        String newText = StringConverterRegistry.toString(newValue);
+        String newText;
         if (newValue == null) {
           newText = "";
         } else if (newValue instanceof Number) {
-          BigDecimal decimal = new BigDecimal(newText);
-          if (decimal.scale() < this.scale) {
-            decimal = decimal.setScale(this.scale, RoundingMode.HALF_UP);
+          newText = MathUtil.toString((Number)newValue);
+          if ("NAN".equalsIgnoreCase(newText)) {
+            newText = "NaN";
+          } else if ("Infinity".equalsIgnoreCase(newText)) {
+            newText = "Infinity";
+          } else if ("-Infinity".equalsIgnoreCase(newText)) {
+            newText = "-Infinity";
+          } else {
+            BigDecimal decimal = new BigDecimal(newText);
+            if (decimal.scale() > this.scale) {
+              decimal = decimal.setScale(this.scale, RoundingMode.HALF_UP);
+            }
+            newText = decimal.toPlainString();
           }
-          newText = decimal.toPlainString();
         } else {
           newText = StringConverterRegistry.toString(newValue);
         }
@@ -369,30 +389,53 @@ DocumentListener, FocusListener {
     final String text = getText();
     String message = null;
     if (Property.hasValue(text)) {
-      try {
-        BigDecimal number = new BigDecimal(text.trim());
-        if (number.scale() < 0) {
-          number = number.setScale(this.scale);
-        }
-        if (number.scale() > this.scale) {
-          message = "Number of decimal places must be < " + this.scale;
-        } else if (this.minimumValue != null
-            && this.minimumValue.compareTo(number) > 0) {
-          message = "Value must be >= " + this.minimumValue;
-        } else if (this.maximumValue != null
-            && this.maximumValue.compareTo(number) < 0) {
-          message = "Value must be <= " + this.maximumValue;
+      if ("NaN".equalsIgnoreCase(text)) {
+        if (this.dataType.equals(DataTypes.DOUBLE)) {
+        } else if (this.dataType.equals(DataTypes.FLOAT)) {
         } else {
-          // number = number.setScale(scale);
-          // final String newText = number.toPlainString();
-          // if (!newText.equals(text)) {
-          // setText(newText);
-          // }
-          message = null;
+          message = "'" + text + "' is not a valid "
+              + this.dataType.getValidationName() + ".";
         }
-      } catch (final Throwable t) {
-        message = "'" + text + "' is not a valid "
-            + this.dataType.getValidationName() + ".";
+      } else if ("Infinity".equalsIgnoreCase(text)) {
+        if (this.dataType.equals(DataTypes.DOUBLE)) {
+        } else if (this.dataType.equals(DataTypes.FLOAT)) {
+        } else {
+          message = "'" + text + "' is not a valid "
+              + this.dataType.getValidationName() + ".";
+        }
+      } else if ("-Infinity".equalsIgnoreCase(text)) {
+        if (this.dataType.equals(DataTypes.DOUBLE)) {
+        } else if (this.dataType.equals(DataTypes.FLOAT)) {
+        } else {
+          message = "'" + text + "' is not a valid "
+              + this.dataType.getValidationName() + ".";
+        }
+      } else {
+        try {
+          BigDecimal number = new BigDecimal(text.trim());
+          if (number.scale() < 0) {
+            number = number.setScale(this.scale);
+          }
+          if (number.scale() > this.scale) {
+            message = "Number of decimal places must be < " + this.scale;
+          } else if (this.minimumValue != null
+              && this.minimumValue.compareTo(number) > 0) {
+            message = "Value must be >= " + this.minimumValue;
+          } else if (this.maximumValue != null
+              && this.maximumValue.compareTo(number) < 0) {
+            message = "Value must be <= " + this.maximumValue;
+          } else {
+            // number = number.setScale(scale);
+            // final String newText = number.toPlainString();
+            // if (!newText.equals(text)) {
+            // setText(newText);
+            // }
+            message = null;
+          }
+        } catch (final Throwable t) {
+          message = "'" + text + "' is not a valid "
+              + this.dataType.getValidationName() + ".";
+        }
       }
     }
     final boolean valid = !Property.hasValue(message);
