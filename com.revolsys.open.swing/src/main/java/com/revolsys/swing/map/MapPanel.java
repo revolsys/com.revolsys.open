@@ -349,9 +349,9 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
 
   protected void addUndoButtons() {
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canUndo");
+        "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-      "canRedo");
+        "canRedo");
 
     this.toolBar.addButton("undo", "Undo", "arrow_undo", canUndo,
       this.undoManager, "undo");
@@ -730,7 +730,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     } else if (source == this.baseMapLayers) {
       if ("layers".equals(propertyName)) {
         if (this.baseMapOverlay != null
-          && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
+            && (this.baseMapOverlay.getLayer() == null || NullLayer.INSTANCE.equals(this.baseMapOverlay.getLayer()))) {
           final Layer layer = (Layer)event.getNewValue();
           if (layer != null && layer.isVisible()) {
             this.baseMapOverlay.setLayer(layer);
@@ -966,15 +966,15 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
     final PopupMenu menu = new PopupMenu("Zoom Bookmark");
     final MenuFactory factory = menu.getMenu();
     factory.addMenuItemTitleIcon("default", "Add Bookmark", "add", this,
-      "addZoomBookmark");
+        "addZoomBookmark");
 
     final Project project = getProject();
     for (final Entry<String, BoundingBox> entry : project.getZoomBookmarks()
-      .entrySet()) {
+        .entrySet()) {
       final String name = entry.getKey();
       final BoundingBox boundingBox = entry.getValue();
       factory.addMenuItemTitleIcon("bookmark", "Zoom to " + name, "magnifier",
-        this, "zoomTo", boundingBox);
+        this, "zoomToGeometry", boundingBox);
     }
     menu.show(this.zoomBookmarkButton, 0, 20);
   }
@@ -1043,31 +1043,31 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
    *
    * @param boundingBox
    */
-  public void zoomTo(BoundingBox boundingBox) {
+  public void zoomToBoundingBox(BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     boundingBox = boundingBox.convert(geometryFactory).expandPercent(0.1);
     setBoundingBox(boundingBox);
   }
 
-  public void zoomTo(final Geometry geometry) {
+  public void zoomToGeometry(final Geometry geometry) {
     if (geometry != null) {
       final Geometry convertedGeometry = geometry.copy(getGeometryFactory());
       final BoundingBox boudingBox = convertedGeometry.getBoundingBox();
-      zoomTo(boudingBox);
+      zoomToBoundingBox(boudingBox);
     }
   }
 
-  public void zoomTo(final Layer layer) {
+  public void zoomToLayer(final Layer layer) {
     if (layer != null && layer.isExists() && layer.isVisible()) {
       final BoundingBox boundingBox = layer.getBoundingBox(true);
-      zoomTo(boundingBox);
+      zoomToBoundingBox(boundingBox);
     }
   }
 
-  public void zoomTo(final Record object) {
-    if (object != null) {
-      final Geometry geometry = object.getGeometryValue();
-      zoomTo(geometry);
+  public void zoomToRecord(final Record record) {
+    if (record != null) {
+      final Geometry geometry = record.getGeometryValue();
+      zoomToGeometry(geometry);
     }
   }
 
@@ -1078,7 +1078,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void zoomToSelected(final Layer layer) {
     final BoundingBox boundingBox = layer.getSelectedBoundingBox();
     if (!boundingBox.isEmpty()) {
-      zoomTo(boundingBox);
+      zoomToBoundingBox(boundingBox);
     }
   }
 

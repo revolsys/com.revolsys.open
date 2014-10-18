@@ -3,6 +3,7 @@ package com.revolsys.jts.util;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
+import com.revolsys.util.MathUtil;
 
 public class BoundingBoxUtil {
   public static boolean covers(final double minX1, final double minY1,
@@ -13,11 +14,13 @@ public class BoundingBoxUtil {
 
   public static double[] createBounds(final double... bounds) {
     final int axisCount = bounds.length;
-    final double[] newBounds = new double[axisCount * 2];
+    final double[] newBounds = createBounds(axisCount);
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double value = bounds[axisIndex];
-      newBounds[axisIndex] = value;
-      newBounds[axisCount + axisCount] = value;
+      final double coordinate = bounds[axisIndex];
+      if (!MathUtil.isNanOrInfinite(coordinate)) {
+        newBounds[axisIndex] = coordinate;
+        newBounds[axisCount + axisCount] = coordinate;
+      }
     }
     return newBounds;
   }
@@ -25,14 +28,16 @@ public class BoundingBoxUtil {
   public static double[] createBounds(final GeometryFactory geometryFactory,
     final double... bounds) {
     final int axisCount = bounds.length;
-    final double[] newBounds = new double[axisCount * 2];
+    final double[] newBounds = createBounds(axisCount);
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      double value = bounds[axisIndex];
+      double coordinate = bounds[axisIndex];
       if (geometryFactory != null) {
-        value = geometryFactory.makePrecise(axisIndex, value);
+        coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
       }
-      newBounds[axisIndex] = value;
-      newBounds[axisCount + axisIndex] = value;
+      if (!MathUtil.isNanOrInfinite(coordinate)) {
+        newBounds[axisIndex] = coordinate;
+        newBounds[axisCount + axisIndex] = coordinate;
+      }
     }
     return newBounds;
   }
@@ -40,14 +45,16 @@ public class BoundingBoxUtil {
   public static double[] createBounds(final GeometryFactory geometryFactory,
     final int axisCount, Point point) {
     point = point.convert(geometryFactory, axisCount);
-    final double[] bounds = new double[axisCount * 2];
+    final double[] bounds = createBounds(axisCount);
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      double value = point.getCoordinate(axisIndex);
+      double coordinate = point.getCoordinate(axisIndex);
       if (geometryFactory != null) {
-        value = geometryFactory.makePrecise(axisIndex, value);
+        coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
       }
-      bounds[axisIndex] = value;
-      bounds[axisCount + axisIndex] = value;
+      if (!MathUtil.isNanOrInfinite(coordinate)) {
+        bounds[axisIndex] = coordinate;
+        bounds[axisCount + axisIndex] = coordinate;
+      }
     }
     return bounds;
   }
@@ -67,11 +74,13 @@ public class BoundingBoxUtil {
   }
 
   public static double[] createBounds(final int axisCount, final Point point) {
-    final double[] bounds = new double[axisCount * 2];
+    final double[] bounds = createBounds(axisCount);
     for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double value = point.getCoordinate(axisIndex);
-      bounds[axisIndex] = value;
-      bounds[axisCount + axisIndex] = value;
+      final double coordinate = point.getCoordinate(axisIndex);
+      if (!MathUtil.isNanOrInfinite(coordinate)) {
+        bounds[axisIndex] = coordinate;
+        bounds[axisCount + axisIndex] = coordinate;
+      }
     }
     return bounds;
   }
@@ -84,21 +93,23 @@ public class BoundingBoxUtil {
   public static void expand(final double[] bounds, final int axisCount,
     final double... coordinates) {
     for (int axisIndex = 0; axisIndex < axisCount
-      && axisIndex < coordinates.length; axisIndex++) {
+        && axisIndex < coordinates.length; axisIndex++) {
       final double coordinate = coordinates[axisIndex];
       expand(bounds, axisCount, axisIndex, coordinate);
     }
   }
 
   public static void expand(final double[] bounds, final int axisCount,
-    final int axisIndex, final double value) {
-    final double min = bounds[axisIndex];
-    if (value < min || Double.isNaN(min)) {
-      bounds[axisIndex] = value;
-    }
-    final double max = bounds[axisCount + axisIndex];
-    if (value > max || Double.isNaN(max)) {
-      bounds[axisCount + axisIndex] = value;
+    final int axisIndex, final double coordinate) {
+    if (!MathUtil.isNanOrInfinite(coordinate)) {
+      final double min = bounds[axisIndex];
+      if (coordinate < min || Double.isNaN(min)) {
+        bounds[axisIndex] = coordinate;
+      }
+      final double max = bounds[axisCount + axisIndex];
+      if (coordinate > max || Double.isNaN(max)) {
+        bounds[axisCount + axisIndex] = coordinate;
+      }
     }
   }
 
@@ -121,35 +132,37 @@ public class BoundingBoxUtil {
   }
 
   public static void expand(final GeometryFactory geometryFactory,
-    final double[] bounds, final int axisIndex, double value) {
+    final double[] bounds, final int axisIndex, double coordinate) {
     if (geometryFactory != null) {
-      value = geometryFactory.makePrecise(axisIndex, value);
+      coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
     }
-    final int axisCount = bounds.length / 2;
-    final double min = bounds[axisIndex];
-    if (value < min || Double.isNaN(min)) {
-      bounds[axisIndex] = value;
-    }
-    final double max = bounds[axisCount + axisIndex];
-    if (value > max || Double.isNaN(max)) {
-      bounds[axisCount + axisIndex] = value;
+    if (!MathUtil.isNanOrInfinite(coordinate)) {
+      final int axisCount = bounds.length / 2;
+      final double min = bounds[axisIndex];
+      if (coordinate < min || Double.isNaN(min)) {
+        bounds[axisIndex] = coordinate;
+      }
+      final double max = bounds[axisCount + axisIndex];
+      if (coordinate > max || Double.isNaN(max)) {
+        bounds[axisCount + axisIndex] = coordinate;
+      }
     }
   }
 
   public static void expand(final GeometryFactory geometryFactory,
     final double[] bounds, final int axisCount, final int axisIndex,
-    double value) {
-    if (!Double.isNaN(value)) {
-      if (geometryFactory != null) {
-        value = geometryFactory.makePrecise(axisIndex, value);
-      }
+    double coordinate) {
+    if (geometryFactory != null) {
+      coordinate = geometryFactory.makePrecise(axisIndex, coordinate);
+    }
+    if (!MathUtil.isNanOrInfinite(coordinate)) {
       final double min = bounds[axisIndex];
-      if (value < min || Double.isNaN(min)) {
-        bounds[axisIndex] = value;
+      if (coordinate < min || Double.isNaN(min)) {
+        bounds[axisIndex] = coordinate;
       }
       final double max = bounds[axisCount + axisIndex];
-      if (value > max || Double.isNaN(max)) {
-        bounds[axisCount + axisIndex] = value;
+      if (coordinate > max || Double.isNaN(max)) {
+        bounds[axisCount + axisIndex] = coordinate;
       }
     }
   }
@@ -160,8 +173,10 @@ public class BoundingBoxUtil {
     point = point.convert(geometryFactory, axisCount);
     final int count = Math.min(axisCount, point.getAxisCount());
     for (int axisIndex = 0; axisIndex < count; axisIndex++) {
-      final double value = point.getCoordinate(axisIndex);
-      expand(geometryFactory, bounds, axisCount, axisIndex, value);
+      final double coordinate = point.getCoordinate(axisIndex);
+      if (!MathUtil.isNanOrInfinite(coordinate)) {
+        expand(geometryFactory, bounds, axisCount, axisIndex, coordinate);
+      }
     }
   }
 
@@ -210,7 +225,7 @@ public class BoundingBoxUtil {
 
   /**
    * Point intersects the bounding box of the line.
-   * 
+   *
    * @param lineStart
    * @param lineEnd
    * @param point
@@ -218,8 +233,8 @@ public class BoundingBoxUtil {
    */
   public static boolean intersects(final double p1X, final double p1Y,
     final double p2X, final double p2Y, final double qX, final double qY) {
-    if (((qX >= (p1X < p2X ? p1X : p2X)) && (qX <= (p1X > p2X ? p1X : p2X)))
-      && ((qY >= (p1Y < p2Y ? p1Y : p2Y)) && (qY <= (p1Y > p2Y ? p1Y : p2Y)))) {
+    if (qX >= (p1X < p2X ? p1X : p2X) && qX <= (p1X > p2X ? p1X : p2X)
+        && qY >= (p1Y < p2Y ? p1Y : p2Y) && qY <= (p1Y > p2Y ? p1Y : p2Y)) {
       return true;
     } else {
       return false;
@@ -274,7 +289,7 @@ public class BoundingBoxUtil {
 
   /**
    * Point intersects the bounding box of the line.
-   * 
+   *
    * @param lineStart
    * @param lineEnd
    * @param point
@@ -296,7 +311,7 @@ public class BoundingBoxUtil {
    * Tests whether the envelope defined by p1-p2
    * and the envelope defined by q1-q2
    * intersect.
-   * 
+   *
    * @param p1 one extremal point of the envelope P
    * @param p2 another extremal point of the envelope P
    * @param q1 one extremal point of the envelope Q

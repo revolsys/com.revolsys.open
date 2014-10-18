@@ -5,6 +5,8 @@ import com.revolsys.jts.geom.Point;
 
 public interface GeometryValidationError {
 
+  Geometry getErrorGeometry();
+
   Point getErrorPoint();
 
   Geometry getGeometry();

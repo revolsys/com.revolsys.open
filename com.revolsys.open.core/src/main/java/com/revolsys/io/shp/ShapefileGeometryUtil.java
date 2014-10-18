@@ -804,8 +804,7 @@ public final class ShapefileGeometryUtil {
         out.writeInt(recordLength);
       }
       out.writeLEInt(ShapefileConstants.POINT_SHAPE);
-      writeXy(out, point.getX());
-      writeXy(out, point.getY());
+      writeXy(out, point);
     } else {
       throw new IllegalArgumentException("Expecting " + Point.class
         + " geometry got " + geometry.getClass());
@@ -822,8 +821,8 @@ public final class ShapefileGeometryUtil {
         out.writeInt(recordLength);
       }
       out.writeLEInt(ShapefileConstants.POINT_M_SHAPE);
-      writeXy(out, point.getX());
-      writeXy(out, point.getY());
+      writeXy(out, point);
+
       final double m = point.getM();
       if (Double.isNaN(m)) {
         out.writeLEDouble(0);
@@ -850,8 +849,7 @@ public final class ShapefileGeometryUtil {
       } else {
         out.writeLEInt(ShapefileConstants.POINT_Z_SHAPE);
       }
-      writeXy(out, point.getX());
-      writeXy(out, point.getY());
+      writeXy(out, point);
       final double z = point.getZ();
       if (Double.isNaN(z)) {
         out.writeLEDouble(0);
@@ -874,8 +872,7 @@ public final class ShapefileGeometryUtil {
         out.writeInt(recordLength);
       }
       out.writeLEInt(ShapefileConstants.POINT_ZM_SHAPE);
-      writeXy(out, point.getX());
-      writeXy(out, point.getY());
+      writeXy(out, point);
       final double z = point.getZ();
       if (Double.isNaN(z)) {
         out.writeLEDouble(0);
@@ -1055,32 +1052,44 @@ public final class ShapefileGeometryUtil {
     writeMCoordinates(out, geometry);
   }
 
-  public void writeXy(final EndianOutput out, final double value)
-      throws IOException {
+  public void writeXy(final EndianOutput out, final double value,
+    final char axisName) throws IOException {
     if (Double.isNaN(value)) {
-      throw new IllegalArgumentException("Value cannot be NaN");
+      throw new IllegalArgumentException(axisName
+        + " coordinate value cannot be NaN");
     } else if (Double.isInfinite(value)) {
-      throw new IllegalArgumentException("Value cannot be infinite");
+      throw new IllegalArgumentException(axisName
+        + " coordinate cannot be infinite");
     } else {
       out.writeLEDouble(value);
     }
   }
 
+  private void writeXy(final EndianOutput out, final LineString points,
+    final int index) throws IOException {
+    writeXy(out, points.getX(index), 'X');
+    writeXy(out, points.getY(index), 'Y');
+  }
+
+  private void writeXy(final EndianOutput out, final Point point)
+      throws IOException {
+    final double x = point.getX();
+    final double y = point.getY();
+    writeXy(out, x, 'X');
+    writeXy(out, y, 'Y');
+  }
+
   public void writeXYCoordinates(final EndianOutput out, final Geometry geometry)
       throws IOException {
     for (final Vertex vertex : geometry.vertices()) {
-      final double x = vertex.getX();
-      writeXy(out, x);
-      final double y = vertex.getY();
-      writeXy(out, y);
+      writeXy(out, vertex);
     }
   }
 
   public void writeXYCoordinates(final EndianOutput out, final LineString points)
       throws IOException {
     for (int i = 0; i < points.getVertexCount(); i++) {
-      writeXy(out, points.getX(i));
-      writeXy(out, points.getY(i));
+      writeXy(out, points, i);
     }
   }
 
@@ -1111,7 +1120,7 @@ public final class ShapefileGeometryUtil {
         if (Double.isNaN(z)) {
           out.writeLEDouble(0);
         } else {
-          writeXy(out, z);
+          out.writeLEDouble(z);
         }
       }
     } else {

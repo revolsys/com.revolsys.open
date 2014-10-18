@@ -10,10 +10,6 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
-import com.revolsys.jts.geom.Point;
-import com.revolsys.jts.operation.IsSimpleOp;
-import com.revolsys.jts.operation.valid.GeometryValidationError;
-import com.revolsys.jts.operation.valid.IsValidOp;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.renderer.MarkerStyleRenderer;
@@ -135,28 +131,29 @@ public class SelectedRecordsRenderer {
         }
       }
 
-      if (geometry.getVertexCount() < 100) {
-        try {
-          final IsValidOp validOp = new IsValidOp(geometry, false);
-          if (validOp.isValid()) {
-            final IsSimpleOp simpleOp = new IsSimpleOp(geometry, false);
-            if (!simpleOp.isSimple()) {
-              for (final Point coordinates : simpleOp.getNonSimplePoints()) {
-                final Point point = viewportGeometryFactory.point(coordinates);
-                MarkerStyleRenderer.renderMarker(viewport, graphics, point,
-                  this.erroStyle);
-              }
-            }
-          } else {
-            for (final GeometryValidationError error : validOp.getErrors()) {
-              final Point point = viewportGeometryFactory.point(error.getErrorPoint());
-              MarkerStyleRenderer.renderMarker(viewport, graphics, point,
-                this.erroStyle);
-            }
-          }
-        } catch (final Throwable e) {
-        }
-      }
+      // if (geometry.getVertexCount() < 100) {
+      // try {
+      // final IsValidOp validOp = new IsValidOp(geometry, false);
+      // if (validOp.isValid()) {
+      // final IsSimpleOp simpleOp = new IsSimpleOp(geometry, false);
+      // if (!simpleOp.isSimple()) {
+      // for (final Point coordinates : simpleOp.getNonSimplePoints()) {
+      // final Point point = viewportGeometryFactory.point(coordinates);
+      // MarkerStyleRenderer.renderMarker(viewport, graphics, point,
+      // this.erroStyle);
+      // }
+      // }
+      // } else {
+      // for (final GeometryValidationError error : validOp.getErrors()) {
+      // final Point point =
+      // viewportGeometryFactory.point(error.getErrorPoint());
+      // MarkerStyleRenderer.renderMarker(viewport, graphics, point,
+      // this.erroStyle);
+      // }
+      // }
+      // } catch (final Throwable e) {
+      // }
+      // }
     }
   }
 }

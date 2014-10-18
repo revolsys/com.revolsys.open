@@ -11,11 +11,11 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 
 import org.jdesktop.swingx.JXList;
 
+import com.revolsys.io.datastore.RecordStoreConnection;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -23,7 +23,6 @@ import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.list.renderer.IconListCellRenderer;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
-import com.revolsys.swing.tree.node.record.AddRecordStoreConnectionPanel;
 
 public class RecordStoreConnectionDialog extends BaseDialog {
   private final JXList buttons;
@@ -32,8 +31,17 @@ public class RecordStoreConnectionDialog extends BaseDialog {
 
   public RecordStoreConnectionDialog(
     final RecordStoreConnectionRegistry registry) {
+    this(registry, null);
+  }
+
+  public RecordStoreConnectionDialog(
+    final RecordStoreConnectionRegistry registry,
+    final RecordStoreConnection connection) {
     super(SwingUtil.getActiveWindow(), "Add Record Store Connection",
       ModalityType.APPLICATION_MODAL);
+    if (connection != null) {
+      setTitle("Edit Record Store Connection " + connection.getName());
+    }
     this.panels = new JLayeredPane();
     this.panels.setOpaque(true);
     this.panels.setBackground(Color.WHITE);
@@ -41,21 +49,28 @@ public class RecordStoreConnectionDialog extends BaseDialog {
     this.panels.setLayout(new FullSizeLayoutManager());
 
     int index = 0;
-    this.panels.setPreferredSize(new Dimension(300, 310));
-    final AddRecordStoreConnectionPanel oraclePanel = new AddRecordStoreConnectionPanel(
-      registry);
+    this.panels.setPreferredSize(new Dimension(500, 310));
+    final OracleRecordStoreConnectionPanel oraclePanel = new OracleRecordStoreConnectionPanel(
+      registry, connection);
     SwingUtil.setTitledBorder(oraclePanel, "Oracle");
     this.panels.add(oraclePanel, 0);
+
     final AddRecordStoreConnectionPanel postgresPanel = new AddRecordStoreConnectionPanel(
       registry);
     SwingUtil.setTitledBorder(postgresPanel, "PostgreSQL/PostGIS");
     this.panels.add(postgresPanel, new Integer(index++));
+
+    final AddRecordStoreConnectionPanel filePanel = new AddRecordStoreConnectionPanel(
+      registry);
+    SwingUtil.setTitledBorder(filePanel, "File");
+    this.panels.add(filePanel, new Integer(index++));
+
     this.buttons = new JXList(new Object[] {
       "Oracle", "PostgreSQL/PostGIS"
     });
     this.buttons.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.buttons.addListSelectionListener(new InvokeMethodListener(this,
-        "selectionChangeType"));
+      "selectionChangeType"));
 
     final Map<Object, Icon> icons = new HashMap<>();
     icons.put("Oracle", Icons.getIcon("database"));
@@ -68,10 +83,9 @@ public class RecordStoreConnectionDialog extends BaseDialog {
     this.buttons.setCellRenderer(renderer);
     final JScrollPane buttonScroll = new JScrollPane(this.buttons);
     buttonScroll.setPreferredSize(new Dimension(150, 400));
-    final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-      false, buttonScroll, new JScrollPane(this.panels));
 
-    add(splitPane, BorderLayout.CENTER);
+    add(buttonScroll, BorderLayout.WEST);
+    add(new JScrollPane(this.panels), BorderLayout.CENTER);
     pack();
     this.buttons.setSelectedIndex(0);
   }

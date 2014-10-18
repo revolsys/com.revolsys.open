@@ -9,6 +9,8 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.beans.ObjectException;
+import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.FieldDefinition;
@@ -100,17 +102,10 @@ public class FileGdbWriter extends AbstractRecordWriter {
   private void insert(final Record record) {
     final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
     final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
+
+    validateRequired(record, recordDefinition);
+
     final String typePath = sourceRecordDefinition.getPath();
-    for (final FieldDefinition attribute : recordDefinition.getFields()) {
-      final String name = attribute.getName();
-      if (attribute.isRequired()) {
-        final Object value = record.getValue(name);
-        if (value == null && !(attribute instanceof OidFieldDefinition)) {
-          throw new IllegalArgumentException("Atribute " + typePath + "."
-              + name + " is required");
-        }
-      }
-    }
     final Table table = getTable(typePath);
     try {
       final Row row = this.recordStore.createRowObject(table);
@@ -118,31 +113,38 @@ public class FileGdbWriter extends AbstractRecordWriter {
         final List<Object> values = new ArrayList<Object>();
         for (final FieldDefinition attribute : recordDefinition.getFields()) {
           final String name = attribute.getName();
-          final Object value = record.getValue(name);
-          final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
-          final Object esriValue = esriAttribute.setInsertValue(record, row,
-            value);
-          values.add(esriValue);
+          try {
+            final Object value = record.getValue(name);
+            final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
+            final Object esriValue = esriAttribute.setInsertValue(record, row,
+              value);
+            values.add(esriValue);
+          } catch (final Throwable e) {
+            throw new ObjectPropertyException(record, name, e);
+          }
         }
         this.recordStore.insertRow(table, row);
         for (final FieldDefinition attribute : recordDefinition.getFields()) {
           final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
-          esriAttribute.setPostInsertValue(record, row);
+          try {
+            esriAttribute.setPostInsertValue(record, row);
+          } catch (final Throwable e) {
+            throw new ObjectPropertyException(record, attribute.getName(), e);
+          }
         }
         record.setState(RecordState.Persisted);
       } finally {
         this.recordStore.closeRow(row);
         this.recordStore.addStatistic("Insert", record);
       }
-    } catch (final IllegalArgumentException e) {
-      throw new RuntimeException("Unable to insert row " + e.getMessage()
-        + "\n" + record.toString(), e);
-    } catch (final RuntimeException e) {
-      if (LoggerFactory.getLogger(FileGdbWriter.class).isDebugEnabled()) {
-        LoggerFactory.getLogger(FileGdbWriter.class).debug(
-          "Unable to insert row \n:" + record.toString());
+    } catch (final ObjectException e) {
+      if (e.getObject() == record) {
+        throw e;
+      } else {
+        throw new ObjectException(record, e);
       }
-      throw new RuntimeException("Unable to insert row", e);
+    } catch (final Throwable e) {
+      throw new ObjectException(record, e);
     }
 
   }
@@ -158,6 +160,9 @@ public class FileGdbWriter extends AbstractRecordWriter {
     } else {
       final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
       final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(sourceRecordDefinition);
+
+      validateRequired(record, recordDefinition);
+
       final String typePath = sourceRecordDefinition.getPath();
       final Table table = getTable(typePath);
       final EnumRows rows = this.recordStore.search(table, "OBJECTID",
@@ -171,33 +176,46 @@ public class FileGdbWriter extends AbstractRecordWriter {
               try {
                 for (final FieldDefinition attribute : recordDefinition.getFields()) {
                   final String name = attribute.getName();
-                  final Object value = record.getValue(name);
-                  final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
-                  esriValues.add(esriAttribute.setUpdateValue(record, row,
-                    value));
+                  try {
+                    final Object value = record.getValue(name);
+                    final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
+                    esriValues.add(esriAttribute.setUpdateValue(record, row,
+                      value));
+                  } catch (final Throwable e) {
+                    throw new ObjectPropertyException(record, name, e);
+                  }
                 }
                 this.recordStore.updateRow(table, row);
               } finally {
                 this.recordStore.addStatistic("Update", record);
               }
-            } catch (final IllegalArgumentException e) {
-              LoggerFactory.getLogger(FileGdbWriter.class).error(
-                "Unable to update row " + e.getMessage() + "\n"
-                    + record.toString(), e);
-            } catch (final RuntimeException e) {
-              LoggerFactory.getLogger(FileGdbWriter.class).error(
-                "Unable to update row \n:" + record.toString());
-              if (LoggerFactory.getLogger(FileGdbWriter.class).isDebugEnabled()) {
-                LoggerFactory.getLogger(FileGdbWriter.class).debug(
-                  "Unable to update row \n:" + record.toString());
+            } catch (final ObjectException e) {
+              if (e.getObject() == record) {
+                throw e;
+              } else {
+                throw new ObjectException(record, e);
               }
-              throw new RuntimeException("Unable to update row", e);
+            } catch (final Throwable e) {
+              throw new ObjectException(record, e);
             } finally {
               this.recordStore.closeRow(row);
             }
           }
         } finally {
           this.recordStore.closeEnumRows(rows);
+        }
+      }
+    }
+  }
+
+  private void validateRequired(final Record record,
+    final RecordDefinition recordDefinition) {
+    for (final FieldDefinition attribute : recordDefinition.getFields()) {
+      final String name = attribute.getName();
+      if (attribute.isRequired()) {
+        final Object value = record.getValue(name);
+        if (value == null && !(attribute instanceof OidFieldDefinition)) {
+          throw new ObjectPropertyException(record, name, "Value required");
         }
       }
     }
@@ -212,16 +230,16 @@ public class FileGdbWriter extends AbstractRecordWriter {
         switch (record.getState()) {
           case New:
             insert(record);
-            break;
+          break;
           case Modified:
             update(record);
-            break;
+          break;
           case Persisted:
-            // No action required
-            break;
+          // No action required
+          break;
           case Deleted:
             delete(record);
-            break;
+          break;
           default:
             throw new IllegalStateException("State not known");
         }

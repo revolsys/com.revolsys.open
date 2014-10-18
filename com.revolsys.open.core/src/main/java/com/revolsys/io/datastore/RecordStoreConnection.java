@@ -13,6 +13,7 @@ import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class RecordStoreConnection implements MapSerializer {
@@ -50,6 +51,10 @@ public class RecordStoreConnection implements MapSerializer {
     this.name = null;
     this.registry = null;
 
+  }
+
+  public Map<String, Object> getConfig() {
+    return JavaBeanUtil.clone(this.config);
   }
 
   public String getName() {

@@ -48,6 +48,13 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.Segment;
+import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.jts.operation.simple.DuplicateVertexError;
+import com.revolsys.jts.operation.simple.SelfIntersectionPointError;
+import com.revolsys.jts.operation.simple.SelfIntersectionVertexError;
+import com.revolsys.jts.operation.simple.SelfOverlapLineSegmentError;
+import com.revolsys.jts.operation.simple.SelfOverlapSegmentError;
+import com.revolsys.jts.operation.valid.GeometryValidationError;
 
 /**
  * Tests whether a <code>Geometry</code> is simple.
@@ -62,30 +69,30 @@ import com.revolsys.jts.geom.segment.Segment;
  * <ul>
  * <li><b>Polygonal</b> geometries are simple by definition, so
  * <code>isSimple</code> trivially returns true.
- * (Note: this means that <tt>isSimple</tt> cannot be used to test 
- * for (invalid) self-intersections in <tt>Polygon</tt>s.  
+ * (Note: this means that <tt>isSimple</tt> cannot be used to test
+ * for (invalid) self-intersections in <tt>Polygon</tt>s.
  * In order to check if a <tt>Polygonal</tt> geometry has self-intersections,
  * use {@link Geometry#isValid()}).
  * <li><b>Linear</b> geometries are simple iff they do <i>not</i> self-intersect at interior points
  * (i.e. points other than boundary points).
  * This is equivalent to saying that no two linear components satisfy the SFS {@link Geometry#touches(Geometry)}
- * predicate. 
+ * predicate.
  * <li><b>Zero-dimensional (point)</b> geometries are simple if and only if they have no
  * repeated points.
  * <li><b>Empty</b> geometries are <i>always</i> simple, by definition
  * </ul>
- * For {@link Lineal} geometries the evaluation of simplicity  
- * can be customized by supplying a {@link BoundaryNodeRule} 
+ * For {@link Lineal} geometries the evaluation of simplicity
+ * can be customized by supplying a {@link BoundaryNodeRule}
  * to define how boundary points are determined.
  * The default is the SFS-standard {@link BoundaryNodeRule#MOD2_BOUNDARY_RULE}.
  * Note that under the <tt>Mod-2</tt> rule, closed <tt>LineString</tt>s (rings)
  * will never satisfy the <tt>touches</tt> predicate at their endpoints, since these are
- * interior points, not boundary points. 
+ * interior points, not boundary points.
  * If it is required to test whether a set of <code>LineString</code>s touch
  * only at their endpoints, use <code>IsSimpleOp</code> with {@link BoundaryNodeRule#ENDPOINT_BOUNDARY_RULE}.
  * For example, this can be used to validate that a set of lines form a topologically valid
  * linear network.
- * 
+ *
  * @see BoundaryNodeRule
  *
  * @version 1.7
@@ -94,7 +101,7 @@ public class IsSimpleOp {
 
   private final Geometry geometry;
 
-  private final List<Point> nonSimplePoints = new ArrayList<Point>();
+  private final List<GeometryValidationError> errors = new ArrayList<>();
 
   private boolean shortCircuit = true;
 
@@ -112,9 +119,13 @@ public class IsSimpleOp {
     this.shortCircuit = shortCircuit;
   }
 
+  public List<GeometryValidationError> getErrors() {
+    return this.errors;
+  }
+
   /**
    * Gets a coordinate for the location where the geometry
-   * fails to be simple. 
+   * fails to be simple.
    * (i.e. where it has a non-boundary self-intersection).
    * {@link #isSimple} must be called before this method is called.
    *
@@ -122,15 +133,11 @@ public class IsSimpleOp {
    * or null if the geometry is simple
    */
   public Point getNonSimpleLocation() {
-    if (nonSimplePoints.isEmpty()) {
+    if (this.errors.isEmpty()) {
       return null;
     } else {
-      return nonSimplePoints.get(0);
+      return this.errors.get(0).getErrorPoint();
     }
-  }
-
-  public List<Point> getNonSimplePoints() {
-    return nonSimplePoints;
   }
 
   private boolean isEndIntersection(final Segment segment, final Point point) {
@@ -144,7 +151,7 @@ public class IsSimpleOp {
   }
 
   private boolean isErrorReturn() {
-    return shortCircuit && !nonSimplePoints.isEmpty();
+    return this.shortCircuit && !this.errors.isEmpty();
   }
 
   /**
@@ -153,8 +160,8 @@ public class IsSimpleOp {
    * @return true if the geometry is simple
    */
   public boolean isSimple() {
-    nonSimplePoints.clear();
-    return isSimple(geometry);
+    this.errors.clear();
+    return isSimple(this.geometry);
   }
 
   private boolean isSimple(final Geometry geometry) {
@@ -174,9 +181,9 @@ public class IsSimpleOp {
   }
 
   /**
-   * Semantics for GeometryCollection is 
+   * Semantics for GeometryCollection is
    * simple if all components are simple.
-   * 
+   *
    * @param geom
    * @return true if the geometry is simple
    */
@@ -194,80 +201,112 @@ public class IsSimpleOp {
   private boolean isSimple(final Lineal lineal) {
     final Segment segment2 = (Segment)lineal.segments().iterator();
     for (final Segment segment : lineal.segments()) {
-      final int partIndex = segment.getPartIndex();
-      final int segmentIndex = segment.getSegmentIndex();
-      segment2.setSegmentId(segment.getSegmentId());
-      boolean nextSegment = true;
-      while (segment2.hasNext()) {
-        segment2.next();
-        final Geometry intersection = segment.getIntersection(segment2);
-        if (intersection instanceof Point) {
-          final Point pointIntersection = (Point)intersection;
-          boolean isIntersection = true;
-
-          final int partIndex2 = segment2.getPartIndex();
-          // Process segments on the same linestring part
-          if (partIndex == partIndex2) {
-            final int segmentIndex2 = segment2.getSegmentIndex();
-            // The end of the current segment can touch the start of the next
-            // segment
-            if (segmentIndex + 1 == segmentIndex2) {
-              if (segment2.equalsVertex(2, 0, pointIntersection)) {
-                isIntersection = false;
-              }
-              // A loop can touch itself at the start/end
-            } else if (segment.isLineClosed()) {
-              if (segment.isLineStart() && segment2.isLineEnd()) {
-                if (segment.equalsVertex(2, 0, pointIntersection)) {
-                  isIntersection = false;
-                }
-              }
-            }
-          } else {
-            if (!segment.isLineClosed() && !segment2.isLineClosed()) {
-              final boolean segment1EndIntersection = isEndIntersection(
-                segment, pointIntersection);
-              final boolean segment2EndIntersection = isEndIntersection(
-                segment2, pointIntersection);
-
-              if (segment1EndIntersection && segment2EndIntersection) {
-                isIntersection = false;
-              }
-            }
-          }
-          if (isIntersection) {
-            nonSimplePoints.add(pointIntersection);
-            if (shortCircuit) {
+      if (segment.getLength() == 0) {
+        this.errors.add(new DuplicateVertexError(segment.getGeometryVertex(0)));
+      } else {
+        final int partIndex = segment.getPartIndex();
+        final int segmentIndex = segment.getSegmentIndex();
+        segment2.setSegmentId(segment.getSegmentId());
+        while (segment2.hasNext()) {
+          segment2.next();
+          if (segment.equals(segment2)) {
+            final SelfOverlapSegmentError error = new SelfOverlapSegmentError(
+              segment);
+            this.errors.add(error);
+            if (this.shortCircuit) {
               return false;
             }
-          }
-        } else if (intersection instanceof LineSegment) {
-          final LineSegment lineIntersection = (LineSegment)intersection;
-          nonSimplePoints.add(lineIntersection.getPoint(0));
-          nonSimplePoints.add(lineIntersection.getPoint(1));
-          if (shortCircuit) {
-            return false;
+          } else {
+            final Geometry intersection = segment.getIntersection(segment2);
+            if (intersection instanceof Point) {
+              final Point pointIntersection = (Point)intersection;
+              boolean isIntersection = true;
+
+              final int partIndex2 = segment2.getPartIndex();
+              // Process segments on the same linestring part
+              if (partIndex == partIndex2) {
+                final int segmentIndex2 = segment2.getSegmentIndex();
+                // The end of the current segment can touch the start of the
+                // next
+                // segment
+                if (segmentIndex + 1 == segmentIndex2) {
+                  if (segment2.equalsVertex(2, 0, pointIntersection)) {
+                    isIntersection = false;
+                  }
+                  // A loop can touch itself at the start/end
+                } else if (segment.isLineClosed()) {
+                  if (segment.isLineStart() && segment2.isLineEnd()) {
+                    if (segment.equalsVertex(2, 0, pointIntersection)) {
+                      isIntersection = false;
+                    }
+                  }
+                }
+              } else {
+                if (!segment.isLineClosed() && !segment2.isLineClosed()) {
+                  final boolean segment1EndIntersection = isEndIntersection(
+                    segment, pointIntersection);
+                  final boolean segment2EndIntersection = isEndIntersection(
+                    segment2, pointIntersection);
+
+                  if (segment1EndIntersection && segment2EndIntersection) {
+                    isIntersection = false;
+                  }
+                }
+              }
+              if (isIntersection) {
+                GeometryValidationError error;
+                if (segment.equalsVertex(2, 0, pointIntersection)) {
+                  final Vertex vertex = segment.getGeometryVertex(0);
+                  error = new SelfIntersectionVertexError(vertex);
+                } else if (segment.equalsVertex(2, 1, pointIntersection)) {
+                  final Vertex vertex = segment.getGeometryVertex(1);
+                  error = new SelfIntersectionVertexError(vertex);
+                } else {
+                  error = new SelfIntersectionPointError(this.geometry,
+                    pointIntersection.clonePoint());
+                }
+                this.errors.add(error);
+                if (this.shortCircuit) {
+                  return false;
+                }
+              }
+            } else if (intersection instanceof LineSegment) {
+              final LineSegment lineIntersection = (LineSegment)intersection;
+              GeometryValidationError error;
+              if (segment.equals(lineIntersection)) {
+                error = new SelfOverlapSegmentError(segment);
+              } else if (segment2.equals(lineIntersection)) {
+                error = new SelfOverlapSegmentError(segment2);
+              } else {
+                error = new SelfOverlapLineSegmentError(this.geometry,
+                  lineIntersection);
+              }
+              this.errors.add(error);
+              if (this.shortCircuit) {
+                return false;
+              }
+            }
           }
         }
-        nextSegment = false;
       }
     }
-    return nonSimplePoints.isEmpty();
+    return this.errors.isEmpty();
   }
 
   private boolean isSimple(final MultiPoint mulitPoint) {
     boolean simple = true;
     final Set<Point> points = new TreeSet<>();
-    for (final Point point : mulitPoint.getPoints()) {
-      final Point coordinates = new PointDouble(point, 2);
-      if (points.contains(coordinates)) {
+    for (final Vertex vertex : mulitPoint.vertices()) {
+      final Point point = new PointDouble(vertex, 2);
+      if (points.contains(point)) {
         simple = false;
-        nonSimplePoints.add(coordinates);
+        final DuplicateVertexError error = new DuplicateVertexError(vertex);
+        this.errors.add(error);
         if (!isErrorReturn()) {
           return false;
         }
       } else {
-        points.add(coordinates);
+        points.add(point);
       }
     }
     return simple;
@@ -277,7 +316,7 @@ public class IsSimpleOp {
    * Computes simplicity for polygonal geometries.
    * Polygonal geometries are simple if and only if
    * all of their component rings are simple.
-   * 
+   *
    * @param geom a Polygonal geometry
    * @return true if the geometry is simple
    */

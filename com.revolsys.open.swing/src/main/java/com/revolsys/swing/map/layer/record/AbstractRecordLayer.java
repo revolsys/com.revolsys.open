@@ -42,6 +42,7 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
+import com.revolsys.beans.EventsEnabledState;
 import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
@@ -75,6 +76,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
+import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.spring.ByteArrayResource;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
@@ -108,6 +110,7 @@ import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordDefinitionTableModel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
+import com.revolsys.swing.map.layer.record.table.model.RecordSaveErrorTableModel;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
@@ -126,7 +129,7 @@ import com.revolsys.util.Label;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayer extends AbstractLayer implements
-  RecordFactory, AddGeometryCompleteAction {
+RecordFactory, AddGeometryCompleteAction {
 
   public static void addVisibleLayers(final List<AbstractRecordLayer> layers,
     final LayerGroup group) {
@@ -181,9 +184,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     menu.addMenuItem(clazz, "ViewRecords");
 
     final EnableCheck hasSelectedRecords = new MenuSourcePropertyEnableCheck(
-      "hasSelectedRecords");
+        "hasSelectedRecords");
     final EnableCheck hasGeometry = new MenuSourcePropertyEnableCheck(
-      "hasGeometry");
+        "hasGeometry");
     menu.addMenuItem("zoom", MenuSourceRunnable.createAction(
       "Zoom to Selected", "magnifier_zoom_selected", new AndEnableCheck(exists,
         hasGeometry, hasSelectedRecords), "zoomToSelected"));
@@ -192,13 +195,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     final EnableCheck readonly = new MenuSourcePropertyEnableCheck("readOnly",
       false);
     final EnableCheck hasChanges = new MenuSourcePropertyEnableCheck(
-      "hasChanges");
+        "hasChanges");
     final EnableCheck canAdd = new MenuSourcePropertyEnableCheck(
-      "canAddRecords");
+        "canAddRecords");
     final EnableCheck canDelete = new MenuSourcePropertyEnableCheck(
-      "canDeleteRecords");
+        "canDeleteRecords");
     final EnableCheck canMergeRecords = new MenuSourcePropertyEnableCheck(
-      "canMergeRecords");
+        "canMergeRecords");
     final EnableCheck canPaste = new MenuSourcePropertyEnableCheck("canPaste");
 
     menu.addCheckboxMenuItem("edit", MenuSourceRunnable.createAction(
@@ -219,19 +222,19 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
     menu.addMenuItem("edit", MenuSourceRunnable.createAction(
       "Merge Selected Records", "shape_group", canMergeRecords,
-      "mergeSelectedRecords"));
+        "mergeSelectedRecords"));
 
     menu.addMenuItem("dnd", MenuSourceRunnable.createAction(
       "Copy Selected Records", "page_copy", hasSelectedRecords,
-      "copySelectedRecords"));
+        "copySelectedRecords"));
 
     menu.addMenuItem("dnd", MenuSourceRunnable.createAction(
       "Paste New Records", "paste_plain", new AndEnableCheck(canAdd, canPaste),
-      "pasteRecords"));
+        "pasteRecords"));
 
     menu.addMenuItem("layer", 0, MenuSourceRunnable.createAction("Layer Style",
       "palette", new AndEnableCheck(exists, hasGeometry), "showProperties",
-      "Style"));
+        "Style"));
 
     // menu.addMenuItem("edit", 0, MenuSourceRunnable.createAction(
     // "Export Records", "disk", new AndEnableCheck(exists, hasSelectedRecords),
@@ -503,9 +506,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   public void cancelChanges() {
     synchronized (this.getEditSync()) {
-      final boolean eventsEnabled = setEventsEnabled(false);
       boolean cancelled = true;
-      try {
+      try (
+          EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
         cancelled &= internalCancelChanges(this.cacheIdNew, getNewRecords());
         cancelled &= internalCancelChanges(this.cacheIdDeleted,
           getDeletedRecords());
@@ -514,15 +517,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
         clearSelectedRecordsIndex();
         cleanCachedRecords();
       } finally {
-        setEventsEnabled(eventsEnabled);
         fireRecordsChanged();
       }
       if (!cancelled) {
         JOptionPane.showMessageDialog(MapPanel.get(this),
           "<html><p>There was an error cancelling changes for one or more records.</p>"
-            + "<p>" + getPath() + "</p>"
-            + "<p>Check the logging panel for details.</html>",
-          "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
+              + "<p>" + getPath() + "</p>"
+              + "<p>Check the logging panel for details.</html>",
+              "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
       }
 
     }
@@ -574,7 +576,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     clone.sync = new Object();
     clone.editSync = new Object();
     clone.userReadOnlyFieldNames = new LinkedHashSet<>(
-      this.userReadOnlyFieldNames);
+        this.userReadOnlyFieldNames);
 
     return clone;
   }
@@ -739,7 +741,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       return new ArrayLayerRecord(this);
     } else {
       throw new IllegalArgumentException("Cannot create records for "
-        + recordDefinition);
+          + recordDefinition);
     }
   }
 
@@ -791,19 +793,22 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
-    if (isCanDeleteRecords()) {
-      synchronized (this.getEditSync()) {
-        unSelectRecords(records);
-        for (final LayerRecord record : records) {
-          doDeleteRecord(record);
+    try (
+        EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+      if (isCanDeleteRecords()) {
+        synchronized (this.getEditSync()) {
+          unSelectRecords(records);
+          for (final LayerRecord record : records) {
+            doDeleteRecord(record);
+          }
         }
-      }
-    } else {
-      synchronized (this.getEditSync()) {
-        for (final LayerRecord record : records) {
-          if (removeRecordFromCache(this.cacheIdNew, record)) {
-            removeRecordFromCache(record);
-            record.setState(RecordState.Deleted);
+      } else {
+        synchronized (this.getEditSync()) {
+          for (final LayerRecord record : records) {
+            if (removeRecordFromCache(this.cacheIdNew, record)) {
+              removeRecordFromCache(record);
+              record.setState(RecordState.Deleted);
+            }
           }
         }
       }
@@ -873,12 +878,20 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   @Override
   protected boolean doSaveChanges() {
+    throw new UnsupportedOperationException();
+  }
+
+  protected boolean doSaveChanges(final LayerRecord record) {
+    return false;
+  }
+
+  protected boolean doSaveChanges(final RecordSaveErrorTableModel errors) {
     if (isExists()) {
       boolean saved = true;
       try {
-        saved &= doSaveChanges(getDeletedRecords());
-        saved &= doSaveChanges(getModifiedRecords());
-        saved &= doSaveChanges(getNewRecords());
+        saved &= doSaveChanges(errors, getDeletedRecords());
+        saved &= doSaveChanges(errors, getModifiedRecords());
+        saved &= doSaveChanges(errors, getNewRecords());
       } finally {
         fireRecordsChanged();
       }
@@ -888,18 +901,20 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     }
   }
 
-  private boolean doSaveChanges(final Collection<LayerRecord> records) {
+  private boolean doSaveChanges(final RecordSaveErrorTableModel errors,
+    final Collection<LayerRecord> records) {
     boolean saved = true;
-    for (final LayerRecord record : new ArrayList<LayerRecord>(records)) {
-      if (!internalSaveChanges(record)) {
-        saved = false;
+    for (final LayerRecord record : new ArrayList<>(records)) {
+      try {
+        if (!internalSaveChanges(errors, record)) {
+          errors.addRecord(record, "Unknown error");
+          saved = false;
+        }
+      } catch (final Throwable t) {
+        errors.addRecord(record, t);
       }
     }
     return saved;
-  }
-
-  protected boolean doSaveChanges(final LayerRecord record) {
-    return false;
   }
 
   public void exportRecords() {
@@ -907,8 +922,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     if (!records.isEmpty()) {
       try {
         try (
-          GpxWriter writer = new GpxWriter(new File("/Users/paustin/Desktop/"
-            + getName() + ".gpx"))) {
+            GpxWriter writer = new GpxWriter(new File("/Users/paustin/Desktop/"
+                + getName() + ".gpx"))) {
           for (final LayerRecord record : records) {
             writer.write(record);
           }
@@ -1346,9 +1361,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
                       JOptionPane.showMessageDialog(
                         parentComponent,
                         "Clipboard should contain a record with a "
-                          + geometryDataType + " not a "
-                          + sourceGeometry.getGeometryType() + ".",
-                        "Paste Geometry", JOptionPane.ERROR_MESSAGE);
+                            + geometryDataType + " not a "
+                            + sourceGeometry.getGeometryType() + ".",
+                            "Paste Geometry", JOptionPane.ERROR_MESSAGE);
                     }
                     return null;
                   }
@@ -1532,8 +1547,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       removeFromIndex(record);
       try {
         removeRecordFromCache(cacheId, record);
-        internalCancelChanges(record);
-        addToIndex(record);
+        if (cacheId == this.cacheIdNew) {
+          removeRecordFromCache(record);
+          record.setState(RecordState.Deleted);
+        } else {
+          internalCancelChanges(record);
+          addToIndex(record);
+        }
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to cancel changes.\n" + record, e);
         cancelled = false;
@@ -1570,34 +1590,29 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     return null;
   }
 
-  protected boolean internalSaveChanges(final LayerRecord record) {
-    try {
-      final RecordState originalState = record.getState();
-      final boolean saved = doSaveChanges(record);
-      if (saved) {
-        postSaveChanges(originalState, record);
-      }
-      return saved;
-    } catch (final Throwable e) {
-      ExceptionUtil.log(getClass(), "Unable to save changes for record:\n"
-        + record, e);
-      return false;
+  protected boolean internalSaveChanges(final RecordSaveErrorTableModel errors,
+    final LayerRecord record) {
+    final RecordState originalState = record.getState();
+    final boolean saved = doSaveChanges(record);
+    if (saved) {
+      postSaveChanges(originalState, record);
     }
+    return saved;
   }
 
   public boolean isCanAddRecords() {
     return !super.isReadOnly() && isEditable() && this.canAddRecords
-      && hasPermission("INSERT");
+        && hasPermission("INSERT");
   }
 
   public boolean isCanDeleteRecords() {
     return !super.isReadOnly() && isEditable() && this.canDeleteRecords
-      && hasPermission("DELETE");
+        && hasPermission("DELETE");
   }
 
   public boolean isCanEditRecords() {
     return !super.isReadOnly() && isEditable() && this.canEditRecords
-      && hasPermission("UPDATE");
+        && hasPermission("UPDATE");
   }
 
   public boolean isCanMergeRecords() {
@@ -1749,7 +1764,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   protected boolean isPostSaveRemoveCacheId(final Label cacheId) {
     if (cacheId == this.cacheIdDeleted || cacheId == this.cacheIdNew
-      || cacheId == this.cacheIdModified) {
+        || cacheId == this.cacheIdModified) {
       return true;
     } else {
       return false;
@@ -1821,9 +1836,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public List<LayerRecord> pasteRecords() {
-    final List<LayerRecord> newRecords = new ArrayList<LayerRecord>();
-    final boolean eventsEnabled = setEventsEnabled(false);
-    try {
+    final List<LayerRecord> newRecords = new ArrayList<>();
+    try (
+        EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
       RecordReader reader = ClipboardUtil.getContents(RecordReaderTransferable.DATA_OBJECT_READER_FLAVOR);
       if (reader == null) {
         final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
@@ -1837,7 +1852,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
           }
         }
       }
-      final List<Record> regectedRecords = new ArrayList<Record>();
+      final List<Record> rejectedRecords = new ArrayList<Record>();
       if (reader != null) {
         final RecordDefinition recordDefinition = getRecordDefinition();
         final FieldDefinition geometryField = recordDefinition.getGeometryField();
@@ -1851,7 +1866,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
         final Collection<String> ignorePasteFields = getIgnorePasteFields();
         for (final Record sourceRecord : reader) {
           final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-            sourceRecord);
+              sourceRecord);
 
           Geometry sourceGeometry = sourceRecord.getGeometryValue();
           for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator.hasNext();) {
@@ -1882,20 +1897,23 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
           }
           LayerRecord newRecord = null;
           if (newValues.isEmpty()) {
-            regectedRecords.add(sourceRecord);
+            rejectedRecords.add(sourceRecord);
           } else {
             newRecord = createRecord(newValues);
           }
           if (newRecord == null) {
-            regectedRecords.add(sourceRecord);
+            rejectedRecords.add(sourceRecord);
           } else {
             recordPasted(newRecord);
             newRecords.add(newRecord);
           }
         }
       }
-    } finally {
-      setEventsEnabled(eventsEnabled);
+      saveChanges(newRecords);
+      if (!newRecords.isEmpty()) {
+        zoomToRecords(newRecords);
+        showRecordsTable(RecordLayerTableModel.MODE_EDITS);
+      }
     }
     firePropertyChange("recordsInserted", null, newRecords);
     addSelectedRecords(newRecords);
@@ -2116,7 +2134,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     synchronized (getSync()) {
       if (isLayerRecord(record)) {
         for (final Label cacheId : new ArrayList<>(
-          this.cacheIdToRecordMap.keySet())) {
+            this.cacheIdToRecordMap.keySet())) {
           removed |= removeRecordFromCache(cacheId, record);
         }
       }
@@ -2168,52 +2186,77 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   @Override
   public boolean saveChanges() {
     synchronized (this.getEditSync()) {
-      boolean saved = true;
+      boolean allSaved = true;
       if (isHasChanges()) {
-        final boolean eventsEnabled = setEventsEnabled(false);
-        try {
-          saved &= doSaveChanges();
-        } catch (final Throwable e) {
-          ExceptionUtil.log(getClass(), "Unable to save changes for layer: "
-            + this, e);
-          saved = false;
+        final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(
+          this);
+        try (
+            EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+          doSaveChanges(errors);
         } finally {
-          setEventsEnabled(eventsEnabled);
           cleanCachedRecords();
           fireRecordsChanged();
+          allSaved = errors.showErrorDialog();
         }
       }
-      if (!saved) {
-        JOptionPane.showMessageDialog(MapPanel.get(this),
-          "<html><p>There was an error saving changes for one or more records.</p>"
-            + "<p>" + getPath() + "</p>"
-            + "<p>Check the logging panel for details.</html>",
-          "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
-      }
-      return saved;
+      return allSaved;
     }
+  }
+
+  public final boolean saveChanges(
+    final Collection<? extends LayerRecord> records) {
+    synchronized (this.getEditSync()) {
+      boolean allSaved;
+      final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(
+        this);
+      try (
+          EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+        for (final LayerRecord record : records) {
+          try {
+            if (isLayerRecord(record)) {
+              if (!internalSaveChanges(errors, record)) {
+                errors.addRecord(record, "Unknown error");
+              }
+            }
+          } catch (final Throwable t) {
+            errors.addRecord(record, t);
+          }
+        }
+        cleanCachedRecords();
+        fireRecordsChanged();
+      } finally {
+        allSaved = errors.showErrorDialog();
+      }
+      return allSaved;
+    }
+  }
+
+  public final boolean saveChanges(final LayerRecord... records) {
+    final List<LayerRecord> list = Arrays.asList(records);
+    return saveChanges(list);
   }
 
   public final boolean saveChanges(final LayerRecord record) {
     synchronized (this.getEditSync()) {
-      final boolean eventsEnabled = setEventsEnabled(false);
-      try {
-        final boolean saved = internalSaveChanges(record);
+      boolean allSaved;
+      final RecordSaveErrorTableModel errors = new RecordSaveErrorTableModel(
+        this);
+      try (
+          EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+        try {
+          final boolean saved = internalSaveChanges(errors, record);
+          if (!saved) {
+            errors.addRecord(record, "Unknown error");
+          }
+        } catch (final Throwable t) {
+          errors.addRecord(record, t);
+        }
         cleanCachedRecords();
-        if (saved) {
-          fireRecordUpdated(record);
-        }
-        if (!saved) {
-          JOptionPane.showMessageDialog(MapPanel.get(this),
-            "<html><p>There was an error saving changes to the record.</p>"
-              + "<p>" + getPath() + "</p>"
-              + "<p>Check the logging panel for details.</html>",
-            "Error Saving Changes", JOptionPane.ERROR_MESSAGE);
-        }
-        return saved;
+        fireRecordUpdated(record);
       } finally {
-        setEventsEnabled(eventsEnabled);
+        allSaved = errors.showErrorDialog();
       }
+      return allSaved;
     }
   }
 
@@ -2309,7 +2352,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
                   found = true;
                   LoggerFactory.getLogger(getClass()).error(
                     "Duplicate field set name " + name + "=" + name2
-                      + " for layer " + getPath());
+                    + " for layer " + getPath());
                 }
               }
               if (!found) {
@@ -2508,7 +2551,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public void setUserReadOnlyFieldNames(
     final Collection<String> userReadOnlyFieldNames) {
     this.userReadOnlyFieldNames = new LinkedHashSet<String>(
-      userReadOnlyFieldNames);
+        userReadOnlyFieldNames);
   }
 
   public void setWhere(final String where) {
@@ -2537,7 +2580,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       final Window window = SwingUtil.getActiveWindow();
       JOptionPane.showMessageDialog(window,
         "Adding records is not enabled for the " + getPath()
-          + " layer. If possible make the layer editable", "Cannot Add Record",
+        + " layer. If possible make the layer editable", "Cannot Add Record",
         JOptionPane.ERROR_MESSAGE);
       return null;
     }
@@ -2692,10 +2735,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     property.setSplitAttributes(line, point, record1);
     property.setSplitAttributes(line, point, record2);
     deleteRecord(record);
-    saveChanges(record);
 
-    saveChanges(record1);
-    saveChanges(record2);
+    saveChanges(record, record1, record2);
 
     addSelectedRecords(record1, record2);
     return Arrays.asList(record1, record2);
@@ -2789,38 +2830,43 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   }
 
-  public void zoomTo(final Geometry geometry) {
-    if (geometry != null) {
+  public void zoomToBoundingBox(BoundingBox boundingBox) {
+    if (!BoundingBoxUtil.isEmpty(boundingBox)) {
       final Project project = getProject();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
-      final BoundingBox boundingBox = geometry.getBoundingBox()
-        .convert(geometryFactory)
-        .expandPercent(0.1)
-        .clipToCoordinateSystem();
-
+      boundingBox = boundingBox.convert(geometryFactory);
+      boundingBox = boundingBox.expandPercent(0.1);
       project.setViewBoundingBox(boundingBox);
     }
   }
 
-  public void zoomToHighlighted() {
-    final Project project = getProject();
-    final GeometryFactory geometryFactory = project.getGeometryFactory();
-    final BoundingBox boundingBox = getHighlightedBoundingBox().convert(
-      geometryFactory).expandPercent(0.1);
-    project.setViewBoundingBox(boundingBox);
+  public void zoomToGeometry(final Geometry geometry) {
+    if (geometry != null) {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      zoomToBoundingBox(boundingBox);
+    }
   }
 
-  public void zoomToObject(final Record record) {
-    final Geometry geometry = record.getGeometryValue();
+  public void zoomToHighlighted() {
+    final BoundingBox boundingBox = getHighlightedBoundingBox();
+    zoomToBoundingBox(boundingBox);
+  }
 
-    zoomTo(geometry);
+  public void zoomToRecord(final Record record) {
+    final Geometry geometry = record.getGeometryValue();
+    zoomToGeometry(geometry);
+  }
+
+  public void zoomToRecords(final List<? extends LayerRecord> records) {
+    BoundingBox boundingBox = new BoundingBoxDoubleGf();
+    for (final Record record : records) {
+      boundingBox = boundingBox.expandToInclude(record);
+    }
+    zoomToBoundingBox(boundingBox);
   }
 
   public void zoomToSelected() {
-    final Project project = getProject();
-    final GeometryFactory geometryFactory = project.getGeometryFactory();
-    final BoundingBox boundingBox = getSelectedBoundingBox().convert(
-      geometryFactory).expandPercent(0.1);
-    project.setViewBoundingBox(boundingBox);
+    final BoundingBox selectedBoundingBox = getSelectedBoundingBox();
+    zoomToBoundingBox(selectedBoundingBox);
   }
 }

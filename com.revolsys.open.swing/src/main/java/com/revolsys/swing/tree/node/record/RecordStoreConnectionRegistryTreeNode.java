@@ -9,9 +9,11 @@ import com.revolsys.io.datastore.RecordStoreConnection;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.swing.map.form.RecordStoreConnectionDialog;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.tree.TreeNodeRunnable;
 import com.revolsys.swing.tree.node.BaseTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.file.FileTreeNode;
+import com.revolsys.util.OS;
 
 public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
   implements PropertyChangeListener {
@@ -20,9 +22,10 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
       "Record Store Connections");
 
   static {
-    // MENU.addMenuItem("default",
-    // TreeNodeRunnable.createAction("Add Connection",
-    // "map_add", "addConnection"));
+    if (OS.isMac()) {
+      MENU.addMenuItem("default", TreeNodeRunnable.createAction(
+        "Add Connection", "database_add", "addConnection"));
+    }
   }
 
   public RecordStoreConnectionRegistryTreeNode(

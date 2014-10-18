@@ -10,6 +10,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
 public class SearchField extends JXSearchField implements FocusListener, Field {
@@ -137,6 +138,15 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   @Override
   public void setUndoManager(final UndoManager undoManager) {
     this.undoManager.setParent(undoManager);
+  }
+
+  @Override
+  public void setUseNativeSearchFieldIfPossible(
+    boolean useNativeSearchFieldIfPossible) {
+    if (OS.isMac()) {
+      useNativeSearchFieldIfPossible = false;
+    }
+    super.setUseNativeSearchFieldIfPossible(useNativeSearchFieldIfPossible);
   }
 
   @Override

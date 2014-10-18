@@ -29,18 +29,26 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
 
+/**
+jdbc:oracle:thin:@//<host>:<port>/<ServiceName>
+jdbc:oracle:thin:@<host>:<port>:<SID>
+jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=<host>)(PORT=<port>))(CONNECT_DATA=(SERVICE_NAME=<service>)))
+jdbc:oracle:oci:@<tnsname>
+jdbc:oracle:oci:@<host>:<port>:<sid>
+jdbc:oracle:oci:@<host>:<port>/<service>
+ */
 public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   public static List<String> getTnsConnectionNames() {
     File tnsFile = new File(System.getProperty("oracle.net.tns_admin"),
-        "tnsnames.ora");
+      "tnsnames.ora");
     if (!tnsFile.exists()) {
       tnsFile = new File(System.getenv("TNS_ADMIN"), "tnsnames.ora");
       if (!tnsFile.exists()) {
         tnsFile = new File(System.getenv("ORACLE_HOME") + "/network/admin",
-            "tnsnames.ora");
+          "tnsnames.ora");
         if (!tnsFile.exists()) {
           tnsFile = new File(System.getenv("ORACLE_HOME") + "/NETWORK/ADMIN",
-              "tnsnames.ora");
+            "tnsnames.ora");
 
         }
       }
@@ -144,7 +152,7 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
       return dataSource;
     } catch (final Throwable e) {
       throw new IllegalArgumentException("Unable to create data source for "
-          + config, e);
+        + config, e);
     }
   }
 

@@ -35,6 +35,7 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.beans.EventsEnabler;
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.converter.string.BooleanStringConverter;
@@ -71,7 +72,8 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
-implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
+  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy,
+  EventsEnabler {
   public static final ImageIcon ICON_LAYER = Icons.getIcon("map");
 
   private static final AtomicLong ID_GEN = new AtomicLong();
@@ -242,18 +244,18 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
       } else {
         final JLabel extentLabel = new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
-              + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-              + StringConverterRegistry.toString(boundingBox.getMaximum(1))
-              + "</td><td>&nbsp;</td></tr><tr>"
-              + "<td><b>Left</b>: "
-              + StringConverterRegistry.toString(boundingBox.getMinimum(0))
-              + "</td><td>&nbsp;</td><td>&nbsp;</td>"
-              + "<td><b>Right</b>: "
-              + StringConverterRegistry.toString(boundingBox.getMaximum(0))
-              + "</td></tr>"
-              + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-              + StringConverterRegistry.toString(boundingBox.getMinimum(1))
-              + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
+            + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+            + StringConverterRegistry.toString(boundingBox.getMaximum(1))
+            + "</td><td>&nbsp;</td></tr><tr>"
+            + "<td><b>Left</b>: "
+            + StringConverterRegistry.toString(boundingBox.getMinimum(0))
+            + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+            + "<td><b>Right</b>: "
+            + StringConverterRegistry.toString(boundingBox.getMaximum(0))
+            + "</td></tr>"
+            + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+            + StringConverterRegistry.toString(boundingBox.getMinimum(1))
+            + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
         extentLabel.setFont(SwingUtil.FONT);
         extentPanel.add(extentLabel);
 
@@ -270,26 +272,26 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
         final int axisCount = geometryFactory.getAxisCount();
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "ID",
           coordinateSystem.getId(), 10);
-        SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "axisCount",
-          axisCount, 10);
+        SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel,
+          "axisCount", axisCount, 10);
 
         final double scaleXY = geometryFactory.getScaleXY();
         if (scaleXY > 0) {
-          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy",
-            scaleXY, 10);
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel,
+            "scaleXy", scaleXY, 10);
         } else {
-          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy",
-            "Floating", 10);
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel,
+            "scaleXy", "Floating", 10);
         }
 
         if (axisCount > 2) {
           final double scaleZ = geometryFactory.getScaleZ();
           if (scaleZ > 0) {
-            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleZ",
-              scaleZ, 10);
+            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel,
+              "scaleZ", scaleZ, 10);
           } else {
-            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleZ",
-              "Floating", 10);
+            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel,
+              "scaleZ", "Floating", 10);
           }
         }
 
@@ -584,7 +586,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
         setExists(exists);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to initialize layer: "
-            + getPath(), e);
+          + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -607,6 +609,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     return isVisible(scale) && isEditable();
   }
 
+  @Override
   public boolean isEventsEnabled() {
     if (this.eventsEnabled.get() != Boolean.FALSE) {
       final LayerGroup layerGroup = getLayerGroup();
@@ -658,7 +661,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   @Override
   public boolean isSelectable() {
     return isExists() && isVisible()
-        && (isSelectSupported() && this.selectable || isEditable());
+      && (isSelectSupported() && this.selectable || isEditable());
   }
 
   @Override
@@ -681,7 +684,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
   public boolean isVisible(final double scale) {
     final LayerGroup parent = getParent();
     if (isExists() && isVisible()
-        && (parent == null || parent.isVisible(scale))) {
+      && (parent == null || parent.isVisible(scale))) {
       final long longScale = (long)scale;
       final long minimumScale = getMinimumScale();
       final long maximumScale = getMaximumScale();
@@ -769,6 +772,7 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     firePropertyChange("editable", old, isEditable());
   }
 
+  @Override
   public boolean setEventsEnabled(final boolean eventsEnabled) {
     final boolean oldValue = this.eventsEnabled.get() != Boolean.FALSE;
     if (eventsEnabled) {
@@ -1079,8 +1083,8 @@ implements Layer, PropertyChangeListener, PropertyChangeSupportProxy {
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
     final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-        .expandPercent(0.1)
-        .clipToCoordinateSystem();
+      .expandPercent(0.1)
+      .clipToCoordinateSystem();
     project.setViewBoundingBox(boundingBox);
   }
 }

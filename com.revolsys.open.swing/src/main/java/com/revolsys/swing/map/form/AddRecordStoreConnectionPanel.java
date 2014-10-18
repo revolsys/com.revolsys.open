@@ -1,4 +1,4 @@
-package com.revolsys.swing.tree.node.record;
+package com.revolsys.swing.map.form;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

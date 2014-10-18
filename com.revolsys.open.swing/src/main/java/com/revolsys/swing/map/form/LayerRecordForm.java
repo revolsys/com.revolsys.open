@@ -232,8 +232,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     closeWindow();
   }
 
-  public void actionZoomToObject() {
-    getLayer().zoomToObject(getRecord());
+  public void actionZoomToRecord() {
+    getLayer().zoomToRecord(getRecord());
   }
 
   protected ObjectLabelField addCodeTableLabelField(final String fieldName) {
@@ -528,8 +528,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     // Zoom
 
     if (hasGeometry) {
-      this.toolBar.addButtonTitleIcon("zoom", "Zoom to Object", "magnifier",
-        this, "actionZoomToObject");
+      this.toolBar.addButtonTitleIcon("zoom", "Zoom to Record", "magnifier",
+        this, "actionZoomToRecord");
     }
 
     // Geometry manipulation
@@ -664,6 +664,19 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
       window.removeWindowListener(this);
     }
     removeAll();
+  }
+
+  protected boolean doValidateField(final String fieldName) {
+    return validateFieldInternal(fieldName);
+  }
+
+  protected boolean doValidateFields(final Collection<String> fieldNames) {
+    boolean valid = true;
+    for (final String fieldName : fieldNames) {
+      setFieldValid(fieldName);
+      valid &= validateFieldInternal(fieldName);
+    }
+    return valid;
   }
 
   @Override
@@ -1076,7 +1089,12 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
           final String fieldNamesSetName = (String)event.getNewValue();
           this.allAttributes.setFieldNames(layer.getFieldNamesSet(fieldNamesSetName));
         } else if (source == layer) {
-          if (propertyName.equals("recordsChanged")) {
+          if ("recordDeleted".equals(propertyName)) {
+            if (record.isDeleted() || isSame(event.getNewValue())) {
+              final Window window = SwingUtilities.getWindowAncestor(this);
+              SwingUtil.setVisible(window, false);
+            }
+          } else if ("recordsChanged".equals(propertyName)) {
             if (record.isDeleted()) {
               final Window window = SwingUtilities.getWindowAncestor(this);
               SwingUtil.setVisible(window, false);
@@ -1118,11 +1136,13 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
               setFieldValue(propertyName, value, isFieldValidationEnabled());
             }
             final boolean modifiedOrDeleted = isModifiedOrDeleted();
-            this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
-              !modifiedOrDeleted, modifiedOrDeleted);
-            final boolean deletable = isDeletable();
-            this.propertyChangeSupport.firePropertyChange("deletable",
-              !deletable, deletable);
+            if (this.propertyChangeSupport != null) {
+              this.propertyChangeSupport.firePropertyChange(
+                "modifiedOrDeleted", !modifiedOrDeleted, modifiedOrDeleted);
+              final boolean deletable = isDeletable();
+              this.propertyChangeSupport.firePropertyChange("deletable",
+                !deletable, deletable);
+            }
             repaint();
           }
         }
@@ -1180,8 +1200,9 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (message == null) {
       message = "Invalid value";
     }
-    if (!EqualsRegistry.equal(message, this.fieldInValidMessage.equals(message))) {
-      if (SwingUtilities.isEventDispatchThread()) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      final String oldValue = this.fieldInValidMessage.get(fieldName);
+      if (!EqualsRegistry.equal(message, oldValue)) {
         this.fieldInValidMessage.put(fieldName, message);
         final Field field = getField(fieldName);
         field.setFieldInvalid(message, WebColors.Red, WebColors.Pink);
@@ -1191,9 +1212,9 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
         CollectionUtil.addToSet(this.tabInvalidFieldMap, tabIndex, fieldName);
         updateTabValid(tabIndex);
         updateInvalidFields();
-      } else {
-        Invoke.later(this, "setFieldInvalid", fieldName, message);
       }
+    } else {
+      Invoke.later(this, "setFieldInvalid", fieldName, message);
     }
   }
 
@@ -1207,23 +1228,23 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public boolean setFieldValid(final String fieldName) {
     final boolean valid = isFieldValid(fieldName);
-    if (!valid) {
-      if (SwingUtilities.isEventDispatchThread()) {
-        final Field field = getField(fieldName);
-        field.setFieldValid();
-        if (this.record.isModified(fieldName)) {
-          final Object originalValue = this.record.getOriginalValue(fieldName);
-          String originalString;
-          if (originalValue == null) {
-            originalString = "-";
-          } else {
-            originalString = StringConverterRegistry.toString(originalValue);
-          }
-          field.setFieldToolTip(originalString);
-          field.setFieldBackgroundColor(new Color(0, 255, 0, 31));
+    if (SwingUtilities.isEventDispatchThread()) {
+      final Field field = getField(fieldName);
+      field.setFieldValid();
+      if (this.record.isModified(fieldName)) {
+        final Object originalValue = this.record.getOriginalValue(fieldName);
+        String originalString;
+        if (originalValue == null) {
+          originalString = "-";
         } else {
-          field.setFieldToolTip("");
+          originalString = StringConverterRegistry.toString(originalValue);
         }
+        field.setFieldToolTip(originalString);
+        field.setFieldBackgroundColor(new Color(0, 255, 0, 31));
+      } else {
+        field.setFieldToolTip("");
+      }
+      if (!valid) {
         this.invalidFieldNames.remove(fieldName);
         this.fieldInValidMessage.remove(fieldName);
         final int tabIndex = getTabIndex(fieldName);
@@ -1232,11 +1253,12 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
         updateTabValid(tabIndex);
         updateInvalidFields();
         return true;
-      } else {
-        Invoke.later(this, "setFieldValid", fieldName);
-        return false;
       }
+    } else {
+      Invoke.later(this, "setFieldValid", fieldName);
+      return false;
     }
+
     return false;
   }
 
@@ -1458,7 +1480,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
         fieldName);
       return false;
     } else {
-      return validateFieldInternal(fieldName);
+      return doValidateField(fieldName);
     }
   }
 
@@ -1511,14 +1533,11 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   protected boolean validateFields(final Collection<String> fieldNames) {
-    boolean valid = true;
     if (isFieldValidationEnabled()) {
-      for (final String fieldName : fieldNames) {
-        setFieldValid(fieldName);
-        valid &= validateFieldInternal(fieldName);
-      }
+      return doValidateFields(fieldNames);
+    } else {
+      return true;
     }
-    return valid;
   }
 
   @Override

@@ -10,7 +10,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 
 public abstract class AbstractTableModel extends
-javax.swing.table.AbstractTableModel implements PropertyChangeSupportProxy {
+  javax.swing.table.AbstractTableModel implements PropertyChangeSupportProxy {
 
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);
@@ -37,6 +37,10 @@ javax.swing.table.AbstractTableModel implements PropertyChangeSupportProxy {
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
     return this.propertyChangeSupport;
+  }
+
+  public boolean isEmpty() {
+    return getRowCount() == 0;
   }
 
   public void setMenu(final MenuFactory menu) {

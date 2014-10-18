@@ -346,38 +346,43 @@ implements SortableTableModel, CellEditorListener {
   }
 
   @Override
-  public String toCopyValue(final int rowIndex, final int attributeIndex,
+  public String toCopyValue(final int rowIndex, int attributeIndex,
     final Object objectValue) {
-    String text;
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final String idFieldName = recordDefinition.getIdFieldName();
-    final String name = getFieldName(attributeIndex);
-    if (objectValue == null) {
-      return null;
+    if (attributeIndex < this.fieldsOffset) {
+      return StringConverterRegistry.toString(objectValue);
     } else {
-      if (objectValue instanceof Geometry) {
-        final Geometry geometry = (Geometry)objectValue;
-        return geometry.toString();
-      }
-      CodeTable codeTable = null;
-      if (!name.equals(idFieldName)) {
-        codeTable = recordDefinition.getCodeTableByColumn(name);
-      }
-      if (codeTable == null) {
-        text = StringConverterRegistry.toString(objectValue);
+      attributeIndex -= this.fieldsOffset;
+      String text;
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final String idFieldName = recordDefinition.getIdFieldName();
+      final String name = getFieldName(attributeIndex);
+      if (objectValue == null) {
+        return null;
       } else {
-        final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
-        if (values == null || values.isEmpty()) {
-          return null;
+        if (objectValue instanceof Geometry) {
+          final Geometry geometry = (Geometry)objectValue;
+          return geometry.toString();
+        }
+        CodeTable codeTable = null;
+        if (!name.equals(idFieldName)) {
+          codeTable = recordDefinition.getCodeTableByColumn(name);
+        }
+        if (codeTable == null) {
+          text = StringConverterRegistry.toString(objectValue);
         } else {
-          text = CollectionUtil.toString(values);
+          final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
+          if (values == null || values.isEmpty()) {
+            return null;
+          } else {
+            text = CollectionUtil.toString(values);
+          }
+        }
+        if (text.length() == 0) {
+          return null;
         }
       }
-      if (text.length() == 0) {
-        return null;
-      }
+      return text;
     }
-    return text;
   }
 
   @Override
