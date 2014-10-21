@@ -40,11 +40,17 @@ public class ObjectLabelField extends TextField {
     } else {
       final List<Object> values = this.codeTable.getValues(SingleIdentifier.create(fieldValue));
       if (values == null || values.isEmpty()) {
-        return "-";
+        return StringConverterRegistry.toString(fieldValue);
       } else {
         return CollectionUtil.toString(values);
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T getFieldValue() {
+    return (T)getFieldValueInternal();
   }
 
   @Override

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -26,7 +25,7 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class NumberTextField extends JXTextField implements Field,
-DocumentListener, FocusListener {
+  DocumentListener, FocusListener {
 
   public static Number createMaximumValue(final DataType dataType,
     final int length, final int scale) {
@@ -176,7 +175,7 @@ DocumentListener, FocusListener {
     this.scale = scale;
     setMinimumValue(minimumValue);
     setMaximumValue(maximumValue);
-    setColumns(getLength(dataType, length, scale, this.minimumValue));
+    setColumns(getLength(dataType, length, scale, this.minimumValue) + 1);
     setHorizontalAlignment(RIGHT);
     getDocument().addDocumentListener(this);
     addFocusListener(new WeakFocusListener(this));
@@ -312,31 +311,28 @@ DocumentListener, FocusListener {
     if (SwingUtilities.isEventDispatchThread()) {
       final Object newValue = getTypedValue(value);
       final Object oldValue = getFieldValue();
-      if (!EqualsRegistry.equal(oldValue, newValue)) {
-        String newText;
-        if (newValue == null) {
-          newText = "";
-        } else if (newValue instanceof Number) {
-          newText = MathUtil.toString((Number)newValue);
-          if ("NAN".equalsIgnoreCase(newText)) {
-            newText = "NaN";
-          } else if ("Infinity".equalsIgnoreCase(newText)) {
-            newText = "Infinity";
-          } else if ("-Infinity".equalsIgnoreCase(newText)) {
-            newText = "-Infinity";
-          } else {
-            BigDecimal decimal = new BigDecimal(newText);
-            if (decimal.scale() > this.scale) {
-              decimal = decimal.setScale(this.scale, RoundingMode.HALF_UP);
-            }
-            newText = decimal.toPlainString();
-          }
+      String newText;
+      if (newValue == null) {
+        newText = "";
+      } else if (newValue instanceof Number) {
+        newText = MathUtil.toString((Number)newValue);
+        if ("NAN".equalsIgnoreCase(newText)) {
+          newText = "NaN";
+        } else if ("Infinity".equalsIgnoreCase(newText)) {
+          newText = "Infinity";
+        } else if ("-Infinity".equalsIgnoreCase(newText)) {
+          newText = "-Infinity";
         } else {
-          newText = StringConverterRegistry.toString(newValue);
+          final BigDecimal decimal = new BigDecimal(newText);
+          newText = decimal.toPlainString();
         }
-        if (!EqualsRegistry.equal(newText, getText())) {
-          setText(newText);
-        }
+      } else {
+        newText = StringConverterRegistry.toString(newValue);
+      }
+      if (!EqualsRegistry.equal(newText, getText())) {
+        setText(newText);
+      }
+      if (!EqualsRegistry.equal(oldValue, newValue)) {
         validateField();
         this.support.setValue(newValue);
       }
@@ -349,7 +345,7 @@ DocumentListener, FocusListener {
     if (maximumValue == null) {
       this.maximumValue = null;
     } else {
-      this.maximumValue = new BigDecimal(maximumValue.toString());
+      this.maximumValue = new BigDecimal(MathUtil.toString(maximumValue));
     }
   }
 
@@ -357,7 +353,7 @@ DocumentListener, FocusListener {
     if (minimumValue == null) {
       this.minimumValue = null;
     } else {
-      this.minimumValue = new BigDecimal(minimumValue.toString());
+      this.minimumValue = new BigDecimal(MathUtil.toString(minimumValue));
     }
   }
 
@@ -394,21 +390,21 @@ DocumentListener, FocusListener {
         } else if (this.dataType.equals(DataTypes.FLOAT)) {
         } else {
           message = "'" + text + "' is not a valid "
-              + this.dataType.getValidationName() + ".";
+            + this.dataType.getValidationName() + ".";
         }
       } else if ("Infinity".equalsIgnoreCase(text)) {
         if (this.dataType.equals(DataTypes.DOUBLE)) {
         } else if (this.dataType.equals(DataTypes.FLOAT)) {
         } else {
           message = "'" + text + "' is not a valid "
-              + this.dataType.getValidationName() + ".";
+            + this.dataType.getValidationName() + ".";
         }
       } else if ("-Infinity".equalsIgnoreCase(text)) {
         if (this.dataType.equals(DataTypes.DOUBLE)) {
         } else if (this.dataType.equals(DataTypes.FLOAT)) {
         } else {
           message = "'" + text + "' is not a valid "
-              + this.dataType.getValidationName() + ".";
+            + this.dataType.getValidationName() + ".";
         }
       } else {
         try {
@@ -419,11 +415,13 @@ DocumentListener, FocusListener {
           if (number.scale() > this.scale) {
             message = "Number of decimal places must be < " + this.scale;
           } else if (this.minimumValue != null
-              && this.minimumValue.compareTo(number) > 0) {
-            message = "Value must be >= " + this.minimumValue;
+            && this.minimumValue.compareTo(number) > 0) {
+            message = MathUtil.toString(number) + " < "
+                + MathUtil.toString(this.minimumValue) + " (minimum)";
           } else if (this.maximumValue != null
-              && this.maximumValue.compareTo(number) < 0) {
-            message = "Value must be <= " + this.maximumValue;
+            && this.maximumValue.compareTo(number) < 0) {
+            message = MathUtil.toString(number) + " > "
+                + MathUtil.toString(this.maximumValue) + " (maximum)";
           } else {
             // number = number.setScale(scale);
             // final String newText = number.toPlainString();
@@ -434,7 +432,7 @@ DocumentListener, FocusListener {
           }
         } catch (final Throwable t) {
           message = "'" + text + "' is not a valid "
-              + this.dataType.getValidationName() + ".";
+            + this.dataType.getValidationName() + ".";
         }
       }
     }

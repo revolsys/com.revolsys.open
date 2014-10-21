@@ -17,7 +17,7 @@ import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.util.Property;
 
 public class RecordLayerAttributesTableModel extends
-AbstractSingleRecordTableModel implements PropertyChangeListener {
+  AbstractSingleRecordTableModel implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -84,8 +84,8 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
     if (this.record == null) {
       return null;
     } else if (columnIndex == 3) {
-      final String attributeName = getFieldName(rowIndex);
-      return this.record.getOriginalValue(attributeName);
+      final String fieldName = getFieldName(rowIndex);
+      return this.record.getOriginalValue(fieldName);
     } else {
       return super.getValueAt(rowIndex, columnIndex);
     }
@@ -102,7 +102,7 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
           final String idFieldName = idField.getName();
           if (attributeName.equals(idFieldName)) {
             if (this.record != null
-              && this.record.getState() == RecordState.New) {
+                && this.record.getState() == RecordState.New) {
               if (!Number.class.isAssignableFrom(idField.getTypeClass())) {
                 return true;
               }
@@ -110,8 +110,7 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
             return false;
           }
         }
-        if (recordDefinition.getGeometryFieldNames()
-          .contains(attributeName)) {
+        if (recordDefinition.getGeometryFieldNames().contains(attributeName)) {
           return false;
         } else {
           return this.form.get().isEditable(attributeName);

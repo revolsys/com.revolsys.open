@@ -106,6 +106,10 @@ public class TextField extends JXTextField implements Field, FocusListener {
     return (T)text;
   }
 
+  protected <T> T getFieldValueInternal() {
+    return this.support.getValue();
+  }
+
   @Override
   public boolean isFieldValid() {
     return true;
@@ -172,7 +176,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
       }
       this.support.discardAllEdits();
     }
-    this.support.setValue(newText);
+    this.support.setValue(value);
   }
 
   @Override

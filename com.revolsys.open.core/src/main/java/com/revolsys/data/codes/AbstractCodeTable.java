@@ -21,7 +21,7 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
 
 public abstract class AbstractCodeTable implements Closeable,
-PropertyChangeSupportProxy, CodeTable, Cloneable {
+  PropertyChangeSupportProxy, CodeTable, Cloneable {
 
   private boolean capitalizeWords = false;
 
@@ -112,13 +112,13 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
   }
 
   @Override
-  public List<String> getFieldAliases() {
-    return Collections.emptyList();
+  public Map<Identifier, List<Object>> getCodes() {
+    return Collections.unmodifiableMap(this.idValueCache);
   }
 
   @Override
-  public Map<Identifier, List<Object>> getCodes() {
-    return Collections.unmodifiableMap(this.idValueCache);
+  public List<String> getFieldAliases() {
+    return Collections.emptyList();
   }
 
   public Identifier getId(final List<Object> values) {

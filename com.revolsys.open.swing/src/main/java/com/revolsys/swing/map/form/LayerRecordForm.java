@@ -1105,13 +1105,12 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
           final Field field = (Field)source;
           final String fieldName = field.getFieldName();
           final Object fieldValue = field.getFieldValue();
-          final Object objectValue = this.record.getValue(fieldName);
-          if (field.isFieldValid()
-              && !EqualsRegistry.equal(objectValue, fieldValue)) {
+          final Object recordValue = this.record.getValue(fieldName);
+          if (!EqualsRegistry.equal(recordValue, fieldValue)) {
             boolean equal = false;
             if (fieldValue instanceof String) {
               final String string = (String)fieldValue;
-              if (!Property.hasValue(string) && objectValue == null) {
+              if (!Property.hasValue(string) && recordValue == null) {
                 equal = true;
               }
             }

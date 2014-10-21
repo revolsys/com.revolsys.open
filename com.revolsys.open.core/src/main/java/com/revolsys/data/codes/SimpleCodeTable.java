@@ -15,38 +15,33 @@ public class SimpleCodeTable extends AbstractCodeTable {
 
   public static CodeTable create(final String name, final Resource resource) {
     final SimpleCodeTable codeTable = new SimpleCodeTable(name);
-    final RecordReader reader = RecordIo.recordReader(resource);
-    try {
-      for (final Record codeObject : reader) {
-        final Identifier id = SingleIdentifier.create(
-          codeObject.getValue(0));
-        final List<Object> values = new ArrayList<Object>();
-        final int attributeCount = codeObject.getRecordDefinition().getFieldCount();
-        for (int i = 1; i < attributeCount; i++) {
-          final Object value = codeObject.getValue(i);
+    try (
+        final RecordReader reader = RecordIo.recordReader(resource)) {
+      for (final Record record : reader) {
+        final Identifier id = SingleIdentifier.create(record.getValue(0));
+        final List<Object> values = new ArrayList<>();
+        final int fieldCount = record.getRecordDefinition().getFieldCount();
+        for (int i = 1; i < fieldCount; i++) {
+          final Object value = record.getValue(i);
           values.add(value);
         }
         codeTable.addValue(id, values);
       }
-    } finally {
-      reader.close();
     }
     return codeTable;
   }
-
-  private int index = 0;
 
   public SimpleCodeTable(final String name) {
     setName(name);
   }
 
-  public void addValue(final Object id, final Object... values) {
-    super.addValue(SingleIdentifier.create(id), values);
-  }
-
   @Override
   public void addValue(final Identifier id, final Object... values) {
     super.addValue(id, values);
+  }
+
+  public void addValue(final Object id, final Object... values) {
+    super.addValue(SingleIdentifier.create(id), values);
   }
 
   @Override
@@ -60,10 +55,8 @@ public class SimpleCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  protected Identifier loadId(final List<Object> values,
-    final boolean createId) {
-    this.index++;
-    return SingleIdentifier.create(this.index);
+  protected Identifier loadId(final List<Object> values, final boolean createId) {
+    return null;
   }
 
   @Override

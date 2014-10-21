@@ -164,7 +164,7 @@ PropertyChangeSupportProxy {
       } else {
         final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
         if (values == null || values.isEmpty()) {
-          text = "-";
+          text = StringConverterRegistry.toString(objectValue);
         } else {
           text = CollectionUtil.toString(values);
         }

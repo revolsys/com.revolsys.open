@@ -52,7 +52,7 @@ public class TablePanel extends JPanel implements MouseListener {
         TablePanel.eventColumn = table.convertColumnIndexToModel(eventColumn);
 
         if (e.getButton() == MouseEvent.BUTTON3) {
-          table.getSelectionModel().setSelectionInterval(eventRow, eventRow);
+          // table.getSelectionModel().setSelectionInterval(eventRow, eventRow);
           if (table.isEditing()) {
             table.getCellEditor().stopCellEditing();
           }
@@ -68,7 +68,7 @@ public class TablePanel extends JPanel implements MouseListener {
   private static Reference<JTable> eventTable = new WeakReference<JTable>(null);
 
   private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(
-      null);
+    null);
 
   private static final long serialVersionUID = 1L;
 
@@ -102,7 +102,7 @@ public class TablePanel extends JPanel implements MouseListener {
 
     menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value",
       "paste_plain", new ObjectPropertyEnableCheck(this, "canPaste"), this,
-        "pasteFieldValue");
+      "pasteFieldValue");
   }
 
   private void copyCurrentCell() {
@@ -186,7 +186,7 @@ public class TablePanel extends JPanel implements MouseListener {
 
   public boolean isCanCut() {
     return isEditingCurrentCell() || isCurrentCellHasValue()
-        && isCurrentCellEditable();
+      && isCurrentCellEditable();
   }
 
   public boolean isCanPaste() {
