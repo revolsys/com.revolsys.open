@@ -975,7 +975,7 @@ LineString {
   @Override
   public List<LineString> split(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convert(getGeometryFactory());
+    point = point.convert(geometryFactory);
     final Map<GeometryComponent, Double> result = LineStringUtil.findClosestGeometryComponent(
       this, point);
     if (result.isEmpty()) {
@@ -1006,7 +1006,7 @@ LineString {
       } else if (geometryComponent instanceof Segment) {
         final Segment segment = (Segment)geometryComponent;
         final int segmentIndex = segment.getSegmentIndex();
-        final LineString line1 = subLine(segmentIndex, point);
+        final LineString line1 = subLine(segmentIndex + 1, point);
         final LineString line2 = subLine(point, segmentIndex + 1, vertexCount
           - segmentIndex - 1, null);
         return Arrays.asList(line1, line2);
