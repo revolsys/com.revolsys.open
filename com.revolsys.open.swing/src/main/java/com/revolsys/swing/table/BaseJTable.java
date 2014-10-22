@@ -1,5 +1,6 @@
 package com.revolsys.swing.table;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 
@@ -31,9 +32,8 @@ public class BaseJTable extends JXTable {
     super(model);
     setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-    addHighlighter(new ColorHighlighter(HighlightPredicate.ODD,
-      WebColors.LightSteelBlue, WebColors.Black, WebColors.Navy,
-      WebColors.White));
+    addHighlighter(new ColorHighlighter(HighlightPredicate.ODD, new Color(223,
+      223, 223), WebColors.Black, WebColors.Navy, WebColors.White));
     addHighlighter(new ColorHighlighter(HighlightPredicate.EVEN,
       WebColors.White, WebColors.Black, WebColors.Blue, WebColors.White));
 
