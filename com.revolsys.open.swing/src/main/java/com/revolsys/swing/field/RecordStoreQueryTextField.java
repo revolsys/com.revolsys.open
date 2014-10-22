@@ -61,16 +61,16 @@ import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.util.Property;
 
 public class RecordStoreQueryTextField extends TextField implements
-DocumentListener, KeyListener, MouseListener, FocusListener,
-ListDataListener, ItemSelectable, Field, ListSelectionListener,
-HighlightPredicate {
+  DocumentListener, KeyListener, MouseListener, FocusListener,
+  ListDataListener, ItemSelectable, Field, ListSelectionListener,
+  HighlightPredicate {
   private static final Icon ICON_DELETE = Icons.getIcon("delete");
 
   private static final long serialVersionUID = 1L;
 
   private final RecordStore recordStore;
 
-  private final String displayAttributeName;
+  private final String displayFieldName;
 
   private final String idFieldName;
 
@@ -87,27 +87,27 @@ HighlightPredicate {
   public Record selectedItem;
 
   private final Map<String, String> valueToDisplayMap = new LruMap<String, String>(
-      100);
+    100);
 
   private Object originalValue;
 
   private boolean below = false;
 
   public RecordStoreQueryTextField(final RecordDefinition recordDefinition,
-    final String displayAttributeName) {
-    this(recordDefinition, displayAttributeName, new Query(recordDefinition,
-      new Equal(F.upper(displayAttributeName), new Value(null))), new Query(
-      recordDefinition, Q.iLike(displayAttributeName, "")));
+    final String displayFieldName) {
+    this(recordDefinition, displayFieldName, new Query(recordDefinition,
+      new Equal(F.upper(displayFieldName), new Value(null))), new Query(
+        recordDefinition, Q.iLike(displayFieldName, "")));
 
   }
 
   public RecordStoreQueryTextField(final RecordDefinition recordDefinition,
-    final String displayAttributeName, final List<Query> queries) {
-    super(displayAttributeName);
+    final String displayFieldName, final List<Query> queries) {
+    super(displayFieldName);
     this.recordDefinition = recordDefinition;
     this.recordStore = recordDefinition.getRecordStore();
     this.idFieldName = recordDefinition.getIdFieldName();
-    this.displayAttributeName = displayAttributeName;
+    this.displayFieldName = displayFieldName;
 
     final Document document = getDocument();
     document.addDocumentListener(this);
@@ -124,9 +124,9 @@ HighlightPredicate {
     this.menu.add(this.oldValueItem, BorderLayout.NORTH);
 
     this.listModel = new RecordStoreQueryListModel(this.recordStore,
-      displayAttributeName, queries);
+      displayFieldName, queries);
     this.list = new JXList(this.listModel);
-    this.list.setCellRenderer(new RecordListCellRenderer(displayAttributeName));
+    this.list.setCellRenderer(new RecordListCellRenderer(displayFieldName));
     this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.list.setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
     this.list.addMouseListener(this);
@@ -148,16 +148,18 @@ HighlightPredicate {
   }
 
   public RecordStoreQueryTextField(final RecordDefinition recordDefinition,
-    final String displayAttributeName, final Query... queries) {
-    this(recordDefinition, displayAttributeName, Arrays.asList(queries));
+    final String displayFieldName, final Query... queries) {
+    this(recordDefinition, displayFieldName, Arrays.asList(queries));
 
   }
 
   public RecordStoreQueryTextField(final RecordStore recordStore,
-    final String typeName, final String displayAttributeName) {
-    this(recordStore.getRecordDefinition(typeName), displayAttributeName,
-      new Query(typeName, new Equal(F.upper(displayAttributeName), new Value(
-        null))), new Query(typeName, Q.iLike(displayAttributeName, "")));
+    final String typeName, final String displayFieldName) {
+    this(
+      recordStore.getRecordDefinition(typeName),
+      displayFieldName,
+      new Query(typeName, new Equal(F.upper(displayFieldName), new Value(null))),
+      new Query(typeName, Q.iLike(displayFieldName, "")));
   }
 
   @Override
@@ -213,7 +215,7 @@ HighlightPredicate {
       if (record == null) {
         displayText = stringValue;
       } else {
-        displayText = record.getString(this.displayAttributeName);
+        displayText = record.getString(this.displayFieldName);
       }
     }
     return displayText;
@@ -274,7 +276,7 @@ HighlightPredicate {
     final ComponentAdapter adapter) {
     final Record object = this.listModel.getElementAt(adapter.row);
     final String text = getText();
-    final String value = object.getString(this.displayAttributeName);
+    final String value = object.getString(this.displayFieldName);
     if (EqualsRegistry.equal(text, value)) {
       return true;
     } else {
@@ -288,7 +290,7 @@ HighlightPredicate {
     } else {
       final String text = getText();
       if (Property.hasValue(text)) {
-        final String value = this.selectedItem.getString(this.displayAttributeName);
+        final String value = this.selectedItem.getString(this.displayFieldName);
         return text.equals(value);
       } else {
         return false;
@@ -317,12 +319,12 @@ HighlightPredicate {
         }
         this.list.setSelectedIndex(selectedIndex);
         e.consume();
-        break;
+      break;
       case KeyEvent.VK_ENTER:
         if (size > 0) {
           if (selectedIndex >= 0 && selectedIndex < size) {
             final Record selectedItem = this.listModel.getElementAt(selectedIndex);
-            final String text = selectedItem.getString(this.displayAttributeName);
+            final String text = selectedItem.getString(this.displayFieldName);
             if (!text.equals(this.getText())) {
               this.selectedItem = selectedItem;
               setText(text);
@@ -333,7 +335,7 @@ HighlightPredicate {
       case KeyEvent.VK_TAB:
         return;
       default:
-        break;
+      break;
     }
     showMenu();
   }
@@ -455,7 +457,7 @@ HighlightPredicate {
       if (this.below) {
         x = 0;
         final Insets screenInsets = Toolkit.getDefaultToolkit()
-            .getScreenInsets(getGraphicsConfiguration());
+          .getScreenInsets(getGraphicsConfiguration());
 
         final Rectangle bounds = getGraphicsConfiguration().getBounds();
         final int menuHeight = this.menu.getBounds().height;
@@ -487,7 +489,7 @@ HighlightPredicate {
     if (!e.getValueIsAdjusting()) {
       final Record value = (Record)this.list.getSelectedValue();
       if (value != null) {
-        final String label = value.getString(this.displayAttributeName);
+        final String label = value.getString(this.displayFieldName);
         if (!EqualsRegistry.equal(label, getText())) {
           setFieldValue(value.getIdentifier());
         }

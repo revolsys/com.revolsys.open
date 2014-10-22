@@ -35,7 +35,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.util.DateUtil;
 
 public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
-  implements EsriGeodatabaseXmlConstants {
+implements EsriGeodatabaseXmlConstants {
   private static final Logger LOG = LoggerFactory.getLogger(EsriGeodatabaseXmlRecordWriter.class);
 
   private int datasetId = 1;
@@ -88,8 +88,8 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     this.out.attribute(XsiConstants.TYPE, VALUES_TYPE);
 
     for (final FieldDefinition attribute : this.recordDefinition.getFields()) {
-      final String attributeName = attribute.getName();
-      final Object value = object.getValue(attributeName);
+      final String fieldName = attribute.getName();
+      final Object value = object.getValue(fieldName);
       final DataType type = attribute.getType();
       final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(type);
       if (fieldType != null) {

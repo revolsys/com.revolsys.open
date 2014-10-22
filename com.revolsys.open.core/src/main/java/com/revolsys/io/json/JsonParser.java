@@ -23,14 +23,14 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.util.MathUtil;
 
 public class JsonParser implements Iterator<JsonParser.EventType>,
-  AutoCloseable {
+AutoCloseable {
   public enum EventType {
     booleanValue, colon, comma, endArray, endDocument, endObject, nullValue, number, startArray, startDocument, startObject, string, unknown
   }
 
   public static List<Object> getArray(final JsonParser parser) {
     if (parser.getEvent() == EventType.startArray || parser.hasNext()
-      && parser.next() == EventType.startArray) {
+        && parser.next() == EventType.startArray) {
       EventType event = parser.getEvent();
       final List<Object> list = new ArrayList<Object>();
       do {
@@ -49,14 +49,14 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
       return list;
     } else {
       throw new IllegalStateException("Exepecting start array, not:"
-        + parser.getEvent());
+          + parser.getEvent());
     }
 
   }
 
   public static double[] getDoubleArray(final JsonParser parser) {
     if (parser.getEvent() == EventType.startArray || parser.hasNext()
-      && parser.next() == EventType.startArray) {
+        && parser.next() == EventType.startArray) {
       EventType event = parser.getEvent();
       final List<Number> list = new ArrayList<Number>();
       do {
@@ -79,7 +79,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
       return null;
     } else {
       throw new IllegalStateException("Exepecting start array, not: "
-        + parser.getEvent());
+          + parser.getEvent());
     }
   }
 
@@ -88,7 +88,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
       return null;
     } else {
       try (
-        final JsonParser parser = new JsonParser(in)) {
+          final JsonParser parser = new JsonParser(in)) {
         if (parser.next() == EventType.startDocument) {
           return getMap(parser);
         } else {
@@ -100,7 +100,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
 
   public static Map<String, Object> getMap(final JsonParser parser) {
     if (parser.getEvent() == EventType.startObject || parser.hasNext()
-      && parser.next() == EventType.startObject) {
+        && parser.next() == EventType.startObject) {
       EventType event = parser.getEvent();
       final Map<String, Object> map = new LinkedHashMap<String, Object>();
       do {
@@ -112,7 +112,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
                 final Object value = getValue(parser);
                 if (value instanceof EventType) {
                   throw new IllegalStateException("Exepecting a value, not:"
-                    + value);
+                      + value);
                 }
                 map.put(key, value);
               }
@@ -129,7 +129,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
       return map;
     } else {
       throw new IllegalStateException("Exepecting end object, not:"
-        + parser.getEvent());
+          + parser.getEvent());
     }
 
   }
@@ -149,7 +149,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
 
   public static String getString(final JsonParser parser) {
     if (parser.getEvent() == EventType.string || parser.hasNext()
-      && parser.next() == EventType.string) {
+        && parser.next() == EventType.string) {
       return parser.getValue();
     } else {
       throw new IllegalStateException("Expecting a string");
@@ -256,15 +256,15 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
    * found.
    *
    * @param parser The parser.
-   * @param attributeName The name of the attribute to skip through.
+   * @param fieldName The name of the attribute to skip through.
    */
   public static void skipToAttribute(final JsonParser parser,
-    final String attributeName) {
+    final String fieldName) {
     while (parser.hasNext()) {
       final EventType eventType = parser.next();
       if (eventType == EventType.string) {
         final String key = getString(parser);
-        if (key.equals(attributeName)) {
+        if (key.equals(fieldName)) {
           if (parser.hasNext() && parser.next() == EventType.colon) {
             return;
           }
@@ -360,29 +360,29 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
         case ',':
           this.nextEvent = EventType.comma;
           this.currentCharacter = this.reader.read();
-        break;
+          break;
         case ':':
           this.nextEvent = EventType.colon;
           this.currentCharacter = this.reader.read();
-        break;
+          break;
         case '{':
           this.nextEvent = EventType.startObject;
           this.currentCharacter = this.reader.read();
           this.depth++;
-        break;
+          break;
         case '}':
           this.nextEvent = EventType.endObject;
           this.currentCharacter = this.reader.read();
           this.depth--;
-        break;
+          break;
         case '[':
           this.nextEvent = EventType.startArray;
           this.currentCharacter = this.reader.read();
-        break;
+          break;
         case ']':
           this.nextEvent = EventType.endArray;
           this.currentCharacter = this.reader.read();
-        break;
+          break;
         case 't':
           for (int i = 0; i < 3; i++) {
             this.currentCharacter = this.reader.read();
@@ -390,7 +390,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
           this.nextEvent = EventType.booleanValue;
           this.nextValue = Boolean.TRUE;
           this.currentCharacter = this.reader.read();
-        break;
+          break;
         case 'f':
           for (int i = 0; i < 4; i++) {
             this.currentCharacter = this.reader.read();
@@ -398,7 +398,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
           this.nextEvent = EventType.booleanValue;
           this.nextValue = Boolean.FALSE;
           this.currentCharacter = this.reader.read();
-        break;
+          break;
         case 'n':
           for (int i = 0; i < 3; i++) {
             this.currentCharacter = this.reader.read();
@@ -406,21 +406,21 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
           this.nextEvent = EventType.nullValue;
           this.nextValue = null;
           this.currentCharacter = this.reader.read();
-        break;
+          break;
         case '"':
           this.nextEvent = EventType.string;
 
           processString();
           this.currentCharacter = this.reader.read();
-        break;
+          break;
         case '-':
           this.nextEvent = EventType.number;
 
           processNumber();
-        break;
+          break;
         case -1:
           this.nextEvent = EventType.endDocument;
-        break;
+          break;
         default:
           if (this.currentCharacter >= '0' && this.currentCharacter <= '9') {
             this.nextEvent = EventType.number;
@@ -428,7 +428,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
           } else {
             this.nextEvent = EventType.unknown;
           }
-        break;
+          break;
       }
     } catch (final IOException e) {
       this.nextEvent = EventType.endDocument;
@@ -490,22 +490,22 @@ public class JsonParser implements Iterator<JsonParser.EventType>,
         switch (this.currentCharacter) {
           case 'n':
             text.append('\n');
-          break;
+            break;
           case 'r':
             text.append('\r');
-          break;
+            break;
           case 't':
             text.append('\t');
-          break;
+            break;
           case 'b':
             text.setLength(text.length() - 1);
-          break;
+            break;
           case 'u':
-          // TODO process hex
-          break;
+            // TODO process hex
+            break;
           default:
             text.append((char)this.currentCharacter);
-          break;
+            break;
         }
       } else {
         text.append((char)this.currentCharacter);

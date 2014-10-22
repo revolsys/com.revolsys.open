@@ -13,7 +13,7 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayerRecord extends AbstractRecord implements
-  LayerRecord {
+LayerRecord {
 
   private final AbstractRecordLayer layer;
 
@@ -33,12 +33,12 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements
   }
 
   @Override
-  public void firePropertyChange(final String attributeName,
-    final Object oldValue, final Object newValue) {
+  public void firePropertyChange(final String fieldName, final Object oldValue,
+    final Object newValue) {
     final AbstractLayer layer = getLayer();
     if (layer.isEventsEnabled()) {
       final PropertyChangeEvent event = new PropertyChangeEvent(this,
-        attributeName, oldValue, newValue);
+        fieldName, oldValue, newValue);
       layer.propertyChange(event);
     }
   }
@@ -89,8 +89,8 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements
 
   @Override
   public boolean isModified(final int index) {
-    final String attributeName = getRecordDefinition().getFieldName(index);
-    return isModified(attributeName);
+    final String fieldName = getRecordDefinition().getFieldName(index);
+    return isModified(fieldName);
   }
 
   @Override
@@ -142,7 +142,7 @@ public abstract class AbstractLayerRecord extends AbstractRecord implements
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
-          && !Property.hasValue((String)value)) {
+            && !Property.hasValue((String)value)) {
           return false;
         }
       }

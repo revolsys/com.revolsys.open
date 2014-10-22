@@ -20,7 +20,8 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
     return getProperty(recordDefinition);
   }
 
-  public static PseudoNodeProperty getProperty(final RecordDefinition recordDefinition) {
+  public static PseudoNodeProperty getProperty(
+    final RecordDefinition recordDefinition) {
     PseudoNodeProperty property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
       property = new PseudoNodeProperty();
@@ -33,10 +34,10 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
     RecordEquals.EXCLUDE_ID, RecordEquals.EXCLUDE_GEOMETRY);
 
   public static final String PROPERTY_NAME = PseudoNodeProperty.class.getName()
-    + ".propertyName";
+      + ".propertyName";
 
   private Set<String> equalExcludeAttributes = new HashSet<String>(
-    DEFAULT_EXCLUDE);
+      DEFAULT_EXCLUDE);
 
   public PseudoNodeProperty() {
   }
@@ -46,19 +47,19 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
       this.equalExcludeAttributes);
   }
 
-  public PseudoNodeAttribute getField(final Node<Record> node) {
-    final String attributeName = PseudoNodeProperty.PROPERTY_NAME;
-    if (!node.hasAttribute(attributeName)) {
-      final ObjectAttributeProxy<PseudoNodeAttribute, Node<Record>> proxy = new InvokeMethodObjectAttributeProxy<PseudoNodeAttribute, Node<Record>>(
-        this, "createAttribute", Node.class);
-      node.setAttribute(attributeName, proxy);
-    }
-    final PseudoNodeAttribute value = node.getField(attributeName);
-    return value;
-  }
-
   public Collection<String> getEqualExcludeAttributes() {
     return this.equalExcludeAttributes;
+  }
+
+  public PseudoNodeAttribute getField(final Node<Record> node) {
+    final String fieldName = PseudoNodeProperty.PROPERTY_NAME;
+    if (!node.hasAttribute(fieldName)) {
+      final ObjectAttributeProxy<PseudoNodeAttribute, Node<Record>> proxy = new InvokeMethodObjectAttributeProxy<PseudoNodeAttribute, Node<Record>>(
+          this, "createAttribute", Node.class);
+      node.setAttribute(fieldName, proxy);
+    }
+    final PseudoNodeAttribute value = node.getField(fieldName);
+    return value;
   }
 
   @Override

@@ -174,14 +174,14 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
   }
 
   protected boolean isPropertyUnique(final Record object,
-    final String attributeName) {
-    final String value = object.getValue(attributeName);
+    final String fieldName) {
+    final String value = object.getValue(fieldName);
     final RecordStore recordStore = getRecordStore();
     final RecordDefinition recordDefinition = recordStore.getRecordDefinition(this.tableName);
     if (recordDefinition == null) {
       return true;
     } else {
-      final Query query = Query.equal(recordDefinition, attributeName, value);
+      final Query query = Query.equal(recordDefinition, fieldName, value);
       final Reader<Record> results = recordStore.query(query);
       final List<Record> objects = results.read();
       if (object.getState() == RecordState.New) {

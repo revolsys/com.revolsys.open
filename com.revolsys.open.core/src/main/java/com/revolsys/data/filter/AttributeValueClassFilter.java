@@ -5,19 +5,19 @@ import com.revolsys.data.record.RecordUtil;
 import com.revolsys.filter.Filter;
 
 /**
- * Filter Records by the type (Java class) of the attributeName value.
+ * Filter Records by the type (Java class) of the fieldName value.
  *
  * @author Paul Austin
  */
 public class AttributeValueClassFilter implements Filter<Record> {
-  /** The attributeName name, or path to match. */
-  private String attributeName;
+  /** The fieldName name, or path to match. */
+  private String fieldName;
 
   /** The type to match. */
   private Class<?> type = Object.class;
 
   /**
-   * Match the attributeName on the data object with the required value.
+   * Match the fieldName on the data object with the required value.
    *
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
@@ -25,17 +25,17 @@ public class AttributeValueClassFilter implements Filter<Record> {
   @Override
   public boolean accept(final Record object) {
     final Object propertyValue = RecordUtil.getFieldByPath(object,
-      this.attributeName);
+      this.fieldName);
     return this.type.isInstance(propertyValue);
   }
 
   /**
-   * Get the attributeName name, or path to match.
+   * Get the fieldName name, or path to match.
    *
-   * @return The attributeName name, or path to match.
+   * @return The fieldName name, or path to match.
    */
   public String getFieldName() {
-    return this.attributeName;
+    return this.fieldName;
   }
 
   /**
@@ -48,12 +48,12 @@ public class AttributeValueClassFilter implements Filter<Record> {
   }
 
   /**
-   * Set the attributeName name, or path to match.
+   * Set the fieldName name, or path to match.
    *
-   * @param attributeName The attributeName name, or path to match.
+   * @param fieldName The fieldName name, or path to match.
    */
-  public void setAttributeName(final String attributeName) {
-    this.attributeName = attributeName;
+  public void setFieldName(final String fieldName) {
+    this.fieldName = fieldName;
   }
 
   /**
@@ -74,6 +74,6 @@ public class AttributeValueClassFilter implements Filter<Record> {
    */
   @Override
   public String toString() {
-    return this.attributeName + " type " + this.type;
+    return this.fieldName + " type " + this.type;
   }
 }

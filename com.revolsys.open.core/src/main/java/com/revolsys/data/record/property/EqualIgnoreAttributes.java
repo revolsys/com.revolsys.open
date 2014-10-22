@@ -26,31 +26,31 @@ public class EqualIgnoreAttributes extends AbstractRecordDefinitionProperty {
   }
 
   public static final String PROPERTY_NAME = EqualIgnoreAttributes.class.getName()
-    + ".propertyName";
+      + ".propertyName";
 
-  private Set<String> attributeNames = new LinkedHashSet<String>();
+  private Set<String> fieldNames = new LinkedHashSet<String>();
 
   public EqualIgnoreAttributes() {
   }
 
-  public EqualIgnoreAttributes(final Collection<String> attributeNames) {
-    this.attributeNames.addAll(attributeNames);
+  public EqualIgnoreAttributes(final Collection<String> fieldNames) {
+    this.fieldNames.addAll(fieldNames);
   }
 
-  public EqualIgnoreAttributes(final String... attributeNames) {
-    this(Arrays.asList(attributeNames));
+  public EqualIgnoreAttributes(final String... fieldNames) {
+    this(Arrays.asList(fieldNames));
   }
 
-  public void addFieldNames(final Collection<String> attributeNames) {
-    this.attributeNames.addAll(attributeNames);
+  public void addFieldNames(final Collection<String> fieldNames) {
+    this.fieldNames.addAll(fieldNames);
   }
 
-  public void addFieldNames(final String... attributeNames) {
-    addFieldNames(Arrays.asList(attributeNames));
+  public void addFieldNames(final String... fieldNames) {
+    addFieldNames(Arrays.asList(fieldNames));
   }
 
   public Set<String> getFieldNames() {
-    return this.attributeNames;
+    return this.fieldNames;
   }
 
   @Override
@@ -58,37 +58,37 @@ public class EqualIgnoreAttributes extends AbstractRecordDefinitionProperty {
     return PROPERTY_NAME;
   }
 
-  public boolean isAttributeIgnored(final String attributeName) {
-    return this.attributeNames.contains(attributeName);
+  public boolean isFieldIgnored(final String fieldName) {
+    return this.fieldNames.contains(fieldName);
   }
 
-  public void setAttributeNames(final Collection<String> attributeNames) {
-    setAttributeNames(new LinkedHashSet<String>(attributeNames));
+  public void setFieldNames(final Collection<String> fieldNames) {
+    setFieldNames(new LinkedHashSet<String>(fieldNames));
   }
 
-  public void setAttributeNames(final Set<String> attributeNames) {
-    this.attributeNames = attributeNames;
+  public void setFieldNames(final Set<String> fieldNames) {
+    this.fieldNames = fieldNames;
   }
 
-  public void setAttributeNames(final String... attributeNames) {
-    setAttributeNames(Arrays.asList(attributeNames));
+  public void setFieldNames(final String... fieldNames) {
+    setFieldNames(Arrays.asList(fieldNames));
   }
 
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     super.setRecordDefinition(recordDefinition);
-    if (this.attributeNames.contains(RecordEquals.EXCLUDE_ID)) {
+    if (this.fieldNames.contains(RecordEquals.EXCLUDE_ID)) {
       final String idFieldName = recordDefinition.getIdFieldName();
-      this.attributeNames.add(idFieldName);
+      this.fieldNames.add(idFieldName);
     }
-    if (this.attributeNames.contains(RecordEquals.EXCLUDE_GEOMETRY)) {
+    if (this.fieldNames.contains(RecordEquals.EXCLUDE_GEOMETRY)) {
       final String geometryFieldName = recordDefinition.getGeometryFieldName();
-      this.attributeNames.add(geometryFieldName);
+      this.fieldNames.add(geometryFieldName);
     }
   }
 
   @Override
   public String toString() {
-    return "EqualIgnore " + this.attributeNames;
+    return "EqualIgnore " + this.fieldNames;
   }
 }

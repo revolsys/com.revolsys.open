@@ -31,16 +31,16 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
   @Override
   protected synchronized Identifier createId(final List<Object> values) {
     try (
-      JdbcConnection connection = this.recordStore.getJdbcConnection()) {
+        JdbcConnection connection = this.recordStore.getJdbcConnection()) {
       Identifier id = loadId(values, false);
       boolean retry = true;
       while (id == null) {
         try (
-          final PreparedStatement statement = connection.prepareStatement(this.insertSql)) {
+            final PreparedStatement statement = connection.prepareStatement(this.insertSql)) {
           id = SingleIdentifier.create(this.recordStore.getNextPrimaryKey(getRecordDefinition()));
           int index = 1;
           index = JdbcUtils.setValue(statement, index, id);
-          for (int i = 0; i < getValueAttributeNames().size(); i++) {
+          for (int i = 0; i < getValueFieldNames().size(); i++) {
             final Object value = values.get(i);
             index = JdbcUtils.setValue(statement, index, value);
           }
@@ -72,27 +72,27 @@ public class JdbcCodeTableProperty extends CodeTableProperty {
     if (recordDefinition != null) {
       this.tableName = JdbcUtils.getQualifiedTableName(recordDefinition.getPath());
 
-      final List<String> valueAttributeNames = getValueAttributeNames();
+      final List<String> valueFieldNames = getValueFieldNames();
       String idColumn = recordDefinition.getIdFieldName();
       if (!Property.hasValue(idColumn)) {
         idColumn = recordDefinition.getFieldName(0);
       }
       this.insertSql = "INSERT INTO " + this.tableName + " (" + idColumn;
-      for (int i = 0; i < valueAttributeNames.size(); i++) {
-        final String columnName = valueAttributeNames.get(i);
+      for (int i = 0; i < valueFieldNames.size(); i++) {
+        final String columnName = valueFieldNames.get(i);
         this.insertSql += ", " + columnName;
       }
       if (this.useAuditColumns) {
         this.insertSql += ", WHO_CREATED, WHEN_CREATED, WHO_UPDATED, WHEN_UPDATED";
       }
       this.insertSql += ") VALUES (?";
-      for (int i = 0; i < valueAttributeNames.size(); i++) {
+      for (int i = 0; i < valueFieldNames.size(); i++) {
         this.insertSql += ", ?";
       }
       if (this.useAuditColumns) {
         if (this.recordStore.getClass()
-          .getName()
-          .equals("com.revolsys.gis.oracle.io.OracleRecordStore")) {
+            .getName()
+            .equals("com.revolsys.gis.oracle.io.OracleRecordStore")) {
           this.insertSql += ", USER, SYSDATE, USER, SYSDATE";
         } else {
           this.insertSql += ", current_user, current_timestamp, current_user, current_timestamp";

@@ -16,40 +16,39 @@ public class Sort extends BaseInOutProcess<Record, Record> {
 
   private final List<Record> objects = new ArrayList<Record>();
 
-  private String attributeName;
-
-  public String getFieldName() {
-    return attributeName;
-  }
+  private String fieldName;
 
   public Comparator<Record> getComparator() {
-    return comparator;
+    return this.comparator;
+  }
+
+  public String getFieldName() {
+    return this.fieldName;
   }
 
   @Override
-  protected void postRun(final Channel<Record> in,
-    final Channel<Record> out) {
-    if (comparator != null) {
-      Collections.sort(objects, comparator);
+  protected void postRun(final Channel<Record> in, final Channel<Record> out) {
+    if (this.comparator != null) {
+      Collections.sort(this.objects, this.comparator);
     }
-    for (final Record object : objects) {
+    for (final Record object : this.objects) {
       out.write(object);
     }
   }
 
   @Override
-  protected void process(final Channel<Record> in,
-    final Channel<Record> out, final Record object) {
-    objects.add(object);
-  }
-
-  public void setAttributeName(final String attributeName) {
-    this.attributeName = attributeName;
-    this.comparator = new RecordAttributeComparator(attributeName);
+  protected void process(final Channel<Record> in, final Channel<Record> out,
+    final Record object) {
+    this.objects.add(object);
   }
 
   public void setComparator(final Comparator<Record> comparator) {
     this.comparator = comparator;
+  }
+
+  public void setFieldName(final String fieldName) {
+    this.fieldName = fieldName;
+    this.comparator = new RecordAttributeComparator(fieldName);
   }
 
 }

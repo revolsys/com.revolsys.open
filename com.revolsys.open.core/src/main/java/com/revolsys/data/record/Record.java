@@ -10,7 +10,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 
 public interface Record extends Map<String, Object>, Comparable<Record>,
-Identifiable {
+  Identifiable {
   /**
    * Create a clone of the data object.
    *
@@ -19,8 +19,6 @@ Identifiable {
   Record clone();
 
   void delete();
-
-  String getFieldTitle(String fieldName);
 
   Byte getByte(final CharSequence name);
 
@@ -33,6 +31,8 @@ Identifiable {
    */
   RecordFactory getFactory();
 
+  String getFieldTitle(String fieldName);
+
   Float getFloat(final CharSequence name);
 
   /**
@@ -42,9 +42,9 @@ Identifiable {
    */
   <T extends Geometry> T getGeometryValue();
 
-  Identifier getIdentifier(List<String> attributeNames);
+  Identifier getIdentifier(List<String> fieldNames);
 
-  Identifier getIdentifier(String... attributeNames);
+  Identifier getIdentifier(String... fieldNames);
 
   /**
    * Get the value of the unique identifier attribute.
@@ -91,7 +91,7 @@ Identifiable {
   <T> T getValueByPath(CharSequence attributePath);
 
   Map<String, Object> getValueMap(
-    final Collection<? extends CharSequence> attributeNames);
+    final Collection<? extends CharSequence> fieldNames);
 
   /**
    * Get the values of all attributes.
@@ -115,7 +115,7 @@ Identifiable {
 
   boolean isValid(int index);
 
-  boolean isValid(String attributeName);
+  boolean isValid(String fieldName);
 
   /**
    * Set the value of the primary geometry attribute.
@@ -158,9 +158,9 @@ Identifiable {
 
   void setValues(Map<String, ? extends Object> values);
 
-  void setValues(Map<String, Object> record, Collection<String> attributeNames);
+  void setValues(Map<String, Object> record, Collection<String> fieldNames);
 
-  void setValues(Map<String, Object> record, String... attributeNames);
+  void setValues(Map<String, Object> record, String... fieldNames);
 
   void setValues(final Record object);
 

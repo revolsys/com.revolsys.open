@@ -16,9 +16,9 @@ public interface Identifier extends Comparable<Identifier> {
 
   List<Object> getValues();
 
+  void setIdentifier(Map<String, Object> record, List<String> fieldNames);
+
+  void setIdentifier(Map<String, Object> record, String... fieldNames);
+
   void setIdentifier(Record record);
-
-  void setIdentifier(Map<String, Object> record, List<String> attributeNames);
-
-  void setIdentifier(Map<String, Object> record, String... attributeNames);
 }

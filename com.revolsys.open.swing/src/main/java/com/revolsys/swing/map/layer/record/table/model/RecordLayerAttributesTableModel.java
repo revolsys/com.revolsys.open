@@ -17,7 +17,7 @@ import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.util.Property;
 
 public class RecordLayerAttributesTableModel extends
-  AbstractSingleRecordTableModel implements PropertyChangeListener {
+AbstractSingleRecordTableModel implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -95,14 +95,14 @@ public class RecordLayerAttributesTableModel extends
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (columnIndex == 2) {
       if (this.form.get().isEditable()) {
-        final String attributeName = getFieldName(rowIndex);
+        final String fieldName = getFieldName(rowIndex);
         final RecordDefinition recordDefinition = getRecordDefinition();
         final FieldDefinition idField = recordDefinition.getIdField();
         if (idField != null) {
           final String idFieldName = idField.getName();
-          if (attributeName.equals(idFieldName)) {
+          if (fieldName.equals(idFieldName)) {
             if (this.record != null
-                && this.record.getState() == RecordState.New) {
+              && this.record.getState() == RecordState.New) {
               if (!Number.class.isAssignableFrom(idField.getTypeClass())) {
                 return true;
               }
@@ -110,10 +110,10 @@ public class RecordLayerAttributesTableModel extends
             return false;
           }
         }
-        if (recordDefinition.getGeometryFieldNames().contains(attributeName)) {
+        if (recordDefinition.getGeometryFieldNames().contains(fieldName)) {
           return false;
         } else {
-          return this.form.get().isEditable(attributeName);
+          return this.form.get().isEditable(fieldName);
         }
       } else {
         return false;
@@ -124,9 +124,9 @@ public class RecordLayerAttributesTableModel extends
   }
 
   public boolean isModified(final int rowIndex) {
-    final String attributeName = getFieldName(rowIndex);
-    final Object originalValue = this.record.getOriginalValue(attributeName);
-    final Object value = this.record.getValue(attributeName);
+    final String fieldName = getFieldName(rowIndex);
+    final Object originalValue = this.record.getOriginalValue(fieldName);
+    final Object value = this.record.getValue(fieldName);
     return !EqualsRegistry.equal(originalValue, value);
   }
 

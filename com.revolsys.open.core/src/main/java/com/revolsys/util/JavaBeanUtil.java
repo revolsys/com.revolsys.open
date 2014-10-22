@@ -69,7 +69,7 @@ public final class JavaBeanUtil {
   public static <V> V clone(final V value) {
     if (value instanceof Map) {
       final Map<Object, Object> map = new LinkedHashMap<Object, Object>(
-          (Map<Object, Object>)value);
+        (Map<Object, Object>)value);
       for (final Entry<Object, Object> entry : map.entrySet()) {
         final Object mapValue = entry.getValue();
         final Object clonedMapValue = clone(mapValue);
@@ -138,11 +138,11 @@ public final class JavaBeanUtil {
   }
 
   public static boolean getBooleanValue(final Object object,
-    final String attributeName) {
+    final String fieldName) {
     if (object == null) {
       return false;
     } else {
-      final Object value = Property.get(object, attributeName);
+      final Object value = Property.get(object, fieldName);
       if (value == null) {
         return false;
       } else if (value instanceof Boolean) {
@@ -221,11 +221,11 @@ public final class JavaBeanUtil {
       @Override
       public int compare(final Method method1, final Method method2) {
         final String name1 = method1.getName()
-            .replaceAll("^(set|get|is)", "")
-            .toLowerCase();
+          .replaceAll("^(set|get|is)", "")
+          .toLowerCase();
         final String name2 = method2.getName()
-            .replaceAll("^(set|get|is)", "")
-            .toLowerCase();
+          .replaceAll("^(set|get|is)", "")
+          .toLowerCase();
         final int nameCompare = name1.compareTo(name2);
         return nameCompare;
       }
@@ -266,10 +266,10 @@ public final class JavaBeanUtil {
     String propertyName;
     if (methodName.startsWith("is")) {
       propertyName = methodName.substring(2, 3).toLowerCase()
-          + methodName.substring(3);
+        + methodName.substring(3);
     } else {
       propertyName = methodName.substring(3, 4).toLowerCase()
-          + methodName.substring(4);
+        + methodName.substring(4);
     }
     return propertyName;
   }
@@ -350,7 +350,7 @@ public final class JavaBeanUtil {
       }
     }
     throw new IllegalArgumentException(method.getName() + " must return "
-        + expectedRawClass.getName() + " with 1 generic class parameter");
+      + expectedRawClass.getName() + " with 1 generic class parameter");
   }
 
   public static Method getWriteMethod(final Class<?> beanClass,
@@ -549,7 +549,7 @@ public final class JavaBeanUtil {
             }
             type = ((MappedPropertyDescriptor)descriptor).getMappedPropertyType();
           } else if (index >= 0
-              && descriptor instanceof IndexedPropertyDescriptor) {
+            && descriptor instanceof IndexedPropertyDescriptor) {
             if (((IndexedPropertyDescriptor)descriptor).getIndexedWriteMethod() == null) {
               return false;
             }
@@ -562,7 +562,7 @@ public final class JavaBeanUtil {
           } else {
             if (descriptor.getWriteMethod() == null) {
               final String setMethodName = "set"
-                  + CaseConverter.toUpperFirstChar(propertyName);
+                + CaseConverter.toUpperFirstChar(propertyName);
               Method setMethod = MethodUtils.getAccessibleMethod(
                 target.getClass(), setMethodName, value.getClass());
               if (setMethod == null) {

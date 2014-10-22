@@ -16,11 +16,11 @@ public class AlignedPointConverter extends PointConverter {
    */
   @Override
   protected void readAttribute(final OsnIterator iterator,
-    final String attributeName, final Map<String, Object> values) {
-    if (attributeName.equals("alignment")) {
+    final String fieldName, final Map<String, Object> values) {
+    if (fieldName.equals("alignment")) {
       values.put("alignment", new Double(iterator.nextDoubleValue()));
     } else {
-      super.readAttribute(iterator, attributeName, values);
+      super.readAttribute(iterator, fieldName, values);
     }
   }
 

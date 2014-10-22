@@ -5,13 +5,13 @@
  * $Revision$
 
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -145,19 +145,19 @@ public class OsnIterator implements Iterator<Object> {
   private Object value;
 
   public OsnIterator(final File directory, final String fileName)
-    throws IOException {
+      throws IOException {
     this(fileName, new ObjectSetInputStream(directory, fileName));
   }
 
   public OsnIterator(final String fileName, final InputStream in)
-    throws IOException {
+      throws IOException {
     this.in = new BufferedInputStream(in);
     this.fileName = fileName;
-    scopeStack.push(IN_DOCUMENT);
+    this.scopeStack.push(IN_DOCUMENT);
   }
 
   public OsnIterator(final ZipFile zipFile, final String fileName)
-    throws IOException {
+      throws IOException {
     this(fileName, new ObjectSetInputStream(zipFile, fileName));
   }
 
@@ -171,7 +171,7 @@ public class OsnIterator implements Iterator<Object> {
   private Object checkStartObject() throws IOException {
     skipWhitespace();
     if (isNextCharacter('(')) {
-      scopeStack.push(IN_OBJECT);
+      this.scopeStack.push(IN_OBJECT);
       return START_DEFINITION;
     } else {
       return UNKNOWN;
@@ -179,28 +179,13 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   public void close() throws IOException {
-    in.close();
-  }
-
-  private Object findAttributeName() throws IOException {
-    value = findLowerName(true);
-    if (value == null) {
-      return UNKNOWN;
-    } else {
-      skipWhitespace();
-      if (isNextCharacter(':')) {
-        scopeStack.push(IN_ATTRIBUTE);
-        return START_ATTRIBUTE;
-      } else {
-        return UNKNOWN;
-      }
-    }
+    this.in.close();
   }
 
   private String findClassName() throws IOException {
     final String className = findUpperName(true);
     // If the class name is fullowed by '::' get and return the schema name
-    if (currentCharacter == ':' && getNextCharacter() == ':') {
+    if (this.currentCharacter == ':' && getNextCharacter() == ':') {
       getNextCharacter();
       final String schemaName = findUpperName(false);
       return (className + "::" + schemaName).intern();
@@ -211,7 +196,7 @@ public class OsnIterator implements Iterator<Object> {
 
   private Object findEndCollection() throws IOException {
     if (isNextCharacter('}')) {
-      final Object scope = scopeStack.pop();
+      final Object scope = this.scopeStack.pop();
       if (scope == IN_LIST) {
         return END_LIST;
       } else if (scope == IN_SET) {
@@ -228,7 +213,7 @@ public class OsnIterator implements Iterator<Object> {
 
   private Object findEndObject() throws IOException {
     if (isNextCharacter(')')) {
-      scopeStack.pop();
+      this.scopeStack.pop();
       return END_OBJECT;
     } else {
       return UNKNOWN;
@@ -237,7 +222,7 @@ public class OsnIterator implements Iterator<Object> {
 
   private Object findExpression() throws IOException {
     Object eventType = UNKNOWN;
-    final int c = currentCharacter;
+    final int c = this.currentCharacter;
     if (IS_NUMBER_CHARACTER[c]) {
       eventType = processDigitString();
     } else if (c == '"') {
@@ -245,16 +230,16 @@ public class OsnIterator implements Iterator<Object> {
     } else if (IS_LOWER_CASE_CHARACTER[c]) {
       final String name = findLowerName(true);
       if (name.equals("true")) {
-        value = Boolean.TRUE;
+        this.value = Boolean.TRUE;
         eventType = BOOLEAN_VALUE;
       } else if (name.equals("false")) {
-        value = Boolean.FALSE;
+        this.value = Boolean.FALSE;
         eventType = BOOLEAN_VALUE;
       } else if (name.equals("nil")) {
-        value = null;
+        this.value = null;
         eventType = NULL_VALUE;
       } else {
-        value = name;
+        this.value = name;
         eventType = ENUM_TAG;
       }
     } else if (IS_UPPER_CASE_CHARACTER[c]) {
@@ -262,17 +247,17 @@ public class OsnIterator implements Iterator<Object> {
       if (name.equals("List")) {
         checkStartCollection(name);
         eventType = START_LIST;
-        scopeStack.push(IN_LIST);
+        this.scopeStack.push(IN_LIST);
       } else if (name.equals("Set")) {
         checkStartCollection(name);
         eventType = START_SET;
-        scopeStack.push(IN_SET);
+        this.scopeStack.push(IN_SET);
       } else if (name.equals("Relation")) {
         checkStartCollection(name);
         eventType = START_RELATION;
-        scopeStack.push(IN_RELATION);
+        this.scopeStack.push(IN_RELATION);
       } else {
-        value = name;
+        this.value = name;
         eventType = checkStartObject();
         if (eventType == UNKNOWN) {
           throwParseError("Expecting a '('");
@@ -282,8 +267,23 @@ public class OsnIterator implements Iterator<Object> {
     return eventType;
   }
 
+  private Object findFieldName() throws IOException {
+    this.value = findLowerName(true);
+    if (this.value == null) {
+      return UNKNOWN;
+    } else {
+      skipWhitespace();
+      if (isNextCharacter(':')) {
+        this.scopeStack.push(IN_ATTRIBUTE);
+        return START_ATTRIBUTE;
+      } else {
+        return UNKNOWN;
+      }
+    }
+  }
+
   private String findLowerName(final boolean tokenStart) throws IOException {
-    if (IS_LOWER_CASE_CHARACTER[currentCharacter]) {
+    if (IS_LOWER_CASE_CHARACTER[this.currentCharacter]) {
       return findName(tokenStart);
     } else {
       return null;
@@ -292,11 +292,11 @@ public class OsnIterator implements Iterator<Object> {
 
   private String findName(final boolean tokenStart) throws IOException {
     if (tokenStart) {
-      lineNumber = currentLineNumber;
-      columnNumber = currentColumnNumber;
+      this.lineNumber = this.currentLineNumber;
+      this.columnNumber = this.currentColumnNumber;
     }
     final StringBuilder name = new StringBuilder();
-    int c = currentCharacter;
+    int c = this.currentCharacter;
     while (c != -1 && IS_NAME_CHARACTER[c]) {
       name.append((char)c);
       c = getNextCharacter();
@@ -305,8 +305,8 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   private Object findStartObject() throws IOException {
-    value = findClassName();
-    if (value == null) {
+    this.value = findClassName();
+    if (this.value == null) {
       return UNKNOWN;
     } else {
       return checkStartObject();
@@ -314,7 +314,7 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   private String findUpperName(final boolean tokenStart) throws IOException {
-    if (IS_UPPER_CASE_CHARACTER[currentCharacter]) {
+    if (IS_UPPER_CASE_CHARACTER[this.currentCharacter]) {
       return findName(tokenStart);
     } else {
       return null;
@@ -322,52 +322,52 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   public Boolean getBooleanValue() {
-    if (value == null) {
+    if (this.value == null) {
       return null;
-    } else if (value instanceof Boolean) {
-      return (Boolean)value;
+    } else if (this.value instanceof Boolean) {
+      return (Boolean)this.value;
 
     } else {
-      return Boolean.valueOf(value.toString());
+      return Boolean.valueOf(this.value.toString());
     }
   }
 
   public double getDoubleValue() {
-    return ((BigDecimal)value).doubleValue();
+    return ((BigDecimal)this.value).doubleValue();
   }
 
   public Object getEventType() {
-    return eventType;
+    return this.eventType;
   }
 
   public float getFloatValue() {
-    return ((BigDecimal)value).floatValue();
+    return ((BigDecimal)this.value).floatValue();
   }
 
   public int getIntegerValue() {
-    return ((BigDecimal)value).intValue();
+    return ((BigDecimal)this.value).intValue();
   }
 
   private int getNextCharacter() {
-    if (bufferIndex == bufferLength) {
+    if (this.bufferIndex == this.bufferLength) {
       try {
-        bufferLength = in.read(buffer);
+        this.bufferLength = this.in.read(this.buffer);
       } catch (final IOException e) {
         return -1;
       }
-      if (bufferLength == -1) {
+      if (this.bufferLength == -1) {
         return -1;
       } else {
-        bufferIndex = 0;
+        this.bufferIndex = 0;
       }
     }
-    currentCharacter = buffer[bufferIndex];
-    bufferIndex++;
+    this.currentCharacter = this.buffer[this.bufferIndex];
+    this.bufferIndex++;
 
     // currentCharacter = in.read();
     // line.append((char)currentCharacter);
-    currentColumnNumber++;
-    return currentCharacter;
+    this.currentColumnNumber++;
+    return this.currentCharacter;
   }
 
   public String getPathValue() {
@@ -380,14 +380,14 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   public String getStringValue() {
-    if (value != null) {
-      return value.toString();
+    if (this.value != null) {
+      return this.value.toString();
     }
     return null;
   }
 
   public Object getValue() {
-    return value;
+    return this.value;
   }
 
   @Override
@@ -396,7 +396,7 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   private boolean isNextCharacter(final int c) throws IOException {
-    if (currentCharacter == c) {
+    if (this.currentCharacter == c) {
       getNextCharacter();
       return true;
     } else {
@@ -410,9 +410,9 @@ public class OsnIterator implements Iterator<Object> {
       if (skipWhitespace() == -1) {
         return END_DOCUMENT;
       }
-      eventType = UNKNOWN;
-      value = null;
-      final Object scope = scopeStack.peek();
+      this.eventType = UNKNOWN;
+      this.value = null;
+      final Object scope = this.scopeStack.peek();
       if (scope == IN_DOCUMENT) {
         processDocument();
       } else if (scope == IN_OBJECT) {
@@ -422,41 +422,28 @@ public class OsnIterator implements Iterator<Object> {
       } else if (scope == IN_LIST) {
         processList();
       } else if (scope == IN_SET) {
-        eventType = findExpression();
+        this.eventType = findExpression();
         processSet();
       } else if (scope == IN_RELATION) {
         processRelation();
       }
-      return eventType;
+      return this.eventType;
     } catch (final IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
 
-  public String nextAttributeName() {
-    Object currentEventType = getEventType();
-    if (currentEventType != OsnIterator.START_ATTRIBUTE) {
-      currentEventType = next();
-      if (currentEventType == OsnIterator.END_OBJECT) {
-        return null;
-      } else if (currentEventType != OsnIterator.START_ATTRIBUTE) {
-        throwParseError("Excepecting an attribute name");
-      }
-    }
-    return getStringValue();
-  }
-
   public Boolean nextBooleanAttribute(final String name) {
-    final String attributeName = nextAttributeName();
-    if (attributeName == null || !attributeName.equals(name)) {
+    final String fieldName = nextFieldName();
+    if (fieldName == null || !fieldName.equals(name)) {
       throwParseError("Expecting attribute " + name);
     }
     return nextBooleanValue();
   }
 
   public Boolean nextBooleanValue() {
-    if (eventType != OsnIterator.BOOLEAN_VALUE) {
-      if (eventType == END_OBJECT) {
+    if (this.eventType != OsnIterator.BOOLEAN_VALUE) {
+      if (this.eventType == END_OBJECT) {
         return null;
       } else if (next() != OsnIterator.BOOLEAN_VALUE) {
         throwParseError("Excepecting an boolean value");
@@ -466,16 +453,16 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   public double nextDoubleAttribute(final String name) {
-    final String attributeName = nextAttributeName();
-    if (attributeName == null || !attributeName.equals(name)) {
+    final String fieldName = nextFieldName();
+    if (fieldName == null || !fieldName.equals(name)) {
       throwParseError("Expecting attribute " + name);
     }
     return nextDoubleValue();
   }
 
   public double nextDoubleValue() {
-    if (eventType != OsnIterator.NUMERIC_VALUE) {
-      if (eventType == END_OBJECT) {
+    if (this.eventType != OsnIterator.NUMERIC_VALUE) {
+      if (this.eventType == END_OBJECT) {
         return 0;
       } else if (next() != OsnIterator.NUMERIC_VALUE) {
         throwParseError("Excepecting an numeric value");
@@ -490,9 +477,22 @@ public class OsnIterator implements Iterator<Object> {
     }
   }
 
+  public String nextFieldName() {
+    Object currentEventType = getEventType();
+    if (currentEventType != OsnIterator.START_ATTRIBUTE) {
+      currentEventType = next();
+      if (currentEventType == OsnIterator.END_OBJECT) {
+        return null;
+      } else if (currentEventType != OsnIterator.START_ATTRIBUTE) {
+        throwParseError("Excepecting an attribute name");
+      }
+    }
+    return getStringValue();
+  }
+
   public int nextIntValue() {
-    if (eventType != OsnIterator.NUMERIC_VALUE) {
-      if (eventType == END_OBJECT) {
+    if (this.eventType != OsnIterator.NUMERIC_VALUE) {
+      if (this.eventType == END_OBJECT) {
         return 0;
       } else if (next() != OsnIterator.NUMERIC_VALUE) {
         throwParseError("Excepecting an numeric value");
@@ -519,22 +519,22 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   public String nextStringAttribute(final String name) {
-    final String attributeName = nextAttributeName();
-    if (attributeName == null) {
+    final String fieldName = nextFieldName();
+    if (fieldName == null) {
       return null;
-    } else if (!attributeName.equals(name)) {
+    } else if (!fieldName.equals(name)) {
       throwParseError("Expecting attribute " + name);
     }
     return nextStringValue();
   }
 
   public String nextStringValue() {
-    if (eventType != OsnIterator.TEXT_VALUE
-      && eventType != OsnIterator.ENUM_TAG) {
-      if (eventType == END_OBJECT) {
+    if (this.eventType != OsnIterator.TEXT_VALUE
+        && this.eventType != OsnIterator.ENUM_TAG) {
+      if (this.eventType == END_OBJECT) {
         return null;
       } else if (next() != OsnIterator.TEXT_VALUE
-        && eventType != OsnIterator.ENUM_TAG) {
+          && this.eventType != OsnIterator.ENUM_TAG) {
         throwParseError("Excepecting an text value");
       }
     }
@@ -542,16 +542,16 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   public Object nextValue() {
-    if (eventType != OsnIterator.BOOLEAN_VALUE
-      && eventType != OsnIterator.NUMERIC_VALUE
-      && eventType != OsnIterator.TEXT_VALUE
-      && eventType != OsnIterator.ENUM_TAG) {
-      if (eventType == END_OBJECT) {
+    if (this.eventType != OsnIterator.BOOLEAN_VALUE
+        && this.eventType != OsnIterator.NUMERIC_VALUE
+        && this.eventType != OsnIterator.TEXT_VALUE
+        && this.eventType != OsnIterator.ENUM_TAG) {
+      if (this.eventType == END_OBJECT) {
         return null;
       } else if (next() != OsnIterator.TEXT_VALUE
-        && eventType != OsnIterator.NUMERIC_VALUE
-        && eventType != OsnIterator.BOOLEAN_VALUE
-        && eventType != OsnIterator.ENUM_TAG) {
+          && this.eventType != OsnIterator.NUMERIC_VALUE
+          && this.eventType != OsnIterator.BOOLEAN_VALUE
+          && this.eventType != OsnIterator.ENUM_TAG) {
         throwParseError("Excepecting a value");
       }
     }
@@ -559,39 +559,39 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   private void processAttribute() throws IOException {
-    scopeStack.pop();
-    eventType = findExpression();
-    if (eventType == UNKNOWN) {
+    this.scopeStack.pop();
+    this.eventType = findExpression();
+    if (this.eventType == UNKNOWN) {
       throwParseError("Expecting an expression");
     }
   }
 
   private Object processDigitString() throws IOException {
     final StringBuilder number = new StringBuilder();
-    int c = currentCharacter;
+    int c = this.currentCharacter;
     while (IS_NUMBER_CHARACTER[(char)c]) {
       number.append((char)c);
       c = getNextCharacter();
     }
     if (number.length() > 0) {
       setNextToken(new BigDecimal(number.toString()));
-      eventType = NUMERIC_VALUE;
+      this.eventType = NUMERIC_VALUE;
     }
-    return eventType;
+    return this.eventType;
   }
 
   private void processDocument() throws IOException {
-    eventType = findStartObject();
-    if (eventType == UNKNOWN) {
+    this.eventType = findStartObject();
+    if (this.eventType == UNKNOWN) {
       throwParseError("Expecting start of an object definition");
     }
   }
 
   private void processList() throws IOException {
-    eventType = findExpression();
-    if (eventType == UNKNOWN) {
-      eventType = findEndCollection();
-      if (eventType == UNKNOWN) {
+    this.eventType = findExpression();
+    if (this.eventType == UNKNOWN) {
+      this.eventType = findEndCollection();
+      if (this.eventType == UNKNOWN) {
         throwParseError("Expecting an expression or end of a list");
       }
     }
@@ -599,38 +599,38 @@ public class OsnIterator implements Iterator<Object> {
 
   private void processObject() throws IOException {
     skipWhitespace();
-    eventType = findAttributeName();
-    if (eventType == UNKNOWN) {
+    this.eventType = findFieldName();
+    if (this.eventType == UNKNOWN) {
       skipWhitespace();
-      eventType = findEndObject();
-      if (eventType == UNKNOWN) {
+      this.eventType = findEndObject();
+      if (this.eventType == UNKNOWN) {
         throwParseError("Expecting start of an attribute definition or end of object definition");
       }
     }
   }
 
   private void processRelation() throws IOException {
-    eventType = findStartObject();
-    if (eventType == UNKNOWN) {
-      eventType = findEndCollection();
-      if (eventType == UNKNOWN) {
+    this.eventType = findStartObject();
+    if (this.eventType == UNKNOWN) {
+      this.eventType = findEndCollection();
+      if (this.eventType == UNKNOWN) {
         throwParseError("Expecting an expression or end of a relation");
       }
     }
   }
 
   private void processSet() throws IOException {
-    if (eventType == UNKNOWN) {
-      eventType = findEndCollection();
-      if (eventType == UNKNOWN) {
+    if (this.eventType == UNKNOWN) {
+      this.eventType = findEndCollection();
+      if (this.eventType == UNKNOWN) {
         throwParseError("Expecting an expression or end of a set");
       }
     }
   }
 
   private Object processTextString() throws IOException {
-    lineNumber = currentLineNumber;
-    columnNumber = currentColumnNumber;
+    this.lineNumber = this.currentLineNumber;
+    this.columnNumber = this.currentColumnNumber;
 
     final StringBuilder text = new StringBuilder();
     char c = (char)getNextCharacter();
@@ -648,9 +648,9 @@ public class OsnIterator implements Iterator<Object> {
     }
     final String string = text.toString();
     setNextToken(string);
-    eventType = TEXT_VALUE;
+    this.eventType = TEXT_VALUE;
     getNextCharacter();
-    return eventType;
+    return this.eventType;
   }
 
   @Override
@@ -659,16 +659,16 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   private void setNextToken(final Object token) {
-    value = token;
+    this.value = token;
   }
 
   public int skipWhitespace() {
-    int c = currentCharacter;
+    int c = this.currentCharacter;
     while (c != -1 && IS_WHITESPACE_CHARACTER[c]) {
       if (c == '\n') {
         // line.setLength(0);
-        currentLineNumber++;
-        currentColumnNumber = 1;
+        this.currentLineNumber++;
+        this.currentColumnNumber = 1;
         c = getNextCharacter();
       } else if (c == '/') {
         c = getNextCharacter();
@@ -677,7 +677,7 @@ public class OsnIterator implements Iterator<Object> {
             c = getNextCharacter();
           } while (c != -1 && c != '\n');
         } else {
-          return currentCharacter;
+          return this.currentCharacter;
         }
       } else {
         c = getNextCharacter();
@@ -687,15 +687,16 @@ public class OsnIterator implements Iterator<Object> {
   }
 
   public void throwParseError(final String message) {
-    final int startIndex = Math.max(bufferIndex - 40, 0);
-    final int endIndex = Math.min(80, bufferLength - 1 - startIndex);
+    final int startIndex = Math.max(this.bufferIndex - 40, 0);
+    final int endIndex = Math.min(80, this.bufferLength - 1 - startIndex);
     throw new ParseException(toString(), message + " got '"
-      + (char)currentCharacter + "' context="
-      + new String(buffer, startIndex, endIndex));
+        + (char)this.currentCharacter + "' context="
+        + new String(this.buffer, startIndex, endIndex));
   }
 
   @Override
   public String toString() {
-    return fileName + "[" + lineNumber + "," + columnNumber + "]";
+    return this.fileName + "[" + this.lineNumber + "," + this.columnNumber
+      + "]";
   }
 }

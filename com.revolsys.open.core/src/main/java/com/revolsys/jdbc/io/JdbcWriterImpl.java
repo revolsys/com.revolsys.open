@@ -104,11 +104,11 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
 
   private void addSqlColumEqualsPlaceholder(final StringBuilder sqlBuffer,
     final JdbcFieldDefinition attribute) {
-    final String attributeName = attribute.getName();
+    final String fieldName = attribute.getName();
     if (this.quoteColumnNames) {
-      sqlBuffer.append('"').append(attributeName).append('"');
+      sqlBuffer.append('"').append(fieldName).append('"');
     } else {
-      sqlBuffer.append(attributeName);
+      sqlBuffer.append(fieldName);
     }
     sqlBuffer.append(" = ");
     attribute.addInsertStatementPlaceHolder(sqlBuffer, false);
@@ -354,11 +354,11 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       }
       for (int i = 0; i < type.getFieldCount(); i++) {
         if (!generatePrimaryKey || i != type.getIdFieldIndex()) {
-          final String attributeName = type.getFieldName(i);
+          final String fieldName = type.getFieldName(i);
           if (this.quoteColumnNames) {
-            sqlBuffer.append('"').append(attributeName).append('"');
+            sqlBuffer.append('"').append(fieldName).append('"');
           } else {
-            sqlBuffer.append(attributeName);
+            sqlBuffer.append(fieldName);
           }
           if (i < type.getFieldCount() - 1) {
             sqlBuffer.append(", ");
@@ -481,8 +481,7 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       }
     }
 
-    final boolean hasIdValue = hasId
-      && object.getValue(idFieldName) != null;
+    final boolean hasIdValue = hasId && object.getValue(idFieldName) != null;
 
     if (!hasId || hasIdValue) {
       insert(object, typePath, recordDefinition);
@@ -706,16 +705,16 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
         switch (state) {
           case New:
             insert(object);
-          break;
+            break;
           case Modified:
             update(object);
-          break;
+            break;
           case Persisted:
-          // No action required
-          break;
+            // No action required
+            break;
           case Deleted:
             delete(object);
-          break;
+            break;
           default:
             throw new IllegalStateException("State not known");
         }

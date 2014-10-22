@@ -11,14 +11,14 @@ import com.revolsys.data.record.Record;
 @SuppressWarnings("serial")
 public class RecordListCellRenderer extends DefaultListCellRenderer {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 
-  private final String attributeName;
+  private final String fieldName;
 
-  public RecordListCellRenderer(final String attributeName) {
-    this.attributeName = attributeName;
+  public RecordListCellRenderer(final String fieldName) {
+    this.fieldName = fieldName;
   }
 
   @Override
@@ -29,7 +29,7 @@ public class RecordListCellRenderer extends DefaultListCellRenderer {
       cellHasFocus);
     if (cellValue instanceof Record) {
       final Record object = (Record)cellValue;
-      final Object value = object.getValue(this.attributeName);
+      final Object value = object.getValue(this.fieldName);
       final String text = StringConverterRegistry.toString(value);
       setText(text);
     }

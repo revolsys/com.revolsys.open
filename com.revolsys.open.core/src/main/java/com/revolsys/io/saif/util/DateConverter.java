@@ -11,7 +11,7 @@ public class DateConverter implements OsnConverter {
     int month = 0;
     int day = 1;
     boolean nullDate = false;
-    String name = iterator.nextAttributeName();
+    String name = iterator.nextFieldName();
     while (name != null) {
 
       if (name.equals("day")) {
@@ -32,7 +32,7 @@ public class DateConverter implements OsnConverter {
           nullDate = true;
         }
       }
-      name = iterator.nextAttributeName();
+      name = iterator.nextFieldName();
     }
     if (nullDate) {
       return NULL_DATE;

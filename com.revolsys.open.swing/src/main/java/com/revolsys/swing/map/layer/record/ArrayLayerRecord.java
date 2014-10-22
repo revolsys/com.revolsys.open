@@ -60,10 +60,6 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     }
   }
 
-  protected Object getSync() {
-    return getLayer().getSync();
-  }
-
   @Override
   public void clearChanges() {
     final RecordState state = getState();
@@ -73,12 +69,12 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
-  public void firePropertyChange(final String attributeName,
-    final Object oldValue, final Object newValue) {
+  public void firePropertyChange(final String fieldName, final Object oldValue,
+    final Object newValue) {
     final AbstractLayer layer = getLayer();
     if (layer.isEventsEnabled()) {
       final PropertyChangeEvent event = new PropertyChangeEvent(this,
-        attributeName, oldValue, newValue);
+        fieldName, oldValue, newValue);
       layer.propertyChange(event);
     }
   }
@@ -111,6 +107,10 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     return (T)getValue(name);
   }
 
+  protected Object getSync() {
+    return getLayer().getSync();
+  }
+
   @Override
   public boolean isDeletable() {
     if (this.layer.isCanDeleteRecords()) {
@@ -139,8 +139,8 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     if (this.originalValues == null) {
       return false;
     } else {
-      final String attributeName = getRecordDefinition().getFieldName(index);
-      return isModified(attributeName);
+      final String fieldName = getRecordDefinition().getFieldName(index);
+      return isModified(fieldName);
     }
   }
 
@@ -197,7 +197,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
         if (value == null || value instanceof String
-          && !Property.hasValue((String)value)) {
+            && !Property.hasValue((String)value)) {
           return false;
         }
       }
@@ -249,7 +249,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   @Override
   public void setValue(final int index, final Object value) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final String attributeName = recordDefinition.getFieldName(index);
+    final String fieldName = recordDefinition.getFieldName(index);
 
     final Object oldValue = getValue(index);
     if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
@@ -267,10 +267,10 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
           "Cannot edit a deleted object for layer " + layer);
       } else {
         if (layer.isCanEditRecords()) {
-          final Object originalValue = getOriginalValue(attributeName);
+          final Object originalValue = getOriginalValue(fieldName);
           if (EqualsRegistry.equal(value, originalValue)) {
             if (this.originalValues != null) {
-              this.originalValues.remove(attributeName);
+              this.originalValues.remove(fieldName);
               if (this.originalValues.isEmpty()) {
                 this.originalValues = null;
                 setState(RecordState.Persisted);
@@ -280,7 +280,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
             if (this.originalValues == null) {
               this.originalValues = new HashMap<String, Object>();
             }
-            this.originalValues.put(attributeName, originalValue);
+            this.originalValues.put(fieldName, originalValue);
           }
         } else {
           throw new IllegalStateException(
@@ -289,7 +289,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
       }
       super.setValue(index, value);
       if (!RecordState.Initalizing.equals(state)) {
-        firePropertyChange(attributeName, oldValue, value);
+        firePropertyChange(fieldName, oldValue, value);
         layer.updateRecordState(this);
       }
     }

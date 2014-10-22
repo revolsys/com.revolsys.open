@@ -130,15 +130,15 @@ implements SortableTableModel, CellEditorListener {
     } else {
       final int fieldIndex = columnIndex - this.fieldsOffset;
       if (fieldIndex < this.fieldNames.size()) {
-        final String attributeName = this.fieldNames.get(fieldIndex);
-        if (attributeName == null) {
+        final String fieldName = this.fieldNames.get(fieldIndex);
+        if (fieldName == null) {
           return null;
         } else {
-          final int index = attributeName.indexOf('.');
+          final int index = fieldName.indexOf('.');
           if (index == -1) {
-            return attributeName;
+            return fieldName;
           } else {
-            return attributeName.substring(0, index);
+            return fieldName.substring(0, index);
           }
         }
       } else {
@@ -242,12 +242,12 @@ implements SortableTableModel, CellEditorListener {
     return false;
   }
 
-  public void setFieldNames(final Collection<String> attributeNames) {
-    if (attributeNames == null || attributeNames.isEmpty()) {
+  public void setFieldNames(final Collection<String> fieldNames) {
+    if (fieldNames == null || fieldNames.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
       this.fieldNames = new ArrayList<>(recordDefinition.getFieldNames());
     } else {
-      this.fieldNames = new ArrayList<>(attributeNames);
+      this.fieldNames = new ArrayList<>(fieldNames);
     }
     fireTableStructureChanged();
   }
@@ -266,9 +266,9 @@ implements SortableTableModel, CellEditorListener {
       if (i < fieldTitles.size()) {
         title = fieldTitles.get(i);
       } else {
-        final String attributeName = getFieldName(i);
+        final String fieldName = getFieldName(i);
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final FieldDefinition attribute = recordDefinition.getField(attributeName);
+        final FieldDefinition attribute = recordDefinition.getField(fieldName);
         title = attribute.getTitle();
       }
       this.fieldTitles.add(title);
@@ -287,9 +287,9 @@ implements SortableTableModel, CellEditorListener {
       if (i < fieldTitles.size()) {
         title = fieldTitles.get(i);
       } else {
-        final String attributeName = getFieldName(i);
+        final String fieldName = getFieldName(i);
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final FieldDefinition attribute = recordDefinition.getField(attributeName);
+        final FieldDefinition attribute = recordDefinition.getField(fieldName);
         title = attribute.getTitle();
       }
       this.fieldTitles.add(title);

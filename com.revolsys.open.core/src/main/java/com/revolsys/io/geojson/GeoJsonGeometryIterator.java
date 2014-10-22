@@ -21,7 +21,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 
 public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
-  implements GeoJsonConstants {
+implements GeoJsonConstants {
 
   private GeometryFactory geometryFactory;
 
@@ -33,19 +33,19 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   @Override
   protected void doClose() {
-    FileUtil.closeSilent(in);
-    geometryFactory = null;
-    in = null;
+    FileUtil.closeSilent(this.in);
+    this.geometryFactory = null;
+    this.in = null;
   }
 
   @Override
   protected void doInit() {
-    geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
-    if (geometryFactory == null) {
-      geometryFactory = GeometryFactory.floating3(4326);
+    this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
+    if (this.geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.floating3(4326);
     }
-    if (in.hasNext()) {
-      in.next();
+    if (this.in.hasNext()) {
+      this.in.next();
     }
   }
 
@@ -57,24 +57,23 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   @Override
   protected Geometry getNext() throws NoSuchElementException {
     do {
-      final String attributeName = JsonParser.skipToAttribute(in);
-      if (TYPE.equals(attributeName)) {
-        in.next();
-        final String geometryType = in.getValue();
+      final String fieldName = JsonParser.skipToAttribute(this.in);
+      if (TYPE.equals(fieldName)) {
+        this.in.next();
+        final String geometryType = this.in.getValue();
         if (GEOMETRY_TYPE_NAMES.contains(geometryType)) {
           return readGeometry();
         }
-      } else if (CRS.equals(attributeName)) {
-        in.next();
-        geometryFactory = readCoordinateSystem();
+      } else if (CRS.equals(fieldName)) {
+        this.in.next();
+        this.geometryFactory = readCoordinateSystem();
 
       }
-    } while (in.getEvent() != EventType.endDocument);
+    } while (this.in.getEvent() != EventType.endDocument);
     throw new NoSuchElementException();
   }
 
-  private LineString readCoordinatesList(final boolean cogo,
-    final boolean ring) {
+  private LineString readCoordinatesList(final boolean cogo, final boolean ring) {
     final List<Double> coordinates = new ArrayList<>();
     final int axisCount = readCoordinatesList(coordinates);
     if (cogo) {
@@ -107,14 +106,14 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private int readCoordinatesList(final List<Double> coordinates) {
     int axisCount = 0;
-    if (in.getEvent() == EventType.startArray || in.hasNext()
-      && in.next() == EventType.startArray) {
-      EventType event = in.next();
+    if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
+        && this.in.next() == EventType.startArray) {
+      EventType event = this.in.next();
       if (event != EventType.endArray) {
         do {
           axisCount = Math.max(axisCount,
             readCoordinatesListCoordinates(coordinates));
-          event = in.next();
+          event = this.in.next();
         } while (event == EventType.comma);
       }
       if (event != EventType.endArray) {
@@ -122,30 +121,30 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       }
     } else {
       throw new IllegalStateException("Exepecting start array, not: "
-        + in.getEvent());
+          + this.in.getEvent());
     }
     return axisCount;
   }
 
   /**
    * Read one points coordinates and add them to the list of coordinate values.
-   * 
+   *
    * @param values The list to add the points coordinates to.
    * @return The dimension of the coordinate read.
    */
   private int readCoordinatesListCoordinates(final List<Double> values) {
     int numAxis = 0;
-    if (in.getEvent() == EventType.startArray || in.hasNext()
-      && in.next() == EventType.startArray) {
-      EventType event = in.getEvent();
+    if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
+        && this.in.next() == EventType.startArray) {
+      EventType event = this.in.getEvent();
       do {
-        final Object value = JsonParser.getValue(in);
+        final Object value = JsonParser.getValue(this.in);
         if (value instanceof EventType) {
           event = (EventType)value;
         } else if (value instanceof Number) {
           values.add(((Number)value).doubleValue());
           numAxis++;
-          event = in.next();
+          event = this.in.next();
         } else {
           throw new IllegalArgumentException("Expecting number, not: " + value);
         }
@@ -157,20 +156,20 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       return numAxis;
     } else {
       throw new IllegalStateException("Exepecting start array, not: "
-        + in.getEvent());
+          + this.in.getEvent());
     }
   }
 
   private List<LineString> readCoordinatesListList(final boolean cogo,
     final boolean ring) {
-    if (in.getEvent() == EventType.startArray || in.hasNext()
-      && in.next() == EventType.startArray) {
-      EventType event = in.next();
+    if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
+        && this.in.next() == EventType.startArray) {
+      EventType event = this.in.next();
       final List<LineString> coordinatesLists = new ArrayList<LineString>();
       if (event != EventType.endArray) {
         do {
           coordinatesLists.add(readCoordinatesList(cogo, ring));
-          event = in.next();
+          event = this.in.next();
         } while (event == EventType.comma);
       }
       if (event != EventType.endArray) {
@@ -179,20 +178,19 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       return coordinatesLists;
     } else {
       throw new IllegalStateException("Exepecting start array, not: "
-        + in.getEvent());
+          + this.in.getEvent());
     }
   }
 
-  private List<List<LineString>> readCoordinatesListListList(
-    final boolean cogo) {
-    if (in.getEvent() == EventType.startArray || in.hasNext()
-      && in.next() == EventType.startArray) {
-      EventType event = in.next();
+  private List<List<LineString>> readCoordinatesListListList(final boolean cogo) {
+    if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
+        && this.in.next() == EventType.startArray) {
+      EventType event = this.in.next();
       final List<List<LineString>> coordinatesLists = new ArrayList<List<LineString>>();
       if (event != EventType.endArray) {
         do {
           coordinatesLists.add(readCoordinatesListList(cogo, true));
-          event = in.next();
+          event = this.in.next();
         } while (event == EventType.comma);
       }
       if (event != EventType.endArray) {
@@ -201,16 +199,16 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       return coordinatesLists;
     } else {
       throw new IllegalStateException("Exepecting start array, not: "
-        + in.getEvent());
+          + this.in.getEvent());
     }
   }
 
   private GeometryFactory readCoordinateSystem() {
-    GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = this.geometryFactory;
     do {
-      final String attributeName = JsonParser.skipToNextAttribute(in);
-      if (PROPERTIES.equals(attributeName)) {
-        final Map<String, Object> properties = JsonParser.getMap(in);
+      final String fieldName = JsonParser.skipToNextAttribute(this.in);
+      if (PROPERTIES.equals(fieldName)) {
+        final Map<String, Object> properties = JsonParser.getMap(this.in);
         final String name = (String)properties.get("name");
         if (name != null) {
           if (name.startsWith(URN_OGC_DEF_CRS_EPSG)) {
@@ -222,13 +220,13 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
           }
         }
       }
-    } while (in.getEvent() != EventType.endObject
-      && in.getEvent() != EventType.endDocument);
+    } while (this.in.getEvent() != EventType.endObject
+        && this.in.getEvent() != EventType.endDocument);
     return factory;
   }
 
   private Geometry readGeometry() {
-    final String geometryType = in.getValue();
+    final String geometryType = this.in.getValue();
     if (geometryType.equals(POINT)) {
       return readPoint();
     } else if (geometryType.equals(LINE_STRING)) {
@@ -258,30 +256,30 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Geometry readGeometryCollection() {
     List<Geometry> geometries = new ArrayList<Geometry>();
-    GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = this.geometryFactory;
     do {
-      final String attributeName = JsonParser.skipToNextAttribute(in);
-      if (GEOMETRIES.equals(attributeName)) {
+      final String fieldName = JsonParser.skipToNextAttribute(this.in);
+      if (GEOMETRIES.equals(fieldName)) {
         geometries = readGeometryList();
-      } else if (CRS.equals(attributeName)) {
+      } else if (CRS.equals(fieldName)) {
         factory = readCoordinateSystem();
       }
-    } while (in.getEvent() != EventType.endObject
-      && in.getEvent() != EventType.endDocument);
+    } while (this.in.getEvent() != EventType.endObject
+        && this.in.getEvent() != EventType.endDocument);
 
     return factory.geometry(geometries);
   }
 
   private List<Geometry> readGeometryList() {
-    if (in.getEvent() == EventType.startArray || in.hasNext()
-      && in.next() == EventType.startArray) {
-      EventType event = in.next();
+    if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
+        && this.in.next() == EventType.startArray) {
+      EventType event = this.in.next();
       final List<Geometry> geometries = new ArrayList<Geometry>();
       if (event != EventType.endArray) {
         do {
           final Geometry geometry = getNext();
           geometries.add(geometry);
-          event = in.next();
+          event = this.in.next();
         } while (event == EventType.comma);
       }
       if (event != EventType.endArray) {
@@ -290,22 +288,22 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       return geometries;
     } else {
       throw new IllegalStateException("Exepecting start array, not: "
-        + in.getEvent());
+          + this.in.getEvent());
     }
   }
 
   private LineString readLineString(final boolean cogo) {
     LineString points = null;
-    GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = this.geometryFactory;
     do {
-      final String attributeName = JsonParser.skipToNextAttribute(in);
-      if (COORDINATES.equals(attributeName)) {
+      final String fieldName = JsonParser.skipToNextAttribute(this.in);
+      if (COORDINATES.equals(fieldName)) {
         points = readCoordinatesList(cogo, false);
-      } else if (CRS.equals(attributeName)) {
+      } else if (CRS.equals(fieldName)) {
         factory = readCoordinateSystem();
       }
-    } while (in.getEvent() != EventType.endObject
-      && in.getEvent() != EventType.endDocument);
+    } while (this.in.getEvent() != EventType.endObject
+        && this.in.getEvent() != EventType.endDocument);
 
     if (points == null) {
       return factory.lineString();
@@ -318,16 +316,16 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Geometry readMultiLineString(final boolean cogo) {
     List<LineString> lineStrings = null;
-    GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = this.geometryFactory;
     do {
-      final String attributeName = JsonParser.skipToNextAttribute(in);
-      if (COORDINATES.equals(attributeName)) {
+      final String fieldName = JsonParser.skipToNextAttribute(this.in);
+      if (COORDINATES.equals(fieldName)) {
         lineStrings = readCoordinatesListList(cogo, false);
-      } else if (CRS.equals(attributeName)) {
+      } else if (CRS.equals(fieldName)) {
         factory = readCoordinateSystem();
       }
-    } while (in.getEvent() != EventType.endObject
-      && in.getEvent() != EventType.endDocument);
+    } while (this.in.getEvent() != EventType.endObject
+        && this.in.getEvent() != EventType.endDocument);
     int axisCount = 2;
     for (final LineString points : lineStrings) {
       axisCount = Math.max(axisCount, points.getAxisCount());
@@ -338,16 +336,16 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Geometry readMultiPoint() {
     List<LineString> pointsList = null;
-    GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = this.geometryFactory;
     do {
-      final String attributeName = JsonParser.skipToNextAttribute(in);
-      if (COORDINATES.equals(attributeName)) {
+      final String fieldName = JsonParser.skipToNextAttribute(this.in);
+      if (COORDINATES.equals(fieldName)) {
         pointsList = readPointCoordinatesListList();
-      } else if (CRS.equals(attributeName)) {
+      } else if (CRS.equals(fieldName)) {
         factory = readCoordinateSystem();
       }
-    } while (in.getEvent() != EventType.endObject
-      && in.getEvent() != EventType.endDocument);
+    } while (this.in.getEvent() != EventType.endObject
+        && this.in.getEvent() != EventType.endDocument);
     int axisCount = 2;
     for (final LineString points : pointsList) {
       axisCount = Math.max(axisCount, points.getAxisCount());
@@ -359,16 +357,16 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   private Geometry readMultiPolygon(final boolean cogo) {
     final List<Polygon> polygons = new ArrayList<Polygon>();
     List<List<LineString>> polygonRings = null;
-    GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = this.geometryFactory;
     do {
-      final String attributeName = JsonParser.skipToNextAttribute(in);
-      if (COORDINATES.equals(attributeName)) {
+      final String fieldName = JsonParser.skipToNextAttribute(this.in);
+      if (COORDINATES.equals(fieldName)) {
         polygonRings = readCoordinatesListListList(cogo);
-      } else if (CRS.equals(attributeName)) {
+      } else if (CRS.equals(fieldName)) {
         factory = readCoordinateSystem();
       }
-    } while (in.getEvent() != EventType.endObject
-      && in.getEvent() != EventType.endDocument);
+    } while (this.in.getEvent() != EventType.endObject
+        && this.in.getEvent() != EventType.endDocument);
     int axisCount = 2;
     if (polygonRings != null) {
       for (final List<LineString> rings : polygonRings) {
@@ -386,16 +384,16 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
 
   private Point readPoint() {
     LineString coordinates = null;
-    GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = this.geometryFactory;
     do {
-      final String attributeName = JsonParser.skipToNextAttribute(in);
-      if (COORDINATES.equals(attributeName)) {
+      final String fieldName = JsonParser.skipToNextAttribute(this.in);
+      if (COORDINATES.equals(fieldName)) {
         coordinates = readPointCoordinatesList();
-      } else if (CRS.equals(attributeName)) {
+      } else if (CRS.equals(fieldName)) {
         factory = readCoordinateSystem();
       }
-    } while (in.getEvent() != EventType.endObject
-      && in.getEvent() != EventType.endDocument);
+    } while (this.in.getEvent() != EventType.endObject
+        && this.in.getEvent() != EventType.endDocument);
     if (coordinates == null) {
       return factory.point();
     } else {
@@ -406,7 +404,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private LineString readPointCoordinatesList() {
-    final double[] values = JsonParser.getDoubleArray(in);
+    final double[] values = JsonParser.getDoubleArray(this.in);
     if (values == null) {
       return null;
     } else {
@@ -415,14 +413,14 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private List<LineString> readPointCoordinatesListList() {
-    if (in.getEvent() == EventType.startArray || in.hasNext()
-      && in.next() == EventType.startArray) {
-      EventType event = in.next();
+    if (this.in.getEvent() == EventType.startArray || this.in.hasNext()
+        && this.in.next() == EventType.startArray) {
+      EventType event = this.in.next();
       final List<LineString> coordinatesLists = new ArrayList<LineString>();
       if (event != EventType.endArray) {
         do {
           coordinatesLists.add(readPointCoordinatesList());
-          event = in.next();
+          event = this.in.next();
         } while (event == EventType.comma);
       }
       if (event != EventType.endArray) {
@@ -431,22 +429,22 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry>
       return coordinatesLists;
     } else {
       throw new IllegalStateException("Exepecting start array, not: "
-        + in.getEvent());
+          + this.in.getEvent());
     }
   }
 
   private Polygon readPolygon(final boolean cogo) {
     List<LineString> rings = null;
-    GeometryFactory factory = geometryFactory;
+    GeometryFactory factory = this.geometryFactory;
     do {
-      final String attributeName = JsonParser.skipToNextAttribute(in);
-      if (COORDINATES.equals(attributeName)) {
+      final String fieldName = JsonParser.skipToNextAttribute(this.in);
+      if (COORDINATES.equals(fieldName)) {
         rings = readCoordinatesListList(cogo, true);
-      } else if (CRS.equals(attributeName)) {
+      } else if (CRS.equals(fieldName)) {
         factory = readCoordinateSystem();
       }
-    } while (in.getEvent() != EventType.endObject
-      && in.getEvent() != EventType.endDocument);
+    } while (this.in.getEvent() != EventType.endObject
+        && this.in.getEvent() != EventType.endDocument);
     int axisCount = 2;
     for (final LineString points : rings) {
       axisCount = Math.max(axisCount, points.getAxisCount());

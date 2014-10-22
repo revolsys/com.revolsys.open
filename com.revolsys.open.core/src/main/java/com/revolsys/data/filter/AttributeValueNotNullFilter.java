@@ -12,13 +12,13 @@ import com.revolsys.filter.Filter;
 public class AttributeValueNotNullFilter implements Filter<Record> {
 
   /** The property name, or path to match. */
-  private String attributeName;
+  private String fieldName;
 
   public AttributeValueNotNullFilter() {
   }
 
-  public AttributeValueNotNullFilter(final String attributeName) {
-    this.attributeName = attributeName;
+  public AttributeValueNotNullFilter(final String fieldName) {
+    this.fieldName = fieldName;
   }
 
   /**
@@ -30,16 +30,16 @@ public class AttributeValueNotNullFilter implements Filter<Record> {
   @Override
   public boolean accept(final Record object) {
     final Object propertyValue = RecordUtil.getFieldByPath(object,
-      this.attributeName);
+      this.fieldName);
     return propertyValue != null;
   }
 
   public String getFieldName() {
-    return this.attributeName;
+    return this.fieldName;
   }
 
-  public void setAttributeName(final String attributeName) {
-    this.attributeName = attributeName;
+  public void setFieldName(final String fieldName) {
+    this.fieldName = fieldName;
   }
 
   /**
@@ -47,6 +47,6 @@ public class AttributeValueNotNullFilter implements Filter<Record> {
    */
   @Override
   public String toString() {
-    return this.attributeName + " != null ";
+    return this.fieldName + " != null ";
   }
 }

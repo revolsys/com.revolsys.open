@@ -67,7 +67,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
       } else {
         final double lookAtScale = 1.2;
         final double lookAtRange = maxMetres / 2 / Math.tan(Math.toRadians(25))
-            * lookAtScale;
+          * lookAtScale;
         return (long)Math.ceil(lookAtRange);
       }
     }
@@ -132,7 +132,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
   public void writeExtendedData(final Map<String, ? extends Object> data) {
     boolean hasValues = false;
     for (final Entry<String, ? extends Object> entry : data.entrySet()) {
-      final String attributeName = entry.getKey();
+      final String fieldName = entry.getKey();
       final Object value = entry.getValue();
       if (!(value instanceof Geometry)) {
         if (value != null) {
@@ -143,7 +143,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
               startTag(EXTENDED_DATA);
             }
             startTag(DATA);
-            attribute(NAME, attributeName);
+            attribute(NAME, fieldName);
             element(VALUE, value);
             endTag(DATA);
           }
@@ -426,7 +426,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     startTag(ICON);
     final Map<String, String> parameters = Collections.singletonMap("BBOX",
       envelope.getMinX() + "," + envelope.getMinY() + "," + envelope.getMaxX()
-      + "," + envelope.getMaxY());
+        + "," + envelope.getMaxY());
     element(HREF, UrlUtil.getUrl(baseUrl, parameters));
 
     endTag();

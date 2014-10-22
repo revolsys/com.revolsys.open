@@ -31,19 +31,19 @@ public class ArcConverter implements OsnConverter {
   @Override
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
-    values.put(SaifConstants.TYPE, geometryType);
+    values.put(SaifConstants.TYPE, this.geometryType);
 
-    String attributeName = iterator.nextAttributeName();
+    String field = iterator.nextFieldName();
     LineString geometry = null;
-    while (attributeName != null) {
-      if (attributeName.equals("LineString")) {
+    while (field != null) {
+      if (field.equals("LineString")) {
         final List<Point> coordinates = new ArrayList<Point>();
         while (iterator.next() != OsnIterator.END_LIST) {
           final String pointName = iterator.nextObjectName();
           if (!pointName.equals("/Point")) {
             iterator.throwParseError("Expecting Point object");
           }
-          final String coordsName = iterator.nextAttributeName();
+          final String coordsName = iterator.nextFieldName();
           if (!coordsName.equals("coords")) {
             iterator.throwParseError("Expecting coords attribute");
           }
@@ -63,11 +63,11 @@ public class ArcConverter implements OsnConverter {
           iterator.nextEndObject();
           iterator.nextEndObject();
         }
-        geometry = geometryFactory.lineString(coordinates);
+        geometry = this.geometryFactory.lineString(coordinates);
       } else {
-        readAttribute(iterator, attributeName, values);
+        readAttribute(iterator, field, values);
       }
-      attributeName = iterator.nextAttributeName();
+      field = iterator.nextFieldName();
     }
     if (!values.isEmpty()) {
       geometry.setUserData(values);
@@ -77,14 +77,14 @@ public class ArcConverter implements OsnConverter {
   }
 
   protected void readAttribute(final OsnIterator iterator,
-    final String attributeName, final Map<String, Object> values) {
+    final String fieldName, final Map<String, Object> values) {
     final Object value = iterator.nextValue();
-    values.put(attributeName, value);
+    values.put(fieldName, value);
   }
 
   @Override
   public void write(final OsnSerializer serializer, final Object object)
-    throws IOException {
+      throws IOException {
     final boolean writeAttributes = true;
     write(serializer, object, writeAttributes);
   }
@@ -93,15 +93,15 @@ public class ArcConverter implements OsnConverter {
     final boolean writeAttributes) throws IOException {
     if (object instanceof LineString) {
       final LineString line = (LineString)object;
-      serializer.startObject(geometryType);
+      serializer.startObject(this.geometryType);
 
-      serializer.attributeName("LineString");
+      serializer.fieldName("LineString");
       serializer.startCollection("List");
       final LineString points = line;
       final int axisCount = points.getAxisCount();
       for (int i = 0; i < points.getVertexCount(); i++) {
         serializer.startObject(SaifConstants.POINT);
-        serializer.attributeName("coords");
+        serializer.fieldName("coords");
         final double x = points.getX(i);
         final double y = points.getY(i);
         final double z = points.getZ(i);

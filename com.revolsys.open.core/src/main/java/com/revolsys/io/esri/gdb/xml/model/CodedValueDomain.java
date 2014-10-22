@@ -162,7 +162,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   @Override
-  public List<String> getValueAttributeNames() {
+  public List<String> getValueFieldNames() {
     return Arrays.asList("NAME");
   }
 

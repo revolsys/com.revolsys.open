@@ -13,15 +13,15 @@ import com.revolsys.util.Property;
 
 public class RecordToStringConverter extends ObjectToStringConverter {
 
-  private final List<String> attributeNames;
+  private final List<String> fieldNames;
 
-  public RecordToStringConverter(final List<String> attributeNames) {
+  public RecordToStringConverter(final List<String> fieldNames) {
     super();
-    this.attributeNames = attributeNames;
+    this.fieldNames = fieldNames;
   }
 
-  public RecordToStringConverter(final String... attributeNames) {
-    this(Arrays.asList(attributeNames));
+  public RecordToStringConverter(final String... fieldNames) {
+    this(Arrays.asList(fieldNames));
   }
 
   @Override
@@ -31,9 +31,9 @@ public class RecordToStringConverter extends ObjectToStringConverter {
     } else if (value instanceof Record) {
       final Record object = (Record)value;
       final List<String> values = new ArrayList<String>();
-      for (final String attributeName : this.attributeNames) {
+      for (final String fieldName : this.fieldNames) {
         final String text = StringConverterRegistry.toString(Property.get(
-          object, attributeName));
+          object, fieldName));
         values.add(text);
       }
       return CollectionUtil.toString(values);

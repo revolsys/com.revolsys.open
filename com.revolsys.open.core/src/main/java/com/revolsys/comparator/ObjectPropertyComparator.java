@@ -7,7 +7,7 @@ import java.util.List;
 import com.revolsys.util.Property;
 
 public class ObjectPropertyComparator<V> implements Comparator<V> {
-  private List<String> attributeNames;
+  private List<String> fieldNames;
 
   private boolean invert;
 
@@ -17,23 +17,23 @@ public class ObjectPropertyComparator<V> implements Comparator<V> {
   }
 
   public ObjectPropertyComparator(final boolean sortAsceding,
-    final String... attributeNames) {
-    this(Arrays.asList(attributeNames));
+    final String... fieldNames) {
+    this(Arrays.asList(fieldNames));
     this.invert = !sortAsceding;
   }
 
-  public ObjectPropertyComparator(final List<String> attributeNames) {
-    this.attributeNames = attributeNames;
+  public ObjectPropertyComparator(final List<String> fieldNames) {
+    this.fieldNames = fieldNames;
   }
 
-  public ObjectPropertyComparator(final String... attributeNames) {
-    this(Arrays.asList(attributeNames));
+  public ObjectPropertyComparator(final String... fieldNames) {
+    this(Arrays.asList(fieldNames));
   }
 
   @Override
   public int compare(final Object object1, final Object object2) {
-    for (final String attributeName : attributeNames) {
-      final int compare = compare(object1, object2, attributeName);
+    for (final String fieldName : this.fieldNames) {
+      final int compare = compare(object1, object2, fieldName);
       if (compare != 0) {
         return compare;
       }
@@ -43,28 +43,28 @@ public class ObjectPropertyComparator<V> implements Comparator<V> {
   }
 
   public int compare(final Object object1, final Object object2,
-    final String attributeName) {
-    final Comparable<Object> value1 = Property.get(object1, attributeName);
-    final Comparable<Object> value2 = Property.get(object2, attributeName);
+    final String fieldName) {
+    final Comparable<Object> value1 = Property.get(object1, fieldName);
+    final Comparable<Object> value2 = Property.get(object2, fieldName);
     if (value1 == null) {
       if (value2 == null) {
         return 0;
       } else {
-        if (nullFirst) {
+        if (this.nullFirst) {
           return -1;
         } else {
           return 1;
         }
       }
     } else if (value2 == null) {
-      if (nullFirst) {
+      if (this.nullFirst) {
         return 1;
       } else {
         return -1;
       }
     } else {
       final int compare = value1.compareTo(value2);
-      if (invert) {
+      if (this.invert) {
         return -compare;
       } else {
         return compare;
@@ -73,19 +73,19 @@ public class ObjectPropertyComparator<V> implements Comparator<V> {
   }
 
   public List<String> getFieldNames() {
-    return attributeNames;
+    return this.fieldNames;
   }
 
   public boolean isInvert() {
-    return invert;
+    return this.invert;
   }
 
   public boolean isNullFirst() {
-    return nullFirst;
+    return this.nullFirst;
   }
 
-  public void setAttributeNames(final List<String> attributeNames) {
-    this.attributeNames = attributeNames;
+  public void setFieldNames(final List<String> fieldNames) {
+    this.fieldNames = fieldNames;
   }
 
   public void setInvert(final boolean invert) {

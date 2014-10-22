@@ -29,12 +29,12 @@ public class PointConverter implements OsnConverter {
   @Override
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<String, Object>();
-    values.put("type", geometryClass);
+    values.put("type", this.geometryClass);
     Geometry geometry = null;
 
-    String attributeName = iterator.nextAttributeName();
-    while (attributeName != null) {
-      if (attributeName.equals("coords")) {
+    String fieldName = iterator.nextFieldName();
+    while (fieldName != null) {
+      if (fieldName.equals("coords")) {
         Point coordinate = null;
         final String coordTypeName = iterator.nextObjectName();
         if (coordTypeName.equals("/Coord3D")) {
@@ -53,11 +53,11 @@ public class PointConverter implements OsnConverter {
           iterator.throwParseError("Expecting Coord2D or Coord3D");
         }
         iterator.nextEndObject();
-        geometry = geometryFactory.point(coordinate);
+        geometry = this.geometryFactory.point(coordinate);
       } else {
-        readAttribute(iterator, attributeName, values);
+        readAttribute(iterator, fieldName, values);
       }
-      attributeName = iterator.nextAttributeName();
+      fieldName = iterator.nextFieldName();
     }
     if (!values.isEmpty()) {
       geometry.setUserData(values);
@@ -66,22 +66,22 @@ public class PointConverter implements OsnConverter {
   }
 
   protected void readAttribute(final OsnIterator iterator,
-    final String attributeName, final Map<String, Object> values) {
+    final String fieldName, final Map<String, Object> values) {
     iterator.next();
-    values.put(attributeName, iterator.getValue());
+    values.put(fieldName, iterator.getValue());
   }
 
   @Override
   public void write(final OsnSerializer serializer, final Object object)
-    throws IOException {
+      throws IOException {
     if (object instanceof Point) {
       final Point point = (Point)object;
       final int axisCount = point.getAxisCount();
       final double x = point.getX();
       final double y = point.getY();
       final double z = point.getZ();
-      serializer.startObject(geometryClass);
-      serializer.attributeName("coords");
+      serializer.startObject(this.geometryClass);
+      serializer.fieldName("coords");
       if (axisCount == 2) {
         serializer.startObject("/Coord2D");
         serializer.attribute("c1", x, true);

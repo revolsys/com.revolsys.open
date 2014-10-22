@@ -12,15 +12,14 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 
 public class SetCodeTableId extends
-  AbstractSourceToTargetProcess<Record, Record> {
+AbstractSourceToTargetProcess<Record, Record> {
   private final CodeTable codeTable;
 
   private final Map<String, Converter<Record, Object>> codeTableValueConverters = new HashMap<String, Converter<Record, Object>>();
 
   private final String targetFieldName;
 
-  public SetCodeTableId(final CodeTable codeTable,
-    final String targetFieldName) {
+  public SetCodeTableId(final CodeTable codeTable, final String targetFieldName) {
     this.codeTable = codeTable;
     this.targetFieldName = targetFieldName;
   }
@@ -29,19 +28,19 @@ public class SetCodeTableId extends
   public void process(final Record source, final Record target) {
     final Map<String, Object> codeTableValues = new HashMap<String, Object>();
 
-    for (final Entry<String, Converter<Record, Object>> entry : codeTableValueConverters.entrySet()) {
-      String codeTableAttributeName = entry.getKey();
+    for (final Entry<String, Converter<Record, Object>> entry : this.codeTableValueConverters.entrySet()) {
+      String codeTableFieldName = entry.getKey();
       final Converter<Record, Object> sourceAttributeConverter = entry.getValue();
       Object sourceValue = sourceAttributeConverter.convert(source);
       if (sourceValue != null) {
         final RecordDefinition targetRecordDefinition = target.getRecordDefinition();
         String codeTableValueName = null;
-        final int dotIndex = codeTableAttributeName.indexOf(".");
+        final int dotIndex = codeTableFieldName.indexOf(".");
         if (dotIndex != -1) {
-          codeTableValueName = codeTableAttributeName.substring(dotIndex + 1);
-          codeTableAttributeName = codeTableAttributeName.substring(0, dotIndex);
+          codeTableValueName = codeTableFieldName.substring(dotIndex + 1);
+          codeTableFieldName = codeTableFieldName.substring(0, dotIndex);
         }
-        final CodeTable targetCodeTable = targetRecordDefinition.getCodeTableByColumn(codeTableAttributeName);
+        final CodeTable targetCodeTable = targetRecordDefinition.getCodeTableByColumn(codeTableFieldName);
         if (targetCodeTable != null) {
           if (codeTableValueName == null) {
             sourceValue = targetCodeTable.getId(sourceValue);
@@ -51,20 +50,20 @@ public class SetCodeTableId extends
           }
         }
       }
-      codeTableValues.put(codeTableAttributeName, sourceValue);
+      codeTableValues.put(codeTableFieldName, sourceValue);
     }
-    final Object codeId = codeTable.getId(codeTableValues);
-    target.setValue(targetFieldName, codeId);
+    final Object codeId = this.codeTable.getId(codeTableValues);
+    target.setValue(this.targetFieldName, codeId);
   }
 
   public void setValueMapping(final String codeTableAttribute,
     final Converter<Record, Object> valueConverter) {
-    codeTableValueConverters.put(codeTableAttribute, valueConverter);
+    this.codeTableValueConverters.put(codeTableAttribute, valueConverter);
 
   }
 
   @Override
   public String toString() {
-    return "setCodeTableId" + codeTableValueConverters;
+    return "setCodeTableId" + this.codeTableValueConverters;
   }
 }

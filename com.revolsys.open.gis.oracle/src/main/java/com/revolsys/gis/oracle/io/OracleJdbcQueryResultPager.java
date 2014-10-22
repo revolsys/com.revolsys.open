@@ -44,23 +44,23 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
         final int startRowNum = (pageNumber - 1) * pageSize + 1;
         final int endRowNum = startRowNum + pageSize - 1;
         sql = "SELECT * FROM ( SELECT  T2.*, ROWNUM TROWNUM FROM ( " + sql
-            + ") T2 ) WHERE TROWNUM BETWEEN " + startRowNum + " AND " + endRowNum;
+          + ") T2 ) WHERE TROWNUM BETWEEN " + startRowNum + " AND " + endRowNum;
 
         try (
-            final JdbcConnection connection = getRecordStore().getJdbcConnection()) {
+          final JdbcConnection connection = getRecordStore().getJdbcConnection()) {
           final RecordFactory recordFactory = getRecordFactory();
           final RecordDefinition recordDefinition = getRecordDefinition();
           final List<FieldDefinition> attributes = new ArrayList<>();
 
-          final List<String> attributeNames = query.getFieldNames();
-          if (attributeNames.isEmpty()) {
+          final List<String> fieldNames = query.getFieldNames();
+          if (fieldNames.isEmpty()) {
             attributes.addAll(recordDefinition.getFields());
           } else {
-            for (final String attributeName : attributeNames) {
-              if (attributeName.equals("*")) {
+            for (final String fieldName : fieldNames) {
+              if (fieldName.equals("*")) {
                 attributes.addAll(recordDefinition.getFields());
               } else {
-                final FieldDefinition attribute = recordDefinition.getField(attributeName);
+                final FieldDefinition attribute = recordDefinition.getField(fieldName);
                 if (attribute != null) {
                   attributes.add(attribute);
                 }
@@ -68,9 +68,9 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
             }
           }
           try (
-              final PreparedStatement statement = connection.prepareStatement(sql);
-              final ResultSet resultSet = JdbcQueryIterator.getResultSet(
-                recordDefinition, statement, getQuery());) {
+            final PreparedStatement statement = connection.prepareStatement(sql);
+            final ResultSet resultSet = JdbcQueryIterator.getResultSet(
+              recordDefinition, statement, getQuery());) {
             if (resultSet.next()) {
               int i = 0;
               do {

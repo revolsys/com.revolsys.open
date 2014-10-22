@@ -81,8 +81,8 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     if (geometryField == null) {
       return null;
     } else {
-      final EnvelopeIntersects intersects = F.envelopeIntersects(
-        geometryField, boundingBox);
+      final EnvelopeIntersects intersects = F.envelopeIntersects(geometryField,
+        boundingBox);
       final Query query = new Query(recordDefinition, intersects);
       return query;
     }
@@ -98,7 +98,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     return query;
   }
 
-  private List<String> attributeNames = Collections.emptyList();
+  private List<String> fieldNames = Collections.emptyList();
 
   private String fromClause;
 
@@ -169,7 +169,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   public Query clone() {
     try {
       final Query clone = (Query)super.clone();
-      clone.attributeNames = new ArrayList<String>(clone.attributeNames);
+      clone.fieldNames = new ArrayList<String>(clone.fieldNames);
       clone.parameters = new ArrayList<Object>(this.parameters);
       clone.orderBy = new HashMap<String, Boolean>(this.orderBy);
       if (this.whereCondition != null) {
@@ -185,7 +185,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   }
 
   public List<String> getFieldNames() {
-    return this.attributeNames;
+    return this.fieldNames;
   }
 
   public String getFromClause() {
@@ -248,12 +248,12 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     return this.lockResults;
   }
 
-  public void setAttributeNames(final List<String> attributeNames) {
-    this.attributeNames = attributeNames;
+  public void setFieldNames(final List<String> fieldNames) {
+    this.fieldNames = fieldNames;
   }
 
-  public void setAttributeNames(final String... attributeNames) {
-    setAttributeNames(Arrays.asList(attributeNames));
+  public void setFieldNames(final String... fieldNames) {
+    setFieldNames(Arrays.asList(fieldNames));
   }
 
   public void setFromClause(final String fromClause) {

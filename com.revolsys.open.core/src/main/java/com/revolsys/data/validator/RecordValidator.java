@@ -66,12 +66,10 @@ public class RecordValidator {
       new GeometryFieldValidator());
     setObjectValidator(DataTypes.POLYGON, new GeometryFieldValidator());
     setObjectValidator(DataTypes.MULTI_POINT, new GeometryFieldValidator());
-    setObjectValidator(DataTypes.MULTI_POLYGON,
-      new GeometryFieldValidator());
+    setObjectValidator(DataTypes.MULTI_POLYGON, new GeometryFieldValidator());
   }
 
-  public void addValidators(
-    final Map<DataType, FieldValueValidator> validators) {
+  public void addValidators(final Map<DataType, FieldValueValidator> validators) {
     for (final Entry<DataType, FieldValueValidator> entry : validators.entrySet()) {
       final DataType dataType = entry.getKey();
       final FieldValueValidator validator = entry.getValue();
@@ -89,7 +87,7 @@ public class RecordValidator {
       } else {
         final String packageName = getClass().getPackage().getName();
         final String className = packageName + "." + dataType
-          + "AttributeValidator";
+            + "AttributeValidator";
         try {
           final Class<?> validatorClass = Class.forName(className);
           validator = (FieldValueValidator)validatorClass.newInstance();
@@ -113,14 +111,13 @@ public class RecordValidator {
         final Object value = record.getValue(i);
         final DataType dataType = type.getFieldType(i);
         final FieldDefinition attribDef = type.getField(i);
-        final String attributeName = type.getFieldName(i);
+        final String fieldName = type.getFieldName(i);
 
         if (value == null) {
           if (attribDef.isRequired()) {
-            final Object defaultValue = type.getDefaultValue(attributeName);
+            final Object defaultValue = type.getDefaultValue(fieldName);
             if (defaultValue != null) {
-              log.error("Attribute " + attributeName
-                + "value must be specified");
+              log.error("Attribute " + fieldName + "value must be specified");
               valid = false;
             }
           }
@@ -129,8 +126,8 @@ public class RecordValidator {
           if (validator != null) {
             if (!validator.isValid(attribDef, value)) {
               if (!(validator instanceof RecordAttributeValidator)) {
-                log.error(attributeName + "='" + value + "' is not a valid "
-                  + dataType.getValidationName());
+                log.error(fieldName + "='" + value + "' is not a valid "
+                    + dataType.getValidationName());
               }
               valid = i == record.getRecordDefinition().getGeometryFieldIndex();
             }

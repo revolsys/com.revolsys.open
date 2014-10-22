@@ -36,16 +36,6 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.util.Property;
 
 public final class JdbcUtils {
-  public static void addFieldName(final StringBuilder sql,
-    final String tablePrefix, final FieldDefinition attribute) {
-    if (attribute instanceof JdbcFieldDefinition) {
-      final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
-      jdbcAttribute.addColumnName(sql, tablePrefix);
-    } else {
-      sql.append(attribute.getName());
-    }
-  }
-
   public static void addColumnNames(final StringBuilder sql,
     final RecordDefinition recordDefinition, final String tablePrefix) {
     for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
@@ -59,18 +49,28 @@ public final class JdbcUtils {
 
   public static void addColumnNames(final StringBuilder sql,
     final RecordDefinition recordDefinition, final String tablePrefix,
-    final List<String> attributeNames, boolean hasColumns) {
-    for (final String attributeName : attributeNames) {
+    final List<String> fieldNames, boolean hasColumns) {
+    for (final String fieldName : fieldNames) {
       if (hasColumns) {
         sql.append(", ");
       }
-      final FieldDefinition attribute = recordDefinition.getField(attributeName);
+      final FieldDefinition attribute = recordDefinition.getField(fieldName);
       if (attribute == null) {
-        sql.append(attributeName);
+        sql.append(fieldName);
       } else {
         addFieldName(sql, tablePrefix, attribute);
       }
       hasColumns = true;
+    }
+  }
+
+  public static void addFieldName(final StringBuilder sql,
+    final String tablePrefix, final FieldDefinition attribute) {
+    if (attribute instanceof JdbcFieldDefinition) {
+      final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
+      jdbcAttribute.addColumnName(sql, tablePrefix);
+    } else {
+      sql.append(attribute.getName());
     }
   }
 
@@ -79,7 +79,7 @@ public final class JdbcUtils {
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
       for (final Iterator<Entry<String, Boolean>> iterator = orderBy.entrySet()
-          .iterator(); iterator.hasNext();) {
+        .iterator(); iterator.hasNext();) {
         final Entry<String, Boolean> entry = iterator.next();
         final String column = entry.getKey();
         sql.append(column);
@@ -150,18 +150,17 @@ public final class JdbcUtils {
 
   public static String createSelectSql(final RecordDefinition recordDefinition,
     final String tablePrefix, final String fromClause,
-    final boolean lockResults, final List<String> attributeNames,
+    final boolean lockResults, final List<String> fieldNames,
     final Query query, final Map<String, Boolean> orderBy) {
     final String typePath = recordDefinition.getPath();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
     boolean hasColumns = false;
-    if (attributeNames.isEmpty() || attributeNames.remove("*")) {
+    if (fieldNames.isEmpty() || fieldNames.remove("*")) {
       addColumnNames(sql, recordDefinition, tablePrefix);
       hasColumns = true;
     }
-    addColumnNames(sql, recordDefinition, tablePrefix, attributeNames,
-      hasColumns);
+    addColumnNames(sql, recordDefinition, tablePrefix, fieldNames, hasColumns);
     sql.append(" FROM ");
     if (Property.hasValue(fromClause)) {
       sql.append(fromClause);
@@ -183,7 +182,7 @@ public final class JdbcUtils {
     final String tableName, final String idColumn, final Object id) {
 
     final String sql = "DELETE FROM " + cleanObjectName(tableName) + " WHERE "
-        + cleanObjectName(idColumn) + " = ?";
+      + cleanObjectName(idColumn) + " = ?";
     try {
       final PreparedStatement statement = connection.prepareStatement(sql);
       try {
@@ -199,7 +198,7 @@ public final class JdbcUtils {
     } catch (final SQLException e) {
       LOG.error("Invalid table name or id column: " + sql, e);
       throw new IllegalArgumentException("Invalid table name or id column: "
-          + sql);
+        + sql);
     }
 
   }
@@ -230,7 +229,7 @@ public final class JdbcUtils {
   public static int executeUpdate(final JdbcRecordStore recordStore,
     final String sql, final Object... parameters) {
     try (
-        final JdbcConnection connection = recordStore.getJdbcConnection()) {
+      final JdbcConnection connection = recordStore.getJdbcConnection()) {
       try {
         return executeUpdate(connection, sql, parameters);
       } catch (final SQLException e) {
@@ -276,9 +275,9 @@ public final class JdbcUtils {
           if (dataSource.getClass().getName().toLowerCase().contains("oracle")) {
             return "Oracle";
           } else if (dataSource.getClass()
-              .getName()
-              .toLowerCase()
-              .contains("postgres")) {
+            .getName()
+            .toLowerCase()
+            .contains("postgres")) {
             return "PostgreSQL";
           } else {
             return null;
@@ -327,20 +326,20 @@ public final class JdbcUtils {
         // throw new IllegalArgumentException("Unknown table name " +
         // tableName);
       }
-      final List<String> attributeNames = new ArrayList<String>(
-          query.getFieldNames());
-      if (attributeNames.isEmpty()) {
-        final List<String> recordDefinitionAttributeNames = recordDefinition.getFieldNames();
-        if (recordDefinitionAttributeNames.isEmpty()) {
-          attributeNames.add("T.*");
+      final List<String> fieldNames = new ArrayList<String>(
+        query.getFieldNames());
+      if (fieldNames.isEmpty()) {
+        final List<String> recordDefinitionFieldNames = recordDefinition.getFieldNames();
+        if (recordDefinitionFieldNames.isEmpty()) {
+          fieldNames.add("T.*");
         } else {
-          attributeNames.addAll(recordDefinitionAttributeNames);
+          fieldNames.addAll(recordDefinitionFieldNames);
         }
       }
       final String fromClause = query.getFromClause();
       final boolean lockResults = query.isLockResults();
       sql = createSelectSql(recordDefinition, "T", fromClause, lockResults,
-        attributeNames, query, orderBy);
+        fieldNames, query, orderBy);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
         final StringBuilder newSql = new StringBuilder("SELECT ");
@@ -379,7 +378,7 @@ public final class JdbcUtils {
     if (recordStore instanceof JdbcRecordStore) {
       final JdbcRecordStore jdbcRecordStore = (JdbcRecordStore)recordStore;
       try (
-          final JdbcConnection connection = jdbcRecordStore.getJdbcConnection()) {
+        final JdbcConnection connection = jdbcRecordStore.getJdbcConnection()) {
         final String tableName = getQualifiedTableName(typePath);
         final String sql = "LOCK TABLE " + tableName + " IN SHARE MODE";
         executeUpdate(connection, sql);
@@ -391,7 +390,7 @@ public final class JdbcUtils {
   }
 
   public static Map<String, Object> readMap(final ResultSet rs)
-      throws SQLException {
+    throws SQLException {
     final Map<String, Object> values = new LinkedHashMap<String, Object>();
     final ResultSetMetaData metaData = rs.getMetaData();
     for (int i = 1; i <= metaData.getColumnCount(); i++) {
@@ -431,7 +430,7 @@ public final class JdbcUtils {
 
   public static Date selectDate(final DataSource dataSource,
     final Connection connection, final String sql, final Object... parameters)
-        throws SQLException {
+    throws SQLException {
     if (dataSource == null) {
       return selectDate(connection, sql, parameters);
     } else {
@@ -495,13 +494,13 @@ public final class JdbcUtils {
   public static int selectInt(final JdbcRecordStore recordStore,
     final String sql, final Object... parameters) {
     try (
-        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      JdbcConnection connection = recordStore.getJdbcConnection()) {
       try (
-          final PreparedStatement statement = connection.prepareStatement(sql)) {
+        final PreparedStatement statement = connection.prepareStatement(sql)) {
         setParameters(statement, parameters);
 
         try (
-            final ResultSet resultSet = statement.executeQuery()) {
+          final ResultSet resultSet = statement.executeQuery()) {
           if (resultSet.next()) {
             return resultSet.getInt(1);
           } else {
@@ -516,7 +515,7 @@ public final class JdbcUtils {
 
   public static <T> List<T> selectList(final Connection connection,
     final String sql, final int columnIndex, final Object... parameters)
-        throws SQLException {
+    throws SQLException {
     final List<T> results = new ArrayList<T>();
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
@@ -559,7 +558,7 @@ public final class JdbcUtils {
 
   public static long selectLong(final DataSource dataSource,
     final Connection connection, final String sql, final Object... parameters)
-        throws SQLException {
+    throws SQLException {
     if (dataSource == null) {
       return selectLong(connection, sql, parameters);
     } else {
@@ -580,13 +579,13 @@ public final class JdbcUtils {
   public static long selectLong(final JdbcRecordStore recordStore,
     final String sql, final Object... parameters) {
     try (
-        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      JdbcConnection connection = recordStore.getJdbcConnection()) {
       try (
-          final PreparedStatement statement = connection.prepareStatement(sql)) {
+        final PreparedStatement statement = connection.prepareStatement(sql)) {
         setParameters(statement, parameters);
 
         try (
-            final ResultSet resultSet = statement.executeQuery()) {
+          final ResultSet resultSet = statement.executeQuery()) {
           if (resultSet.next()) {
             return resultSet.getLong(1);
           } else {
@@ -610,7 +609,7 @@ public final class JdbcUtils {
           return readMap(resultSet);
         } else {
           throw new IllegalArgumentException("Value not found for " + sql + " "
-              + Arrays.asList(parameters));
+            + Arrays.asList(parameters));
         }
       } finally {
         close(resultSet);
@@ -634,13 +633,13 @@ public final class JdbcUtils {
     final JdbcRecordStore recordStore, final String sql,
     final Object... parameters) {
     try (
-        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      JdbcConnection connection = recordStore.getJdbcConnection()) {
       try (
-          final PreparedStatement statement = connection.prepareStatement(sql)) {
+        final PreparedStatement statement = connection.prepareStatement(sql)) {
         setParameters(statement, parameters);
 
         try (
-            final ResultSet resultSet = statement.executeQuery()) {
+          final ResultSet resultSet = statement.executeQuery()) {
           if (resultSet.next()) {
             return readMap(resultSet);
           } else {
@@ -657,10 +656,10 @@ public final class JdbcUtils {
   public static String selectString(final Connection connection,
     final String sql, final Object... parameters) throws SQLException {
     try (
-        final PreparedStatement statement = connection.prepareStatement(sql)) {
+      final PreparedStatement statement = connection.prepareStatement(sql)) {
       setParameters(statement, parameters);
       try (
-          final ResultSet resultSet = statement.executeQuery()) {
+        final ResultSet resultSet = statement.executeQuery()) {
         if (resultSet.next()) {
           return resultSet.getString(1);
         } else {
@@ -672,7 +671,7 @@ public final class JdbcUtils {
 
   public static String selectString(final DataSource dataSource,
     final Connection connection, final String sql, final Object... parameters)
-        throws SQLException {
+    throws SQLException {
     if (dataSource == null) {
       return selectString(connection, sql, parameters);
     } else {
@@ -693,7 +692,7 @@ public final class JdbcUtils {
   public static String selectString(final JdbcRecordStore recordStore,
     final String sql, final Object... parameters) throws SQLException {
     try (
-        JdbcConnection connection = recordStore.getJdbcConnection()) {
+      JdbcConnection connection = recordStore.getJdbcConnection()) {
       return selectString(connection, sql, parameters);
     }
   }

@@ -23,7 +23,7 @@ import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.util.Reorderable;
 
 public class RecordListTableModel extends RecordRowTableModel implements
-  Reorderable {
+Reorderable {
   public static TablePanel createPanel(final AbstractRecordLayer layer) {
     return createPanel(layer.getRecordDefinition(), new ArrayList<Record>(),
       layer.getFieldNamesSet());
@@ -37,16 +37,16 @@ public class RecordListTableModel extends RecordRowTableModel implements
 
   public static TablePanel createPanel(final RecordDefinition recordDefinition,
     final Collection<? extends Record> records,
-    final Collection<String> attributeNames) {
+    final Collection<String> fieldNames) {
     final RecordListTableModel model = new RecordListTableModel(
-      recordDefinition, records, attributeNames);
+      recordDefinition, records, fieldNames);
     final JTable table = new RecordRowTable(model);
     return new TablePanel(table);
   }
 
   public static TablePanel createPanel(final RecordDefinition recordDefinition,
-    final List<? extends Record> records, final String... attributeNames) {
-    return createPanel(recordDefinition, records, Arrays.asList(attributeNames));
+    final List<? extends Record> records, final String... fieldNames) {
+    return createPanel(recordDefinition, records, Arrays.asList(fieldNames));
   }
 
   private static final long serialVersionUID = 1L;
@@ -118,12 +118,12 @@ public class RecordListTableModel extends RecordRowTableModel implements
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     if (isEditable()) {
-      final String attributeName = getFieldName(rowIndex, columnIndex);
-      if (isReadOnly(attributeName)) {
+      final String fieldName = getFieldName(rowIndex, columnIndex);
+      if (isReadOnly(fieldName)) {
         return false;
       } else {
         final RecordDefinition recordDefinition = getRecordDefinition();
-        final DataType dataType = recordDefinition.getFieldType(attributeName);
+        final DataType dataType = recordDefinition.getFieldType(fieldName);
         if (dataType == null) {
           return false;
         } else if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
@@ -183,9 +183,9 @@ public class RecordListTableModel extends RecordRowTableModel implements
   public SortOrder setSortOrder(final int column) {
     final SortOrder sortOrder = super.setSortOrder(column);
     if (this.records != null) {
-      final String attributeName = getFieldName(column);
+      final String fieldName = getFieldName(column);
       final Comparator<Record> comparitor = new RecordAttributeComparator(
-        sortOrder == SortOrder.ASCENDING, attributeName);
+        sortOrder == SortOrder.ASCENDING, fieldName);
       Collections.sort(this.records, comparitor);
       fireTableDataChanged();
     }

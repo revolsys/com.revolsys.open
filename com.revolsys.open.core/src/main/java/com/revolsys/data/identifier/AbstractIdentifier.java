@@ -17,8 +17,8 @@ public abstract class AbstractIdentifier implements Identifier {
     final List<String> idFieldNames, final Identifier identifier) {
     if (identifier == null) {
       for (int i = 0; i < idFieldNames.size(); i++) {
-        final String attributeName = idFieldNames.get(0);
-        record.put(attributeName, null);
+        final String fieldName = idFieldNames.get(0);
+        record.put(fieldName, null);
       }
     } else {
       identifier.setIdentifier(record, idFieldNames);
@@ -137,24 +137,24 @@ public abstract class AbstractIdentifier implements Identifier {
 
   @Override
   public void setIdentifier(final Map<String, Object> record,
-    final List<String> attributeNames) {
+    final List<String> fieldNames) {
     final List<Object> values = getValues();
-    if (attributeNames.size() == values.size()) {
-      for (int i = 0; i < attributeNames.size(); i++) {
-        final String attributeName = attributeNames.get(i);
+    if (fieldNames.size() == values.size()) {
+      for (int i = 0; i < fieldNames.size(); i++) {
+        final String fieldName = fieldNames.get(i);
         final Object value = values.get(i);
-        record.put(attributeName, value);
+        record.put(fieldName, value);
       }
     } else {
       throw new IllegalArgumentException("Attribute names count for "
-          + attributeNames + " != count for values " + values);
+        + fieldNames + " != count for values " + values);
     }
   }
 
   @Override
   public void setIdentifier(final Map<String, Object> record,
-    final String... attributeNames) {
-    setIdentifier(record, Arrays.asList(attributeNames));
+    final String... fieldNames) {
+    setIdentifier(record, Arrays.asList(fieldNames));
   }
 
   @Override

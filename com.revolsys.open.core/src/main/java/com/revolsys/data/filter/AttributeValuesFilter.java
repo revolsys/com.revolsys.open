@@ -10,15 +10,15 @@ import com.revolsys.data.record.RecordUtil;
 import com.revolsys.filter.Filter;
 
 /**
- * Filter Records by the value of the attributeName.
+ * Filter Records by the value of the fieldName.
  *
  * @author Paul Austin
  */
 public class AttributeValuesFilter implements Filter<Record> {
   private boolean allowNulls;
 
-  /** The attributeName name, or path to match. */
-  private String attributeName;
+  /** The fieldName name, or path to match. */
+  private String fieldName;
 
   /** The value to match. */
   private List<Object> values = new ArrayList<Object>();
@@ -32,12 +32,12 @@ public class AttributeValuesFilter implements Filter<Record> {
   /**
    * Construct a new AttributeValuesFilter.
    *
-   * @param attributeName The attribute name.
+   * @param fieldName The attribute name.
    * @param values The list of values.
    */
-  public AttributeValuesFilter(final String attributeName,
+  public AttributeValuesFilter(final String fieldName,
     final boolean allowNulls, final List<Object> values) {
-    this.attributeName = attributeName;
+    this.fieldName = fieldName;
     this.values = values;
     this.allowNulls = allowNulls;
   }
@@ -45,28 +45,27 @@ public class AttributeValuesFilter implements Filter<Record> {
   /**
    * Construct a new AttributeValuesFilter.
    *
-   * @param attributeName The attribute name.
+   * @param fieldName The attribute name.
    * @param values The array of values.
    */
-  public AttributeValuesFilter(final String attributeName,
+  public AttributeValuesFilter(final String fieldName,
     final boolean allowNulls, final Object... values) {
-    this(attributeName, allowNulls, Arrays.asList(values));
+    this(fieldName, allowNulls, Arrays.asList(values));
   }
 
   /**
    * Construct a new AttributeValuesFilter.
    *
-   * @param attributeName The attribute name.
+   * @param fieldName The attribute name.
    * @param values The list of values.
    */
-  public AttributeValuesFilter(final String attributeName,
-    final List<Object> values) {
-    this.attributeName = attributeName;
+  public AttributeValuesFilter(final String fieldName, final List<Object> values) {
+    this.fieldName = fieldName;
     this.values = values;
   }
 
   /**
-   * Match the attributeName on the data object with the required value.
+   * Match the fieldName on the data object with the required value.
    *
    * @param object The object.
    * @return True if the object matched the filter, false otherwise.
@@ -74,7 +73,7 @@ public class AttributeValuesFilter implements Filter<Record> {
   @Override
   public boolean accept(final Record object) {
     final Object propertyValue = RecordUtil.getFieldByPath(object,
-      this.attributeName);
+      this.fieldName);
     if (propertyValue == null) {
       if (this.allowNulls) {
         return true;
@@ -92,12 +91,12 @@ public class AttributeValuesFilter implements Filter<Record> {
   }
 
   /**
-   * Get the attributeName name, or path to match.
+   * Get the fieldName name, or path to match.
    *
-   * @return The attributeName name, or path to match.
+   * @return The fieldName name, or path to match.
    */
   public String getFieldName() {
-    return this.attributeName;
+    return this.fieldName;
   }
 
   /**
@@ -116,12 +115,12 @@ public class AttributeValuesFilter implements Filter<Record> {
   }
 
   /**
-   * Set the attributeName name, or path to match.
+   * Set the fieldName name, or path to match.
    *
-   * @param attributeName The attributeName name, or path to match.
+   * @param fieldName The fieldName name, or path to match.
    */
-  public void setAttributeName(final String attributeName) {
-    this.attributeName = attributeName;
+  public void setFieldName(final String fieldName) {
+    this.fieldName = fieldName;
   }
 
   /**
@@ -136,7 +135,7 @@ public class AttributeValuesFilter implements Filter<Record> {
    */
   @Override
   public String toString() {
-    return this.attributeName + " in " + this.values;
+    return this.fieldName + " in " + this.values;
   }
 
 }

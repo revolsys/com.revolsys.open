@@ -30,19 +30,18 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
 
   protected Record copy(final Record object) {
     Record targetObject;
-    if (recordDefinition == null) {
+    if (this.recordDefinition == null) {
       targetObject = object;
     } else {
-      targetObject = new ArrayRecord(recordDefinition);
-      for (final String attributeName : recordDefinition.getFieldNames()) {
-        copyAttribute(object, attributeName, targetObject, attributeName);
+      targetObject = new ArrayRecord(this.recordDefinition);
+      for (final String fieldName : this.recordDefinition.getFieldNames()) {
+        copyAttribute(object, fieldName, targetObject, fieldName);
       }
-      if (attributeMap != null) {
-        for (final Entry<String, String> mapping : attributeMap.entrySet()) {
-          final String sourceAttributeName = mapping.getKey();
+      if (this.attributeMap != null) {
+        for (final Entry<String, String> mapping : this.attributeMap.entrySet()) {
+          final String sourceFieldName = mapping.getKey();
           final String targetFieldName = mapping.getValue();
-          copyAttribute(object, sourceAttributeName, targetObject,
-            targetFieldName);
+          copyAttribute(object, sourceFieldName, targetObject, targetFieldName);
         }
       }
     }
@@ -50,10 +49,10 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
   }
 
   private void copyAttribute(final Record sourceObject,
-    final String sourceAttributeName, final Record targetObject,
+    final String sourceFieldName, final Record targetObject,
     final String targetFieldName) {
-    Object value = sourceObject.getValueByPath(sourceAttributeName);
-    final Map<Object, Object> valueMap = valueMaps.get(targetFieldName);
+    Object value = sourceObject.getValueByPath(sourceFieldName);
+    final Map<Object, Object> valueMap = this.valueMaps.get(targetFieldName);
     if (valueMap != null) {
       final Object mappedValue = valueMap.get(value);
       if (mappedValue != null) {
@@ -64,37 +63,37 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
   }
 
   public Map<String, String> getFieldMap() {
-    return attributeMap;
+    return this.attributeMap;
   }
 
   public RecordDefinition getRecordDefinition() {
-    return recordDefinition;
+    return this.recordDefinition;
   }
 
   public RecordDefinitionFactory getRecordDefinitionFactory() {
-    return recordDefinitionFactory;
+    return this.recordDefinitionFactory;
   }
 
   public String getTypeName() {
-    return typeName;
+    return this.typeName;
   }
 
   public Map<String, Map<Object, Object>> getValueMaps() {
-    return valueMaps;
+    return this.valueMaps;
   }
 
   @Override
   @PostConstruct
   protected void init() {
     super.init();
-    if (recordDefinition == null) {
-      recordDefinition = recordDefinitionFactory.getRecordDefinition(typeName);
+    if (this.recordDefinition == null) {
+      this.recordDefinition = this.recordDefinitionFactory.getRecordDefinition(this.typeName);
     }
   }
 
   @Override
-  protected void process(final Channel<Record> in,
-    final Channel<Record> out, final Record object) {
+  protected void process(final Channel<Record> in, final Channel<Record> out,
+    final Record object) {
     final Record targetObject = copy(object);
     out.write(targetObject);
   }
@@ -107,7 +106,8 @@ public class CopyProcess extends BaseInOutProcess<Record, Record> {
     this.recordDefinition = recordDefinition;
   }
 
-  public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
+  public void setRecordDefinitionFactory(
+    final RecordDefinitionFactory recordDefinitionFactory) {
     this.recordDefinitionFactory = recordDefinitionFactory;
   }
 

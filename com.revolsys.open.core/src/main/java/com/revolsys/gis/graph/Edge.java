@@ -25,7 +25,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
 public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
-  Externalizable {
+Externalizable {
 
   public static <T> void addEdgeToEdgesByLine(
     final Map<LineString, Set<Edge<T>>> lineEdgeMap, final Edge<T> edge) {
@@ -130,7 +130,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
 
   /**
    * Get the list of objects from the collection of edges.
-   * 
+   *
    * @param <T> The type of the objects.
    * @param edges The collection of edges.
    * @return The collection of edges.
@@ -146,7 +146,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
 
   /**
    * Get the map of type name to list of edges.
-   * 
+   *
    * @param <T> The type of object stored in the edge.
    * @param edges The list of edges.
    * @return The map of type name to list of edges.
@@ -184,9 +184,9 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
   }
 
   public static <T> void setEdgesAttribute(final List<Edge<T>> edges,
-    final String attributeName, final Object value) {
+    final String fieldName, final Object value) {
     for (final Edge<T> edge : edges) {
-      edge.setAttribute(attributeName, value);
+      edge.setAttribute(fieldName, value);
     }
   }
 
@@ -237,7 +237,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
             final String otherName = edge.toSuperString();
             final int nameCompare = name.compareTo(otherName);
             if (nameCompare == 0) {
-              return ((Integer)id).compareTo(edge.id);
+              return ((Integer)this.id).compareTo(edge.id);
             } else {
               return nameCompare;
             }
@@ -252,10 +252,6 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     }
   }
 
-  public double distance(final Point point) {
-    return LineStringUtil.distance(point, getLine());
-  }
-
   public double distance(final Edge<LineSegmentMatch> edge) {
     return getLine().distance(edge.getLine());
   }
@@ -265,40 +261,29 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     return distance(point);
   }
 
+  public double distance(final Point point) {
+    return LineStringUtil.distance(point, getLine());
+  }
+
   @Override
   protected void finalize() throws Throwable {
-    if (graph != null) {
-      graph.evict(this);
+    if (this.graph != null) {
+      this.graph.evict(this);
     }
     super.finalize();
   }
 
   public double getAngle(final Node<T> node) {
-    if (node.getGraph() == graph) {
+    if (node.getGraph() == this.graph) {
       final int nodeId = node.getId();
-      if (nodeId == fromNodeId) {
+      if (nodeId == this.fromNodeId) {
         return getFromAngle();
-      } else if (nodeId == toNodeId) {
+      } else if (nodeId == this.toNodeId) {
         return getToAngle();
 
       }
     }
     return Double.NaN;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <V> V getField(final String name) {
-    if (graph == null) {
-      return null;
-    } else {
-      return (V)graph.getEdgeAttribute(id, name);
-    }
-  }
-
-  @Override
-  public Map<String, Object> getFields() {
-    return graph.getEdgeAttributes(id);
   }
 
   public BoundingBox getBoundingBox() {
@@ -334,6 +319,21 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     return getLine().getBoundingBox();
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
+  public <V> V getField(final String name) {
+    if (this.graph == null) {
+      return null;
+    } else {
+      return (V)this.graph.getEdgeAttribute(this.id, name);
+    }
+  }
+
+  @Override
+  public Map<String, Object> getFields() {
+    return this.graph.getEdgeAttributes(this.id);
+  }
+
   public double getFromAngle() {
     final LineString line = getLine();
     final LineString points = line;
@@ -341,15 +341,15 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
   }
 
   public Node<T> getFromNode() {
-    return graph.getNode(fromNodeId);
+    return this.graph.getNode(this.fromNodeId);
   }
 
   public Graph<T> getGraph() {
-    return graph;
+    return this.graph;
   }
 
   public int getId() {
-    return id;
+    return this.id;
   }
 
   public double getLength() {
@@ -358,7 +358,7 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
   }
 
   public LineString getLine() {
-    return graph.getEdgeLine(id);
+    return this.graph.getEdgeLine(this.id);
   }
 
   public Node<T> getNextJunctionNode(final Node<T> node) {
@@ -384,15 +384,15 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
   }
 
   public T getObject() {
-    return graph.getEdgeObject(id);
+    return this.graph.getEdgeObject(this.id);
   }
 
   public Node<T> getOppositeNode(final Node<T> node) {
     if (node.getGraph() == node.getGraph()) {
       final int nodeId = node.getId();
-      if (fromNodeId == nodeId) {
+      if (this.fromNodeId == nodeId) {
         return getToNode();
-      } else if (toNodeId == nodeId) {
+      } else if (this.toNodeId == nodeId) {
         return getFromNode();
       }
     }
@@ -405,29 +405,30 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
       return Double.NaN;
     } else {
       final LineString points = line;
-      return CoordinatesListUtil.angleToPrevious(points, points.getVertexCount() - 1);
+      return CoordinatesListUtil.angleToPrevious(points,
+        points.getVertexCount() - 1);
     }
   }
 
   public Node<T> getToNode() {
-    return graph.getNode(toNodeId);
+    return this.graph.getNode(this.toNodeId);
   }
 
   public String getTypeName() {
-    return graph.getTypeName(this);
+    return this.graph.getTypeName(this);
   }
 
   @Override
   public int hashCode() {
-    return id;
+    return this.id;
   }
 
   public boolean hasNode(final Node<T> node) {
-    if (node.getGraph() == graph) {
+    if (node.getGraph() == this.graph) {
       final int nodeId = node.getId();
-      if (fromNodeId == nodeId) {
+      if (this.fromNodeId == nodeId) {
         return true;
-      } else if (toNodeId == nodeId) {
+      } else if (this.toNodeId == nodeId) {
         return true;
       }
     }
@@ -439,16 +440,16 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
    * Get the direction of the edge from the specified node. If the node is at
    * the start of the edge then return true. If the node is at the end of the
    * edge return false. Otherwise an exception is thrown.
-   * 
+   *
    * @param node The node to test the direction from.
    * @return True if the node is at the start of the edge.
    */
   public boolean isForwards(final Node<T> node) {
-    if (node.getGraph() == graph) {
+    if (node.getGraph() == this.graph) {
       final int nodeId = node.getId();
-      if (fromNodeId == nodeId) {
+      if (this.fromNodeId == nodeId) {
         return true;
-      } else if (toNodeId == nodeId) {
+      } else if (this.toNodeId == nodeId) {
         return false;
       }
     }
@@ -456,22 +457,17 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
       + " is not part of the edge.");
   }
 
-  public boolean isLessThanDistance(final Point point,
-    final double distance) {
-    return LineStringUtil.distance(point, getLine(), distance) < distance;
-  }
-
   public boolean isLessThanDistance(final Node<T> node, final double distance) {
     final Point point = node;
     return isLessThanDistance(point, distance);
   }
 
-  public boolean isRemoved() {
-    return graph == null;
+  public boolean isLessThanDistance(final Point point, final double distance) {
+    return LineStringUtil.distance(point, getLine(), distance) < distance;
   }
 
-  public boolean isWithinDistance(final Point point, final double distance) {
-    return LineStringUtil.distance(point, getLine(), distance) <= distance;
+  public boolean isRemoved() {
+    return this.graph == null;
   }
 
   public boolean isWithinDistance(final Node<T> node, final double distance) {
@@ -479,32 +475,36 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
     return isWithinDistance(point, distance);
   }
 
+  public boolean isWithinDistance(final Point point, final double distance) {
+    return LineStringUtil.distance(point, getLine(), distance) <= distance;
+  }
+
   @Override
   public void readExternal(final ObjectInput in) throws IOException,
-    ClassNotFoundException {
+  ClassNotFoundException {
     final int graphId = in.readInt();
-    graph = Graph.getGraph(graphId);
-    id = in.readInt();
-    fromNodeId = in.readInt();
-    toNodeId = in.readInt();
+    this.graph = Graph.getGraph(graphId);
+    this.id = in.readInt();
+    this.fromNodeId = in.readInt();
+    this.toNodeId = in.readInt();
   }
 
   public void remove() {
-    if (graph != null) {
-      graph.remove(this);
+    if (this.graph != null) {
+      this.graph.remove(this);
     }
   }
 
   void removeInternal() {
-    final Node<T> fromNode = graph.getNode(fromNodeId);
+    final Node<T> fromNode = this.graph.getNode(this.fromNodeId);
     if (fromNode != null) {
       fromNode.remove(this);
     }
-    final Node<T> toNode = graph.getNode(toNodeId);
+    final Node<T> toNode = this.graph.getNode(this.toNodeId);
     if (toNode != null) {
       toNode.remove(this);
     }
-    graph = null;
+    this.graph = null;
   }
 
   public List<Edge<T>> replace(final LineString... lines) {
@@ -522,31 +522,30 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
 
   @Override
   public void setAttribute(final String name, final Object value) {
-    graph.setEdgeAttribute(id, name, value);
+    this.graph.setEdgeAttribute(this.id, name, value);
   }
 
   public void setAttributes(final Map<String, Object> attributes) {
-    graph.setEdgeAttributes(id, attributes);
+    this.graph.setEdgeAttributes(this.id, attributes);
   }
 
-  public <V extends Point> List<Edge<T>> split(
-    final Collection<V> splitPoints) {
-    return graph.splitEdge(this, splitPoints);
+  public <V extends Point> List<Edge<T>> split(final Collection<V> splitPoints) {
+    return this.graph.splitEdge(this, splitPoints);
   }
 
-  public <V extends Point> List<Edge<T>> split(
-    final Collection<V> points, final double maxDistance) {
-    return graph.splitEdge(this, points, maxDistance);
-  }
-
-  public List<Edge<T>> split(final Point... points) {
-    return split(Arrays.asList(points));
+  public <V extends Point> List<Edge<T>> split(final Collection<V> points,
+    final double maxDistance) {
+    return this.graph.splitEdge(this, points, maxDistance);
   }
 
   public List<Edge<T>> split(final List<Point> points) {
     final Graph<T> graph = getGraph();
     return graph.splitEdge(this, points);
 
+  }
+
+  public List<Edge<T>> split(final Point... points) {
+    return split(Arrays.asList(points));
   }
 
   @Override
@@ -560,11 +559,11 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
       if (typeName != null) {
         sb.append(typeName.toString());
       }
-      sb.append(id);
+      sb.append(this.id);
       sb.append('{');
-      sb.append(fromNodeId);
+      sb.append(this.fromNodeId);
       sb.append(',');
-      sb.append(toNodeId);
+      sb.append(this.toNodeId);
       sb.append("}\tLINESTRING(");
       final Node<T> fromNode = getFromNode();
       sb.append(fromNode.getX());
@@ -591,11 +590,11 @@ public class Edge<T> implements AttributedObject, Comparable<Edge<T>>,
 
   @Override
   public void writeExternal(final ObjectOutput out) throws IOException {
-    final int graphId = graph.getId();
+    final int graphId = this.graph.getId();
     out.writeInt(graphId);
-    out.writeInt(id);
-    out.writeInt(fromNodeId);
-    out.writeInt(toNodeId);
+    out.writeInt(this.id);
+    out.writeInt(this.fromNodeId);
+    out.writeInt(this.toNodeId);
 
   }
 }

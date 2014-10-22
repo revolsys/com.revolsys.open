@@ -30,13 +30,13 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class CsvRecordIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
 
   private final char fieldSeparator;
 
-  private String pointXAttributeName;
+  private String pointXFieldName;
 
-  private String pointYAttributeName;
+  private String pointYFieldName;
 
   private String geometryColumnName;
 
@@ -75,14 +75,14 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
   }
 
   private void createRecordDefinition(final String[] fieldNames)
-    throws IOException {
-    this.hasPointFields = Property.hasValue(this.pointXAttributeName)
-      && Property.hasValue(this.pointYAttributeName);
+      throws IOException {
+    this.hasPointFields = Property.hasValue(this.pointXFieldName)
+        && Property.hasValue(this.pointYFieldName);
     if (this.hasPointFields) {
       this.geometryType = DataTypes.POINT;
     } else {
-      this.pointXAttributeName = null;
-      this.pointYAttributeName = null;
+      this.pointXFieldName = null;
+      this.pointYFieldName = null;
     }
     final List<FieldDefinition> attributes = new ArrayList<>();
     FieldDefinition geometryField = null;
@@ -100,11 +100,11 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
           type = DataTypes.MULTI_POINT;
           isGeometryAttribute = true;
         } else if ("LINESTRING".equalsIgnoreCase(name)
-          || "LINE".equalsIgnoreCase(name)) {
+            || "LINE".equalsIgnoreCase(name)) {
           type = DataTypes.LINE_STRING;
           isGeometryAttribute = true;
         } else if ("MULTILINESTRING".equalsIgnoreCase(name)
-          || "MULTILINE".equalsIgnoreCase(name)) {
+            || "MULTILINE".equalsIgnoreCase(name)) {
           type = DataTypes.MULTI_LINE_STRING;
           isGeometryAttribute = true;
         } else if ("POLYGON".equalsIgnoreCase(name)) {
@@ -164,8 +164,8 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
   @Override
   protected void doInit() {
     try {
-      this.pointXAttributeName = getProperty("pointXAttributeName");
-      this.pointYAttributeName = getProperty("pointYAttributeName");
+      this.pointXFieldName = getProperty("pointXFieldName");
+      this.pointYFieldName = getProperty("pointYFieldName");
       this.geometryColumnName = getProperty("geometryColumnName", "GEOMETRY");
 
       this.geometryFactory = GeometryFactory.get(getProperty("geometryFactory"));
@@ -241,7 +241,7 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
    * @throws IOException if bad things happen during the read
    */
   private String[] parseLine(final String nextLine, final boolean readLine)
-    throws IOException {
+      throws IOException {
     String line = nextLine;
     if (line.length() == 0) {
       return new String[0];
@@ -264,14 +264,14 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
           if (c == CsvConstants.QUOTE_CHARACTER) {
             hadQuotes = true;
             if (inQuotes && line.length() > i + 1
-              && line.charAt(i + 1) == CsvConstants.QUOTE_CHARACTER) {
+                && line.charAt(i + 1) == CsvConstants.QUOTE_CHARACTER) {
               sb.append(line.charAt(i + 1));
               i++;
             } else {
               inQuotes = !inQuotes;
               if (i > 2 && line.charAt(i - 1) != this.fieldSeparator
-                && line.length() > i + 1
-                && line.charAt(i + 1) != this.fieldSeparator) {
+                  && line.length() > i + 1
+                  && line.charAt(i + 1) != this.fieldSeparator) {
                 sb.append(c);
               }
             }
@@ -321,10 +321,8 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
       }
     }
     if (this.hasPointFields) {
-      final Double x = CollectionUtil.getDouble(object,
-        this.pointXAttributeName);
-      final Double y = CollectionUtil.getDouble(object,
-        this.pointYAttributeName);
+      final Double x = CollectionUtil.getDouble(object, this.pointXFieldName);
+      final Double y = CollectionUtil.getDouble(object, this.pointYFieldName);
       if (x != null && y != null) {
         final Geometry geometry = this.geometryFactory.point(x, y);
         object.setGeometryValue(geometry);

@@ -268,9 +268,9 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       }
       for (final XBaseFieldDefinition field : this.fields) {
         if (!writeField(object, field)) {
-          final String attributeName = field.getFullName();
-          log.warn("Unable to write attribute '" + attributeName
-            + "' with value " + object.getValue(attributeName));
+          final String fieldName = field.getFullName();
+          log.warn("Unable to write attribute '" + fieldName + "' with value "
+            + object.getValue(fieldName));
         }
       }
       this.numRecords++;
@@ -284,8 +284,8 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
     if (this.out == null) {
       return true;
     } else {
-      final String attributeName = field.getFullName();
-      final Object value = object.getValue(attributeName);
+      final String fieldName = field.getFullName();
+      final Object value = object.getValue(fieldName);
       final int fieldLength = field.getLength();
       switch (field.getType()) {
         case XBaseFieldDefinition.NUMBER_TYPE:
@@ -311,7 +311,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
             }
             numString = numberFormat.format(number);
           } else {
-            throw new IllegalArgumentException("Not a number " + attributeName
+            throw new IllegalArgumentException("Not a number " + fieldName
               + "=" + value);
           }
           final int numLength = numString.length();

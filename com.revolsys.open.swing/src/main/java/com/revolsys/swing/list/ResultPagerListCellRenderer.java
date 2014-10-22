@@ -17,17 +17,17 @@ import com.revolsys.util.Property;
 public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
   private static final long serialVersionUID = 1L;
 
-  private List<String> attributeNames = Collections.emptyList();
+  private List<String> fieldNames = Collections.emptyList();
 
   public ResultPagerListCellRenderer() {
   }
 
-  public ResultPagerListCellRenderer(final List<String> attributeNames) {
-    this.attributeNames = attributeNames;
+  public ResultPagerListCellRenderer(final List<String> fieldNames) {
+    this.fieldNames = fieldNames;
   }
 
-  public ResultPagerListCellRenderer(final String... attributeNames) {
-    this(Arrays.asList(attributeNames));
+  public ResultPagerListCellRenderer(final String... fieldNames) {
+    this(Arrays.asList(fieldNames));
   }
 
   @Override
@@ -39,13 +39,13 @@ public class ResultPagerListCellRenderer extends DefaultListCellRenderer {
     String label;
     if (value == ResultPagerComboBoxModel.NULL || value == null) {
       label = "-";
-    } else if (this.attributeNames.isEmpty()) {
+    } else if (this.fieldNames.isEmpty()) {
       label = StringConverterRegistry.toString(value);
     } else {
       final List<String> values = new ArrayList<String>();
-      for (final String attributeName : this.attributeNames) {
+      for (final String fieldName : this.fieldNames) {
         final String text = StringConverterRegistry.toString(Property.get(
-          value, attributeName));
+          value, fieldName));
         values.add(text);
       }
       label = CollectionUtil.toString(values);

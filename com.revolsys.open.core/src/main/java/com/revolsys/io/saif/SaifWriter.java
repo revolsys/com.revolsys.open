@@ -189,17 +189,17 @@ public class SaifWriter extends AbstractRecordWriter {
     final OsnSerializer exportsSerializer = createSerializer("/ExportedObject",
       exportsFile, Long.MAX_VALUE);
     exportsSerializer.startObject("/ExportedObjects");
-    exportsSerializer.attributeName("handles");
+    exportsSerializer.fieldName("handles");
     exportsSerializer.startCollection("Set");
     writeExport(exportsSerializer, "GlobalMetadata", "GlobalMetadata",
-        "globmeta.osn");
+      "globmeta.osn");
     for (final Map<String, Object> export : this.exports.values()) {
       final String compositeType = (String)export.get("compositeType");
       final String referenceId = (String)export.get("referenceId");
       final String objectSubset = (String)export.get("objectSubset");
       String compositeTypeName = Path.getName(compositeType);
-      final String compositeNamespace = Path.getPath(compositeType)
-          .replaceAll("/", "");
+      final String compositeNamespace = Path.getPath(compositeType).replaceAll(
+        "/", "");
       if (Property.hasValue(compositeNamespace)) {
         compositeTypeName += "::" + compositeNamespace;
       }
@@ -233,7 +233,7 @@ public class SaifWriter extends AbstractRecordWriter {
         serializer.startObject("/GlobalMetadata");
         serializer.attribute("objectIdentifier", "GlobalMetadata", true);
 
-        serializer.attributeName("creationTime");
+        serializer.fieldName("creationTime");
         serializer.startObject("/TimeStamp");
         final Date creationTimestamp = new Date(System.currentTimeMillis());
         serializer.attribute("year", new BigDecimal(
@@ -250,7 +250,7 @@ public class SaifWriter extends AbstractRecordWriter {
           new BigDecimal(creationTimestamp.getSeconds()), true);
         serializer.endObject();
 
-        serializer.attributeName("saifProfile");
+        serializer.fieldName("saifProfile");
         serializer.startObject("/Profile");
         serializer.attribute("authority", "Government of British Columbia",
           true);
@@ -262,10 +262,10 @@ public class SaifWriter extends AbstractRecordWriter {
         serializer.attribute("toolkitVersion",
           "SAIF Toolkit Version 1.4.0 (May 05, 1997)", true);
 
-        serializer.attributeName("userProfile");
+        serializer.fieldName("userProfile");
         serializer.startObject("/UserProfile");
 
-        serializer.attributeName("coordDefs");
+        serializer.fieldName("coordDefs");
         serializer.startObject("/LocationalDefinitions");
         serializer.attributeEnum("c1", "real32", true);
         serializer.attributeEnum("c2", "real32", true);
@@ -380,21 +380,21 @@ public class SaifWriter extends AbstractRecordWriter {
           }
           if (compositeType.isInstanceOf(this.annotatedSpatialDataSetType)) {
             serializer.startObject(compositeType.getPath());
-            serializer.attributeName("objectIdentifier");
+            serializer.fieldName("objectIdentifier");
             final String objectIdentifier = getObjectIdentifier(typePath);
             serializer.attributeValue(objectIdentifier);
             serializer.endLine();
             serializer.serializeIndent();
-            serializer.attributeName("annotationComponents");
+            serializer.fieldName("annotationComponents");
             serializer.startCollection("Set");
           } else if (compositeType.isInstanceOf(this.spatialDataSetType)) {
             serializer.startObject(compositeType.getPath());
-            serializer.attributeName("objectIdentifier");
+            serializer.fieldName("objectIdentifier");
             final String objectIdentifier = getObjectIdentifier(typePath);
             serializer.attributeValue(objectIdentifier);
             serializer.endLine();
             serializer.serializeIndent();
-            serializer.attributeName("geoComponents");
+            serializer.fieldName("geoComponents");
             serializer.startCollection("Set");
           }
           addExport(typePath, compositeType.getPath(), objectSubsetName);
@@ -404,7 +404,7 @@ public class SaifWriter extends AbstractRecordWriter {
             this.tempDirectory, "imports.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
         } else if (Path.getName(typePath).endsWith(
-            "InternallyReferencedObjects")) {
+          "InternallyReferencedObjects")) {
           serializer = createSerializer("/InternallyReferencedObject",
             new File(this.tempDirectory, "internal.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);

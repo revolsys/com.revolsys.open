@@ -1253,9 +1253,9 @@ RecordFactory, AddGeometryCompleteAction {
     if (record1 == record2) {
       return record1;
     } else {
-      final String sourceIdAttributeName = getIdFieldName();
-      final Object id1 = record1.getValue(sourceIdAttributeName);
-      final Object id2 = record2.getValue(sourceIdAttributeName);
+      final String sourceIdFieldName = getIdFieldName();
+      final Object id1 = record1.getValue(sourceIdFieldName);
+      final Object id2 = record2.getValue(sourceIdFieldName);
       int compare = 0;
       if (id1 == null) {
         if (id2 != null) {
@@ -1870,8 +1870,8 @@ RecordFactory, AddGeometryCompleteAction {
 
           Geometry sourceGeometry = sourceRecord.getGeometryValue();
           for (final Iterator<String> iterator = newValues.keySet().iterator(); iterator.hasNext();) {
-            final String attributeName = iterator.next();
-            final FieldDefinition attribute = recordDefinition.getField(attributeName);
+            final String fieldName = iterator.next();
+            final FieldDefinition attribute = recordDefinition.getField(fieldName);
             if (attribute == null) {
               iterator.remove();
             } else if (ignorePasteFields != null) {

@@ -34,21 +34,21 @@ public class TextOnCurveConverter implements OsnConverter {
     Geometry geometry = null;
     final List<Point> points = new ArrayList<Point>();
 
-    String attributeName = iterator.nextAttributeName();
-    while (attributeName != null) {
-      if (attributeName.equals("characters")) {
+    String fieldName = iterator.nextFieldName();
+    while (fieldName != null) {
+      if (fieldName.equals("characters")) {
         while (iterator.next() != OsnIterator.END_LIST) {
           final String objectName = iterator.nextObjectName();
-          final OsnConverter osnConverter = converters.getConverter(objectName);
+          final OsnConverter osnConverter = this.converters.getConverter(objectName);
           if (osnConverter == null) {
             iterator.throwParseError("No Geometry Converter for " + objectName);
           }
           points.add((Point)osnConverter.read(iterator));
         }
       }
-      attributeName = iterator.nextAttributeName();
+      fieldName = iterator.nextFieldName();
     }
-    geometry = geometryFactory.multiPoint(points);
+    geometry = this.geometryFactory.multiPoint(points);
     for (int i = 0; i < points.size(); i++) {
       final Point originalPoint = points.get(0);
       final Point geometryPoint = (Point)geometry.getGeometry(i);
@@ -59,20 +59,20 @@ public class TextOnCurveConverter implements OsnConverter {
   }
 
   protected void readAttribute(final OsnIterator iterator,
-    final String attributeName, final Map<String, Object> values) {
+    final String fieldName, final Map<String, Object> values) {
     iterator.next();
-    values.put(attributeName, iterator.getValue());
+    values.put(fieldName, iterator.getValue());
   }
 
   @Override
   public void write(final OsnSerializer serializer, final Object object)
-    throws IOException {
+      throws IOException {
     if (object instanceof MultiPoint) {
       final MultiPoint multiPoint = (MultiPoint)object;
       serializer.startObject(SaifConstants.TEXT_ON_CURVE);
-      serializer.attributeName("characters");
+      serializer.fieldName("characters");
       serializer.startCollection("List");
-      final OsnConverter osnConverter = converters.getConverter(SaifConstants.TEXT_LINE);
+      final OsnConverter osnConverter = this.converters.getConverter(SaifConstants.TEXT_LINE);
       for (int i = 0; i < multiPoint.getGeometryCount(); i++) {
         final Point point = (Point)multiPoint.getGeometry(i);
         osnConverter.write(serializer, point);

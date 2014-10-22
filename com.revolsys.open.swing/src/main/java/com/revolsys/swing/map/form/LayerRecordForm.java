@@ -106,7 +106,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerRecordForm extends JPanel implements PropertyChangeListener,
-CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
+  CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public static final String FLIP_FIELDS_ICON = "flip_fields";
 
@@ -123,7 +123,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   private static final long serialVersionUID = 1L;
 
   private JButton addOkButton = InvokeMethodAction.createButton("OK", this,
-      "actionAddOk");
+    "actionAddOk");
 
   private RecordLayerAttributesTableModel allAttributes;
 
@@ -284,8 +284,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (field instanceof ComboBox) {
       final ComboBox comboBox = (ComboBox)field;
       comboBox.getEditor()
-      .getEditorComponent()
-      .addFocusListener(new WeakFocusListener(this));
+        .getEditorComponent()
+        .addFocusListener(new WeakFocusListener(this));
     } else {
       ((JComponent)field).addFocusListener(new WeakFocusListener(this));
     }
@@ -440,7 +440,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
     int maxHeight = 500;
     for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
-        .getScreenDevices()) {
+      .getScreenDevices()) {
       final GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
       final Rectangle bounds = graphicsConfiguration.getBounds();
 
@@ -507,12 +507,12 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     }
 
     final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canUndo");
+      "canUndo");
     final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canRedo");
+      "canRedo");
 
     final EnableCheck modifiedOrDeleted = new ObjectPropertyEnableCheck(this,
-        "modifiedOrDeleted");
+      "modifiedOrDeleted");
 
     this.toolBar.addButton("changes", "Revert Record", "arrow_revert",
       modifiedOrDeleted, this, "revertChanges");
@@ -536,9 +536,9 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (hasGeometry) {
       final DataType geometryDataType = geometryField.getType();
       if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition)
-            .hasDirectionalAttributes()) {
+          .hasDirectionalAttributes()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME,
             FLIP_RECORD_ICON, editable, this, "flipRecordOrientation");
           this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME,
@@ -976,9 +976,9 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     return this.editable;
   }
 
-  public boolean isEditable(final String attributeName) {
+  public boolean isEditable(final String fieldName) {
     if (isEditable()) {
-      if (!this.readOnlyFieldNames.contains(attributeName)) {
+      if (!this.readOnlyFieldNames.contains(fieldName)) {
         return true;
       }
     }
@@ -1046,7 +1046,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     final AbstractLayer layer = getLayer();
     if (layer != null) {
       final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-          map);
+        map);
       final Collection<String> ignorePasteFields = layer.getProperty("ignorePasteFields");
       final Set<String> keySet = newValues.keySet();
       if (ignorePasteFields != null) {
@@ -1115,8 +1115,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
               }
             }
             if (!equal
-                && layer.isEditable()
-                && (record.getState() == RecordState.New
+              && layer.isEditable()
+              && (record.getState() == RecordState.New
                 && layer.isCanAddRecords() || layer.isCanEditRecords())) {
               record.setValueByPath(fieldName, fieldValue);
             }

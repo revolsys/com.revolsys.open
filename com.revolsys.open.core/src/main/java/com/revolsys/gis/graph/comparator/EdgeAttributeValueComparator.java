@@ -7,13 +7,13 @@ import com.revolsys.comparator.CollectionComparator;
 import com.revolsys.gis.graph.Edge;
 
 public class EdgeAttributeValueComparator<T> implements Comparator<Edge<T>> {
-  private String[] attributeNames;
+  private String[] fieldNames;
 
   public EdgeAttributeValueComparator() {
   }
 
-  public EdgeAttributeValueComparator(final String... attributeNames) {
-    this.attributeNames = attributeNames;
+  public EdgeAttributeValueComparator(final String... fieldNames) {
+    this.fieldNames = fieldNames;
   }
 
   @SuppressWarnings({
@@ -28,10 +28,10 @@ public class EdgeAttributeValueComparator<T> implements Comparator<Edge<T>> {
     } else if (edge2.isRemoved()) {
       return -11;
     } else {
-      for (final String attributeName : attributeNames) {
-        final Object object1 = edge1.getField(attributeName);
+      for (final String fieldName : this.fieldNames) {
+        final Object object1 = edge1.getField(fieldName);
 
-        final Object object2 = edge2.getField(attributeName);
+        final Object object2 = edge2.getField(fieldName);
         if (object1 == null) {
           if (object2 != null) {
             return 1;

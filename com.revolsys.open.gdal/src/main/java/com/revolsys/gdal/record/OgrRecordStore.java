@@ -592,12 +592,12 @@ public class OgrRecordStore extends AbstractRecordStore {
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
 
-    List<String> attributeNames = query.getFieldNames();
-    if (attributeNames.isEmpty()) {
-      attributeNames = recordDefinition.getFieldNames();
+    List<String> fieldNames = query.getFieldNames();
+    if (fieldNames.isEmpty()) {
+      fieldNames = recordDefinition.getFieldNames();
     }
-    attributeNames.remove("ROWID");
-    CollectionUtil.append(sql, attributeNames);
+    fieldNames.remove("ROWID");
+    CollectionUtil.append(sql, fieldNames);
     sql.append(" FROM ");
     final String layerName = getLayerName(typePath);
     sql.append(layerName);

@@ -27,22 +27,22 @@ public class ContourConverter extends ArcConverter {
     values.put(SaifConstants.TYPE, GEOMETRY_CLASS);
     Geometry geometry = null;
 
-    String attributeName = iterator.nextAttributeName();
-    while (attributeName != null) {
-      if (attributeName.equals("arc")) {
+    String fieldName = iterator.nextFieldName();
+    while (fieldName != null) {
+      if (fieldName.equals("arc")) {
         final String objectName = iterator.nextObjectName();
-        final OsnConverter osnConverter = converters.getConverter(objectName);
+        final OsnConverter osnConverter = this.converters.getConverter(objectName);
         if (osnConverter == null) {
           iterator.throwParseError("No Geometry Converter for " + objectName);
         }
         geometry = (Geometry)osnConverter.read(iterator);
-      } else if (attributeName.equals("value")) {
+      } else if (fieldName.equals("value")) {
         final double value = iterator.nextDoubleValue();
         values.put("value", new Double(value));
       } else {
-        readAttribute(iterator, attributeName, values);
+        readAttribute(iterator, fieldName, values);
       }
-      attributeName = iterator.nextAttributeName();
+      fieldName = iterator.nextFieldName();
     }
     if (geometry != null) {
       if (!values.isEmpty()) {
@@ -54,11 +54,11 @@ public class ContourConverter extends ArcConverter {
 
   @Override
   public void write(final OsnSerializer serializer, final Object object)
-    throws IOException {
+      throws IOException {
     if (object instanceof LineString) {
       final LineString lineString = (LineString)object;
       serializer.startObject(GEOMETRY_CLASS);
-      serializer.attributeName("arc");
+      serializer.fieldName("arc");
       super.write(serializer, object);
       serializer.endAttribute();
       final Map<String, Object> values = GeometryProperties.getGeometryProperties(lineString);

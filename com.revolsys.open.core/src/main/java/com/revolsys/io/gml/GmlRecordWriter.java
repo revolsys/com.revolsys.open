@@ -20,7 +20,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class GmlRecordWriter extends AbstractRecordWriter implements
-GmlConstants {
+  GmlConstants {
   public static final void srsName(final XmlWriter out,
     final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -85,9 +85,9 @@ GmlConstants {
     this.out.startTag(ENVELOPE);
     srsName(this.out, geometryFactory);
     this.out.element(LOWER_CORNER, areaBoundingBox.getMinX() + " "
-        + areaBoundingBox.getMinY());
+      + areaBoundingBox.getMinY());
     this.out.element(UPPER_CORNER, areaBoundingBox.getMaxX() + " "
-        + areaBoundingBox.getMaxY());
+      + areaBoundingBox.getMaxY());
     this.out.endTag(ENVELOPE);
   }
 
@@ -123,10 +123,10 @@ GmlConstants {
     this.out.startTag(qualifiedName);
 
     for (final FieldDefinition attribute : recordDefinition.getFields()) {
-      final String attributeName = attribute.getName();
-      final Object value = object.getValue(attributeName);
+      final String fieldName = attribute.getName();
+      final Object value = object.getValue(fieldName);
       if (isWritable(value)) {
-        this.out.startTag(this.namespaceUri, attributeName);
+        this.out.startTag(this.namespaceUri, fieldName);
         final DataType type = attribute.getType();
         final GmlFieldType fieldType = this.fieldTypes.getFieldType(type);
         if (fieldType != null) {

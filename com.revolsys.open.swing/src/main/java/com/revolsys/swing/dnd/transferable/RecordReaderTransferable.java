@@ -40,8 +40,8 @@ public class RecordReaderTransferable implements Transferable {
       final StringWriter out = new StringWriter();
       final RecordDefinition recordDefinition = this.reader.getRecordDefinition();
       if (recordDefinition != null) {
-        final Collection<String> attributeNames = recordDefinition.getFieldNames();
-        CsvUtil.writeColumns(out, attributeNames, '\t', '\n');
+        final Collection<String> fieldNames = recordDefinition.getFieldNames();
+        CsvUtil.writeColumns(out, fieldNames, '\t', '\n');
         for (final Record object : this.reader) {
           if (object != null) {
             final Collection<Object> values = object.values();

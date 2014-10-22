@@ -73,6 +73,52 @@ public final class RecordUtil {
     return results;
   }
 
+  public static boolean getBoolean(final Record object, final String fieldName) {
+    if (object == null) {
+      return false;
+    } else {
+      final Object value = object.getValue(fieldName);
+      if (value == null) {
+        return false;
+      } else if (value instanceof Boolean) {
+        final Boolean booleanValue = (Boolean)value;
+        return booleanValue;
+      } else if (value instanceof Number) {
+        final Number number = (Number)value;
+        return number.intValue() == 1;
+      } else {
+        final String stringValue = value.toString();
+        if (stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+  }
+
+  public static Double getDouble(final Record object, final int attributeIndex) {
+    final Number value = object.getValue(attributeIndex);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Double) {
+      return (Double)value;
+    } else {
+      return value.doubleValue();
+    }
+  }
+
+  public static Double getDouble(final Record object, final String fieldName) {
+    final Number value = object.getValue(fieldName);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Double) {
+      return (Double)value;
+    } else {
+      return value.doubleValue();
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public static <T> T getFieldByPath(final Record object, final String path) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
@@ -123,59 +169,11 @@ public final class RecordUtil {
     return (T)propertyValue;
   }
 
-  public static boolean getBoolean(final Record object,
-    final String attributeName) {
-    if (object == null) {
-      return false;
-    } else {
-      final Object value = object.getValue(attributeName);
-      if (value == null) {
-        return false;
-      } else if (value instanceof Boolean) {
-        final Boolean booleanValue = (Boolean)value;
-        return booleanValue;
-      } else if (value instanceof Number) {
-        final Number number = (Number)value;
-        return number.intValue() == 1;
-      } else {
-        final String stringValue = value.toString();
-        if (stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }
-  }
-
-  public static Double getDouble(final Record object, final int attributeIndex) {
-    final Number value = object.getValue(attributeIndex);
-    if (value == null) {
-      return null;
-    } else if (value instanceof Double) {
-      return (Double)value;
-    } else {
-      return value.doubleValue();
-    }
-  }
-
-  public static Double getDouble(final Record object, final String attributeName) {
-    final Number value = object.getValue(attributeName);
-    if (value == null) {
-      return null;
-    } else if (value instanceof Double) {
-      return (Double)value;
-    } else {
-      return value.doubleValue();
-    }
-  }
-
-  public static Integer getInteger(final Record object,
-    final String attributeName) {
+  public static Integer getInteger(final Record object, final String fieldName) {
     if (object == null) {
       return null;
     } else {
-      final Number value = object.getValue(attributeName);
+      final Number value = object.getValue(fieldName);
       if (value == null) {
         return null;
       } else if (value instanceof Integer) {
@@ -186,12 +184,12 @@ public final class RecordUtil {
     }
   }
 
-  public static Integer getInteger(final Record object,
-    final String attributeName, final Integer defaultValue) {
+  public static Integer getInteger(final Record object, final String fieldName,
+    final Integer defaultValue) {
     if (object == null) {
       return null;
     } else {
-      final Number value = object.getValue(attributeName);
+      final Number value = object.getValue(fieldName);
       if (value == null) {
         return defaultValue;
       } else if (value instanceof Integer) {
@@ -202,8 +200,8 @@ public final class RecordUtil {
     }
   }
 
-  public static Long getLong(final Record object, final String attributeName) {
-    final Number value = object.getValue(attributeName);
+  public static Long getLong(final Record object, final String fieldName) {
+    final Number value = object.getValue(fieldName);
     if (value == null) {
       return null;
     } else if (value instanceof Long) {
@@ -229,7 +227,7 @@ public final class RecordUtil {
             object.setValue(name, value);
           } else {
             final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-              .getConverter(dataTypeClass);
+                .getConverter(dataTypeClass);
             if (converter == null) {
               object.setValue(name, value);
             } else {
@@ -294,15 +292,15 @@ public final class RecordUtil {
   }
 
   public static void setValues(final Record target, final Record source,
-    final Collection<String> attributesNames,
-    final Collection<String> ignoreAttributeNames) {
-    for (final String attributeName : attributesNames) {
-      if (!ignoreAttributeNames.contains(attributeName)) {
-        final Object oldValue = target.getValue(attributeName);
-        Object newValue = source.getValue(attributeName);
+    final Collection<String> fieldNames,
+    final Collection<String> ignoreFieldNames) {
+    for (final String fieldName : fieldNames) {
+      if (!ignoreFieldNames.contains(fieldName)) {
+        final Object oldValue = target.getValue(fieldName);
+        Object newValue = source.getValue(fieldName);
         if (!EqualsInstance.INSTANCE.equals(oldValue, newValue)) {
           newValue = JavaBeanUtil.clone(newValue);
-          target.setValue(attributeName, newValue);
+          target.setValue(fieldName, newValue);
         }
       }
     }

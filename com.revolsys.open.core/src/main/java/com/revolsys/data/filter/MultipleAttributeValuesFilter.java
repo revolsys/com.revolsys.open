@@ -32,10 +32,9 @@ public class MultipleAttributeValuesFilter implements Filter<Record> {
   @Override
   public boolean accept(final Record object) {
     for (final Entry<String, ? extends Object> entry : this.values.entrySet()) {
-      final String attributeName = entry.getKey();
+      final String fieldName = entry.getKey();
       final Object value = entry.getValue();
-      final Object objectValue = RecordUtil.getFieldByPath(object,
-        attributeName);
+      final Object objectValue = RecordUtil.getFieldByPath(object, fieldName);
       if (objectValue == null) {
         if (value != null) {
           if (!EqualsInstance.INSTANCE.equals(value, objectValue)) {

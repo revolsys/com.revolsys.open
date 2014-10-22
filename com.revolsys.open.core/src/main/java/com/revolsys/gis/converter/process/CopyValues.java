@@ -8,15 +8,14 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 
-public class CopyValues extends
-  AbstractSourceToTargetProcess<Record, Record> {
-  private Map<String, String> attributeNames = new LinkedHashMap<String, String>();
+public class CopyValues extends AbstractSourceToTargetProcess<Record, Record> {
+  private Map<String, String> fieldNames = new LinkedHashMap<String, String>();
 
   public CopyValues() {
   }
 
-  public CopyValues(final Map<String, String> attributeNames) {
-    this.attributeNames = attributeNames;
+  public CopyValues(final Map<String, String> fieldNames) {
+    this.fieldNames = fieldNames;
   }
 
   public CopyValues(final String sourceName, final String targetName) {
@@ -24,16 +23,16 @@ public class CopyValues extends
   }
 
   public void addFieldName(final String sourceName, final String targetName) {
-    attributeNames.put(sourceName, targetName);
+    this.fieldNames.put(sourceName, targetName);
   }
 
   public Map<String, String> getFieldNames() {
-    return attributeNames;
+    return this.fieldNames;
   }
 
   @Override
   public void process(final Record source, final Record target) {
-    for (final Entry<String, String> entry : attributeNames.entrySet()) {
+    for (final Entry<String, String> entry : this.fieldNames.entrySet()) {
       final String sourceName = entry.getKey();
       final String targetName = entry.getValue();
       final Object value;
@@ -55,12 +54,12 @@ public class CopyValues extends
     }
   }
 
-  public void setAttributeNames(final Map<String, String> attributeNames) {
-    this.attributeNames = attributeNames;
+  public void setFieldNames(final Map<String, String> fieldNames) {
+    this.fieldNames = fieldNames;
   }
 
   @Override
   public String toString() {
-    return "copy" + attributeNames;
+    return "copy" + this.fieldNames;
   }
 }

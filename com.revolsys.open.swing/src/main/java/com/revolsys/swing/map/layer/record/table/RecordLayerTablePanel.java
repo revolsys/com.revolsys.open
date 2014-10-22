@@ -33,7 +33,7 @@ import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.component.AttributeFilterPanel;
+import com.revolsys.swing.map.layer.record.component.FieldFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.WrappedMenuFactory;
@@ -167,7 +167,7 @@ PropertyChangeListener {
     this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets",
       "fields_filter", this, "actionShowFieldSetsMenu");
 
-    final AttributeFilterPanel attributeFilterPanel = new AttributeFilterPanel(
+    final FieldFilterPanel attributeFilterPanel = new FieldFilterPanel(
       this, this.tableModel);
     toolBar.addComponent("search", attributeFilterPanel);
 

@@ -11,7 +11,7 @@ public interface LayerRecord extends Record {
 
   AbstractRecordLayer getLayer();
 
-  <T> T getOriginalValue(String attributeName);
+  <T> T getOriginalValue(String fieldName);
 
   boolean isDeletable();
 

@@ -5,41 +5,41 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.util.Property;
 
-public class LengthAttributeName extends AbstractRecordDefinitionProperty {
-  public static LengthAttributeName getProperty(final Record object) {
+public class LengthFieldName extends AbstractRecordDefinitionProperty {
+  public static LengthFieldName getProperty(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     return getProperty(recordDefinition);
   }
 
-  public static LengthAttributeName getProperty(
+  public static LengthFieldName getProperty(
     final RecordDefinition recordDefinition) {
-    LengthAttributeName property = recordDefinition.getProperty(PROPERTY_NAME);
+    LengthFieldName property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
-      property = new LengthAttributeName();
+      property = new LengthFieldName();
       property.setRecordDefinition(recordDefinition);
     }
     return property;
   }
 
   public static void setObjectLength(final Record object) {
-    final LengthAttributeName property = getProperty(object);
+    final LengthFieldName property = getProperty(object);
     property.setLength(object);
   }
 
-  public static final String PROPERTY_NAME = LengthAttributeName.class.getName()
+  public static final String PROPERTY_NAME = LengthFieldName.class.getName()
       + ".propertyName";
 
-  private String attributeName;
+  private String fieldName;
 
-  public LengthAttributeName() {
+  public LengthFieldName() {
   }
 
-  public LengthAttributeName(final String attributeName) {
-    this.attributeName = attributeName;
+  public LengthFieldName(final String fieldName) {
+    this.fieldName = fieldName;
   }
 
   public String getFieldName() {
-    return this.attributeName;
+    return this.fieldName;
   }
 
   @Override
@@ -47,20 +47,20 @@ public class LengthAttributeName extends AbstractRecordDefinitionProperty {
     return PROPERTY_NAME;
   }
 
-  public void setAttributeName(final String attributeName) {
-    this.attributeName = attributeName;
+  public void setFieldName(final String fieldName) {
+    this.fieldName = fieldName;
   }
 
   public void setLength(final Record object) {
-    if (Property.hasValue(this.attributeName)) {
+    if (Property.hasValue(this.fieldName)) {
       final LineString line = object.getGeometryValue();
       final double length = line.getLength();
-      object.setValue(this.attributeName, length);
+      object.setValue(this.fieldName, length);
     }
   }
 
   @Override
   public String toString() {
-    return "LengthAttribute " + this.attributeName;
+    return "LengthField " + this.fieldName;
   }
 }

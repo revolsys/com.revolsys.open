@@ -25,9 +25,9 @@ public class MapEquals implements Equals<Map<Object, Object>> {
   }
 
   public static boolean equals(final Map<String, Object> map1,
-    final Map<String, Object> map2, final String attributeName) {
-    final Object value1 = map1.get(attributeName);
-    final Object value2 = map2.get(attributeName);
+    final Map<String, Object> map2, final String fieldName) {
+    final Object value1 = map1.get(fieldName);
+    final Object value2 = map2.get(fieldName);
     return EqualsInstance.INSTANCE.equals(value1, value2);
   }
 

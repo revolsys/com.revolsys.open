@@ -58,14 +58,14 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class AttributeFilterPanel extends JComponent implements ActionListener,
+public class FieldFilterPanel extends JComponent implements ActionListener,
 ItemListener, DocumentListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
   private String previousSearchFieldName;
 
-  private final List<String> attributeNames;
+  private final List<String> fieldNames;
 
   private JComponent searchField;
 
@@ -107,7 +107,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   private FieldDefinition attribute;
 
-  public AttributeFilterPanel(final TablePanel tablePanel,
+  public FieldFilterPanel(final TablePanel tablePanel,
     final RecordLayerTableModel tableModel) {
     this.tableModel = tableModel;
     this.layer = tableModel.getLayer();
@@ -123,12 +123,12 @@ ItemListener, DocumentListener, PropertyChangeListener {
     this.whereLabel.setBackground(WebColors.White);
     add(this.whereLabel);
 
-    this.attributeNames = new ArrayList<String>(this.layer.getFieldNamesSet());
-    this.attributeNames.remove(this.recordDefinition.getGeometryFieldName());
+    this.fieldNames = new ArrayList<String>(this.layer.getFieldNamesSet());
+    this.fieldNames.remove(this.recordDefinition.getGeometryFieldName());
     final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
       this.layer);
     this.nameField = new ComboBox(converter, false,
-      this.attributeNames.toArray());
+      this.fieldNames.toArray());
     this.nameField.setRenderer(converter);
     this.nameField.addActionListener(this);
     add(this.nameField);
@@ -218,7 +218,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
   }
 
   public List<String> getFieldNames() {
-    return this.attributeNames;
+    return this.fieldNames;
   }
 
   public Condition getFilter() {

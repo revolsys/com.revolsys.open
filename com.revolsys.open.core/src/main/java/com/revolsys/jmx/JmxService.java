@@ -78,7 +78,7 @@ public class JmxService {
           + " " + objectId);
       } catch (final AttributeNotFoundException e) {
         throw new IllegalArgumentException("MBean attribute not found "
-            + serverId + " " + objectId + "." + attributeId);
+          + serverId + " " + objectId + "." + attributeId);
       } catch (final Throwable e) {
         return ExceptionUtil.throwUncheckedException(e);
       }
@@ -86,29 +86,6 @@ public class JmxService {
       throw new IllegalArgumentException("Attribute not configured " + serverId
         + " " + objectId + "." + attributeId);
     }
-  }
-
-  /**
-   * Get all the attributes names for an object on a server.
-   *
-   * @param serverId The name of the server.
-   * @param objectId The name of the object.
-   * @return The attribute names.
-   */
-  @SuppressWarnings("unchecked")
-  public List<String> getAttributeNames(final String serverId,
-    final String objectId) {
-    final Map<String, Object> object = getObjectParams(serverId, objectId);
-    final List<Map<String, Object>> attributes = (List<Map<String, Object>>)object.get("attributes");
-
-    final List<String> attributeNames = new ArrayList<String>();
-    for (final Map<String, Object> attribute : attributes) {
-      final String name = (String)attribute.get("attributeName");
-      if (name != null) {
-        attributeNames.add(name);
-      }
-    }
-    return attributeNames;
   }
 
   /**
@@ -133,7 +110,7 @@ public class JmxService {
       return attributeValues;
     } catch (final InstanceNotFoundException e) {
       throw new IllegalArgumentException("MBean not found " + serverId + " "
-          + objectId);
+        + objectId);
     } catch (final MalformedObjectNameException e) {
       throw new IllegalArgumentException("MBean name not valid " + serverId
         + " " + objectId);
@@ -162,6 +139,28 @@ public class JmxService {
   }
 
   /**
+   * Get all the attributes names for an object on a server.
+   *
+   * @param serverId The name of the server.
+   * @param objectId The name of the object.
+   * @return The attribute names.
+   */
+  @SuppressWarnings("unchecked")
+  public List<String> getAttributeNames(final String serverId, final String objectId) {
+    final Map<String, Object> object = getObjectParams(serverId, objectId);
+    final List<Map<String, Object>> attributes = (List<Map<String, Object>>)object.get("attributes");
+
+    final List<String> fieldNames = new ArrayList<String>();
+    for (final Map<String, Object> field : attributes) {
+      final String name = (String)field.get("attributeName");
+      if (name != null) {
+        fieldNames.add(name);
+      }
+    }
+    return fieldNames;
+  }
+
+  /**
    * Get the object name for object on a server. Throws an
    * IllegalArgumentException if the object does not have a configuration.
    *
@@ -172,7 +171,7 @@ public class JmxService {
    *           valid.
    */
   private ObjectName getObjectName(final String serverId, final String objectId)
-      throws MalformedObjectNameException {
+    throws MalformedObjectNameException {
     final Map<String, Object> object = getObjectParams(serverId, objectId);
     final String objectName = (String)object.get("objectName");
     return new ObjectName(objectName);
@@ -215,7 +214,7 @@ public class JmxService {
     }
 
     throw new IllegalArgumentException("Object for server " + serverId + " "
-        + objectId + " not found");
+      + objectId + " not found");
   }
 
   /**
@@ -241,10 +240,10 @@ public class JmxService {
           }
         }
         throw new IllegalArgumentException("MBean Operation not found "
-            + serverId + " " + objectId + "." + operationId);
+          + serverId + " " + objectId + "." + operationId);
       } catch (final InstanceNotFoundException e) {
         throw new IllegalArgumentException("MBean not found " + serverId + " "
-            + objectId);
+          + objectId);
       } catch (final MalformedObjectNameException e) {
         throw new IllegalArgumentException("MBean name not valid " + serverId
           + " " + objectId);
@@ -308,7 +307,7 @@ public class JmxService {
       return operations;
     } catch (final InstanceNotFoundException e) {
       throw new IllegalArgumentException("MBean not found " + serverId + " "
-          + objectId);
+        + objectId);
     } catch (final MalformedObjectNameException e) {
       throw new IllegalArgumentException("MBean name not valid " + serverId
         + " " + objectId);
@@ -392,7 +391,7 @@ public class JmxService {
         signature);
     } catch (final InstanceNotFoundException e) {
       throw new IllegalArgumentException("MBean not found " + serverId + " "
-          + objectId);
+        + objectId);
     } catch (final MalformedObjectNameException e) {
       throw new IllegalArgumentException("MBean name not valid " + serverId
         + " " + objectId);

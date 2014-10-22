@@ -20,7 +20,7 @@ import com.revolsys.swing.table.record.renderer.SingleRecordTableCellRenderer;
 import com.revolsys.util.CollectionUtil;
 
 public abstract class AbstractSingleRecordTableModel extends
-  AbstractRecordTableModel {
+AbstractRecordTableModel {
   public static BaseJTable createTable(
     final AbstractSingleRecordTableModel model) {
     final BaseJTable table = new BaseJTable(model);
@@ -161,14 +161,14 @@ public abstract class AbstractSingleRecordTableModel extends
         if (rowIndex == recordDefinition.getIdFieldIndex()) {
           return false;
         } else {
-          final String attributeName = getFieldName(rowIndex);
-          if (recordDefinition.getIdFieldNames().contains(attributeName)) {
+          final String fieldName = getFieldName(rowIndex);
+          if (recordDefinition.getIdFieldNames().contains(fieldName)) {
             return false;
           } else if (recordDefinition.getGeometryFieldNames().contains(
-            attributeName)) {
+            fieldName)) {
             return false;
           } else {
-            return !isReadOnly(attributeName);
+            return !isReadOnly(fieldName);
           }
         }
       } else {
@@ -193,7 +193,7 @@ public abstract class AbstractSingleRecordTableModel extends
 
   public void setFieldNames(final List<String> fieldNames) {
     if (fieldNames != null
-      && (this.fieldNames == null || !this.fieldNames.equals(fieldNames))) {
+        && (this.fieldNames == null || !this.fieldNames.equals(fieldNames))) {
       this.fieldNames = fieldNames;
       fireTableDataChanged();
     }

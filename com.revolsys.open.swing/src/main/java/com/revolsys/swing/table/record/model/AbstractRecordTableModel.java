@@ -22,8 +22,8 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordTableModel extends
-com.revolsys.swing.table.AbstractTableModel implements
-PropertyChangeSupportProxy {
+  com.revolsys.swing.table.AbstractTableModel implements
+  PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
 
@@ -107,8 +107,8 @@ PropertyChangeSupportProxy {
     return this.editable;
   }
 
-  public boolean isReadOnly(final String attributeName) {
-    return this.readOnlyFieldNames.contains(attributeName);
+  public boolean isReadOnly(final String fieldName) {
+    return this.readOnlyFieldNames.contains(fieldName);
   }
 
   public abstract boolean isSelected(boolean selected, int rowIndex,

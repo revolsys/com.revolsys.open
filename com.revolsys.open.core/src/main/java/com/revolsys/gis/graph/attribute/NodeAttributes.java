@@ -22,7 +22,7 @@ public class NodeAttributes {
   protected static class Methods {
     public static Set<Double> edgeAngles(final Node<?> node) {
       final Set<Double> angles = new TreeSet<Double>(
-          new NumericComparator<Double>());
+        new NumericComparator<Double>());
       for (final Edge<?> edge : node.getInEdges()) {
         final double toAngle = edge.getToAngle();
         angles.add(toAngle);
@@ -153,18 +153,6 @@ public class NodeAttributes {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  private static <T, V> V getField(final Node<T> node, final String name) {
-    final String attributeName = NodeAttributes.class.getName() + "." + name;
-    if (!node.hasAttribute(attributeName)) {
-      final ObjectAttributeProxy<T, V> proxy = new InvokeMethodObjectAttributeProxy<T, V>(
-          Methods.class, name, Node.class);
-      node.setAttribute(attributeName, proxy);
-    }
-    final V value = (V)node.getField(attributeName);
-    return value;
-  }
-
   public static Set<Double> getEdgeAngles(final Node<?> node) {
     return getField(node, EDGE_ANGLES);
   }
@@ -219,6 +207,18 @@ public class NodeAttributes {
 
   public static Set<String> getEdgeTypeNames(final Node<? extends Object> node) {
     return getField(node, EDGE_TYPE_NAMES);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T, V> V getField(final Node<T> node, final String name) {
+    final String fieldName = NodeAttributes.class.getName() + "." + name;
+    if (!node.hasAttribute(fieldName)) {
+      final ObjectAttributeProxy<T, V> proxy = new InvokeMethodObjectAttributeProxy<T, V>(
+        Methods.class, name, Node.class);
+      node.setAttribute(fieldName, proxy);
+    }
+    final V value = (V)node.getField(fieldName);
+    return value;
   }
 
   private static String EDGE_ANGLES = "edgeAngles";

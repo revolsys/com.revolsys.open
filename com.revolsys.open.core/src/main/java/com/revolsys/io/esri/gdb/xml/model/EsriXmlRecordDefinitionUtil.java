@@ -64,22 +64,22 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     final int precision = field.getPrecision();
     final DataType dataType;
     if (fieldType == FieldType.esriFieldTypeGeometry
-      && deTable instanceof DEFeatureClass) {
+        && deTable instanceof DEFeatureClass) {
       final DEFeatureClass featureClass = (DEFeatureClass)deTable;
       final GeometryType shapeType = featureClass.getShapeType();
       switch (shapeType) {
         case esriGeometryPoint:
           dataType = DataTypes.POINT;
-        break;
+          break;
         case esriGeometryMultipoint:
           dataType = DataTypes.MULTI_POINT;
-        break;
+          break;
         case esriGeometryPolyline:
           dataType = DataTypes.MULTI_LINE_STRING;
-        break;
+          break;
         case esriGeometryPolygon:
           dataType = DataTypes.POLYGON;
-        break;
+          break;
 
         default:
           throw new RuntimeException("Unknown geometry type" + shapeType
@@ -87,7 +87,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
       }
 
     } else if (precision > 0
-      && (fieldType.equals(FieldType.esriFieldTypeSingle) || fieldType.equals(FieldType.esriFieldTypeDouble))) {
+        && (fieldType.equals(FieldType.esriFieldTypeSingle) || fieldType.equals(FieldType.esriFieldTypeDouble))) {
       dataType = DataTypes.DECIMAL;
     } else {
       dataType = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE.getDataType(fieldType);
@@ -98,7 +98,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
       length = precision;
     }
     final Boolean required = !field.isIsNullable()
-      || BooleanStringConverter.getBoolean(field.getRequired());
+        || BooleanStringConverter.getBoolean(field.getRequired());
     final FieldDefinition attribute = new FieldDefinition(fieldName, dataType,
       length, scale, required);
 
@@ -163,7 +163,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
       return createDEFeatureDatasets(schemaName, spatialReference);
     } else {
       throw new IllegalArgumentException("Expected a "
-        + DEFeatureClass.class.getName());
+          + DEFeatureClass.class.getName());
     }
   }
 
@@ -200,7 +200,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
     if (geometryField != null) {
       if (spatialReference == null) {
         throw new IllegalArgumentException(
-          "A Geometry Factory with a coordinate system must be specified.");
+            "A Geometry Factory with a coordinate system must be specified.");
       }
       geometryDataType = geometryField.getType();
       if (FIELD_TYPES.getFieldType(geometryDataType) != null) {
@@ -265,11 +265,11 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
       if (attribute == geometryField) {
         addGeometryField(shapeType, table, attribute);
       } else {
-        final String attributeName = attribute.getName();
-        if (!attributeName.equals(oidFieldName)) {
+        final String fieldName = attribute.getName();
+        if (!fieldName.equals(oidFieldName)) {
           final Field field = addField(table, attribute);
           if (idField == attribute) {
-            table.addIndex(field, true, attributeName + "_PK");
+            table.addIndex(field, true, fieldName + "_PK");
           }
         }
       }
@@ -388,7 +388,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
   }
 
   private static final String DE_TABLE_PROPERTY = EsriXmlRecordDefinitionUtil.class
-    + ".DETable";
+      + ".DETable";
 
   public static final EsriGeodatabaseXmlFieldTypeRegistry FIELD_TYPES = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;
 }

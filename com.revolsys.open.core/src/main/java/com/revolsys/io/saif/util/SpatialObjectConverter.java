@@ -9,7 +9,7 @@ public class SpatialObjectConverter implements OsnConverter {
 
   @Override
   public Object read(final OsnIterator iterator) {
-    final String name = iterator.nextAttributeName();
+    final String name = iterator.nextFieldName();
     if (!name.equals("geometry")) {
       iterator.throwParseError("No geometry attribute");
     }

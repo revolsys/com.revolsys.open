@@ -28,11 +28,12 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 
 public class JdbcQueryIterator extends AbstractIterator<Record> implements
-RecordIterator {
+  RecordIterator {
 
   public static Record getNextObject(final JdbcRecordStore recordStore,
-    final RecordDefinition recordDefinition, final List<FieldDefinition> attributes,
-    final RecordFactory recordFactory, final ResultSet resultSet) {
+    final RecordDefinition recordDefinition,
+    final List<FieldDefinition> attributes, final RecordFactory recordFactory,
+    final ResultSet resultSet) {
     final Record object = recordFactory.createRecord(recordDefinition);
     if (object != null) {
       object.setState(RecordState.Initalizing);
@@ -194,16 +195,16 @@ RecordIterator {
         this.recordDefinition = this.recordStore.getRecordDefinition(tableName,
           resultSetMetaData);
       }
-      final List<String> attributeNames = new ArrayList<String>(
-          this.query.getFieldNames());
-      if (attributeNames.isEmpty()) {
+      final List<String> fieldNames = new ArrayList<String>(
+        this.query.getFieldNames());
+      if (fieldNames.isEmpty()) {
         this.attributes.addAll(this.recordDefinition.getFields());
       } else {
-        for (final String attributeName : attributeNames) {
-          if (attributeName.equals("*")) {
+        for (final String fieldName : fieldNames) {
+          if (fieldName.equals("*")) {
             this.attributes.addAll(this.recordDefinition.getFields());
           } else {
-            final FieldDefinition attribute = this.recordDefinition.getField(attributeName);
+            final FieldDefinition attribute = this.recordDefinition.getField(fieldName);
             if (attribute != null) {
               this.attributes.add(attribute);
             }

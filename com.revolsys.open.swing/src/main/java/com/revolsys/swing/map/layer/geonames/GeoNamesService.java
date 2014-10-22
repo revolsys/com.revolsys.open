@@ -53,16 +53,12 @@ public class GeoNamesService {
       Path.toPath("/geoname.org", "wikipedia"));
     wikipediaRecordDefinition.addField("summary", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("title", DataTypes.STRING, false);
-    wikipediaRecordDefinition.addField("wikipediaUrl", DataTypes.STRING,
-      false);
-    wikipediaRecordDefinition.addField("countryCode", DataTypes.STRING,
-      false);
+    wikipediaRecordDefinition.addField("wikipediaUrl", DataTypes.STRING, false);
+    wikipediaRecordDefinition.addField("countryCode", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("feature", DataTypes.STRING, false);
-    wikipediaRecordDefinition.addField("thumbnailImg", DataTypes.STRING,
-      false);
+    wikipediaRecordDefinition.addField("thumbnailImg", DataTypes.STRING, false);
     wikipediaRecordDefinition.addField("lang", DataTypes.STRING, false);
-    wikipediaRecordDefinition.addField("population", DataTypes.INTEGER,
-      false);
+    wikipediaRecordDefinition.addField("population", DataTypes.INTEGER, false);
     wikipediaRecordDefinition.addField("geometry", DataTypes.POINT, false);
 
     WIKIPEDIA_RECORD_DEFINITION = wikipediaRecordDefinition;
@@ -98,9 +94,9 @@ public class GeoNamesService {
     final double width = geographicBoundingBox.getWidth();
     final double diagonal = Math.sqrt(width * width + height * height);
     final double radiusKm = cs.getUnit()
-        .getConverterTo(SI.RADIAN)
-        .convert(diagonal)
-        * radius / 1000;
+      .getConverterTo(SI.RADIAN)
+      .convert(diagonal)
+      * radius / 1000;
 
     params.put("lat", geographicBoundingBox.getCentreY());
     params.put("lng", geographicBoundingBox.getCentreX());
@@ -114,7 +110,7 @@ public class GeoNamesService {
       return mapToObjects(NAME_RECORD_DEFINITION, result);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to connect to URL:"
-          + searchUrlString);
+        + searchUrlString);
     }
   }
 
@@ -135,7 +131,7 @@ public class GeoNamesService {
       return mapToObjects(WIKIPEDIA_RECORD_DEFINITION, result);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to connect to URL:"
-          + searchUrlString);
+        + searchUrlString);
     }
   }
 
@@ -157,10 +153,10 @@ public class GeoNamesService {
     final List<Map<String, Object>> names = (List<Map<String, Object>>)result.get("geonames");
     for (final Map<String, Object> name : names) {
       final Record record = recordDefinition.createRecord();
-      for (final String attributeName : recordDefinition.getFieldNames()) {
-        final Object value = name.get(attributeName);
+      for (final String fieldName : recordDefinition.getFieldNames()) {
+        final Object value = name.get(fieldName);
         if (value != null) {
-          record.setValue(attributeName, value);
+          record.setValue(fieldName, value);
         }
       }
       final double lat = ((Number)name.get("lat")).doubleValue();
@@ -195,7 +191,7 @@ public class GeoNamesService {
       return mapToObjects(NAME_RECORD_DEFINITION, result);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to connect to URL:"
-          + searchUrlString);
+        + searchUrlString);
     }
   }
 }

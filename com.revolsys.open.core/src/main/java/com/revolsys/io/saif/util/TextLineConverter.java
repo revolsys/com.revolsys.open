@@ -27,19 +27,19 @@ public class TextLineConverter implements OsnConverter {
     values.put(TYPE, SaifConstants.TEXT_LINE);
     Geometry geometry = null;
 
-    String attributeName = iterator.nextAttributeName();
-    while (attributeName != null) {
-      if (attributeName.equals("position")) {
+    String fieldName = iterator.nextFieldName();
+    while (fieldName != null) {
+      if (fieldName.equals("position")) {
         final String objectName = iterator.nextObjectName();
-        final OsnConverter osnConverter = converters.getConverter(objectName);
+        final OsnConverter osnConverter = this.converters.getConverter(objectName);
         if (osnConverter == null) {
           iterator.throwParseError("No Geometry Converter for " + objectName);
         }
         geometry = (Geometry)osnConverter.read(iterator);
       } else {
-        readAttribute(iterator, attributeName, values);
+        readAttribute(iterator, fieldName, values);
       }
-      attributeName = iterator.nextAttributeName();
+      fieldName = iterator.nextFieldName();
     }
     if (!values.isEmpty()) {
       geometry.setUserData(values);
@@ -48,19 +48,19 @@ public class TextLineConverter implements OsnConverter {
   }
 
   protected void readAttribute(final OsnIterator iterator,
-    final String attributeName, final Map<String, Object> values) {
+    final String fieldName, final Map<String, Object> values) {
     iterator.next();
-    values.put(attributeName, iterator.getValue());
+    values.put(fieldName, iterator.getValue());
   }
 
   @Override
   public void write(final OsnSerializer serializer, final Object object)
-    throws IOException {
+      throws IOException {
     if (object instanceof Point) {
       final Point point = (Point)object;
       serializer.startObject(SaifConstants.TEXT_LINE);
-      serializer.attributeName("position");
-      final OsnConverter osnConverter = converters.getConverter(SaifConstants.POINT);
+      serializer.fieldName("position");
+      final OsnConverter osnConverter = this.converters.getConverter(SaifConstants.POINT);
       osnConverter.write(serializer, point);
       serializer.endAttribute();
 

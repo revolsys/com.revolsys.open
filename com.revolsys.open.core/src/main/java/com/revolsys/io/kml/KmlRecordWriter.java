@@ -18,7 +18,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.util.Property;
 
 public class KmlRecordWriter extends AbstractRecordWriter implements
-Kml22Constants {
+  Kml22Constants {
   private static final Map<Class<?>, String> TYPE_MAP = new HashMap<Class<?>, String>();
 
   static {
@@ -63,7 +63,7 @@ Kml22Constants {
   @Override
   public boolean isWriteNulls() {
     return super.isWriteNulls()
-      || BooleanStringConverter.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY));
+        || BooleanStringConverter.isTrue(getProperty(Kml22Constants.WRITE_NULLS_PROPERTY));
   }
 
   @Override
@@ -145,7 +145,7 @@ Kml22Constants {
     boolean hasValues = false;
     for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
       if (i != geometryIndex) {
-        final String attributeName = recordDefinition.getFieldName(i);
+        final String fieldName = recordDefinition.getFieldName(i);
         final Object value = object.getValue(i);
         if (isWritable(value)) {
           if (!hasValues) {
@@ -153,7 +153,7 @@ Kml22Constants {
             this.writer.startTag(EXTENDED_DATA);
           }
           this.writer.startTag(DATA);
-          this.writer.attribute(NAME, attributeName);
+          this.writer.attribute(NAME, fieldName);
           this.writer.element(VALUE, value);
           this.writer.endTag(DATA);
         }

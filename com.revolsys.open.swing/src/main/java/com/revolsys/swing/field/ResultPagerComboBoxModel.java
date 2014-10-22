@@ -12,26 +12,26 @@ import com.revolsys.swing.list.ResultPagerListCellRenderer;
 
 @SuppressWarnings("serial")
 public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
-  ComboBoxModel {
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 1L;
-
-  public static final Object NULL = new Object();
+ComboBoxModel {
 
   public static <T> ComboBox create(final ResultPager<T> codeTable,
-    final boolean allowNull, final String... attributeNames) {
+    final boolean allowNull, final String... fieldNames) {
     final ResultPagerComboBoxModel<T> model = new ResultPagerComboBoxModel<T>(
-      codeTable, allowNull);
+        codeTable, allowNull);
     final ComboBox comboBox = new ComboBox(model);
     final ResultPagerListCellRenderer renderer = new ResultPagerListCellRenderer(
-      attributeNames);
+      fieldNames);
     comboBox.setRenderer(renderer);
     comboBox.setEditable(false);
     return comboBox;
   }
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  public static final Object NULL = new Object();
 
   private final Map<Integer, T> cache = new LruMap<Integer, T>(200);
 
@@ -123,7 +123,7 @@ public class ResultPagerComboBoxModel<T> extends AbstractListModel implements
   @Override
   public void setSelectedItem(final Object item) {
     if (this.selectedItem != null && !this.selectedItem.equals(item)
-      || this.selectedItem == null && item != null) {
+        || this.selectedItem == null && item != null) {
       this.selectedItem = item;
     }
   }

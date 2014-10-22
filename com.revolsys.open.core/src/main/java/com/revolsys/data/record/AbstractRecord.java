@@ -124,12 +124,6 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
-  public String getFieldTitle(final String name) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFieldTitle(name);
-  }
-
-  @Override
   public Byte getByte(final CharSequence name) {
     final Number value = getValue(name);
     if (value == null) {
@@ -162,6 +156,12 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
     } else {
       return recordDefinition.getRecordFactory();
     }
+  }
+
+  @Override
+  public String getFieldTitle(final String name) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getFieldTitle(name);
   }
 
   @Override
@@ -226,12 +226,12 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
-  public Identifier getIdentifier(final List<String> attributeNames) {
-    final int idCount = attributeNames.size();
+  public Identifier getIdentifier(final List<String> fieldNames) {
+    final int idCount = fieldNames.size();
     if (idCount == 0) {
       return null;
     } else if (idCount == 1) {
-      final String idFieldName = attributeNames.get(0);
+      final String idFieldName = fieldNames.get(0);
       final Object idValue = getValue(idFieldName);
       if (idValue == null) {
         return null;
@@ -242,7 +242,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
       boolean notNull = false;
       final Object[] idValues = new Object[idCount];
       for (int i = 0; i < idValues.length; i++) {
-        final String idFieldName = attributeNames.get(i);
+        final String idFieldName = fieldNames.get(i);
         final Object value = getValue(idFieldName);
         if (value != null) {
           notNull = true;
@@ -258,8 +258,8 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
-  public Identifier getIdentifier(final String... attributeNames) {
-    return getIdentifier(Arrays.asList(attributeNames));
+  public Identifier getIdentifier(final String... fieldNames) {
+    return getIdentifier(Arrays.asList(fieldNames));
   }
 
   /**
@@ -407,9 +407,9 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
 
   @Override
   public Map<String, Object> getValueMap(
-    final Collection<? extends CharSequence> attributeNames) {
+    final Collection<? extends CharSequence> fieldNames) {
     final Map<String, Object> values = new HashMap<String, Object>();
-    for (final CharSequence name : attributeNames) {
+    for (final CharSequence name : fieldNames) {
       final Object value = getValue(name);
       if (value != null) {
         values.put(name.toString(), value);
@@ -463,7 +463,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
-  public boolean isValid(final String attributeName) {
+  public boolean isValid(final String fieldName) {
     return true;
   }
 
@@ -569,20 +569,20 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   public void setValueByPath(final CharSequence path, final Object value) {
     final String name = path.toString();
     final int dotIndex = name.indexOf(".");
-    String codeTableAttributeName;
+    String codeTableFieldName;
     String codeTableValueName = null;
     if (dotIndex == -1) {
       if (name.equals(getRecordDefinition().getIdFieldName())) {
-        codeTableAttributeName = null;
+        codeTableFieldName = null;
       } else {
-        codeTableAttributeName = name;
+        codeTableFieldName = name;
       }
     } else {
-      codeTableAttributeName = name.substring(0, dotIndex);
+      codeTableFieldName = name.substring(0, dotIndex);
       codeTableValueName = name.substring(dotIndex + 1);
     }
     final CodeTable codeTable = this.getRecordDefinition()
-      .getCodeTableByColumn(codeTableAttributeName);
+      .getCodeTableByColumn(codeTableFieldName);
     if (codeTable == null) {
       if (dotIndex != -1) {
         LoggerFactory.getLogger(getClass()).debug(
@@ -592,7 +592,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
       }
       setValue(name, value);
     } else if (!Property.hasValue(value)) {
-      setValue(codeTableAttributeName, null);
+      setValue(codeTableFieldName, null);
     } else {
       Object targetValue;
       if (codeTableValueName == null) {
@@ -615,7 +615,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
       if (targetValue == null) {
         targetValue = value;
       }
-      setValue(codeTableAttributeName, targetValue);
+      setValue(codeTableFieldName, targetValue);
     }
   }
 
@@ -643,12 +643,12 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   @Override
   public void setValues(final Map<String, Object> record,
     final Collection<String> attributesNames) {
-    for (final String attributeName : attributesNames) {
-      final Object oldValue = getValue(attributeName);
-      Object newValue = record.get(attributeName);
+    for (final String fieldName : attributesNames) {
+      final Object oldValue = getValue(fieldName);
+      Object newValue = record.get(fieldName);
       if (!EqualsInstance.INSTANCE.equals(oldValue, newValue)) {
         newValue = JavaBeanUtil.clone(newValue);
-        setValue(attributeName, newValue);
+        setValue(fieldName, newValue);
       }
     }
   }

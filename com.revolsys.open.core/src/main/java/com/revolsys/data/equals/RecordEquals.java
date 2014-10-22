@@ -7,27 +7,11 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 
 public class RecordEquals implements Equals<Record> {
-  public static final String EXCLUDE_GEOMETRY = RecordEquals.class.getName()
-    + ".excludeGeometry";
-
-  public static final String EXCLUDE_ID = RecordEquals.class.getName()
-    + ".excludeId";
-
   public static boolean equalAttributes(
     final Collection<String> excludedAttributes, final Record object1,
-    final Record object2, final Collection<String> attributeNames) {
-    for (final String attributeName : attributeNames) {
-      if (!equals(excludedAttributes, object1, object2, attributeName)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  public static boolean equalAttributes(final Record object1,
-    final Record object2, final Collection<String> attributeNames) {
-    for (final String attributeName : attributeNames) {
-      if (!equals(object1, object2, attributeName)) {
+    final Record object2, final Collection<String> fieldNames) {
+    for (final String fieldName : fieldNames) {
+      if (!equals(excludedAttributes, object1, object2, fieldName)) {
         return false;
       }
     }
@@ -41,9 +25,9 @@ public class RecordEquals implements Equals<Record> {
     } else if (values2 == null) {
       return false;
     } else {
-      for (final String attributeName : object1.getRecordDefinition()
-        .getFieldNames()) {
-        if (!MapEquals.equals(object1, values2, attributeName)) {
+      for (final String fieldName : object1.getRecordDefinition()
+          .getFieldNames()) {
+        if (!MapEquals.equals(object1, values2, fieldName)) {
           return false;
         }
       }
@@ -51,46 +35,62 @@ public class RecordEquals implements Equals<Record> {
     }
   }
 
+  public static boolean equalAttributes(final Record object1,
+    final Record object2, final Collection<String> fieldNames) {
+    for (final String fieldName : fieldNames) {
+      if (!equals(object1, object2, fieldName)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public static boolean equals(final Collection<String> excludedAttributes,
-    final Record object1, final Record object2,
-    final String attributeName) {
+    final Record object1, final Record object2, final String fieldName) {
     final RecordDefinition recordDefinition = object1.getRecordDefinition();
-    if (excludedAttributes.contains(attributeName)) {
+    if (excludedAttributes.contains(fieldName)) {
       return true;
     } else if (excludedAttributes.contains(EXCLUDE_ID)
-      && attributeName.equals(recordDefinition.getIdFieldName())) {
+        && fieldName.equals(recordDefinition.getIdFieldName())) {
       return true;
     } else if (excludedAttributes.contains(EXCLUDE_GEOMETRY)
-      && attributeName.equals(recordDefinition.getGeometryFieldName())) {
+        && fieldName.equals(recordDefinition.getGeometryFieldName())) {
       return true;
     } else {
-      final Object value1 = object1.getValue(attributeName);
-      final Object value2 = object2.getValue(attributeName);
+      final Object value1 = object1.getValue(fieldName);
+      final Object value2 = object2.getValue(fieldName);
       return EqualsInstance.INSTANCE.equals(value1, value2);
     }
   }
 
-  public static boolean equals(final Record object1,
-    final Record object2, final String attributeName) {
-    final Object value1 = object1.getValue(attributeName);
-    final Object value2 = object2.getValue(attributeName);
+  public static boolean equals(final Record object1, final Record object2,
+    final String fieldName) {
+    final Object value1 = object1.getValue(fieldName);
+    final Object value2 = object2.getValue(fieldName);
     return EqualsInstance.INSTANCE.equals(value1, value2);
   }
 
-  public static boolean isAttributeIgnored(final RecordDefinition recordDefinition,
-    final Collection<String> excludedAttributes, final String attributeName) {
-    if (excludedAttributes.contains(attributeName)) {
+  public static boolean isFieldIgnored(
+    final RecordDefinition recordDefinition,
+    final Collection<String> excludedAttributes, final String fieldName) {
+    if (excludedAttributes.contains(fieldName)) {
       return true;
     } else if (excludedAttributes.contains(EXCLUDE_ID)
-      && attributeName.equals(recordDefinition.getIdFieldName())) {
+        && fieldName.equals(recordDefinition.getIdFieldName())) {
       return true;
     } else if (excludedAttributes.contains(EXCLUDE_GEOMETRY)
-      && attributeName.equals(recordDefinition.getGeometryFieldName())) {
+        && fieldName.equals(recordDefinition.getGeometryFieldName())) {
       return true;
     } else {
       return false;
     }
   }
+
+  public static final String EXCLUDE_GEOMETRY = RecordEquals.class.getName()
+      + ".excludeGeometry";
+
+  public static final String EXCLUDE_ID = RecordEquals.class.getName()
+      + ".excludeId";
 
   private EqualsRegistry equalsRegistry;
 
@@ -110,13 +110,14 @@ public class RecordEquals implements Equals<Record> {
             if (excludedAttributes.contains(name)) {
             } else if (i == idIndex && excludedAttributes.contains(EXCLUDE_ID)) {
             } else if (i == geometryIndex
-              && excludedAttributes.contains(EXCLUDE_GEOMETRY)) {
+                && excludedAttributes.contains(EXCLUDE_GEOMETRY)) {
             } else if (i == objectIdIndex
-              && excludedAttributes.contains(EXCLUDE_GEOMETRY)) {
+                && excludedAttributes.contains(EXCLUDE_GEOMETRY)) {
             } else {
               final Object value1 = object1.getValue(i);
               final Object value2 = object2.getValue(i);
-              if (!equalsRegistry.equals(value1, value2, excludedAttributes)) {
+              if (!this.equalsRegistry.equals(value1, value2,
+                excludedAttributes)) {
                 return false;
               }
             }

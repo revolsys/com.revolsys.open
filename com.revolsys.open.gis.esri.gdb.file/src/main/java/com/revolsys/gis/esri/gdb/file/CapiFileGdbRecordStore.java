@@ -543,11 +543,11 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements
     } else {
       sql.append("SELECT ");
 
-      final List<String> attributeNames = query.getFieldNames();
-      if (attributeNames.isEmpty()) {
+      final List<String> fieldNames = query.getFieldNames();
+      if (fieldNames.isEmpty()) {
         CollectionUtil.append(sql, recordDefinition.getFieldNames());
       } else {
-        CollectionUtil.append(sql, attributeNames);
+        CollectionUtil.append(sql, fieldNames);
       }
       sql.append(" FROM ");
       sql.append(JdbcUtils.getTableName(typePath));

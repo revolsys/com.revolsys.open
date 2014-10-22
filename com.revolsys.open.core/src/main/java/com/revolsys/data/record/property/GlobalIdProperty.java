@@ -4,14 +4,13 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 
 public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
-  static final String PROPERTY_NAME = "http://revolsys.com/gis/globalId";
-
   public static GlobalIdProperty getProperty(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     return getProperty(recordDefinition);
   }
 
-  public static GlobalIdProperty getProperty(final RecordDefinition recordDefinition) {
+  public static GlobalIdProperty getProperty(
+    final RecordDefinition recordDefinition) {
     if (recordDefinition == null) {
       return null;
     } else {
@@ -19,13 +18,15 @@ public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
     }
   }
 
-  private String attributeName;
+  static final String PROPERTY_NAME = "http://revolsys.com/gis/globalId";
+
+  private String fieldName;
 
   public GlobalIdProperty() {
   }
 
-  public GlobalIdProperty(final String attributeName) {
-    this.attributeName = attributeName;
+  public GlobalIdProperty(final String fieldName) {
+    this.fieldName = fieldName;
   }
 
   @Override
@@ -34,7 +35,7 @@ public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
   }
 
   public String getFieldName() {
-    return attributeName;
+    return this.fieldName;
   }
 
   @Override
@@ -42,14 +43,14 @@ public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
     return PROPERTY_NAME;
   }
 
-  public void setAttributeName(final String attributeName) {
-    this.attributeName = attributeName;
+  public void setFieldName(final String fieldName) {
+    this.fieldName = fieldName;
   }
 
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    if (attributeName == null) {
-      attributeName = recordDefinition.getIdFieldName();
+    if (this.fieldName == null) {
+      this.fieldName = recordDefinition.getIdFieldName();
     }
     super.setRecordDefinition(recordDefinition);
   }

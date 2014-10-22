@@ -25,7 +25,7 @@ public class RecordStoreQueryListModel implements ListModel {
 
   private final RecordStore recordStore;
 
-  private final String displayAttributeName;
+  private final String displayFieldName;
 
   protected EventListenerList listDataListeners = new EventListenerList();
 
@@ -40,15 +40,15 @@ public class RecordStoreQueryListModel implements ListModel {
   private int maxResults = Integer.MAX_VALUE;
 
   public RecordStoreQueryListModel(final RecordStore recordStore,
-    final String displayAttributeName, final List<Query> queries) {
+    final String displayFieldName, final List<Query> queries) {
     this.recordStore = recordStore;
     this.queries.addAll(queries);
-    this.displayAttributeName = displayAttributeName;
+    this.displayFieldName = displayFieldName;
   }
 
   public RecordStoreQueryListModel(final RecordStore recordStore,
-    final String displayAttributeName, final Query... queries) {
-    this(recordStore, displayAttributeName, Arrays.asList(queries));
+    final String displayFieldName, final Query... queries) {
+    this(recordStore, displayFieldName, Arrays.asList(queries));
   }
 
   @Override
@@ -72,8 +72,8 @@ public class RecordStoreQueryListModel implements ListModel {
     }
   }
 
-  public String getDisplayAttributeName() {
-    return this.displayAttributeName;
+  public String getDisplayFieldName() {
+    return this.displayFieldName;
   }
 
   @Override
@@ -95,13 +95,13 @@ public class RecordStoreQueryListModel implements ListModel {
       for (Query query : this.queries) {
         if (allObjects.size() < this.maxResults) {
           query = query.clone();
-          query.addOrderBy(this.displayAttributeName, true);
+          query.addOrderBy(this.displayFieldName, true);
           final Condition whereCondition = query.getWhereCondition();
           if (whereCondition instanceof BinaryCondition) {
             final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
             if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
               final String likeString = "%"
-                  + searchParam.toUpperCase().replaceAll("[^A-Z0-9 ]", "%") + "%";
+                + searchParam.toUpperCase().replaceAll("[^A-Z0-9 ]", "%") + "%";
               Q.setValue(0, binaryCondition, likeString);
             } else {
               Q.setValue(0, binaryCondition, searchParam);
@@ -113,7 +113,7 @@ public class RecordStoreQueryListModel implements ListModel {
             final List<Record> objects = reader.read();
             for (final Record object : objects) {
               if (allObjects.size() < this.maxResults) {
-                final String key = object.getString(this.displayAttributeName);
+                final String key = object.getString(this.displayFieldName);
                 if (!allObjects.containsKey(key)) {
                   if (searchParam.equals(key)) {
                     this.selectedItem = object;

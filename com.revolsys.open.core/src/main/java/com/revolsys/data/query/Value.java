@@ -195,9 +195,9 @@ public class Value extends QueryValue {
 
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    final String attributeName = this.attribute.getName();
-    if (Property.hasValue(attributeName)) {
-      final FieldDefinition attribute = recordDefinition.getField(attributeName);
+    final String fieldName = this.attribute.getName();
+    if (Property.hasValue(fieldName)) {
+      final FieldDefinition attribute = recordDefinition.getField(fieldName);
       setAttribute(attribute);
     }
   }

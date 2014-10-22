@@ -243,10 +243,10 @@ public class OsmDocument implements OsmConstants {
 
   private void parseDocument(final XMLStreamReader in) {
     if (StaxUtils.skipToStartElement(in, OsmConstants.OSM)) {
-      for (final String attributeName : Arrays.asList("version", "generator",
+      for (final String fieldName : Arrays.asList("version", "generator",
         "copyright", "attribution", "license")) {
-        final String value = in.getAttributeValue(null, attributeName);
-        Property.set(this, attributeName, value);
+        final String value = in.getAttributeValue(null, fieldName);
+        Property.set(this, fieldName, value);
       }
       while (StaxUtils.skipToChildStartElements(in, OSM_XML_ELEMENTS)) {
         final QName name = in.getName();

@@ -101,29 +101,29 @@ public class ArcSdeBinaryGeometryQueryIterator extends AbstractIterator<Record> 
     }
     try {
 
-      final List<String> attributeNames = new ArrayList<String>(
-          this.query.getFieldNames());
-      if (attributeNames.isEmpty()) {
+      final List<String> fieldNames = new ArrayList<String>(
+        this.query.getFieldNames());
+      if (fieldNames.isEmpty()) {
         this.attributes.addAll(this.recordDefinition.getFields());
-        attributeNames.addAll(this.recordDefinition.getFieldNames());
+        fieldNames.addAll(this.recordDefinition.getFieldNames());
       } else {
-        for (final String attributeName : attributeNames) {
-          if (attributeName.equals("*")) {
+        for (final String fieldName : fieldNames) {
+          if (fieldName.equals("*")) {
             this.attributes.addAll(this.recordDefinition.getFields());
-            attributeNames.addAll(this.recordDefinition.getFieldNames());
+            fieldNames.addAll(this.recordDefinition.getFieldNames());
           } else {
-            final FieldDefinition attribute = this.recordDefinition.getField(attributeName);
+            final FieldDefinition attribute = this.recordDefinition.getField(fieldName);
             if (attribute != null) {
               this.attributes.add(attribute);
             }
-            attributeNames.add(attributeName);
+            fieldNames.add(fieldName);
           }
         }
       }
 
       this.connection = this.sdeUtil.createSeConnection();
       final SeSqlConstruct sqlConstruct = new SeSqlConstruct(tableName);
-      final String[] columnNames = attributeNames.toArray(new String[0]);
+      final String[] columnNames = fieldNames.toArray(new String[0]);
       this.seQuery = new SeQuery(this.connection, columnNames, sqlConstruct);
       BoundingBox boundingBox = QueryValue.getBoundingBox(this.query);
       if (boundingBox != null) {
@@ -141,8 +141,8 @@ public class ArcSdeBinaryGeometryQueryIterator extends AbstractIterator<Record> 
           SeFilter.METHOD_ENVP);
         this.seQuery.setSpatialConstraints(SeQuery.SE_SPATIAL_FIRST, false,
           new SeFilter[] {
-          filter
-        });
+            filter
+          });
       }
       // TODO where clause
       // TODO how to load geometry for non-spatial queries

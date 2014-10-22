@@ -30,7 +30,7 @@ public interface CodeTable extends Cloneable {
 
   <V> V getValue(final Object id);
 
-  List<String> getValueAttributeNames();
+  List<String> getValueFieldNames();
 
   List<Object> getValues(final Identifier id);
 

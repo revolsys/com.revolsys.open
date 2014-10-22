@@ -5,13 +5,13 @@
  * $Revision: 112 $
 
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ public class AddDefaultValuesProcess extends
   AbstractInOutProcess<Record, Record> {
   private static final Logger log = Logger.getLogger(AddDefaultValuesProcess.class);
 
-  private Set<String> excludedAttributeNames = new HashSet<String>();
+  private Set<String> excludedFieldNames = new HashSet<String>();
 
   private RecordDefinitionFactory recordDefinitionFactory;
 
@@ -52,20 +52,20 @@ public class AddDefaultValuesProcess extends
 
   private void addDefaultValues(final Map<String, Object> defaultValues,
     final RecordDefinition type) {
-    if (Path.getPath(type.getPath()).equals(schemaName)) {
+    if (Path.getPath(type.getPath()).equals(this.schemaName)) {
       defaultValues.putAll(type.getDefaultValues());
     }
   }
 
   private Map<String, Object> getDefaultValues(final RecordDefinition type) {
-    if (schemaName == null) {
+    if (this.schemaName == null) {
       return type.getDefaultValues();
     } else {
-      Map<String, Object> defaultValues = typeDefaultValues.get(type);
+      Map<String, Object> defaultValues = this.typeDefaultValues.get(type);
       if (defaultValues == null) {
         defaultValues = new HashMap<String, Object>();
         addDefaultValues(defaultValues, type);
-        typeDefaultValues.put(type, defaultValues);
+        this.typeDefaultValues.put(type, defaultValues);
       }
       return defaultValues;
     }
@@ -74,32 +74,32 @@ public class AddDefaultValuesProcess extends
   /**
    * Get the list of attribute names that will be excluded from having the
    * default values set.
-   * 
+   *
    * @return The names of the attributes to exclude.
    */
-  public Set<String> getExcludedAttributeNames() {
-    return excludedAttributeNames;
+  public Set<String> getExcludedFieldNames() {
+    return this.excludedFieldNames;
   }
 
   public RecordDefinitionFactory getRecordDefinitionFactory() {
-    return recordDefinitionFactory;
+    return this.recordDefinitionFactory;
   }
 
   /**
    * Get the schema name of the type definitions to get the default values from.
-   * 
+   *
    * @return The schema name.
    */
   public String getSchemaName() {
-    return schemaName;
+    return this.schemaName;
   }
 
   private void process(final Record record) {
     final RecordDefinition type = record.getRecordDefinition();
 
     boolean process = true;
-    if (schemaName != null) {
-      if (!Path.getPath(type.getPath()).equals(schemaName)) {
+    if (this.schemaName != null) {
+      if (!Path.getPath(type.getPath()).equals(this.schemaName)) {
         process = false;
       }
     }
@@ -139,35 +139,35 @@ public class AddDefaultValuesProcess extends
     final int dotIndex = key.indexOf('.');
     if (dotIndex == -1) {
       if (record.getValue(key) == null
-        && !excludedAttributeNames.contains(key)) {
+        && !this.excludedFieldNames.contains(key)) {
         log.info("Adding attribute " + key + "=" + value);
         record.setValue(key, value);
       }
     } else {
-      final String attributeName = key.substring(0, dotIndex);
-      NDC.push(" -> " + attributeName);
+      final String fieldName = key.substring(0, dotIndex);
+      NDC.push(" -> " + fieldName);
       try {
         final String subKey = key.substring(dotIndex + 1);
-        final Object attributeValue = record.getValue(attributeName);
+        final Object attributeValue = record.getValue(fieldName);
         if (attributeValue == null) {
           final RecordDefinition type = record.getRecordDefinition();
-          final int attrIndex = type.getFieldIndex(attributeName);
+          final int attrIndex = type.getFieldIndex(fieldName);
           final DataType dataType = type.getFieldType(attrIndex);
           final Class<?> typeClass = dataType.getJavaClass();
           if (typeClass == Record.class) {
 
-            final RecordDefinition subClass = recordDefinitionFactory.getRecordDefinition(dataType.getName());
+            final RecordDefinition subClass = this.recordDefinitionFactory.getRecordDefinition(dataType.getName());
             final Record subObject = subClass.createRecord();
             setDefaultValue(subObject, subKey, value);
-            record.setValue(attributeName, subObject);
+            record.setValue(fieldName, subObject);
             process(subObject);
           }
         } else if (attributeValue instanceof Record) {
           final Record subObject = (Record)attributeValue;
           setDefaultValue(subObject, subKey, value);
-        } else if (!attributeName.equals(record.getRecordDefinition()
+        } else if (!fieldName.equals(record.getRecordDefinition()
           .getGeometryFieldName())) {
-          log.error("Attribute '" + attributeName + "' must be a Record");
+          log.error("Attribute '" + fieldName + "' must be a Record");
         }
       } finally {
         NDC.pop();
@@ -178,20 +178,21 @@ public class AddDefaultValuesProcess extends
   /**
    * Set the list of attribute names that will be excluded from having the
    * default values set.
-   * 
-   * @param excludedAttributeNames The names of the attributes to exclude.
+   *
+   * @param excludedFieldNames The names of the attributes to exclude.
    */
-  public void setExcludedAttributeNames(final Set<String> excludedAttributeNames) {
-    this.excludedAttributeNames = excludedAttributeNames;
+  public void setExcludedFieldNames(final Set<String> excludedFieldNames) {
+    this.excludedFieldNames = excludedFieldNames;
   }
 
-  public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
+  public void setRecordDefinitionFactory(
+    final RecordDefinitionFactory recordDefinitionFactory) {
     this.recordDefinitionFactory = recordDefinitionFactory;
   }
 
   /**
    * Set the schema name of the type definitions to get the default values from.
-   * 
+   *
    * @param schemaName The schema name.
    */
   public void setSchemaName(final String schemaName) {

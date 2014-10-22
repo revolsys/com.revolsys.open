@@ -244,13 +244,13 @@ public class OsnReader implements RecordIterator {
       final RecordDefinitionImpl type = (RecordDefinitionImpl)recordDefinitionFactory.getRecordDefinition(typePath);
       final RecordDefinition spatialDataSetType = recordDefinitionFactory.getRecordDefinition("/SpatialDataSet");
       if (type != null && type.isInstanceOf(spatialDataSetType)) {
-        final String oiName = osnIterator.nextAttributeName();
+        final String oiName = osnIterator.nextFieldName();
 
         if (oiName != null && oiName.equals("objectIdentifier")) {
           osnIterator.nextStringValue();
-          final String attributeName = osnIterator.nextAttributeName();
-          if (attributeName != null
-            && (attributeName.equals("geoComponents") || attributeName.equals("annotationComponents"))) {
+          final String fieldName = osnIterator.nextFieldName();
+          if (fieldName != null
+            && (fieldName.equals("geoComponents") || fieldName.equals("annotationComponents"))) {
             if (osnIterator.next() == OsnIterator.START_SET) {
               return true;
             } else {

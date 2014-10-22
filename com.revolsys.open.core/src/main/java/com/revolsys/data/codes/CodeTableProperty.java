@@ -34,14 +34,14 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return property;
   }
 
-  private static final ArrayList<String> DEFAULT_ATTRIBUTE_NAMES = new ArrayList<String>(
+  private static final ArrayList<String> DEFAULT_FIELD_NAMES = new ArrayList<String>(
     Arrays.asList("VALUE"));
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
 
-  private String creationTimestampAttributeName;
+  private String creationTimestampFieldName;
 
-  private String modificationTimestampAttributeName;
+  private String modificationTimestampFieldName;
 
   private List<String> fieldAliases = new ArrayList<String>();
 
@@ -51,9 +51,9 @@ public class CodeTableProperty extends AbstractCodeTable implements
 
   private RecordDefinition recordDefinition;
 
-  private List<String> valueAttributeNames = DEFAULT_ATTRIBUTE_NAMES;
+  private List<String> valueFieldNames = DEFAULT_FIELD_NAMES;
 
-  private List<String> orderBy = DEFAULT_ATTRIBUTE_NAMES;
+  private List<String> orderBy = DEFAULT_FIELD_NAMES;
 
   private String typePath;
 
@@ -77,8 +77,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
   public void addValue(final Record code) {
     final Identifier id = code.getIdentifier(getIdFieldName());
     final List<Object> values = new ArrayList<Object>();
-    for (final String attributeName : this.valueAttributeNames) {
-      final Object value = code.getValue(attributeName);
+    for (final String fieldName : this.valueFieldNames) {
+      final Object value = code.getValue(fieldName);
       if (value instanceof SingleIdentifier) {
         final SingleIdentifier identifier = (SingleIdentifier)value;
         values.add(identifier.getValue(0));
@@ -100,7 +100,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     final CodeTableProperty clone = (CodeTableProperty)super.clone();
     clone.recordDefinition = null;
     clone.fieldAliases = new ArrayList<String>(this.fieldAliases);
-    clone.valueAttributeNames = new ArrayList<String>(this.valueAttributeNames);
+    clone.valueFieldNames = new ArrayList<String>(this.valueFieldNames);
     return clone;
   }
 
@@ -113,8 +113,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
       if (id == null) {
         final FieldDefinition idField = recordDefinition.getIdField();
         if (idField != null) {
-          if (Number.class.isAssignableFrom(idField.getType()
-            .getJavaClass())) {
+          if (Number.class.isAssignableFrom(idField.getType().getJavaClass())) {
             id = getNextId();
           } else {
             id = UUID.randomUUID().toString();
@@ -122,18 +121,18 @@ public class CodeTableProperty extends AbstractCodeTable implements
         }
       }
       code.setIdValue(id);
-      for (int i = 0; i < this.valueAttributeNames.size(); i++) {
-        final String name = this.valueAttributeNames.get(i);
+      for (int i = 0; i < this.valueFieldNames.size(); i++) {
+        final String name = this.valueFieldNames.get(i);
         final Object value = values.get(i);
         code.setValue(name, value);
       }
 
       final Timestamp now = new Timestamp(System.currentTimeMillis());
-      if (this.creationTimestampAttributeName != null) {
-        code.setValue(this.creationTimestampAttributeName, now);
+      if (this.creationTimestampFieldName != null) {
+        code.setValue(this.creationTimestampFieldName, now);
       }
-      if (this.modificationTimestampAttributeName != null) {
-        code.setValue(this.modificationTimestampAttributeName, now);
+      if (this.modificationTimestampFieldName != null) {
+        code.setValue(this.modificationTimestampFieldName, now);
       }
 
       this.recordStore.insert(code);
@@ -141,11 +140,6 @@ public class CodeTableProperty extends AbstractCodeTable implements
     } else {
       return null;
     }
-  }
-
-  @Override
-  public List<String> getFieldAliases() {
-    return this.fieldAliases;
   }
 
   @Override
@@ -159,8 +153,13 @@ public class CodeTableProperty extends AbstractCodeTable implements
     }
   }
 
-  public String getCreationTimestampAttributeName() {
-    return this.creationTimestampAttributeName;
+  public String getCreationTimestampFieldName() {
+    return this.creationTimestampFieldName;
+  }
+
+  @Override
+  public List<String> getFieldAliases() {
+    return this.fieldAliases;
   }
 
   @Override
@@ -187,7 +186,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
     } else {
       final Map<String, Object> map = new HashMap<String, Object>();
       for (int i = 0; i < values.size(); i++) {
-        final String name = this.valueAttributeNames.get(i);
+        final String name = this.valueFieldNames.get(i);
         final Object value = values.get(i);
         map.put(name, value);
       }
@@ -195,8 +194,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
     }
   }
 
-  public String getModificationTimestampAttributeName() {
-    return this.modificationTimestampAttributeName;
+  public String getModificationTimestampFieldName() {
+    return this.modificationTimestampFieldName;
   }
 
   @Override
@@ -230,8 +229,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   @Override
-  public List<String> getValueAttributeNames() {
-    return this.valueAttributeNames;
+  public List<String> getValueFieldNames() {
+    return this.valueFieldNames;
   }
 
   public boolean isCreateMissingCodes() {
@@ -258,7 +257,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
         try {
           final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(this.typePath);
           final Query query = new Query(this.typePath);
-          query.setAttributeNames(recordDefinition.getFieldNames());
+          query.setFieldNames(recordDefinition.getFieldNames());
           for (final String order : this.orderBy) {
             query.addOrderBy(order, true);
           }
@@ -295,12 +294,12 @@ public class CodeTableProperty extends AbstractCodeTable implements
       final And and = new And();
       if (!values.isEmpty()) {
         int i = 0;
-        for (final String attributeName : this.valueAttributeNames) {
+        for (final String fieldName : this.valueFieldNames) {
           final Object value = values.get(i);
           if (value == null) {
-            and.add(Q.isNull(attributeName));
+            and.add(Q.isNull(fieldName));
           } else {
-            final FieldDefinition attribute = this.recordDefinition.getField(attributeName);
+            final FieldDefinition attribute = this.recordDefinition.getField(fieldName);
             and.add(Q.equal(attribute, value));
           }
           i++;
@@ -351,17 +350,17 @@ public class CodeTableProperty extends AbstractCodeTable implements
     }
   }
 
-  public void setFieldAliases(final List<String> columnAliases) {
-    this.fieldAliases = columnAliases;
-  }
-
   public void setCreateMissingCodes(final boolean createMissingCodes) {
     this.createMissingCodes = createMissingCodes;
   }
 
-  public void setCreationTimestampAttributeName(
-    final String creationTimestampAttributeName) {
-    this.creationTimestampAttributeName = creationTimestampAttributeName;
+  public void setCreationTimestampFieldName(
+    final String creationTimestampFieldName) {
+    this.creationTimestampFieldName = creationTimestampFieldName;
+  }
+
+  public void setFieldAliases(final List<String> columnAliases) {
+    this.fieldAliases = columnAliases;
   }
 
   public void setIdFieldName(final String idFieldName) {
@@ -376,9 +375,9 @@ public class CodeTableProperty extends AbstractCodeTable implements
     this.loadMissingCodes = loadMissingCodes;
   }
 
-  public void setModificationTimestampAttributeName(
-    final String modificationTimestampAttributeName) {
-    this.modificationTimestampAttributeName = modificationTimestampAttributeName;
+  public void setModificationTimestampFieldName(
+    final String modificationTimestampFieldName) {
+    this.modificationTimestampFieldName = modificationTimestampFieldName;
   }
 
   public void setOrderBy(final List<String> orderBy) {
@@ -405,25 +404,24 @@ public class CodeTableProperty extends AbstractCodeTable implements
     }
   }
 
-  public void setValueAttributeName(final String valueColumns) {
-    setValueAttributeNames(valueColumns);
+  public void setValueFieldName(final String valueColumns) {
+    setValueFieldNames(valueColumns);
   }
 
-  public void setValueAttributeNames(final List<String> valueColumns) {
-    this.valueAttributeNames = new ArrayList<String>(valueColumns);
-    if (this.orderBy == DEFAULT_ATTRIBUTE_NAMES) {
+  public void setValueFieldNames(final List<String> valueColumns) {
+    this.valueFieldNames = new ArrayList<String>(valueColumns);
+    if (this.orderBy == DEFAULT_FIELD_NAMES) {
       setOrderBy(valueColumns);
     }
   }
 
-  public void setValueAttributeNames(final String... valueColumns) {
-    setValueAttributeNames(Arrays.asList(valueColumns));
+  public void setValueFieldNames(final String... valueColumns) {
+    setValueFieldNames(Arrays.asList(valueColumns));
   }
 
   @Override
   public String toString() {
-    return this.typePath + " " + getIdFieldName() + " "
-      + this.valueAttributeNames;
+    return this.typePath + " " + getIdFieldName() + " " + this.valueFieldNames;
 
   }
 

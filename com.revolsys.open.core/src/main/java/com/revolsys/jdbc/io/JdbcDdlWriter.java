@@ -82,44 +82,44 @@ public abstract class JdbcDdlWriter implements Cloneable {
   }
 
   public void writeAddForeignKeyConstraint(
-    final RecordDefinition recordDefinition, final String attributeName,
+    final RecordDefinition recordDefinition, final String fieldName,
     final RecordDefinition referencedRecordDefinition) {
     final String typePath = recordDefinition.getPath();
     final String referencedTypeName = referencedRecordDefinition.getPath();
-    final String referencedAttributeName = referencedRecordDefinition.getIdFieldName();
+    final String referencedFieldName = referencedRecordDefinition.getIdFieldName();
     final String constraintName = getTableAlias(recordDefinition) + "_"
       + getTableAlias(referencedRecordDefinition) + "_FK";
-    writeAddForeignKeyConstraint(typePath, constraintName, attributeName,
-      referencedTypeName, referencedAttributeName);
+    writeAddForeignKeyConstraint(typePath, constraintName, fieldName,
+      referencedTypeName, referencedFieldName);
   }
 
   public void writeAddForeignKeyConstraint(
-    final RecordDefinition recordDefinition, final String attributeName,
+    final RecordDefinition recordDefinition, final String fieldName,
     final String referenceTablePrefix,
     final RecordDefinition referencedRecordDefinition) {
     final String typePath = recordDefinition.getPath();
     final String referencedTypeName = referencedRecordDefinition.getPath();
-    final String referencedAttributeName = referencedRecordDefinition.getIdFieldName();
+    final String referencedFieldName = referencedRecordDefinition.getIdFieldName();
     final String constraintName = getTableAlias(recordDefinition) + "_"
       + referenceTablePrefix + "_" + getTableAlias(referencedRecordDefinition)
       + "_FK";
-    writeAddForeignKeyConstraint(typePath, constraintName, attributeName,
-      referencedTypeName, referencedAttributeName);
+    writeAddForeignKeyConstraint(typePath, constraintName, fieldName,
+      referencedTypeName, referencedFieldName);
   }
 
   public void writeAddForeignKeyConstraint(final String typePath,
-    final String constraintName, final String attributeName,
-    final String referencedTypeName, final String referencedAttributeName) {
+    final String constraintName, final String fieldName,
+    final String referencedTypeName, final String referencedFieldName) {
     this.out.print("ALTER TABLE ");
     writeTableName(typePath);
     this.out.print(" ADD CONSTRAINT ");
     this.out.print(constraintName);
     this.out.print(" FOREIGN KEY (");
-    this.out.print(attributeName);
+    this.out.print(fieldName);
     this.out.print(") REFERENCES ");
     writeTableName(referencedTypeName);
     this.out.print(" (");
-    this.out.print(referencedAttributeName);
+    this.out.print(referencedFieldName);
     this.out.println(");");
   }
 

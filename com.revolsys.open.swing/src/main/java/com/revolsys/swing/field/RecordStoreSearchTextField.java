@@ -53,12 +53,12 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
 public class RecordStoreSearchTextField extends JXSearchField implements
-DocumentListener, KeyListener, MouseListener, FocusListener,
-ListDataListener, ItemSelectable, Field, ListSelectionListener,
-HighlightPredicate {
+  DocumentListener, KeyListener, MouseListener, FocusListener,
+  ListDataListener, ItemSelectable, Field, ListSelectionListener,
+  HighlightPredicate {
   private static final long serialVersionUID = 1L;
 
-  private final String displayAttributeName;
+  private final String displayFieldName;
 
   private final JXList list;
 
@@ -75,16 +75,15 @@ HighlightPredicate {
   private final CascadingUndoManager undoManager = new CascadingUndoManager();
 
   public RecordStoreSearchTextField(final RecordDefinition recordDefinition,
-    final String displayAttributeName) {
-    this(recordDefinition.getRecordStore(), displayAttributeName, new Query(
-      recordDefinition, new Equal(F.upper(displayAttributeName),
-        new Value(null))), new Query(recordDefinition, Q.iLike(
-      displayAttributeName, "")));
+    final String displayFieldName) {
+    this(recordDefinition.getRecordStore(), displayFieldName, new Query(
+      recordDefinition, new Equal(F.upper(displayFieldName), new Value(null))),
+      new Query(recordDefinition, Q.iLike(displayFieldName, "")));
   }
 
   public RecordStoreSearchTextField(final RecordStore recordStore,
-    final String displayAttributeName, final List<Query> queries) {
-    this.displayAttributeName = displayAttributeName;
+    final String displayFieldName, final List<Query> queries) {
+    this.displayFieldName = displayFieldName;
 
     final Document document = getDocument();
     document.addDocumentListener(this);
@@ -93,9 +92,9 @@ HighlightPredicate {
     addMouseListener(this);
 
     this.listModel = new RecordStoreQueryListModel(recordStore,
-      displayAttributeName, queries);
+      displayFieldName, queries);
     this.list = new JXList(this.listModel);
-    this.list.setCellRenderer(new RecordListCellRenderer(displayAttributeName));
+    this.list.setCellRenderer(new RecordListCellRenderer(displayFieldName));
     this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.list.setHighlighters(HighlighterFactory.createSimpleStriping(Color.LIGHT_GRAY));
     this.list.addMouseListener(this);
@@ -117,16 +116,16 @@ HighlightPredicate {
   }
 
   public RecordStoreSearchTextField(final RecordStore recordStore,
-    final String displayAttributeName, final Query... queries) {
-    this(recordStore, displayAttributeName, Arrays.asList(queries));
+    final String displayFieldName, final Query... queries) {
+    this(recordStore, displayFieldName, Arrays.asList(queries));
 
   }
 
   public RecordStoreSearchTextField(final RecordStore recordStore,
-    final String typeName, final String displayAttributeName) {
-    this(recordStore, displayAttributeName, new Query(typeName, new Equal(
-      F.upper(displayAttributeName), new Value(null))), new Query(typeName,
-        Q.iLike(displayAttributeName, "")));
+    final String typeName, final String displayFieldName) {
+    this(recordStore, displayFieldName, new Query(typeName, new Equal(
+      F.upper(displayFieldName), new Value(null))), new Query(typeName,
+      Q.iLike(displayFieldName, "")));
   }
 
   @Override
@@ -174,7 +173,7 @@ HighlightPredicate {
 
   @Override
   public String getFieldName() {
-    return this.displayAttributeName;
+    return this.displayFieldName;
   }
 
   @Override
@@ -236,7 +235,7 @@ HighlightPredicate {
     final ComponentAdapter adapter) {
     final Record object = this.listModel.getElementAt(adapter.row);
     final String text = getText();
-    final String value = object.getString(this.displayAttributeName);
+    final String value = object.getString(this.displayFieldName);
     if (StringEqualsIgnoreCase.equal(text, value)) {
       return true;
     } else {
@@ -250,7 +249,7 @@ HighlightPredicate {
     } else {
       final String text = getText();
       if (Property.hasValue(text)) {
-        final String value = this.selectedItem.getString(this.displayAttributeName);
+        final String value = this.selectedItem.getString(this.displayFieldName);
         return text.equalsIgnoreCase(value);
       } else {
         return false;
@@ -279,12 +278,12 @@ HighlightPredicate {
         }
         this.list.setSelectedIndex(selectedIndex);
         e.consume();
-        break;
+      break;
       case KeyEvent.VK_ENTER:
         if (size > 0) {
           if (selectedIndex >= 0 && selectedIndex < size) {
             final Record selectedItem = this.listModel.getElementAt(selectedIndex);
-            final String text = selectedItem.getString(this.displayAttributeName);
+            final String text = selectedItem.getString(this.displayFieldName);
             if (!text.equals(this.getText())) {
               this.selectedItem = selectedItem;
               setText(text);
@@ -298,9 +297,9 @@ HighlightPredicate {
           findButton.doClick();
           setText("");
         }
-        break;
+      break;
       default:
-        break;
+      break;
     }
     showMenu();
   }
@@ -322,7 +321,7 @@ HighlightPredicate {
     // this.list.setSelectedIndex(index);
     // final Record value = this.listModel.getElementAt(index);
     // if (value != null) {
-    // final String label = value.getString(this.displayAttributeName);
+    // final String label = value.getString(this.displayFieldName);
     // setText(label);
     // }
     // requestFocus();
@@ -471,7 +470,7 @@ HighlightPredicate {
     if (!e.getValueIsAdjusting()) {
       final Record value = (Record)this.list.getSelectedValue();
       if (value != null) {
-        final String label = value.getString(this.displayAttributeName);
+        final String label = value.getString(this.displayFieldName);
         if (!EqualsRegistry.equal(label, getText())) {
           setText(label);
         }
