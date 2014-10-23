@@ -10,25 +10,25 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.swing.map.form.LayerRecordForm;
-import com.revolsys.swing.map.layer.record.table.model.RecordLayerAttributesTableModel;
+import com.revolsys.swing.map.layer.record.table.model.LayerRecordTableModel;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.util.Property;
 
 public class FormAllFieldsModifiedPredicate implements HighlightPredicate {
 
   public static void add(final LayerRecordForm form, final BaseJTable table) {
-    final RecordLayerAttributesTableModel model = table.getTableModel();
+    final LayerRecordTableModel model = table.getTableModel();
     final FormAllFieldsModifiedPredicate predicate = new FormAllFieldsModifiedPredicate(
       form, model);
     ModifiedAttributePredicate.addModifiedHighlighters(table, predicate);
   }
 
-  private final RecordLayerAttributesTableModel model;
+  private final LayerRecordTableModel model;
 
   private final Reference<LayerRecordForm> form;
 
   public FormAllFieldsModifiedPredicate(final LayerRecordForm form,
-    final RecordLayerAttributesTableModel model) {
+    final LayerRecordTableModel model) {
     this.form = new WeakReference<>(form);
     this.model = model;
   }

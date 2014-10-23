@@ -191,13 +191,14 @@ public class StringListField extends ValueField {
   private void setSelectedButtonsEnabled(final boolean editable) {
     for (final Component component : this.toolBar.getGroup(SELECTED)) {
       component.setEnabled(editable);
-      this.valueEntry.setEditable(editable);
+      // this.valueEntry.setEditable(editable);
     }
   }
 
   public void updateFields() {
     this.valueEntry.setEnabled(true);
-    if (Property.hasValue(this.valueEntry.getText())) {
+    final String text = this.valueEntry.getText();
+    if (Property.hasValue(text) && !this.values.contains(text)) {
       this.addButton.setEnabled(true);
     } else {
       this.addButton.setEnabled(false);

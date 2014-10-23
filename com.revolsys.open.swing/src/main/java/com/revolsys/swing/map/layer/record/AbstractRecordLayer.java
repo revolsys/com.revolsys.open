@@ -2573,8 +2573,16 @@ RecordFactory, AddGeometryCompleteAction {
       if (form == null) {
         return null;
       } else {
-        final LayerRecord addedRecord = form.showAddDialog();
-        return addedRecord;
+        try {
+          form.setAddRecord(newRecord);
+          if (form.showAddDialog()) {
+            return form.getAddRecord();
+          } else {
+            return null;
+          }
+        } finally {
+          form.setAddRecord(null);
+        }
       }
     } else {
       final Window window = SwingUtil.getActiveWindow();

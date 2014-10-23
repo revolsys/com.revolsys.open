@@ -78,6 +78,11 @@ LayerRecord {
   }
 
   @Override
+  public boolean isEventsEnabled() {
+    return this.layer.isEventsEnabled();
+  }
+
+  @Override
   public boolean isGeometryEditable() {
     return true;
   }
@@ -183,6 +188,11 @@ LayerRecord {
         }
       }
     }
+  }
+
+  @Override
+  public boolean setEventsEnabled(final boolean eventsEnabled) {
+    return this.layer.setEventsEnabled(eventsEnabled);
   }
 
 }

@@ -14,13 +14,13 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.swing.map.form.LayerRecordForm;
-import com.revolsys.swing.map.layer.record.table.model.RecordLayerAttributesTableModel;
+import com.revolsys.swing.map.layer.record.table.model.LayerRecordTableModel;
 import com.revolsys.swing.table.BaseJTable;
 
 public class FormAllFieldsErrorPredicate implements HighlightPredicate {
 
   public static void add(final LayerRecordForm form, final BaseJTable table) {
-    final RecordLayerAttributesTableModel model = table.getTableModel();
+    final LayerRecordTableModel model = table.getTableModel();
     final FormAllFieldsErrorPredicate predicate = new FormAllFieldsErrorPredicate(
       form, model);
     addErrorHighlighters(table, predicate);
@@ -38,12 +38,12 @@ public class FormAllFieldsErrorPredicate implements HighlightPredicate {
       WebColors.Black, WebColors.DarkRed, WebColors.White));
   }
 
-  private final RecordLayerAttributesTableModel model;
+  private final LayerRecordTableModel model;
 
   private final Reference<LayerRecordForm> form;
 
   public FormAllFieldsErrorPredicate(final LayerRecordForm form,
-    final RecordLayerAttributesTableModel model) {
+    final LayerRecordTableModel model) {
     this.form = new WeakReference<>(form);
     this.model = model;
   }

@@ -87,7 +87,7 @@ import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.table.model.RecordLayerAttributesTableModel;
+import com.revolsys.swing.map.layer.record.table.model.LayerRecordTableModel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsErrorPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsModifiedPredicate;
@@ -125,7 +125,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
   private JButton addOkButton = InvokeMethodAction.createButton("OK", this,
     "actionAddOk");
 
-  private RecordLayerAttributesTableModel allAttributes;
+  private LayerRecordTableModel allAttributes;
 
   private boolean allowAddWithErrors = false;
 
@@ -178,6 +178,10 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
 
   private ComboBox fieldNameSetNamesField;
 
+  private boolean cancelled = false;
+
+  private LayerRecord addRecord;
+
   public LayerRecordForm(final AbstractRecordLayer layer) {
     ProjectFrame.addSaveActions(this, layer.getProject());
     setLayout(new BorderLayout());
@@ -220,6 +224,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     setRecord(null);
     layer.deleteRecords(record);
     layer.saveChanges(record);
+    this.cancelled = true;
     closeWindow();
   }
 
@@ -400,7 +405,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
   }
 
   protected void addTabAllFields() {
-    this.allAttributes = new RecordLayerAttributesTableModel(this);
+    this.allAttributes = new LayerRecordTableModel(this);
     final BaseJTable table = AbstractSingleRecordTableModel.createTable(this.allAttributes);
     final TableColumnModel columnModel = table.getColumnModel();
     FormAllFieldsModifiedPredicate.add(this, table);
@@ -731,7 +736,11 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     }
   }
 
-  public RecordLayerAttributesTableModel getAllAttributes() {
+  public LayerRecord getAddRecord() {
+    return this.addRecord;
+  }
+
+  public LayerRecordTableModel getAllAttributes() {
     return this.allAttributes;
   }
 
@@ -1008,7 +1017,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
   }
 
   public boolean isNewRecord(final LayerRecord record) {
-    return record.getState() != RecordState.New;
+    return record.getState() == RecordState.New;
   }
 
   public boolean isReadOnly(final String fieldName) {
@@ -1073,7 +1082,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
       if (record != null) {
         final Object source = event.getSource();
 
-        if (source == this.geometryCoordinatesPanel.getTable().getModel()) {
+        if (this.geometryCoordinatesPanel != null
+            && source == this.geometryCoordinatesPanel.getTable().getModel()) {
           if (propertyName.equals("geometry")) {
             record.setGeometryValue((Geometry)event.getNewValue());
           }
@@ -1168,6 +1178,10 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     if (this.addOkButton != null) {
       this.addOkButton.setEnabled(enabled);
     }
+  }
+
+  public void setAddRecord(final LayerRecord addRecord) {
+    this.addRecord = addRecord;
   }
 
   public void setAllowAddWithErrors(final boolean allowAddWithErrors) {
@@ -1403,7 +1417,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
 
   }
 
-  public LayerRecord showAddDialog() {
+  public boolean showAddDialog() {
     final String title = "Add New " + getName();
     final Window window = SwingUtil.getActiveWindow();
     final JDialog dialog = new JDialog(window, title,
@@ -1424,9 +1438,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener,
     dialog.setLocation(50, 50);
     dialog.addWindowListener(this);
     dialog.setVisible(true);
-    final LayerRecord record = getRecord();
     dialog.dispose();
-    return record;
+    return !this.cancelled;
   }
 
   protected void updateErrors() {

@@ -125,6 +125,11 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   }
 
   @Override
+  public boolean isEventsEnabled() {
+    return this.layer.isEventsEnabled();
+  }
+
+  @Override
   public boolean isGeometryEditable() {
     return true;
   }
@@ -244,6 +249,11 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         }
       }
     }
+  }
+
+  @Override
+  public boolean setEventsEnabled(final boolean eventsEnabled) {
+    return this.layer.setEventsEnabled(eventsEnabled);
   }
 
   @Override

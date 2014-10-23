@@ -16,7 +16,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.util.Property;
 
-public class RecordLayerAttributesTableModel extends
+public class LayerRecordTableModel extends
 AbstractSingleRecordTableModel implements PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
@@ -27,7 +27,7 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
 
   private final Reference<LayerRecordForm> form;
 
-  public RecordLayerAttributesTableModel(final LayerRecordForm form) {
+  public LayerRecordTableModel(final LayerRecordForm form) {
     super(form.getRecordDefinition(), true);
     this.form = new WeakReference<>(form);
     this.layer = form.getLayer();
