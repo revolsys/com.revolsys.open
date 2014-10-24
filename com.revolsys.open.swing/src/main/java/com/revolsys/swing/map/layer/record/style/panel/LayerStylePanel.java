@@ -40,6 +40,8 @@ public class LayerStylePanel extends ValueField implements MouseListener,
 
   private final ListTreeNode rootNode;
 
+  private LayerRendererTreeNode currentNode;
+
   public LayerStylePanel(final AbstractLayer layer) {
     this.layer = layer;
     setLayout(new BorderLayout());
@@ -70,7 +72,8 @@ public class LayerStylePanel extends ValueField implements MouseListener,
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if (e.getClickCount() == 1 && SwingUtil.isLeftButtonAndNoModifiers(e)) {
+    if (e.getClickCount() == 1 && SwingUtil.isLeftButtonAndNoModifiers(e)
+      && e.getClickCount() == 1) {
       final int x = e.getX();
       final int y = e.getY();
       final TreePath path = this.tree.getPathForLocation(x, y);
@@ -78,8 +81,12 @@ public class LayerStylePanel extends ValueField implements MouseListener,
         final Object node = path.getLastPathComponent();
         if (node instanceof LayerRendererTreeNode) {
           final LayerRendererTreeNode rendererNode = (LayerRendererTreeNode)node;
-          final LayerRenderer<?> renderer = rendererNode.getRenderer();
-          setEditStylePanel(renderer);
+          if (rendererNode != this.currentNode) {
+            System.out.println(x);
+            final LayerRenderer<?> renderer = rendererNode.getRenderer();
+            setEditStylePanel(renderer);
+            this.currentNode = rendererNode;
+          }
         }
       }
     }
@@ -110,7 +117,7 @@ public class LayerStylePanel extends ValueField implements MouseListener,
       final LayerRenderer<? extends Layer> oldRenderer = (LayerRenderer<? extends Layer>)event.getOldValue();
       final LayerRenderer<? extends Layer> newRenderer = (LayerRenderer<? extends Layer>)event.getNewValue();
       if (oldRenderer == this.rootRenderer && newRenderer != null
-          && newRenderer != oldRenderer) {
+        && newRenderer != oldRenderer) {
         Property.removeListener(oldRenderer, this);
         this.rootNode.removeNode(0);
 

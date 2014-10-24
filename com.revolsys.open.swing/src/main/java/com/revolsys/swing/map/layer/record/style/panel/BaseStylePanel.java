@@ -7,10 +7,8 @@ import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -103,7 +101,7 @@ public class BaseStylePanel extends ValueField implements
 
   private final Set<String> rendererFieldNames = new HashSet<String>();
 
-  private final Map<String, Object> rendererFieldValues = new HashMap<String, Object>();
+  private Field visibleField;
 
   public BaseStylePanel(final LayerRenderer<?> renderer) {
     super(renderer);
@@ -111,6 +109,7 @@ public class BaseStylePanel extends ValueField implements
     setBackground(WebColors.White);
     setLayout(new VerticalLayout());
     addReadOnlyFieldName("type");
+    Property.addListener(renderer, "visible", this);
 
     addPanel(this, "General", renderer, "name", "type", "visible");
     addPanel(this, "Scales", renderer, "minimumScale", "maximumScale");
@@ -145,6 +144,7 @@ public class BaseStylePanel extends ValueField implements
       final Object value = Property.get(object, fieldName);
       SwingUtil.addLabel(container, fieldName);
       final Field field = createField(fieldName, fieldClass, value);
+
       if (this.readOnlyFieldNames.contains(fieldName)) {
         field.setEditable(false);
       }
@@ -157,7 +157,6 @@ public class BaseStylePanel extends ValueField implements
       Property.addListener(field, fieldName, this);
       if (object instanceof LayerRenderer) {
         this.rendererFieldNames.add(fieldName);
-        this.rendererFieldValues.put(fieldName, value);
       }
       return field;
     }
@@ -246,7 +245,10 @@ public class BaseStylePanel extends ValueField implements
   protected Field createField(final String fieldName,
     final Class<?> fieldClass, final Object value) {
     Field field;
-    if (fieldName.equals("textFaceName")) {
+    if (fieldName.equals("visible")) {
+      this.visibleField = new CheckBox(fieldName, value);
+      field = this.visibleField;
+    } else if (fieldName.equals("textFaceName")) {
       field = new FontChooserField(fieldName, (String)value);
     } else if (fieldName.endsWith("HorizontalAlignment")) {
       field = createHorizontalAlignmentField(fieldName, (String)value);
@@ -343,6 +345,11 @@ public class BaseStylePanel extends ValueField implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
+    if (event.getSource() == getRenderer()) {
+      if ("visible".equals(event.getPropertyName())) {
+        this.visibleField.setFieldValue(event.getNewValue());
+      }
+    }
     if (!rendererPropertyChange(event)) {
       doPropertyChange(event);
     }
@@ -351,6 +358,7 @@ public class BaseStylePanel extends ValueField implements
   protected boolean rendererPropertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source instanceof Field) {
+      final LayerRenderer<Layer> renderer = getRenderer();
       final Field field = (Field)source;
       final String fieldName = field.getFieldName();
       final Object fieldValue = field.getFieldValue();
@@ -369,19 +377,13 @@ public class BaseStylePanel extends ValueField implements
             scale = 0;
           }
         }
-        this.rendererFieldValues.put(fieldName, scale);
+        Property.set(renderer, fieldName, scale);
         return true;
       } else if (this.rendererFieldNames.contains(fieldName)) {
-        this.rendererFieldValues.put(fieldName, fieldValue);
+        Property.set(renderer, fieldName, fieldValue);
       }
     }
     return false;
   }
 
-  @Override
-  public void save() {
-    super.save();
-    final LayerRenderer<Layer> renderer = getRenderer();
-    Property.set(renderer, this.rendererFieldValues);
-  }
 }

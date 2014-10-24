@@ -29,7 +29,7 @@ import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.util.Property;
 
 public class LayerRendererTreeNode extends ListTreeNode implements
-  MouseListener {
+MouseListener {
   public static final Icon ICON = Icons.getIcon("folder");
 
   public LayerRendererTreeNode(final LayerRenderer<?> renderer) {
@@ -92,10 +92,14 @@ public class LayerRendererTreeNode extends ListTreeNode implements
   @Override
   protected void doPropertyChange(final PropertyChangeEvent e) {
     if (e.getSource() == getRenderer()) {
-      if (e.getPropertyName().equals("renderers")) {
+      final String propertyName = e.getPropertyName();
+      if (propertyName.equals("renderers")) {
         refresh();
+      } else if ("name".equals(propertyName)) {
+        setName((String)e.getNewValue());
       }
     }
+    super.doPropertyChange(e);
   }
 
   @Override

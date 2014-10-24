@@ -62,8 +62,8 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class AbstractOverlay extends JComponent implements
-  PropertyChangeListener, MouseListener, MouseMotionListener,
-  MouseWheelListener, KeyListener, FocusListener {
+PropertyChangeListener, MouseListener, MouseMotionListener,
+MouseWheelListener, KeyListener, FocusListener {
   public static final Cursor CURSOR_LINE_ADD_NODE = Icons.getCursor(
     "cursor_line_node_add", 8, 6);
 
@@ -751,7 +751,7 @@ public class AbstractOverlay extends JComponent implements
 
       boolean nodeSnap = false;
       final StringBuilder text = new StringBuilder(
-        "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
+          "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
       text.append("<li style=\"padding: 2px; margin:1px;");
       if (0 == this.snapPointIndex) {
         text.append("border: 2px solid maroon");
@@ -783,7 +783,7 @@ public class AbstractOverlay extends JComponent implements
 
         final Map<String, Set<CloseLocation>> typeLocationsMap = new TreeMap<String, Set<CloseLocation>>();
         for (final CloseLocation snapLocation : this.snapPointLocationMap.get(snapPoint)) {
-          final String typePath = snapLocation.getTypePath();
+          final String typePath = snapLocation.getLayerPath();
           final String locationType = snapLocation.getType();
           if ("Point".equals(locationType) || "End-Vertex".equals(locationType)) {
             nodeSnap = true;

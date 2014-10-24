@@ -121,6 +121,14 @@ public class CloseLocation implements Comparable<CloseLocation> {
     return this.layer;
   }
 
+  public String getLayerPath() {
+    if (this.layer == null) {
+      return null;
+    } else {
+      return this.layer.getPath();
+    }
+  }
+
   public Point getPoint() {
     return this.point;
   }
@@ -161,15 +169,6 @@ public class CloseLocation implements Comparable<CloseLocation> {
     }
   }
 
-  public String getTypePath() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    if (recordDefinition == null) {
-      return null;
-    } else {
-      return recordDefinition.getPath();
-    }
-  }
-
   public Vertex getVertex() {
     return this.vertex;
   }
@@ -190,9 +189,11 @@ public class CloseLocation implements Comparable<CloseLocation> {
   @Override
   public String toString() {
     final StringBuilder string = new StringBuilder();
-    final String typePath = getTypePath();
-    if (Property.hasValue(typePath)) {
-      string.append(typePath);
+    final String layerPath = getLayerPath();
+    if (Property.hasValue(layerPath)) {
+      string.append(layerPath);
+    }
+    if (getRecordDefinition() != null) {
       string.append(", ");
       final RecordDefinition recordDefinition = getRecordDefinition();
       string.append(recordDefinition.getIdFieldName());

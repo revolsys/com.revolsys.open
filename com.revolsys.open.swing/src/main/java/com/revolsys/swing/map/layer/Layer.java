@@ -43,6 +43,10 @@ MapSerializer, Child<LayerGroup>, Cloneable {
 
   String getName();
 
+  /**
+   * Get the path from the root project. The name of the layer group at the root is not included.
+   * @return
+   */
   String getPath();
 
   List<Layer> getPathList();

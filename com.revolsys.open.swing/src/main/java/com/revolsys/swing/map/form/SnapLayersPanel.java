@@ -104,8 +104,10 @@ ListSelectionListener {
 
     this.layerPathsModel = new BaseListModel<String>();
     for (final AbstractLayer recordLayer : recordLayers) {
-      final String layerPath = recordLayer.getPath();
-      this.layerPathsModel.add(layerPath);
+      if (recordLayer.isHasGeometry()) {
+        final String layerPath = recordLayer.getPath();
+        this.layerPathsModel.add(layerPath);
+      }
     }
     this.layerPathsField = new JXList(this.layerPathsModel);
     this.layerPathsField.setAutoCreateRowSorter(true);
