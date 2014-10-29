@@ -26,7 +26,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerStylePanel extends ValueField implements MouseListener,
-  PropertyChangeListener {
+PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -73,7 +73,7 @@ public class LayerStylePanel extends ValueField implements MouseListener,
   @Override
   public void mouseClicked(final MouseEvent e) {
     if (e.getClickCount() == 1 && SwingUtil.isLeftButtonAndNoModifiers(e)
-      && e.getClickCount() == 1) {
+        && e.getClickCount() == 1) {
       final int x = e.getX();
       final int y = e.getY();
       final TreePath path = this.tree.getPathForLocation(x, y);
@@ -82,7 +82,6 @@ public class LayerStylePanel extends ValueField implements MouseListener,
         if (node instanceof LayerRendererTreeNode) {
           final LayerRendererTreeNode rendererNode = (LayerRendererTreeNode)node;
           if (rendererNode != this.currentNode) {
-            System.out.println(x);
             final LayerRenderer<?> renderer = rendererNode.getRenderer();
             setEditStylePanel(renderer);
             this.currentNode = rendererNode;
@@ -117,7 +116,7 @@ public class LayerStylePanel extends ValueField implements MouseListener,
       final LayerRenderer<? extends Layer> oldRenderer = (LayerRenderer<? extends Layer>)event.getOldValue();
       final LayerRenderer<? extends Layer> newRenderer = (LayerRenderer<? extends Layer>)event.getNewValue();
       if (oldRenderer == this.rootRenderer && newRenderer != null
-        && newRenderer != oldRenderer) {
+          && newRenderer != oldRenderer) {
         Property.removeListener(oldRenderer, this);
         this.rootNode.removeNode(0);
 

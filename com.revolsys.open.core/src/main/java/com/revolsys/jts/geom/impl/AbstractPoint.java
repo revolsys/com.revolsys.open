@@ -372,11 +372,6 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
-  public Vertex getToVertex(final int... vertexId) {
-    return getVertex(vertexId);
-  }
-
-  @Override
   public GeometryFactory getGeometryFactory() {
     return GeometryFactory.floating3();
   }
@@ -396,6 +391,15 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
+  public Point getPointWithin() {
+    if (isEmpty()) {
+      return null;
+    } else {
+      return this;
+    }
+  }
+
+  @Override
   public Segment getSegment(final int... segmentId) {
     return null;
   }
@@ -403,6 +407,11 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   @Override
   public long getTime() {
     return (long)getM();
+  }
+
+  @Override
+  public Vertex getToVertex(final int... vertexId) {
+    return getVertex(vertexId);
   }
 
   @Override

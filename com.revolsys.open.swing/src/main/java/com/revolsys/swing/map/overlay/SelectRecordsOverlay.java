@@ -34,10 +34,12 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Property;
 
 public class SelectRecordsOverlay extends AbstractOverlay {
   public static final String ACTION_SELECT_RECORDS = "Select Records";
@@ -70,7 +72,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private static final Set<String> REDRAW_REPAINT_PROPERTY_NAMES = new HashSet<>(
     Arrays.asList("layers", "selectable", "visible", "editable",
       "recordsChanged", "updateRecord", "hasSelectedRecords",
-      "hasHighlightedRecords"));
+      "hasHighlightedRecords", "minimumScale", "maximumScale"));
 
   public static final SelectedRecordsRenderer SELECT_RENDERER = new SelectedRecordsRenderer(
     WebColors.Black, WebColors.Lime);
@@ -98,6 +100,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     setOverlayActionCursor(ACTION_SELECT_RECORDS, CURSOR_SELECT_BOX);
     addOverlayActionOverride(ACTION_SELECT_RECORDS, ZoomOverlay.ACTION_PAN,
       ZoomOverlay.ACTION_ZOOM);
+    Property.addListener(map.getProject(), this);
   }
 
   public void addSelectedRecords(final BoundingBox boundingBox) {
@@ -341,7 +344,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   public void propertyChange(final PropertyChangeEvent event) {
     final String propertyName = event.getPropertyName();
     final Object source = event.getSource();
-    if (source instanceof Record) {
+    if (source instanceof Record || source instanceof LayerRenderer) {
       redraw();
     } else if (REDRAW_PROPERTY_NAMES.contains(propertyName)) {
       redraw();

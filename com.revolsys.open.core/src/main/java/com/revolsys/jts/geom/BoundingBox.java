@@ -171,6 +171,8 @@ public interface BoundingBox {
    */
   double getMinY();
 
+  Point getRandomPointWithin();
+
   int getSrid();
 
   Point getTopLeftPoint();

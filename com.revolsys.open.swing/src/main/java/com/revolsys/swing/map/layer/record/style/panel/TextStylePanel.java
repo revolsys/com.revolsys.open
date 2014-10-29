@@ -22,7 +22,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class TextStylePanel extends BaseStylePanel implements
-  PropertyChangeListener {
+PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private final TextStyleRenderer textStyleRenderer;
@@ -50,19 +50,19 @@ public class TextStylePanel extends BaseStylePanel implements
       panel.add(stylePanels, BorderLayout.CENTER);
 
       this.previews = new JPanel(new VerticalLayout(5));
-      SwingUtil.setTitledBorder(previews, "Preview");
+      SwingUtil.setTitledBorder(this.previews, "Preview");
 
       final JPanel previewContainer = new JPanel(new VerticalLayout());
       previewContainer.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
       previewContainer.setBackground(WebColors.White);
-      previewContainer.add(previews);
+      previewContainer.add(this.previews);
       panel.add(previewContainer, BorderLayout.EAST);
 
-      addPanel(stylePanels, "Text Label", textStyle, "textName", "textSize",
-        "textFaceName");
-      addPanel(stylePanels, "Text Color", textStyle, "textFill",
+      addPanel(stylePanels, "Text Label", this.textStyle, "textName",
+        "textSize", "textFaceName");
+      addPanel(stylePanels, "Text Color", this.textStyle, "textFill",
         "textBoxColor", "textHaloFill", "textHaloRadius");
-      addPanel(stylePanels, "Text Position", textStyle,
+      addPanel(stylePanels, "Text Position", this.textStyle,
         "textHorizontalAlignment", "textVerticalAlignment", "textDx", "textDy",
         "textOrientationType", "textOrientation", "textPlacementType");
 

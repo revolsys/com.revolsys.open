@@ -94,13 +94,13 @@ public class SelectedRecordsRenderer {
     this.firstVertexStyle = MarkerStyle.marker(firstVertexShape(), 9,
       outlineColor, 1, selectColor);
     this.firstVertexStyle.setMarkerOrientationType("auto");
-    this.firstVertexStyle.setMarkerPlacement("point(0)");
+    this.firstVertexStyle.setMarkerPlacementType("point(0)");
     this.firstVertexStyle.setMarkerHorizontalAlignment("center");
 
     this.lastVertexStyle = MarkerStyle.marker(lastVertexShape(), 9,
       outlineColor, 1, selectColor);
     this.lastVertexStyle.setMarkerOrientationType("auto");
-    this.lastVertexStyle.setMarkerPlacement("point(n)");
+    this.lastVertexStyle.setMarkerPlacementType("point(n)");
     this.lastVertexStyle.setMarkerHorizontalAlignment("right");
 
   }

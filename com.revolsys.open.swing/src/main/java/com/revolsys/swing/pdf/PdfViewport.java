@@ -18,6 +18,7 @@ import java.util.TreeMap;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
+import javax.measure.unit.Unit;
 
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSDictionary;
@@ -271,7 +272,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
             final int ascent = fontMetrics.getAscent();
             final int leading = fontMetrics.getLeading();
             final double maxHeight = lines.length * (ascent + descent)
-              + (lines.length - 1) * leading;
+                + (lines.length - 1) * leading;
             final String verticalAlignment = style.getTextVerticalAlignment();
             if ("top".equals(verticalAlignment)) {
             } else if ("middle".equals(verticalAlignment)) {
@@ -283,8 +284,8 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
             String horizontalAlignment = style.getTextHorizontalAlignment();
             double screenX = location[0];
             double screenY = getViewHeightPixels() - location[1];
-            final String textPlacementType = style.getTextPlacementType();
-            if ("auto".equals(textPlacementType)) {
+            final String textPlacement = style.getTextPlacementType();
+            if ("auto".equals(textPlacement)) {
               if (screenX < 0) {
                 screenX = 1;
                 dx = 0;
@@ -415,9 +416,10 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
       }
 
       final Measure<Length> lineWidth = style.getLineWidth();
+      final Unit<Length> unit = lineWidth.getUnit();
       graphicsState.setLineWidth((float)toDisplayValue(lineWidth));
 
-      final List<Measure<Length>> lineDashArray = style.getLineDashArray();
+      final List<Double> lineDashArray = style.getLineDashArray();
       if (lineDashArray != null && !lineDashArray.isEmpty()) {
         int size = lineDashArray.size();
         if (size == 1) {
@@ -427,13 +429,17 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
 
         for (int i = 0; i < dashArray.length; i++) {
           if (i < lineDashArray.size()) {
-            final Measure<Length> dash = lineDashArray.get(i);
-            dashArray[i] = (float)toDisplayValue(dash);
+            final Double dashDouble = lineDashArray.get(i);
+            final Measure<Length> dashMeasure = Measure.valueOf(dashDouble,
+              unit);
+            final float dashFloat = (float)toDisplayValue(dashMeasure);
+            dashArray[i] = dashFloat;
           } else {
             dashArray[i] = dashArray[i - 1];
           }
         }
-        final int offset = (int)toDisplayValue(style.getLineDashOffset());
+        final int offset = (int)toDisplayValue(Measure.valueOf(
+          style.getLineDashOffset(), unit));
         final COSArray dashCosArray = new COSArray();
         dashCosArray.setFloatArray(dashArray);
         final PDLineDashPattern pattern = new PDLineDashPattern(dashCosArray,
@@ -443,25 +449,25 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
       switch (style.getLineCap()) {
         case BUTT:
           graphicsState.setLineCapStyle(0);
-        break;
+          break;
         case ROUND:
           graphicsState.setLineCapStyle(1);
-        break;
+          break;
         case SQUARE:
           graphicsState.setLineCapStyle(2);
-        break;
+          break;
       }
 
       switch (style.getLineJoin()) {
         case MITER:
           graphicsState.setLineJoinStyle(0);
-        break;
+          break;
         case ROUND:
           graphicsState.setLineJoinStyle(1);
-        break;
+          break;
         case BEVEL:
           graphicsState.setLineJoinStyle(2);
-        break;
+          break;
       }
 
       final int polygonFillOpacity = style.getPolygonFillOpacity();

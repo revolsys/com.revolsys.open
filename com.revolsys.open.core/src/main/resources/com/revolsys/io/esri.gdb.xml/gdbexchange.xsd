@@ -2744,7 +2744,7 @@
 				<xs:sequence>
 					<xs:element name="ID" type="xs:int" minOccurs="0"/>
 					<xs:element name="GraphicAttributes" type="ArrayOfGraphicAttribute"/>
-					<xs:element name="MarkerPlacement" type="RepresentationComponent">
+					<xs:element name="markerPlacementType" type="RepresentationComponent">
 						<xs:annotation>
 							<xs:documentation>Marker placement.</xs:documentation>
 						</xs:annotation>

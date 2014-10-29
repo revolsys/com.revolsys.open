@@ -56,7 +56,7 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
 public class BaseStylePanel extends ValueField implements
-  PropertyChangeListener {
+PropertyChangeListener {
   public static List<Action> getLineActions(final String type,
     final String... alignmentTypes) {
     final List<Action> actions = new ArrayList<Action>();
@@ -208,7 +208,7 @@ public class BaseStylePanel extends ValueField implements
     addPanel(stylePanels, "Marker Position", markerStyle,
       "markerHorizontalAlignment", "markerVerticalAlignment", "markerDx",
       "markerDy", "markerOrientationType", "markerOrientation",
-      "markerPlacement");
+        "markerPlacementType");
 
   }
 
@@ -267,12 +267,25 @@ public class BaseStylePanel extends ValueField implements
       Property.addListener(field, fieldName, this);
     } else if (fieldName.equals("marker")) {
       field = new MarkerField(fieldName, value);
+    } else if (fieldName.endsWith("OrientationType")) {
+      final ComboBox orientationTypeField = new ComboBox(fieldName,
+        new DefaultComboBoxModel<>(new String[] {
+          "auto", "none"
+        }));
+      field = orientationTypeField;
+    } else if (fieldName.endsWith("PlacementType")) {
+      final ComboBox placementField = new ComboBox(fieldName,
+        new DefaultComboBoxModel<>(new String[] {
+          "auto", "center", "point(0)", "point(n)", "vertices"
+        }));
+      placementField.setFieldValue(value);
+      field = placementField;
     } else if (fieldName.endsWith("Scale")) {
       field = createScaleField(fieldName, (Long)value);
     } else if (Color.class.equals(fieldClass)) {
       field = new ColorChooserField(fieldName, (Color)value);
     } else if (Boolean.TYPE.equals(fieldClass)
-      || Boolean.class.equals(fieldClass)) {
+        || Boolean.class.equals(fieldClass)) {
       field = new CheckBox(fieldName, value);
     } else if (Measure.class.equals(fieldClass)) {
       field = new LengthMeasureTextField(fieldName, (Measure<Length>)value,
@@ -286,7 +299,7 @@ public class BaseStylePanel extends ValueField implements
   protected TogglePanel createHorizontalAlignmentField(final String fieldName,
     String aligment) {
     if (!"left".equalsIgnoreCase(aligment)
-      && !"right".equalsIgnoreCase(aligment)) {
+        && !"right".equalsIgnoreCase(aligment)) {
       aligment = "center";
     }
     return new TogglePanel(fieldName, aligment, new Dimension(28, 28),
@@ -322,7 +335,7 @@ public class BaseStylePanel extends ValueField implements
   protected TogglePanel createVerticalAlignmentField(final String fieldName,
     String aligment) {
     if (!"top".equalsIgnoreCase(aligment)
-      && !"middle".equalsIgnoreCase(aligment)) {
+        && !"middle".equalsIgnoreCase(aligment)) {
       aligment = "bottom";
     }
     return new TogglePanel(fieldName, aligment, new Dimension(28, 28),

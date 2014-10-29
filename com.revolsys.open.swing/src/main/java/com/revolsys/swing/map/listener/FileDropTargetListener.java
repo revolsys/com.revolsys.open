@@ -26,7 +26,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
 
 public class FileDropTargetListener implements DropTargetListener,
-  HierarchyListener {
+HierarchyListener {
   private static final String ZERO_CHAR_STRING = String.valueOf((char)0);
 
   private static final Logger LOG = Logger.getLogger(FileDropTargetListener.class);
@@ -98,8 +98,11 @@ public class FileDropTargetListener implements DropTargetListener,
               try {
                 // kde seems to append a 0 char to the end of the reader
                 if (!ZERO_CHAR_STRING.equals(fileName)) {
-                  final File file = new File(new URI(fileName));
-                  files.add(file);
+                  final URI uri = new URI(fileName);
+                  if (uri.isAbsolute()) {
+                    final File file = new File(uri);
+                    files.add(file);
+                  }
                 }
               } catch (final URISyntaxException e) {
                 LOG.error("Drag and Drop file " + fileName + " not valid", e);
@@ -113,8 +116,7 @@ public class FileDropTargetListener implements DropTargetListener,
         }
       }
       if (files != null && !files.isEmpty()) {
-        Invoke.background("Open Files", Project.get(), "openFiles",
-          files);
+        Invoke.background("Open Files", Project.get(), "openFiles", files);
       }
       event.getDropTargetContext().dropComplete(true);
     } catch (final Throwable e) {
@@ -146,7 +148,7 @@ public class FileDropTargetListener implements DropTargetListener,
     final DataFlavor[] flavors = event.getCurrentDataFlavors();
     for (final DataFlavor flavor : flavors) {
       if (flavor.equals(DataFlavor.javaFileListFlavor)
-        || flavor.isRepresentationClassReader()) {
+          || flavor.isRepresentationClassReader()) {
         return true;
       }
     }

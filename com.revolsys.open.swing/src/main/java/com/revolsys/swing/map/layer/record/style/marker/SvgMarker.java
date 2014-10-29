@@ -48,6 +48,8 @@ public class SvgMarker extends AbstractMarker {
     }
 
     graphics.translate(modelX, modelY);
+    final double markerOrientation = style.getMarkerOrientation();
+    orientation = orientation + markerOrientation;
     if (orientation != 0) {
       graphics.rotate(Math.toRadians(orientation));
     }
@@ -58,7 +60,7 @@ public class SvgMarker extends AbstractMarker {
     double dy = Viewport2D.toDisplayValue(viewport, deltaY);
 
     final String verticalAlignment = style.getMarkerVerticalAlignment();
-    if ("top".equals(verticalAlignment)) {
+    if ("bottom".equals(verticalAlignment)) {
       dy -= mapHeight;
     } else if ("middle".equals(verticalAlignment)) {
       dy -= mapHeight / 2;

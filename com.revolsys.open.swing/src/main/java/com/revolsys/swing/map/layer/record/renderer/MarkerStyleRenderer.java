@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.Icon;
 
-import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.PointWithOrientation;
 import com.revolsys.jts.geom.BoundingBox;
@@ -33,11 +32,6 @@ import com.revolsys.swing.map.layer.record.style.panel.MarkerStylePanel;
 
 public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
 
-  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
-    .geometry();
-
-  private static final Icon ICON = Icons.getIcon("style_marker");
-
   public static Geometry getGeometry(final Viewport2D viewport,
     final Geometry geometry) {
     final BoundingBox viewExtent = viewport.getBoundingBox();
@@ -56,52 +50,55 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   public static PointWithOrientation getMarkerLocation(
     final Viewport2D viewport, final Geometry geometry, final MarkerStyle style) {
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    if (viewportGeometryFactory != null) {
-      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
-
+    if (viewportGeometryFactory != null && geometry != null
+      && !geometry.isEmpty()) {
       Point point = null;
       double orientation = 0;
-      final String placement = style.getMarkerPlacement();
-      final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(
-        placement);
-      // TODO optimize projection?
-      final int numPoints = geometry.getVertexCount();
-      if (numPoints > 1) {
+      final String placementType = style.getMarkerPlacementType();
+      final int vertexCount = geometry.getVertexCount();
+      if (vertexCount > 1) {
+        final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(
+          placementType);
         final boolean matches = matcher.matches();
         if (matches) {
           final String argument = matcher.group(1);
-          int index;
           if (argument.matches("n(?:\\s*-\\s*(\\d+)\\s*)?")) {
             final String indexString = argument.replaceAll("[^0-9]+", "");
-            index = numPoints - 1;
+            int index = 0;
             if (indexString.length() > 0) {
-              index -= Integer.parseInt(indexString);
+              index = Integer.parseInt(indexString);
             }
-            if (index == 0) {
-              index++;
+            if (index < 0) {
+              index = 0;
+            } else if (index + 1 == vertexCount) {
+              index--;
             }
-            point = geometry.getVertex(index).convert(viewportGeometryFactory);
-            final Point p2 = geometry.getVertex(index - 1).convert(
+            point = geometry.getToVertex(index).convert(
+              viewportGeometryFactory, 2);
+            final Point p2 = geometry.getToVertex(index + 1).convert(
               viewportGeometryFactory);
             orientation = Math.toDegrees(p2.angle2d(point));
 
           } else {
-            index = Integer.parseInt(argument);
-            if (index + 1 == numPoints) {
+            int index = Integer.parseInt(argument);
+            if (index < 0) {
+              index = 0;
+            } else if (index + 1 == vertexCount) {
               index--;
             }
-            point = geometry.getVertex(index).convert(viewportGeometryFactory);
+            point = geometry.getVertex(index).convert(viewportGeometryFactory,
+              2);
             final Point p2 = geometry.getVertex(index + 1).convert(
               viewportGeometryFactory);
             orientation = Math.toDegrees(-point.angle2d(p2));
           }
-        } else if ("center".equals(placement)) {
-          if (geometry instanceof LineString && geometry.getVertexCount() > 1) {
+        } else {
+          if (geometry instanceof LineString) {
             final Geometry projectedGeometry = geometry.convert(viewportGeometryFactory);
             final double totalLength = projectedGeometry.getLength();
             final double centreLength = totalLength / 2;
             double currentLength = 0;
-            for (int i = 1; i < numPoints && currentLength < centreLength; i++) {
+            for (int i = 1; i < vertexCount && currentLength < centreLength; i++) {
               final Point p1 = projectedGeometry.getVertex(i - 1);
               final Point p2 = projectedGeometry.getVertex(i);
               final double segmentLength = p1.distance(p2);
@@ -113,13 +110,16 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
               }
               currentLength += segmentLength;
             }
+          } else {
+            point = geometry.getPointWithin();
           }
-        } else {
-          point = ProjectionFactory.convert(geometry.getPoint(),
-            geometryFactory, viewportGeometryFactory);
         }
-
-        if (point != null && viewport.getBoundingBox().covers(point)) {
+      } else {
+        point = geometry.getPoint();
+      }
+      if (point != null) {
+        point = point.convert(viewportGeometryFactory, 2);
+        if (viewport.getBoundingBox().covers(point)) {
           return new PointWithOrientation(point, orientation);
         }
       }
@@ -131,7 +131,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     final Geometry geometry, final MarkerStyle style) {
     final Graphics2D graphics = viewport.getGraphics();
     if (graphics != null) {
-      if ("line".equals(style.getMarkerPlacement())) {
+      if ("vertices".equals(style.getMarkerPlacementType())) {
         renderMarkerVertices(viewport, graphics, geometry, style);
       } else {
         for (int i = 0; i < geometry.getGeometryCount(); i++) {
@@ -171,7 +171,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
 
   /**
    * Point must be in the same geometry factory as the view.
-   * 
+   *
    * @param viewport
    * @param graphics
    * @param point
@@ -195,13 +195,13 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
 
   private static void renderMarker(final Viewport2D viewport,
     final Graphics2D graphics, final Polygon polygon, final MarkerStyle style) {
-    // TODO Auto-generated method stub
-
+    final Point point = polygon.getPointWithin();
+    renderMarker(viewport, graphics, point, style);
   }
 
   /**
    * Point must be in the same geometry factory as the view.
-   * 
+   *
    * @param viewport
    * @param graphics
    * @param style
@@ -313,6 +313,11 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
+  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
+    .geometry();
+
+  private static final Icon ICON = Icons.getIcon("style_marker");
+
   private MarkerStyle style;
 
   public MarkerStyleRenderer(final AbstractRecordLayer layer,
@@ -342,7 +347,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   @Override
   public MarkerStyleRenderer clone() {
     final MarkerStyleRenderer clone = (MarkerStyleRenderer)super.clone();
-    clone.style = style.clone();
+    clone.style = this.style.clone();
     return clone;
   }
 
@@ -353,8 +358,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
 
   @Override
   public Icon getIcon() {
-    final Marker marker = style.getMarker();
-    final Icon icon = marker.getIcon(style);
+    final Marker marker = this.style.getMarker();
+    final Icon icon = marker.getIcon(this.style);
     if (icon == null) {
       return super.getIcon();
     } else {

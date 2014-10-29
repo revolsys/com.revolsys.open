@@ -971,6 +971,12 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     return getMin(1);
   }
 
+  public Point getRandomPointWithin() {
+    final double x = getMinX() + getWidth() * Math.random();
+    final double y = getMinY() + getHeight() * Math.random();
+    return this.geometryFactory.point(x, y);
+  }
+
   @Override
   public int getSrid() {
     final GeometryFactory geometryFactory = getGeometryFactory();
@@ -1054,7 +1060,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
     if (isEmpty() || convertedBoundingBox.isEmpty()
-      || !intersects(convertedBoundingBox)) {
+        || !intersects(convertedBoundingBox)) {
       return new BoundingBoxDoubleGf(geometryFactory);
     } else {
       final double intMinX = Math.max(getMinX(), convertedBoundingBox.getMinX());
@@ -1087,8 +1093,8 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       final double maxY = getMaxY();
 
       return !(convertedBoundingBox.getMinX() > maxX
-        || convertedBoundingBox.getMaxX() < minX
-        || convertedBoundingBox.getMinY() > maxY || convertedBoundingBox.getMaxY() < minY);
+          || convertedBoundingBox.getMaxX() < minX
+          || convertedBoundingBox.getMinY() > maxY || convertedBoundingBox.getMaxY() < minY);
     }
   }
 

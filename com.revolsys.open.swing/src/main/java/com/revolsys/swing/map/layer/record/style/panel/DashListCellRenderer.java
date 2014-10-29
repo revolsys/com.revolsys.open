@@ -8,15 +8,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.List;
 
-import javax.measure.Measure;
-import javax.measure.quantity.Length;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 
 public class DashListCellRenderer extends DefaultListCellRenderer {
   private static final long serialVersionUID = 3249988648052455831L;
 
-  private List<Measure<Length>> dash;
+  private List<Double> dash;
 
   @SuppressWarnings("unchecked")
   @Override
@@ -26,7 +24,7 @@ public class DashListCellRenderer extends DefaultListCellRenderer {
     super.getListCellRendererComponent(list, value, index, isSelected,
       cellHasFocus);
     setText(null);
-    this.dash = (List<Measure<Length>>)value;
+    this.dash = (List<Double>)value;
     setPreferredSize(new Dimension(100, 10));
     return this;
   }
@@ -42,7 +40,7 @@ public class DashListCellRenderer extends DefaultListCellRenderer {
       dash = new float[this.dash.size()];
 
       for (int i = 0; i < dash.length; i++) {
-        final float f = this.dash.get(i).getValue().floatValue();
+        final float f = this.dash.get(i).floatValue();
         dash[i] = f;
 
       }

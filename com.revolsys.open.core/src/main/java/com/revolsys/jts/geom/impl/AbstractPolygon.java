@@ -82,7 +82,8 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *@version 1.7
  */
 public abstract class AbstractPolygon extends AbstractGeometry implements
-Polygon {
+  Polygon {
+
   /**
    *  Returns the minimum coordinate, using the usual lexicographic comparison.
    *
@@ -143,7 +144,7 @@ Polygon {
     } else if (geometryId.length == 1) {
       if (isEmpty()) {
         throw new IllegalArgumentException(
-            "Cannot move vertex for empty Polygon");
+          "Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = geometryId[0];
         final int ringCount = getRingCount();
@@ -158,13 +159,13 @@ Polygon {
         } else {
           throw new IllegalArgumentException(
             "Ring index must be between 0 and " + ringCount + " not "
-                + ringIndex);
+              + ringIndex);
         }
       }
     } else {
       throw new IllegalArgumentException(
         "Geometry id's for Polygons must have length 1. "
-            + Arrays.toString(geometryId));
+          + Arrays.toString(geometryId));
     }
   }
 
@@ -220,7 +221,7 @@ Polygon {
     if (vertexId.length == 2) {
       if (isEmpty()) {
         throw new IllegalArgumentException(
-            "Cannot move vertex for empty Polygon");
+          "Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -236,13 +237,13 @@ Polygon {
         } else {
           throw new IllegalArgumentException(
             "Ring index must be between 0 and " + ringCount + " not "
-                + ringIndex);
+              + ringIndex);
         }
       }
     } else {
       throw new IllegalArgumentException(
         "Vertex id's for Polygons must have length 2. "
-            + Arrays.toString(vertexId));
+          + Arrays.toString(vertexId));
     }
   }
 
@@ -431,6 +432,27 @@ Polygon {
   }
 
   @Override
+  public Point getPointWithin() {
+    if (isEmpty()) {
+      return null;
+    } else {
+      final Point centroid = getCentroid();
+      if (centroid.within(this)) {
+        return centroid;
+      } else {
+        final BoundingBox boundingBox = getBoundingBox();
+        for (int i = 0; i < 100; i++) {
+          final Point point = boundingBox.getRandomPointWithin();
+          if (point.within(this)) {
+            return point;
+          }
+        }
+        return getPoint();
+      }
+    }
+  }
+
+  @Override
   public Segment getSegment(final int... segmentId) {
     if (segmentId == null || segmentId.length != 2) {
       return null;
@@ -520,7 +542,7 @@ Polygon {
     } else if (vertexId.length == 2) {
       if (isEmpty()) {
         throw new IllegalArgumentException(
-            "Cannot move vertex for empty Polygon");
+          "Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -536,13 +558,13 @@ Polygon {
         } else {
           throw new IllegalArgumentException(
             "Ring index must be between 0 and " + ringCount + " not "
-                + ringIndex);
+              + ringIndex);
         }
       }
     } else {
       throw new IllegalArgumentException(
         "Vertex id's for Polygons must have length 2. "
-            + Arrays.toString(vertexId));
+          + Arrays.toString(vertexId));
     }
   }
 
@@ -637,7 +659,7 @@ Polygon {
     } else if (vertexId.length == 2) {
       if (isEmpty()) {
         throw new IllegalArgumentException(
-            "Cannot move vertex for empty Polygon");
+          "Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -653,13 +675,13 @@ Polygon {
         } else {
           throw new IllegalArgumentException(
             "Ring index must be between 0 and " + ringCount + " not "
-                + ringIndex);
+              + ringIndex);
         }
       }
     } else {
       throw new IllegalArgumentException(
         "Vertex id's for Polygons must have length 2. "
-            + Arrays.toString(vertexId));
+          + Arrays.toString(vertexId));
     }
   }
 

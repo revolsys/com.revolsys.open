@@ -12,10 +12,11 @@ import java.util.Map;
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.NonSI;
+import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class GeometryStyle extends MarkerStyle {
@@ -69,9 +70,9 @@ public class GeometryStyle extends MarkerStyle {
     WebColors.Purple, WebColors.Red, WebColors.Yellow, WebColors.Lime,
     WebColors.Aqua, WebColors.Blue, WebColors.Fuchsia);
 
-  private Measure<Length> lineDashOffset = ZERO_PIXEL;
+  private double lineDashOffset = 0;
 
-  private List<Measure<Length>> lineDashArray = Collections.emptyList();
+  private List<Double> lineDashArray = Collections.emptyList();
 
   static {
     // addProperty("backgroundColor", Color.class);
@@ -89,7 +90,7 @@ public class GeometryStyle extends MarkerStyle {
     addProperty("lineColor", Color.class, new Color(128, 128, 128));
     addProperty("lineCompOp", CompositionOperation.class,
       CompositionOperation.src_over);
-    addProperty("lineDashOffset", Measure.class, ZERO_PIXEL);
+    addProperty("lineDashOffset", Double.class, 0);
     addProperty("lineDashArray", List.class, Collections.emptyList());
     addProperty("lineGamma", Double.class, 1.0);
     addProperty("lineGammaMethod", GammaMethod.class, GammaMethod.power);
@@ -236,11 +237,11 @@ public class GeometryStyle extends MarkerStyle {
     return this.lineCompOp;
   }
 
-  public List<Measure<Length>> getLineDashArray() {
+  public List<Double> getLineDashArray() {
     return Collections.unmodifiableList(this.lineDashArray);
   }
 
-  public Measure<Length> getLineDashOffset() {
+  public double getLineDashOffset() {
     return this.lineDashOffset;
   }
 
@@ -359,22 +360,21 @@ public class GeometryStyle extends MarkerStyle {
   }
 
   public void setLineDashArray(final List<?> lineDashArray) {
-    this.lineDashArray = new ArrayList<Measure<Length>>();
+    this.lineDashArray = new ArrayList<>();
     if (lineDashArray != null) {
       for (final Object dashObject : lineDashArray) {
-        final Measure<Length> dash = StringConverterRegistry.toObject(
-          Measure.class, dashObject);
-        this.lineDashArray.add(dash);
+        if (Property.hasValue(dashObject)) {
+          String dashString = dashObject.toString();
+          dashString = dashString.replaceAll(" \\[pnt\\]", "");
+          final Double dash = MathUtil.toDouble(dashString);
+          this.lineDashArray.add(dash);
+        }
       }
     }
   }
 
-  public void setLineDashOffset(final Measure<Length> lineDashOffset) {
-    if (lineDashOffset == null) {
-      this.lineDashOffset = ZERO_PIXEL;
-    } else {
-      this.lineDashOffset = lineDashOffset;
-    }
+  public void setLineDashOffset(final double lineDashOffset) {
+    this.lineDashOffset = lineDashOffset;
   }
 
   public void setLineGamma(final double gamma) {
@@ -427,12 +427,12 @@ public class GeometryStyle extends MarkerStyle {
   public void setLineStyle(final Viewport2D viewport, final Graphics2D graphics) {
     final Color color = getLineColor();
     graphics.setColor(color);
-
+    final Unit<Length> unit = this.lineWidth.getUnit();
     final float width = (float)Viewport2D.toDisplayValue(viewport,
       this.lineWidth);
 
     final float dashOffset = (float)Viewport2D.toDisplayValue(viewport,
-      this.lineDashOffset);
+      Measure.valueOf(this.lineDashOffset, unit));
 
     final float[] dashArray;
     final int dashArraySize = this.lineDashArray.size();
@@ -441,10 +441,10 @@ public class GeometryStyle extends MarkerStyle {
     } else {
       dashArray = new float[dashArraySize];
       for (int i = 0; i < dashArray.length; i++) {
-        final Measure<Length> dashMeasure = this.lineDashArray.get(i);
-        final float dash = (float)Viewport2D.toDisplayValue(viewport,
-          dashMeasure);
-        dashArray[i] = dash;
+        final Double dashDouble = this.lineDashArray.get(i);
+        final float dashFloat = (float)Viewport2D.toDisplayValue(viewport,
+          Measure.valueOf(dashDouble, unit));
+        dashArray[i] = dashFloat;
       }
     }
 

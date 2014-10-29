@@ -299,6 +299,21 @@ implements GeometryCollection {
   }
 
   @Override
+  public Point getPointWithin() {
+    if (isEmpty()) {
+      return null;
+    } else {
+      for (final Geometry geometry : geometries()) {
+        final Point point = geometry.getPointWithin();
+        if (point != null) {
+          return point;
+        }
+      }
+      return null;
+    }
+  }
+
+  @Override
   public Segment getSegment(final int... segmentId) {
     return new GeometryCollectionSegment(this, segmentId);
   }

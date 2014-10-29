@@ -483,6 +483,15 @@ LineString {
   }
 
   @Override
+  public Point getPointWithin() {
+    if (isEmpty()) {
+      return null;
+    } else {
+      return LineStringUtil.midPoint(this);
+    }
+  }
+
+  @Override
   public LineStringSegment getSegment(final int... segmentId) {
     if (segmentId.length == 1) {
       int segmentIndex = segmentId[0];

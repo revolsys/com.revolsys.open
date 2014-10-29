@@ -38,8 +38,7 @@ public class TextStylePreview extends JPanel {
     graphics.drawLine(0, 50, 100, 50);
     graphics.translate(50, 50);
     try {
-      TextStyleRenderer.renderText(null, graphics, (String)null, null,
-        this.textStyle);
+      TextStyleRenderer.renderText(null, graphics, "Text", null, this.textStyle);
     } catch (final Throwable e) {
       ExceptionUtil.log(getClass(), e);
     }

@@ -23,11 +23,11 @@ import java.util.regex.Pattern;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
+import javax.measure.unit.Unit;
 import javax.swing.Icon;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.Record;
-import com.revolsys.gis.jts.PointUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
 import com.revolsys.gis.model.coordinates.PointWithOrientation;
 import com.revolsys.jts.geom.BoundingBox;
@@ -81,7 +81,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
       return new PointWithOrientation(new PointDouble(0.0, 0.0), 0);
     }
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    if (viewportGeometryFactory != null) {
+    if (viewportGeometryFactory != null && geometry != null
+        && !geometry.isEmpty()) {
       final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
       Point point = null;
@@ -128,34 +129,15 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           }
 
         } else if ("center".equals(placementType)) {
-          if (geometry instanceof LineString && geometry.getVertexCount() > 1) {
-            final double totalLength = geometry.getLength();
-            final double centreLength = totalLength / 2;
-            double currentLength = 0;
-            for (int i = 1; i < vertexCount && currentLength < centreLength; i++) {
-              Point p1 = geometry.getVertex(i - 1);
-              Point p2 = geometry.getVertex(i);
-              final double segmentLength = p1.distance(p2);
-              if (segmentLength + currentLength >= centreLength) {
-                p1 = p1.convert(viewportGeometryFactory);
-                p2 = p2.convert(viewportGeometryFactory);
-                point = LineSegmentUtil.project(geometryFactory, p1, p2,
-                  (centreLength - currentLength) / segmentLength);
-
-                final double angle = Math.toDegrees(p1.angle2d(p2));
-                orientation += angle;
-              }
-              currentLength += segmentLength;
-            }
-          }
+          return getTextLocationCenter(viewportGeometryFactory, geometry, style);
         }
         if (point == null) {
-          PointUtil.getPointWithin(geometry);
-          point = geometry.getCentroid().copy(geometryFactory);
+          point = getTextLocationCenter(viewportGeometryFactory, geometry,
+            style);
           if (!viewport.getBoundingBox().covers(point)) {
             final Geometry clippedGeometry = viewport.getBoundingBox()
-              .toPolygon()
-              .intersection(geometry);
+                .toPolygon()
+                .intersection(geometry);
             if (!clippedGeometry.isEmpty()) {
               double maxArea = 0;
               double maxLength = 0;
@@ -165,19 +147,22 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
                   final double area = part.getArea();
                   if (area > maxArea) {
                     maxArea = area;
-                    point = part.getCentroid();
+                    point = getTextLocationCenter(viewportGeometryFactory,
+                      geometry, style);
                   }
                 } else if (part instanceof LineString) {
                   if (maxArea == 0) {
                     final double length = part.getLength();
                     if (length > maxLength) {
                       maxLength = length;
-                      point = part.getCentroid();
+                      point = getTextLocationCenter(viewportGeometryFactory,
+                        geometry, style);
                     }
                   }
                 } else if (part instanceof Point) {
                   if (maxArea == 0 && maxLength == 0) {
-                    point = part.getPoint();
+                    point = getTextLocationCenter(viewportGeometryFactory,
+                      geometry, style);
                   }
                 }
               }
@@ -188,13 +173,50 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
         if (point != null) {
           final String orientationType = style.getTextOrientationType();
           if ("none".equals(orientationType)) {
-            orientation = 0;
+            return new PointWithOrientation(point, 0);
           }
-          return new PointWithOrientation(point, orientation);
+          if (point instanceof PointWithOrientation) {
+            return (PointWithOrientation)point;
+          } else {
+            return new PointWithOrientation(point, orientation);
+          }
         }
       }
     }
     return null;
+  }
+
+  public static PointWithOrientation getTextLocationCenter(
+    final GeometryFactory viewportGeometryFactory, final Geometry geometry,
+    final TextStyle style) {
+
+    double orientation = style.getTextOrientation();
+    Point point = null;
+    if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+
+      final double totalLength = line.getLength();
+      final double centreLength = totalLength / 2;
+      double currentLength = 0;
+      for (int i = 1; i < line.getVertexCount() && currentLength < centreLength; i++) {
+        Point p1 = line.getVertex(i - 1);
+        Point p2 = line.getVertex(i);
+        final double segmentLength = p1.distance(p2);
+        if (segmentLength + currentLength >= centreLength) {
+          p1 = p1.convert(viewportGeometryFactory);
+          p2 = p2.convert(viewportGeometryFactory);
+          point = LineSegmentUtil.project(viewportGeometryFactory, p1, p2,
+            (centreLength - currentLength) / segmentLength);
+
+          final double angle = Math.toDegrees(p1.angle2d(p2));
+          orientation += angle;
+        }
+        currentLength += segmentLength;
+      }
+    } else {
+      point = geometry.getPointWithin();
+    }
+    return new PointWithOrientation(point, orientation);
   }
 
   public static final void renderText(final Viewport2D viewport,
@@ -257,7 +279,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           final int ascent = fontMetrics.getAscent();
           final int leading = fontMetrics.getLeading();
           final double maxHeight = lines.length * (ascent + descent)
-            + (lines.length - 1) * leading;
+              + (lines.length - 1) * leading;
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
           } else if ("middle".equals(verticalAlignment)) {
@@ -269,8 +291,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           String horizontalAlignment = style.getTextHorizontalAlignment();
           double screenX = location[0];
           double screenY = location[1];
-          final String textPlacementType = style.getTextPlacementType();
-          if ("auto".equals(textPlacementType) && viewport != null) {
+          final String textPlacement = style.getTextPlacementType();
+          if ("auto".equals(textPlacement) && viewport != null) {
             if (screenX < 0) {
               screenX = 1;
               dx = 0;
@@ -308,7 +330,8 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
 
             if ("right".equals(horizontalAlignment)) {
               graphics.translate(-width, 0);
-            } else if ("center".equals(horizontalAlignment)) {
+            } else if ("center".equals(horizontalAlignment)
+              || "auto".equals(horizontalAlignment)) {
               graphics.translate(-width / 2, 0);
             }
             graphics.translate(dx, 0);
@@ -329,8 +352,10 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
               graphics.fill(box);
             }
 
+            final double radius = style.getTextHaloRadius();
+            final Unit<Length> unit = style.getTextSizeUnit();
             final double textHaloRadius = Viewport2D.toDisplayValue(viewport,
-              style.getTextHaloRadius());
+              Measure.valueOf(radius, unit));
             if (textHaloRadius > 0) {
               final Stroke savedStroke = graphics.getStroke();
               final Stroke outlineStroke = new BasicStroke(

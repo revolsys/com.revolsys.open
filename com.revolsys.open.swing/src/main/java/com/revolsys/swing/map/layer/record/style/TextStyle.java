@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
+import javax.measure.unit.Unit;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
@@ -22,6 +23,25 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class TextStyle implements MapSerializer, Cloneable {
+
+  private static final void addProperty(final String name,
+    final Class<?> dataClass, final Object defaultValue) {
+    PROPERTIES.put(name, dataClass);
+    DEFAULT_VALUES.put(name, defaultValue);
+  }
+
+  private static Object getValue(final String propertyName, final Object value) {
+    final Class<?> dataClass = PROPERTIES.get(propertyName);
+    if (dataClass == null) {
+      return null;
+    } else {
+      return StringConverterRegistry.toObject(dataClass, value);
+    }
+  }
+
+  public static TextStyle text() {
+    return new TextStyle();
+  }
 
   private static final String AUTO = "auto";
 
@@ -42,7 +62,7 @@ public class TextStyle implements MapSerializer, Cloneable {
     addProperty("textFaceName", String.class, "Arial");
     addProperty("textFill", Color.class, WebColors.Black);
     addProperty("textHaloFill", Color.class, WebColors.White);
-    addProperty("textHaloRadius", Measure.class, MarkerStyle.ZERO_PIXEL);
+    addProperty("textHaloRadius", Double.class, 0);
     addProperty("textHorizontalAlignment", String.class, AUTO);
     // addProperty("text-label-position-tolerance",DataTypes.);
     // addProperty("text-line-spacing",DataTypes.);
@@ -67,25 +87,6 @@ public class TextStyle implements MapSerializer, Cloneable {
     // addProperty("text-wrap-width", Double.class);
   }
 
-  private static final void addProperty(final String name,
-    final Class<?> dataClass, final Object defaultValue) {
-    PROPERTIES.put(name, dataClass);
-    DEFAULT_VALUES.put(name, defaultValue);
-  }
-
-  private static Object getValue(final String propertyName, final Object value) {
-    final Class<?> dataClass = PROPERTIES.get(propertyName);
-    if (dataClass == null) {
-      return null;
-    } else {
-      return StringConverterRegistry.toObject(dataClass, value);
-    }
-  }
-
-  public static TextStyle text() {
-    return new TextStyle();
-  }
-
   private Font font;
 
   private long lastScale = 0;
@@ -102,7 +103,7 @@ public class TextStyle implements MapSerializer, Cloneable {
 
   private Color textHaloFill = WebColors.White;
 
-  private Measure<Length> textHaloRadius = GeometryStyle.ZERO_PIXEL;
+  private double textHaloRadius = 0;
 
   private String textHorizontalAlignment = AUTO;
 
@@ -117,7 +118,7 @@ public class TextStyle implements MapSerializer, Cloneable {
 
   private String textPlacementType = AUTO;
 
-  private Measure<Length> textSizeMeasure = GeometryStyle.TEN_PIXELS;
+  private Measure<Length> textSize = GeometryStyle.TEN_PIXELS;
 
   private String textVerticalAlignment = AUTO;
 
@@ -130,7 +131,13 @@ public class TextStyle implements MapSerializer, Cloneable {
     for (final Entry<String, Object> entry : style.entrySet()) {
       final String propertyName = entry.getKey();
       if (PROPERTIES.containsKey(propertyName)) {
-        final Object value = entry.getValue();
+        Object value = entry.getValue();
+        if (propertyName.equals("textHaloRadius")) {
+          String string = value.toString();
+          string = string.replaceAll(" \\[.*\\]", "");
+          value = string;
+
+        }
         final Object propertyValue = getValue(propertyName, value);
         try {
           JavaBeanUtil.setProperty(this, propertyName, propertyValue);
@@ -159,8 +166,7 @@ public class TextStyle implements MapSerializer, Cloneable {
     // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
     // style += Font.ITALIC;
     // }
-    final double fontSize = Viewport2D.toDisplayValue(viewport,
-      this.textSizeMeasure);
+    final double fontSize = Viewport2D.toDisplayValue(viewport, this.textSize);
     return new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
   }
 
@@ -192,7 +198,7 @@ public class TextStyle implements MapSerializer, Cloneable {
     return this.textHaloFill;
   }
 
-  public Measure<Length> getTextHaloRadius() {
+  public double getTextHaloRadius() {
     return this.textHaloRadius;
   }
 
@@ -221,7 +227,11 @@ public class TextStyle implements MapSerializer, Cloneable {
   }
 
   public Measure<Length> getTextSize() {
-    return this.textSizeMeasure;
+    return this.textSize;
+  }
+
+  public Unit<Length> getTextSizeUnit() {
+    return this.textSize.getUnit();
   }
 
   public String getTextVerticalAlignment() {
@@ -241,7 +251,7 @@ public class TextStyle implements MapSerializer, Cloneable {
   public void setTextBoxOpacity(final int textBoxOpacity) {
     if (textBoxOpacity < 0 || textBoxOpacity > 255) {
       throw new IllegalArgumentException(
-        "Text box opacity must be between 0 - 255");
+          "Text box opacity must be between 0 - 255");
     } else {
       this.textBoxOpacity = textBoxOpacity;
       this.textBoxColor = WebColors.setAlpha(this.textBoxColor,
@@ -279,8 +289,12 @@ public class TextStyle implements MapSerializer, Cloneable {
     }
   }
 
-  public void setTextHaloRadius(final Measure<Length> textHaloRadius) {
+  public void setTextHaloRadius(final double textHaloRadius) {
     this.textHaloRadius = textHaloRadius;
+  }
+
+  public void setTextHaloRadius(final Measure<Length> textHaloRadius) {
+    setTextHaloRadius(textHaloRadius.doubleValue(textHaloRadius.getUnit()));
   }
 
   public void setTextHorizontalAlignment(final String textHorizontalAlignment) {
@@ -304,8 +318,7 @@ public class TextStyle implements MapSerializer, Cloneable {
       throw new IllegalArgumentException("Text opacity must be between 0 - 255");
     } else {
       this.textOpacity = textOpacity;
-      this.textFill = WebColors.setAlpha(this.textFill,
-        this.textOpacity);
+      this.textFill = WebColors.setAlpha(this.textFill, this.textOpacity);
       this.textHaloFill = WebColors.setAlpha(this.textHaloFill,
         this.textOpacity);
     }
@@ -319,6 +332,10 @@ public class TextStyle implements MapSerializer, Cloneable {
     this.textOrientationType = textOrientationType;
   }
 
+  public void setTextPlacement(final String textPlacementType) {
+    setTextPlacementType(textPlacementType);
+  }
+
   public void setTextPlacementType(final String textPlacementType) {
     if (Property.hasValue(textPlacementType)) {
       this.textPlacementType = textPlacementType;
@@ -328,16 +345,15 @@ public class TextStyle implements MapSerializer, Cloneable {
   }
 
   public void setTextSize(final Measure<Length> textSize) {
-    this.textSizeMeasure = MarkerStyle.getWithDefault(textSize,
-      MarkerStyle.TEN_PIXELS);
+    this.textSize = MarkerStyle.getWithDefault(textSize, MarkerStyle.TEN_PIXELS);
     this.font = null;
   }
 
   public synchronized void setTextStyle(final Viewport2D viewport,
     final Graphics2D graphics) {
     if (viewport == null) {
-      final Font font = new Font(this.textFaceName, 0,
-        textSizeMeasure.getValue().intValue());
+      final Font font = new Font(this.textFaceName, 0, this.textSize.getValue()
+        .intValue());
       graphics.setFont(font);
     } else {
       final long scale = (long)viewport.getScale();
@@ -351,7 +367,7 @@ public class TextStyle implements MapSerializer, Cloneable {
         // style += Font.ITALIC;
         // }
         final double fontSize = Viewport2D.toDisplayValue(viewport,
-          this.textSizeMeasure);
+          this.textSize);
         this.font = new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
       }
       graphics.setFont(this.font);

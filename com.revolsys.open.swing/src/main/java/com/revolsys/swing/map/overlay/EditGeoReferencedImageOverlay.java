@@ -71,11 +71,11 @@ public class EditGeoReferencedImageOverlay extends AbstractOverlay {
 
   static {
     STYLE_VERTEX_FIRST_POINT.setMarkerOrientationType("auto");
-    STYLE_VERTEX_FIRST_POINT.setMarkerPlacement("point(0)");
+    STYLE_VERTEX_FIRST_POINT.setMarkerPlacementType("point(0)");
     STYLE_VERTEX_FIRST_POINT.setMarkerHorizontalAlignment("center");
 
     STYLE_VERTEX_LAST_POINT.setMarkerOrientationType("auto");
-    STYLE_VERTEX_LAST_POINT.setMarkerPlacement("point(n)");
+    STYLE_VERTEX_LAST_POINT.setMarkerPlacementType("point(n)");
     STYLE_VERTEX_LAST_POINT.setMarkerHorizontalAlignment("right");
   }
 
