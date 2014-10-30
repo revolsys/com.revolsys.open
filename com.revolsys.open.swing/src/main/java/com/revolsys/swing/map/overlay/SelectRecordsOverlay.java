@@ -322,7 +322,8 @@ public class SelectRecordsOverlay extends AbstractOverlay {
         final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
         final AbstractRecordLayerRenderer layerRenderer = layer.getRenderer();
         if (recordLayer.isSelectable()) {
-          for (final LayerRecord record : recordLayer.getSelectedRecords()) {
+          List<LayerRecord> selectedRecords = recordLayer.getSelectedRecords();
+          for (final LayerRecord record : selectedRecords) {
             if (record != null && recordLayer.isVisible(record)) {
               if (!recordLayer.isHighlighted(record)) {
                 if (!recordLayer.isDeleted(record)) {
