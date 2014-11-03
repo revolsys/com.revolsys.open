@@ -47,6 +47,7 @@ import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.predicate.DeletedPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.ModifiedPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.NewPredicate;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.filter.ContainsFilter;
@@ -56,7 +57,7 @@ import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.util.Property;
 
 public class RecordLayerTableModel extends RecordRowTableModel implements
-  SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
+SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
 
   public static RecordLayerTable createTable(final AbstractRecordLayer layer) {
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
@@ -216,6 +217,16 @@ public class RecordLayerTableModel extends RecordRowTableModel implements
   protected List<LayerRecord> getLayerSelectedRecords() {
     final AbstractRecordLayer layer = getLayer();
     return layer.getSelectedRecords();
+  }
+
+  @Override
+  public MenuFactory getMenu(final int rowIndex, final int columnIndex) {
+    Record record = getRecord(rowIndex);
+    if (record instanceof LoadingRecord) {
+      return null;
+    } else {
+      return super.getMenu(rowIndex, columnIndex);
+    }
   }
 
   private Integer getNextPageNumber(final int refreshIndex) {
