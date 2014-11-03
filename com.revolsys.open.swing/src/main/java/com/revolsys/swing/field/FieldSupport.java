@@ -28,6 +28,8 @@ public class FieldSupport {
 
   private final Color originalForegroundColor;
 
+  private Color originalSelectedTextColor;
+
   private String originalTooltipText;
 
   private final CascadingUndoManager undoManager = new CascadingUndoManager();
@@ -45,6 +47,10 @@ public class FieldSupport {
     this.undoManager.addKeyMap(this.component);
     this.originalForegroundColor = this.component.getForeground();
     this.originalBackgroundColor = this.component.getBackground();
+    if (component instanceof JTextComponent) {
+      final JTextComponent textComponent = (JTextComponent)component;
+      this.originalSelectedTextColor = textComponent.getSelectedTextColor();
+    }
     this.originalTooltipText = this.component.getToolTipText();
     this.iconBorder = new IconBorder(null);
     final Border originalBorder = this.component.getBorder();
@@ -115,7 +121,7 @@ public class FieldSupport {
       this.component.setForeground(this.originalForegroundColor);
       if (this.component instanceof JTextComponent) {
         final JTextComponent textComponent = (JTextComponent)this.component;
-        textComponent.setSelectedTextColor(this.originalForegroundColor);
+        textComponent.setSelectedTextColor(this.originalSelectedTextColor);
       }
       this.component.setBackground(this.originalBackgroundColor);
       this.component.setToolTipText(this.originalTooltipText);
