@@ -245,12 +245,12 @@ public class ProjectFrame extends BaseFrame {
 
     this.catalogTree = tree;
 
-    addTabIcon(this.leftTabs, "tree_catalog", "Catalog", this.catalogTree);
+    addTabIcon(this.leftTabs, "tree_catalog", "Catalog", this.catalogTree, true);
   }
 
   protected void addLogPanel() {
     final JPanel panel = Log4jTableModel.createPanel();
-    addTabIcon(this.bottomTabs, "error", "Logging", panel);
+    addTabIcon(this.bottomTabs, "error", "Logging", panel, false);
   }
 
   protected MapPanel addMapPanel() {
@@ -270,11 +270,15 @@ public class ProjectFrame extends BaseFrame {
   }
 
   public int addTabIcon(final JTabbedPane tabs, final String iconName,
-    final String toolTipText, final Component component) {
-    final JScrollPane scrollPane = new JScrollPane(component);
-    scrollPane.setBorder(BorderFactory.createEmptyBorder());
+    final String toolTipText, Component component, final boolean useScrollPane) {
 
-    tabs.addTab(null, Icons.getIcon(iconName), scrollPane);
+    if (useScrollPane) {
+      final JScrollPane scrollPane = new JScrollPane(component);
+      scrollPane.setBorder(BorderFactory.createEmptyBorder());
+      component = scrollPane;
+    }
+
+    tabs.addTab(null, Icons.getIcon(iconName), component);
     final int tabIndex = tabs.getTabCount() - 1;
     tabs.setToolTipTextAt(tabIndex, toolTipText);
     return tabIndex;
@@ -288,14 +292,14 @@ public class ProjectFrame extends BaseFrame {
       new InvokeMethodPropertyChangeListener(true, this, "expandLayers",
         PropertyChangeEvent.class));
 
-    addTabIcon(this.leftTabs, "tree_layers", "TOC", this.tocTree);
+    addTabIcon(this.leftTabs, "tree_layers", "TOC", this.tocTree, true);
 
   }
 
   protected void addTasksPanel() {
     final JPanel panel = SwingWorkerTableModel.createPanel();
     final int tabIndex = addTabIcon(this.bottomTabs, "time",
-      "Background Tasks", panel);
+      "Background Tasks", panel, false);
 
     final SwingWorkerProgressBar progressBar = this.mapPanel.getProgressBar();
     final JButton viewTasksAction = InvokeMethodAction.createButton(null,
@@ -583,7 +587,7 @@ public class ProjectFrame extends BaseFrame {
     final FileSystemResource resource = new FileSystemResource(projectDirectory);
     this.project.readProject(resource);
     Invoke.later(this, "setTitle", this.project.getName() + " - "
-        + this.frameTitle);
+      + this.frameTitle);
 
     final Object frameBoundsObject = this.project.getProperty("frameBounds");
     setBounds(frameBoundsObject);
