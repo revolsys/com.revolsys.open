@@ -24,18 +24,25 @@ implements EnableCheck, PropertyChangeListener {
     return null;
   }
 
+  private boolean enabled = false;
+
   public boolean disabled() {
-    firePropertyChange("enabled", true, false);
-    return false;
+    return setEnabled(false);
   }
 
   public boolean enabled() {
-    firePropertyChange("enabled", false, true);
-    return true;
+    return setEnabled(true);
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     isEnabled();
+  }
+
+  protected boolean setEnabled(final boolean enabled) {
+    final boolean oldValue = this.enabled;
+    this.enabled = enabled;
+    firePropertyChange("enabled", oldValue, enabled);
+    return enabled;
   }
 }

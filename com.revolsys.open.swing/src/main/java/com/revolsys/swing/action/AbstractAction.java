@@ -5,7 +5,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
@@ -13,6 +12,7 @@ import javax.swing.SwingConstants;
 
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.menu.CheckBoxMenuItem;
 import com.revolsys.util.OS;
 
 public abstract class AbstractAction extends javax.swing.AbstractAction {
@@ -31,8 +31,8 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     return button;
   }
 
-  public JCheckBoxMenuItem createCheckboxMenuItem() {
-    final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(this);
+  public CheckBoxMenuItem createCheckboxMenuItem() {
+    final CheckBoxMenuItem menuItem = new CheckBoxMenuItem(this);
     final Icon disabledIcon = getDisabledIcon();
     menuItem.setDisabledIcon(disabledIcon);
     return menuItem;

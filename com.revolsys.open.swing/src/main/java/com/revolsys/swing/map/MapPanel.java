@@ -480,6 +480,8 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void clearZoomHistory() {
     this.zoomHistory.clear();
     this.zoomHistoryIndex = -1;
+    firePropertyChange("zoomPreviousEnabled", true, false);
+    firePropertyChange("zoomNextEnabled", true, false);
   }
 
   public void createScales() {

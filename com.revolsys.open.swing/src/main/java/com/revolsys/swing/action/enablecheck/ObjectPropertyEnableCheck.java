@@ -28,10 +28,10 @@ public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
   public ObjectPropertyEnableCheck(final Object object,
     final String propertyName, final Object value, final boolean inverse) {
     this.object = new WeakReference<>(object);
-    Property.addListener(object, propertyName, this);
     this.propertyName = propertyName;
     this.value = value;
     this.inverse = inverse;
+    Property.addListener(object, propertyName, this);
   }
 
   @Override
@@ -47,6 +47,6 @@ public class ObjectPropertyEnableCheck extends AbstractEnableCheck {
 
   @Override
   public String toString() {
-    return this.object.toString() + "." + this.propertyName + "=" + this.value;
+    return this.object.get() + "." + this.propertyName + "=" + this.value;
   }
 }

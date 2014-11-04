@@ -4,7 +4,6 @@ import java.awt.Component;
 
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 
 import com.revolsys.swing.action.AbstractAction;
@@ -54,8 +53,8 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
     if (this.checkBoxSelectedCheck == null) {
       return this.action.createMenuItem();
     } else {
-      final JCheckBoxMenuItem menuItem = this.action.createCheckboxMenuItem();
-      menuItem.setSelected(this.checkBoxSelectedCheck.isEnabled());
+      final CheckBoxMenuItem menuItem = this.action.createCheckboxMenuItem();
+      menuItem.setSelectedCheck(this.checkBoxSelectedCheck);
       return menuItem;
     }
   }
