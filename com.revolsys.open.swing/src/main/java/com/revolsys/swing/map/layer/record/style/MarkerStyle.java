@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -375,7 +376,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   public void setMarkerFillOpacity(final double markerFillOpacity) {
     if (markerFillOpacity < 0 || markerFillOpacity > 1) {
       throw new IllegalArgumentException(
-          "The opacity must be between 0.0 - 1.0");
+        "The opacity must be between 0.0 - 1.0");
     } else {
       this.markerFillOpacity = (int)(255 * markerFillOpacity);
       this.markerFill = WebColors.setAlpha(this.markerFill,
@@ -410,7 +411,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   public void setMarkerHorizontalAlignment(
     final String markerHorizontalAlignment) {
     this.markerHorizontalAlignment = getWithDefault(markerHorizontalAlignment,
-        "center");
+      "center");
   }
 
   public void setMarkerIgnorePlacement(final String markerIgnorePlacement) {
@@ -429,7 +430,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   public void setMarkerLineOpacity(final double markerLineOpacity) {
     if (markerLineOpacity < 0 || markerLineOpacity > 1) {
       throw new IllegalArgumentException(
-          "The opacity must be between 0.0 - 1.0");
+        "The opacity must be between 0.0 - 1.0");
     } else {
       this.markerLineOpacity = (int)(255 * markerLineOpacity);
       this.markerLineColor = WebColors.setAlpha(this.markerLineColor,
@@ -469,7 +470,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   public void setMarkerOpacity(final double markerOpacity) {
     if (this.markerLineOpacity < 0 || this.markerLineOpacity > 1) {
       throw new IllegalArgumentException(
-          "The opacity must be between 0.0 - 1.0");
+        "The opacity must be between 0.0 - 1.0");
     } else {
       this.markerOpacity = (int)(255 * markerOpacity);
       setMarkerLineOpacity(markerOpacity);
@@ -518,7 +519,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
 
   public void setMarkerVerticalAlignment(final String markerVerticalAlignment) {
     this.markerVerticalAlignment = getWithDefault(markerVerticalAlignment,
-        "middle");
+      "middle");
   }
 
   public void setMarkerWidth(final Measure<Length> markerWidth) {
@@ -529,8 +530,12 @@ public class MarkerStyle implements Cloneable, MapSerializer {
     for (final Entry<String, Object> entry : style.entrySet()) {
       final String propertyName = entry.getKey();
       if (PROPERTIES.containsKey(propertyName)) {
-        final Object value = entry.getValue();
-
+        Object value = entry.getValue();
+        if (Arrays.asList("lineDashOffset", "lineMiterLimit").contains(
+          propertyName)) {
+          final String string = (String)value;
+          value = string.replaceAll(" \\[pnt\\]", "");
+        }
         final Object propertyValue = getValue(propertyName, value);
         try {
           JavaBeanUtil.setProperty(this, propertyName, propertyValue);
@@ -544,10 +549,6 @@ public class MarkerStyle implements Cloneable, MapSerializer {
 
   @Override
   public Map<String, Object> toMap() {
-    // return toMap(Collections.<String, Object> emptyMap());
-    // }
-    //
-    // public Map<String, Object> toMap() {
     final boolean geometryStyle = this instanceof GeometryStyle;
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     for (final String name : PROPERTIES.keySet()) {
@@ -560,11 +561,6 @@ public class MarkerStyle implements Cloneable, MapSerializer {
           defaultValue = getValue(name, defaultValue);
           defaultEqual = EqualsRegistry.equal(defaultValue, value);
         }
-        // if (defaults.containsKey(name)) {
-        // Object defaultValue = defaults.get(name);
-        // defaultValue = getValue(name, defaultValue);
-        // defaultEqual = EqualsRegistry.equal(defaultValue, value);
-        // }
         if (!defaultEqual) {
           MapSerializerUtil.add(map, name, value);
         }
