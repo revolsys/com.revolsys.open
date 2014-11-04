@@ -46,6 +46,12 @@ public class CsvRecordStore extends AbstractRecordStore {
   }
 
   @Override
+  public RecordDefinition getRecordDefinition(
+    final RecordDefinition recordDefinition) {
+    return this.writer.getRecordDefinition(recordDefinition);
+  }
+
+  @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
     return this.writer.getRecordDefinition(typePath);
   }

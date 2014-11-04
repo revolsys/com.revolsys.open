@@ -15,7 +15,7 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.vrt.OgrVrtWriter;
-import com.revolsys.jts.geom.Geometry;
+import com.revolsys.jts.geom.GeometryFactory;
 
 public class CsvDirectoryWriter extends AbstractRecordWriter {
   private File directory;
@@ -54,27 +54,23 @@ public class CsvDirectoryWriter extends AbstractRecordWriter {
     return this.directory;
   }
 
-  public RecordDefinition getRecordDefinition(final String path) {
-    return this.recordDefinitionMap.get(path);
-  }
-
-  private CsvRecordWriter getWriter(final Record record) {
-    final RecordDefinition recordDefinition = record.getRecordDefinition();
-    CsvRecordWriter writer = this.writers.get(recordDefinition);
-    if (writer == null) {
+  public synchronized RecordDefinition getRecordDefinition(
+    final RecordDefinition recordDefinition) {
+    final String typePath = recordDefinition.getPath();
+    RecordDefinition storeRecordDefinition = getRecordDefinition(typePath);
+    if (storeRecordDefinition == null) {
+      storeRecordDefinition = recordDefinition;
+      this.recordDefinitionMap.put(typePath, storeRecordDefinition);
       try {
         final String path = recordDefinition.getPath();
         final File file = new File(this.directory, path.toString() + ".csv");
         file.getParentFile().mkdirs();
-        writer = new CsvRecordWriter(recordDefinition, new FileWriter(file),
-          this.ewkt);
-        final Geometry geometry = record.getGeometryValue();
-        if (geometry != null) {
-          writer.setProperty(IoConstants.GEOMETRY_FACTORY,
-            geometry.getGeometryFactory());
-        }
+        final CsvRecordWriter writer = new CsvRecordWriter(recordDefinition,
+          new FileWriter(file), this.ewkt);
+        final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
+        writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
         this.writers.put(recordDefinition, writer);
-        this.recordDefinitionMap.put(path, recordDefinition);
+
         final File vrtFile = new File(this.directory, path.toString() + ".vrt");
         final String typeName = recordDefinition.getName();
         OgrVrtWriter.write(vrtFile, recordDefinition, typeName + ".csv");
@@ -86,7 +82,22 @@ public class CsvDirectoryWriter extends AbstractRecordWriter {
         throw new IllegalArgumentException(e.getMessage(), e);
       }
     }
-    return writer;
+    return storeRecordDefinition;
+  }
+
+  public RecordDefinition getRecordDefinition(final String path) {
+    return this.recordDefinitionMap.get(path);
+  }
+
+  private CsvRecordWriter getWriter(final Record record) {
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
+    return getWriter(recordDefinition);
+  }
+
+  public synchronized CsvRecordWriter getWriter(
+    final RecordDefinition recordDefinition) {
+    final RecordDefinition storeRecordDefinition = getRecordDefinition(recordDefinition);
+    return this.writers.get(storeRecordDefinition);
   }
 
   public boolean isEwkt() {
@@ -112,5 +123,4 @@ public class CsvDirectoryWriter extends AbstractRecordWriter {
     final CsvRecordWriter writer = getWriter(object);
     writer.write(object);
   }
-
 }

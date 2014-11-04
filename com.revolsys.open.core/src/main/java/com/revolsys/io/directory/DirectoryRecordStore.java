@@ -3,6 +3,7 @@ package com.revolsys.io.directory;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +55,11 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final Collection<String> fileExtensions) {
     this.directory = directory;
     this.fileExtensions = new ArrayList<>(fileExtensions);
+  }
+
+  public DirectoryRecordStore(final File directory,
+    final String... fileExtensions) {
+    this(directory, Arrays.asList(fileExtensions));
   }
 
   @Override
@@ -182,7 +188,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       final File subDirectory = new File(getDirectory(), schemaName);
       final String fileExtension = getFileExtension();
       final File file = new File(subDirectory, recordDefinition.getName() + "."
-        + fileExtension);
+          + fileExtension);
       final Resource resource = new FileSystemResource(file);
       writer = RecordIo.recordWriter(recordDefinition, resource);
       if (writer instanceof ObjectWithProperties) {
@@ -207,7 +213,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final RecordStoreSchema schema, final String schemaName,
     final Resource resource) {
     try (
-      RecordReader recordReader = RecordIo.recordReader(resource)) {
+        RecordReader recordReader = RecordIo.recordReader(resource)) {
       final String typePath = Path.toPath(schemaName,
         SpringUtil.getBaseName(resource));
       recordReader.setProperty("schema", schema);
@@ -264,11 +270,11 @@ public class DirectoryRecordStore extends AbstractRecordStore {
           } else {
             childSchemaPath = schemaPath + "/" + childSchemaPath;
           }
-          RecordStoreSchema childSchema = schema.getSchema(schemaPath);
+          RecordStoreSchema childSchema = schema.getSchema(childSchemaPath);
           if (childSchema == null) {
             childSchema = new RecordStoreSchema(schema, childSchemaPath);
           } else {
-            if (childSchema.isInitialized()) {
+            if (!childSchema.isInitialized()) {
               childSchema.refresh();
             }
           }
@@ -316,14 +322,14 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     if (recordStore == this) {
       switch (record.getState()) {
         case Deleted:
-        break;
+          break;
         case Persisted:
-        break;
+          break;
         case Modified:
           throw new UnsupportedOperationException();
         default:
           insert(record);
-        break;
+          break;
       }
     } else {
       insert(record);
