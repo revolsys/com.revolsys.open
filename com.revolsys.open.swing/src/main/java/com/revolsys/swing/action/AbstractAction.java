@@ -2,17 +2,17 @@ package com.revolsys.swing.action;
 
 import java.awt.event.KeyEvent;
 
-import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
 
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.menu.Button;
 import com.revolsys.swing.menu.CheckBoxMenuItem;
+import com.revolsys.swing.menu.ToggleButton;
 import com.revolsys.util.OS;
 
 public abstract class AbstractAction extends javax.swing.AbstractAction {
@@ -26,8 +26,7 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   private EnableCheck enableCheck;
 
   public JButton createButton() {
-    final JButton button = new JButton(this);
-    initButton(button);
+    final Button button = new Button(this);
     return button;
   }
 
@@ -50,8 +49,7 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   }
 
   public JToggleButton createToggleButton() {
-    final JToggleButton button = new JToggleButton(this);
-    initButton(button);
+    final ToggleButton button = new ToggleButton(this);
     return button;
   }
 
@@ -82,19 +80,6 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
 
   public String getToolTip() {
     return (String)getValue(SHORT_DESCRIPTION);
-  }
-
-  protected void initButton(final AbstractButton button) {
-    final Icon icon = getIcon();
-    if (icon != null || getLargeIcon() != null) {
-      button.setHideActionText(true);
-    }
-    final Icon disabledIcon = getDisabledIcon();
-    button.setDisabledIcon(disabledIcon);
-    button.setHorizontalTextPosition(SwingConstants.CENTER);
-    button.setVerticalTextPosition(SwingConstants.BOTTOM);
-    button.setFocusPainted(false);
-    button.setBorderPainted(false);
   }
 
   public boolean isCheckBox() {
@@ -145,7 +130,8 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     this.enableCheck = enableCheck;
     if (this.enableCheck != null) {
       this.enableCheck.addListener("enabled", this.enabledListener);
-      enableCheck.isEnabled();
+      final boolean enabled = enableCheck.isEnabled();
+      firePropertyChange("enabled", !enabled, enabled);
     }
   }
 

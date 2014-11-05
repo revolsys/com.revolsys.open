@@ -7,13 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JToggleButton;
 
 import com.revolsys.swing.action.AbstractAction;
 
 public class ActionToolBarButtonFactory extends AbstractAction implements
-  ToolBarButtonFactory {
+ToolBarButtonFactory {
   private static final List<String> KEYS = Arrays.asList(
     Action.ACCELERATOR_KEY, Action.ACTION_COMMAND_KEY, Action.DEFAULT,
     Action.DISPLAYED_MNEMONIC_INDEX_KEY, Action.LARGE_ICON_KEY,
@@ -57,7 +56,7 @@ public class ActionToolBarButtonFactory extends AbstractAction implements
     if (isCheckBox()) {
       return new JToggleButton(this);
     } else {
-      return new JButton(this);
+      return createButton();
     }
   }
 

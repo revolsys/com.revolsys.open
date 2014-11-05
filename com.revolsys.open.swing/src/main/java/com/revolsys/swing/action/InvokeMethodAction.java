@@ -23,16 +23,14 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
     final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, toolTip,
       icon, true, object, methodName, parameters);
-    final JButton button = new JButton(action);
-    return button;
+    return action.createButton();
   }
 
   public static JButton createButton(final String name, final Object object,
     final String methodName, final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, object,
       methodName, parameters);
-    final JButton button = new JButton(action);
-    return button;
+    return action.createButton();
   }
 
   public static JCheckBoxMenuItem createCheckBoxMenuItem(final String name,
@@ -81,7 +79,7 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
   public InvokeMethodAction(final CharSequence name, final boolean invokeLater,
     final Object object, final String methodName, final Object... parameters) {
     this(name, null, invokeLater, object, methodName, parameters);
-  };
+  }
 
   public InvokeMethodAction(final CharSequence name, final Icon icon,
     final boolean invokeLater, final Object object, final String methodName,
@@ -104,7 +102,7 @@ public class InvokeMethodAction extends AbstractActionMainMenuItemFactory {
       });
 
     }
-  }
+  };
 
   public InvokeMethodAction(final CharSequence name, final Icon icon,
     final Object object, final String methodName, final Object... parameters) {

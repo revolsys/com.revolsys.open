@@ -17,31 +17,31 @@ import com.revolsys.swing.listener.InvokeMethodListSelectionListener;
 
 public class TwoListsPanel<T> extends JPanel {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 374118950070073549L;
 
   private final JList leftList;
 
-  private final JButton moveLeftButton = new JButton(new InvokeMethodAction(
-    Icons.getIcon("arrow_left"), this, "moveSelectedLeft"));
+  private final JButton moveLeftButton = new InvokeMethodAction(
+    Icons.getIcon("arrow_left"), this, "moveSelectedLeft").createButton();
 
-  private final JButton moveRightButton = new JButton(new InvokeMethodAction(
-    Icons.getIcon("arrow_right"), this, "moveSelectedLeft"));
+  private final JButton moveRightButton = new InvokeMethodAction(
+    Icons.getIcon("arrow_right"), this, "moveSelectedLeft").createButton();
 
   private final JList rightList;
 
   public TwoListsPanel() {
     final SpringLayout layout = new SpringLayout();
     setLayout(layout);
-    leftList = createList();
-    final JScrollPane leftScroll = new JScrollPane(leftList);
+    this.leftList = createList();
+    final JScrollPane leftScroll = new JScrollPane(this.leftList);
     add(leftScroll);
 
-    add(moveRightButton);
+    add(this.moveRightButton);
     // add(moveLeftButton);
-    rightList = createList();
-    final JScrollPane rightScroll = new JScrollPane(rightList);
+    this.rightList = createList();
+    final JScrollPane rightScroll = new JScrollPane(this.rightList);
     add(rightScroll);
 
     final Constraints panelConstraints = layout.getConstraints(this);
@@ -50,7 +50,7 @@ public class TwoListsPanel<T> extends JPanel {
     leftConstraints.setX(Spring.constant(5));
     leftConstraints.setY(Spring.constant(5));
 
-    final Constraints moveRightConstraints = layout.getConstraints(moveRightButton);
+    final Constraints moveRightConstraints = layout.getConstraints(this.moveRightButton);
     final Spring buttonLeft = Spring.sum(leftConstraints.getWidth(),
       Spring.constant(10));
     moveRightConstraints.setX(buttonLeft);
@@ -104,14 +104,14 @@ public class TwoListsPanel<T> extends JPanel {
   }
 
   public void addLeftItems(final T... items) {
-    final DefaultListModel model = (DefaultListModel)leftList.getModel();
+    final DefaultListModel model = (DefaultListModel)this.leftList.getModel();
     for (final T item : items) {
       model.addElement(item);
     }
   }
 
   public void addRightItems(final T... items) {
-    final DefaultListModel model = (DefaultListModel)rightList.getModel();
+    final DefaultListModel model = (DefaultListModel)this.rightList.getModel();
     for (final T item : items) {
       model.addElement(item);
     }
@@ -124,7 +124,7 @@ public class TwoListsPanel<T> extends JPanel {
     list.setLayoutOrientation(JList.VERTICAL);
     list.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     list.addListSelectionListener(new InvokeMethodListSelectionListener(this,
-      "updateSelection"));
+        "updateSelection"));
     // list.setPreferredSize(new Dimension(300, 600));
     return list;
   }
@@ -140,16 +140,16 @@ public class TwoListsPanel<T> extends JPanel {
   }
 
   public void moveSelectedLeft() {
-    moveSelected(rightList, leftList);
+    moveSelected(this.rightList, this.leftList);
   }
 
   public void moveSelectedRight() {
-    moveSelected(rightList, leftList);
+    moveSelected(this.rightList, this.leftList);
   }
 
   public void updateSelection() {
-    moveRightButton.setEnabled(leftList.getSelectedIndex() != -1);
-    moveLeftButton.setEnabled(rightList.getSelectedIndex() != -1);
+    this.moveRightButton.setEnabled(this.leftList.getSelectedIndex() != -1);
+    this.moveLeftButton.setEnabled(this.rightList.getSelectedIndex() != -1);
   }
 
 }

@@ -35,13 +35,14 @@ public class ToolBar extends JToolBar {
 
   public JButton addButton(final AbstractAction action) {
     final JButton button = action.createButton();
+    button.setBorderPainted(false);
     this.groups.addComponent(this, button);
     return button;
   }
 
   public JButton addButton(final String groupName, final AbstractAction action) {
     final JButton button = action.createButton();
-    button.setAction(action);
+    button.setBorderPainted(false);
     this.groups.addComponent(this, groupName, button);
     return button;
   }
@@ -49,7 +50,7 @@ public class ToolBar extends JToolBar {
   public JButton addButton(final String groupName, final int index,
     final AbstractAction action) {
     final JButton button = action.createButton();
-    button.setAction(action);
+    button.setBorderPainted(false);
     this.groups.addComponent(this, groupName, index, button);
     return button;
   }
@@ -142,6 +143,7 @@ public class ToolBar extends JToolBar {
     action.setEnableCheck(enableCheck);
 
     final JToggleButton button = action.createToggleButton();
+    button.setBorderPainted(false);
     this.groups.addComponent(this, groupName, index, button);
     final ButtonGroup buttonGroup = getButtonGroup(groupName);
     buttonGroup.add(button);

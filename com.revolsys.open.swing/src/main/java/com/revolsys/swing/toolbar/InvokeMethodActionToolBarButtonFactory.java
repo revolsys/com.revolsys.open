@@ -9,7 +9,7 @@ import javax.swing.JToggleButton;
 import com.revolsys.swing.action.InvokeMethodAction;
 
 public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction
-  implements ToolBarButtonFactory {
+implements ToolBarButtonFactory {
   private static final long serialVersionUID = -5626990626102421865L;
 
   private boolean checkBox;
@@ -113,7 +113,7 @@ public class InvokeMethodActionToolBarButtonFactory extends InvokeMethodAction
       final JToggleButton button = new JToggleButton(this);
       return button;
     } else {
-      final JButton button = new JButton(this);
+      final JButton button = createButton();
       return button;
     }
   }
