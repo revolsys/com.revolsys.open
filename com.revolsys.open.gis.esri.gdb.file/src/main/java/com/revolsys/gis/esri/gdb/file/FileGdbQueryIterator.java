@@ -20,6 +20,7 @@ import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.util.CollectionUtil;
 
 public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
@@ -77,7 +78,11 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     this.typePath = typePath;
     this.recordDefinition = recordStore.getRecordDefinition(typePath);
     this.table = recordStore.getTable(typePath);
-    this.fields = fields;
+    if ("*".equals(fields)) {
+      this.fields = CollectionUtil.toString(this.recordDefinition.getFieldNames());
+    } else {
+      this.fields = fields;
+    }
     this.sql = sql;
     setBoundingBox(boundingBox);
     this.recordFactory = recordStore.getRecordFactory();
