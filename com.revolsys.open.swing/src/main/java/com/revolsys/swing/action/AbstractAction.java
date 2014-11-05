@@ -35,6 +35,7 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     final CheckBoxMenuItem menuItem = new CheckBoxMenuItem(this);
     final Icon disabledIcon = getDisabledIcon();
     menuItem.setDisabledIcon(disabledIcon);
+    menuItem.setEnabled(isEnabled());
     return menuItem;
   }
 
@@ -43,6 +44,8 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
 
     final Icon disabledIcon = getDisabledIcon();
     menuItem.setDisabledIcon(disabledIcon);
+    final boolean enabled = isEnabled();
+    menuItem.setEnabled(enabled);
     return menuItem;
   }
 
@@ -101,7 +104,7 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   @Override
   public boolean isEnabled() {
     if (this.enableCheck != null) {
-      this.enableCheck.isEnabled();
+      return this.enableCheck.isEnabled();
     }
     return super.isEnabled();
   }
