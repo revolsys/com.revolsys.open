@@ -267,6 +267,18 @@ public final class CollectionUtil {
     }
   }
 
+  public static boolean getBool(final Map<String, ? extends Object> map,
+    final String name, final boolean defaultValue) {
+    final Object value = get(map, name);
+    if (value == null) {
+      return defaultValue;
+    } else if (value instanceof Boolean) {
+      return (Boolean)value;
+    } else {
+      return Boolean.parseBoolean(value.toString());
+    }
+  }
+
   public static Boolean getBoolean(final Map<String, ? extends Object> map,
     final String name) {
     final Object value = get(map, name);
@@ -631,11 +643,11 @@ public final class CollectionUtil {
                 }
               }
             }
-            break;
+          break;
 
           default:
             buffer.append(c);
-            break;
+          break;
         }
       }
       return buffer.toString();
@@ -659,7 +671,7 @@ public final class CollectionUtil {
   public static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
     final Map<K, V> map) {
     final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(
-        map);
+      map);
     final Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
     sortedMap.putAll(map);
     return new LinkedHashMap<K, V>(sortedMap);
