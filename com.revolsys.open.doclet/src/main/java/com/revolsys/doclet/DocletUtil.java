@@ -9,10 +9,11 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.util.StringUtils;
+
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
-import com.revolsys.util.Property;
 import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.AnnotationTypeDoc;
 import com.sun.javadoc.ClassDoc;
@@ -152,7 +153,7 @@ public class DocletUtil {
       if (qualifiedTypeName.startsWith(packagePrefix)) {
         final String baseUrl = entry.getValue();
         final String url = baseUrl + qualifiedTypeName.replaceAll("\\.", "/")
-            + ".html?is-external=true";
+          + ".html?is-external=true";
         return url;
       }
     }
@@ -187,19 +188,21 @@ public class DocletUtil {
     writer.element(HtmlUtil.TITLE, docTitle);
     HtmlUtil.serializeCss(
       writer,
-        "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables_themeroller.css");
+        "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/jquery-ui.css");
     HtmlUtil.serializeCss(
       writer,
-        "https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/cupertino/jquery-ui.css");
+        "https://cdn.datatables.net/plug-ins/9dcbecd42ad/integration/jqueryui/dataTables.jqueryui.css");
     HtmlUtil.serializeCss(writer, "prettify.css");
     HtmlUtil.serializeCss(writer, "javadoc.css");
     HtmlUtil.serializeScriptLink(writer,
-        "https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js");
+      "https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js");
     HtmlUtil.serializeScriptLink(writer,
-        "https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js");
+      "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js");
+    HtmlUtil.serializeScriptLink(writer,
+      "https://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js");
     HtmlUtil.serializeScriptLink(
       writer,
-        "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js");
+        "https://cdn.datatables.net/plug-ins/9dcbecd42ad/integration/jqueryui/dataTables.jqueryui.js");
     HtmlUtil.serializeScriptLink(writer, "prettify.js");
     HtmlUtil.serializeScriptLink(writer, "javadoc.js");
     writer.endTagLn(HtmlUtil.HEAD);
@@ -209,8 +212,8 @@ public class DocletUtil {
     final ClassDoc classDoc = type.asClassDoc();
     final ClassDoc annotationDoc = type.asAnnotationTypeDoc();
     final boolean included = annotationDoc != null
-        && annotationDoc.isIncluded() || classDoc != null
-        && classDoc.isIncluded();
+      && annotationDoc.isIncluded() || classDoc != null
+      && classDoc.isIncluded();
     return included;
   }
 
@@ -227,7 +230,7 @@ public class DocletUtil {
 
   public static void link(final XmlWriter writer, final String url,
     final String label, final boolean code) {
-    final boolean hasUrl = Property.hasValue(url);
+    final boolean hasUrl = StringUtils.hasText(url);
     if (hasUrl) {
       writer.startTag(HtmlUtil.A);
       writer.attribute(HtmlUtil.ATTR_HREF, url);
@@ -253,22 +256,22 @@ public class DocletUtil {
       if (i < 0) {
         return text;
       } else {
-        final StringBuilder StringBuilder = new StringBuilder();
+        final StringBuffer stringbuffer = new StringBuffer();
         int k = 0;
         do {
           final int j = lowerText.indexOf("{@docroot}", k);
           if (j < 0) {
-            StringBuilder.append(text.substring(k));
+            stringbuffer.append(text.substring(k));
             break;
           }
-          StringBuilder.append(text.substring(k, j));
+          stringbuffer.append(text.substring(k, j));
           k = j + 10;
-          StringBuilder.append("./");
+          stringbuffer.append("./");
           if ("./".length() > 0 && k < text.length() && text.charAt(k) != '/') {
-            StringBuilder.append("/");
+            stringbuffer.append("/");
           }
         } while (true);
-        return StringBuilder.toString();
+        return stringbuffer.toString();
       }
     }
   }
@@ -280,11 +283,11 @@ public class DocletUtil {
       final boolean code = !name.equalsIgnoreCase("@linkplain");
       String label = seeTag.label();
 
-      final StringBuilder StringBuilder = new StringBuilder();
+      final StringBuffer stringbuffer = new StringBuffer();
 
       final String seeTagText = replaceDocRootDir(seeTag.text());
       if (seeTagText.startsWith("<") || seeTagText.startsWith("\"")) {
-        StringBuilder.append(seeTagText);
+        stringbuffer.append(seeTagText);
         writer.write(seeTagText);
       } else {
         final ClassDoc referencedClass = seeTag.referencedClass();
@@ -294,7 +297,7 @@ public class DocletUtil {
           final PackageDoc packagedoc = seeTag.referencedPackage();
           if (packagedoc != null && packagedoc.isIncluded()) {
             final String packageName = packagedoc.name();
-            if (!Property.hasValue(label)) {
+            if (!StringUtils.hasText(label)) {
               label = packageName;
             }
             link(writer, "#" + packageName, label, code);
@@ -303,15 +306,15 @@ public class DocletUtil {
             // String s9 = getCrossPackageLink(referencedClassName);
             // String s8;
             // if (s9 != null)
-            // StringBuilder.append(getHyperLink(s9, "", s1.length() != 0 ? s1
+            // stringbuffer.append(getHyperLink(s9, "", s1.length() != 0 ? s1
             // : s3, false));
             // else if ((s8 = getCrossClassLink(referencedClassName,
             // referencedMemberName, s1, false, "", !plainLink)) != null) {
-            // StringBuilder.append(s8);
+            // stringbuffer.append(s8);
             // } else {
             // configuration.getDocletSpecificMsg().warning(seeTag.position(),
             // "doclet.see.class_or_package_not_found", name, s2);
-            // StringBuilder.append(s1.length() != 0 ? s1 : s3);
+            // stringbuffer.append(s1.length() != 0 ? s1 : s3);
             // }
           }
         } else {
@@ -321,7 +324,7 @@ public class DocletUtil {
             url = "#" + className;
           } else {
             url = getExternalUrl(className);
-            if (!Property.hasValue(url)) {
+            if (!StringUtils.hasText(url)) {
               label = className;
             }
           }
@@ -330,9 +333,9 @@ public class DocletUtil {
               if (referencedMemberName.indexOf('(') < 0) {
                 final ExecutableMemberDoc executableDoc = (ExecutableMemberDoc)referencedMember;
                 referencedMemberName = referencedMemberName
-                    + executableDoc.signature();
+                  + executableDoc.signature();
               }
-              if (Property.hasValue(referencedMemberName)) {
+              if (StringUtils.hasText(referencedMemberName)) {
                 label = referencedMemberName;
               } else {
                 label = seeTagText;
@@ -340,13 +343,13 @@ public class DocletUtil {
             }
             if (referencedClass.isIncluded()) {
               url += "." + referencedMemberName;
-            } else if (Property.hasValue(url)) {
+            } else if (StringUtils.hasText(url)) {
               url += "#" + referencedMemberName;
             } else {
               label = referencedMember.toString();
             }
           }
-          if (!Property.hasValue(label)) {
+          if (!StringUtils.hasText(label)) {
             label = referencedClass.name();
           }
           link(writer, url, label, code);
@@ -446,6 +449,6 @@ public class DocletUtil {
   static {
     addPackageUrl("java.", "http://docs.oracle.com/javase/6/docs/api/");
     addPackageUrl("com.revolsys.jts.",
-        "http://tsusiatsoftware.net/jts/javadoc/");
+      "http://tsusiatsoftware.net/jts/javadoc/");
   }
 }
