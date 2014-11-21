@@ -218,6 +218,9 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     this.keySerializers.put(keySerializer.getName(), keySerializer);
   }
 
+  protected void addListMenuItems(final Menu menu, final String prefix) {
+  }
+
   public void addMenuElement(final ElementContainer container, final Menu menu) {
     if (menu.getMenus().size() > 0) {
       final MenuElement actionMenuElement = new MenuElement(menu, "actionMenu");
@@ -461,6 +464,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String prefix = pageName.replaceAll("[lL]ist$", "");
     final Menu actionMenu = new Menu();
     addMenuItem(actionMenu, prefix, "add", "Add", "_top");
+    addListMenuItems(actionMenu, prefix);
     addMenuElement(container, actionMenu);
 
     return container;

@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
@@ -103,6 +104,10 @@ public abstract class Field extends Element {
 
   public <T> T getValue() {
     return (T)this.value;
+  }
+
+  public <T> T getValue(final Class<T> valueClass) {
+    return StringConverterRegistry.toObject(valueClass, getValue());
   }
 
   public boolean hasValidationErrors() {
