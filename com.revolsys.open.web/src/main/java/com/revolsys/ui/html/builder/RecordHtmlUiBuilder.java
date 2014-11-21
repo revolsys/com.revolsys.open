@@ -1,5 +1,6 @@
 package com.revolsys.ui.html.builder;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -97,24 +98,31 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
 
   protected Map<String, Object> createDataTableMap(
     final HttpServletRequest request, final String pageName, final Query query) {
-    final String search = request.getParameter("sSearch");
-    if (Property.hasValue(search)) {
-      final List<KeySerializer> serializers = getSerializers(pageName, "list");
-      final Or or = new Or();
-      final int numSortColumns = HttpServletUtils.getIntegerParameter(request,
-          "iColumns");
-      for (int i = 0; i < numSortColumns; i++) {
-        if (HttpServletUtils.getBooleanParameter(request, "bSearchable_" + i)) {
-          final KeySerializer serializer = serializers.get(i);
-          final String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
-          or.add(Q.iLike("T." + columnName, search));
+    final String search = request.getParameter("search[value]");
+    final List<String> columnNames = new ArrayList<>();
+    final List<KeySerializer> serializers = getSerializers(pageName, "list");
+    final Or or = new Or();
+    for (int i = 0;; i++) {
+      final String name = request.getParameter("columns[" + i + "][name]");
+      if (Property.hasValue(name)) {
+        final KeySerializer serializer = serializers.get(i);
+        final String columnName = JavaBeanUtil.getFirstName(serializer.getKey());
+        columnNames.add(columnName);
+        if (Property.hasValue(search)) {
+          if (HttpServletUtils.getBooleanParameter(request, "columns[" + i
+            + "][searchable]")) {
+            or.add(Q.iLike("T." + columnName, search));
+          }
         }
-      }
-      if (!or.isEmpty()) {
-        query.and(or);
+      } else {
+        break;
       }
     }
-    final Map<String, Boolean> orderBy = getDataTableSortOrder(request);
+    if (!or.isEmpty()) {
+      query.and(or);
+    }
+    final Map<String, Boolean> orderBy = getDataTableSortOrder(columnNames,
+      request);
     query.setOrderBy(orderBy);
 
     try (
@@ -173,8 +181,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     this.recordStore.insert(object);
   }
 
-  protected boolean isPropertyUnique(final Record object,
-    final String fieldName) {
+  protected boolean isPropertyUnique(final Record object, final String fieldName) {
     final String value = object.getValue(fieldName);
     final RecordStore recordStore = getRecordStore();
     final RecordDefinition recordDefinition = recordStore.getRecordDefinition(this.tableName);

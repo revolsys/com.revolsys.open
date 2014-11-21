@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
+import oracle.jdbc.OracleDriver;
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.net.jdbc.nl.NLParamParser;
 
@@ -24,7 +25,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.jdbc.io.JdbcDatabaseFactory;
+import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
@@ -37,7 +38,7 @@ jdbc:oracle:oci:@<tnsname>
 jdbc:oracle:oci:@<host>:<port>:<sid>
 jdbc:oracle:oci:@<host>:<port>/<service>
  */
-public class OracleDatabaseFactory implements JdbcDatabaseFactory {
+public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
   public static List<String> getTnsConnectionNames() {
     File tnsFile = new File(System.getProperty("oracle.net.tns_admin"),
       "tnsnames.ora");
@@ -108,51 +109,57 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
           "Unable to close data source", e);
       }
     }
+    super.closeDataSource(dataSource);
   }
 
   @Override
   public DataSource createDataSource(final Map<String, ? extends Object> config) {
-    try {
-      final Map<String, Object> newConfig = new HashMap<String, Object>(config);
-      final Properties cacheProperties = new Properties();
-      final String url = (String)newConfig.remove("url");
-      final String username = (String)newConfig.remove("username");
-      String password = (String)newConfig.remove("password");
-      password = PasswordUtil.decrypt(password);
-      addCacheProperty(newConfig, "minPoolSize", cacheProperties, "MinLimit",
-        0, DataTypes.INT);
-      addCacheProperty(newConfig, "maxPoolSize", cacheProperties, "MaxLimit",
-        10, DataTypes.INT);
-      addCacheProperty(newConfig, "inactivityTimeout", cacheProperties,
-        "InactivityTimeout", 300, DataTypes.INT);
-      addCacheProperty(newConfig, "waitTimeout", cacheProperties,
-        "ConnectionWaitTimeout", 1, DataTypes.INT);
-      addCacheProperty(newConfig, "validateConnection", cacheProperties,
-        "ValidateConnection", Boolean.TRUE, DataTypes.BOOLEAN);
+    if (isUseCommonsDbcp()) {
+      return super.createDataSource(config);
+    } else {
+      try {
+        final Map<String, Object> newConfig = new HashMap<String, Object>(
+          config);
+        final Properties cacheProperties = new Properties();
+        final String url = (String)newConfig.remove("url");
+        final String username = (String)newConfig.remove("username");
+        String password = (String)newConfig.remove("password");
+        password = PasswordUtil.decrypt(password);
+        addCacheProperty(newConfig, "minPoolSize", cacheProperties, "MinLimit",
+          0, DataTypes.INT);
+        addCacheProperty(newConfig, "maxPoolSize", cacheProperties, "MaxLimit",
+          10, DataTypes.INT);
+        addCacheProperty(newConfig, "inactivityTimeout", cacheProperties,
+          "InactivityTimeout", 300, DataTypes.INT);
+        addCacheProperty(newConfig, "waitTimeout", cacheProperties,
+          "ConnectionWaitTimeout", 1, DataTypes.INT);
+        addCacheProperty(newConfig, "validateConnection", cacheProperties,
+          "ValidateConnection", Boolean.TRUE, DataTypes.BOOLEAN);
 
-      final OracleDataSource dataSource = new OracleDataSource();
+        final OracleDataSource dataSource = new OracleDataSource();
 
-      dataSource.setConnectionCachingEnabled(true);
-      dataSource.setConnectionCacheProperties(cacheProperties);
+        dataSource.setConnectionCachingEnabled(true);
+        dataSource.setConnectionCacheProperties(cacheProperties);
 
-      for (final Entry<String, Object> property : newConfig.entrySet()) {
-        final String name = property.getKey();
-        final Object value = property.getValue();
-        try {
-          JavaBeanUtil.setProperty(dataSource, name, value);
-        } catch (final Throwable e) {
-          LoggerFactory.getLogger(OracleDatabaseFactory.class).debug(
-            "Unable to set Oracle data source property " + name, e);
+        for (final Entry<String, Object> property : newConfig.entrySet()) {
+          final String name = property.getKey();
+          final Object value = property.getValue();
+          try {
+            JavaBeanUtil.setProperty(dataSource, name, value);
+          } catch (final Throwable e) {
+            LoggerFactory.getLogger(OracleDatabaseFactory.class).debug(
+              "Unable to set Oracle data source property " + name, e);
+          }
         }
-      }
-      dataSource.setURL(url);
-      dataSource.setUser(username);
-      dataSource.setPassword(password);
+        dataSource.setURL(url);
+        dataSource.setUser(username);
+        dataSource.setPassword(password);
 
-      return dataSource;
-    } catch (final Throwable e) {
-      throw new IllegalArgumentException("Unable to create data source for "
-        + config, e);
+        return dataSource;
+      } catch (final Throwable e) {
+        throw new IllegalArgumentException("Unable to create data source for "
+          + config, e);
+      }
     }
   }
 
@@ -165,6 +172,16 @@ public class OracleDatabaseFactory implements JdbcDatabaseFactory {
   public JdbcRecordStore createRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
     return new OracleRecordStore(this, connectionProperties);
+  }
+
+  @Override
+  public String getConnectionValidationQuery() {
+    return "SELECT 1 FROM DUAL";
+  }
+
+  @Override
+  public String getDriverClassName() {
+    return OracleDriver.class.getName();
   }
 
   @Override

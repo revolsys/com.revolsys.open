@@ -86,6 +86,10 @@ div.simpleDataTable>div>table.data>tbody>tr:last-child>:last-child {
   border-bottom-right-radius: 6px;
 }
 
+div.dataTables_wrapper td.description {
+  white-space: normal;
+}
+
 table.dataTable>tbody {
   border-left: 1px solid #aed0ea;
   border-right: 1px solid #aed0ea;

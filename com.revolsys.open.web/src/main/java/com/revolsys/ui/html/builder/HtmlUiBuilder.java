@@ -114,7 +114,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public static boolean isDataTableCallback() {
     return HttpServletUtils.getParameter("_") != null
-      && HttpServletUtils.getParameter("callback") == null;
+        && HttpServletUtils.getParameter("callback") == null;
   }
 
   public static boolean isDataTableCallback(final HttpServletRequest request) {
@@ -357,24 +357,26 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     tableView.setNoRecordsMessgae(null);
 
     final Map<String, Object> tableParams = new LinkedHashMap<String, Object>();
-    tableParams.put("bJQueryUI", true);
-    tableParams.put("bAutoWidth", false);
-    tableParams.put("bScrollInfinite", true);
-    tableParams.put("bScrollCollapse", true);
+    tableParams.put("jQueryUI", true);
+    tableParams.put("stateSave", true);
+    tableParams.put("autoWidth", true);
+    tableParams.put("paging", false);
+    tableParams.put("scrollInfinite", true);
+    tableParams.put("scrollCollapse", true);
     final String scrollY = (String)parameters.get("scrollY");
     if (scrollY == null) {
-      tableParams.put("sScrollY", "200px");
+      tableParams.put("scrollY", "200px");
     } else {
-      tableParams.put("sScrollY", scrollY);
+      tableParams.put("scrollY", scrollY);
     }
     final String scrollX = (String)parameters.get("scrollX");
     if (scrollX == null) {
-      tableParams.put("sScrollX", "100%");
+      tableParams.put("scrollX", "true");
     } else {
-      tableParams.put("sScrollX", scrollX);
+      tableParams.put("scrollX", scrollX);
     }
-    tableParams.put("iDisplayLength", 50);
-    tableParams.put("aaSorting", getListSortOrder(pageName));
+    tableParams.put("displayLength", 50);
+    tableParams.put("order", getListSortOrder(pageName));
 
     Boolean serverSide = (Boolean)parameters.get("serverSide");
     final String ajaxSource = (String)parameters.get("ajaxSource");
@@ -383,10 +385,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         serverSide = true;
       }
 
-      tableParams.put("iDeferLoading", parameters.get("deferLoading"));
-      tableParams.put("bProcessing", false);
-      tableParams.put("bServerSide", serverSide);
-      tableParams.put("sAjaxSource", ajaxSource);
+      tableParams.put("deferLoading", parameters.get("deferLoading"));
+      tableParams.put("processing", false);
+      tableParams.put("serverSide", serverSide);
+      tableParams.put("ajax", ajaxSource);
     } else if (serverSide == null) {
       serverSide = false;
     }
@@ -395,36 +397,36 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     int i = 0;
     for (final KeySerializer serializer : serializers) {
       final Map<String, Object> columnDef = new LinkedHashMap<String, Object>();
-      columnDef.put("aTargets", Arrays.asList(i));
-      columnDef.put("sName", serializer.getKey());
-      columnDef.put("sClass",
+      columnDef.put("targets", Arrays.asList(i));
+      columnDef.put("name", serializer.getKey());
+      columnDef.put("className",
         serializer.getKey().replaceAll("[^A-Za-z0-9]", "_"));
-      columnDef.put("sTitle", serializer.getLabel());
+      columnDef.put("title", serializer.getLabel());
 
       final Boolean sortable = serializer.getProperty("sortable");
       if (sortable != null) {
-        columnDef.put("bSortable", sortable);
+        columnDef.put("orderable", sortable);
       }
 
       final Boolean searchable = serializer.getProperty("searchable");
       if (searchable != null) {
-        columnDef.put("bSearchable", searchable);
+        columnDef.put("searchable", searchable);
       }
 
       final Boolean visible = serializer.getProperty("visible");
       if (visible != null) {
-        columnDef.put("bVisible", visible);
+        columnDef.put("visible", visible);
       }
       final String width = serializer.getWidth();
       if (width != null) {
-        columnDef.put("sWidth", width);
+        columnDef.put("width", width);
       }
 
       columnDefs.add(columnDef);
       i++;
     }
     if (!columnDefs.isEmpty()) {
-      tableParams.put("aoColumnDefs", columnDefs);
+      tableParams.put("columnDefs", columnDefs);
     }
     Number scrollYPercent = (Number)parameters.get("scrollYPercent");
     if (scrollYPercent == null) {
@@ -437,14 +439,10 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final Script script = new Script();
     String jsonMap = JsonMapIoFactory.toString(tableParams);
     jsonMap = jsonMap.substring(0, jsonMap.length() - 1)
-      + ",\"fnCreatedRow\": function( row, data, dataIndex ) {refreshButtons(row);}"
-      + ",\"fnInitComplete\": function() {this.fnAdjustColumnSizing(false);}";
-    // if (serverSide) {
-    // jsonMap +=
-    // ",\"fnServerData\": function ( sSource, aoData, fnCallback ) {$.ajax( {'dataType': 'json','type': 'POST','url': sSource,'data': aoData,'success': fnCallback} );}";
-    // }
+        + ",\"createdRow\": function( row, data, dataIndex ) {refreshButtons(row);}"
+        + ",\"initComplete\": function() {$(this).DataTable().columns.adjust();}";
     jsonMap += "}";
-    final StringBuilder scriptBody = new StringBuilder();
+    final StringBuffer scriptBody = new StringBuffer();
     scriptBody.append("$(document).ready(function() {\n");
     scriptBody.append("  var tableDiv = $('#");
     scriptBody.append(tableId);
@@ -455,7 +453,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     scriptBody.append("  tableShowEvents(table,");
     scriptBody.append(scrollYPercent);
     scriptBody.append(");\n");
-    scriptBody.append("$(window).bind('resize', function () {table.fnAdjustColumnSizing();} );");
+    scriptBody.append("$(window).bind('resize', function () {$(table).DataTable().columns.adjust();} );");
     scriptBody.append("});");
     script.setContent(scriptBody.toString());
     final ElementContainer container = new ElementContainer(tableView, script);
@@ -582,7 +580,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final ResultPager<? extends Object> pager, final String pageName) {
     try {
       int pageSize = HttpServletUtils.getIntegerParameter(request,
-        "iDisplayLength");
+          "iDisplayLength");
       if (pageSize < 0) {
         pageSize = this.defaultPageSize;
       } else if (pageSize == 0) {
@@ -590,7 +588,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       }
 
       final int recordNumber = HttpServletUtils.getIntegerParameter(request,
-        "iDisplayStart");
+          "iDisplayStart");
       final int pageNumber = (int)Math.floor(recordNumber / (double)pageSize) + 1;
       pager.setPageNumberAndSize(pageSize, pageNumber);
 
@@ -632,7 +630,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       serializers);
     model.setObject(object);
     final DetailView detailView = new DetailView(model, "objectView "
-      + this.typeName);
+        + this.typeName);
     return new ElementContainer(detailView);
   }
 
@@ -726,7 +724,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       + "').submit()"));
 
     final MenuElement actionMenuElement = new MenuElement(actionMenu,
-      "actionMenu");
+        "actionMenu");
     final ElementContainer view = new ElementContainer(form, actionMenuElement);
     final TabElementContainer tabs = new TabElementContainer();
     tabs.add(title, view);
@@ -734,7 +732,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public Element createObjectEditPage(final T object, final String prefix)
-    throws IOException, ServletException {
+      throws IOException, ServletException {
     if (object == null) {
       throw new PageNotFoundException();
     } else {
@@ -782,7 +780,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         + "').submit()"));
 
       final MenuElement actionMenuElement = new MenuElement(actionMenu,
-        "actionMenu");
+          "actionMenu");
       final ElementContainer view = new ElementContainer(form,
         actionMenuElement);
       final TabElementContainer tabs = new TabElementContainer();
@@ -965,34 +963,20 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   }
 
   public Map<String, Boolean> getDataTableSortOrder(
-    final HttpServletRequest request) {
-    final Map<String, Boolean> sortOrder = new LinkedHashMap<String, Boolean>();
-    final String sColumns = request.getParameter("sColumns");
-    if (sColumns != null) {
-      final String[] columnNames = sColumns.split(",");
-      final String iSortingCols = request.getParameter("iSortingCols");
-      final int numSortColumns = Integer.parseInt(iSortingCols);
-      for (int i = 0; i < numSortColumns; i++) {
-        int sortColumn;
-        try {
-          final String sSortCol = request.getParameter("iSortCol_" + i);
-          sortColumn = Integer.valueOf(sSortCol);
-        } catch (final Throwable t) {
-          sortColumn = 0;
-        }
-        String columnName;
-        if (sortColumn < columnNames.length) {
-          columnName = columnNames[sortColumn];
-        } else {
-          columnName = columnNames[0];
-        }
-        columnName = JavaBeanUtil.getFirstName(columnName);
-        final String sSortDir = request.getParameter("sSortDir_" + i);
-        final Boolean sortDir = "asc".equalsIgnoreCase(sSortDir);
+    final List<String> columnNames, final HttpServletRequest request) {
+    final Map<String, Boolean> sortOrder = new LinkedHashMap<>();
+    for (int i = 0;; i++) {
+      final String columnIndex = request.getParameter("order[" + i
+        + "][column]");
+      final String direction = request.getParameter("order[" + i + "][dir]");
+      if (Property.hasValue(columnIndex) && Property.hasValue(direction)) {
+        final String columnName = columnNames.get(Integer.valueOf(columnIndex));
+        final Boolean sortDir = "asc".equalsIgnoreCase(direction);
         sortOrder.put(columnName, sortDir);
+      } else {
+        return sortOrder;
       }
     }
-    return sortOrder;
   }
 
   public int getDefaultPageSize() {
@@ -1441,7 +1425,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
             uiBuilder = getBuilder(currentObject);
           } catch (final IllegalArgumentException e) {
             final String message = currentObject.getClass().getName()
-              + " does not have a property " + keyName;
+                + " does not have a property " + keyName;
             this.log.error(e.getMessage(), e);
             out.element(HtmlUtil.B, message);
             return;
@@ -1476,7 +1460,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
               }
             } catch (final IllegalArgumentException e) {
               final String message = currentObject.getClass().getName()
-                + " does not have a property " + key;
+                  + " does not have a property " + key;
               this.log.error(e.getMessage(), e);
               out.element(HtmlUtil.B, message);
               return;

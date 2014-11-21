@@ -11,17 +11,18 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
+import org.postgresql.Driver;
 import org.postgresql.ds.PGPoolingDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.jdbc.io.JdbcDatabaseFactory;
+import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
 
-public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
+public class PostgreSQLDatabaseFactory extends AbstractJdbcDatabaseFactory {
   private static final Logger LOG = LoggerFactory.getLogger(PostgreSQLDatabaseFactory.class);
 
   private static final String URL_REGEX = "jdbc:postgresql:(?://([^:]+)(?::(\\d+))?/)?(.+)";
@@ -42,47 +43,53 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
       final PGPoolingDataSource postgreSqlDataSource = (PGPoolingDataSource)dataSource;
       postgreSqlDataSource.close();
     }
+    super.closeDataSource(dataSource);
   }
 
   @Override
   public DataSource createDataSource(final Map<String, ? extends Object> config) {
-    final Map<String, Object> newConfig = new HashMap<String, Object>(config);
-    final String url = (String)newConfig.remove("url");
-    final String username = (String)newConfig.remove("username");
-    String password = (String)newConfig.remove("password");
-    password = PasswordUtil.decrypt(password);
-    final Matcher urlMatcher = URL_PATTERN.matcher(url);
-
-    final boolean matches = urlMatcher.matches();
-    if (matches) {
-      final String serverName = urlMatcher.group(1);
-      final String port = urlMatcher.group(2);
-      final String databaseName = urlMatcher.group(3);
-
-      final PGPoolingDataSource dataSource = new PGPoolingDataSource();
-      for (final Entry<String, Object> property : newConfig.entrySet()) {
-        final String name = property.getKey();
-        final Object value = property.getValue();
-        try {
-          JavaBeanUtil.setProperty(dataSource, name, value);
-        } catch (final Throwable t) {
-          LOG.debug("Unable to set data source property " + name + " = "
-              + value + " for " + url, t);
-        }
-      }
-
-      dataSource.setDatabaseName(databaseName);
-      dataSource.setUser(username);
-      dataSource.setPassword(password);
-      if (serverName != null) {
-        dataSource.setServerName(serverName);
-      }
-      if (port != null) {
-        dataSource.setPortNumber(Integer.parseInt(port));
-      }
-      return dataSource;
+    if (isUseCommonsDbcp()) {
+      return super.createDataSource(config);
     } else {
-      throw new IllegalArgumentException("Not a valid postgres JDBC URL " + url);
+      final Map<String, Object> newConfig = new HashMap<String, Object>(config);
+      final String url = (String)newConfig.remove("url");
+      final String username = (String)newConfig.remove("username");
+      String password = (String)newConfig.remove("password");
+      password = PasswordUtil.decrypt(password);
+      final Matcher urlMatcher = URL_PATTERN.matcher(url);
+
+      final boolean matches = urlMatcher.matches();
+      if (matches) {
+        final String serverName = urlMatcher.group(1);
+        final String port = urlMatcher.group(2);
+        final String databaseName = urlMatcher.group(3);
+
+        final PGPoolingDataSource dataSource = new PGPoolingDataSource();
+        for (final Entry<String, Object> property : newConfig.entrySet()) {
+          final String name = property.getKey();
+          final Object value = property.getValue();
+          try {
+            JavaBeanUtil.setProperty(dataSource, name, value);
+          } catch (final Throwable t) {
+            LOG.debug("Unable to set data source property " + name + " = "
+              + value + " for " + url, t);
+          }
+        }
+
+        dataSource.setDatabaseName(databaseName);
+        dataSource.setUser(username);
+        dataSource.setPassword(password);
+        if (serverName != null) {
+          dataSource.setServerName(serverName);
+        }
+        if (port != null) {
+          dataSource.setPortNumber(Integer.parseInt(port));
+        }
+        return dataSource;
+      } else {
+        throw new IllegalArgumentException("Not a valid postgres JDBC URL "
+          + url);
+      }
     }
   }
 
@@ -95,6 +102,11 @@ public class PostgreSQLDatabaseFactory implements JdbcDatabaseFactory {
   public JdbcRecordStore createRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
     return new PostgreSQLRecordStore(this, connectionProperties);
+  }
+
+  @Override
+  public String getDriverClassName() {
+    return Driver.class.getName();
   }
 
   @Override
