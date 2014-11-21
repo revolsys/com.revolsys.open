@@ -96,7 +96,7 @@ function refreshButtons(root) {
 
 function tableDraw(table, heightPercent) {
   if (heightPercent > 0) {
-    var settings = table.fnSettings();
+    var settings = $(table).DataTable().settings();
     var tableDiv = table.closest('div.table');
 
     var bodyDiv = tableDiv.closest('div.body');
@@ -114,8 +114,8 @@ function tableDraw(table, heightPercent) {
         if (newHeight < 50) {
           newHeight = 50;
         }
-        if (newHeight != settings.oScroll.sY) {
-          settings.oScroll.sY = newHeight;
+        if (newHeight != settings.scrollY) {
+          settings.scrollY = newHeight;
         }
       }
       var tabPanel = tableDiv.closest('div.ui-tabs-panel');
@@ -128,13 +128,13 @@ function tableDraw(table, heightPercent) {
         if (newHeight < 50) {
           newHeight = 50;
         }
-        if (newHeight != settings.oScroll.sY) {
-          settings.oScroll.sY = newHeight;
+        if (newHeight != settings.scrollY) {
+          settings.scrollY = newHeight;
         }
       }
     }
   }
-  table.fnDraw();
+  $(table).DataTable().draw();
 }
 
 function tableShowEvents(table, heightPercent) {
@@ -258,23 +258,23 @@ $(document).ready(
     });
     $('div.jqueryTabs').tabs({
       create : function(event, ui) {
-        var table = $.fn.dataTable.fnTables(true);
+        var table = $.fn.dataTable.tables();
         if ( table.length > 0 ) {
-          $(table).dataTable().fnAdjustColumnSizing(false);
+          $(table).DataTable().columns.adjust();
         }
         $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
       },
       activate : function(event, ui) {
-        var table = $.fn.dataTable.fnTables(true);
+        var table = $.fn.dataTable.tables();
         if ( table.length > 0 ) {
-          $(table).dataTable().fnAdjustColumnSizing(false);
+          $(table).DataTable().columns.adjust();
         }
         $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
       },
       load: function (event, ui) {
-        var table = $.fn.dataTable.fnTables(true);
+        var table = $.fn.dataTable.tables();
         if (table.length > 0) {
-          $(table).dataTable().fnAdjustColumnSizing(false);
+          $(table).DataTable().columns.adjust();
         }
       },
       beforeActivate: function (event, ui) {
@@ -294,18 +294,18 @@ $(document).ready(
     });
      
     $('div.objectList table').dataTable({
-      "bJQueryUI" : true,
-      "bPaginate" : false,
-      "bSort" : false
+      "jQueryUI" : true,
+      "paginate" : false,
+      "ordering" : false
     });
 
     $('div.simpleDataTable table').dataTable({
-      "bInfo" : false,
-      "bJQueryUI" : true,
-      "bPaginate" : false,
-      "bSort" : false,
-      "bFilter" : false,
-      "bAutoWidth": false
+      "info" : false,
+      "jQueryUI" : true,
+      "paginate" : false,
+      "ordering" : false,
+      "searching" : false,
+      "autoWidth": false
     });
 
     if (typeof jQuery.validator != "undefined") {

@@ -83,7 +83,7 @@ td p:last-child {
 
 td.actions form {
   display: inline;
-  margin-right: 0.5em;
+  margin-right: 5px;
 }
 
 div.body {
@@ -151,8 +151,8 @@ div.bodyContent {
 
 div.header {
   background: #d7ebf9
-    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
-    50% 50% repeat-x;
+  url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
+  50% 50% repeat-x;
   border: 2px solid #aed0ea;
   border-radius: 0.5em;
   color: #0046a0;
@@ -208,8 +208,8 @@ div.breadcrumb ul li a:hover {
 div.footer {
   clear: both;
   background: #d7ebf9
-    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
-    50% 50% repeat-x;
+  url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
+  50% 50% repeat-x;
   border: 2px solid #aed0ea;
   border-radius: 0.5em;
   color: #0046a0;
@@ -360,8 +360,8 @@ div.sideMenu div.title {
   border-top-left-radius: 0.4em;
   border-top-right-radius: 0.4em;
   background: #3baae3
-    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png)
-    50% 50% repeat-x;
+  url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png)
+  50% 50% repeat-x;
   color: #ffffff;
   font-weight: bold;
   padding: 0.2em 0.4em 0.2em 0.4em;
@@ -594,6 +594,18 @@ input.ui-button,.ui-button-text-only span.ui-button-text {
   padding: 0.2em 0.4em;
 }
 
+div.dataTables_wrapper td {
+  white-space: nowrap;
+}
+
+div.dataTables_wrapper td div,
+div.dataTables_wrapper td figure,
+div.dataTables_wrapper td ol,
+div.dataTables_wrapper td ul,
+div.dataTables_wrapper td p {
+  white-space: normal;
+}
+
 div.simpleDataTable>div div.fg-toolbar {
   padding: 0px;
   border: 0px;
@@ -637,10 +649,6 @@ div.simpleDataTable>div>table.data>tbody>tr:last-child>:last-child {
   border-bottom-right-radius: 6px;
 }
 
-table.dataTable {
-  max-width:100%;
-}
-
 table.dataTable>tbody {
   border-left: 1px solid #aed0ea;
   border-right: 1px solid #aed0ea;
@@ -649,15 +657,14 @@ table.dataTable>tbody {
 table.dataTable>tbody>tr.odd {
   background-color: #eeeeee;
 }
-
-table.dataTable thead th,table.dataTable tbody td {
-  padding: 2px 3px 2px 3px;
+table.dataTable thead th,
+table.dataTable tbody td {
+  padding: 1px 2px 1px 2px;
 }
 
 table.dataTable tbody td {
   border-right: 1px solid #dddddd;
 }
-
 div.ui-accordion {
   margin-bottom: 1em;
 }
@@ -773,7 +780,7 @@ div.tocMenu {
 }
 
 div.tocMenu div.title {
-  background: #3baae3 url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png) 50% 50% repeat-x;
+  background: #3baae3 url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png) 50% 50% repeat-x;
   color: #ffffff;
   font-weight: bold;
   padding: 0.2em 0.4em 0.2em 0.4em;
