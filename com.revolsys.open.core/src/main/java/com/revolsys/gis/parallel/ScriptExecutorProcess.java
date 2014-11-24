@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +32,7 @@ import com.revolsys.parallel.tools.ScriptExecutorRunnable;
 import com.revolsys.util.JexlUtil;
 
 public class ScriptExecutorProcess extends BaseInProcess<Record> implements
-BeanFactoryAware {
+  BeanFactoryAware {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorProcess.class);
 
   private final Map<String, Object> attributes = new HashMap<String, Object>();
@@ -72,7 +72,7 @@ BeanFactoryAware {
     try {
       final JexlContext context = new HashMapContext();
       final Map<String, Object> vars = new HashMap<String, Object>(
-        this.attributes);
+          this.attributes);
       vars.putAll(record);
       context.setVars(vars);
       final Map<String, Object> scriptParams = new HashMap<String, Object>();
@@ -144,7 +144,7 @@ BeanFactoryAware {
 
   @Override
   public void setBeanFactory(final BeanFactory beanFactory)
-      throws BeansException {
+    throws BeansException {
     this.attributes.putAll(ThreadSharedAttributes.getFields());
   }
 
@@ -157,7 +157,7 @@ BeanFactoryAware {
     if (this.executor == null) {
       this.executor = new ThreadPoolExecutor(
         Math.min(maxConcurrentScripts, 10), maxConcurrentScripts, 10,
-        TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+        TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
     }
   }
 
@@ -168,11 +168,11 @@ BeanFactoryAware {
       final String value = param.getValue();
       try {
         final Expression expression = JexlUtil.createExpression(value,
-            "#\\{([^\\}]+)\\}");
+          "#\\{([^\\}]+)\\}");
         this.expressions.put(key, expression);
       } catch (final Exception e) {
         throw new IllegalArgumentException("Expression not valid " + key + "="
-            + value);
+          + value);
       }
     }
   }

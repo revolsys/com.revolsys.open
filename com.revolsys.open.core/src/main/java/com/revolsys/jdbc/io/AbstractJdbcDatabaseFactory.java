@@ -14,7 +14,8 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
 
-public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory {
+public abstract class AbstractJdbcDatabaseFactory implements
+  JdbcDatabaseFactory {
 
   private boolean useCommonsDbcp = true;
 
@@ -45,9 +46,10 @@ public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory
       dataSource.setValidationQuery(getConnectionValidationQuery());
 
       final int minPoolSize = CollectionUtil.getInteger(config, "minPoolSize",
-        0);
+        -1);
       newConfig.remove("minPoolSize");
-      dataSource.setMaxIdle(minPoolSize);
+      dataSource.setMinIdle(minPoolSize);
+      dataSource.setMaxIdle(-1);
 
       final int maxPoolSize = CollectionUtil.getInteger(config, "maxPoolSize",
         10);
@@ -65,9 +67,10 @@ public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory
       dataSource.setTestOnBorrow(validateConnection);
 
       final int inactivityTimeout = CollectionUtil.getInteger(config,
-        "inactivityTimeout", 300);
+        "inactivityTimeout", 60);
       newConfig.remove("inactivityTimeout");
       dataSource.setMinEvictableIdleTimeMillis(inactivityTimeout * 1000);
+      dataSource.setTimeBetweenEvictionRunsMillis(inactivityTimeout * 1000);
 
       for (final Entry<String, Object> property : newConfig.entrySet()) {
         final String name = property.getKey();
