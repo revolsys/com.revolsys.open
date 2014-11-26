@@ -291,6 +291,16 @@ public final class CollectionUtil {
     }
   }
 
+  public static <K, V> int getCollectionSize(
+    final Map<K, ? extends Collection<V>> map, final K key) {
+    final Collection<V> values = map.get(key);
+    if (values == null) {
+      return 0;
+    } else {
+      return values.size();
+    }
+  }
+
   public static Double getDouble(final Map<String, ? extends Object> map,
     final String name) {
     final Object value = get(map, name);

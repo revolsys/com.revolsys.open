@@ -75,7 +75,7 @@ public class TableView extends Element {
       out.startTag(HtmlUtil.TABLE);
       out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
       out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
-      out.attribute(HtmlUtil.ATTR_CLASS, "data");
+      out.attribute(HtmlUtil.ATTR_CLASS, "data display cell-border");
       out.attribute(HtmlUtil.ATTR_WIDTH, this.width);
 
       serializeHeadings(out);

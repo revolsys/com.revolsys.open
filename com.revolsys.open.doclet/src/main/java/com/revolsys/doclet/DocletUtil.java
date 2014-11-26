@@ -186,25 +186,20 @@ public class DocletUtil {
   public static void head(final XmlWriter writer, final String docTitle) {
     writer.startTag(HtmlUtil.HEAD);
     writer.element(HtmlUtil.TITLE, docTitle);
-    HtmlUtil.serializeCss(
-      writer,
-        "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/jquery-ui.css");
-    HtmlUtil.serializeCss(
-      writer,
-        "https://cdn.datatables.net/plug-ins/9dcbecd42ad/integration/jqueryui/dataTables.jqueryui.css");
-    HtmlUtil.serializeCss(writer, "prettify.css");
-    HtmlUtil.serializeCss(writer, "javadoc.css");
-    HtmlUtil.serializeScriptLink(writer,
-      "https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js");
-    HtmlUtil.serializeScriptLink(writer,
-      "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js");
-    HtmlUtil.serializeScriptLink(writer,
-      "https://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js");
-    HtmlUtil.serializeScriptLink(
-      writer,
-        "https://cdn.datatables.net/plug-ins/9dcbecd42ad/integration/jqueryui/dataTables.jqueryui.js");
-    HtmlUtil.serializeScriptLink(writer, "prettify.js");
-    HtmlUtil.serializeScriptLink(writer, "javadoc.js");
+    for (final String url : Arrays.asList(
+      "https://code.jquery.com/ui/1.11.2/themes/cupertino/jquery-ui.css",
+      "https://cdn.datatables.net/1.10.4/css/jquery.dataTables.min.css",
+      "prettify.css", "javadoc.css")) {
+      HtmlUtil.serializeCss(writer, url);
+
+    }
+    for (final String url : Arrays.asList(
+      "https://code.jquery.com/jquery-1.11.1.min.js",
+      "https://code.jquery.com/ui/1.11.2/jquery-ui.min.js",
+      "https://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js",
+      "prettify.js", "javadoc.js")) {
+      HtmlUtil.serializeScriptLink(writer, url);
+    }
     writer.endTagLn(HtmlUtil.HEAD);
   }
 

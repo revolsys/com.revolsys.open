@@ -125,10 +125,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
       request);
     query.setOrderBy(orderBy);
 
-    try (
-        final ResultPager<Record> pager = getResultPager(query)) {
-      return createDataTableMap(request, pager, pageName);
-    }
+    return createDataTableMap(request, getRecordStore(), query, pageName);
   }
 
   public Object createDataTableMap(final String pageName,

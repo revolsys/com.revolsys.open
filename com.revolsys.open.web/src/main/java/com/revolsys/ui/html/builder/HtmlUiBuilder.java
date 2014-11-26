@@ -40,7 +40,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 
 import com.revolsys.collection.ResultPager;
+import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.io.Reader;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.spring.InvokeMethodAfterCommit;
@@ -360,15 +363,12 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     tableView.setNoRecordsMessgae(null);
 
     final Map<String, Object> tableParams = new LinkedHashMap<String, Object>();
-    tableParams.put("jQueryUI", true);
     tableParams.put("stateSave", true);
     tableParams.put("autoWidth", true);
-    tableParams.put("paging", false);
-    tableParams.put("scrollInfinite", true);
-    tableParams.put("scrollCollapse", true);
+    tableParams.put("dom", "frtiS");
     final String scrollY = (String)parameters.get("scrollY");
     if (scrollY == null) {
-      tableParams.put("scrollY", "200px");
+      tableParams.put("scrollY", "300px");
     } else {
       tableParams.put("scrollY", scrollY);
     }
@@ -378,7 +378,6 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     } else {
       tableParams.put("scrollX", scrollX);
     }
-    tableParams.put("displayLength", 50);
     tableParams.put("order", getListSortOrder(pageName));
 
     Boolean serverSide = (Boolean)parameters.get("serverSide");
@@ -388,14 +387,14 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         serverSide = true;
       }
 
-      tableParams.put("deferLoading", parameters.get("deferLoading"));
-      tableParams.put("processing", false);
       tableParams.put("serverSide", serverSide);
       tableParams.put("ajax", ajaxSource);
     } else if (serverSide == null) {
       serverSide = false;
     }
 
+    tableParams.put("scroller",
+      Collections.singletonMap("loadingIndicator", true));
     final List<Map<String, Object>> columnDefs = new ArrayList<Map<String, Object>>();
     int i = 0;
     for (final KeySerializer serializer : serializers) {
@@ -574,58 +573,51 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     }
 
     final Map<String, Object> response = new LinkedHashMap<String, Object>();
-    response.put("aaData", rows);
+    response.put("data", rows);
     return response;
 
   }
 
   public Map<String, Object> createDataTableMap(
-    final HttpServletRequest request,
-    final ResultPager<? extends Object> pager, final String pageName) {
-    try {
-      int pageSize = HttpServletUtils.getIntegerParameter(request,
-          "iDisplayLength");
-      if (pageSize < 0) {
-        pageSize = this.defaultPageSize;
-      } else if (pageSize == 0) {
-        pageSize = this.defaultPageSize;
+    final HttpServletRequest request, final RecordStore recordStore,
+    Query query, final String pageName) {
+    final int numRecords = recordStore.getRowCount(query);
+    int recordCount = 50;
+    final String lengthString = request.getParameter("length");
+    if (Property.hasValue(lengthString)) {
+      if (!"NAN".equalsIgnoreCase(lengthString)) {
+        try {
+          recordCount = Integer.valueOf(lengthString);
+        } catch (final Throwable e) {
+        }
       }
+    }
 
-      final int recordNumber = HttpServletUtils.getIntegerParameter(request,
-          "iDisplayStart");
-      final int pageNumber = (int)Math.floor(recordNumber / (double)pageSize) + 1;
-      pager.setPageNumberAndSize(pageSize, pageNumber);
+    final int offset = HttpServletUtils.getIntegerParameter(request, "start");
+    query = query.clone();
+    query.setOffset(offset);
+    query.setLimit(recordCount);
 
-      final List<KeySerializer> serializers = getSerializers(pageName, "list");
+    final List<KeySerializer> serializers = getSerializers(pageName, "list");
 
-      final List<List<String>> rows = new ArrayList<List<String>>();
-      for (final Object object : pager.getList()) {
+    final List<List<String>> rows = new ArrayList<>();
+    try (
+      Reader<Record> reader = recordStore.query(query)) {
+      for (final Record record : reader) {
         final List<String> row = new ArrayList<String>();
         for (final KeySerializer serializer : serializers) {
-          final String html = serializer.toString(object);
+          final String html = serializer.toString(record);
           row.add(html);
         }
         rows.add(row);
       }
-
-      final int numRecords = pager.getNumResults();
-
-      final Map<String, Object> response = new LinkedHashMap<String, Object>();
-      response.put("sEcho", request.getParameter("sEcho"));
-      response.put("iTotalRecords", numRecords);
-      response.put("iTotalDisplayRecords", numRecords);
-      response.put("aaData", rows);
-      return response;
-    } finally {
-      pager.close();
     }
-
-  }
-
-  public Map<String, Object> createDataTableMap(
-    final ResultPager<? extends Object> pager, final String pageName) {
-    final HttpServletRequest request = HttpServletUtils.getRequest();
-    return createDataTableMap(request, pager, pageName);
+    final Map<String, Object> response = new LinkedHashMap<String, Object>();
+    response.put("draw", HttpServletUtils.getIntegerParameter(request, "draw"));
+    response.put("recordsTotal", numRecords);
+    response.put("recordsFiltered", numRecords);
+    response.put("data", rows);
+    return response;
   }
 
   public ElementContainer createDetailView(final Object object,

@@ -51,60 +51,8 @@ div.simpleDataTable>div div.fg-toolbar {
   border: 0px;
 }
 
-div.simpleDataTable>div>table {
-  border: 1px solid #aed0ea;
-  border-collapse: inherit;
-  border-spacing: 0px;
-  padding: 0px;
-  border-radius: 6px;
-  margin-left: 0px;
-  width: auto;
-}
-
-div.simpleDataTable>div>table.data>thead>tr:first-child>th {
-  border-top-width: 0px;
-}
-
-div.simpleDataTable>div>table.data>thead>tr:first-child>th {
-  border-left-width: 0px;
-}
-
-div.simpleDataTable>div>table.data>thead>tr:first-child>:first-child {
-  border-top-left-radius: 6px;
-}
-
-div.simpleDataTable>div>table.data>thead>tr:first-child>:last-child {
-  border-top-right-radius: 6px;
-  border-right-width: 0px;
-}
-
-div.simpleDataTable>div>table.data>tbody>tr:last-child>:first-child {
-  border-bottom-left-radius: 6px;
-}
-
-div.simpleDataTable>div>table.data>tbody>tr:last-child>:last-child {
-  border-bottom-right-radius: 6px;
-}
-
 div.dataTables_wrapper td.description {
   white-space: normal;
-}
-
-table.dataTable>tbody {
-  border-left: 1px solid #aed0ea;
-  border-right: 1px solid #aed0ea;
-}
-
-table.dataTable>tbody>tr.odd {
-  background-color: #eeeeee;
-}
-
-table.dataTable thead th,table.dataTable tbody td {
-  padding: 0.2em 0.4em 0.2em 0.4em;
-}
-
-table.dataTable tbody td {
-  border-right: 1px solid #dddddd;
 }
 
 table td p:first-child {

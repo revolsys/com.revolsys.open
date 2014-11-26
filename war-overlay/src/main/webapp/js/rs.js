@@ -1,3 +1,4 @@
+
 function resizeHeight(iframe) {
   var body = $(iframe, window.top.document).contents().find('body');
   var newHeight = body.height() + 5;
@@ -134,7 +135,7 @@ function tableDraw(table, heightPercent) {
       }
     }
   }
-  $(table).DataTable().draw();
+  $(table).DataTable().columns.adjust();
 }
 
 function tableShowEvents(table, heightPercent) {
@@ -148,6 +149,8 @@ function tableShowEvents(table, heightPercent) {
     tabs.bind('tabsshow', function(event, ui) {
       if ($(ui.panel).find(table).length > 0) {
         tableDraw(table, heightPercent);
+      } else {
+        
       }
     });
 
@@ -207,176 +210,6 @@ function validateDecimalNumber(element, value, optional, min, max) {
   }
   return false;
 }
-
-$(document).ready(
-  function() {
-    $('html.lt-ie9').each(function() {
-      document.createElement('section');
-    });
-    addConfirmButton({
-      selector : 'button.delete',
-      icon : 'trash',
-      title : 'Confirm Delete',
-      message : 'Are you sure you want to delete this record?'
-    });
-    if (jQuery().jfilestyle) {
-      $(':file').jfilestyle({});
-      $(':file').each(function() {
-        var jfile = $(this);
-        var button = $('<label/>', {
-          click: function() {
-            jfile.jfilestyle('clear');
-            return false;
-          }
-        });
-        button.append('<i class="icon-remove-sign" />');
-        button.append('<span>Clear</span>');
-        $(this).next('div.jquery-filestyle').append(button);
-      });
-      $('div.jquery-filestyle label').button();
-    }
-    refreshButtons($(document));
-    $('div.collapsibleBox').each(function() {
-      var active;
-      if ($(this).hasClass('closed')) {
-        active = false;
-      } else {
-        active = 0;
-      }
-      $(this).accordion({
-        icons : {
-          header : "ui-icon-triangle-1-e",
-          headerSelected : "ui-icon-triangle-1-s"
-        },
-        collapsible : true,
-        active : active,
-        autoHeight : false,
-        change : function(event, ui) {
-          $('iframe.autoHeight', ui.newContent).iframeAutoHeight();
-        }
-      });
-    });
-    $('div.jqueryTabs').tabs({
-      create : function(event, ui) {
-        var table = $.fn.dataTable.tables();
-        if ( table.length > 0 ) {
-          $(table).DataTable().columns.adjust();
-        }
-        $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
-      },
-      activate : function(event, ui) {
-        var table = $.fn.dataTable.tables();
-        if ( table.length > 0 ) {
-          $(table).DataTable().columns.adjust();
-        }
-        $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
-      },
-      load: function (event, ui) {
-        var table = $.fn.dataTable.tables();
-        if (table.length > 0) {
-          $(table).DataTable().columns.adjust();
-        }
-      },
-      beforeActivate: function (event, ui) {
-        window.location.hash = ui.newPanel.selector;
-      },
-      heightStyle: "content"
-    });
- 
-    $(window).bind('hashchange', function() {
-      var hash = window.location.hash;
-      if (hash) {
-        var anchor = $('a.ui-tabs-anchor[href="' + hash + '"]');
-        anchor.click();
-        showParentsHash(hash);
-      }
-      window.location.hash = hash;
-    });
-     
-    $('div.objectList table').dataTable({
-      "jQueryUI" : true,
-      "paginate" : false,
-      "ordering" : false
-    });
-
-    $('div.simpleDataTable table').dataTable({
-      "info" : false,
-      "jQueryUI" : true,
-      "paginate" : false,
-      "ordering" : false,
-      "searching" : false,
-      "autoWidth": false
-    });
-
-    if (typeof jQuery.validator != "undefined") {
-      $('div.form').each(
-        function() {
-          var formWrapper = this;
-          var form = $('form', this);
-          var validator = form.bind("invalid-form.validate", function() {
-            $('div.errorContainer div.title ', formWrapper).html("The form contains errors. Update the highlighted fields to fix the errors.");
-          }).validate({
-            errorElement: "div",
-            errorContainer : $('div.errorContainer', formWrapper),
-            errorPlacement: function(error, element) {
-              error.insertBefore(element);
-              error.addClass('errorMessage');
-            },
-            highlight : function(element, errorClass, validClass) {
-              $(element).closest('div.fieldComponent').addClass('invalid');
-              $(element).addClass(errorClass).removeClass(validClass);
-              $(element.form).find("label[for=" + element.id + "]").addClass(
-                errorClass);
-              $('.tempError').hide();
-            },
-            unhighlight : function(element, errorClass, validClass) {
-              $(element).closest('div.fieldComponent').removeClass('invalid');
-              $(element).removeClass(errorClass).addClass(validClass);
-              $(element.form).find("label[for=" + element.id + "]").removeClass(
-                errorClass);
-              $('.tempError').hide();
-            }
-          });
-          if ($(formWrapper).hasClass('formInvalid')) {
-            validator.form();
-          }
-        }
-      );
-
-      jQuery.validator.addMethod("integer", function(value, element) {
-        return validateIntegerNumber(element, value, this.optional(element));
-      }, "Please enter a valid integer number.");
-  
-      jQuery.validator.addMethod("byte", function(value, element) {
-        return validateIntegerNumber(element, value, this.optional(element), -128, 127);
-      }, "Please enter a valid integer number -128 >=< 127.");
-  
-      jQuery.validator.addMethod("short", function(value, element) {
-        return validateIntegerNumber(element, value, this.optional(element), -32768, 32767);
-      }, "Please enter a valid integer number -32768 >=< 32767.");
-  
-      jQuery.validator.addMethod("int", function(value, element) {
-        return validateIntegerNumber(element, value, this.optional(element), -2147483648, 2147483647);
-      }, "Please enter a valid integer number -2147483648 >=< 2147483647.");
-  
-      jQuery.validator.addMethod("long", function(value, element) {
-        return validateIntegerNumber(element, value, this.optional(element), -9223372036854775808, 9223372036854775807);
-      }, "Please enter a valid integer number -9223372036854775808 >=< 9223372036854775807.");
-  
-      jQuery.validator.addMethod("number", function(value, element) {
-        return validateDecimalNumber(element, value, this.optional(element));
-      }, "Please enter a valid number.");
-  
-      jQuery.validator.addMethod("float", function(value, element) {
-        return validateDecimalNumber(element, value, this.optional(element));
-      }, "Please enter a valid float number.");
-  
-      jQuery.validator.addMethod("double", function(value, element) {
-        return validateDecimalNumber(element, value, this.optional(element));
-      }, "Please enter a valid double number.");
-    }
-    showParentsHash(window.location.hash);
-  });
 
 function clearTempErrorsOnChange() {
   $(':input').change(function() {
@@ -516,3 +349,179 @@ function createToc() {
   $(document).scroll(resize);
   resize();
 }
+
+$(document).ready(function() {
+    $('html.lt-ie9').each(function() {
+      document.createElement('section');
+    });
+    addConfirmButton({
+      selector : 'button.delete',
+      icon : 'trash',
+      title : 'Confirm Delete',
+      message : 'Are you sure you want to delete this record?'
+    });
+    if (jQuery().jfilestyle) {
+      $(':file').jfilestyle({});
+      $(':file').each(function() {
+        var jfile = $(this);
+        var button = $('<label/>', {
+          click: function() {
+            jfile.jfilestyle('clear');
+            return false;
+          }
+        });
+        button.append('<i class="icon-remove-sign" />');
+        button.append('<span>Clear</span>');
+        $(this).next('div.jquery-filestyle').append(button);
+      });
+      $('div.jquery-filestyle label').button();
+    }
+    refreshButtons($(document));
+    $('div.collapsibleBox').each(function() {
+      var active;
+      if ($(this).hasClass('closed')) {
+        active = false;
+      } else {
+        active = 0;
+      }
+      $(this).accordion({
+        icons : {
+          header : "ui-icon-triangle-1-e",
+          headerSelected : "ui-icon-triangle-1-s"
+        },
+        collapsible : true,
+        active : active,
+        autoHeight : false,
+        change : function(event, ui) {
+          $('iframe.autoHeight', ui.newContent).iframeAutoHeight();
+        }
+      });
+    });
+    $('div.jqueryTabs').tabs({
+      create : function(event, ui) {
+        var tables = $.fn.dataTable.tables();
+        if (tables.length > 0) {
+          $(tables).DataTable().columns.adjust();
+        }
+        $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
+      },
+      activate : function(event, ui) {
+        var tables = $.fn.dataTable.tables();
+        if (tables.length > 0) {
+          $(tables).DataTable().scroller().measure();
+          $(tables).DataTable().columns.adjust();
+        }
+        $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
+      },
+      load: function (event, ui) {
+        var tables = $.fn.dataTable.tables();
+        if (tables.length > 0) {
+          $(tables).DataTable().columns.adjust();
+        }
+      },
+      beforeActivate: function (event, ui) {
+        window.location.hash = ui.newPanel.selector;
+      },
+      heightStyle: "content"
+    });
+ 
+    $(window).bind('hashchange', function() {
+      var hash = window.location.hash;
+      if (hash) {
+        var anchor = $('a.ui-tabs-anchor[href="' + hash + '"]');
+        anchor.click();
+        showParentsHash(hash);
+      }
+      window.location.hash = hash;
+    });
+     
+    $('div.objectList table').addClass('display cell-border');
+    $('div.objectList table').dataTable({
+      "dom": "ft",
+      "ordering" : false
+    });
+
+    $('div.simpleDataTable table').addClass('display cell-border');
+    $('div.simpleDataTable table').dataTable({
+      "dom": "t",
+      "ordering" : false,
+      "autoWidth": false
+    });
+    
+    if (typeof jQuery.validator != "undefined") {
+      $('div.form').each(
+        function() {
+          var formWrapper = this;
+          var form = $('form', this);
+          var validator = form.bind("invalid-form.validate", function() {
+            $('div.errorContainer div.title ', formWrapper).html("The form contains errors. Update the highlighted fields to fix the errors.");
+          }).validate({
+            errorElement: "div",
+            errorContainer : $('div.errorContainer', formWrapper),
+            errorPlacement: function(error, element) {
+              error.insertBefore(element);
+              error.addClass('errorMessage');
+            },
+            highlight : function(element, errorClass, validClass) {
+              $(element).closest('div.fieldComponent').addClass('invalid');
+              $(element).addClass(errorClass).removeClass(validClass);
+              if (element.id) {
+                var label = $(element.form).find("label[for=" + element.id + "]");
+                if (label) {
+                  addClass(errorClass);
+                }
+              }
+              $('.tempError').hide();
+            },
+            unhighlight : function(element, errorClass, validClass) {
+              $(element).closest('div.fieldComponent').removeClass('invalid');
+              $(element).removeClass(errorClass).addClass(validClass);
+              if (element.id) {
+                var label = $(element.form).find("label[for=" + element.id + "]");
+                if (label) {
+                  removeClass(errorClass);
+                }
+              }
+              $('.tempError').hide();
+            }
+          });
+          if ($(formWrapper).hasClass('formInvalid')) {
+            validator.form();
+          }
+        }
+      );
+
+      jQuery.validator.addMethod("integer", function(value, element) {
+        return validateIntegerNumber(element, value, this.optional(element));
+      }, "Please enter a valid integer number.");
+  
+      jQuery.validator.addMethod("byte", function(value, element) {
+        return validateIntegerNumber(element, value, this.optional(element), -128, 127);
+      }, "Please enter a valid integer number -128 >=< 127.");
+  
+      jQuery.validator.addMethod("short", function(value, element) {
+        return validateIntegerNumber(element, value, this.optional(element), -32768, 32767);
+      }, "Please enter a valid integer number -32768 >=< 32767.");
+  
+      jQuery.validator.addMethod("int", function(value, element) {
+        return validateIntegerNumber(element, value, this.optional(element), -2147483648, 2147483647);
+      }, "Please enter a valid integer number -2147483648 >=< 2147483647.");
+  
+      jQuery.validator.addMethod("long", function(value, element) {
+        return validateIntegerNumber(element, value, this.optional(element), -9223372036854775808, 9223372036854775807);
+      }, "Please enter a valid integer number -9223372036854775808 >=< 9223372036854775807.");
+  
+      jQuery.validator.addMethod("number", function(value, element) {
+        return validateDecimalNumber(element, value, this.optional(element));
+      }, "Please enter a valid number.");
+  
+      jQuery.validator.addMethod("float", function(value, element) {
+        return validateDecimalNumber(element, value, this.optional(element));
+      }, "Please enter a valid float number.");
+  
+      jQuery.validator.addMethod("double", function(value, element) {
+        return validateDecimalNumber(element, value, this.optional(element));
+      }, "Please enter a valid double number.");
+    }
+    showParentsHash(window.location.hash);
+});
