@@ -539,10 +539,10 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
       }
     }
     int parameterIndex = 1;
-    final FieldDefinition attribute = recordDefinition.getIdField();
-    for (final FieldDefinition idField : recordDefinition.getFields()) {
-      if (attribute != idField) {
-        final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
+    final FieldDefinition idField = recordDefinition.getIdField();
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      if (field != idField) {
+        final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)field;
         parameterIndex = jdbcAttribute.setInsertPreparedStatementValue(
           statement, parameterIndex, object);
       }
@@ -705,16 +705,16 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
         switch (state) {
           case New:
             insert(object);
-            break;
+          break;
           case Modified:
             update(object);
-            break;
+          break;
           case Persisted:
-            // No action required
-            break;
+          // No action required
+          break;
           case Deleted:
             delete(object);
-            break;
+          break;
           default:
             throw new IllegalStateException("State not known");
         }

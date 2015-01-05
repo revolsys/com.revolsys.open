@@ -169,33 +169,23 @@ MapWriterFactory {
 
   public static void write(final Map<String, ? extends Object> object,
     final Resource resource) {
-    final Writer writer = SpringUtil.getWriter(resource);
-    try {
-      final JsonMapWriter out = new JsonMapWriter(writer);
-      try {
-        out.setSingleObject(true);
-        out.write(object);
-      } finally {
-        out.close();
-      }
-    } finally {
-      FileUtil.closeSilent(writer);
+    try (
+        final Writer writer = SpringUtil.getWriter(resource);
+        final JsonMapWriter out = new JsonMapWriter(writer);) {
+      out.setSingleObject(true);
+      out.write(object);
+    } catch (final IOException e) {
     }
   }
 
   public static void write(final Map<String, ? extends Object> object,
     final Resource resource, final boolean indent) {
-    final Writer writer = SpringUtil.getWriter(resource);
-    try {
-      final JsonMapWriter out = new JsonMapWriter(writer, indent);
-      try {
-        out.setSingleObject(true);
-        out.write(object);
-      } finally {
-        out.close();
-      }
-    } finally {
-      FileUtil.closeSilent(writer);
+    try (
+        final Writer writer = SpringUtil.getWriter(resource);
+        final JsonMapWriter out = new JsonMapWriter(writer, indent);) {
+      out.setSingleObject(true);
+      out.write(object);
+    } catch (final IOException e) {
     }
   }
 

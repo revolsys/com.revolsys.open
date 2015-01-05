@@ -26,6 +26,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.MapPanel;
@@ -474,7 +475,22 @@ public class MeasureOverlay extends AbstractOverlay {
       this.measureGeometry = measureGeometry;
       if (measureGeometry != null) {
         this.area = measureGeometry.getArea();
-        this.length = measureGeometry.getLength();
+        if (measureGeometry instanceof Point) {
+          this.length = 0;
+        } else if (measureGeometry instanceof LineString) {
+          final LineString line = (LineString)measureGeometry;
+          this.length = line.getLength();
+        } else if (measureGeometry instanceof Polygon) {
+          final Polygon polygon = (Polygon)measureGeometry;
+          final LinearRing ring = polygon.getExteriorRing();
+          double length = 0;
+          for (final Segment segment : ring.segments()) {
+            if (!segment.isLineEnd()) {
+              length += segment.getLength();
+            }
+          }
+          this.length = length;
+        }
       }
       setXorGeometry(null);
     }

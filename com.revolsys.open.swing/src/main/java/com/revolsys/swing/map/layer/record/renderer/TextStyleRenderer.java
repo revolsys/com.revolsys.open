@@ -82,7 +82,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     }
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null && geometry != null
-        && !geometry.isEmpty()) {
+      && !geometry.isEmpty()) {
       final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
       Point point = null;
@@ -135,9 +135,13 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           point = getTextLocationCenter(viewportGeometryFactory, geometry,
             style);
           if (!viewport.getBoundingBox().covers(point)) {
-            final Geometry clippedGeometry = viewport.getBoundingBox()
-                .toPolygon()
-                .intersection(geometry);
+            Geometry clippedGeometry = geometry;
+            try {
+              clippedGeometry = viewport.getBoundingBox()
+                  .toPolygon()
+                  .intersection(geometry);
+            } catch (final Throwable t) {
+            }
             if (!clippedGeometry.isEmpty()) {
               double maxArea = 0;
               double maxLength = 0;
@@ -279,7 +283,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           final int ascent = fontMetrics.getAscent();
           final int leading = fontMetrics.getLeading();
           final double maxHeight = lines.length * (ascent + descent)
-              + (lines.length - 1) * leading;
+            + (lines.length - 1) * leading;
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
           } else if ("middle".equals(verticalAlignment)) {
@@ -331,7 +335,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
             if ("right".equals(horizontalAlignment)) {
               graphics.translate(-width, 0);
             } else if ("center".equals(horizontalAlignment)
-              || "auto".equals(horizontalAlignment)) {
+                || "auto".equals(horizontalAlignment)) {
               graphics.translate(-width / 2, 0);
             }
             graphics.translate(dx, 0);

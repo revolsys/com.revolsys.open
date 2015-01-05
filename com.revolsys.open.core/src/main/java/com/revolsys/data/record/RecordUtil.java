@@ -23,10 +23,31 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.jts.GeometryProperties;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.CompareUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public final class RecordUtil {
+
+  public static int compare(final Record record1, final Record record2,
+    final String fieldName) {
+    final Object value1 = getValue(record1, fieldName);
+    final Object value2 = getValue(record2, fieldName);
+    return CompareUtil.compare(value1, value2);
+  }
+
+  public static int compare(final Record record1, final Record record2,
+    final String... fieldNames) {
+    for (final String fieldName : fieldNames) {
+      final Object value1 = getValue(record1, fieldName);
+      final Object value2 = getValue(record2, fieldName);
+      final int compare = CompareUtil.compare(value1, value2);
+      if (compare != 0) {
+        return compare;
+      }
+    }
+    return 0;
+  }
 
   public static Record copy(final RecordDefinition recordDefinition,
     final Record object) {
@@ -77,7 +98,7 @@ public final class RecordUtil {
     if (object == null) {
       return false;
     } else {
-      final Object value = object.getValue(fieldName);
+      final Object value = getValue(object, fieldName);
       if (value == null) {
         return false;
       } else if (value instanceof Boolean) {
@@ -131,7 +152,7 @@ public final class RecordUtil {
         final Record record = (Record)propertyValue;
 
         if (record.hasField(propertyName)) {
-          propertyValue = record.getValue(propertyName);
+          propertyValue = getValue(record, propertyName);
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
@@ -252,6 +273,14 @@ public final class RecordUtil {
     return objects;
   }
 
+  private static Object getValue(final Record record, final String fieldName) {
+    if (record == null) {
+      return null;
+    } else {
+      return record.getValue(fieldName);
+    }
+  }
+
   public static void mergeStringListValue(final Map<String, Object> object,
     final Record object1, final Record object2, final String fieldName,
     final String separator) {
@@ -296,8 +325,8 @@ public final class RecordUtil {
     final Collection<String> ignoreFieldNames) {
     for (final String fieldName : fieldNames) {
       if (!ignoreFieldNames.contains(fieldName)) {
-        final Object oldValue = target.getValue(fieldName);
-        Object newValue = source.getValue(fieldName);
+        final Object oldValue = getValue(target, fieldName);
+        Object newValue = getValue(source, fieldName);
         if (!EqualsInstance.INSTANCE.equals(oldValue, newValue)) {
           newValue = JavaBeanUtil.clone(newValue);
           target.setValue(fieldName, newValue);

@@ -79,6 +79,25 @@ public final class CollectionUtil {
   }
 
   public static void append(final StringBuilder buffer,
+    final Collection<? extends Object> values, final boolean skipNulls,
+    final String separator) {
+    boolean first = true;
+    for (final Object value : values) {
+      final String string = StringConverterRegistry.toString(value);
+      if (!skipNulls || Property.hasValue(string)) {
+        if (first) {
+          first = false;
+        } else {
+          buffer.append(separator);
+        }
+        if (string != null) {
+          buffer.append(string);
+        }
+      }
+    }
+  }
+
+  public static void append(final StringBuilder buffer,
     final Collection<? extends Object> values, final String separator) {
     boolean first = true;
     for (final Object value : values) {
@@ -162,6 +181,14 @@ public final class CollectionUtil {
       }
     }
     return false;
+  }
+
+  public static <T> List<T> copy(final List<T> list) {
+    if (list == null) {
+      return new ArrayList<>();
+    } else {
+      return new ArrayList<>(list);
+    }
   }
 
   public static <K, V> Map<K, V> createHashMap(final Map<K, ? extends V> map) {
@@ -376,12 +403,12 @@ public final class CollectionUtil {
   }
 
   public static <K, V> List<V> getList(final Map<K, List<V>> map, final K key) {
-    List<V> value = map.get(key);
-    if (value == null) {
-      value = new ArrayList<V>();
-      map.put(key, value);
+    List<V> list = map.get(key);
+    if (list == null) {
+      list = new ArrayList<V>();
+      map.put(key, list);
     }
-    return value;
+    return list;
   }
 
   public static Long getLong(final Map<String, ? extends Object> map,
@@ -530,6 +557,14 @@ public final class CollectionUtil {
     }
   }
 
+  public static <V> List<V> list(final Collection<? extends V> collection) {
+    final List<V> list = new ArrayList<>();
+    if (collection != null) {
+      list.addAll(collection);
+    }
+    return list;
+  }
+
   public static <V> List<V> list(final V... values) {
     final ArrayList<V> list = new ArrayList<V>();
     if (values != null) {
@@ -653,11 +688,11 @@ public final class CollectionUtil {
                 }
               }
             }
-            break;
+          break;
 
           default:
             buffer.append(c);
-            break;
+          break;
         }
       }
       return buffer.toString();
@@ -681,7 +716,7 @@ public final class CollectionUtil {
   public static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
     final Map<K, V> map) {
     final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(
-        map);
+      map);
     final Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
     sortedMap.putAll(map);
     return new LinkedHashMap<K, V>(sortedMap);
@@ -773,6 +808,22 @@ public final class CollectionUtil {
       }
       return map;
     }
+  }
+
+  public static String toString(final boolean skipNulls,
+    final String separator, final Collection<? extends Object> values) {
+    if (values == null) {
+      return null;
+    } else {
+      final StringBuilder string = new StringBuilder();
+      append(string, values, skipNulls, separator);
+      return string.toString();
+    }
+  }
+
+  public static String toString(final boolean skipNulls,
+    final String separator, final Object... values) {
+    return toString(skipNulls, separator, Arrays.asList(values));
   }
 
   /**

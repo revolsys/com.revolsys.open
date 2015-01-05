@@ -21,9 +21,9 @@ public class RecordGraph extends Graph<Record> {
   public static <T extends Geometry> Filter<Edge<Record>> getEdgeFilter(
     final Filter<T> geometryFilter) {
     final Filter<Record> objectFilter = new RecordGeometryFilter<T>(
-      geometryFilter);
+        geometryFilter);
     final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(
-      objectFilter);
+        objectFilter);
     return edgeFilter;
   }
 
@@ -40,8 +40,7 @@ public class RecordGraph extends Graph<Record> {
     return addEdge(object, line);
   }
 
-  public List<Edge<Record>> addEdges(
-    final Collection<? extends Record> objects) {
+  public List<Edge<Record>> addEdges(final Collection<? extends Record> objects) {
     final List<Edge<Record>> edges = new ArrayList<Edge<Record>>();
     for (final Record object : objects) {
       final Edge<Record> edge = addEdge(object);
@@ -52,7 +51,7 @@ public class RecordGraph extends Graph<Record> {
 
   /**
    * Clone the object, setting the line property to the new value.
-   * 
+   *
    * @param object The object to clone.
    * @param line The line.
    * @return The new object.
@@ -64,6 +63,20 @@ public class RecordGraph extends Graph<Record> {
     } else {
       return RecordUtil.copy(object, line);
     }
+  }
+
+  public Edge<Record> getEdge(final Record record) {
+    final LineString line = record.getGeometryValue();
+    final Point fromPoint = line.getPoint(0);
+    final Node<Record> fromNode = findNode(fromPoint);
+    if (fromNode != null) {
+      for (final Edge<Record> edge : fromNode.getEdges()) {
+        if (edge.getObject() == record) {
+          return edge;
+        }
+      }
+    }
+    return null;
   }
 
   @Override
@@ -94,7 +107,7 @@ public class RecordGraph extends Graph<Record> {
 
   /**
    * Get the type name for the edge.
-   * 
+   *
    * @param edge The edge.
    * @return The type name.
    */
@@ -130,8 +143,8 @@ public class RecordGraph extends Graph<Record> {
   }
 
   @Override
-  public Edge<Record> merge(final Node<Record> node,
-    final Edge<Record> edge1, final Edge<Record> edge2) {
+  public Edge<Record> merge(final Node<Record> node, final Edge<Record> edge1,
+    final Edge<Record> edge2) {
     final Record object1 = edge1.getObject();
     final Record object2 = edge2.getObject();
     final Record mergedObject = DirectionalAttributes.merge(node, object1,
@@ -142,13 +155,11 @@ public class RecordGraph extends Graph<Record> {
     return mergedEdge;
   }
 
-  public List<Edge<Record>> splitEdges(final Point point,
-    final double distance) {
+  public List<Edge<Record>> splitEdges(final Point point, final double distance) {
     final List<Edge<Record>> edges = new ArrayList<Edge<Record>>();
     for (final Edge<Record> edge : findEdges(point, distance)) {
       final LineString line = edge.getLine();
-      final List<Edge<Record>> splitEdges = edge.split(new PointDouble(
-        point));
+      final List<Edge<Record>> splitEdges = edge.split(new PointDouble(point));
       DirectionalAttributes.edgeSplitAttributes(line, point, splitEdges);
       edges.addAll(splitEdges);
     }

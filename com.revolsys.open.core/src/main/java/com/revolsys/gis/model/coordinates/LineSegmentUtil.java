@@ -38,28 +38,11 @@ public class LineSegmentUtil {
     return a * d - b * c;
   }
 
-  public static double distanceLineLine(final Point line1From, final Point line1To,
-    final Point line2From, final Point line2To) {
-    final double line1X1 = line1From.getX();
-    final double line1Y1 = line1From.getY();
-
-    final double line1X2 = line1To.getX();
-    final double line1Y2 = line1To.getY();
-
-    final double line2X1 = line2From.getX();
-    final double line2Y1 = line2From.getY();
-
-    final double line2X2 = line2To.getX();
-    final double line2Y2 = line2To.getY();
-    return distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, line2X1,
-      line2Y1, line2X2, line2Y2);
-  }
-
   /**
    * Computes the distance from a line segment AB to a line segment CD
-   * 
+   *
    * Note: NON-ROBUST!
-   * 
+   *
    * @param A
    *          a point of one line
    * @param B
@@ -96,25 +79,25 @@ public class LineSegmentUtil {
        */
 
       boolean noIntersection = false;
-      if (!BoundingBoxUtil.intersects(line1X1, line1Y1, line1X2, line1Y2, line2X1,
-        line2Y1, line2X2, line2Y2)) {
+      if (!BoundingBoxUtil.intersects(line1X1, line1Y1, line1X2, line1Y2,
+        line2X1, line2Y1, line2X2, line2Y2)) {
         noIntersection = true;
       } else {
         final double denom = (line1X2 - line1X1) * (line2Y2 - line2Y1)
-          - (line1Y2 - line1Y1) * (line2X2 - line2X1);
+            - (line1Y2 - line1Y1) * (line2X2 - line2X1);
 
         if (denom == 0) {
           noIntersection = true;
         } else {
           final double r_num = (line1Y1 - line2Y1) * (line2X2 - line2X1)
-            - (line1X1 - line2X1) * (line2Y2 - line2Y1);
+              - (line1X1 - line2X1) * (line2Y2 - line2Y1);
           final double s_num = (line1Y1 - line2Y1) * (line1X2 - line1X1)
-            - (line1X1 - line2X1) * (line1Y2 - line1Y1);
+              - (line1X1 - line2X1) * (line1Y2 - line1Y1);
 
           final double s = s_num / denom;
           final double r = r_num / denom;
 
-          if ((r < 0) || (r > 1) || (s < 0) || (s > 1)) {
+          if (r < 0 || r > 1 || s < 0 || s > 1) {
             noIntersection = true;
           }
         }
@@ -128,8 +111,7 @@ public class LineSegmentUtil {
           line1Y2, line2X1, line2Y1);
         final double distance4 = distanceLinePoint(line1X1, line1Y1, line1X2,
           line1Y2, line2X2, line2Y2);
-        return com.revolsys.jts.math.MathUtil.min(distance1, distance2,
-          distance3, distance4);
+        return MathUtil.min(distance1, distance2, distance3, distance4);
       } else {
         // segments intersect
         return 0.0;
@@ -137,10 +119,27 @@ public class LineSegmentUtil {
     }
   }
 
+  public static double distanceLineLine(final Point line1From,
+    final Point line1To, final Point line2From, final Point line2To) {
+    final double line1X1 = line1From.getX();
+    final double line1Y1 = line1From.getY();
+
+    final double line1X2 = line1To.getX();
+    final double line1Y2 = line1To.getY();
+
+    final double line2X1 = line2From.getX();
+    final double line2Y1 = line2From.getY();
+
+    final double line2X2 = line2To.getX();
+    final double line2Y2 = line2To.getY();
+    return distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, line2X1,
+      line2Y1, line2X2, line2Y2);
+  }
+
   /**
    * Calculate the distance between the line from x1,y1 to x2,y2 and the point
    * x,y.
-   * 
+   *
    * @param x1 The x coordinate at the start of the line.
    * @param y1 The y coordinate at the start of the line.
    * @param x2 The x coordinate at the end of the line.
@@ -159,7 +158,7 @@ public class LineSegmentUtil {
       final double dyy1 = y - y1;
       final double dy2y1 = y2 - y1;
       final double r = (dxx1 * dx2x1 + dyy1 * dy2y1)
-        / (dx2x1 * dx2x1 + dy2y1 * dy2y1);
+          / (dx2x1 * dx2x1 + dy2y1 * dy2y1);
 
       if (r <= 0.0) {
         return MathUtil.distance(x, y, x1, y1);
@@ -169,7 +168,7 @@ public class LineSegmentUtil {
         final double dy1y = y1 - y;
         final double dx1x = x1 - x;
         final double s = (dy1y * dx2x1 - dx1x * dy2y1)
-          / (dx2x1 * dx2x1 + dy2y1 * dy2y1);
+            / (dx2x1 * dx2x1 + dy2y1 * dy2y1);
 
         return Math.abs(s) * Math.sqrt(dx2x1 * dx2x1 + dy2y1 * dy2y1);
       }
@@ -180,7 +179,7 @@ public class LineSegmentUtil {
   /**
    * Calculate the distance between the line from lineStart to lineEnd and the
    * point.
-   * 
+   *
    * @param lineStart The point at the start of the line.
    * @param lineEnd The point at the end of the line.
    * @param point The point.
@@ -201,7 +200,7 @@ public class LineSegmentUtil {
   /**
    * Check to see if the point (x,y) intersects the envelope of the line from
    * (x1,y1) to (x2,y2).
-   * 
+   *
    * @param x1 The x coordinate at the start of the line.
    * @param y1 The y coordinate at the start of the line.
    * @param x2 The x coordinate at the end of the line.
@@ -231,7 +230,7 @@ public class LineSegmentUtil {
   /**
    * Check to see if the point intersects the envelope of the line from
    * lineStart to lineEnd.
-   * 
+   *
    * @param lineStart The point at the start of the line.
    * @param lineEnd The point at the end of the line.
    * @param point The point.
@@ -254,7 +253,7 @@ public class LineSegmentUtil {
   /**
    * Check to see if the envelope one the line from line1Start to line1End
    * intersects the envelope of the line from line2Start to line2End.
-   * 
+   *
    * @param line1Start The point at the start of the first line.
    * @param line1End The point at the end of the first line.
    * @param line2Start The point at the start of the second line.
@@ -295,14 +294,13 @@ public class LineSegmentUtil {
     return false;
   }
 
-  public static Point getElevation(
-    final GeometryFactory geometryFactory,
+  public static Point getElevation(final GeometryFactory geometryFactory,
     final Point lineStart, final Point lineEnd, final Point point) {
     final int axisCount = geometryFactory.getAxisCount();
     final double[] coordinates = point.getCoordinates();
     if (axisCount > 2) {
       final double fraction = point.distance(lineStart)
-        / lineStart.distance(lineEnd);
+          / lineStart.distance(lineEnd);
       double z1 = lineStart.getZ();
       if (Double.isNaN(z1)) {
         z1 = 0;
@@ -311,7 +309,7 @@ public class LineSegmentUtil {
       if (Double.isNaN(z2)) {
         z2 = 0;
       }
-      final double z = z1 + (z2 - z1) * (fraction);
+      final double z = z1 + (z2 - z1) * fraction;
       if (coordinates.length < 3) {
         return geometryFactory.point(coordinates[0], coordinates[1], z);
       } else {
@@ -326,9 +324,9 @@ public class LineSegmentUtil {
   public static double getElevation(final Point lineStart, final Point lineEnd,
     final Point point) {
     final double fraction = point.distance(lineStart)
-      / lineStart.distance(lineEnd);
+        / lineStart.distance(lineEnd);
     final double z = lineStart.getZ() + (lineEnd.getZ() - lineStart.getZ())
-      * (fraction);
+        * fraction;
     return z;
   }
 
@@ -340,7 +338,7 @@ public class LineSegmentUtil {
    * interpolation will be calculated using the z-values from line (segment) 1.
    * For linear intersections the order of the points will be the same as the
    * orientation of line1.
-   * 
+   *
    * @param geometryFactory
    * @param line1Start
    * @param line1End
@@ -357,7 +355,7 @@ public class LineSegmentUtil {
     line2End = geometryFactory.createCoordinates(line2End);
     if (BoundingBoxUtil.intersects(line1Start, line1End, line2Start, line2End)) {
       final Set<Point> intersections = new TreeSet<Point>(
-        new CoordinatesDistanceComparator(line1Start));
+          new CoordinatesDistanceComparator(line1Start));
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End,
         line1Start)) {
         intersections.add(line1Start);
@@ -395,13 +393,13 @@ public class LineSegmentUtil {
         final int Pq2 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
           line1x2, line1y2, line2x2, line2y2);
 
-        if (!((Pq1 > 0 && Pq2 > 0) || (Pq1 < 0 && Pq2 < 0))) {
+        if (!(Pq1 > 0 && Pq2 > 0 || Pq1 < 0 && Pq2 < 0)) {
           final int Qp1 = CoordinatesListUtil.orientationIndex(line2x1,
             line2y1, line2x2, line2y2, line1x1, line1y1);
           final int Qp2 = CoordinatesListUtil.orientationIndex(line2x1,
             line2y1, line2x2, line2y2, line1x2, line1y2);
 
-          if (!((Qp1 > 0 && Qp2 > 0) || (Qp1 < 0 && Qp2 < 0))) {
+          if (!(Qp1 > 0 && Qp2 > 0 || Qp1 < 0 && Qp2 < 0)) {
             final double detLine1StartLine1End = LineSegmentUtil.det(line1x1,
               line1y1, line1x2, line1y2);
             final double detLine2StartLine2End = LineSegmentUtil.det(line2x1,
@@ -459,7 +457,7 @@ public class LineSegmentUtil {
    * Check to see if the point is on the line between lineStart and lineEnd
    * using the precision model to see if a line split at the projection of the
    * point on the line would be the same point.
-   * 
+   *
    * @param precisionModel The precision model.
    * @param lineStart The point at the start of the line.
    * @param lineEnd The point at the end of the line.
@@ -499,25 +497,6 @@ public class LineSegmentUtil {
       if (distance < maxDistance) {
         final double projectionFactor = projectionFactor(lineStart, lineEnd,
           point);
-        if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
-          return true;
-        }
-      }
-      return false;
-    }
-  }
-
-  public static boolean isPointOnLineMiddle(final double x1, final double y1,
-    final double x2, final double y2, final double x, final double y,
-    final double maxDistance) {
-    if (NumberEquals.equal(x, x1) && NumberEquals.equal(y, y1)) {
-      return false;
-    } else if (NumberEquals.equal(x, x2) && NumberEquals.equal(y, y2)) {
-      return false;
-    } else {
-      final double distance = distanceLinePoint(x1, y1, x2, y2, x, y);
-      if (distance < maxDistance) {
-        final double projectionFactor = projectionFactor(x1, y1, x2, y2, x, y);
         if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
           return true;
         }
@@ -570,7 +549,7 @@ public class LineSegmentUtil {
    * the two vectors from the start point and line1End and line2End. The angle
    * is relative to the vector from start to line1End. The angle will be in the
    * range 0 -> 2 * PI.
-   * 
+   *
    * @return The angle in radians.
    */
   public static double orientedAngleBetween2d(final Point start,
@@ -676,7 +655,7 @@ public class LineSegmentUtil {
    * Calculate the projection factor of the distance of the point (x,y)
    * coordinates along the line (x1,y1 -> x2,y2). If the point is within the
    * line the range will be between 0.0 -> 1.0.
-   * 
+   *
    * @param x1 The x coordinate for the start of the line.
    * @param y1 The y coordinate for the start of the line.
    * @param x2 The x coordinate for the end of the line.
@@ -698,7 +677,7 @@ public class LineSegmentUtil {
    * Calculate the projection factor of the distance of the point coordinates
    * along the line. If the point is within the line the range will be between
    * 0.0 -> 1.0.
-   * 
+   *
    * @param lineStart The start coordinates of the line.
    * @param lineEnd The end coordinates of the line.
    * @param point The point coordinates.

@@ -176,8 +176,8 @@ public class GpxIterator implements RecordIterator {
   // String propertySchemaName = in.getNamespaceURI();
   // String propertyName = in.getLocalName();
   // in.requireLocalPart(XMLStreamReader.START_ELEMENT, null, null);
-  // if (in.getName().equals(GpxConstants.EXTENSION_ELEMENT)
-  // || in.getName().equals(GpxConstants.TRACK_SEGMENT_ELEMENT)) {
+  // if (in.getName().equals(TcxConstants.EXTENSION_ELEMENT)
+  // || in.getName().equals(TcxConstants.TRACK_SEGMENT_ELEMENT)) {
   // StaxUtils.skipSubTree(in);
   // in.requireLocalPart(XMLStreamReader.END_ELEMENT, propertySchemaName,
   // propertyName);

@@ -30,6 +30,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.Record;
 import com.revolsys.io.ObjectWithProperties;
+import com.revolsys.jts.geom.Geometry;
 
 public final class Property {
   public static void addListener(final Object source, final Object listener) {
@@ -317,9 +318,21 @@ public final class Property {
     } else if (value instanceof Collection<?>) {
       final Collection<?> collection = (Collection<?>)value;
       return !collection.isEmpty();
+    } else if (value instanceof Geometry) {
+      final Geometry geometry = (Geometry)value;
+      return !geometry.isEmpty();
     } else {
       return true;
     }
+  }
+
+  public static boolean hasValues(final Object... values) {
+    for (final Object value : values) {
+      if (!hasValue(value)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @SuppressWarnings("unchecked")

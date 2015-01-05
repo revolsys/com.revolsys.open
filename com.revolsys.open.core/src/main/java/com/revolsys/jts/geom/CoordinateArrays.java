@@ -36,7 +36,7 @@ import java.util.Collection;
 import java.util.Comparator;
 
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.math.MathUtil;
+import com.revolsys.util.MathUtil;
 
 /**
  * Useful utility functions for handling Point arrays
@@ -59,8 +59,6 @@ public class CoordinateArrays {
       return CoordinateArrays.compare(pts1, pts2);
     }
   }
-
-  private final static Point[] coordArrayType = new Point[0];
 
   /**
    * Returns either the given coordinate array if its length is greater than the
@@ -122,7 +120,7 @@ public class CoordinateArrays {
    *
    * @param src an array of Coordinates
    * @param srcStart the index to start copying from
-   * @param dest the 
+   * @param dest the
    * @param destStart the destination index to start copying to
    * @param length the number of items to copy
    */
@@ -275,9 +273,9 @@ public class CoordinateArrays {
 
   /**
    * Tests whether an array of {@link Coordinates}s forms a ring,
-   * by checking length and closure. 
+   * by checking length and closure.
    * Self-intersection is not checked.
-   * 
+   *
    * @param pts an array of Coordinates
    * @return true if the coordinate form a ring.
    */
@@ -285,7 +283,7 @@ public class CoordinateArrays {
     if (pts.length < 4) {
       return false;
     }
-    if (!pts[0].equals(2,pts[pts.length - 1])) {
+    if (!pts[0].equals(2, pts[pts.length - 1])) {
       return false;
     }
     return true;
@@ -310,7 +308,7 @@ public class CoordinateArrays {
 
   /**
    * Collapses a coordinate array to remove all null elements.
-   * 
+   *
    * @param coord the coordinate array to collapse
    * @return an array containing only non-null elements
    */
@@ -369,5 +367,7 @@ public class CoordinateArrays {
   public static Point[] toCoordinateArray(final Collection coordList) {
     return (Point[])coordList.toArray(coordArrayType);
   }
+
+  private final static Point[] coordArrayType = new Point[0];
 
 }

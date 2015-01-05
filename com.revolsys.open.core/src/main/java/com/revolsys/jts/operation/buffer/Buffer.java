@@ -61,7 +61,6 @@ import com.revolsys.jts.geomgraph.Label;
 import com.revolsys.jts.geomgraph.Node;
 import com.revolsys.jts.geomgraph.PlanarGraph;
 import com.revolsys.jts.geomgraph.Position;
-import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jts.noding.IntersectionAdder;
 import com.revolsys.jts.noding.MCIndexNoder;
 import com.revolsys.jts.noding.NodedSegmentString;
@@ -71,6 +70,7 @@ import com.revolsys.jts.noding.SegmentString;
 import com.revolsys.jts.noding.snapround.MCIndexSnapRounder;
 import com.revolsys.jts.operation.overlay.OverlayNodeFactory;
 import com.revolsys.jts.operation.overlay.PolygonBuilder;
+import com.revolsys.util.MathUtil;
 
 //import debug.*;
 
@@ -81,8 +81,8 @@ import com.revolsys.jts.operation.overlay.PolygonBuilder;
  * the Minkowski sum (or difference) of the geometry
  * with a circle of radius equal to the absolute value of the buffer distance.
  * In the CAD/CAM world buffers are known as </i>offset curves</i>.
- * In morphological analysis the 
- * operation of postive and negative buffering 
+ * In morphological analysis the
+ * operation of postive and negative buffering
  * is referred to as <i>erosion</i> and <i>dilation</i>
  * <p>
  * The buffer operation always returns a polygonal result.
@@ -105,14 +105,6 @@ import com.revolsys.jts.operation.overlay.PolygonBuilder;
  * @version 1.7
  */
 public class Buffer {
-
-  /**
-   * A number of digits of precision which leaves some computational "headroom"
-   * for floating point operations.
-   * 
-   * This value should be less than the decimal precision of double-precision values (16).
-   */
-  private static int MAX_PRECISION_DIGITS = 12;
 
   /**
    * Computes the buffer of a geometry for a given buffer distance.
@@ -250,7 +242,7 @@ public class Buffer {
         final double sizeBasedScaleFactor = precisionScaleFactor(geometry,
           distance, precDigits);
         final GeometryFactory precisionModel = geometry.getGeometryFactory()
-          .convertScales(sizeBasedScaleFactor);
+            .convertScales(sizeBasedScaleFactor);
         return bufferFixedPrecision(precisionModel, geometry, distance,
           parameters);
       } catch (final TopologyException e) {
@@ -292,9 +284,8 @@ public class Buffer {
     final Collection<NodedSegmentString> nodedSegments = noder.getNodedSubstrings();
     for (final SegmentString segment : nodedSegments) {
       final int vertexCount = segment.size();
-      if (vertexCount > 2
-        || (vertexCount == 2 && !segment.getCoordinate(0).equals(2,
-          segment.getCoordinate(1)))) {
+      if (vertexCount > 2 || vertexCount == 2
+        && !segment.getCoordinate(0).equals(2, segment.getCoordinate(1))) {
         final Label oldLabel = (Label)segment.getData();
         final Label label = new Label(oldLabel);
         final LineString points = segment.getPoints();
@@ -350,7 +341,7 @@ public class Buffer {
     for (final BufferSubgraph graph : graphs) {
       final BoundingBox env = graph.getEnvelope();
       if (stabbingRayLeftPt.getY() >= env.getMinY()
-        && stabbingRayLeftPt.getY() <= env.getMaxY()) {
+          && stabbingRayLeftPt.getY() <= env.getMaxY()) {
         final List<DirectedEdge> edges = graph.getDirectedEdges();
         for (final DirectedEdge edge : edges) {
           if (edge.isForward()) {
@@ -504,5 +495,13 @@ public class Buffer {
     final double scaleFactor = Math.pow(10.0, minUnitLog10);
     return scaleFactor;
   }
+
+  /**
+   * A number of digits of precision which leaves some computational "headroom"
+   * for floating point operations.
+   *
+   * This value should be less than the decimal precision of double-precision values (16).
+   */
+  private static int MAX_PRECISION_DIGITS = 12;
 
 }

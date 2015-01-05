@@ -248,6 +248,15 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     return this.lockResults;
   }
 
+  public void or(final Condition condition) {
+    final Condition whereCondition = getWhereCondition();
+    if (whereCondition == null) {
+      setWhereCondition(condition);
+    } else if (condition != null) {
+      setWhereCondition(new Or(whereCondition, condition));
+    }
+  }
+
   public void setFieldNames(final List<String> fieldNames) {
     this.fieldNames = fieldNames;
   }

@@ -26,14 +26,6 @@ import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 
 public final class LineStringUtil {
-  public static final String COORDINATE_DISTANCE = "coordinateDistance";
-
-  public static final String COORDINATE_INDEX = "coordinateIndex";
-
-  public static final String SEGMENT_DISTANCE = "segmentDistance";
-
-  public static final String SEGMENT_INDEX = "segmentIndex";
-
   public static LineString addElevation(final LineString original,
     final LineString update) {
     final int axisCount = update.getAxisCount();
@@ -55,81 +47,6 @@ public final class LineStringUtil {
       return update;
     }
   }
-
-  // public static LineString cleanShortSegments(final LineString line) {
-  // final GeometryFactory factory = GeometryFactory.getFactory(line);
-  // if (line.getLength() > 2) {
-  // final LineString points = CoordinatesListUtil.get(line);
-  // DoubleListCoordinatesList newPoints = null;
-  // int numRemoved = 0;
-  // for (int i = 1; i < points.size(); i++) {
-  // final double length = points.distance(i - 1, points, i);
-  // if (length < 2) {
-  // if (newPoints == null) {
-  // newPoints = new DoubleListCoordinatesList(points);
-  // }
-  // if (newPoints.size() > 2) {
-  // if (i == 1) {
-  // final Point p1 = points.get(0);
-  // final Point p2 = points.get(1);
-  // final Point p3 = points.get(2);
-  // final double angle = CoordinatesUtil.angle(p1, p2, p3);
-  // if (angle > Math.toRadians(170)) {
-  // newPoints.remove(1);
-  // numRemoved++;
-  // }
-  // } else if (i == points.size() - 1) {
-  // final Point p1 = points.get(i - 2);
-  // final Point p2 = points.get(i - 1);
-  // final Point p3 = points.get(i);
-  // final double angle = CoordinatesUtil.angle(p1, p2, p3);
-  // if (angle > Math.toRadians(170)) {
-  // newPoints.remove(points.size() - 2 - numRemoved);
-  // numRemoved++;
-  // }
-  // } else {
-  // final Point p1 = points.get(i - 2);
-  // final Point p2 = points.get(i - 1);
-  // final Point p3 = points.get(i);
-  // final Point p4 = points.get(i + 1);
-  // final double angle1 = CoordinatesUtil.angle(p1, p2, p3);
-  // final double angle2 = CoordinatesUtil.angle(p2, p3, p4);
-  // boolean removed = false;
-  // if (angle1 > angle2) {
-  // if (angle1 > Math.toRadians(170)) {
-  // if (i - 1 - numRemoved == 0) {
-  // newPoints.remove(i - numRemoved);
-  // } else {
-  // newPoints.remove(i - 1 - numRemoved);
-  //
-  // }
-  // removed = true;
-  // }
-  // } else if (angle2 > Math.toRadians(170)) {
-  // newPoints.remove(i - numRemoved);
-  // removed = true;
-  // }
-  // if (!removed) {
-  // final Point midPoint = LineSegmentUtil.midPoint(factory,
-  // p2, p3);
-  // newPoints.setPoint(i - 1 - numRemoved, midPoint);
-  // newPoints.remove(i - numRemoved);
-  // }
-  // numRemoved++;
-  // }
-  //
-  // }
-  // }
-  // }
-  // if (newPoints == null) {
-  // return line;
-  // } else {
-  // return factory.lineString(newPoints);
-  // }
-  // } else {
-  // return line;
-  // }
-  // }
 
   public static void addLineString(final GeometryFactory geometryFactory,
     final LineString points, final Point startPoint, final int startIndex,
@@ -171,30 +88,30 @@ public final class LineStringUtil {
        */
       final double rTop = (aY1 - bY1) * (bX2 - bX1) - (aX1 - bX1) * (bY2 - bY1);
       final double rBottom = (aX2 - aX1) * (bY2 - bY1) - (aY2 - aY1)
-        * (bX2 - bX1);
+          * (bX2 - bX1);
 
       final double sTop = (aY1 - bY1) * (aX2 - aX1) - (aX1 - bX1) * (aY2 - aY1);
       final double sBottom = (aX2 - aX1) * (bY2 - bY1) - (aY2 - aY1)
-        * (bX2 - bX1);
+          * (bX2 - bX1);
 
       if (rBottom == 0 || sBottom == 0) {
         return Math.min(LineSegmentUtil.distanceLinePoint(bX1, bY1, bX2, bY2,
           aX1, aY1), Math.min(LineSegmentUtil.distanceLinePoint(bX1, bY1, bX2,
-          bY2, aX2, aY2), Math.min(
-          LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX1, bY1),
-          LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX2, bY2))));
+            bY2, aX2, aY2), Math.min(
+              LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX1, bY1),
+              LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX2, bY2))));
 
       } else {
         final double s = sTop / sBottom;
         final double r = rTop / rBottom;
 
-        if ((r < 0) || (r > 1) || (s < 0) || (s > 1)) {
+        if (r < 0 || r > 1 || s < 0 || s > 1) {
           // no intersection
           return Math.min(LineSegmentUtil.distanceLinePoint(bX1, bY1, bX2, bY2,
             aX1, aY1), Math.min(LineSegmentUtil.distanceLinePoint(bX1, bY1,
-            bX2, bY2, aX2, aY2), Math.min(
-            LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX1, bY1),
-            LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX2, bY2))));
+              bX2, bY2, aX2, aY2), Math.min(
+                LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX1, bY1),
+                LineSegmentUtil.distanceLinePoint(aX1, aY1, aX2, aY2, bX2, bY2))));
         }
         return 0.0;
       }
@@ -304,11 +221,119 @@ public final class LineStringUtil {
     return point.distance(point2);
   }
 
+  public static double distanceFromStart(final LineString line,
+    final Point point) {
+    double segmentDistance = 0;
+    double closestDistance = Double.MAX_VALUE;
+    double distanceAlong = 0;
+    for (final Segment segment : line.segments()) {
+      final double distance = segment.distance(point);
+      if (distance < line.getGeometryFactory().getResolutionXy()) {
+        return segmentDistance + segment.getPoint(0).distance(point);
+      } else if (distance < closestDistance) {
+        closestDistance = distance;
+        final double projectionFactor = segment.projectionFactor(point);
+        if (projectionFactor <= 0) {
+          if (segment.getSegmentIndex() == 0) {
+            distanceAlong = -distance;
+          } else {
+            distanceAlong = segmentDistance;
+          }
+        } else if (projectionFactor >= 1) {
+          if (segment.isLineEnd()) {
+            distanceAlong = segmentDistance + segment.getLength() + distance;
+          } else {
+            distanceAlong = segmentDistance + segment.getLength();
+          }
+        } else {
+          distanceAlong = segmentDistance + segment.distanceAlong(point);
+        }
+      }
+      segmentDistance += segment.getLength();
+    }
+    return distanceAlong;
+  }
+
+  // public static LineString cleanShortSegments(final LineString line) {
+  // final GeometryFactory factory = GeometryFactory.getFactory(line);
+  // if (line.getLength() > 2) {
+  // final LineString points = CoordinatesListUtil.get(line);
+  // DoubleListCoordinatesList newPoints = null;
+  // int numRemoved = 0;
+  // for (int i = 1; i < points.size(); i++) {
+  // final double length = points.distance(i - 1, points, i);
+  // if (length < 2) {
+  // if (newPoints == null) {
+  // newPoints = new DoubleListCoordinatesList(points);
+  // }
+  // if (newPoints.size() > 2) {
+  // if (i == 1) {
+  // final Point p1 = points.get(0);
+  // final Point p2 = points.get(1);
+  // final Point p3 = points.get(2);
+  // final double angle = CoordinatesUtil.angle(p1, p2, p3);
+  // if (angle > Math.toRadians(170)) {
+  // newPoints.remove(1);
+  // numRemoved++;
+  // }
+  // } else if (i == points.size() - 1) {
+  // final Point p1 = points.get(i - 2);
+  // final Point p2 = points.get(i - 1);
+  // final Point p3 = points.get(i);
+  // final double angle = CoordinatesUtil.angle(p1, p2, p3);
+  // if (angle > Math.toRadians(170)) {
+  // newPoints.remove(points.size() - 2 - numRemoved);
+  // numRemoved++;
+  // }
+  // } else {
+  // final Point p1 = points.get(i - 2);
+  // final Point p2 = points.get(i - 1);
+  // final Point p3 = points.get(i);
+  // final Point p4 = points.get(i + 1);
+  // final double angle1 = CoordinatesUtil.angle(p1, p2, p3);
+  // final double angle2 = CoordinatesUtil.angle(p2, p3, p4);
+  // boolean removed = false;
+  // if (angle1 > angle2) {
+  // if (angle1 > Math.toRadians(170)) {
+  // if (i - 1 - numRemoved == 0) {
+  // newPoints.remove(i - numRemoved);
+  // } else {
+  // newPoints.remove(i - 1 - numRemoved);
+  //
+  // }
+  // removed = true;
+  // }
+  // } else if (angle2 > Math.toRadians(170)) {
+  // newPoints.remove(i - numRemoved);
+  // removed = true;
+  // }
+  // if (!removed) {
+  // final Point midPoint = LineSegmentUtil.midPoint(factory,
+  // p2, p3);
+  // newPoints.setPoint(i - 1 - numRemoved, midPoint);
+  // newPoints.remove(i - numRemoved);
+  // }
+  // numRemoved++;
+  // }
+  //
+  // }
+  // }
+  // }
+  // if (newPoints == null) {
+  // return line;
+  // } else {
+  // return factory.lineString(newPoints);
+  // }
+  // } else {
+  // return line;
+  // }
+  // }
+
   /**
    * Compare the coordinates of the two lines up to the given dimension to see
    * if they have the same ordinate values in either the forward or reverse
    * direction.
-   * 
+   *
    * @param line1 The first line.
    * @param line2 The second line.
    * @param dimension The dimension.
@@ -330,7 +355,7 @@ public final class LineStringUtil {
   /**
    * Compare the 2D coordinates of the two lines to see if they have the same
    * ordinate values in either the forward or reverse direction.
-   * 
+   *
    * @param line1 The first line.
    * @param line2 The second line.
    * @return True if the coordinates match.
@@ -368,7 +393,7 @@ public final class LineStringUtil {
             to.distance(point));
           if (toDistance <= closestDistance) {
             if (!(closestComponent instanceof Vertex)
-              || toDistance < closestDistance) {
+                || toDistance < closestDistance) {
               closestComponent = to;
               closestDistance = toDistance;
             }
@@ -405,7 +430,7 @@ public final class LineStringUtil {
       final LineString coordinates = line;
       final int coordinateIndex = result.get(COORDINATE_INDEX).intValue();
       final double coordinateDistance = result.get(COORDINATE_DISTANCE)
-        .doubleValue();
+          .doubleValue();
       final double segmentDistance = result.get(SEGMENT_DISTANCE).doubleValue();
       if (coordinateIndex == 0) {
         final Point c0 = coordinates.getPoint(0);
@@ -476,7 +501,7 @@ public final class LineStringUtil {
 
   /**
    * Get the coordinate where two lines cross, or null if they don't cross.
-   * 
+   *
    * @param line1 The first line.
    * @param line2 The second line
    * @return The coordinate or null if they don't cross
@@ -512,10 +537,10 @@ public final class LineStringUtil {
           } else if (numIntersections == 1) {
             final Point intersection = intersector.getIntersection(0);
             if (i1 == 1 || i2 == 1 || i1 == numCoordinates1 - 1
-              || i2 == numCoordinates2 - 1) {
+                || i2 == numCoordinates2 - 1) {
               if (!((intersection.equals(2, firstCoord1) || intersection.equals(
                 2, lastCoord1)) && (intersection.equals(2, firstCoord2) || intersection.equals(
-                2, lastCoord2)))) {
+                  2, lastCoord2)))) {
                 return intersection;
               }
             } else {
@@ -551,7 +576,7 @@ public final class LineStringUtil {
     } else {
       fraction = point.distance(point1) / point1.distance(point2);
     }
-    final double z = z1 + (z2 - z1) * (fraction);
+    final double z = z1 + (z2 - z1) * fraction;
     return z;
   }
 
@@ -618,7 +643,7 @@ public final class LineStringUtil {
     final LineString line2) {
     if (line1.getBoundingBox().intersects(line2.getBoundingBox())) {
       final LineMatchGraph<LineString> graph = new LineMatchGraph<LineString>(
-        line2);
+          line2);
       for (final LineString line : new LineStringCoordinatesListIterator(line1)) {
         if (graph.add(line)) {
           return true;
@@ -671,7 +696,7 @@ public final class LineStringUtil {
 
   /**
    * Check to see if the point is on any of the segments of the line.
-   * 
+   *
    * @param line The line.
    * @param point The point.
    * @return True if the point is on the line, false otherwise.
@@ -701,7 +726,7 @@ public final class LineStringUtil {
 
   /**
    * Check to see if the point is on any of the segments of the line.
-   * 
+   *
    * @param line The line.
    * @param point The point.
    * @param maxDistance The maximum distance the point can be from the line.
@@ -819,7 +844,7 @@ public final class LineStringUtil {
           if (!(index.isWithinDistance(c0) && index.isWithinDistance(c1))) {
             if (i == 1 && intersection.distance(firstCoordinate) < tolerance) {
             } else if (i == lastIndex
-              && intersection.distance(lastCoordinate) < tolerance) {
+                && intersection.distance(lastCoordinate) < tolerance) {
             } else {
               final double d0 = intersection.distance(c0);
               final double d1 = intersection.distance(c1);
@@ -927,5 +952,13 @@ public final class LineStringUtil {
     }
     return lines;
   }
+
+  public static final String COORDINATE_DISTANCE = "coordinateDistance";
+
+  public static final String COORDINATE_INDEX = "coordinateIndex";
+
+  public static final String SEGMENT_DISTANCE = "segmentDistance";
+
+  public static final String SEGMENT_INDEX = "segmentIndex";
 
 }

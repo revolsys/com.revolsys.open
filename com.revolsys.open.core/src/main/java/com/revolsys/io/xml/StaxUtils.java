@@ -456,6 +456,25 @@ public final class StaxUtils {
     return true;
   }
 
+  public static boolean skipToStartElements(final XMLStreamReader parser,
+    final QName... elementNames) {
+    return skipToStartElements(parser, Arrays.asList(elementNames));
+  }
+
+  public static void skipToStartOrEndElement(final XMLStreamReader parser) {
+    require(parser, XMLStreamConstants.END_ELEMENT, null, null);
+    while (true) {
+      final int eventType = next(parser);
+      if (eventType == XMLStreamConstants.END_ELEMENT) {
+        return;
+      } else if (eventType == XMLStreamConstants.START_ELEMENT) {
+        return;
+      } else if (eventType == XMLStreamConstants.END_DOCUMENT) {
+        return;
+      }
+    }
+  }
+
   /**
    * Skip any whitespace until an start or end of element is found.
    *

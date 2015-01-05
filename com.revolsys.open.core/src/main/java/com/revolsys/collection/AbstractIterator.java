@@ -8,7 +8,7 @@ import javax.annotation.PreDestroy;
 import com.revolsys.io.AbstractObjectWithProperties;
 
 public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
-  implements Iterator<T>, Iterable<T>, AutoCloseable {
+implements Iterator<T>, Iterable<T>, AutoCloseable {
 
   private boolean hasNext = true;
 
@@ -21,8 +21,8 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
   @Override
   @PreDestroy
   public final void close() {
-    hasNext = false;
-    object = null;
+    this.hasNext = false;
+    this.object = null;
     doClose();
   }
 
@@ -41,26 +41,26 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
 
   @Override
   public final boolean hasNext() {
-    if (hasNext) {
-      if (!initialized) {
+    if (this.hasNext) {
+      if (!this.initialized) {
         init();
       }
-      if (loadNext) {
+      if (this.loadNext) {
         try {
-          object = getNext();
-          loadNext = false;
+          this.object = getNext();
+          this.loadNext = false;
         } catch (final NoSuchElementException e) {
           close();
-          hasNext = false;
+          this.hasNext = false;
         }
       }
     }
-    return hasNext;
+    return this.hasNext;
   }
 
   public synchronized void init() {
-    if (!initialized) {
-      initialized = true;
+    if (!this.initialized) {
+      this.initialized = true;
       doInit();
     }
   }
@@ -73,8 +73,8 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
   @Override
   public final T next() {
     if (hasNext()) {
-      final T currentObject = object;
-      loadNext = true;
+      final T currentObject = this.object;
+      this.loadNext = true;
       return currentObject;
     } else {
       throw new NoSuchElementException();
@@ -88,6 +88,6 @@ public abstract class AbstractIterator<T> extends AbstractObjectWithProperties
 
   protected void setLoadNext(final boolean loadNext) {
     this.loadNext = loadNext;
-    hasNext = true;
+    this.hasNext = true;
   }
 }

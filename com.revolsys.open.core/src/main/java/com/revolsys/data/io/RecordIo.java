@@ -45,16 +45,16 @@ public class RecordIo {
 
   public static void copy(final File sourceFile, final File targetFile) {
     try (
-        RecordReader reader = recordReader(sourceFile);) {
+      RecordReader reader = recordReader(sourceFile);) {
       if (reader == null) {
         throw new IllegalArgumentException("Unable to read " + sourceFile);
       } else {
         try (
-            Writer<Record> writer = recordWriter(reader.getRecordDefinition(),
-              targetFile)) {
+          Writer<Record> writer = recordWriter(reader.getRecordDefinition(),
+            targetFile)) {
           if (writer == null) {
             throw new IllegalArgumentException("Unable to create writer "
-                + targetFile);
+              + targetFile);
           } else {
             for (final Record record : reader) {
               writer.write(record);
@@ -111,6 +111,11 @@ public class RecordIo {
         factory);
       return reader;
     }
+  }
+
+  public static RecordReader recordReader(final String fileName) {
+    final Resource resource = new FileSystemResource(fileName);
+    return recordReader(resource);
   }
 
   public static RecordReaderFactory recordReaderFactory(final Resource resource) {

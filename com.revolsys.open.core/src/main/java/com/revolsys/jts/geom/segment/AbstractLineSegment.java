@@ -1,5 +1,6 @@
 package com.revolsys.jts.geom.segment;
 
+import com.revolsys.data.equals.NumberEquals;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.CoordinatesUtil;
 import com.revolsys.gis.model.coordinates.LineSegmentUtil;
@@ -20,11 +21,10 @@ import com.revolsys.jts.geom.impl.PointDoubleGf;
 import com.revolsys.jts.util.BoundingBoxUtil;
 import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 
 public abstract class AbstractLineSegment extends AbstractLineString implements
-  LineSegment {
-
-  private static final long serialVersionUID = 1L;
+LineSegment {
 
   private static int addEndPointIntersection(final double[] coordinates,
     final int intersectionCount, final int axisCount,
@@ -101,6 +101,8 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     return intersectionCount;
   }
 
+  private static final long serialVersionUID = 1L;
+
   public AbstractLineSegment() {
     super();
   }
@@ -140,7 +142,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
 
   /**
    * Computes the closest points on two line segments.
-   * 
+   *
    * @param line the segment to find the closest point to
    * @return a pair of Point which are the closest points on the line segments
    */
@@ -294,6 +296,21 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     return distance(x, y);
   }
 
+  @Override
+  public double distanceAlong(final double x, final double y) {
+    final double projectionFactor = projectionFactor(x, y);
+    if (projectionFactor >= 0 && projectionFactor <= 1) {
+      return getLength() * projectionFactor;
+    } else {
+      return 0;
+    }
+  }
+
+  @Override
+  public double distanceAlong(final Point point) {
+    return distanceAlong(point.getX(), point.getY());
+  }
+
   /**
    * Computes the perpendicular distance between the (infinite) line defined
    * by this line segment and a point.
@@ -334,7 +351,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
   @Override
   public boolean equalsTopo(final LineSegment other) {
     return getP0().equals(other.getP0()) && getP1().equals(other.getP1())
-      || getP0().equals(other.getP1()) && getP1().equals(other.getP0());
+        || getP0().equals(other.getP1()) && getP1().equals(other.getP0());
   }
 
   public LineSegment extend(final double startDistance, final double endDistance) {
@@ -441,13 +458,13 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
         final int Pq2 = CoordinatesListUtil.orientationIndex(line1x1, line1y1,
           line1x2, line1y2, line2x2, line2y2);
 
-        if (!((Pq1 > 0 && Pq2 > 0) || (Pq1 < 0 && Pq2 < 0))) {
+        if (!(Pq1 > 0 && Pq2 > 0 || Pq1 < 0 && Pq2 < 0)) {
           final int Qp1 = CoordinatesListUtil.orientationIndex(line2x1,
             line2y1, line2x2, line2y2, line1x1, line1y1);
           final int Qp2 = CoordinatesListUtil.orientationIndex(line2x1,
             line2y1, line2x2, line2y2, line1x2, line1y2);
 
-          if (!((Qp1 > 0 && Qp2 > 0) || (Qp1 < 0 && Qp2 < 0))) {
+          if (!(Qp1 > 0 && Qp2 > 0 || Qp1 < 0 && Qp2 < 0)) {
             final double detLine1StartLine1End = LineSegmentUtil.det(line1x1,
               line1y1, line1x2, line1y2);
             final double detLine2StartLine2End = LineSegmentUtil.det(line2x1,
@@ -534,15 +551,15 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
   /**
    * Computes an intersection point between two line segments, if there is one.
    * There may be 0, 1 or many intersection points between two segments.
-   * If there are 0, null is returned. If there is 1 or more, 
-   * exactly one of them is returned 
-   * (chosen at the discretion of the algorithm).  
+   * If there are 0, null is returned. If there is 1 or more,
+   * exactly one of them is returned
+   * (chosen at the discretion of the algorithm).
    * If more information is required about the details of the intersection,
    * the {@link RobustLineIntersector} class should be used.
    *
    * @param line a line segment
    * @return an intersection point, or <code>null</code> if there is none
-   * 
+   *
    * @see RobustLineIntersector
    */
   @Override
@@ -588,6 +605,21 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
   }
 
   @Override
+  public boolean isPerpendicularTo(Point point) {
+    if (Property.hasValues(point, this)) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.convert(geometryFactory, 2);
+      final double x = point.getX();
+      final double y = point.getY();
+      final double projectionFactor = projectionFactor(x, y);
+      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   public boolean isPointOnLineMiddle(Point point, final double maxDistance) {
     if (point == null || point.isEmpty()) {
       return false;
@@ -600,8 +632,22 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
       final double y2 = getY(1);
       final double x = point.getX();
       final double y = point.getY();
-      return LineSegmentUtil.isPointOnLineMiddle(x1, y1, x2, y2, x, y,
-        maxDistance);
+      if (NumberEquals.equal(x, x1) && NumberEquals.equal(y, y1)) {
+        return false;
+      } else if (NumberEquals.equal(x, x2) && NumberEquals.equal(y, y2)) {
+        return false;
+      } else {
+        final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2,
+          y2, x, y);
+        if (distance < maxDistance) {
+          final double projectionFactor = LineSegmentUtil.projectionFactor(x1,
+            y1, x2, y2, x, y);
+          if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+            return true;
+          }
+        }
+        return false;
+      }
     }
   }
 
@@ -622,18 +668,18 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
   /**
    * Computes the intersection point of the lines of infinite extent defined
    * by two line segments (if there is one).
-   * There may be 0, 1 or an infinite number of intersection points 
+   * There may be 0, 1 or an infinite number of intersection points
    * between two lines.
-   * If there is a unique intersection point, it is returned. 
+   * If there is a unique intersection point, it is returned.
    * Otherwise, <tt>null</tt> is returned.
    * If more information is required about the details of the intersection,
    * the {@link RobustLineIntersector} class should be used.
    *
    * @param line a line segment defining an straight line with infinite extent
-   * @return an intersection point, 
+   * @return an intersection point,
    * or <code>null</code> if there is no point of intersection
    * or an infinite number of intersection points
-   * 
+   *
    * @see RobustLineIntersector
    */
   @Override
@@ -721,7 +767,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
    * @return 1 (LEFT) if <code>p</code> is to the left of this segment
    * @return -1 (RIGHT) if <code>p</code> is to the right of this segment
    * @return 0 (COLLINEAR) if <code>p</code> is collinear with this segment
-   * 
+   *
    * @see CGAlgorithms#computeOrientation(Coordinate, Coordinate, Coordinate)
    */
   @Override
@@ -731,22 +777,22 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
      * dependent, when computing the orientation of a point very close to a
      * line. This is possibly due to the arithmetic in the translation to the
      * origin.
-     * 
+     *
      * For instance, the following situation produces identical results in spite
      * of the inverse orientation of the line segment:
-     * 
+     *
      * Point p0 = new PointDouble((double)219.3649559090992, 140.84159161824724);
      * Point p1 = new PointDouble((double)168.9018919682399, -5.713787599646864);
-     * 
+     *
      * Point p = new PointDouble((double)186.80814046338352, 46.28973405831556); int
      * orient = orientationIndex(p0, p1, p); int orientInv =
      * orientationIndex(p1, p0, p);
-     * 
+     *
      * A way to force consistent results is to normalize the orientation of the
      * vector using the following code. However, this may make the results of
      * orientationIndex inconsistent through the triangle of points, so it's not
      * clear this is an appropriate patch.
-     * 
+     *
      */
     return CGAlgorithmsDD.orientationIndex(getP0(), getP1(), p);
     // testing only
@@ -760,8 +806,8 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
    * fraction along the line defined by this segment.
    * A fraction of <code>0.0</code> returns the start point of the segment;
    * a fraction of <code>1.0</code> returns the end point of the segment.
-   * If the fraction is < 0.0 or > 1.0 the point returned 
-   * will lie before the start or beyond the end of the segment. 
+   * If the fraction is < 0.0 or > 1.0 the point returned
+   * will lie before the start or beyond the end of the segment.
    *
    * @param segmentLengthFraction the fraction of the segment length along the line
    * @return the point at that distance
@@ -784,7 +830,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
 
   /**
    * Computes the {@link Coordinates} that lies a given
-   * fraction along the line defined by this segment and offset from 
+   * fraction along the line defined by this segment and offset from
    * the segment by a given distance.
    * A fraction of <code>0.0</code> offsets from the start point of the segment;
    * a fraction of <code>1.0</code> offsets from the end point of the segment.
@@ -795,7 +841,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
    * @param offsetDistance the distance the point is offset from the segment
    *    (positive is to the left, negative is to the right)
    * @return the point at that distance and offset
-   * 
+   *
    * @throws IllegalStateException if the segment has zero length
    */
   @Override
@@ -810,14 +856,14 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     final double dy = y2 - y1;
 
     // the point on the segment line
-    double x = x1 + segmentLengthFraction * (dx);
-    double y = y1 + segmentLengthFraction * (dy);
+    double x = x1 + segmentLengthFraction * dx;
+    double y = y1 + segmentLengthFraction * dy;
 
     final double len = Math.sqrt(dx * dx + dy * dy);
     if (offsetDistance != 0.0) {
       if (len <= 0.0) {
         throw new IllegalStateException(
-          "Cannot compute offset from zero-length line segment");
+            "Cannot compute offset from zero-length line segment");
       }
       double ux = 0.0;
       double uy = 0.0;
@@ -926,7 +972,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
    * <p>
    * The projection factor will lie in the range <tt>(-inf, +inf)</tt>,
    * or be <code>NaN</code> if the line segment has zero length..
-   * 
+   *
    * @param p the point to compute the factor for
    * @return the projection factor for the point
    */
@@ -955,15 +1001,15 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
   }
 
   /**
-   * Computes the fraction of distance (in <tt>[0.0, 1.0]</tt>) 
+   * Computes the fraction of distance (in <tt>[0.0, 1.0]</tt>)
    * that the projection of a point occurs along this line segment.
    * If the point is beyond either ends of the line segment,
    * the closest fractional value (<tt>0.0</tt> or <tt>1.0</tt>) is returned.
    * <p>
-   * Essentially, this is the {@link #projectionFactor} clamped to 
+   * Essentially, this is the {@link #projectionFactor} clamped to
    * the range <tt>[0.0, 1.0]</tt>.
    * If the segment has zero length, 1.0 is returned.
-   *  
+   *
    * @param inputPt the point
    * @return the fraction along the line segment the projection of the point occurs
    */

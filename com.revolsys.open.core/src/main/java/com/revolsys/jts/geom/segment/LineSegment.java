@@ -28,7 +28,7 @@ public interface LineSegment extends LineString {
 
   /**
    * Computes the closest points on two line segments.
-   * 
+   *
    * @param line the segment to find the closest point to
    * @return a pair of Point which are the closest points on the line segments
    */
@@ -49,6 +49,10 @@ public interface LineSegment extends LineString {
    * @return the distance from this segment to the given point
    */
   double distance(Point p);
+
+  double distanceAlong(final double x, final double y);
+
+  double distanceAlong(final Point point);
 
   /**
    * Computes the perpendicular distance between the (infinite) line defined
@@ -94,15 +98,15 @@ public interface LineSegment extends LineString {
   /**
    * Computes an intersection point between two line segments, if there is one.
    * There may be 0, 1 or many intersection points between two segments.
-   * If there are 0, null is returned. If there is 1 or more, 
-   * exactly one of them is returned 
-   * (chosen at the discretion of the algorithm).  
+   * If there are 0, null is returned. If there is 1 or more,
+   * exactly one of them is returned
+   * (chosen at the discretion of the algorithm).
    * If more information is required about the details of the intersection,
    * the {@link RobustLineIntersector} class should be used.
    *
    * @param line a line segment
    * @return an intersection point, or <code>null</code> if there is none
-   * 
+   *
    * @see RobustLineIntersector
    */
   Point intersection(LineSegment line);
@@ -118,6 +122,8 @@ public interface LineSegment extends LineString {
    */
   boolean isHorizontal();
 
+  boolean isPerpendicularTo(Point point);
+
   boolean isPointOnLineMiddle(Point point, final double maxDistance);
 
   /**
@@ -130,18 +136,18 @@ public interface LineSegment extends LineString {
   /**
    * Computes the intersection point of the lines of infinite extent defined
    * by two line segments (if there is one).
-   * There may be 0, 1 or an infinite number of intersection points 
+   * There may be 0, 1 or an infinite number of intersection points
    * between two lines.
-   * If there is a unique intersection point, it is returned. 
+   * If there is a unique intersection point, it is returned.
    * Otherwise, <tt>null</tt> is returned.
    * If more information is required about the details of the intersection,
    * the {@link RobustLineIntersector} class should be used.
    *
    * @param line a line segment defining an straight line with infinite extent
-   * @return an intersection point, 
+   * @return an intersection point,
    * or <code>null</code> if there is no point of intersection
    * or an infinite number of intersection points
-   * 
+   *
    * @see RobustLineIntersector
    */
   Point lineIntersection(LineSegment line);
@@ -194,7 +200,7 @@ public interface LineSegment extends LineString {
    * @return 1 (LEFT) if <code>p</code> is to the left of this segment
    * @return -1 (RIGHT) if <code>p</code> is to the right of this segment
    * @return 0 (COLLINEAR) if <code>p</code> is collinear with this segment
-   * 
+   *
    * @see CGAlgorithms#computeOrientation(Coordinate, Coordinate, Coordinate)
    */
   int orientationIndex(Point p);
@@ -204,8 +210,8 @@ public interface LineSegment extends LineString {
    * fraction along the line defined by this segment.
    * A fraction of <code>0.0</code> returns the start point of the segment;
    * a fraction of <code>1.0</code> returns the end point of the segment.
-   * If the fraction is < 0.0 or > 1.0 the point returned 
-   * will lie before the start or beyond the end of the segment. 
+   * If the fraction is < 0.0 or > 1.0 the point returned
+   * will lie before the start or beyond the end of the segment.
    *
    * @param segmentLengthFraction the fraction of the segment length along the line
    * @return the point at that distance
@@ -214,7 +220,7 @@ public interface LineSegment extends LineString {
 
   /**
    * Computes the {@link Coordinates} that lies a given
-   * fraction along the line defined by this segment and offset from 
+   * fraction along the line defined by this segment and offset from
    * the segment by a given distance.
    * A fraction of <code>0.0</code> offsets from the start point of the segment;
    * a fraction of <code>1.0</code> offsets from the end point of the segment.
@@ -225,7 +231,7 @@ public interface LineSegment extends LineString {
    * @param offsetDistance the distance the point is offset from the segment
    *    (positive is to the left, negative is to the right)
    * @return the point at that distance and offset
-   * 
+   *
    * @throws IllegalStateException if the segment has zero length
    */
   Point pointAlongOffset(double segmentLengthFraction, double offsetDistance);
@@ -267,7 +273,7 @@ public interface LineSegment extends LineString {
    * <p>
    * The projection factor will lie in the range <tt>(-inf, +inf)</tt>,
    * or be <code>NaN</code> if the line segment has zero length..
-   * 
+   *
    * @param p the point to compute the factor for
    * @return the projection factor for the point
    */
@@ -280,15 +286,15 @@ public interface LineSegment extends LineString {
   LineSegment reverse();
 
   /**
-   * Computes the fraction of distance (in <tt>[0.0, 1.0]</tt>) 
+   * Computes the fraction of distance (in <tt>[0.0, 1.0]</tt>)
    * that the projection of a point occurs along this line segment.
    * If the point is beyond either ends of the line segment,
    * the closest fractional value (<tt>0.0</tt> or <tt>1.0</tt>) is returned.
    * <p>
-   * Essentially, this is the {@link #projectionFactor} clamped to 
+   * Essentially, this is the {@link #projectionFactor} clamped to
    * the range <tt>[0.0, 1.0]</tt>.
    * If the segment has zero length, 1.0 is returned.
-   *  
+   *
    * @param point the point
    * @return the fraction along the line segment the projection of the point occurs
    */

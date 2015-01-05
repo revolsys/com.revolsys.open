@@ -9,9 +9,11 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.util.Counter;
+import com.revolsys.util.LongCounter;
 
 public class Statistics {
-  private final Map<String, Long> counts = new TreeMap<String, Long>();
+  private final Map<String, Counter> counts = new TreeMap<>();
 
   private final Logger log;
 
@@ -30,7 +32,7 @@ public class Statistics {
   }
 
   public Statistics(final String category, final String message) {
-    log = Logger.getLogger(category);
+    this.log = Logger.getLogger(category);
     this.message = message;
   }
 
@@ -62,26 +64,28 @@ public class Statistics {
   }
 
   public synchronized boolean add(final String name, final long count) {
-    final Long oldCount = counts.get(name);
-    if (oldCount == null) {
-      counts.put(name, count);
+    Counter counter = this.counts.get(name);
+    if (counter == null) {
+      counter = new LongCounter(name, count);
+      this.counts.put(name, counter);
       return true;
     } else {
-      counts.put(name, oldCount + count);
+      counter.add(count);
       return false;
     }
   }
 
   public synchronized void addCountsText(final StringBuilder sb) {
     int totalCount = 0;
-    if (message != null) {
-      sb.append(message);
+    if (this.message != null) {
+      sb.append(this.message);
     }
     sb.append("\n");
-    for (final Entry<String, Long> entry : counts.entrySet()) {
+    for (final Entry<String, Counter> entry : this.counts.entrySet()) {
       sb.append(entry.getKey());
       sb.append("\t");
-      final Long count = entry.getValue();
+      final Counter counter = entry.getValue();
+      final long count = counter.get();
       totalCount += count;
       sb.append(count);
       sb.append("\n");
@@ -93,51 +97,61 @@ public class Statistics {
   }
 
   public synchronized void clearCounts() {
-    counts.clear();
+    this.counts.clear();
   }
 
   public synchronized void clearCounts(final String typeName) {
-    counts.remove(typeName);
+    this.counts.remove(typeName);
   }
 
   public synchronized void connect() {
-    providerCount++;
+    this.providerCount++;
   }
 
   public synchronized void disconnect() {
-    providerCount--;
-    if (providerCount <= 0) {
+    this.providerCount--;
+    if (this.providerCount <= 0) {
       logCounts();
     }
   }
 
   public synchronized Long get(final String name) {
     if (name != null) {
-      final Long count = counts.get(name);
-      return count;
-    } else {
-      return null;
+      final Counter counter = this.counts.get(name);
+      if (counter != null) {
+        return counter.get();
+      }
     }
+    return null;
+  }
+
+  public synchronized Counter getCounter(final String name) {
+    Counter counter = this.counts.get(name);
+    if (counter == null) {
+      counter = new LongCounter(name);
+      this.counts.put(name, counter);
+    }
+    return counter;
   }
 
   public String getMessage() {
-    return message;
+    return this.message;
   }
 
   public synchronized Set<String> getNames() {
-    return counts.keySet();
+    return this.counts.keySet();
   }
 
   public boolean isLogCounts() {
-    return logCounts;
+    return this.logCounts;
   }
 
   public synchronized String logCounts() {
     final StringBuilder sb = new StringBuilder();
     addCountsText(sb);
     final String string = sb.toString();
-    if (isLogCounts() && !counts.isEmpty()) {
-      log.info(string);
+    if (isLogCounts() && !this.counts.isEmpty()) {
+      this.log.info(string);
     }
     return string;
   }
@@ -152,6 +166,6 @@ public class Statistics {
 
   @Override
   public String toString() {
-    return message;
+    return this.message;
   }
 }

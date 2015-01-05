@@ -13,10 +13,6 @@ import com.revolsys.util.OS;
 
 public class ClasspathNativeLibraryUtil {
 
-  private static final Map<String, Boolean> LIBRARY_LOADED_MAP = new HashMap<String, Boolean>();
-
-  public static final Logger LOG = LoggerFactory.getLogger(ClasspathNativeLibraryUtil.class);
-
   public static String getLibraryExtension() {
     if (OS.IS_WINDOWS) {
       return "dll";
@@ -95,7 +91,7 @@ public class ClasspathNativeLibraryUtil {
     boolean loaded = false;
     final String fileName = prefix + name + "." + ext;
     final String libraryName = "/native/" + operatingSystemName + "/" + arch
-      + "/" + fileName;
+        + "/" + fileName;
     final URL url = ClasspathNativeLibraryUtil.class.getResource(libraryName);
     if (url == null) {
       if (arch.equals("x86_64")) {
@@ -107,7 +103,7 @@ public class ClasspathNativeLibraryUtil {
           loaded = true;
         } catch (final Throwable e) {
           LOG.debug("Unable to load shared library from classpath "
-            + libraryName + " " + fileName, e);
+              + libraryName + " " + fileName, e);
         }
       }
     } else {
@@ -126,5 +122,9 @@ public class ClasspathNativeLibraryUtil {
     LIBRARY_LOADED_MAP.put(name, loaded);
     return loaded;
   }
+
+  private static final Map<String, Boolean> LIBRARY_LOADED_MAP = new HashMap<String, Boolean>();
+
+  public static final Logger LOG = LoggerFactory.getLogger(ClasspathNativeLibraryUtil.class);
 
 }

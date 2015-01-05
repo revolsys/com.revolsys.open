@@ -38,13 +38,12 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.jts.math.MathUtil;
 import com.revolsys.jts.shape.GeometricShapeBuilder;
 
 /**
- * Creates random point sets 
- * where the points are constrained to lie in the cells of a grid. 
- * 
+ * Creates random point sets
+ * where the points are constrained to lie in the cells of a grid.
+ *
  * @author mbdavis
  *
  */
@@ -90,21 +89,22 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
 
   /**
    * Gets the {@link MultiPoint} containing the generated point
-   * 
+   *
    * @return a MultiPoint
    */
   @Override
   public Geometry getGeometry() {
-    int nCells = (int)Math.sqrt(numPts);
+    int nCells = (int)Math.sqrt(this.numPts);
     // ensure that at least numPts points are generated
-    if (nCells * nCells < numPts) {
+    if (nCells * nCells < this.numPts) {
       nCells += 1;
     }
 
     final double gridDX = getExtent().getWidth() / nCells;
     final double gridDY = getExtent().getHeight() / nCells;
 
-    final double gutterFrac = MathUtil.clamp(gutterFraction, 0.0, 1.0);
+    final double gutterFrac = com.revolsys.util.MathUtil.clamp(
+      this.gutterFraction, 0.0, 1.0);
     final double gutterOffsetX = gridDX * gutterFrac / 2;
     final double gutterOffsetY = gridDY * gutterFrac / 2;
     final double cellFrac = 1.0 - gutterFrac;
@@ -120,19 +120,19 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
         pts[index++] = randomPointInCell(orgX, orgY, cellDX, cellDY);
       }
     }
-    return geometryFactory.multiPoint(pts);
+    return this.geometryFactory.multiPoint(pts);
   }
 
   private Point randomPointInCell(final double orgX, final double orgY,
     final double xLen, final double yLen) {
-    if (isConstrainedToCircle) {
+    if (this.isConstrainedToCircle) {
       return randomPointInCircle(orgX, orgY, xLen, yLen);
     }
     return randomPointInGridCell(orgX, orgY, xLen, yLen);
   }
 
-  private Point randomPointInGridCell(final double orgX,
-    final double orgY, final double xLen, final double yLen) {
+  private Point randomPointInGridCell(final double orgX, final double orgY,
+    final double xLen, final double yLen) {
     final double x = orgX + xLen * Math.random();
     final double y = orgY + yLen * Math.random();
     return createCoord(x, y);
@@ -155,7 +155,7 @@ public class RandomPointsInGridBuilder extends GeometricShapeBuilder {
    * Sets the fraction of the grid cell side which will be treated as
    * a gutter, in which no points will be created.
    * The provided value is clamped to the range [0.0, 1.0].
-   * 
+   *
    * @param gutterFraction
    */
   public void setGutterFraction(final double gutterFraction) {

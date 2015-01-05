@@ -437,15 +437,17 @@ $(document).ready(function() {
      
     $('div.objectList table').addClass('display cell-border');
     $('div.objectList table').dataTable({
-      "dom": "ft",
-      "ordering" : false
+      "dom": "t",
+      "ordering" : false,
+      "paging": false
     });
 
     $('div.simpleDataTable table').addClass('display cell-border');
     $('div.simpleDataTable table').dataTable({
       "dom": "t",
       "ordering" : false,
-      "autoWidth": false
+      "autoWidth": false,
+      "paging": false
     });
     
     if (typeof jQuery.validator != "undefined") {

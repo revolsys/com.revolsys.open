@@ -78,7 +78,7 @@ public class JsonMapWriter extends AbstractMapWriter {
   }
 
   public void setSingleObject(final boolean singleObject) {
-    setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
+    setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, singleObject);
   }
 
   @Override
