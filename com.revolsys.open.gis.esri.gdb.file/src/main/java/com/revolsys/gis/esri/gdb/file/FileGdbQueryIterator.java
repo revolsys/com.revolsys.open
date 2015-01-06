@@ -78,7 +78,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     this.typePath = typePath;
     this.recordDefinition = recordStore.getRecordDefinition(typePath);
     this.table = recordStore.getTable(typePath);
-    if ("*".equals(fields)) {
+    if (this.recordDefinition != null && "*".equals(fields)) {
       this.fields = CollectionUtil.toString(this.recordDefinition.getFieldNames());
     } else {
       this.fields = fields;
