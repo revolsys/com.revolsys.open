@@ -3,6 +3,7 @@ package com.revolsys.swing.tree.node.record;
 import java.awt.TextField;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +30,7 @@ import com.revolsys.swing.tree.node.file.FileTreeNode;
 import com.revolsys.util.Property;
 
 public class FileRecordStoreTreeNode extends FileTreeNode implements
-  RecordStoreProxy, RecordStoreConnectionMapProxy {
+RecordStoreProxy, RecordStoreConnectionMapProxy {
   private static final MenuFactory MENU = new MenuFactory("File Record Store");
 
   static {
@@ -39,7 +40,7 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
 
     MENU.addMenuItem("default", TreeNodeRunnable.createAction(
       "Add Record Store Connection", "link_add", NODE_EXISTS,
-      "addRecordStoreConnection"));
+        "addRecordStoreConnection"));
   }
 
   public FileRecordStoreTreeNode(final File file) {
@@ -70,8 +71,14 @@ public class FileRecordStoreTreeNode extends FileTreeNode implements
     nameField.setText(fileName);
 
     SwingUtil.addLabel(panel, "Record Store Connections");
-    final List<RecordStoreConnectionRegistry> registries = RecordStoreConnectionManager.get()
-      .getVisibleConnectionRegistries();
+
+    final List<RecordStoreConnectionRegistry> registries = new ArrayList<>();
+    for (final RecordStoreConnectionRegistry registry : RecordStoreConnectionManager.get()
+      .getVisibleConnectionRegistries()) {
+      if (!registry.isReadOnly()) {
+        registries.add(registry);
+      }
+    }
     final JComboBox registryField = new JComboBox(
       new Vector<RecordStoreConnectionRegistry>(registries));
 

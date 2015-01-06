@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 import com.revolsys.jts.algorithm.BoundaryNodeRule;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
@@ -199,91 +200,94 @@ public class IsSimpleOp {
   }
 
   private boolean isSimple(final Lineal lineal) {
-    final Segment segment2 = (Segment)lineal.segments().iterator();
+    final LineSegmentIndex index = new LineSegmentIndex(lineal);
     for (final Segment segment : lineal.segments()) {
+      final int segmentIndex = segment.getSegmentIndex();
+      final int partIndex = segment.getPartIndex();
       if (segment.getLength() == 0) {
         this.errors.add(new DuplicateVertexError(segment.getGeometryVertex(0)));
       } else {
-        final int partIndex = segment.getPartIndex();
-        final int segmentIndex = segment.getSegmentIndex();
-        segment2.setSegmentId(segment.getSegmentId());
-        while (segment2.hasNext()) {
-          segment2.next();
-          if (segment.equals(segment2)) {
-            final SelfOverlapSegmentError error = new SelfOverlapSegmentError(
-              segment);
-            this.errors.add(error);
-            if (this.shortCircuit) {
-              return false;
-            }
-          } else {
-            final Geometry intersection = segment.getIntersection(segment2);
-            if (intersection instanceof Point) {
-              final Point pointIntersection = (Point)intersection;
-              boolean isIntersection = true;
+        final List<LineSegment> segments = index.queryBoundingBox(segment);
+        for (final LineSegment lineSegment : segments) {
+          final Segment segment2 = (Segment)lineSegment;
+          final int partIndex2 = segment2.getPartIndex();
+          final int segmentIndex2 = segment2.getSegmentIndex();
+          if (partIndex2 > partIndex || partIndex == partIndex2
+            && segmentIndex2 > segmentIndex) {
+            if (segment.equals(lineSegment)) {
+              final SelfOverlapSegmentError error = new SelfOverlapSegmentError(
+                segment);
+              this.errors.add(error);
+              if (this.shortCircuit) {
+                return false;
+              }
+            } else {
+              final Geometry intersection = segment.getIntersection(lineSegment);
+              if (intersection instanceof Point) {
+                final Point pointIntersection = (Point)intersection;
+                boolean isIntersection = true;
 
-              final int partIndex2 = segment2.getPartIndex();
-              // Process segments on the same linestring part
-              if (partIndex == partIndex2) {
-                final int segmentIndex2 = segment2.getSegmentIndex();
-                // The end of the current segment can touch the start of the
-                // next
-                // segment
-                if (segmentIndex + 1 == segmentIndex2) {
-                  if (segment2.equalsVertex(2, 0, pointIntersection)) {
-                    isIntersection = false;
+                // Process segments on the same linestring part
+                if (partIndex == partIndex2) {
+                  // The end of the current segment can touch the start of the
+                  // next
+                  // segment
+                  if (segmentIndex + 1 == segmentIndex2) {
+                    if (lineSegment.equalsVertex(2, 0, pointIntersection)) {
+                      isIntersection = false;
+                    }
+                    // A loop can touch itself at the start/end
+                  } else if (segment.isLineClosed()) {
+                    if (segment.isLineStart() && segment2.isLineEnd()) {
+                      if (segment.equalsVertex(2, 0, pointIntersection)) {
+                        isIntersection = false;
+                      }
+                    }
                   }
-                  // A loop can touch itself at the start/end
-                } else if (segment.isLineClosed()) {
-                  if (segment.isLineStart() && segment2.isLineEnd()) {
-                    if (segment.equalsVertex(2, 0, pointIntersection)) {
+                } else {
+                  if (!segment.isLineClosed() && !segment2.isLineClosed()) {
+                    final boolean segment1EndIntersection = isEndIntersection(
+                      segment, pointIntersection);
+                    final boolean segment2EndIntersection = isEndIntersection(
+                      segment2, pointIntersection);
+
+                    if (segment1EndIntersection && segment2EndIntersection) {
                       isIntersection = false;
                     }
                   }
                 }
-              } else {
-                if (!segment.isLineClosed() && !segment2.isLineClosed()) {
-                  final boolean segment1EndIntersection = isEndIntersection(
-                    segment, pointIntersection);
-                  final boolean segment2EndIntersection = isEndIntersection(
-                    segment2, pointIntersection);
-
-                  if (segment1EndIntersection && segment2EndIntersection) {
-                    isIntersection = false;
+                if (isIntersection) {
+                  GeometryValidationError error;
+                  if (segment.equalsVertex(2, 0, pointIntersection)) {
+                    final Vertex vertex = segment.getGeometryVertex(0);
+                    error = new SelfIntersectionVertexError(vertex);
+                  } else if (segment.equalsVertex(2, 1, pointIntersection)) {
+                    final Vertex vertex = segment.getGeometryVertex(1);
+                    error = new SelfIntersectionVertexError(vertex);
+                  } else {
+                    error = new SelfIntersectionPointError(this.geometry,
+                      pointIntersection.clonePoint());
+                  }
+                  this.errors.add(error);
+                  if (this.shortCircuit) {
+                    return false;
                   }
                 }
-              }
-              if (isIntersection) {
+              } else if (intersection instanceof LineSegment) {
+                final LineSegment lineIntersection = (LineSegment)intersection;
                 GeometryValidationError error;
-                if (segment.equalsVertex(2, 0, pointIntersection)) {
-                  final Vertex vertex = segment.getGeometryVertex(0);
-                  error = new SelfIntersectionVertexError(vertex);
-                } else if (segment.equalsVertex(2, 1, pointIntersection)) {
-                  final Vertex vertex = segment.getGeometryVertex(1);
-                  error = new SelfIntersectionVertexError(vertex);
+                if (segment.equals(lineIntersection)) {
+                  error = new SelfOverlapSegmentError(segment);
+                } else if (lineSegment.equals(lineIntersection)) {
+                  error = new SelfOverlapSegmentError(segment2);
                 } else {
-                  error = new SelfIntersectionPointError(this.geometry,
-                    pointIntersection.clonePoint());
+                  error = new SelfOverlapLineSegmentError(this.geometry,
+                    lineIntersection);
                 }
                 this.errors.add(error);
                 if (this.shortCircuit) {
                   return false;
                 }
-              }
-            } else if (intersection instanceof LineSegment) {
-              final LineSegment lineIntersection = (LineSegment)intersection;
-              GeometryValidationError error;
-              if (segment.equals(lineIntersection)) {
-                error = new SelfOverlapSegmentError(segment);
-              } else if (segment2.equals(lineIntersection)) {
-                error = new SelfOverlapSegmentError(segment2);
-              } else {
-                error = new SelfOverlapLineSegmentError(this.geometry,
-                  lineIntersection);
-              }
-              this.errors.add(error);
-              if (this.shortCircuit) {
-                return false;
               }
             }
           }

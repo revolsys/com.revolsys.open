@@ -24,7 +24,7 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLineSegment extends AbstractLineString implements
-LineSegment {
+  LineSegment {
 
   private static int addEndPointIntersection(final double[] coordinates,
     final int intersectionCount, final int axisCount,
@@ -322,21 +322,45 @@ LineSegment {
     return CGAlgorithms.distancePointLinePerpendicular(p, getP0(), getP1());
   }
 
+  @Override
+  public boolean equals(final LineSegment segment) {
+    if (isEmpty()) {
+      return false;
+    } else if (segment.isEmpty()) {
+      return false;
+    } else {
+      if (equalsVertex(2, 0, segment, 0)) {
+        if (equalsVertex(2, 1, segment, 1)) {
+          return true;
+        }
+      } else if (equalsVertex(2, 0, segment, 1)) {
+        if (equalsVertex(2, 1, segment, 0)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
   /**
    *  Returns <code>true</code> if <code>other</code> has the same values for
    *  its points.
    *
-   *@param  o  a <code>LineSegmentDouble</code> with which to do the comparison.
-   *@return        <code>true</code> if <code>other</code> is a <code>LineSegmentDouble</code>
+   *@param  o  a <code>LineSegment</code> with which to do the comparison.
+   *@return        <code>true</code> if <code>other</code> is a <code>LineSegment</code>
    *      with the same values for the x and y ordinates.
    */
   @Override
   public boolean equals(final Object o) {
-    if (!(o instanceof LineSegmentDoubleGF)) {
-      return false;
+    if (o instanceof LineSegment) {
+      final LineSegment segment = (LineSegment)o;
+      if (equalsVertex(2, 0, segment, 0)) {
+        if (equalsVertex(2, 1, segment, 1)) {
+          return true;
+        }
+      }
     }
-    final LineSegment other = (LineSegment)o;
-    return getP0().equals(other.getP0()) && getP1().equals(other.getP1());
+    return false;
   }
 
   /**
@@ -344,14 +368,13 @@ LineSegment {
    *  topologically equal to this LineSegment (e.g. irrespective
    *  of orientation).
    *
-   *@param  other  a <code>LineSegmentDouble</code> with which to do the comparison.
-   *@return        <code>true</code> if <code>other</code> is a <code>LineSegmentDouble</code>
-   *      with the same values for the x and y ordinates.
+   *@param  other  a <code>LineSegment</code> with which to do the comparison.
+   *@return        <code>true</code> if <code>other</code> is a <code>LineSegment</code>
+   *      with the same values for the x and y ordinates in forwards or reverse order.
    */
   @Override
   public boolean equalsTopo(final LineSegment other) {
-    return getP0().equals(other.getP0()) && getP1().equals(other.getP1())
-        || getP0().equals(other.getP1()) && getP1().equals(other.getP0());
+    return equals(other);
   }
 
   public LineSegment extend(final double startDistance, final double endDistance) {
@@ -863,7 +886,7 @@ LineSegment {
     if (offsetDistance != 0.0) {
       if (len <= 0.0) {
         throw new IllegalStateException(
-            "Cannot compute offset from zero-length line segment");
+          "Cannot compute offset from zero-length line segment");
       }
       double ux = 0.0;
       double uy = 0.0;

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.revolsys.data.io.RecordStoreConnectionMapProxy;
@@ -23,6 +24,8 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
   RecordStoreConnectionMapProxy {
 
   public static final ImageIcon ICON_SCHEMA = Icons.getIcon("folder_table");
+
+  public static final ImageIcon ICON_SCHEMA_OPEN = Icons.getIcon("folder_table_open");
 
   private static final MenuFactory MENU = new MenuFactory("Record Store Schema");
 
@@ -59,6 +62,11 @@ public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
   @Override
   public MenuFactory getMenu() {
     return MENU;
+  }
+
+  @Override
+  public Icon getOpenIcon() {
+    return ICON_SCHEMA_OPEN;
   }
 
   public RecordStore getRecordStore() {

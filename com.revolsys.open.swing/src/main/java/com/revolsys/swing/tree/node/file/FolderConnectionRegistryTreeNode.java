@@ -8,6 +8,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.Icon;
+
 import com.revolsys.io.file.FolderConnection;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.SwingUtil;
@@ -20,10 +22,10 @@ import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
 public class FolderConnectionRegistryTreeNode extends LazyLoadTreeNode
-implements PropertyChangeListener {
+  implements PropertyChangeListener {
 
   private static final MenuFactory MENU = new MenuFactory(
-    "Folder Connection Registry");
+      "Folder Connection Registry");
 
   public FolderConnectionRegistryTreeNode(
     final FolderConnectionRegistry registry) {
@@ -91,6 +93,11 @@ implements PropertyChangeListener {
   @Override
   public MenuFactory getMenu() {
     return MENU;
+  }
+
+  @Override
+  public Icon getOpenIcon() {
+    return FileTreeNode.ICON_FOLDER_LINK_OPEN;
   }
 
   public FolderConnectionRegistry getRegistry() {

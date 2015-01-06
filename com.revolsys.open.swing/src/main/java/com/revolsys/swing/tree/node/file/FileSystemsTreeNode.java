@@ -16,6 +16,8 @@ public class FileSystemsTreeNode extends ListTreeNode {
 
   public static final Icon ICON_FOLDER_DRIVE = Icons.getIcon("folder_drive");
 
+  public static final Icon ICON_FOLDER_DRIVE_OPEN = Icons.getIcon("folder_drive_open");
+
   private static final MenuFactory MENU = new MenuFactory("File Systems");
 
   static {
@@ -39,5 +41,10 @@ public class FileSystemsTreeNode extends ListTreeNode {
   @Override
   public MenuFactory getMenu() {
     return MENU;
+  }
+
+  @Override
+  public Icon getOpenIcon() {
+    return ICON_FOLDER_DRIVE_OPEN;
   }
 }

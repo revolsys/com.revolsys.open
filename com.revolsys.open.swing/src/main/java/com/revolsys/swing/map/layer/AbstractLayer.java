@@ -72,8 +72,8 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLayer extends AbstractObjectWithProperties
-  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy,
-  EventsEnabler {
+implements Layer, PropertyChangeListener, PropertyChangeSupportProxy,
+EventsEnabler {
   public static final ImageIcon ICON_LAYER = Icons.getIcon("map");
 
   private static final AtomicLong ID_GEN = new AtomicLong();
@@ -244,18 +244,18 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
       } else {
         final JLabel extentLabel = new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
-            + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-            + StringConverterRegistry.toString(boundingBox.getMaximum(1))
-            + "</td><td>&nbsp;</td></tr><tr>"
-            + "<td><b>Left</b>: "
-            + StringConverterRegistry.toString(boundingBox.getMinimum(0))
-            + "</td><td>&nbsp;</td><td>&nbsp;</td>"
-            + "<td><b>Right</b>: "
-            + StringConverterRegistry.toString(boundingBox.getMaximum(0))
-            + "</td></tr>"
-            + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-            + StringConverterRegistry.toString(boundingBox.getMinimum(1))
-            + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
+              + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+              + StringConverterRegistry.toString(boundingBox.getMaximum(1))
+              + "</td><td>&nbsp;</td></tr><tr>"
+              + "<td><b>Left</b>: "
+              + StringConverterRegistry.toString(boundingBox.getMinimum(0))
+              + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+              + "<td><b>Right</b>: "
+              + StringConverterRegistry.toString(boundingBox.getMaximum(0))
+              + "</td></tr>"
+              + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+              + StringConverterRegistry.toString(boundingBox.getMinimum(1))
+              + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
         extentLabel.setFont(SwingUtil.FONT);
         extentPanel.add(extentLabel);
 
@@ -586,7 +586,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
         setExists(exists);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to initialize layer: "
-          + getPath(), e);
+            + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -639,6 +639,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   }
 
   @Override
+  public boolean isHasSelectedRecords() {
+    return false;
+  }
+
+  @Override
   public boolean isInitialized() {
     return this.initialized;
   }
@@ -661,7 +666,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   @Override
   public boolean isSelectable() {
     return isExists() && isVisible()
-      && (isSelectSupported() && this.selectable || isEditable());
+        && (isSelectSupported() && this.selectable || isEditable());
   }
 
   @Override
@@ -684,7 +689,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
   public boolean isVisible(final double scale) {
     final LayerGroup parent = getParent();
     if (isExists() && isVisible()
-      && (parent == null || parent.isVisible(scale))) {
+        && (parent == null || parent.isVisible(scale))) {
       final long longScale = (long)scale;
       final long minimumScale = getMinimumScale();
       final long maximumScale = getMaximumScale();
@@ -1083,8 +1088,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
     final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-      .expandPercent(0.1)
-      .clipToCoordinateSystem();
+        .expandPercent(0.1)
+        .clipToCoordinateSystem();
     project.setViewBoundingBox(boundingBox);
   }
 }

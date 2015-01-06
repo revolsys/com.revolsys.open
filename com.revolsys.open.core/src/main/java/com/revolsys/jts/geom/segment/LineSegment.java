@@ -62,6 +62,8 @@ public interface LineSegment extends LineString {
    */
   double distancePerpendicular(Point p);
 
+  boolean equals(LineSegment segment);
+
   /**
    *  Returns <code>true</code> if <code>other</code> is
    *  topologically equal to this LineSegment (e.g. irrespective

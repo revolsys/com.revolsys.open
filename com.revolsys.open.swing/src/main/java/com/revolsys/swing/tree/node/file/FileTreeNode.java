@@ -153,11 +153,15 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public static final Icon ICON_FOLDER = Icons.getIcon("folder");
 
+  public static final Icon ICON_FOLDER_OPEN = Icons.getIcon("folder_open");
+
   public static final Icon ICON_DRIVE = Icons.getIcon("drive");
 
   public static final Icon ICON_DRIVE_MISSING = Icons.getIcon("drive_error");
 
   public static final ImageIcon ICON_FOLDER_LINK = Icons.getIcon("folder_link");
+
+  public static final ImageIcon ICON_FOLDER_LINK_OPEN = Icons.getIcon("folder_link_open");
 
   public static final Icon ICON_FOLDER_MISSING = Icons.getIcon("folder_error");
 
@@ -204,8 +208,13 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       nameField.setText(fileName);
 
       SwingUtil.addLabel(panel, "Folder Connections");
-      final List<FolderConnectionRegistry> registries = FolderConnectionManager.get()
-          .getVisibleConnectionRegistries();
+      final List<FolderConnectionRegistry> registries = new ArrayList<>();
+      for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
+        .getVisibleConnectionRegistries()) {
+        if (!registry.isReadOnly()) {
+          registries.add(registry);
+        }
+      }
       final JComboBox registryField = new JComboBox(
         new Vector<FolderConnectionRegistry>(registries));
 
@@ -271,6 +280,16 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   }
 
   @Override
+  public Icon getOpenIcon() {
+    final File file = getUserData();
+    if (file.isDirectory()) {
+      return ICON_FOLDER_OPEN;
+    } else {
+      return super.getOpenIcon();
+    }
+  }
+
+  @Override
   public String getType() {
     final File file = getUserData();
     if (file.isDirectory()) {
@@ -279,7 +298,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       final String extension = FileUtil.getFileNameExtension(file);
       if (Property.hasValue(extension)) {
         final IoFactory factory = IoFactoryRegistry.getInstance()
-            .getFactoryByFileExtension(IoFactory.class, extension);
+          .getFactoryByFileExtension(IoFactory.class, extension);
         if (factory != null) {
           return factory.getName();
         }

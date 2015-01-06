@@ -5,6 +5,8 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.Icon;
+
 import com.revolsys.io.datastore.RecordStoreConnection;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
 import com.revolsys.swing.map.form.RecordStoreConnectionDialog;
@@ -69,6 +71,11 @@ public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
   @Override
   public MenuFactory getMenu() {
     return MENU;
+  }
+
+  @Override
+  public Icon getOpenIcon() {
+    return FileTreeNode.ICON_FOLDER_LINK_OPEN;
   }
 
   protected RecordStoreConnectionRegistry getRegistry() {

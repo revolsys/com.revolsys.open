@@ -3,6 +3,8 @@ package com.revolsys.swing.tree.node.file;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.Icon;
+
 import com.revolsys.io.file.FolderConnectionManager;
 import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.swing.listener.InvokeMethodListener;
@@ -18,14 +20,14 @@ public class FolderConnectionsTreeNode extends ListTreeNode {
     setIcon(FileTreeNode.ICON_FOLDER_LINK);
     final FolderConnectionManager connectionManager = FolderConnectionManager.get();
     Property.addListener(connectionManager, new InvokeMethodListener(this,
-      "refresh"));
+        "refresh"));
   }
 
   @Override
   protected List<BaseTreeNode> doLoadChildren() {
     final List<BaseTreeNode> children = new ArrayList<>();
     final List<FolderConnectionRegistry> registries = FolderConnectionManager.get()
-      .getVisibleConnectionRegistries();
+        .getVisibleConnectionRegistries();
     for (final FolderConnectionRegistry childRegistry : registries) {
       final FolderConnectionRegistryTreeNode child = new FolderConnectionRegistryTreeNode(
         childRegistry);
@@ -34,4 +36,8 @@ public class FolderConnectionsTreeNode extends ListTreeNode {
     return children;
   }
 
+  @Override
+  public Icon getOpenIcon() {
+    return FileTreeNode.ICON_FOLDER_LINK_OPEN;
+  }
 }

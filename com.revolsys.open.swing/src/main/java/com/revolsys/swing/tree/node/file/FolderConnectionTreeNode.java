@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 
+import javax.swing.Icon;
 import javax.swing.JOptionPane;
 
 import com.revolsys.io.file.FolderConnection;
@@ -67,6 +68,11 @@ UrlProxy {
   @Override
   public MenuFactory getMenu() {
     return MENU;
+  }
+
+  @Override
+  public Icon getOpenIcon() {
+    return FileTreeNode.ICON_FOLDER_LINK_OPEN;
   }
 
   @Override

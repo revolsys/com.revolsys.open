@@ -62,8 +62,8 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class AbstractOverlay extends JComponent implements
-PropertyChangeListener, MouseListener, MouseMotionListener,
-MouseWheelListener, KeyListener, FocusListener {
+  PropertyChangeListener, MouseListener, MouseMotionListener,
+  MouseWheelListener, KeyListener, FocusListener {
   public static final Cursor CURSOR_LINE_ADD_NODE = Icons.getCursor(
     "cursor_line_node_add", 8, 6);
 
@@ -751,7 +751,7 @@ MouseWheelListener, KeyListener, FocusListener {
 
       boolean nodeSnap = false;
       final StringBuilder text = new StringBuilder(
-          "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
+        "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
       text.append("<li style=\"padding: 2px; margin:1px;");
       if (0 == this.snapPointIndex) {
         text.append("border: 2px solid maroon");
@@ -759,7 +759,7 @@ MouseWheelListener, KeyListener, FocusListener {
         text.append("border: 2px solid #FFFF33");
       }
 
-      text.append("\">Not snaped: ");
+      text.append("\">Not snapped: ");
       final Point mousePoint = getEventPoint();
       appendPoint(text, mousePoint);
       text.append(" (");

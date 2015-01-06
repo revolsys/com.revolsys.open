@@ -45,6 +45,13 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
     }
   }
 
+  @Override
+  public void collapseChildren() {
+    if (isLoaded()) {
+      super.collapseChildren();
+    }
+  }
+
   private List<BaseTreeNode> createLoadingNodes() {
     final List<BaseTreeNode> nodes = new ArrayList<>();
     nodes.add(new LoadingTreeNode(this));
@@ -84,7 +91,7 @@ public abstract class LazyLoadTreeNode extends BaseTreeNode {
     if (SwingUtilities.isEventDispatchThread()) {
       if (!isLoaded()) {
         Invoke.background("Load tree node " + this.getName(), this,
-          "loadChildren");
+            "loadChildren");
       }
     } else {
       synchronized (this.sync) {

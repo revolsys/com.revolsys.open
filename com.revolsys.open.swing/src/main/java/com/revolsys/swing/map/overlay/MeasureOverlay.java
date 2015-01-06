@@ -38,11 +38,14 @@ import com.revolsys.util.MathUtil;
 
 public class MeasureOverlay extends AbstractOverlay {
 
+  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.wgs84()
+    .geometry();
+
   public static final String MEASURE = "Measure";
 
   private static final Cursor CURSOR = Icons.getCursor("cursor_ruler", 8, 7);
 
-  private Geometry measureGeometry;
+  private Geometry measureGeometry = EMPTY_GEOMETRY;
 
   private double area;
 
@@ -182,14 +185,15 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   @Override
-  public boolean isEnabled() {
-    return isOverlayAction(MEASURE);
-  }
-
-  @Override
   public void keyPressed(final KeyEvent event) {
     final int keyCode = event.getKeyCode();
-    if (keyCode == KeyEvent.VK_ESCAPE) {
+    if (keyCode == KeyEvent.VK_M) {
+      if (isOverlayAction(MEASURE)) {
+        setMeasureGeometry(EMPTY_GEOMETRY);
+      } else {
+        setOverlayAction(MEASURE);
+      }
+    } else if (keyCode == KeyEvent.VK_ESCAPE) {
       if (isOverlayAction(MEASURE) && !this.dragged) {
         cancel();
       }
@@ -206,7 +210,7 @@ public class MeasureOverlay extends AbstractOverlay {
 
   private void modeMeasureClear() {
     if (clearOverlayAction(MEASURE)) {
-      setMeasureGeometry(null);
+      setMeasureGeometry(EMPTY_GEOMETRY);
       this.dragged = false;
     }
   }
@@ -223,7 +227,7 @@ public class MeasureOverlay extends AbstractOverlay {
         if (clickCount == 1) {
           final Geometry measureGeometry = getMeasureGeometry();
           final GeometryFactory geometryFactory = getGeometryFactory();
-          if (measureGeometry == null) {
+          if (measureGeometry.isEmpty()) {
             setMeasureGeometry(point);
           } else if (measureGeometry instanceof Point) {
             final Point from = (Point)measureGeometry;
@@ -324,25 +328,22 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   protected boolean modeMeasureMove(final MouseEvent event) {
-    if (this.measureGeometry != null) {
-      if (isOverlayAction(MEASURE)) {
+    if (isOverlayAction(MEASURE)) {
 
-        final BoundingBox boundingBox = getHotspotBoundingBox();
-        final CloseLocation location = findCloseLocation(null, null,
-          this.measureGeometry, boundingBox);
-        final List<CloseLocation> locations = new ArrayList<>();
-        if (location != null) {
-          locations.add(location);
-        }
-        final boolean hasMouseOver = setMouseOverLocations(locations);
-
-        // TODO make work with multi-part
-        if (!hasMouseOver) {
-          modeMeasureUpdateXorGeometry();
-        }
-        return true;
+      final BoundingBox boundingBox = getHotspotBoundingBox();
+      final CloseLocation location = findCloseLocation(null, null,
+        this.measureGeometry, boundingBox);
+      final List<CloseLocation> locations = new ArrayList<>();
+      if (location != null) {
+        locations.add(location);
       }
+      final boolean hasMouseOver = setMouseOverLocations(locations);
 
+      // TODO make work with multi-part
+      if (!hasMouseOver) {
+        modeMeasureUpdateXorGeometry();
+      }
+      return true;
     }
     return false;
   }
@@ -368,7 +369,7 @@ public class MeasureOverlay extends AbstractOverlay {
     }
     Geometry xorGeometry = null;
 
-    if (this.measureGeometry == null) {
+    if (this.measureGeometry.isEmpty()) {
     } else {
       Vertex firstVertex;
       final Vertex toVertex;
@@ -433,7 +434,7 @@ public class MeasureOverlay extends AbstractOverlay {
   protected void paintComponent(final Graphics2D graphics) {
     final Viewport2D viewport = getViewport();
     final GeometryFactory viewportGeometryFactory = viewport.getRoundedGeometryFactory(getViewportGeometryFactory());
-    if (this.measureGeometry != null) {
+    if (!this.measureGeometry.isEmpty()) {
       String unitString = "m";
       if (viewportGeometryFactory != null) {
         final CoordinateSystem coordinateSystem = viewportGeometryFactory.getCoordinateSystem();
@@ -465,12 +466,15 @@ public class MeasureOverlay extends AbstractOverlay {
     if (propertyName.equals("overlayAction")) {
       final MapPanel map = getMap();
       if (!map.hasOverlayAction(MEASURE)) {
-        setMeasureGeometry(null);
+        setMeasureGeometry(EMPTY_GEOMETRY);
       }
     }
   }
 
-  public void setMeasureGeometry(final Geometry measureGeometry) {
+  public void setMeasureGeometry(Geometry measureGeometry) {
+    if (measureGeometry == null) {
+      measureGeometry = EMPTY_GEOMETRY;
+    }
     if (measureGeometry != this.measureGeometry) {
       this.measureGeometry = measureGeometry;
       if (measureGeometry != null) {

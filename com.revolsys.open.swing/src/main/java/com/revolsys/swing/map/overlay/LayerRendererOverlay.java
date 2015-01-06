@@ -4,6 +4,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 
 import javax.swing.JComponent;
 
@@ -38,6 +41,10 @@ PropertyChangeListener {
   private LayerRendererOverlaySwingWorker imageWorker;
 
   private boolean loadImage = true;
+
+  private static final Collection<String> IGNORE_PROPERTY_NAMES = new HashSet<>(
+      Arrays.asList("selectionCount", "hasHighlightedRecords",
+        "highlightedCount", "scale"));
 
   public LayerRendererOverlay(final MapPanel mapPanel) {
     this(mapPanel, null);
@@ -101,16 +108,15 @@ PropertyChangeListener {
   public void propertyChange(final PropertyChangeEvent e) {
     if (!(e.getSource() instanceof MapPanel)) {
       final String propertyName = e.getPropertyName();
-      if (!propertyName.equals("selectionCount")
-          && !propertyName.equals("hasHighlightedRecords")
-          && !propertyName.equals("highlightedCount")) {
+      if (!IGNORE_PROPERTY_NAMES.contains(propertyName)) {
         redraw();
       }
     }
   }
 
   public void redraw() {
-    if (isValid() && this.layer.isExists() && this.layer.isVisible()) {
+    if (this.layer != null && getWidth() > 0 && getHeight() > 0
+      && this.layer.isExists() && this.layer.isVisible()) {
       synchronized (this.loadSync) {
         this.loadImage = true;
         if (this.imageWorker != null) {

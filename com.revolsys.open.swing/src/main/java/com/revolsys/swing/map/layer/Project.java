@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer;
 
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -256,6 +257,15 @@ public class Project extends LayerGroup {
     return this.zoomBookmarks;
   }
 
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    super.propertyChange(event);
+    if (event.getPropertyName().equals("hasSelectedRecords")) {
+      final boolean selected = isHasSelectedRecords();
+      firePropertyChange("hasSelectedRecords", !selected, selected);
+    }
+  }
+
   protected void readBaseMapsLayers(final Resource resource) {
     final Resource baseMapsResource = SpringUtil.getResource(resource,
       "Base Maps");
@@ -431,6 +441,10 @@ public class Project extends LayerGroup {
   }
 
   public boolean saveChangesWithPrompt() {
+    return saveChangesWithPrompt(JOptionPane.YES_NO_CANCEL_OPTION);
+  }
+
+  public boolean saveChangesWithPrompt(final int optionType) {
     if (isReadOnly()) {
       return true;
     } else {
@@ -448,8 +462,7 @@ public class Project extends LayerGroup {
             + "</li></ul></body></html>");
 
         final int option = JOptionPane.showConfirmDialog(mapPanel, message,
-          "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION,
-          JOptionPane.WARNING_MESSAGE);
+          "Save Changes", optionType, JOptionPane.WARNING_MESSAGE);
         if (option == JOptionPane.CANCEL_OPTION) {
           return false;
         } else if (option == JOptionPane.NO_OPTION) {

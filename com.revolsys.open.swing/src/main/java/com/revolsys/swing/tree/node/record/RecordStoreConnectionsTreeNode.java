@@ -16,13 +16,15 @@ import com.revolsys.util.Property;
 public class RecordStoreConnectionsTreeNode extends ListTreeNode {
   public static final Icon ICON = Icons.getIcon("folder_database");
 
+  public static final Icon ICON_OPEN = Icons.getIcon("folder_database_open");
+
   public RecordStoreConnectionsTreeNode() {
     setName("Record Stores");
     setType("Record Stores");
     setIcon(ICON);
     final RecordStoreConnectionManager connectionManager = RecordStoreConnectionManager.get();
     Property.addListener(connectionManager, new InvokeMethodListener(this,
-      "refresh"));
+        "refresh"));
   }
 
   @Override
@@ -38,4 +40,8 @@ public class RecordStoreConnectionsTreeNode extends ListTreeNode {
     return children;
   }
 
+  @Override
+  public Icon getOpenIcon() {
+    return ICON_OPEN;
+  }
 }
