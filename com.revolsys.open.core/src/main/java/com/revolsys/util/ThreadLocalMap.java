@@ -10,8 +10,7 @@ public class ThreadLocalMap<K, V> implements Map<K, V> {
 
   @Override
   public void clear() {
-    final Map<K, V> localMap = getMap();
-    localMap.clear();
+    this.map.set(null);
   }
 
   @Override
@@ -39,18 +38,18 @@ public class ThreadLocalMap<K, V> implements Map<K, V> {
   }
 
   public Map<K, V> getMap() {
-    Map<K, V> localMap = map.get();
+    Map<K, V> localMap = this.map.get();
     if (localMap == null) {
       localMap = new HashMap<K, V>();
-      map.set(localMap);
+      this.map.set(localMap);
     }
     return localMap;
   }
 
   @Override
   public boolean isEmpty() {
-    final Map<K, V> localMap = getMap();
-    return localMap.isEmpty();
+    final Map<K, V> localMap = this.map.get();
+    return localMap == null || localMap.isEmpty();
   }
 
   @Override

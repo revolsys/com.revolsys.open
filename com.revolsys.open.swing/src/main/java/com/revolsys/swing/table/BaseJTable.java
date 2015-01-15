@@ -146,6 +146,22 @@ public class BaseJTable extends JXTable {
     }
   }
 
+  public int getSelectedRowInModel() {
+    int selectedRow = getSelectedRow();
+    if (selectedRow != -1) {
+      selectedRow = convertRowIndexToModel(selectedRow);
+    }
+    return selectedRow;
+  }
+
+  public int getSelectedRowInView() {
+    int selectedRow = getSelectedRow();
+    if (selectedRow != -1) {
+      selectedRow = convertRowIndexToView(selectedRow);
+    }
+    return selectedRow;
+  }
+
   @SuppressWarnings("unchecked")
   public <V extends TableModel> V getTableModel() {
     return (V)getModel();

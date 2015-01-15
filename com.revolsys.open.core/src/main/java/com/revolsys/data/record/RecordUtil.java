@@ -29,21 +29,77 @@ import com.revolsys.util.Property;
 
 public final class RecordUtil {
 
-  public static int compare(final Record record1, final Record record2,
+  public static int compareNullFirst(final Record record1,
+    final Record record2, final String fieldName) {
+    final Object value1 = getValue(record1, fieldName);
+    final Object value2 = getValue(record2, fieldName);
+    if (value1 == value2) {
+      return 0;
+    } else {
+      if (value1 == null) {
+        return -1;
+      } else if (value2 == null) {
+        return 1;
+      } else {
+        return CompareUtil.compare(value1, value2);
+      }
+    }
+  }
+
+  public static int compareNullFirst(final Record record1,
+    final Record record2, final String... fieldNames) {
+    for (final String fieldName : fieldNames) {
+      final Object value1 = getValue(record1, fieldName);
+      final Object value2 = getValue(record2, fieldName);
+      if (value1 != value2) {
+        if (value1 == null) {
+          return -1;
+        } else if (value2 == null) {
+          return 1;
+        } else {
+          final int compare = CompareUtil.compare(value1, value2);
+          if (compare != 0) {
+            return compare;
+          }
+        }
+      }
+    }
+    return 0;
+  }
+
+  public static int compareNullLast(final Record record1, final Record record2,
     final String fieldName) {
     final Object value1 = getValue(record1, fieldName);
     final Object value2 = getValue(record2, fieldName);
-    return CompareUtil.compare(value1, value2);
+    if (value1 == value2) {
+      return 0;
+    } else {
+      if (value1 == null) {
+        return 1;
+      } else if (value2 == null) {
+        return -1;
+      } else {
+        return CompareUtil.compare(value1, value2);
+      }
+    }
   }
 
-  public static int compare(final Record record1, final Record record2,
+  public static int compareNullLast(final Record record1, final Record record2,
     final String... fieldNames) {
     for (final String fieldName : fieldNames) {
       final Object value1 = getValue(record1, fieldName);
       final Object value2 = getValue(record2, fieldName);
-      final int compare = CompareUtil.compare(value1, value2);
-      if (compare != 0) {
-        return compare;
+      if (value1 != value2) {
+        if (value1 == null) {
+          return 1;
+        } else if (value2 == null) {
+          return -1;
+        } else {
+          final int compare = CompareUtil.compare(value1, value2);
+          if (compare != 0) {
+            return compare;
+          }
+        }
       }
     }
     return 0;
@@ -274,7 +330,7 @@ public final class RecordUtil {
   }
 
   private static Object getValue(final Record record, final String fieldName) {
-    if (record == null) {
+    if (record == null || !Property.hasValue(fieldName)) {
       return null;
     } else {
       return record.getValue(fieldName);
@@ -333,6 +389,18 @@ public final class RecordUtil {
         }
       }
     }
+  }
+
+  public static Geometry unionGeometry(
+    final Collection<? extends Record> records) {
+    Geometry union = null;
+    for (final Record record : records) {
+      final Geometry geometry = record.getGeometryValue();
+      if (geometry != null) {
+        union = geometry.union(union);
+      }
+    }
+    return union;
   }
 
   private RecordUtil() {

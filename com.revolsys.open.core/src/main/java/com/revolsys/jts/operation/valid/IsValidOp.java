@@ -51,6 +51,7 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
+import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.geomgraph.Edge;
 import com.revolsys.jts.geomgraph.EdgeIntersection;
@@ -459,8 +460,13 @@ public class IsValidOp {
 
   private boolean checkTooFewVertices(final LineString line,
     final int minVertexCount) {
-    final int vertexCount = line.getVertexCount();
-    if (vertexCount < minVertexCount) {
+    int edgeCount = 0;
+    for (final Segment segment : line.segments()) {
+      if (!segment.isZeroLength()) {
+        edgeCount++;
+      }
+    }
+    if (edgeCount < minVertexCount - 1) {
       addError(new TopologyValidationError(
         TopologyValidationError.TOO_FEW_POINTS, line.getPoint(0)));
       return false;

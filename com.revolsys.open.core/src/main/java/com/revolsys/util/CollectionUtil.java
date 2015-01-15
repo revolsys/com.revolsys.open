@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -18,6 +19,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.factory.Factory;
 
 public final class CollectionUtil {
   public static <V> void addAllIfNotNull(final Collection<V> collection,
@@ -64,6 +66,12 @@ public final class CollectionUtil {
   public static <K1, V> boolean addToSet(final Map<K1, Set<V>> map,
     final K1 key1, final V value) {
     final Set<V> values = getSet(map, key1);
+    return values.add(value);
+  }
+
+  public static <K1, V> boolean addToTreeSet(final Map<K1, Set<V>> map,
+    final Comparator<V> comparator, final K1 key1, final V value) {
+    final Set<V> values = getTreeSet(map, comparator, key1);
     return values.add(value);
   }
 
@@ -271,6 +279,19 @@ public final class CollectionUtil {
         return value;
       }
     }
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public static <K, V> V get(final Map<K, ? extends Object> map, final K key,
+    final Factory<V> factory) {
+    V value = (V)map.get(key);
+    if (value == null) {
+      value = factory.create();
+      ((Map)map).put(key, value);
+    }
+    return value;
   }
 
   public static Object get(final Map<String, ? extends Object> map,
@@ -538,6 +559,16 @@ public final class CollectionUtil {
     return value;
   }
 
+  public static <K, V> Set<V> getTreeSet(final Map<K, Set<V>> map,
+    final Comparator<V> comparator, final K key) {
+    Set<V> value = map.get(key);
+    if (value == null) {
+      value = new TreeSet<V>(comparator);
+      map.put(key, value);
+    }
+    return value;
+  }
+
   public static <K, V> Set<V> getTreeSet(final Map<K, Set<V>> map, final K key) {
     Set<V> value = map.get(key);
     if (value == null) {
@@ -688,11 +719,11 @@ public final class CollectionUtil {
                 }
               }
             }
-          break;
+            break;
 
           default:
             buffer.append(c);
-          break;
+            break;
         }
       }
       return buffer.toString();
@@ -716,7 +747,7 @@ public final class CollectionUtil {
   public static <K extends Comparable<K>, V extends Comparable<V>> Map<K, V> sortByValues(
     final Map<K, V> map) {
     final MapValueComparator<K, V> comparator = new MapValueComparator<K, V>(
-      map);
+        map);
     final Map<K, V> sortedMap = new TreeMap<K, V>(comparator);
     sortedMap.putAll(map);
     return new LinkedHashMap<K, V>(sortedMap);

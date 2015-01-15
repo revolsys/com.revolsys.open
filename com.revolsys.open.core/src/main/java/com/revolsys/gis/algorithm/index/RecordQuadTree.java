@@ -92,7 +92,7 @@ public class RecordQuadTree extends QuadTree<Record> {
       boundingBox = boundingBox.expand(distance);
       final RecordGeometryDistanceFilter filter = new RecordGeometryDistanceFilter(
         geometry, distance);
-      return queryList(boundingBox, filter);
+      return queryList(boundingBox, filter, filter);
     }
   }
 
@@ -155,7 +155,7 @@ public class RecordQuadTree extends QuadTree<Record> {
   public List<Record> queryList(final BoundingBox boundingBox,
     final Filter<Record> filter, final Comparator<Record> comparator) {
     final CreateListVisitor<Record> listVisitor = new CreateListVisitor<Record>(
-      filter);
+        filter);
     visit(boundingBox, listVisitor);
     final List<Record> list = listVisitor.getList();
     if (comparator != null) {

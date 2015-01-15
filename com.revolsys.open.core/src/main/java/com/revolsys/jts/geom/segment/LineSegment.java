@@ -135,6 +135,8 @@ public interface LineSegment extends LineString {
    */
   boolean isVertical();
 
+  boolean isZeroLength();
+
   /**
    * Computes the intersection point of the lines of infinite extent defined
    * by two line segments (if there is one).

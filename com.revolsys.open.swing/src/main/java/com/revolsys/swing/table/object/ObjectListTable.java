@@ -48,7 +48,7 @@ public class ObjectListTable<T> extends BaseJTable implements Iterable<T> {
 
   @SuppressWarnings("unchecked")
   public <V> V getSelectedObject() {
-    final int selectedRow = getSelectedRow();
+    final int selectedRow = getSelectedRowInModel();
     if (selectedRow > -1) {
       final ObjectListTableModel<T> model = getObjectListTableModel();
       return (V)model.getObject(selectedRow);
@@ -57,6 +57,7 @@ public class ObjectListTable<T> extends BaseJTable implements Iterable<T> {
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public ObjectListTableModel<T> getTableModel() {
     return (ObjectListTableModel<T>)getModel();

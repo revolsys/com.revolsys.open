@@ -14,11 +14,13 @@ public class RecordLayerTable extends RecordRowTable {
 
   public RecordLayerTable(final RecordLayerTableModel model) {
     super(model);
+    getTableHeader().setReorderingAllowed(false);
   }
 
   public RecordLayerTable(final RecordLayerTableModel model,
     final TableCellRenderer cellRenderer) {
     super(model, cellRenderer);
+    getTableHeader().setReorderingAllowed(false);
   }
 
   @Override

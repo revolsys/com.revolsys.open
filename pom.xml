@@ -15,7 +15,7 @@
 
   <licenses>
     <license>
-      <name>apache_v2</name>
+      <name>Apache License, Version 2.0</name>
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
     </license>
@@ -182,7 +182,46 @@
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
-      </plugin> -->   
+      </plugin> -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.8</version>
+ <!--        <executions>
+          <execution>
+            <id>download-licenses</id>
+            <configuration>
+              <licensesOutputDirectory>../src/license</licensesOutputDirectory>
+              <licensesConfigFile>../src/license/licenses.xml</licensesConfigFile>
+            </configuration>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+          </execution>
+         <execution>
+            <id>add-third-party</id>
+            <configuration>
+              <licensesConfigFile>../src/license/licenses.xml</licensesConfigFile>
+              <force>true</force>
+            </configuration>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+          </execution> 
+          <execution>
+            <id>aggregate-add-third-party</id>
+            <configuration>
+              <licenseMerges>
+                <licenseMerge>Apache License, Version 2.0|The Apache Software License, Version 2.0|Apache 2.0 License</licenseMerge>
+              </licenseMerges>
+              <outputDirectory>src/license/</outputDirectory>
+            </configuration>
+            <goals>
+              <goal>aggregate-add-third-party</goal>
+            </goals>
+          </execution>
+        </executions>-->
+      </plugin>
     </plugins>
     <extensions>
       <extension>

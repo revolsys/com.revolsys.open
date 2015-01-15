@@ -55,7 +55,7 @@ import com.revolsys.jts.index.chain.MonotoneChainSelectAction;
  * increase performance.
  *
  * @version 1.7
- * 
+ *
  * @see GeometryFactoryIndexedPointInAreaLocator for more general functionality
  */
 public class MCPointInRing implements PointInRing {
@@ -69,7 +69,7 @@ public class MCPointInRing implements PointInRing {
 
     @Override
     public void select(final LineSegment ls) {
-      testLineSegment(p, ls);
+      testLineSegment(this.p, ls);
     }
   }
 
@@ -88,32 +88,32 @@ public class MCPointInRing implements PointInRing {
 
   private void buildIndex() {
     // BoundingBoxDoubleGf env = ring.getEnvelopeInternal();
-    tree = new Bintree();
+    this.tree = new Bintree();
 
-    final LineString points = CleanDuplicatePoints.clean(ring);
+    final LineString points = CleanDuplicatePoints.clean(this.ring);
     final List<MonotoneChain> mcList = MonotoneChainBuilder.getChains(points);
 
     for (int i = 0; i < mcList.size(); i++) {
       final MonotoneChain mc = mcList.get(i);
       final BoundingBox mcEnv = mc.getEnvelope();
-      interval.min = mcEnv.getMinY();
-      interval.max = mcEnv.getMaxY();
-      tree.insert(interval, mc);
+      this.interval.min = mcEnv.getMinY();
+      this.interval.max = mcEnv.getMaxY();
+      this.tree.insert(this.interval, mc);
     }
   }
 
   @Override
   public boolean isInside(final Point pt) {
-    crossings = 0;
+    this.crossings = 0;
 
     // test all segments intersected by ray from pt in positive x direction
     final double y = pt.getY();
-    final BoundingBox rayEnv = new BoundingBoxDoubleGf(2, Double.NEGATIVE_INFINITY, y,
-      Double.POSITIVE_INFINITY, y);
+    final BoundingBox rayEnv = new BoundingBoxDoubleGf(2, -Double.MAX_VALUE, y,
+      Double.MAX_VALUE, y);
 
-    interval.min = y;
-    interval.max = y;
-    final List segs = tree.query(interval);
+    this.interval.min = y;
+    this.interval.max = y;
+    final List segs = this.tree.query(this.interval);
     // System.out.println("query size = " + segs.size());
 
     final MCSelecter mcSelecter = new MCSelecter(pt);
@@ -125,7 +125,7 @@ public class MCPointInRing implements PointInRing {
     /*
      * p is inside if number of crossings is odd.
      */
-    if ((crossings % 2) == 1) {
+    if (this.crossings % 2 == 1) {
       return true;
     }
     return false;
@@ -148,7 +148,7 @@ public class MCPointInRing implements PointInRing {
     x2 = p2.getX() - p.getX();
     y2 = p2.getY() - p.getY();
 
-    if (((y1 > 0) && (y2 <= 0)) || ((y2 > 0) && (y1 <= 0))) {
+    if (y1 > 0 && y2 <= 0 || y2 > 0 && y1 <= 0) {
       /*
        * segment straddles x axis, so compute intersection.
        */
@@ -158,7 +158,7 @@ public class MCPointInRing implements PointInRing {
        * crosses ray if strictly positive intersection.
        */
       if (0.0 < xInt) {
-        crossings++;
+        this.crossings++;
       }
     }
   }

@@ -26,7 +26,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
 
 public class CodeTableProperty extends AbstractCodeTable implements
-  RecordDefinitionProperty {
+RecordDefinitionProperty {
 
   public static final CodeTableProperty getProperty(
     final RecordDefinition recordDefinition) {
@@ -35,7 +35,7 @@ public class CodeTableProperty extends AbstractCodeTable implements
   }
 
   private static final ArrayList<String> DEFAULT_FIELD_NAMES = new ArrayList<String>(
-    Arrays.asList("VALUE"));
+      Arrays.asList("VALUE"));
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
 
@@ -203,6 +203,10 @@ public class CodeTableProperty extends AbstractCodeTable implements
     return PROPERTY_NAME;
   }
 
+  public Record getRecord(final Identifier id) {
+    return this.recordStore.load(this.typePath, id);
+  }
+
   @Override
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
@@ -262,11 +266,11 @@ public class CodeTableProperty extends AbstractCodeTable implements
             query.addOrderBy(order, true);
           }
           try (
-            Reader<Record> reader = this.recordStore.query(query)) {
+              Reader<Record> reader = this.recordStore.query(query)) {
             final List<Record> codes = reader.read();
             this.recordStore.getStatistics()
-              .getStatistics("query")
-              .add(this.typePath, -codes.size());
+            .getStatistics("query")
+            .add(this.typePath, -codes.size());
             Collections.sort(codes, new RecordAttributeComparator(this.orderBy));
             addValues(codes);
           }
@@ -310,8 +314,8 @@ public class CodeTableProperty extends AbstractCodeTable implements
       try {
         final List<Record> codes = reader.read();
         this.recordStore.getStatistics()
-          .getStatistics("query")
-          .add(this.typePath, -codes.size());
+        .getStatistics("query")
+        .add(this.typePath, -codes.size());
         addValues(codes);
         id = getIdByValue(values);
         Property.firePropertyChange(this, "valuesChanged", false, true);

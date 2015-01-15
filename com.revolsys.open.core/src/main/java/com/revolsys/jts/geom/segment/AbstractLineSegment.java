@@ -24,7 +24,7 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLineSegment extends AbstractLineString implements
-  LineSegment {
+LineSegment {
 
   private static int addEndPointIntersection(final double[] coordinates,
     final int intersectionCount, final int axisCount,
@@ -688,6 +688,11 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     return distance(point) <= distance;
   }
 
+  @Override
+  public boolean isZeroLength() {
+    return equalsVertex(2, 0, 1);
+  }
+
   /**
    * Computes the intersection point of the lines of infinite extent defined
    * by two line segments (if there is one).
@@ -886,7 +891,7 @@ public abstract class AbstractLineSegment extends AbstractLineString implements
     if (offsetDistance != 0.0) {
       if (len <= 0.0) {
         throw new IllegalStateException(
-          "Cannot compute offset from zero-length line segment");
+            "Cannot compute offset from zero-length line segment");
       }
       double ux = 0.0;
       double uy = 0.0;

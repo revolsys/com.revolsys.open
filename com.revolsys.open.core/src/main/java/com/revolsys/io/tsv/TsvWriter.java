@@ -1,4 +1,4 @@
-package com.revolsys.io.csv;
+package com.revolsys.io.tsv;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -7,7 +7,7 @@ import java.util.Collection;
 
 import com.revolsys.io.FileUtil;
 
-public class CsvWriter implements AutoCloseable {
+public class TsvWriter implements AutoCloseable {
 
   /** The writer */
   private final PrintWriter out;
@@ -18,7 +18,7 @@ public class CsvWriter implements AutoCloseable {
    * @param reader The reader to the CSV file.
    * @throws IOException
    */
-  public CsvWriter(final Writer out) {
+  public TsvWriter(final Writer out) {
     this.out = new PrintWriter(out);
   }
 
@@ -50,7 +50,7 @@ public class CsvWriter implements AutoCloseable {
         this.out.write('"');
       }
       if (i < values.length - 1) {
-        this.out.write(',');
+        this.out.write('\t');
       }
     }
     this.out.println();

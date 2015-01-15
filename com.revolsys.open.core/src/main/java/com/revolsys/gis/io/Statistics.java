@@ -1,5 +1,8 @@
 package com.revolsys.gis.io;
 
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -9,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.io.tsv.TsvWriter;
 import com.revolsys.util.Counter;
 import com.revolsys.util.LongCounter;
 
@@ -167,5 +171,26 @@ public class Statistics {
   @Override
   public String toString() {
     return this.message;
+  }
+
+  public String toTsv() {
+    return toTsv("NAME", "COUNT");
+  }
+
+  public String toTsv(final String... fieldNames) {
+    final StringWriter out = new StringWriter();
+    return toTsv(out, fieldNames);
+  }
+
+  public String toTsv(final Writer out, final String... fieldNames) {
+    try (
+        TsvWriter tsv = new TsvWriter(out);) {
+      tsv.write(Arrays.asList(fieldNames));
+      for (final String name : getNames()) {
+        final long count = get(name);
+        tsv.write(name, count);
+      }
+      return out.toString();
+    }
   }
 }
