@@ -16,10 +16,10 @@ public class QNameFactory {
   }
 
   public QName getQName(final String localPart) {
-    QName qName = qNames.get(localPart);
+    QName qName = this.qNames.get(localPart);
     if (qName == null) {
-      qName = new QName(namespaceUri, localPart);
-      qNames.put(localPart, qName);
+      qName = new QName(this.namespaceUri, localPart);
+      this.qNames.put(localPart, qName);
     }
     return qName;
   }

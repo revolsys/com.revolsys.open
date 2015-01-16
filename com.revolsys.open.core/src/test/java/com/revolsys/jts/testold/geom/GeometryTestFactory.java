@@ -152,9 +152,9 @@ public class GeometryTestFactory {
         final double ang = iArmPt * (2 * Math.PI / nArmPt);
         final double len = armLen * (1 - Math.cos(ang) / 2) + armBaseLen;
         final double x = len * Math.cos(starAng + iArmPt * angInc / nArmPt)
-          + basex;
+            + basex;
         final double y = len * Math.sin(starAng + iArmPt * angInc / nArmPt)
-          + basey;
+            + basey;
         final Point pt = new PointDouble(x, y, Point.NULL_ORDINATE);
         pts[iPt++] = pt;
       }

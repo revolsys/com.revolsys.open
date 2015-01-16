@@ -18,8 +18,8 @@ import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Maps;
 
 public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
 
@@ -41,8 +41,8 @@ public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
 
   @SuppressWarnings("unchecked")
   public TreeItemScaleMenu(final Map<String, Object> config) {
-    this.name = CollectionUtil.getString(config, "name");
-    this.min = CollectionUtil.getBool(config, "min");
+    this.name = Maps.getString(config, "name");
+    this.min = Maps.getBool(config, "min");
     final Map<String, Object> enableCheckConfig = (Map<String, Object>)config.get("enableCheck");
     this.enableCheck = AbstractEnableCheck.enableCheck(enableCheckConfig);
   }

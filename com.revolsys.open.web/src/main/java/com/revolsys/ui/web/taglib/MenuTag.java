@@ -19,50 +19,50 @@ public class MenuTag extends AbstractMapElementTag {
    * @return Returns the cssClass.
    */
   public String getCssClass() {
-    return element.getCssClass();
+    return this.element.getCssClass();
   }
 
   /**
    * @return Returns the numLevels.
    */
   public int getNumLevels() {
-    return element.getNumLevels();
+    return this.element.getNumLevels();
   }
 
   /**
    * @return Returns the showRoot.
    */
   public boolean isShowRoot() {
-    return element.isShowRoot();
+    return this.element.isShowRoot();
   }
 
   @Override
   protected void serializeObject(final Writer out, final Object object)
-    throws IOException {
+      throws IOException {
     final Menu menu = (Menu)object;
     Logger.getLogger(MenuTag.class).debug(menu);
-    element.setMenu(menu);
-    element.serialize(out);
+    this.element.setMenu(menu);
+    this.element.serialize(out);
   }
 
   /**
    * @param cssClass The cssClass to set.
    */
   public void setCssClass(final String cssClass) {
-    element.setCssClass(cssClass);
+    this.element.setCssClass(cssClass);
   }
 
   /**
    * @param numLevels The numLevels to set.
    */
   public void setNumLevels(final int numLevels) {
-    element.setNumLevels(numLevels);
+    this.element.setNumLevels(numLevels);
   }
 
   /**
    * @param showRoot The showRoot to set.
    */
   public void setShowRoot(final boolean showRoot) {
-    element.setShowRoot(showRoot);
+    this.element.setShowRoot(showRoot);
   }
 }

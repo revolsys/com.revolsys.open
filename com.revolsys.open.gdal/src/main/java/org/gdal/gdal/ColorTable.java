@@ -9,57 +9,82 @@
 package org.gdal.gdal;
 
 /* imports for getIndexColorModel */
-import java.awt.image.IndexColorModel;
 import java.awt.Color;
+import java.awt.image.IndexColorModel;
 
 public class ColorTable implements Cloneable {
+  protected static long getCPtr(final ColorTable obj) {
+    return obj == null ? 0 : obj.swigCPtr;
+  }
   private long swigCPtr;
+
   protected boolean swigCMemOwn;
 
-  protected ColorTable(long cPtr, boolean cMemoryOwn) {
-    if (cPtr == 0)
-        throw new RuntimeException();
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
-  }
-  
-  protected static long getCPtr(ColorTable obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
+  public ColorTable() {
+    this(gdalJNI.new_ColorTable__SWIG_1(), true);
   }
 
+  public ColorTable(final int palette) {
+    this(gdalJNI.new_ColorTable__SWIG_0(palette), true);
+  }
+
+  protected ColorTable(final long cPtr, final boolean cMemoryOwn) {
+    if (cPtr == 0) {
+      throw new RuntimeException();
+    }
+    this.swigCMemOwn = cMemoryOwn;
+    this.swigCPtr = cPtr;
+  }
+
+  /* Ensure that the GC doesn't collect any parent instance set from Java */
+  protected void addReference(final Object reference) {
+  }
+
+  @Override
+  public Object clone()
+  {
+    return Clone();
+  }
+
+  public ColorTable Clone() {
+    final long cPtr = gdalJNI.ColorTable_Clone(this.swigCPtr, this);
+    return cPtr == 0 ? null : new ColorTable(cPtr, true);
+  }
+
+  public void CreateColorRamp(final int nStartIndex, final java.awt.Color startcolor, final int nEndIndex, final java.awt.Color endcolor) {
+    gdalJNI.ColorTable_CreateColorRamp(this.swigCPtr, this, nStartIndex, startcolor, nEndIndex, endcolor);
+  }
+
+  public synchronized void delete() {
+    if (this.swigCPtr != 0) {
+      if (this.swigCMemOwn) {
+        this.swigCMemOwn = false;
+        gdalJNI.delete_ColorTable(this.swigCPtr);
+      }
+      this.swigCPtr = 0;
+    }
+  }
+
+  @Override
   protected void finalize() {
     delete();
   }
 
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        gdalJNI.delete_ColorTable(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
+  public java.awt.Color GetColorEntry(final int entry) {
+    return gdalJNI.ColorTable_GetColorEntry(this.swigCPtr, this, entry);
   }
 
-  private Object parentReference;
-
-  /* Ensure that the GC doesn't collect any parent instance set from Java */
-  protected void addReference(Object reference) {
-    parentReference = reference;
+  public int GetCount() {
+    return gdalJNI.ColorTable_GetCount(this.swigCPtr, this);
   }
 
-  public Object clone()
-  {
-      return Clone();
-  }
-
-/* convienance method */
-  public IndexColorModel getIndexColorModel(int bits) {
-    int size = GetCount();
-    byte[] reds = new byte[size];
-    byte[] greens = new byte[size];
-    byte[] blues = new byte[size];
-    byte[] alphas = new byte[size];
+  /* convienance method */
+  public IndexColorModel getIndexColorModel(final int bits) {
+    final int size = GetCount();
+    final byte[] reds = new byte[size];
+    final byte[] greens = new byte[size];
+    final byte[] blues = new byte[size];
+    final byte[] alphas = new byte[size];
     int noAlphas = 0;
     int zeroAlphas = 0;
     int lastAlphaIndex = -1;
@@ -70,58 +95,34 @@ public class ColorTable implements Cloneable {
       reds[i] = (byte)(entry.getRed()&0xff);
       greens[i] = (byte)(entry.getGreen()&0xff);
       blues[i] = (byte)(entry.getBlue()&0xff);
-      byte alpha = (byte)(entry.getAlpha()&0xff);
+      final byte alpha = (byte)(entry.getAlpha()&0xff);
 
       // The byte type is -128 to 127 so a normal 255 will be -1.
-      if (alpha == -1) 
-          noAlphas ++;
-      else{
+      if (alpha == -1) {
+        noAlphas ++;
+      } else{
         if (alpha == 0){
-           zeroAlphas++;
-           lastAlphaIndex = i;
+          zeroAlphas++;
+          lastAlphaIndex = i;
         }
       }
       alphas[i] = alpha;
     }
-    if (noAlphas == size)
-        return new IndexColorModel(bits, size, reds, greens, blues);
-    else if (noAlphas == (size - 1) && zeroAlphas == 1)
-        return new IndexColorModel(bits, size, reds, greens, blues, lastAlphaIndex);
-    else 
-        return new IndexColorModel(bits, size, reds, greens, blues, alphas);
- }
-
-  public ColorTable(int palette) {
-    this(gdalJNI.new_ColorTable__SWIG_0(palette), true);
-  }
-
-  public ColorTable() {
-    this(gdalJNI.new_ColorTable__SWIG_1(), true);
-  }
-
-  public ColorTable Clone() {
-    long cPtr = gdalJNI.ColorTable_Clone(swigCPtr, this);
-    return (cPtr == 0) ? null : new ColorTable(cPtr, true);
+    if (noAlphas == size) {
+      return new IndexColorModel(bits, size, reds, greens, blues);
+    } else if (noAlphas == size - 1 && zeroAlphas == 1) {
+      return new IndexColorModel(bits, size, reds, greens, blues, lastAlphaIndex);
+    } else {
+      return new IndexColorModel(bits, size, reds, greens, blues, alphas);
+    }
   }
 
   public int GetPaletteInterpretation() {
-    return gdalJNI.ColorTable_GetPaletteInterpretation(swigCPtr, this);
+    return gdalJNI.ColorTable_GetPaletteInterpretation(this.swigCPtr, this);
   }
 
-  public int GetCount() {
-    return gdalJNI.ColorTable_GetCount(swigCPtr, this);
-  }
-
-  public java.awt.Color GetColorEntry(int entry) {
-    return gdalJNI.ColorTable_GetColorEntry(swigCPtr, this, entry);
-  }
-
-  public void SetColorEntry(int entry, java.awt.Color centry) {
-    gdalJNI.ColorTable_SetColorEntry(swigCPtr, this, entry, centry);
-  }
-
-  public void CreateColorRamp(int nStartIndex, java.awt.Color startcolor, int nEndIndex, java.awt.Color endcolor) {
-    gdalJNI.ColorTable_CreateColorRamp(swigCPtr, this, nStartIndex, startcolor, nEndIndex, endcolor);
+  public void SetColorEntry(final int entry, final java.awt.Color centry) {
+    gdalJNI.ColorTable_SetColorEntry(this.swigCPtr, this, entry, centry);
   }
 
 }

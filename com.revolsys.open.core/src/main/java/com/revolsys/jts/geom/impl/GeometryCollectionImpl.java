@@ -92,7 +92,7 @@ public class GeometryCollectionImpl extends AbstractGeometryCollection {
       this.geometries = null;
     } else if (hasNullElements(geometries)) {
       throw new IllegalArgumentException(
-        "geometries must not contain null elements");
+          "geometries must not contain null elements");
     } else {
       this.geometries = geometries;
     }

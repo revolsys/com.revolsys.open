@@ -71,8 +71,8 @@ import com.revolsys.jts.operation.relate.RelateNodeGraph;
 public class ConsistentAreaTester {
 
   private final LineIntersector li = new RobustLineIntersector();
-  private GeometryGraph geomGraph;
-  private RelateNodeGraph nodeGraph = new RelateNodeGraph();
+  private final GeometryGraph geomGraph;
+  private final RelateNodeGraph nodeGraph = new RelateNodeGraph();
 
   // the intersection point found (if any)
   private Point invalidPoint;
@@ -82,55 +82,15 @@ public class ConsistentAreaTester {
    *
    * @param geomGraph the topology graph of the area geometry
    */
-  public ConsistentAreaTester(GeometryGraph geomGraph)
+  public ConsistentAreaTester(final GeometryGraph geomGraph)
   {
     this.geomGraph = geomGraph;
   }
 
-    /**
+  /**
    * @return the intersection point, or <code>null</code> if none was found
    */
-  public Point getInvalidPoint() { return invalidPoint; }
-
-  /**
-   * Check all nodes to see if their labels are consistent with area topology.
-   *
-   * @return <code>true</code> if this area has a consistent node labelling
-   */
-  public boolean isNodeConsistentArea()
-  {
-    /**
-     * To fully check validity, it is necessary to
-     * compute ALL intersections, including self-intersections within a single edge.
-     */
-    SegmentIntersector intersector = geomGraph.computeSelfNodes(li, true);
-    if (intersector.hasProperIntersection()) {
-      invalidPoint = intersector.getProperIntersectionPoint();
-      return false;
-    }
-
-    nodeGraph.build(geomGraph);
-
-    return isNodeEdgeAreaLabelsConsistent();
-  }
-
-  /**
-   * Check all nodes to see if their labels are consistent.
-   * If any are not, return false
-   *
-   * @return <code>true</code> if the edge area labels are consistent at this node
-   */
-  private boolean isNodeEdgeAreaLabelsConsistent()
-  {
-    for (Iterator nodeIt = nodeGraph.getNodeIterator(); nodeIt.hasNext(); ) {
-      RelateNode node = (RelateNode) nodeIt.next();
-      if (! node.getEdges().isAreaLabelsConsistent(geomGraph)) {
-        invalidPoint = (Point) node.getCoordinate().clone();
-        return false;
-      }
-    }
-    return true;
-  }
+  public Point getInvalidPoint() { return this.invalidPoint; }
 
   /**
    * Checks for two duplicate rings in an area.
@@ -149,17 +109,57 @@ public class ConsistentAreaTester {
    */
   public boolean hasDuplicateRings()
   {
-    for (Iterator nodeIt = nodeGraph.getNodeIterator(); nodeIt.hasNext(); ) {
-      RelateNode node = (RelateNode) nodeIt.next();
-      for (Iterator i = node.getEdges().iterator(); i.hasNext(); ) {
-        EdgeEndBundle eeb = (EdgeEndBundle) i.next();
+    for (final Iterator nodeIt = this.nodeGraph.getNodeIterator(); nodeIt.hasNext(); ) {
+      final RelateNode node = (RelateNode) nodeIt.next();
+      for (final Iterator i = node.getEdges().iterator(); i.hasNext(); ) {
+        final EdgeEndBundle eeb = (EdgeEndBundle) i.next();
         if (eeb.getEdgeEnds().size() > 1) {
-          invalidPoint = eeb.getEdge().getCoordinate(0);
+          this.invalidPoint = eeb.getEdge().getCoordinate(0);
           return true;
         }
       }
     }
     return false;
+  }
+
+  /**
+   * Check all nodes to see if their labels are consistent with area topology.
+   *
+   * @return <code>true</code> if this area has a consistent node labelling
+   */
+  public boolean isNodeConsistentArea()
+  {
+    /**
+     * To fully check validity, it is necessary to
+     * compute ALL intersections, including self-intersections within a single edge.
+     */
+    final SegmentIntersector intersector = this.geomGraph.computeSelfNodes(this.li, true);
+    if (intersector.hasProperIntersection()) {
+      this.invalidPoint = intersector.getProperIntersectionPoint();
+      return false;
+    }
+
+    this.nodeGraph.build(this.geomGraph);
+
+    return isNodeEdgeAreaLabelsConsistent();
+  }
+
+  /**
+   * Check all nodes to see if their labels are consistent.
+   * If any are not, return false
+   *
+   * @return <code>true</code> if the edge area labels are consistent at this node
+   */
+  private boolean isNodeEdgeAreaLabelsConsistent()
+  {
+    for (final Iterator nodeIt = this.nodeGraph.getNodeIterator(); nodeIt.hasNext(); ) {
+      final RelateNode node = (RelateNode) nodeIt.next();
+      if (! node.getEdges().isAreaLabelsConsistent(this.geomGraph)) {
+        this.invalidPoint = node.getCoordinate().clone();
+        return false;
+      }
+    }
+    return true;
   }
 
 

@@ -12,7 +12,7 @@ public class NotMatchedEdgeFilter implements Filter<Edge<LineSegmentMatch>> {
 
   @Override
   public boolean accept(final Edge<LineSegmentMatch> edge) {
-    return edge.getObject().hasMatches(index);
+    return edge.getObject().hasMatches(this.index);
   }
 
 }

@@ -16,12 +16,12 @@ import org.springframework.security.web.access.expression.WebSecurityExpressionH
  * Facade which isolates Spring Security's requirements for evaluating
  * web-security expressions from the implementation of the underlying expression
  * objects.
- * 
+ *
  * @author Luke Taylor
  * @since 3.0
  */
 public class DefaultWebSecurityExpressionHandler implements
-  WebSecurityExpressionHandler {
+WebSecurityExpressionHandler {
 
   private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
@@ -29,21 +29,23 @@ public class DefaultWebSecurityExpressionHandler implements
 
   private RoleHierarchy roleHierarchy;
 
+  @Override
   public EvaluationContext createEvaluationContext(
     final Authentication authentication,
     final FilterInvocation fi) {
     final StandardEvaluationContext ctx = new StandardEvaluationContext();
     final SecurityExpressionRoot root = new WebSecurityExpressionRoot(
       authentication, fi);
-    root.setTrustResolver(trustResolver);
-    root.setRoleHierarchy(roleHierarchy);
+    root.setTrustResolver(this.trustResolver);
+    root.setRoleHierarchy(this.roleHierarchy);
     ctx.setRootObject(root);
 
     return ctx;
   }
 
+  @Override
   public ExpressionParser getExpressionParser() {
-    return expressionParser;
+    return this.expressionParser;
   }
 
   public void setRoleHierarchy(final RoleHierarchy roleHierarchy) {

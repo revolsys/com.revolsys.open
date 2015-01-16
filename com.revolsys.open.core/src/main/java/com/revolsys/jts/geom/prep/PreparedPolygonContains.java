@@ -37,12 +37,12 @@ import com.revolsys.jts.geom.Geometry;
 /**
  * Computes the <tt>contains</tt> spatial relationship predicate
  * for a {@link PreparedPolygon} relative to all other {@link Geometry} classes.
- * Uses short-circuit tests and indexing to improve performance. 
+ * Uses short-circuit tests and indexing to improve performance.
  * <p>
  * It is not possible to short-circuit in all cases, in particular
  * in the case where the test geometry touches the polygon linework.
  * In this case full topology must be computed.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -55,7 +55,7 @@ class PreparedPolygonContains extends AbstractPreparedPolygonContains {
 
   /**
    * Tests whether this PreparedPolygon <tt>contains</tt> a given geometry.
-   * 
+   *
    * @param geom the test geometry
    * @return true if the test geometry is contained
    */
@@ -66,7 +66,7 @@ class PreparedPolygonContains extends AbstractPreparedPolygonContains {
   /**
    * Computes the full topological <tt>contains</tt> predicate.
    * Used when short-circuit tests are not conclusive.
-   * 
+   *
    * @param geometry the test geometry
    * @return true if this prepared polygon contains the test geometry
    */

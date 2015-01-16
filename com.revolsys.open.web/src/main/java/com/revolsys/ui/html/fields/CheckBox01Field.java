@@ -25,7 +25,7 @@ public class CheckBox01Field extends Field {
   }
 
   public String getOnClick() {
-    return onClick;
+    return this.onClick;
   }
 
   @Override
@@ -37,8 +37,8 @@ public class CheckBox01Field extends Field {
   public void initialize(final Form form, final HttpServletRequest request) {
     final String inputValue = request.getParameter(getName());
     if (inputValue != null) {
-      selected = inputValue.equals(selectedValue);
-      if (selected) {
+      this.selected = inputValue.equals(this.selectedValue);
+      if (this.selected) {
         setValue(1);
       } else {
         setValue(0);
@@ -50,35 +50,35 @@ public class CheckBox01Field extends Field {
         if (value instanceof Number) {
           final Integer number = ((Number)value).intValue();
           if (number.intValue() == 1) {
-            selected = true;
+            this.selected = true;
           } else {
-            selected = false;
+            this.selected = false;
           }
         } else if (value instanceof Boolean) {
 
-          selected = (Boolean)value;
+          this.selected = (Boolean)value;
         } else {
           final String string = value.toString();
           if (string.equals("1")) {
-            selected = true;
+            this.selected = true;
           } else if (string.equals("Y")) {
-            selected = true;
+            this.selected = true;
           } else if (string.equals("Yes")) {
-            selected = true;
+            this.selected = true;
           } else {
-            selected = Boolean.parseBoolean(string);
-            selected = value.equals(false);
+            this.selected = Boolean.parseBoolean(string);
+            this.selected = value.equals(false);
           }
         }
       }
     } else {
       setValue(0);
-      selected = false;
+      this.selected = false;
     }
   }
 
   public boolean isSelected() {
-    return selected;
+    return this.selected;
   }
 
   @Override
@@ -101,8 +101,8 @@ public class CheckBox01Field extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    HtmlUtil.serializeCheckBox(out, getName(), selectedValue, isSelected(),
-      onClick);
+    HtmlUtil.serializeCheckBox(out, getName(), this.selectedValue, isSelected(),
+      this.onClick);
   }
 
   public void setOnClick(final String onSelect) {

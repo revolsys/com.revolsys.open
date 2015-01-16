@@ -139,10 +139,10 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     } else {
       final String tableName = getDatabaseTableName(typePath);
       final String idFieldName = recordDefinition.getIdFieldName()
-        .toLowerCase();
+          .toLowerCase();
       if (this.useSchemaSequencePrefix) {
         sequenceName = schema + "." + tableName + "_" + idFieldName
-          + "_seq";
+            + "_seq";
       } else {
         sequenceName = tableName + "_" + idFieldName + "_seq";
       }
@@ -208,15 +208,15 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       + " join pg_attribute c on c.attrelid = t.oid" //
       + " WHERE s.nspname = ? AND c.attnum = any(i.indkey) AND i.indisprimary");
     setSchemaPermissionsSql("select distinct t.table_schema as \"SCHEMA_NAME\" "
-      + "from information_schema.role_table_grants t  "
-      + "where (t.grantee  in (current_user, 'PUBLIC') or "
-      + "t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) and "
-      + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') ");
+        + "from information_schema.role_table_grants t  "
+        + "where (t.grantee  in (current_user, 'PUBLIC') or "
+        + "t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) and "
+        + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') ");
     setTablePermissionsSql("select distinct t.table_schema as \"SCHEMA_NAME\", t.table_name, t.privilege_type as \"PRIVILEGE\", d.description as \"REMARKS\" from information_schema.role_table_grants t join pg_namespace n on t.table_schema = n.nspname join pg_class c on (n.oid = c.relnamespace AND t.table_name = c.relname) left join pg_description d on d.objoid = c.oid "
-      + "where t.table_schema = ? and "
-      + "(t.grantee  in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
-      + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
-      + "order by t.table_schema, t.table_name, t.privilege_type");
+        + "where t.table_schema = ? and "
+        + "(t.grantee  in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
+        + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
+        + "order by t.table_schema, t.table_name, t.privilege_type");
   }
 
   protected void initSettings() {

@@ -65,7 +65,7 @@ public class AffineTransformationTest extends TestCase {
   }
 
   void checkTransformation(final String geomStr) throws IOException,
-    ParseException, NoninvertibleTransformationException {
+  ParseException, NoninvertibleTransformationException {
     final Geometry geom = rdr.read(geomStr);
     final AffineTransformation trans = AffineTransformation.rotationInstance(Math.PI / 2);
     final AffineTransformation inv = trans.getInverse();
@@ -123,42 +123,42 @@ public class AffineTransformationTest extends TestCase {
   }
 
   public void testGeometryCollection() throws IOException, ParseException,
-    NoninvertibleTransformationException {
+  NoninvertibleTransformationException {
     checkTransformation("GEOMETRYCOLLECTION ( POINT ( 1 1), LINESTRING (0 0, 10 10), POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0)) )");
   }
 
   public void testLineString() throws IOException, ParseException,
-    NoninvertibleTransformationException {
+  NoninvertibleTransformationException {
     checkTransformation("LINESTRING (1 2, 10 20, 100 200)");
   }
 
   public void testMultiLineString() throws IOException, ParseException,
-    NoninvertibleTransformationException {
+  NoninvertibleTransformationException {
     checkTransformation("MULTILINESTRING ((0 0, 1 10), (10 10, 20 30), (123 123, 456 789))");
   }
 
   public void testMultiPoint() throws IOException, ParseException,
-    NoninvertibleTransformationException {
+  NoninvertibleTransformationException {
     checkTransformation("MULTIPOINT (0 0, 1 4, 100 200)");
   }
 
   public void testMultiPolygon() throws IOException, ParseException,
-    NoninvertibleTransformationException {
+  NoninvertibleTransformationException {
     checkTransformation("MULTIPOLYGON ( ((0 0, 100 0, 100 100, 0 100, 0 0), (1 1, 1 10, 10 10, 10 1, 1 1) ), ((200 200, 200 250, 250 250, 250 200, 200 200)) )");
   }
 
   public void testNestedGeometryCollection() throws IOException,
-    ParseException, NoninvertibleTransformationException {
+  ParseException, NoninvertibleTransformationException {
     checkTransformation("GEOMETRYCOLLECTION ( POINT (20 20), GEOMETRYCOLLECTION ( POINT ( 1 1), LINESTRING (0 0, 10 10), POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0)) ) )");
   }
 
   public void testPolygon() throws IOException, ParseException,
-    NoninvertibleTransformationException {
+  NoninvertibleTransformationException {
     checkTransformation("POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0))");
   }
 
   public void testPolygonWithHole() throws IOException, ParseException,
-    NoninvertibleTransformationException {
+  NoninvertibleTransformationException {
     checkTransformation("POLYGON ((0 0, 100 0, 100 100, 0 100, 0 0), (1 1, 1 10, 10 10, 10 1, 1 1) )");
   }
 

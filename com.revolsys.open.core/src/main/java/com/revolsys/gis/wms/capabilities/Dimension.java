@@ -8,15 +8,15 @@ public class Dimension {
   private String unitSymbol;
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public String getUnits() {
-    return units;
+    return this.units;
   }
 
   public String getUnitSymbol() {
-    return unitSymbol;
+    return this.unitSymbol;
   }
 
   public void setName(final String name) {

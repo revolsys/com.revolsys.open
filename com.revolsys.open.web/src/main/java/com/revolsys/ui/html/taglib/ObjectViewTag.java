@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,12 +37,12 @@ public class ObjectViewTag extends TagSupport {
 
   @Override
   public int doStartTag() throws JspException {
-    if (name != null) {
+    if (this.name != null) {
       try {
-        final Object object = pageContext.findAttribute(name);
+        final Object object = this.pageContext.findAttribute(this.name);
         if (object != null) {
-          view.setObject(object);
-          view.serialize(pageContext.getOut());
+          this.view.setObject(object);
+          this.view.serialize(this.pageContext.getOut());
         }
       } catch (final Throwable t) {
         throw new JspException(t);
@@ -52,11 +52,11 @@ public class ObjectViewTag extends TagSupport {
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public String getViewClass() {
-    return viewClass;
+    return this.viewClass;
   }
 
   public void setName(final String name) {
@@ -67,7 +67,7 @@ public class ObjectViewTag extends TagSupport {
     this.viewClass = viewClass;
     try {
       final Class klass = Class.forName(viewClass);
-      view = (ObjectView)klass.newInstance();
+      this.view = (ObjectView)klass.newInstance();
     } catch (final Throwable t) {
       throw new IllegalArgumentException("Unable to create class " + viewClass);
     }

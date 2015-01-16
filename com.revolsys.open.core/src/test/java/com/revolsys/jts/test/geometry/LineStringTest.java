@@ -15,10 +15,6 @@ import com.revolsys.jts.geom.impl.PointDouble;
 
 public class LineStringTest {
 
-  private static final double START_Y = 6000000;
-
-  private static final double START_X = 500000;
-
   public static void assertCoordinatesEquals(final Point point,
     final double... coordinates) {
     Assert.assertEquals("Is Empty", false, point.isEmpty());
@@ -133,6 +129,10 @@ public class LineStringTest {
     }
   }
 
+  private static final double START_Y = 6000000;
+
+  private static final double START_X = 500000;
+
   private void assertEquals(final double[] coordinates,
     final double[] coordinatesLessNaN, final Point pointCoordinatesListAllAxis,
     final Point pointCoordinatesListExtraAxis,
@@ -229,10 +229,10 @@ public class LineStringTest {
         switch (i) {
           case 0:
             value = START_X;
-          break;
+            break;
           case 1:
             value = START_Y;
-          break;
+            break;
           default:
             value = i * 10 + i;
         }
@@ -433,7 +433,7 @@ public class LineStringTest {
       2,
       line.subLine(geometryFactory.point(-1, -1), 0, 2,
         geometryFactory.point(10, 10)),
-      geometryFactory.lineString(2, -1.0, -1.0, 0.0, 0, 2, 2, 10, 10));
+        geometryFactory.lineString(2, -1.0, -1.0, 0.0, 0, 2, 2, 10, 10));
 
     final LineString actualFromToIndexMaxLength = line.subLine(
       geometryFactory.point(-1, -1), 3, 3, geometryFactory.point(10, 10));

@@ -7,7 +7,7 @@ import com.revolsys.jts.geom.Point;
 
 /**
  * Compare the distance of nodes from a given node.
- * 
+ *
  * @author paustin
  */
 public class NodeDistanceComparator<T> implements Comparator<Node<T>> {
@@ -29,8 +29,8 @@ public class NodeDistanceComparator<T> implements Comparator<Node<T>> {
   @Override
   public int compare(final Node<T> node1, final Node<T> node2) {
     int compare;
-    final double distance1 = node1.distance(node);
-    final double distance2 = node2.distance(node);
+    final double distance1 = node1.distance(this.node);
+    final double distance2 = node2.distance(this.node);
     if (distance1 == distance2) {
       final Point point1 = node1;
       final Point point2 = node2;
@@ -41,7 +41,7 @@ public class NodeDistanceComparator<T> implements Comparator<Node<T>> {
       compare = 1;
     }
 
-    if (invert) {
+    if (this.invert) {
       return -compare;
     } else {
       return compare;
@@ -49,7 +49,7 @@ public class NodeDistanceComparator<T> implements Comparator<Node<T>> {
   }
 
   public boolean isInvert() {
-    return invert;
+    return this.invert;
   }
 
 }

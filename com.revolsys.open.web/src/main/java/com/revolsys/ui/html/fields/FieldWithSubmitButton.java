@@ -20,20 +20,20 @@ public class FieldWithSubmitButton extends Field {
 
   @Override
   public void initialize(final Form form, final HttpServletRequest request) {
-    field.initialize(form, request);
+    this.field.initialize(form, request);
   }
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    field.serialize(out);
+    this.field.serialize(out);
     HtmlUtil.serializeSubmitInput(out, getName(), getValue());
   }
 
   @Override
-  public void setContainer(ElementContainer container) {
+  public void setContainer(final ElementContainer container) {
     super.setContainer(container);
-    if (field != null) {
-      field.setContainer(container);
+    if (this.field != null) {
+      this.field.setContainer(container);
     }
   }
 }

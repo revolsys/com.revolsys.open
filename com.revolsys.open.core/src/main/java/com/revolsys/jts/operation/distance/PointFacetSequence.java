@@ -43,7 +43,7 @@ import com.revolsys.jts.geom.Point;
  * Represents a sequence of facets (points or line segments)
  * of a {@link Geometry}
  * specified by a subsequence of a {@link LineString}.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -81,7 +81,7 @@ public class PointFacetSequence implements FacetSequence {
     final double x = getCoordinate(0, 0);
     final double y = getCoordinate(0, 1);
     if (isPointOther) {
-      return point.distance(x, y);
+      return this.point.distance(x, y);
     } else {
       return computePointLineDistance(x, y, other);
     }
@@ -89,17 +89,17 @@ public class PointFacetSequence implements FacetSequence {
 
   @Override
   public Point getCoordinate(final int vertexIndex) {
-    return point;
+    return this.point;
   }
 
   @Override
   public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    return point.getCoordinate(axisIndex);
+    return this.point.getCoordinate(axisIndex);
   }
 
   @Override
   public BoundingBox getEnvelope() {
-    return point.getBoundingBox();
+    return this.point.getBoundingBox();
   }
 
   @Override
@@ -114,6 +114,6 @@ public class PointFacetSequence implements FacetSequence {
 
   @Override
   public String toString() {
-    return point.toString();
+    return this.point.toString();
   }
 }

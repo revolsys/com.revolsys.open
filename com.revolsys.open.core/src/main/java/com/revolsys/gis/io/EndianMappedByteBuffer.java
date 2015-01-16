@@ -5,13 +5,13 @@
  * $Revision$
 
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,25 +34,25 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   private final RandomAccessFile randomAccessFile;
 
   public EndianMappedByteBuffer(final File file, final MapMode mapMode)
-    throws IOException {
+      throws IOException {
     String mode = "r";
     if (mapMode.equals(MapMode.READ_WRITE)) {
       mode = "rw";
     }
-    randomAccessFile = new RandomAccessFile(file, mode);
-    final FileChannel channel = randomAccessFile.getChannel();
-    buffer = channel.map(mapMode, 0, randomAccessFile.length());
-    buffer.order(ByteOrder.BIG_ENDIAN);
+    this.randomAccessFile = new RandomAccessFile(file, mode);
+    final FileChannel channel = this.randomAccessFile.getChannel();
+    this.buffer = channel.map(mapMode, 0, this.randomAccessFile.length());
+    this.buffer.order(ByteOrder.BIG_ENDIAN);
   }
 
   public EndianMappedByteBuffer(final String name, final MapMode mapMode)
-    throws IOException {
+      throws IOException {
     this(new File(name), mapMode);
   }
 
   @Override
   public void close() throws IOException {
-    randomAccessFile.close();
+    this.randomAccessFile.close();
   }
 
   @Override
@@ -61,42 +61,42 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
 
   @Override
   public long getFilePointer() throws IOException {
-    return buffer.position();
+    return this.buffer.position();
   }
 
   @Override
   public long length() throws IOException {
-    return randomAccessFile.length();
+    return this.randomAccessFile.length();
   }
 
   @Override
   public int read() throws IOException {
-    return buffer.get();
+    return this.buffer.get();
   }
 
   @Override
   public int read(final byte[] bytes) throws IOException {
-    buffer.get(bytes);
+    this.buffer.get(bytes);
     return bytes.length;
   }
 
   @Override
   public double readDouble() throws IOException {
-    return buffer.getDouble();
+    return this.buffer.getDouble();
   }
 
   @Override
   public int readInt() throws IOException {
-    return buffer.getInt();
+    return this.buffer.getInt();
   }
 
   @Override
   public double readLEDouble() throws IOException {
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
-      return buffer.getDouble();
+      return this.buffer.getDouble();
     } finally {
-      buffer.order(ByteOrder.BIG_ENDIAN);
+      this.buffer.order(ByteOrder.BIG_ENDIAN);
     }
   }
 
@@ -108,74 +108,74 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
 
   @Override
   public int readLEInt() throws IOException {
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
-      return buffer.getInt();
+      return this.buffer.getInt();
     } finally {
-      buffer.order(ByteOrder.BIG_ENDIAN);
+      this.buffer.order(ByteOrder.BIG_ENDIAN);
     }
   }
 
   @Override
   public long readLELong() throws IOException {
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
-      return buffer.getLong();
+      return this.buffer.getLong();
     } finally {
-      buffer.order(ByteOrder.BIG_ENDIAN);
+      this.buffer.order(ByteOrder.BIG_ENDIAN);
     }
   }
 
   @Override
   public short readLEShort() throws IOException {
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
-      return buffer.getShort();
+      return this.buffer.getShort();
     } finally {
-      buffer.order(ByteOrder.BIG_ENDIAN);
+      this.buffer.order(ByteOrder.BIG_ENDIAN);
     }
   }
 
   @Override
   public long readLong() throws IOException {
-    return buffer.getLong();
+    return this.buffer.getLong();
   }
 
   @Override
   public short readShort() throws IOException {
-    return buffer.getShort();
+    return this.buffer.getShort();
   }
 
   @Override
   public void seek(final long index) throws IOException {
-    buffer.position((int)index);
+    this.buffer.position((int)index);
   }
 
   @Override
   public void setLength(final long length) throws IOException {
-    randomAccessFile.setLength(length);
+    this.randomAccessFile.setLength(length);
   }
 
   @Override
   public int skipBytes(final int i) throws IOException {
-    buffer.position(buffer.position() + i);
-    return buffer.position();
+    this.buffer.position(this.buffer.position() + i);
+    return this.buffer.position();
   }
 
   @Override
   public void write(final byte[] bytes) throws IOException {
-    buffer.put(bytes);
+    this.buffer.put(bytes);
   }
 
   @Override
   public void write(final byte[] bytes, final int offset, final int length)
-    throws IOException {
-    buffer.put(bytes, offset, length);
+      throws IOException {
+    this.buffer.put(bytes, offset, length);
   }
 
   @Override
   public void write(final int i) throws IOException {
-    buffer.put((byte)i);
+    this.buffer.put((byte)i);
   }
 
   @Override
@@ -188,76 +188,76 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
 
   @Override
   public void writeDouble(final double value) throws IOException {
-    buffer.putDouble(value);
+    this.buffer.putDouble(value);
   }
 
   @Override
   public void writeFloat(final float value) throws IOException {
-    buffer.putFloat(value);
+    this.buffer.putFloat(value);
   }
 
   @Override
   public void writeInt(final int value) throws IOException {
-    buffer.putInt(value);
+    this.buffer.putInt(value);
   }
 
   @Override
   public void writeLEDouble(final double value) throws IOException {
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
-      buffer.putDouble(value);
+      this.buffer.putDouble(value);
     } finally {
-      buffer.order(ByteOrder.BIG_ENDIAN);
+      this.buffer.order(ByteOrder.BIG_ENDIAN);
     }
   }
 
   @Override
   public void writeLEFloat(final float value) throws IOException {
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
-      buffer.putFloat(value);
+      this.buffer.putFloat(value);
     } finally {
-      buffer.order(ByteOrder.BIG_ENDIAN);
+      this.buffer.order(ByteOrder.BIG_ENDIAN);
     }
   }
 
   @Override
   public void writeLEInt(final int value) throws IOException {
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
-      buffer.putInt(value);
+      this.buffer.putInt(value);
     } finally {
-      buffer.order(ByteOrder.BIG_ENDIAN);
+      this.buffer.order(ByteOrder.BIG_ENDIAN);
     }
   }
 
   @Override
   public void writeLELong(final long value) throws IOException {
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
-      buffer.putLong(value);
+      this.buffer.putLong(value);
     } finally {
-      buffer.order(ByteOrder.BIG_ENDIAN);
+      this.buffer.order(ByteOrder.BIG_ENDIAN);
     }
   }
 
   @Override
   public void writeLEShort(final short value) throws IOException {
-    buffer.order(ByteOrder.LITTLE_ENDIAN);
+    this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
-      buffer.putShort(value);
+      this.buffer.putShort(value);
     } finally {
-      buffer.order(ByteOrder.BIG_ENDIAN);
+      this.buffer.order(ByteOrder.BIG_ENDIAN);
     }
   }
 
   @Override
   public void writeLong(final long value) throws IOException {
-    buffer.putLong(value);
+    this.buffer.putLong(value);
   }
 
   @Override
   public void writeShort(final short value) throws IOException {
-    buffer.putShort(value);
+    this.buffer.putShort(value);
   }
 }

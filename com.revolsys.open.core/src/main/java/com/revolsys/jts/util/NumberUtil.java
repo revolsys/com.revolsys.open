@@ -3,7 +3,7 @@ package com.revolsys.jts.util;
 public class NumberUtil
 {
 
-  public static boolean equalsWithTolerance(double x1, double x2, double tolerance)
+  public static boolean equalsWithTolerance(final double x1, final double x2, final double tolerance)
   {
     return Math.abs(x1 - x2) <= tolerance;
   }

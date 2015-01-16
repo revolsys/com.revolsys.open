@@ -7,7 +7,7 @@ import com.revolsys.parallel.channel.ClosedException;
 import com.revolsys.parallel.channel.store.Buffer;
 
 public abstract class AbstractOutProcess<T> extends AbstractProcess implements
-  OutProcess<T> {
+OutProcess<T> {
 
   private int outBufferSize = 0;
 
@@ -32,22 +32,22 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements
    */
   @Override
   public Channel<T> getOut() {
-    if (out == null) {
+    if (this.out == null) {
       final String channelName = getBeanName() + ".out";
-      if (outBufferSize == 0) {
+      if (this.outBufferSize == 0) {
         final Channel<T> channel = new Channel<T>(channelName);
         setOut(channel);
       } else {
-        final Buffer<T> buffer = new Buffer<T>(outBufferSize);
+        final Buffer<T> buffer = new Buffer<T>(this.outBufferSize);
         final Channel<T> channel = new Channel<T>(channelName, buffer);
         setOut(channel);
       }
     }
-    return out;
+    return this.out;
   }
 
   public int getOutBufferSize() {
-    return outBufferSize;
+    return this.outBufferSize;
   }
 
   protected void init() {
@@ -68,8 +68,8 @@ public abstract class AbstractOutProcess<T> extends AbstractProcess implements
       log.error(e.getMessage(), e);
       getProcessNetwork().stop();
     } finally {
-      if (out != null) {
-        out.writeDisconnect();
+      if (this.out != null) {
+        this.out.writeDisconnect();
       }
       destroy();
     }

@@ -17,7 +17,7 @@ public class CoordinateSystems {
           if (authority.equals("") || authority.equals("EPSG")) {
             return EpsgCoordinateSystems.getCoordinateSystem(id);
           } else if (authority == null || authority.equals("")
-            || authority.equals("ESRI")) {
+              || authority.equals("ESRI")) {
             return EsriCoordinateSystems.getCoordinateSystem(id);
           }
         } catch (final NumberFormatException e) {

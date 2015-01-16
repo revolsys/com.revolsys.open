@@ -1,7 +1,6 @@
 package com.revolsys.jts.testold.geom;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -96,7 +95,7 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     final BoundingBox testEnv = new BoundingBoxDoubleGf(2, this.rectEnv.getMinX()
       - this.bufSize, this.rectEnv.getMinY() - this.bufSize,
       this.rectEnv.getMaxX() + this.bufSize, this.rectEnv.getMaxY()
-        + this.bufSize);
+      + this.bufSize);
     final List<Geometry> testGeoms = createTestGeometries(testEnv, 5,
       this.testGeomSize);
     return testGeoms;
@@ -124,8 +123,8 @@ public class RectanglePredicateSyntheticTest extends TestCase {
     // System.out.println(this.rect);
 
     final List<Geometry> testGeoms = getTestGeometries();
-    for (final Iterator i = testGeoms.iterator(); i.hasNext();) {
-      final Geometry testGeom = (Geometry)i.next();
+    for (final Object element : testGeoms) {
+      final Geometry testGeom = (Geometry)element;
 
       final SegmentDensifier densifier = new SegmentDensifier(
         (LineString)testGeom);

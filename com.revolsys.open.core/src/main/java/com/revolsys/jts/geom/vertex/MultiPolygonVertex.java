@@ -8,6 +8,11 @@ import com.revolsys.jts.geom.MultiPolygon;
 import com.revolsys.jts.geom.Polygon;
 
 public class MultiPolygonVertex extends AbstractVertex {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private int vertexIndex;
 
   private int partIndex;

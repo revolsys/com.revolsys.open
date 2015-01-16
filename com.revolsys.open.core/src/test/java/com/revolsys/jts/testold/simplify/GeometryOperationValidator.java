@@ -44,7 +44,7 @@ public class GeometryOperationValidator {
    * Tests if the result is valid.
    * Throws an exception if result is not valid.
    * This allows chaining multiple tests together.
-   * 
+   *
    * @throws Exception if the result is not valid.
    */
   public void test() throws Exception {
@@ -54,7 +54,7 @@ public class GeometryOperationValidator {
   }
 
   public GeometryOperationValidator testEmpty(final boolean isEmpty)
-    throws Exception {
+      throws Exception {
     final String failureCondition = isEmpty ? "not empty" : "empty";
     Assert.assertTrue("simplified geometry is " + failureCondition,
       this.ioGeometry[1].isEmpty() == isEmpty);

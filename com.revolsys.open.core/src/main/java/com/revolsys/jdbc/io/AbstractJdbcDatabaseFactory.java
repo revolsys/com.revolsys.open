@@ -10,12 +10,12 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.PasswordUtil;
 
 public abstract class AbstractJdbcDatabaseFactory implements
-  JdbcDatabaseFactory {
+JdbcDatabaseFactory {
 
   private boolean useCommonsDbcp = true;
 
@@ -45,28 +45,28 @@ public abstract class AbstractJdbcDatabaseFactory implements
       dataSource.setUrl(url);
       dataSource.setValidationQuery(getConnectionValidationQuery());
 
-      final int minPoolSize = CollectionUtil.getInteger(config, "minPoolSize",
+      final int minPoolSize = Maps.getInteger(config, "minPoolSize",
         -1);
       newConfig.remove("minPoolSize");
       dataSource.setMinIdle(minPoolSize);
       dataSource.setMaxIdle(-1);
 
-      final int maxPoolSize = CollectionUtil.getInteger(config, "maxPoolSize",
+      final int maxPoolSize = Maps.getInteger(config, "maxPoolSize",
         10);
       newConfig.remove("maxPoolSize");
       dataSource.setMaxTotal(maxPoolSize);
 
-      final int maxWaitMillis = CollectionUtil.getInteger(config,
+      final int maxWaitMillis = Maps.getInteger(config,
         "waitTimeout", 1);
       newConfig.remove("waitTimeout");
       dataSource.setMaxWaitMillis(maxWaitMillis);
 
-      final boolean validateConnection = CollectionUtil.getBool(config,
+      final boolean validateConnection = Maps.getBool(config,
         "validateConnection", true);
       newConfig.remove("validateConnection");
       dataSource.setTestOnBorrow(validateConnection);
 
-      final int inactivityTimeout = CollectionUtil.getInteger(config,
+      final int inactivityTimeout = Maps.getInteger(config,
         "inactivityTimeout", 60);
       newConfig.remove("inactivityTimeout");
       dataSource.setMinEvictableIdleTimeMillis(inactivityTimeout * 1000);
@@ -80,13 +80,13 @@ public abstract class AbstractJdbcDatabaseFactory implements
         } catch (final Throwable t) {
           LoggerFactory.getLogger(getClass()).debug(
             "Unable to set data source property " + name + " = " + value
-              + " for " + url, t);
+            + " for " + url, t);
         }
       }
       return dataSource;
     } catch (final Throwable e) {
       throw new IllegalArgumentException("Unable to create data source for "
-        + config, e);
+          + config, e);
     }
   }
 

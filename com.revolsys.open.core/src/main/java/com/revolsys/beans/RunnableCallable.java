@@ -12,7 +12,7 @@ import com.revolsys.util.ExceptionUtil;
  * be obtained using the {@link #getResult()} method.</p>
  *
  * <p>NOTE: This class is designed to be used for a single invocation only.</p>
- * 
+ *
  * @param <T> The type of the result.
  */
 public class RunnableCallable<T> extends AbstractRunnable {
@@ -40,7 +40,7 @@ public class RunnableCallable<T> extends AbstractRunnable {
   @Override
   public void doRun() {
     try {
-      result = callable.call();
+      this.result = this.callable.call();
     } catch (final Exception e) {
       ExceptionUtil.throwUncheckedException(e);
     }
@@ -48,10 +48,10 @@ public class RunnableCallable<T> extends AbstractRunnable {
 
   /**
    * Get the result value returned by the callable.
-   * 
+   *
    * @return The result value returned by the callable.
    */
   public T getResult() {
-    return result;
+    return this.result;
   }
 }

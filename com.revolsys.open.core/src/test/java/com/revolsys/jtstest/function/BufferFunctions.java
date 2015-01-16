@@ -52,8 +52,6 @@ import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
 
 public class BufferFunctions {
 
-  public static String bufferDescription = "Buffers a geometry by a distance";
-
   public static Geometry buffer(final Geometry g, final double distance) {
     return g.buffer(distance);
   }
@@ -187,5 +185,7 @@ public class BufferFunctions {
     bufParams.setSingleSided(true);
     return Buffer.buffer(geom, distance, bufParams);
   }
+
+  public static String bufferDescription = "Buffers a geometry by a distance";
 
 }

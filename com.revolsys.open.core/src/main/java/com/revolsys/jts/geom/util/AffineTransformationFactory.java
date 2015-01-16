@@ -40,22 +40,22 @@ import com.revolsys.math.Angle;
 /**
  * Supports creating {@link AffineTransformation}s defined by various kinds of
  * inputs and transformation mapping rules.
- * 
+ *
  * @author Martin Davis
- * 
+ *
  */
 public class AffineTransformationFactory {
   /**
-   * Creates an AffineTransformation defined by a maping between two baselines. 
+   * Creates an AffineTransformation defined by a maping between two baselines.
    * The computed transformation consists of:
    * <ul>
-   * <li>a translation 
+   * <li>a translation
    * from the start point of the source baseline to the start point of the destination baseline,
    * <li>a rotation through the angle between the baselines about the destination start point,
    * <li>and a scaling equal to the ratio of the baseline lengths.
    * </ul>
    * If the source baseline has zero length, an identity transformation is returned.
-   * 
+   *
    * @param src0 the start point of the source baseline
    * @param src1 the end point of the source baseline
    * @param dest0 the start point of the destination baseline
@@ -93,7 +93,7 @@ public class AffineTransformationFactory {
    * control vector consists of a source point and a destination point, which is
    * the image of the source point under the desired transformation. This
    * produces a translation.
-   * 
+   *
    * @param src0
    *          the start point of the control vector
    * @param dest0
@@ -114,7 +114,7 @@ public class AffineTransformationFactory {
    * computed transformation is a combination of one or more of a uniform scale,
    * a rotation, and a translation (i.e. there is no shear component and no
    * reflection)
-   * 
+   *
    * @param src0
    * @param src1
    * @param dest0
@@ -151,7 +151,7 @@ public class AffineTransformationFactory {
    * vector consists of a source point and a destination point, which is the
    * image of the source point under the desired transformation. Three control
    * vectors allows defining a fully general affine transformation.
-   * 
+   *
    * @param src0
    * @param src1
    * @param src2
@@ -171,7 +171,7 @@ public class AffineTransformationFactory {
   /**
    * Creates an AffineTransformation defined by a set of control vectors.
    * Between one and three vectors must be supplied.
-   * 
+   *
    * @param src
    *          the source points of the vectors
    * @param dest
@@ -185,7 +185,7 @@ public class AffineTransformationFactory {
     final Point[] src, final Point[] dest) {
     if (src.length != dest.length) {
       throw new IllegalArgumentException(
-        "Src and Dest arrays are not the same length");
+          "Src and Dest arrays are not the same length");
     }
     if (src.length <= 0) {
       throw new IllegalArgumentException("Too few control points");

@@ -45,16 +45,16 @@ import com.revolsys.jts.geom.vertex.Vertex;
  * based on a discretization of the input {@link Geometry}.
  * The algorithm computes the Hausdorff distance restricted to discrete points
  * for one of the geometries.
- * The points can be either the vertices of the geometries (the default), 
+ * The points can be either the vertices of the geometries (the default),
  * or the geometries with line segments densified by a given fraction.
  * Also determines two points of the Geometries which are separated by the computed distance.
-* <p>
+ * <p>
  * This algorithm is an approximation to the standard Hausdorff distance.
- * Specifically, 
+ * Specifically,
  * <pre>
  *    for all geometries a, b:    DHD(a, b) <= HD(a, b)
  * </pre>
- * The approximation can be made as close as needed by densifying the input geometries.  
+ * The approximation can be made as close as needed by densifying the input geometries.
  * In the limit, this value will approach the true Hausdorff distance:
  * <pre>
  *    DHD(A, B, densifyFactor) -> HD(A, B) as densifyFactor -> 0.0
@@ -70,7 +70,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
  * <pre>
  *   A = LINESTRING (0 0, 100 0, 10 100, 10 100)
  *   B = LINESTRING (0 100, 0 10, 80 10)
- *   
+ *
  *   DHD(A, B) = 22.360679774997898
  *   HD(A, B) ~= 47.8
  * </pre>
@@ -105,8 +105,8 @@ public class DiscreteHausdorffDistance {
   }
 
   private void compute(final Geometry g0, final Geometry g1) {
-    computeOrientedDistance(g0, g1, ptDist);
-    computeOrientedDistance(g1, g0, ptDist);
+    computeOrientedDistance(g0, g1, this.ptDist);
+    computeOrientedDistance(g1, g0, this.ptDist);
   }
 
   private void computeOrientedDistance(final Geometry discreteGeom,
@@ -121,7 +121,7 @@ public class DiscreteHausdorffDistance {
     }
     ptDist.setMaximum(maxPtDist);
 
-    if (densifyFrac > 0) {
+    if (this.densifyFrac > 0) {
       maxPtDist.initialize();
       final int numSubSegs = 0;
 
@@ -149,17 +149,17 @@ public class DiscreteHausdorffDistance {
   }
 
   public double distance() {
-    compute(g0, g1);
-    return ptDist.getDistance();
+    compute(this.g0, this.g1);
+    return this.ptDist.getDistance();
   }
 
   public Point[] getCoordinates() {
-    return ptDist.getCoordinates();
+    return this.ptDist.getCoordinates();
   }
 
   public double orientedDistance() {
-    computeOrientedDistance(g0, g1, ptDist);
-    return ptDist.getDistance();
+    computeOrientedDistance(this.g0, this.g1, this.ptDist);
+    return this.ptDist.getDistance();
   }
 
   /**
@@ -167,7 +167,7 @@ public class DiscreteHausdorffDistance {
    * Each segment will be (virtually) split into a number of equal-length
    * subsegments, whose fraction of the total length is closest
    * to the given fraction.
-   * 
+   *
    * @param densifyPercent
    */
   public void setDensifyFraction(final double densifyFrac) {

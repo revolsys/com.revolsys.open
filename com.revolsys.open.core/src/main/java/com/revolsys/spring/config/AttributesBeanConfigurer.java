@@ -39,7 +39,7 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
     final String beanClassName) {
     if (beanClassName != null) {
       if (beanClassName.equals(AttributeMap.class.getName())
-        || beanName.endsWith("-AttributeMap")) {
+          || beanName.endsWith("-AttributeMap")) {
         processPlaceholderAttributes(beanFactory, beanName, attributes);
         final Map<String, Object> otherAttributes = (Map<String, Object>)beanFactory.getBean(beanName);
         processPlaceholderAttributes(beanFactory, otherAttributes);
@@ -91,8 +91,8 @@ public class AttributesBeanConfigurer extends BeanConfigurrer {
           if (beanClassName.equals(TargetBeanFactoryBean.class.getName())) {
             final MutablePropertyValues propertyValues = bd.getPropertyValues();
             final BeanDefinition targetBeanDefinition = (BeanDefinition)propertyValues.getPropertyValue(
-              "targetBeanDefinition")
-              .getValue();
+                "targetBeanDefinition")
+                .getValue();
             final String targetBeanClassName = targetBeanDefinition.getBeanClassName();
             addFields(allAttributes, beanFactory, targetBeanDefinition,
               beanName, targetBeanClassName);

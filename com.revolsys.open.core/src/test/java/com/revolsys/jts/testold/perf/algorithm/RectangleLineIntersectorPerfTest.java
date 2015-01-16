@@ -76,7 +76,7 @@ public class RectangleLineIntersectorPerfTest {
   private BoundingBox createRectangle() {
     final BoundingBox rectEnv = new BoundingBoxDoubleGf(new PointDouble(this.baseX,
       this.baseY, Point.NULL_ORDINATE), new PointDouble(this.baseX
-      + this.rectSize, this.baseY + this.rectSize, Point.NULL_ORDINATE));
+        + this.rectSize, this.baseY + this.rectSize, Point.NULL_ORDINATE));
     return rectEnv;
   }
 
@@ -146,7 +146,7 @@ public class RectangleLineIntersectorPerfTest {
 /**
  * Tests intersection of a segment against a rectangle
  * by computing intersection against all side segments.
- * 
+ *
  * @author Martin Davis
  *
  */

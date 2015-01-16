@@ -69,7 +69,7 @@ public class MCIndexPointSnapper {
     }
 
     public boolean isNodeAdded() {
-      return isNodeAdded;
+      return this.isNodeAdded;
     }
 
     @Override
@@ -77,20 +77,20 @@ public class MCIndexPointSnapper {
       final NodedSegmentString ss = (NodedSegmentString)mc.getContext();
       /**
        * Check to avoid snapping a hotPixel vertex to the same vertex.
-       * This method is called for segments which intersects the 
+       * This method is called for segments which intersects the
        * hot pixel,
        * so need to check if either end of the segment is equal to the hot pixel
        * and if so, do not snap.
-       * 
+       *
        * Sep 22 2012 - MD - currently do need to snap to every vertex,
        * since otherwise the testCollapse1 test in SnapRoundingTest fails.
        */
-      if (parentEdge != null) {
-        if (ss == parentEdge && (startIndex == hotPixelVertexIndex)) {
+      if (this.parentEdge != null) {
+        if (ss == this.parentEdge && startIndex == this.hotPixelVertexIndex) {
           return;
         }
       }
-      isNodeAdded = hotPixel.addSnappedNode(ss, startIndex);
+      this.isNodeAdded = this.hotPixel.addSnappedNode(ss, startIndex);
     }
 
   }
@@ -122,7 +122,7 @@ public class MCIndexPointSnapper {
     final HotPixelSnapAction hotPixelSnapAction = new HotPixelSnapAction(
       hotPixel, parentEdge, hotPixelVertexIndex);
 
-    index.query(pixelEnv, new ItemVisitor() {
+    this.index.query(pixelEnv, new ItemVisitor() {
       @Override
       public void visitItem(final Object item) {
         final MonotoneChain testChain = (MonotoneChain)item;

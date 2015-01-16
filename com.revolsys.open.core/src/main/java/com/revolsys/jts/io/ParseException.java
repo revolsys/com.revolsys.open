@@ -42,13 +42,9 @@ package com.revolsys.jts.io;
 public class ParseException extends Exception {
 
   /**
-   *  Creates a <code>ParseException</code> with the given detail message.
    *
-   *@param  message  a description of this <code>ParseException</code>
    */
-  public ParseException(String message) {
-    super(message);
-  }
+  private static final long serialVersionUID = 1L;
 
   /**
    *  Creates a <code>ParseException</code> with <code>e</code>s detail message.
@@ -56,8 +52,17 @@ public class ParseException extends Exception {
    *@param  e  an exception that occurred while a <code>WKTReader</code> was
    *      parsing a Well-known Text string
    */
-  public ParseException(Exception e) {
+  public ParseException(final Exception e) {
     this(e.toString());
+  }
+
+  /**
+   *  Creates a <code>ParseException</code> with the given detail message.
+   *
+   *@param  message  a description of this <code>ParseException</code>
+   */
+  public ParseException(final String message) {
+    super(message);
   }
 }
 

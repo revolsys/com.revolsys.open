@@ -44,13 +44,13 @@ import com.revolsys.jts.planargraph.Edge;
  * @version 1.7
  */
 class PolygonizeEdge
-    extends Edge
+extends Edge
 {
-  private LineString line;
+  private final LineString line;
 
-  public PolygonizeEdge(LineString line)
+  public PolygonizeEdge(final LineString line)
   {
     this.line = line;
   }
-  public LineString getLine() { return line; }
+  public LineString getLine() { return this.line; }
 }

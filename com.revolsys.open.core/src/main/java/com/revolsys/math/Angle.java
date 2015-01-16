@@ -41,24 +41,9 @@ import com.revolsys.util.MathUtil;
  * Unless otherwise noted, methods in this class express angles in radians.
  */
 public class Angle {
-  public static final double PI_TIMES_2 = 2.0 * Math.PI;
-
-  public static final double PI_OVER_2 = Math.PI / 2.0;
-
-  public static final double PI_OVER_4 = Math.PI / 4.0;
-
-  /** Constant representing counterclockwise orientation */
-  public static final int COUNTERCLOCKWISE = CGAlgorithms.COUNTERCLOCKWISE;
-
-  /** Constant representing clockwise orientation */
-  public static final int CLOCKWISE = CGAlgorithms.CLOCKWISE;
-
-  /** Constant representing no orientation */
-  public static final int NONE = CGAlgorithms.COLLINEAR;
-
   /**
    * Calculate the angle of a coordinates
-   * 
+   *
    * @param x The x coordinate.
    * @param y The y coordinate.
    * @return The distance.
@@ -70,7 +55,7 @@ public class Angle {
 
   /**
    * Calculate the angle between three coordinates.
-   * 
+   *
    * @param x1 The first x coordinate.
    * @param y1 The first y coordinate.
    * @param x2 The second x coordinate.
@@ -200,7 +185,7 @@ public class Angle {
     }
 
     if (delAngle > Math.PI) {
-      delAngle = (2 * Math.PI) - delAngle;
+      delAngle = 2 * Math.PI - delAngle;
     }
 
     return delAngle;
@@ -262,7 +247,7 @@ public class Angle {
     }
 
     if (delAngle > Math.PI) {
-      delAngle = (2 * Math.PI) - delAngle;
+      delAngle = 2 * Math.PI - delAngle;
     }
 
     return delAngle;
@@ -293,7 +278,7 @@ public class Angle {
    * Computes the interior angle between two segments of a ring. The ring is
    * assumed to be oriented in a clockwise direction. The computed angle will be
    * in the range [0, 2Pi]
-   * 
+   *
    * @param p0
    *          a point of the ring
    * @param p1
@@ -412,7 +397,7 @@ public class Angle {
    * @return the angle in degrees
    */
   public static double toDegrees(final double radians) {
-    return (radians * 180) / (Math.PI);
+    return radians * 180 / Math.PI;
   }
 
   /**
@@ -422,6 +407,21 @@ public class Angle {
    * @return the angle in radians
    */
   public static double toRadians(final double angleDegrees) {
-    return (angleDegrees * Math.PI) / 180.0;
+    return angleDegrees * Math.PI / 180.0;
   }
+
+  public static final double PI_TIMES_2 = 2.0 * Math.PI;
+
+  public static final double PI_OVER_2 = Math.PI / 2.0;
+
+  public static final double PI_OVER_4 = Math.PI / 4.0;
+
+  /** Constant representing counterclockwise orientation */
+  public static final int COUNTERCLOCKWISE = CGAlgorithms.COUNTERCLOCKWISE;
+
+  /** Constant representing clockwise orientation */
+  public static final int CLOCKWISE = CGAlgorithms.CLOCKWISE;
+
+  /** Constant representing no orientation */
+  public static final int NONE = CGAlgorithms.COLLINEAR;
 }

@@ -96,31 +96,6 @@ public class HttpServletRequestJexlContext implements JexlContext {
           HttpServletRequestJexlContext.this.urlPathHelper.getOriginatingRequestUri(request));
         return map.entrySet();
       }
-
-      public Object get(final String key) {
-        final HttpServletRequest request = getRequest();
-        if (key.equals("request")) {
-          return request;
-        } else if (key.equals("requestURI")) {
-          return HttpServletRequestJexlContext.this.urlPathHelper.getOriginatingRequestUri(request);
-        }
-        Object value = getAttribute(key);
-        if (value == null
-          && HttpServletRequestJexlContext.this.servletContext != null) {
-          value = HttpServletRequestJexlContext.this.servletContext.getAttribute(key);
-        }
-        if (value == null) {
-          value = request.getAttribute(key);
-          if (value == null) {
-            value = request.getParameter(key);
-          }
-        }
-        if (value == null) {
-          return "";
-        } else {
-          return value;
-        }
-      }
     };
   }
 

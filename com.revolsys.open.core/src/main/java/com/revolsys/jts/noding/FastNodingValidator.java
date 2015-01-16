@@ -44,18 +44,18 @@ import com.revolsys.jts.geom.TopologyException;
 /**
  * Validates that a collection of {@link SegmentString}s is correctly noded.
  * Indexing is used to improve performance.
- * In the most common use case, validation stops after a single 
- * non-noded intersection is detected, 
+ * In the most common use case, validation stops after a single
+ * non-noded intersection is detected,
  * but the class can be requested to detect all intersections
  * by using the {@link #setFindAllIntersections(boolean)} method.
  * <p>
  * The validator does not check for a-b-a topology collapse situations.
- * <p> 
+ * <p>
  * The validator does not check for endpoint-interior vertex intersections.
  * This should not be a problem, since the JTS noders should be
  * able to compute intersections between vertices correctly.
  * <p>
- * The client may either test the {@link #isValid()} condition, 
+ * The client may either test the {@link #isValid()} condition,
  * or request that a suitable {@link TopologyException} be thrown.
  *
  * @version 1.7
@@ -73,7 +73,7 @@ public class FastNodingValidator {
 
   /**
    * Creates a new noding validator for a given set of linework.
-   * 
+   *
    * @param segStrings a collection of {@link SegmentString}s
    */
   public FastNodingValidator(final Collection segStrings) {
@@ -82,18 +82,18 @@ public class FastNodingValidator {
 
   private void checkInteriorIntersections() {
     /**
-     * MD - It may even be reliable to simply check whether 
+     * MD - It may even be reliable to simply check whether
      * end segments (of SegmentStrings) have an interior intersection,
      * since noding should have split any true interior intersections already.
      */
-    isValid = true;
-    segInt = new InteriorIntersectionFinder(li);
-    segInt.setFindAllIntersections(findAllIntersections);
+    this.isValid = true;
+    this.segInt = new InteriorIntersectionFinder(this.li);
+    this.segInt.setFindAllIntersections(this.findAllIntersections);
     final MCIndexNoder noder = new MCIndexNoder();
-    noder.setSegmentIntersector(segInt);
-    noder.computeNodes(segStrings);
-    if (segInt.hasIntersection()) {
-      isValid = false;
+    noder.setSegmentIntersector(this.segInt);
+    noder.computeNodes(this.segStrings);
+    if (this.segInt.hasIntersection()) {
+      this.isValid = false;
       return;
     }
   }
@@ -106,15 +106,15 @@ public class FastNodingValidator {
    */
   public void checkValid() {
     execute();
-    if (!isValid) {
+    if (!this.isValid) {
       final String errorMessage = getErrorMessage();
-      final Point interiorIntersection = segInt.getInteriorIntersection();
+      final Point interiorIntersection = this.segInt.getInteriorIntersection();
       throw new TopologyException(errorMessage, interiorIntersection);
     }
   }
 
   private void execute() {
-    if (segInt != null) {
+    if (this.segInt != null) {
       return;
     }
     checkInteriorIntersections();
@@ -123,33 +123,33 @@ public class FastNodingValidator {
   /**
    * Returns an error message indicating the segments containing
    * the intersection.
-   * 
+   *
    * @return an error message documenting the intersection location
    */
   public String getErrorMessage() {
-    if (isValid) {
+    if (this.isValid) {
       return "no intersections found";
     }
 
-    final Point[] intSegs = segInt.getIntersectionSegments();
+    final Point[] intSegs = this.segInt.getIntersectionSegments();
     return "found non-noded intersection between "
-      + EWktWriter.lineString(intSegs[0], intSegs[1]) + " and "
-      + EWktWriter.lineString(intSegs[2], intSegs[3]);
+    + EWktWriter.lineString(intSegs[0], intSegs[1]) + " and "
+    + EWktWriter.lineString(intSegs[2], intSegs[3]);
   }
 
   public List getIntersections() {
-    return segInt.getIntersections();
+    return this.segInt.getIntersections();
   }
 
   /**
-   * Checks for an intersection and 
+   * Checks for an intersection and
    * reports if one is found.
-   * 
+   *
    * @return true if the arrangement contains an interior intersection
    */
   public boolean isValid() {
     execute();
-    return isValid;
+    return this.isValid;
   }
 
   public void setFindAllIntersections(final boolean findAllIntersections) {

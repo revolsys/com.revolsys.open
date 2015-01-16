@@ -17,7 +17,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.spring.SpringUtil;
 
 public class XmlMapIoFactory extends AbstractMapReaderFactory implements
-  MapWriterFactory {
+MapWriterFactory {
   public static Map<String, Object> toMap(final Resource resource) {
     final XmlMapIterator iterator = new XmlMapIterator(resource, true);
     try {
@@ -40,7 +40,7 @@ public class XmlMapIoFactory extends AbstractMapReaderFactory implements
   public Reader<Map<String, Object>> createMapReader(final Resource resource) {
     final XmlMapIterator iterator = new XmlMapIterator(resource);
     final Reader<Map<String, Object>> reader = new IteratorReader<Map<String, Object>>(
-      iterator);
+        iterator);
     return reader;
   }
 

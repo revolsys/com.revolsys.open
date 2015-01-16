@@ -1,35 +1,35 @@
 /*
-* The JTS Topology Suite is a collection of Java classes that
-* implement the fundamental operations required to validate a given
-* geo-spatial data set to a known topological specification.
-*
-* Copyright (C) 2001 Vivid Solutions
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-* For more information, contact:
-*
-*     Vivid Solutions
-*     Suite #1A
-*     2328 Government Street
-*     Victoria BC  V8T 5G5
-*     Canada
-*
-*     (250)385-6040
-*     www.vividsolutions.com
-*/
+ * The JTS Topology Suite is a collection of Java classes that
+ * implement the fundamental operations required to validate a given
+ * geo-spatial data set to a known topological specification.
+ *
+ * Copyright (C) 2001 Vivid Solutions
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * For more information, contact:
+ *
+ *     Vivid Solutions
+ *     Suite #1A
+ *     2328 Government Street
+ *     Victoria BC  V8T 5G5
+ *     Canada
+ *
+ *     (250)385-6040
+ *     www.vividsolutions.com
+ */
 
 package com.revolsys.jts.noding;
 
@@ -57,13 +57,15 @@ public class SegmentPointComparator {
    * 0 the two nodes are equal;
    * 1 node1 occurs first
    */
-  public static int compare(int octant, Point p0, Point p1)
+  public static int compare(final int octant, final Point p0, final Point p1)
   {
     // nodes can only be equal if their coordinates are equal
-    if (p0.equals(2,p1)) return 0;
+    if (p0.equals(2,p1)) {
+      return 0;
+    }
 
-    int xSign = relativeSign(p0.getX(), p1.getX());
-    int ySign = relativeSign(p0.getY(), p1.getY());
+    final int xSign = relativeSign(p0.getX(), p1.getX());
+    final int ySign = relativeSign(p0.getY(), p1.getY());
 
     switch (octant) {
       case 0: return compareValue(xSign, ySign);
@@ -79,20 +81,32 @@ public class SegmentPointComparator {
     return 0;
   }
 
-  public static int relativeSign(double x0, double x1)
+  private static int compareValue(final int compareSign0, final int compareSign1)
   {
-    if (x0 < x1) return -1;
-    if (x0 > x1) return 1;
+    if (compareSign0 < 0) {
+      return -1;
+    }
+    if (compareSign0 > 0) {
+      return 1;
+    }
+    if (compareSign1 < 0) {
+      return -1;
+    }
+    if (compareSign1 > 0) {
+      return 1;
+    }
     return 0;
+
   }
 
-  private static int compareValue(int compareSign0, int compareSign1)
+  public static int relativeSign(final double x0, final double x1)
   {
-    if (compareSign0 < 0) return -1;
-    if (compareSign0 > 0) return 1;
-    if (compareSign1 < 0) return -1;
-    if (compareSign1 > 0) return 1;
+    if (x0 < x1) {
+      return -1;
+    }
+    if (x0 > x1) {
+      return 1;
+    }
     return 0;
-
   }
 }

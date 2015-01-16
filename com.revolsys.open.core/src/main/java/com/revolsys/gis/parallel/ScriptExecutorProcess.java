@@ -32,7 +32,7 @@ import com.revolsys.parallel.tools.ScriptExecutorRunnable;
 import com.revolsys.util.JexlUtil;
 
 public class ScriptExecutorProcess extends BaseInProcess<Record> implements
-  BeanFactoryAware {
+BeanFactoryAware {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptExecutorProcess.class);
 
   private final Map<String, Object> attributes = new HashMap<String, Object>();
@@ -144,7 +144,7 @@ public class ScriptExecutorProcess extends BaseInProcess<Record> implements
 
   @Override
   public void setBeanFactory(final BeanFactory beanFactory)
-    throws BeansException {
+      throws BeansException {
     this.attributes.putAll(ThreadSharedAttributes.getFields());
   }
 
@@ -168,11 +168,11 @@ public class ScriptExecutorProcess extends BaseInProcess<Record> implements
       final String value = param.getValue();
       try {
         final Expression expression = JexlUtil.createExpression(value,
-          "#\\{([^\\}]+)\\}");
+            "#\\{([^\\}]+)\\}");
         this.expressions.put(key, expression);
       } catch (final Exception e) {
         throw new IllegalArgumentException("Expression not valid " + key + "="
-          + value);
+            + value);
       }
     }
   }

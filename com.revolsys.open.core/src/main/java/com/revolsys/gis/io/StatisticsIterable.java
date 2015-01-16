@@ -23,40 +23,40 @@ public class StatisticsIterable implements Iterable<Record>, BeanNameAware {
   }
 
   public Iterable<Record> getIterable() {
-    return iterable;
+    return this.iterable;
   }
 
   /**
    * @return the stats
    */
   public Statistics getStatistics() {
-    return statistics;
+    return this.statistics;
   }
 
   public String getStatsName() {
-    return statsName;
+    return this.statsName;
   }
 
   @PostConstruct
   public void init() {
     if (this.statistics == null) {
-      setStatistics(new Statistics("Read " + statsName + " "
-        + iterable.toString()));
+      setStatistics(new Statistics("Read " + this.statsName + " "
+          + this.iterable.toString()));
     }
   }
 
   @Override
   public Iterator<Record> iterator() {
     if (this.statistics == null) {
-      setStatistics(new Statistics("Read " + statsName + " "
-        + iterable.toString()));
+      setStatistics(new Statistics("Read " + this.statsName + " "
+          + this.iterable.toString()));
     }
-    return new StatisticsIterator(iterable.iterator(), statistics);
+    return new StatisticsIterator(this.iterable.iterator(), this.statistics);
   }
 
   @Override
   public void setBeanName(final String beanName) {
-    if (statsName == null) {
+    if (this.statsName == null) {
       this.statsName = beanName.replaceAll("Stats", "");
     }
   }
@@ -78,7 +78,7 @@ public class StatisticsIterable implements Iterable<Record>, BeanNameAware {
 
   @Override
   public String toString() {
-    return iterable.toString();
+    return this.iterable.toString();
   }
 
 }

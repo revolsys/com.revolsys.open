@@ -44,7 +44,7 @@ import com.revolsys.jts.geom.util.GeometryMapper.MapOp;
  * Maps the members of a {@link GeometryCollection}
  * into another <tt>GeometryCollection</tt> via a defined
  * mapping function.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -64,7 +64,7 @@ public class GeometryCollectionMapper {
   public GeometryCollection map(final GeometryCollection gc) {
     final List<Geometry> mapped = new ArrayList<Geometry>();
     for (int i = 0; i < gc.getGeometryCount(); i++) {
-      final Geometry g = mapOp.map(gc.getGeometry(i));
+      final Geometry g = this.mapOp.map(gc.getGeometry(i));
       if (!g.isEmpty()) {
         mapped.add(g);
       }

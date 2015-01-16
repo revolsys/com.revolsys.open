@@ -6,7 +6,7 @@ import com.revolsys.swing.map.ComponentViewport2D;
 public interface ZoomMode {
   /**
    * Get the best bounding box matching the zoom mode policy
-   * 
+   *
    * @param viewport The viewport.
    * @param boundingBox The bounding box.
    * @return The bounding box.
@@ -16,7 +16,7 @@ public interface ZoomMode {
 
   /**
    * Zoom the map so that the specified bounding box is visible.
-   * 
+   *
    * @param viewport The viewport.
    * @param boundingBox The bounding box.
    */
@@ -25,7 +25,7 @@ public interface ZoomMode {
   /**
    * Zoom the map to include the bounding box specified by the model coordinate
    * pair.
-   * 
+   *
    * @param viewport The viewport.
    * @param x1 The first x coordinate.
    * @param y1 The first y coordinate.
@@ -38,7 +38,7 @@ public interface ZoomMode {
   /**
    * Zoom the map in one level at the view coordinate, with the model coordinate
    * being maintained at the same view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -48,7 +48,7 @@ public interface ZoomMode {
   /**
    * Zoom the map in one level at the view coordinate, re-centering the map at
    * the model coordinate represented by the view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -58,7 +58,7 @@ public interface ZoomMode {
   /**
    * Zoom the map out one level at the view coordinate, with the model
    * coordinate being maintained at the same view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -68,7 +68,7 @@ public interface ZoomMode {
   /**
    * Zoom the map in one level at the view coordinate, re-centering the map at
    * the model coordinate represented by the view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.

@@ -57,7 +57,7 @@ public class HCoordinate {
    */
   public static Point intersection(final Point p1,
     final Point p2, final Point q1, final Point q2)
-    throws NotRepresentableException {
+        throws NotRepresentableException {
     // unrolled computation
     final double px = p1.getY() - p2.getY();
     final double py = p2.getX() - p1.getX();
@@ -74,8 +74,8 @@ public class HCoordinate {
     final double xInt = x / w;
     final double yInt = y / w;
 
-    if ((Double.isNaN(xInt)) || (Double.isInfinite(xInt) || Double.isNaN(yInt))
-      || (Double.isInfinite(yInt))) {
+    if (Double.isNaN(xInt) || Double.isInfinite(xInt) || Double.isNaN(yInt)
+        || Double.isInfinite(yInt)) {
       throw new NotRepresentableException();
     }
 
@@ -93,30 +93,48 @@ public class HCoordinate {
   public double x, y, w;
 
   public HCoordinate() {
-    x = 0.0;
-    y = 0.0;
-    w = 1.0;
+    this.x = 0.0;
+    this.y = 0.0;
+    this.w = 1.0;
+  }
+
+  public HCoordinate(final double _x, final double _y) {
+    this.x = _x;
+    this.y = _y;
+    this.w = 1.0;
+  }
+
+  public HCoordinate(final double _x, final double _y, final double _w) {
+    this.x = _x;
+    this.y = _y;
+    this.w = _w;
+  }
+
+  public HCoordinate(final HCoordinate p1, final HCoordinate p2) {
+    this.x = p1.y * p2.w - p2.y * p1.w;
+    this.y = p2.x * p1.w - p1.x * p2.w;
+    this.w = p1.x * p2.y - p2.x * p1.y;
   }
 
   public HCoordinate(final Point p) {
-    x = p.getX();
-    y = p.getY();
-    w = 1.0;
+    this.x = p.getX();
+    this.y = p.getY();
+    this.w = 1.0;
   }
 
   /**
    * Constructs a homogeneous coordinate which is the intersection of the lines
    * define by the homogenous coordinates represented by two
    * {@link Coordinates}s.
-   * 
+   *
    * @param p1
    * @param p2
    */
   public HCoordinate(final Point p1, final Point p2) {
     // optimization when it is known that w = 1
-    x = p1.getY() - p2.getY();
-    y = p2.getX() - p1.getX();
-    w = p1.getX() * p2.getY() - p2.getX() * p1.getY();
+    this.x = p1.getY() - p2.getY();
+    this.y = p2.getX() - p1.getX();
+    this.w = p1.getX() * p2.getY() - p2.getX() * p1.getY();
   }
 
   public HCoordinate(final Point p1, final Point p2,
@@ -130,27 +148,9 @@ public class HCoordinate {
     final double qy = q2.getX() - q1.getX();
     final double qw = q1.getX() * q2.getY() - q2.getX() * q1.getY();
 
-    x = py * qw - qy * pw;
-    y = qx * pw - px * qw;
-    w = px * qy - qx * py;
-  }
-
-  public HCoordinate(final double _x, final double _y) {
-    x = _x;
-    y = _y;
-    w = 1.0;
-  }
-
-  public HCoordinate(final double _x, final double _y, final double _w) {
-    x = _x;
-    y = _y;
-    w = _w;
-  }
-
-  public HCoordinate(final HCoordinate p1, final HCoordinate p2) {
-    x = p1.y * p2.w - p2.y * p1.w;
-    y = p2.x * p1.w - p1.x * p2.w;
-    w = p1.x * p2.y - p2.x * p1.y;
+    this.x = py * qw - qy * pw;
+    this.y = qx * pw - px * qw;
+    this.w = px * qy - qx * py;
   }
 
   public Point getCoordinate() throws NotRepresentableException {
@@ -158,16 +158,16 @@ public class HCoordinate {
   }
 
   public double getX() throws NotRepresentableException {
-    final double a = x / w;
-    if ((Double.isNaN(a)) || (Double.isInfinite(a))) {
+    final double a = this.x / this.w;
+    if (Double.isNaN(a) || Double.isInfinite(a)) {
       throw new NotRepresentableException();
     }
     return a;
   }
 
   public double getY() throws NotRepresentableException {
-    final double a = y / w;
-    if ((Double.isNaN(a)) || (Double.isInfinite(a))) {
+    final double a = this.y / this.w;
+    if (Double.isNaN(a) || Double.isInfinite(a)) {
       throw new NotRepresentableException();
     }
     return a;

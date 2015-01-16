@@ -170,70 +170,6 @@ import com.revolsys.jts.geom.Point;
 
 public class ShewchuksDeterminant {
 
-  private static final double splitter;
-
-  private static final double resulterrbound;
-
-  private static final double ccwerrboundA;
-
-  private static final double ccwerrboundB;
-
-  private static final double ccwerrboundC;
-
-  /*****************************************************************************/
-  /*                                                                           */
-  /* exactinit() Initialize the variables used for exact arithmetic. */
-  /*                                                                           */
-  /* `epsilon' is the largest power of two such that 1.0 + epsilon = 1.0 in */
-  /* floating-point arithmetic. `epsilon' bounds the relative roundoff */
-  /* error. It is used for floating-point error analysis. */
-  /*                                                                           */
-  /* `splitter' is used to split floating-point numbers into two half- */
-  /* length significands for exact multiplication. */
-  /*                                                                           */
-  /* I imagine that a highly optimizing compiler might be too smart for its */
-  /* own good, and somehow cause this routine to fail, if it pretends that */
-  /* floating-point arithmetic is too much like real arithmetic. */
-  /*                                                                           */
-  /* Don't change this routine unless you fully understand it. */
-  /*                                                                           */
-  /*****************************************************************************/
-
-  static {
-    double epsilon_temp;
-    double splitter_temp;
-    double half;
-    double check, lastcheck;
-    int every_other;
-
-    every_other = 1;
-    half = 0.5;
-    epsilon_temp = 1.0;
-    splitter_temp = 1.0;
-    check = 1.0;
-    /* Repeatedly divide `epsilon' by two until it is too small to add to */
-    /* one without causing roundoff. (Also check if the sum is equal to */
-    /* the previous sum, for machines that round up instead of using exact */
-    /* rounding. Not that this library will work on such machines anyway. */
-    do {
-      lastcheck = check;
-      epsilon_temp *= half;
-      if (every_other != 0) {
-        splitter_temp *= 2.0;
-      }
-      every_other = every_other == 0 ? 1 : 0;
-      check = 1.0 + epsilon_temp;
-    } while (check != 1.0 && check != lastcheck);
-    splitter_temp += 1.0;
-
-    /* Error bounds for orientation and incircle tests. */
-    resulterrbound = (3.0 + 8.0 * epsilon_temp) * epsilon_temp;
-    ccwerrboundA = (3.0 + 16.0 * epsilon_temp) * epsilon_temp;
-    ccwerrboundB = (2.0 + 12.0 * epsilon_temp) * epsilon_temp;
-    ccwerrboundC = (9.0 + 64.0 * epsilon_temp) * epsilon_temp * epsilon_temp;
-    splitter = splitter_temp;
-  }
-
   private static double Absolute(final double a) {
     return a >= 0.0 ? a : -a;
   }
@@ -254,13 +190,13 @@ public class ShewchuksDeterminant {
 
   private static int fast_expansion_sum_zeroelim(final int elen,
     final double[] e, final int flen, final double[] f, final double[] h) /*
-                                                                           * h
-                                                                           * cannot
-                                                                           * be
-                                                                           * e
-                                                                           * or
-                                                                           * f.
-                                                                           */
+     * h
+     * cannot
+     * be
+     * e
+     * or
+     * f.
+     */
   {
     double Q;
     double Qnew;
@@ -494,14 +430,14 @@ public class ShewchuksDeterminant {
   /**
    * Returns the index of the direction of the point <code>q</code> relative to
    * a vector specified by <code>p1-p2</code>.
-   * 
+   *
    * @param p1
    *          the origin point of the vector
    * @param p2
    *          the final point of the vector
    * @param q
    *          the point to compute the direction to
-   * 
+   *
    * @return 1 if q is counter-clockwise (left) from p1-p2;
    * -1 if q is clockwise (right) from p1-p2;
    * 0 if q is collinear with p1-p2
@@ -524,9 +460,9 @@ public class ShewchuksDeterminant {
    * If the orientation can be computed safely using standard DP
    * arithmetic, this routine returns the orientation index.
    * Otherwise, a value i > 1 is returned.
-   * In this case the orientation index must 
+   * In this case the orientation index must
    * be computed using some other method.
-   * 
+   *
    * @param pa a coordinate
    * @param pb a coordinate
    * @param pc a coordinate
@@ -717,6 +653,70 @@ public class ShewchuksDeterminant {
     final double x3 = Two_One_Diff__x2(_j, _0, b1);
 
     return x3;
+  }
+
+  private static final double splitter;
+
+  private static final double resulterrbound;
+
+  private static final double ccwerrboundA;
+
+  private static final double ccwerrboundB;
+
+  private static final double ccwerrboundC;
+
+  /*****************************************************************************/
+  /*                                                                           */
+  /* exactinit() Initialize the variables used for exact arithmetic. */
+  /*                                                                           */
+  /* `epsilon' is the largest power of two such that 1.0 + epsilon = 1.0 in */
+  /* floating-point arithmetic. `epsilon' bounds the relative roundoff */
+  /* error. It is used for floating-point error analysis. */
+  /*                                                                           */
+  /* `splitter' is used to split floating-point numbers into two half- */
+  /* length significands for exact multiplication. */
+  /*                                                                           */
+  /* I imagine that a highly optimizing compiler might be too smart for its */
+  /* own good, and somehow cause this routine to fail, if it pretends that */
+  /* floating-point arithmetic is too much like real arithmetic. */
+  /*                                                                           */
+  /* Don't change this routine unless you fully understand it. */
+  /*                                                                           */
+  /*****************************************************************************/
+
+  static {
+    double epsilon_temp;
+    double splitter_temp;
+    double half;
+    double check, lastcheck;
+    int every_other;
+
+    every_other = 1;
+    half = 0.5;
+    epsilon_temp = 1.0;
+    splitter_temp = 1.0;
+    check = 1.0;
+    /* Repeatedly divide `epsilon' by two until it is too small to add to */
+    /* one without causing roundoff. (Also check if the sum is equal to */
+    /* the previous sum, for machines that round up instead of using exact */
+    /* rounding. Not that this library will work on such machines anyway. */
+    do {
+      lastcheck = check;
+      epsilon_temp *= half;
+      if (every_other != 0) {
+        splitter_temp *= 2.0;
+      }
+      every_other = every_other == 0 ? 1 : 0;
+      check = 1.0 + epsilon_temp;
+    } while (check != 1.0 && check != lastcheck);
+    splitter_temp += 1.0;
+
+    /* Error bounds for orientation and incircle tests. */
+    resulterrbound = (3.0 + 8.0 * epsilon_temp) * epsilon_temp;
+    ccwerrboundA = (3.0 + 16.0 * epsilon_temp) * epsilon_temp;
+    ccwerrboundB = (2.0 + 12.0 * epsilon_temp) * epsilon_temp;
+    ccwerrboundC = (9.0 + 64.0 * epsilon_temp) * epsilon_temp * epsilon_temp;
+    splitter = splitter_temp;
   }
 
 }

@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ import com.revolsys.logging.log4j.ContextClassLoaderRepositorySelector;
  * configuration for a servlet context and to load the logging configuration
  * from the log4j.xml file specified by the log4jXmlLocation context-param (or
  * /WEB-INF/log4j.xml if not specified).
- * 
+ *
  * @author Paul Austin
  * @version 1.0
  */
@@ -43,9 +43,10 @@ public class Log4jServletContextListener implements ServletContextListener {
   /**
    * Clean up the context by removing the logging configuration for the current
    * context.
-   * 
+   *
    * @param event The servler context event.
    */
+  @Override
   public void contextDestroyed(final ServletContextEvent event) {
     ContextClassLoaderRepositorySelector.remove();
   }
@@ -54,9 +55,10 @@ public class Log4jServletContextListener implements ServletContextListener {
    * Initialize the logging for context by creating a new heirarchy for the
    * current thread context class context and loading the configuration from the
    * log4jXmlLocation context-param.
-   * 
+   *
    * @param event The servlet context event.
    */
+  @Override
   public void contextInitialized(final ServletContextEvent event) {
     final Hierarchy hierarchy = ContextClassLoaderRepositorySelector.add();
     final ServletContext context = event.getServletContext();

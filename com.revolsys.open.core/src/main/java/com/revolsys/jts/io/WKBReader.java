@@ -54,9 +54,9 @@ import com.revolsys.jts.geom.impl.LineStringDouble;
  * Supports use of an {@link InStream}, which allows easy use
  * with arbitrary byte stream sources.
  * <p>
- * This class reads the format describe in {@link WKBWriter}.  
+ * This class reads the format describe in {@link WKBWriter}.
  * It also partially handles
- * the <b>Extended WKB</b> format used by PostGIS, 
+ * the <b>Extended WKB</b> format used by PostGIS,
  * by parsing and storing SRID values.
  * The reader repairs structurally-invalid input
  * (specifically, LineStrings and LinearRings which contain
@@ -70,8 +70,6 @@ import com.revolsys.jts.geom.impl.LineStringDouble;
  * @see WKBWriter for a formal format specification
  */
 public class WKBReader {
-  private static final String INVALID_GEOM_TYPE_MSG = "Invalid geometry type encountered in ";
-
   public static LineString createClosedRing(final LineString seq,
     final int size) {
     final int axisCount = seq.getAxisCount();
@@ -86,15 +84,15 @@ public class WKBReader {
   }
 
   /**
-   * Ensures that a LineString forms a valid ring, 
+   * Ensures that a LineString forms a valid ring,
    * returning a new closed sequence of the correct length if required.
-   * If the input sequence is already a valid ring, it is returned 
+   * If the input sequence is already a valid ring, it is returned
    * without modification.
-   * If the input sequence is too short or is not closed, 
+   * If the input sequence is too short or is not closed,
    * it is extended with one or more copies of the start point.
    * @param seq the sequence to test
    * @param geometryFactory the CoordinateSequenceFactory to use to create the new sequence
-   * 
+   *
    * @return the original sequence, if it was a valid ring, or a new sequence which is valid.
    */
   public static LineString ensureValidRing(final LineString seq) {
@@ -171,11 +169,11 @@ public class WKBReader {
   /**
    * Tests whether two {@link LineString}s are equal.
    * To be equal, the sequences must be the same length.
-   * They do not need to be of the same dimension, 
+   * They do not need to be of the same dimension,
    * but the ordinate values for the smallest dimension of the two
    * must be equal.
-   * Two <code>NaN</code> ordinates values are considered to be equal. 
-   * 
+   * Two <code>NaN</code> ordinates values are considered to be equal.
+   *
    * @param cs1 a LineString
    * @param cs2 a LineString
    * @return true if the sequences are equal in the common dimensions
@@ -208,9 +206,9 @@ public class WKBReader {
   /**
    * Tests whether a {@link LineString} forms a valid {@link LinearRing},
    * by checking the sequence length and closure
-   * (whether the first and last points are identical in 2D). 
+   * (whether the first and last points are identical in 2D).
    * Self-intersection is not checked.
-   * 
+   *
    * @param seq the sequence to test
    * @return true if the sequence is a ring
    * @see LinearRing
@@ -231,6 +229,8 @@ public class WKBReader {
         Geometry.Y);
   }
 
+  private static final String INVALID_GEOM_TYPE_MSG = "Invalid geometry type encountered in ";
+
   private final GeometryFactory factory;
 
   // private final PrecisionModel precisionModel;
@@ -239,8 +239,6 @@ public class WKBReader {
   private int inputDimension = 2;
 
   private boolean hasSRID = false;
-
-  private final int SRID = 0;
 
   /**
    * true if structurally invalid input should be reported rather than repaired.
@@ -274,7 +272,7 @@ public class WKBReader {
       return read(new ByteArrayInStream(bytes));
     } catch (final IOException ex) {
       throw new RuntimeException("Unexpected IOException caught: "
-        + ex.getMessage());
+          + ex.getMessage());
     }
   }
 
@@ -287,7 +285,7 @@ public class WKBReader {
    * @throws ParseException if the WKB is ill-formed
    */
   public Geometry read(final InStream is) throws IOException, ParseException {
-    dis.setInStream(is);
+    this.dis.setInStream(is);
     final Geometry g = readGeometry();
     return g;
   }
@@ -298,28 +296,28 @@ public class WKBReader {
    * in use.
    */
   private void readCoordinate() throws IOException {
-    for (int i = 0; i < inputDimension; i++) {
-      ordValues[i] = factory.makePrecise(i, dis.readDouble());
+    for (int i = 0; i < this.inputDimension; i++) {
+      this.ordValues[i] = this.factory.makePrecise(i, this.dis.readDouble());
     }
   }
 
   private LineString readCoordinateSequence(final int size)
-    throws IOException {
-    final double[] coordinates = new double[size * inputDimension];
+      throws IOException {
+    final double[] coordinates = new double[size * this.inputDimension];
 
     for (int i = 0; i < size; i++) {
       readCoordinate();
-      for (int j = 0; j < inputDimension; j++) {
-        coordinates[i * inputDimension + j] = ordValues[j];
+      for (int j = 0; j < this.inputDimension; j++) {
+        coordinates[i * this.inputDimension + j] = this.ordValues[j];
       }
     }
-    return new LineStringDouble(inputDimension, coordinates);
+    return new LineStringDouble(this.inputDimension, coordinates);
   }
 
   private LineString readCoordinateSequenceLineString(final int size)
-    throws IOException {
+      throws IOException {
     final LineString seq = readCoordinateSequence(size);
-    if (isStrict) {
+    if (this.isStrict) {
       return seq;
     }
     if (seq.getVertexCount() == 0 || seq.getVertexCount() >= 2) {
@@ -329,9 +327,9 @@ public class WKBReader {
   }
 
   private LineString readCoordinateSequenceRing(final int size)
-    throws IOException {
+      throws IOException {
     final LineString seq = readCoordinateSequence(size);
-    if (isStrict) {
+    if (this.isStrict) {
       return seq;
     }
     if (isRing(seq)) {
@@ -343,16 +341,16 @@ public class WKBReader {
   private Geometry readGeometry() throws IOException, ParseException {
 
     // determine byte order
-    final byte byteOrderWKB = dis.readByte();
+    final byte byteOrderWKB = this.dis.readByte();
 
     // always set byte order, since it may change from geometry to geometry
     if (byteOrderWKB == WKBConstants.wkbNDR) {
-      dis.setOrder(ByteOrderValues.LITTLE_ENDIAN);
+      this.dis.setOrder(ByteOrderValues.LITTLE_ENDIAN);
     } else if (byteOrderWKB == WKBConstants.wkbXDR) {
-      dis.setOrder(ByteOrderValues.BIG_ENDIAN);
-    } else if (isStrict) {
+      this.dis.setOrder(ByteOrderValues.BIG_ENDIAN);
+    } else if (this.isStrict) {
       throw new ParseException("Unknown geometry byte order (not NDR or XDR): "
-        + byteOrderWKB);
+          + byteOrderWKB);
     }
     // if not strict and not XDR or NDR, then we just use the dis default set at
     // the
@@ -362,47 +360,47 @@ public class WKBReader {
     // just
     // specify endian-ness at the start of the multigeometry.
 
-    final int typeInt = dis.readInt();
+    final int typeInt = this.dis.readInt();
     final int geometryType = typeInt & 0xff;
     // determine if Z values are present
     final boolean hasZ = (typeInt & 0x80000000) != 0;
-    inputDimension = hasZ ? 3 : 2;
+    this.inputDimension = hasZ ? 3 : 2;
     // determine if SRIDs are present
-    hasSRID = (typeInt & 0x20000000) != 0;
+    this.hasSRID = (typeInt & 0x20000000) != 0;
 
     int SRID = 0;
-    if (hasSRID) {
-      SRID = dis.readInt();
+    if (this.hasSRID) {
+      SRID = this.dis.readInt();
     }
 
     // only allocate ordValues buffer if necessary
-    if (ordValues == null || ordValues.length < inputDimension) {
-      ordValues = new double[inputDimension];
+    if (this.ordValues == null || this.ordValues.length < this.inputDimension) {
+      this.ordValues = new double[this.inputDimension];
     }
 
     Geometry geom = null;
     switch (geometryType) {
       case WKBConstants.wkbPoint:
         geom = readPoint();
-      break;
+        break;
       case WKBConstants.wkbLineString:
         geom = readLineString();
-      break;
+        break;
       case WKBConstants.wkbPolygon:
         geom = readPolygon();
-      break;
+        break;
       case WKBConstants.wkbMultiPoint:
         geom = readMultiPoint();
-      break;
+        break;
       case WKBConstants.wkbMultiLineString:
         geom = readMultiLineString();
-      break;
+        break;
       case WKBConstants.wkbMultiPolygon:
         geom = readMultiPolygon();
-      break;
+        break;
       case WKBConstants.wkbGeometryCollection:
         geom = readGeometryCollection();
-      break;
+        break;
       default:
         throw new ParseException("Unknown WKB type " + geometryType);
     }
@@ -411,31 +409,31 @@ public class WKBReader {
   }
 
   private GeometryCollection readGeometryCollection() throws IOException,
-    ParseException {
-    final int numGeom = dis.readInt();
+  ParseException {
+    final int numGeom = this.dis.readInt();
     final List<Geometry> geoms = new ArrayList<Geometry>();
     for (int i = 0; i < numGeom; i++) {
       final Geometry geometry = readGeometry();
       geoms.add(geometry);
     }
-    return factory.geometryCollection(geoms);
+    return this.factory.geometryCollection(geoms);
   }
 
   private LinearRing readLinearRing() throws IOException {
-    final int size = dis.readInt();
+    final int size = this.dis.readInt();
     final LineString pts = readCoordinateSequenceRing(size);
-    return factory.linearRing(pts);
+    return this.factory.linearRing(pts);
   }
 
   private LineString readLineString() throws IOException {
-    final int size = dis.readInt();
+    final int size = this.dis.readInt();
     final LineString pts = readCoordinateSequenceLineString(size);
-    return factory.lineString(pts);
+    return this.factory.lineString(pts);
   }
 
   private MultiLineString readMultiLineString() throws IOException,
-    ParseException {
-    final int numGeom = dis.readInt();
+  ParseException {
+    final int numGeom = this.dis.readInt();
     final LineString[] geoms = new LineString[numGeom];
     for (int i = 0; i < numGeom; i++) {
       final Geometry g = readGeometry();
@@ -444,11 +442,11 @@ public class WKBReader {
       }
       geoms[i] = (LineString)g;
     }
-    return factory.multiLineString(geoms);
+    return this.factory.multiLineString(geoms);
   }
 
   private MultiPoint readMultiPoint() throws IOException, ParseException {
-    final int numGeom = dis.readInt();
+    final int numGeom = this.dis.readInt();
     final Point[] geoms = new Point[numGeom];
     for (int i = 0; i < numGeom; i++) {
       final Geometry g = readGeometry();
@@ -457,11 +455,11 @@ public class WKBReader {
       }
       geoms[i] = (Point)g;
     }
-    return factory.multiPoint(geoms);
+    return this.factory.multiPoint(geoms);
   }
 
   private MultiPolygon readMultiPolygon() throws IOException, ParseException {
-    final int numGeom = dis.readInt();
+    final int numGeom = this.dis.readInt();
     final Polygon[] geoms = new Polygon[numGeom];
 
     for (int i = 0; i < numGeom; i++) {
@@ -471,23 +469,23 @@ public class WKBReader {
       }
       geoms[i] = (Polygon)g;
     }
-    return factory.multiPolygon(geoms);
+    return this.factory.multiPolygon(geoms);
   }
 
   private Point readPoint() throws IOException {
     final LineString pts = readCoordinateSequence(1);
-    return factory.point(pts);
+    return this.factory.point(pts);
   }
 
   private Polygon readPolygon() throws IOException {
-    final int numRings = dis.readInt();
+    final int numRings = this.dis.readInt();
     final List<LinearRing> rings = new ArrayList<>();
 
     for (int i = 0; i < numRings; i++) {
       final LinearRing ring = readLinearRing();
       rings.add(ring);
     }
-    return factory.polygon(rings);
+    return this.factory.polygon(rings);
   }
 
   /**

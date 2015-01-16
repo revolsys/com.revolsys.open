@@ -90,7 +90,7 @@ public class PathAliasController implements Controller {
   }
 
   public static final String PATH_PREFIX = PathAliasController.class.getName()
-    + ".originalPrefix";
+      + ".originalPrefix";
 
   private String prefix;
 

@@ -18,9 +18,9 @@ import com.revolsys.jts.geom.GeometryFactory;
 public class OgrVrtWriter {
   public static void write(final File file,
     final RecordDefinition recordDefinition, final String dataSource)
-    throws IOException {
+        throws IOException {
     try (
-      XmlWriter writer = new XmlWriter(new FileWriter(file))) {
+        XmlWriter writer = new XmlWriter(new FileWriter(file))) {
       writer.setIndent(true);
       writer.startDocument("UTF-8", "1.0");
       writer.startTag("OGRVRTDataSource");

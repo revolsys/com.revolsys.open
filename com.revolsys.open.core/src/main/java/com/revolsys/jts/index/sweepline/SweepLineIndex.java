@@ -48,17 +48,14 @@ public class SweepLineIndex {
 
   List events = new ArrayList();
   private boolean indexBuilt;
-  // statistics information
-  private int nOverlaps;
-
   public SweepLineIndex() {
   }
 
-  public void add(SweepLineInterval sweepInt)
+  public void add(final SweepLineInterval sweepInt)
   {
-    SweepLineEvent insertEvent = new SweepLineEvent(sweepInt.getMin(), null, sweepInt);
-    events.add(insertEvent);
-    events.add(new SweepLineEvent(sweepInt.getMax(), insertEvent, sweepInt));
+    final SweepLineEvent insertEvent = new SweepLineEvent(sweepInt.getMin(), null, sweepInt);
+    this.events.add(insertEvent);
+    this.events.add(new SweepLineEvent(sweepInt.getMax(), insertEvent, sweepInt));
   }
 
   /**
@@ -68,33 +65,34 @@ public class SweepLineIndex {
    */
   private void buildIndex()
   {
-    if (indexBuilt) return;
-    Collections.sort(events);
-    for (int i = 0; i < events.size(); i++ )
+    if (this.indexBuilt) {
+      return;
+    }
+    Collections.sort(this.events);
+    for (int i = 0; i < this.events.size(); i++ )
     {
-      SweepLineEvent ev = (SweepLineEvent) events.get(i);
+      final SweepLineEvent ev = (SweepLineEvent) this.events.get(i);
       if (ev.isDelete()) {
         ev.getInsertEvent().setDeleteEventIndex(i);
       }
     }
-    indexBuilt = true;
+    this.indexBuilt = true;
   }
 
-  public void computeOverlaps(SweepLineOverlapAction action)
+  public void computeOverlaps(final SweepLineOverlapAction action)
   {
-    nOverlaps = 0;
     buildIndex();
 
-    for (int i = 0; i < events.size(); i++ )
+    for (int i = 0; i < this.events.size(); i++ )
     {
-      SweepLineEvent ev = (SweepLineEvent) events.get(i);
+      final SweepLineEvent ev = (SweepLineEvent) this.events.get(i);
       if (ev.isInsert()) {
         processOverlaps(i, ev.getDeleteEventIndex(), ev.getInterval(), action);
       }
     }
   }
 
-  private void processOverlaps(int start, int end, SweepLineInterval s0, SweepLineOverlapAction action)
+  private void processOverlaps(final int start, final int end, final SweepLineInterval s0, final SweepLineOverlapAction action)
   {
     /**
      * Since we might need to test for self-intersections,
@@ -102,11 +100,10 @@ public class SweepLineIndex {
      * Last index can be skipped, because it must be a Delete event.
      */
     for (int i = start; i < end; i++ ) {
-      SweepLineEvent ev = (SweepLineEvent) events.get(i);
+      final SweepLineEvent ev = (SweepLineEvent) this.events.get(i);
       if (ev.isInsert()) {
-        SweepLineInterval s1 = ev.getInterval();
+        final SweepLineInterval s1 = ev.getInterval();
         action.overlap(s0, s1);
-        nOverlaps++;
       }
     }
 

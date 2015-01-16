@@ -9,7 +9,7 @@ import com.revolsys.parallel.channel.ChannelValueStore;
  * <P>
  * The getState method will return EMPTY if the Channel does not contain an
  * Object and FULL if it does.
- * 
+ *
  * @author P.D.Austin
  */
 public class ZeroBuffer<T> extends ChannelValueStore<T> {
@@ -26,7 +26,7 @@ public class ZeroBuffer<T> extends ChannelValueStore<T> {
    * constructing a new instance with the same parameters as the original.
    * <I>NOTE: Only the sizes of the data should be cloned not the stored
    * data.</I>
-   * 
+   *
    * @return The cloned instance of this Object.
    */
   @Override
@@ -42,26 +42,26 @@ public class ZeroBuffer<T> extends ChannelValueStore<T> {
    * undefined state.</I>
    * <P>
    * Pre-condition: The state must not be EMPTY
-   * 
+   *
    * @return The next available Object from the ChannelValueStore
    */
   @Override
   protected T get() {
-    state = EMPTY;
-    final T o = value;
-    value = null;
+    this.state = EMPTY;
+    final T o = this.value;
+    this.value = null;
     return o;
   }
 
   /**
    * Returns the current state of the ZeroBuffer, should be called to ensure the
    * Pre-conditions of the other methods are not broken.
-   * 
+   *
    * @return The current state of the ZeroBuffer (EMPTY or FULL)
    */
   @Override
   protected int getState() {
-    return state;
+    return this.state;
   }
 
   /**
@@ -72,21 +72,21 @@ public class ZeroBuffer<T> extends ChannelValueStore<T> {
    * undefined state.</I>
    * <P>
    * Pre-condition: The state must not be FULL
-   * 
+   *
    * @param value The object to put in the ChannelValueStore
    */
   @Override
   protected void put(final T value) {
-    state = FULL;
+    this.state = FULL;
     this.value = value;
   }
 
   @Override
   public String toString() {
-    if (value == null) {
+    if (this.value == null) {
       return "[]";
     } else {
-      return "[" + value + "]";
+      return "[" + this.value + "]";
     }
   }
 }

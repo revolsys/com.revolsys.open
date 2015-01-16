@@ -6,6 +6,11 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.MultiLineString;
 
 public class MultiLineStringVertex extends AbstractVertex {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private int vertexIndex;
 
   private int partIndex;

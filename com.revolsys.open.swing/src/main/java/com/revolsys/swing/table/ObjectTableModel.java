@@ -7,7 +7,7 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class ObjectTableModel<T> extends AbstractTableModel {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -1243907349293763360L;
 

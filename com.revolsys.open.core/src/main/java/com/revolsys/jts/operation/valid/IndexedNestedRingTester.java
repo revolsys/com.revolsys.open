@@ -67,31 +67,31 @@ public class IndexedNestedRingTester {
   }
 
   public void add(final LinearRing ring) {
-    rings.add(ring);
-    totalEnv.expandToInclude(ring.getBoundingBox());
+    this.rings.add(ring);
+    this.totalEnv.expandToInclude(ring.getBoundingBox());
   }
 
   private void buildIndex() {
-    index = new STRtree();
+    this.index = new STRtree();
 
-    for (int i = 0; i < rings.size(); i++) {
-      final LinearRing ring = (LinearRing)rings.get(i);
+    for (int i = 0; i < this.rings.size(); i++) {
+      final LinearRing ring = (LinearRing)this.rings.get(i);
       final BoundingBox env = ring.getBoundingBox();
-      index.insert(env, ring);
+      this.index.insert(env, ring);
     }
   }
 
   public Point getNestedPoint() {
-    return nestedPt;
+    return this.nestedPt;
   }
 
   public boolean isNonNested() {
     buildIndex();
 
-    for (int i = 0; i < rings.size(); i++) {
-      final LinearRing innerRing = (LinearRing)rings.get(i);
+    for (int i = 0; i < this.rings.size(); i++) {
+      final LinearRing innerRing = (LinearRing)this.rings.get(i);
 
-      final List results = index.query(innerRing.getBoundingBox());
+      final List results = this.index.query(innerRing.getBoundingBox());
       // System.out.println(results.size());
       for (int j = 0; j < results.size(); j++) {
         final LinearRing searchRing = (LinearRing)results.get(j);
@@ -105,14 +105,14 @@ public class IndexedNestedRingTester {
         }
 
         final Point innerRingPt = IsValidOp.findPtNotNode(
-          innerRing.vertices(), searchRing, graph);
+          innerRing.vertices(), searchRing, this.graph);
 
         /**
          * If no non-node pts can be found, this means
          * that the searchRing touches ALL of the innerRing vertices.
          * This indicates an invalid polygon, since either
-         * the two holes create a disconnected interior, 
-         * or they touch in an infinite number of points 
+         * the two holes create a disconnected interior,
+         * or they touch in an infinite number of points
          * (i.e. along a line segment).
          * Both of these cases are caught by other tests,
          * so it is safe to simply skip this situation here.
@@ -124,7 +124,7 @@ public class IndexedNestedRingTester {
         final boolean isInside = CGAlgorithms.isPointInRing(innerRingPt,
           searchRing);
         if (isInside) {
-          nestedPt = innerRingPt;
+          this.nestedPt = innerRingPt;
           return false;
         }
       }

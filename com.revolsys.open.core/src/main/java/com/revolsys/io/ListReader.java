@@ -17,12 +17,12 @@ public class ListReader<T> extends AbstractReader<T> {
 
   @Override
   public void close() {
-    values = null;
+    this.values = null;
   }
 
   @Override
   public Iterator<T> iterator() {
-    return values.iterator();
+    return this.values.iterator();
   }
 
   @Override

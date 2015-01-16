@@ -40,9 +40,9 @@ import com.revolsys.jts.geom.Geometry;
 /**
  * A {@link ResultMatcher} which compares the results of
  * buffer operations for equality, up to the given tolerance.
- * All other operations are delagated to the 
+ * All other operations are delagated to the
  * standard {@link EqualityResultMatcher} algorithm.
- * 
+ *
  * @author mbdavis
  *
  */
@@ -71,7 +71,7 @@ public class BufferResultMatcher implements ResultMatcher {
     haus.setDensifyFraction(0.25);
     final double maxDistanceFound = haus.orientedDistance();
     double expectedDistanceTol = Math.abs(distance)
-      / MAX_HAUSDORFF_DISTANCE_FACTOR;
+        / MAX_HAUSDORFF_DISTANCE_FACTOR;
     if (expectedDistanceTol < MIN_DISTANCE_TOLERANCE) {
       expectedDistanceTol = MIN_DISTANCE_TOLERANCE;
     }
@@ -88,12 +88,12 @@ public class BufferResultMatcher implements ResultMatcher {
     }
 
     /**
-     * MD - need some more checks here - symDiffArea won't catch very small holes ("tears") 
-     * near the edge of computed buffers (which can happen in current version of JTS (1.8)).  
+     * MD - need some more checks here - symDiffArea won't catch very small holes ("tears")
+     * near the edge of computed buffers (which can happen in current version of JTS (1.8)).
      * This can probably be handled by testing
-     * that every point of the actual buffer is at least a certain distance away from the 
-     * geometry boundary.  
-    */
+     * that every point of the actual buffer is at least a certain distance away from the
+     * geometry boundary.
+     */
     if (!isSymDiffAreaInTolerance(actualBuffer, expectedBuffer)) {
       return false;
     }
@@ -109,7 +109,7 @@ public class BufferResultMatcher implements ResultMatcher {
   /**
    * Tests whether the two results are equal within the given
    * tolerance.  The input parameters are not considered.
-   * 
+   *
    * @return true if the actual and expected results are considered equal
    */
   @Override
@@ -117,7 +117,7 @@ public class BufferResultMatcher implements ResultMatcher {
     final Object[] args, final Result actualResult,
     final Result expectedResult, final double tolerance) {
     if (!opName.equalsIgnoreCase("buffer")) {
-      return defaultMatcher.isMatch(geom, opName, args, actualResult,
+      return this.defaultMatcher.isMatch(geom, opName, args, actualResult,
         expectedResult, tolerance);
     }
 

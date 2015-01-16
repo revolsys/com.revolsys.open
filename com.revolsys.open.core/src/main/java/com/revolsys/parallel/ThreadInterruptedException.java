@@ -1,6 +1,11 @@
 package com.revolsys.parallel;
 
 public class ThreadInterruptedException extends RuntimeException {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public ThreadInterruptedException() {
     super("Thread was interrupted");
   }

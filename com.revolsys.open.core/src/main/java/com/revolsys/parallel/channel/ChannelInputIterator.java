@@ -14,7 +14,7 @@ public class ChannelInputIterator<T> extends AbstractIterator<T> {
   @Override
   protected T getNext() throws NoSuchElementException {
     try {
-      final T object = in.read();
+      final T object = this.in.read();
       return object;
     } catch (final ClosedException e) {
       throw new NoSuchElementException();

@@ -15,7 +15,7 @@ import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
 public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
-  implements Filter<Edge<LineSegment>> {
+implements Filter<Edge<LineSegment>> {
   public static List<Edge<LineSegment>> getEdges(
     final Graph<LineSegment> graph, final LineSegment lineSegment,
     final double maxDistance) {
@@ -56,7 +56,7 @@ public class EdgeLessThanDistance extends DelegatingVisitor<Edge<LineSegment>>
   public boolean accept(final Edge<LineSegment> edge) {
     final LineSegment lineSegment = edge.getObject();
     final double distance = lineSegment.distance(this.lineSegment);
-    if (distance <= maxDistance) {
+    if (distance <= this.maxDistance) {
       return true;
     } else {
       return false;

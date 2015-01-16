@@ -39,40 +39,26 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
- * Models a site (node) in a {@link QuadEdgeSubdivision}. 
+ * Models a site (node) in a {@link QuadEdgeSubdivision}.
  * The sites can be points on a line string representing a
- * linear site. 
+ * linear site.
  * <p>
  * The vertex can be considered as a vector with a norm, length, inner product, cross
  * product, etc. Additionally, point relations (e.g., is a point to the left of a line, the circle
  * defined by this point and two others, etc.) are also defined in this class.
  * <p>
- * It is common to want to attach user-defined data to 
- * the vertices of a subdivision.  
+ * It is common to want to attach user-defined data to
+ * the vertices of a subdivision.
  * One way to do this is to subclass <tt>Vertex</tt>
  * to carry any desired information.
- * 
+ *
  * @author David Skea
  * @author Martin Davis
  */
 public class Vertex {
-  public static final int LEFT = 0;
-
-  public static final int RIGHT = 1;
-
-  public static final int BEYOND = 2;
-
-  public static final int BEHIND = 3;
-
-  public static final int BETWEEN = 4;
-
-  public static final int ORIGIN = 5;
-
-  public static final int DESTINATION = 6;
-
   /**
    * Computes the interpolated Z-value for a point p lying on the segment p0-p1
-   * 
+   *
    * @param p
    * @param p0
    * @param p1
@@ -91,14 +77,14 @@ public class Vertex {
    * Interpolates the Z-value (height) of a point enclosed in a triangle
    * whose vertices all have Z values.
    * The containing triangle must not be degenerate
-   * (in other words, the three vertices must enclose a 
+   * (in other words, the three vertices must enclose a
    * non-zero area).
-   * 
+   *
    * @param p the point to interpolate the Z value of
    * @param v0 a vertex of a triangle containing the p
    * @param v1 a vertex of a triangle containing the p
    * @param v2 a vertex of a triangle containing the p
-   * @return the interpolated Z-value (height) of the point  
+   * @return the interpolated Z-value (height) of the point
    */
   public static double interpolateZ(final Point p, final Point v0,
     final Point v1, final Point v2) {
@@ -114,24 +100,38 @@ public class Vertex {
     final double t = (d * dx - b * dy) / det;
     final double u = (-c * dx + a * dy) / det;
     final double z = v0.getZ() + t * (v1.getZ() - v0.getZ()) + u
-      * (v2.getZ() - v0.getZ());
+        * (v2.getZ() - v0.getZ());
     return z;
   }
+
+  public static final int LEFT = 0;
+
+  public static final int RIGHT = 1;
+
+  public static final int BEYOND = 2;
+
+  public static final int BEHIND = 3;
+
+  public static final int BETWEEN = 4;
+
+  public static final int ORIGIN = 5;
+
+  public static final int DESTINATION = 6;
 
   private final Point p;
 
   // private int edgeNumber = -1;
 
-  public Vertex(final Point _p) {
-    p = new PointDouble(_p);
-  }
-
   public Vertex(final double _x, final double _y) {
-    p = new PointDouble(_x, _y, Point.NULL_ORDINATE);
+    this.p = new PointDouble(_x, _y, Point.NULL_ORDINATE);
   }
 
   public Vertex(final double _x, final double _y, final double _z) {
-    p = new PointDouble(_x, _y, _z);
+    this.p = new PointDouble(_x, _y, _z);
+  }
+
+  public Vertex(final Point _p) {
+    this.p = new PointDouble(_p);
   }
 
   private HCoordinate bisector(final Vertex a, final Vertex b) {
@@ -147,7 +147,7 @@ public class Vertex {
 
   /**
    * Computes the centre of the circumcircle of this vertex and two others.
-   * 
+   *
    * @param b
    * @param c
    * @return the Point which is the circumcircle of the 3 points.
@@ -175,7 +175,7 @@ public class Vertex {
    * given tolerance B, the associated triangle is considered skinny. For an equal lateral
    * triangle this value is 0.57735. The ratio is related to the minimum triangle angle theta by:
    * circumRadius/shortestEdge = 1/(2sin(theta)).
-   * 
+   *
    * @param b second vertex of the triangle
    * @param c third vertex of the triangle
    * @return ratio of circumradius to shortest edge.
@@ -206,7 +206,7 @@ public class Vertex {
     if (sa < 0.0) {
       return RIGHT;
     }
-    if ((a.getX() * b.getX() < 0.0) || (a.getY() * b.getY() < 0.0)) {
+    if (a.getX() * b.getX() < 0.0 || a.getY() * b.getY() < 0.0) {
       return BEHIND;
     }
     if (a.magn() < b.magn()) {
@@ -223,17 +223,17 @@ public class Vertex {
 
   /* returns k X v (cross product). this is a vector perpendicular to v */
   Vertex cross() {
-    return (new Vertex(p.getY(), -p.getX()));
+    return new Vertex(this.p.getY(), -this.p.getX());
   }
 
   /**
    * Computes the cross product k = u X v.
-   * 
+   *
    * @param v a vertex
    * @return returns the magnitude of u X v
    */
   double crossProduct(final Vertex v) {
-    return (p.getX() * v.getY() - p.getY() * v.getX());
+    return this.p.getX() * v.getY() - this.p.getY() * v.getX();
   }
 
   private double distance(final Vertex v1, final Vertex v2) {
@@ -243,16 +243,16 @@ public class Vertex {
 
   /**
    * Computes the inner or dot product
-   * 
+   *
    * @param v a vertex
    * @return returns the dot product u.v
    */
   double dot(final Vertex v) {
-    return (p.getX() * v.getX() + p.getY() * v.getY());
+    return this.p.getX() * v.getX() + this.p.getY() * v.getY();
   }
 
   public boolean equals(final Vertex _x) {
-    if (p.getX() == _x.getX() && p.getY() == _x.getY()) {
+    if (this.p.getX() == _x.getX() && this.p.getY() == _x.getY()) {
       return true;
     } else {
       return false;
@@ -260,7 +260,7 @@ public class Vertex {
   }
 
   public boolean equals(final Vertex _x, final double tolerance) {
-    if (p.distance(_x.getCoordinate()) < tolerance) {
+    if (this.p.distance(_x.getCoordinate()) < tolerance) {
       return true;
     } else {
       return false;
@@ -268,19 +268,19 @@ public class Vertex {
   }
 
   public Point getCoordinate() {
-    return p;
+    return this.p;
   }
 
   public double getX() {
-    return p.getX();
+    return this.p.getX();
   }
 
   public double getY() {
-    return p.getY();
+    return this.p.getY();
   }
 
   public double getZ() {
-    return p.getZ();
+    return this.p.getZ();
   }
 
   /** ************************************************************* */
@@ -306,14 +306,14 @@ public class Vertex {
     final double t = (d * dx - b * dy) / det;
     final double u = (-c * dx + a * dy) / det;
     final double z = v0.getZ() + t * (v1.getZ() - v0.getZ()) + u
-      * (v2.getZ() - v0.getZ());
+        * (v2.getZ() - v0.getZ());
     return z;
   }
 
   /**
    * Tests whether the triangle formed by this vertex and two
    * other vertices is in CCW orientation.
-   * 
+   *
    * @param b a vertex
    * @param c a vertex
    * @returns true if the triangle is oriented CCW
@@ -330,19 +330,19 @@ public class Vertex {
 
     // is equal to the signed area of the triangle
 
-    return (b.p.getX() - p.getX()) * (c.p.getY() - p.getY())
-      - (b.p.getY() - p.getY()) * (c.p.getX() - p.getX()) > 0;
+    return (b.p.getX() - this.p.getX()) * (c.p.getY() - this.p.getY())
+        - (b.p.getY() - this.p.getY()) * (c.p.getX() - this.p.getX()) > 0;
 
-    // original rolled code
-    // boolean isCCW = triArea(this, b, c) > 0;
-    // return isCCW;
+        // original rolled code
+        // boolean isCCW = triArea(this, b, c) > 0;
+        // return isCCW;
 
   }
 
   /**
-   * Tests if the vertex is inside the circle defined by 
-   * the triangle with vertices a, b, c (oriented counter-clockwise). 
-   * 
+   * Tests if the vertex is inside the circle defined by
+   * the triangle with vertices a, b, c (oriented counter-clockwise).
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -360,19 +360,19 @@ public class Vertex {
 
   /* magnitude of vector */
   double magn() {
-    return (Math.sqrt(p.getX() * p.getX() + p.getY() * p.getY()));
+    return Math.sqrt(this.p.getX() * this.p.getX() + this.p.getY() * this.p.getY());
   }
 
   /**
    * returns a new vertex that is mid-way between this vertex and another end point.
-   * 
+   *
    * @param a the other end point.
    * @return the point mid-way between this and that.
    */
   public Vertex midPoint(final Vertex a) {
-    final double xm = (p.getX() + a.getX()) / 2.0;
-    final double ym = (p.getY() + a.getY()) / 2.0;
-    final double zm = (p.getZ() + a.getZ()) / 2.0;
+    final double xm = (this.p.getX() + a.getX()) / 2.0;
+    final double ym = (this.p.getY() + a.getY()) / 2.0;
+    final double zm = (this.p.getZ() + a.getZ()) / 2.0;
     return new Vertex(xm, ym, zm);
   }
 
@@ -382,27 +382,27 @@ public class Vertex {
 
   /* and subtraction */
   Vertex sub(final Vertex v) {
-    return (new Vertex(p.getX() - v.getX(), p.getY() - v.getY()));
+    return new Vertex(this.p.getX() - v.getX(), this.p.getY() - v.getY());
   }
 
   /* Vector addition */
   Vertex sum(final Vertex v) {
-    return (new Vertex(p.getX() + v.getX(), p.getY() + v.getY()));
+    return new Vertex(this.p.getX() + v.getX(), this.p.getY() + v.getY());
   }
 
   /**
    * Computes the scalar product c(v)
-   * 
+   *
    * @param v a vertex
    * @return returns the scaled vector
    */
   Vertex times(final double c) {
-    return (new Vertex(c * p.getX(), c * p.getY()));
+    return new Vertex(c * this.p.getX(), c * this.p.getY());
   }
 
   @Override
   public String toString() {
-    return "POINT (" + p.getX() + " " + p.getY() + ")";
+    return "POINT (" + this.p.getX() + " " + this.p.getY() + ")";
   }
 
 }

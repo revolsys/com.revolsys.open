@@ -8,7 +8,7 @@ import com.revolsys.jts.geom.GeometryComponent;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 public interface Segment extends LineSegment, Iterator<Segment>,
-  GeometryComponent {
+GeometryComponent {
 
   @Override
   Segment clone();

@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class NamedLinkedHashMap<K, V> extends LinkedHashMap<K, V> implements
-  NamedObject {
+NamedObject {
   private static final long serialVersionUID = -874346734708399858L;
 
   private final String name;
@@ -25,6 +25,6 @@ public class NamedLinkedHashMap<K, V> extends LinkedHashMap<K, V> implements
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
   }
 }

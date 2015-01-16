@@ -14,27 +14,27 @@ public class ContactInformation {
   private String contactElectronicMailAddress;
 
   public ContactAddress getContactAddress() {
-    return contactAddress;
+    return this.contactAddress;
   }
 
   public String getContactElectronicMailAddress() {
-    return contactElectronicMailAddress;
+    return this.contactElectronicMailAddress;
   }
 
   public String getContactFacsimileTelephone() {
-    return contactFacsimileTelephone;
+    return this.contactFacsimileTelephone;
   }
 
   public ContactPersonPrimary getContactPersonPrimary() {
-    return contactPersonPrimary;
+    return this.contactPersonPrimary;
   }
 
   public String getContactPosition() {
-    return contactPosition;
+    return this.contactPosition;
   }
 
   public String getContactVoiceTelephone() {
-    return contactVoiceTelephone;
+    return this.contactVoiceTelephone;
   }
 
   public void setContactAddress(final ContactAddress contactAddress) {

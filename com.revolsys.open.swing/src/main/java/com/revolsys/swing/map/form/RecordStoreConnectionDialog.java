@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.Icon;
-import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.JXList;
 
@@ -25,6 +25,11 @@ import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
 
 public class RecordStoreConnectionDialog extends BaseDialog {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final JXList buttons;
 
   private final JLayeredPane panels;
@@ -70,16 +75,16 @@ public class RecordStoreConnectionDialog extends BaseDialog {
     });
     this.buttons.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     this.buttons.addListSelectionListener(new InvokeMethodListener(this,
-      "selectionChangeType"));
+        "selectionChangeType"));
 
     final Map<Object, Icon> icons = new HashMap<>();
     icons.put("Oracle", Icons.getIcon("database"));
     icons.put("PostgreSQL/PostGIS", Icons.getIcon("database"));
     final IconListCellRenderer renderer = new IconListCellRenderer(icons);
-    renderer.setAlignmentY(JLabel.CENTER_ALIGNMENT);
-    renderer.setHorizontalAlignment(JLabel.CENTER);
-    renderer.setVerticalTextPosition(JLabel.BOTTOM);
-    renderer.setHorizontalTextPosition(JLabel.CENTER);
+    renderer.setAlignmentY(Component.CENTER_ALIGNMENT);
+    renderer.setHorizontalAlignment(SwingConstants.CENTER);
+    renderer.setVerticalTextPosition(SwingConstants.BOTTOM);
+    renderer.setHorizontalTextPosition(SwingConstants.CENTER);
     this.buttons.setCellRenderer(renderer);
     final JScrollPane buttonScroll = new JScrollPane(this.buttons);
     buttonScroll.setPreferredSize(new Dimension(150, 400));

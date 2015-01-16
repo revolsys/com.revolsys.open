@@ -12,24 +12,24 @@ public class Capability {
   private WmsLayer layer;
 
   public void addExceptionFormat(final String format) {
-    exceptionFormats.add(format);
+    this.exceptionFormats.add(format);
   }
 
   public void addRequest(final Request request) {
-    requests.add(request);
+    this.requests.add(request);
 
   }
 
   public List<String> getExceptionFormats() {
-    return exceptionFormats;
+    return this.exceptionFormats;
   }
 
   public WmsLayer getLayer() {
-    return layer;
+    return this.layer;
   }
 
   public List<Request> getRequests() {
-    return requests;
+    return this.requests;
   }
 
   public void setLayer(final WmsLayer layer) {

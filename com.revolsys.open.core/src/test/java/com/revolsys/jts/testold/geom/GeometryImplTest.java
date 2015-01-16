@@ -141,17 +141,17 @@ public class GeometryImplTest extends TestCase {
     }), collectionFactory.createCollection(new Geometry[] {
       x, somethingExactlyEqual
     }), somethingEqualButNotExactly,
-      collectionFactory.createCollection(new Geometry[] {
-        x, somethingNotEqualButSameClass
-      }));
+    collectionFactory.createCollection(new Geometry[] {
+      x, somethingNotEqualButSameClass
+    }));
   }
 
   private void doTestFromCommcast2003AtYahooDotCa(final WKTReader reader)
-    throws ParseException {
+      throws ParseException {
     this.readerFloat.read(
-      "POLYGON ((708653.498611049 2402311.54647056, 708708.895756966 2402203.47250014, 708280.326454234 2402089.6337791, 708247.896591321 2402252.48269854, 708367.379593851 2402324.00761653, 708248.882609455 2402253.07294874, 708249.523621829 2402244.3124463, 708261.854734465 2402182.39086576, 708262.818392579 2402183.35452387, 708653.498611049 2402311.54647056))")
-      .intersection(
-        reader.read("POLYGON ((708258.754920656 2402197.91172757, 708257.029447455 2402206.56901508, 708652.961095455 2402312.65463437, 708657.068786251 2402304.6356364, 708258.754920656 2402197.91172757))"));
+        "POLYGON ((708653.498611049 2402311.54647056, 708708.895756966 2402203.47250014, 708280.326454234 2402089.6337791, 708247.896591321 2402252.48269854, 708367.379593851 2402324.00761653, 708248.882609455 2402253.07294874, 708249.523621829 2402244.3124463, 708261.854734465 2402182.39086576, 708262.818392579 2402183.35452387, 708653.498611049 2402311.54647056))")
+        .intersection(
+          reader.read("POLYGON ((708258.754920656 2402197.91172757, 708257.029447455 2402206.56901508, 708652.961095455 2402312.65463437, 708657.068786251 2402304.6356364, 708258.754920656 2402197.91172757))"));
   }
 
   public void testDepthMismatchAssertionFailedException() throws Exception {
@@ -159,8 +159,8 @@ public class GeometryImplTest extends TestCase {
     // ("depth mismatch at (160.0, 300.0, Nan)") [Jon Aquino 10/28/2003]
     this.reader.read(
       "MULTIPOLYGON (((100 300, 100 400, 200 400, 200 300, 100 300)),"
-        + "((160 300, 160 400, 260 400, 260 300, 160 300)),"
-        + "((160 300, 160 200, 260 200, 260 300, 160 300)))").buffer(0);
+          + "((160 300, 160 400, 260 400, 260 300, 160 300)),"
+          + "((160 300, 160 200, 260 200, 260 300, 160 300)))").buffer(0);
   }
 
   public void testEmptyGeometryCentroid() throws Exception {
@@ -171,9 +171,9 @@ public class GeometryImplTest extends TestCase {
       .getCentroid()
       .isEmpty());
     assertTrue(this.reader.read(
-      "GEOMETRYCOLLECTION(GEOMETRYCOLLECTION EMPTY, GEOMETRYCOLLECTION EMPTY)")
-      .getCentroid()
-      .isEmpty());
+        "GEOMETRYCOLLECTION(GEOMETRYCOLLECTION EMPTY, GEOMETRYCOLLECTION EMPTY)")
+        .getCentroid()
+        .isEmpty());
     assertTrue(this.reader.read("MULTIPOLYGON EMPTY").getCentroid().isEmpty());
     assertTrue(this.reader.read("MULTILINESTRING EMPTY")
       .getCentroid()

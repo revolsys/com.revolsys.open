@@ -129,13 +129,13 @@ class EdgeRing {
    * @param pt a {@link Coordinates} for the test point
    * @param pts an array of {@link Coordinates}s to test
    * @return <code>true</code> if the point is in the array
-   * 
+   *
    * @deprecated
    */
   @Deprecated
   public static boolean isInList(final Point pt, final Point[] pts) {
-    for (int i = 0; i < pts.length; i++) {
-      if (pt.equals(pts[i])) {
+    for (final Point pt2 : pts) {
+      if (pt.equals(pt2)) {
         return true;
       }
     }
@@ -148,14 +148,14 @@ class EdgeRing {
    * @param pts an array of {@link Coordinates}s to test the input points against
    * @return a {@link Coordinates} from <code>testPts</code> which is not in <code>pts</code>,
    * or null if there is no coordinate not in the list
-   * 
+   *
    * @deprecated Use CoordinateArrays.ptNotInList instead
    */
   @Deprecated
   public static Point ptNotInList(final Point[] testPts,
     final Point[] pts) {
-    for (int i = 0; i < testPts.length; i++) {
-      final Point testPt = testPts[i];
+    for (final Point testPt2 : testPts) {
+      final Point testPt = testPt2;
       if (!isInList(testPt, pts)) {
         return testPt;
       }
@@ -183,7 +183,7 @@ class EdgeRing {
    * @param de the {@link DirectedEdge} to add.
    */
   public void add(final DirectedEdge de) {
-    deList.add(de);
+    this.deList.add(de);
   }
 
   /**
@@ -191,10 +191,10 @@ class EdgeRing {
    * @param hole the {@link LinearRing} forming the hole.
    */
   public void addHole(final LinearRing hole) {
-    if (holes == null) {
-      holes = new ArrayList<>();
+    if (this.holes == null) {
+      this.holes = new ArrayList<>();
     }
-    holes.add(hole);
+    this.holes.add(hole);
   }
 
   /**
@@ -204,16 +204,16 @@ class EdgeRing {
    * @return an array of the {@link Coordinates}s in this ring
    */
   private Point[] getCoordinates() {
-    if (ringPts == null) {
+    if (this.ringPts == null) {
       final CoordinateList coordList = new CoordinateList();
-      for (final DirectedEdge de : deList) {
+      for (final DirectedEdge de : this.deList) {
         final PolygonizeEdge edge = (PolygonizeEdge)de.getEdge();
         addEdge(edge.getLine(), de.getEdgeDirection(),
           coordList);
       }
-      ringPts = coordList.toCoordinateArray();
+      this.ringPts = coordList.toCoordinateArray();
     }
-    return ringPts;
+    return this.ringPts;
   }
 
   /**
@@ -225,7 +225,7 @@ class EdgeRing {
    */
   public LineString getLineString() {
     getCoordinates();
-    return factory.lineString(ringPts);
+    return this.factory.lineString(this.ringPts);
   }
 
   /**
@@ -235,11 +235,11 @@ class EdgeRing {
    */
   public Polygon getPolygon() {
     final List<LinearRing> rings = new ArrayList<>();
-    rings.add(ring);
-    if (holes != null) {
-      rings.addAll(holes);
+    rings.add(this.ring);
+    if (this.holes != null) {
+      rings.addAll(this.holes);
     }
-    final Polygon poly = factory.polygon(rings);
+    final Polygon poly = this.factory.polygon(rings);
     return poly;
   }
 
@@ -249,19 +249,19 @@ class EdgeRing {
    * standard output.
    */
   public LinearRing getRing() {
-    if (ring != null) {
-      return ring;
+    if (this.ring != null) {
+      return this.ring;
     }
     getCoordinates();
-    if (ringPts.length < 3) {
-      System.out.println(ringPts);
+    if (this.ringPts.length < 3) {
+      System.out.println(this.ringPts);
     }
     try {
-      ring = factory.linearRing(ringPts);
+      this.ring = this.factory.linearRing(this.ringPts);
     } catch (final Exception ex) {
-      System.out.println(ringPts);
+      System.out.println(this.ringPts);
     }
-    return ring;
+    return this.ring;
   }
 
   /**
@@ -277,24 +277,24 @@ class EdgeRing {
 
   /**
    * Tests if the {@link LinearRing} ring formed by this edge ring is topologically valid.
-   * 
+   *
    * @return true if the ring is valid
    */
   public boolean isValid() {
     getCoordinates();
-    if (ringPts.length <= 3) {
+    if (this.ringPts.length <= 3) {
       return false;
     }
     getRing();
-    return ring.isValid();
+    return this.ring.isValid();
   }
 
   @Override
   public String toString() {
-    if (ring == null) {
-      return ringPts.toString();
+    if (this.ring == null) {
+      return this.ringPts.toString();
     } else {
-      return ring.toString();
+      return this.ring.toString();
     }
   }
 }

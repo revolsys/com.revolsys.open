@@ -37,9 +37,9 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
 /**
- * This class illustrates the basic functionality and configuration options for generating spatial data. 
+ * This class illustrates the basic functionality and configuration options for generating spatial data.
  *
- * @author David Zwiers, Vivid Solutions. 
+ * @author David Zwiers, Vivid Solutions.
  */
 public abstract class GeometryGenerator {
   /**

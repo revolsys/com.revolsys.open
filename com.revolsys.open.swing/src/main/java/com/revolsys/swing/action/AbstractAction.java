@@ -1,6 +1,6 @@
 package com.revolsys.swing.action;
 
-import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -97,9 +97,9 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   public void setAcceleratorControlKey(final int keyCode) {
     int modifiers;
     if (OS.isMac()) {
-      modifiers = KeyEvent.META_MASK;
+      modifiers = InputEvent.META_MASK;
     } else {
-      modifiers = KeyEvent.CTRL_MASK;
+      modifiers = InputEvent.CTRL_MASK;
     }
     setAcceleratorKey(KeyStroke.getKeyStroke(keyCode, modifiers));
     setMnemonicKey(keyCode);
@@ -110,11 +110,11 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   }
 
   public void setAcceleratorShiftControlKey(final int keyCode) {
-    int modifiers = KeyEvent.SHIFT_MASK;
+    int modifiers = InputEvent.SHIFT_MASK;
     if (OS.isMac()) {
-      modifiers |= KeyEvent.META_MASK;
+      modifiers |= InputEvent.META_MASK;
     } else {
-      modifiers |= KeyEvent.CTRL_MASK;
+      modifiers |= InputEvent.CTRL_MASK;
     }
     setAcceleratorKey(KeyStroke.getKeyStroke(keyCode, modifiers));
   }

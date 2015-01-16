@@ -45,23 +45,6 @@ package com.revolsys.util;
 public final class DoubleFormatUtil {
 
   /**
-   * Most used power of ten (to avoid the cost of Math.pow(10, n)
-   */
-  private static final long[] POWERS_OF_TEN_LONG = new long[19];
-
-  private static final double[] POWERS_OF_TEN_DOUBLE = new double[30];
-
-  static {
-    POWERS_OF_TEN_LONG[0] = 1L;
-    for (int i = 1; i < POWERS_OF_TEN_LONG.length; i++) {
-      POWERS_OF_TEN_LONG[i] = POWERS_OF_TEN_LONG[i - 1] * 10L;
-    }
-    for (int i = 0; i < POWERS_OF_TEN_DOUBLE.length; i++) {
-      POWERS_OF_TEN_DOUBLE[i] = Double.parseDouble("1e" + i);
-    }
-  }
-
-  /**
    * Helper method to do the custom rounding used within formatDoublePrecise
    *
    * @param target the buffer to write to
@@ -96,7 +79,7 @@ public final class DoubleFormatUtil {
       // E.g. for decP = 9999999999999999L and scale = 17,
       // decP < tenPow(16) while (double) decP == tenPowDouble(16)
       while (scale > 0
-        && (scale > 18 ? decP < tenPowDouble(--scale) : decP < tenPow(--scale))) {
+          && (scale > 18 ? decP < tenPowDouble(--scale) : decP < tenPow(--scale))) {
         // Insert leading zeroes
         target.append('0');
       }
@@ -115,7 +98,7 @@ public final class DoubleFormatUtil {
    */
   public static void formatDouble(final double source, final int decimals,
     final int precision, final StringBuilder target) {
-    final int scale = (Math.abs(source) >= 1.0) ? decimals : precision;
+    final int scale = Math.abs(source) >= 1.0 ? decimals : precision;
     if (tooManyDigitsUsed(source, scale) || tooCloseToRound(source, scale)) {
       formatDoublePrecise(source, decimals, precision, target);
     } else {
@@ -149,7 +132,7 @@ public final class DoubleFormatUtil {
 
     final boolean isPositive = source >= 0.0;
     source = Math.abs(source);
-    int scale = (source >= 1.0) ? decimals : precision;
+    int scale = source >= 1.0 ? decimals : precision;
 
     long intPart = (long)Math.floor(source);
     final double tenScale = tenPowDouble(scale);
@@ -219,7 +202,7 @@ public final class DoubleFormatUtil {
       // Done once and for all
       target.append('-');
     }
-    final int scale = (source >= 1.0) ? decimals : precision;
+    final int scale = source >= 1.0 ? decimals : precision;
 
     // The only way to format precisely the double is to use the String
     // representation of the double, and then to do mathematical integer
@@ -281,7 +264,7 @@ public final class DoubleFormatUtil {
           // decimalDigits > scale,
           // Rounding involved
           final long intP = Long.parseLong(intS) * tenPow(exposant)
-            + Long.parseLong(decS.substring(0, exposant));
+              + Long.parseLong(decS.substring(0, exposant));
           final long decP = Long.parseLong(decS.substring(exposant, exposant
             + scale + 1));
           format(target, scale, intP, decP);
@@ -297,7 +280,7 @@ public final class DoubleFormatUtil {
           format(target, scale, 0L, decP);
         } else if (decLength < digits) {
           final long decP = Long.parseLong(intS) * tenPow(decLength + 1)
-            + Long.parseLong(decS) * 10;
+              + Long.parseLong(decS) * 10;
           format(target, exposant + decLength, 0L, decP);
         } else {
           final long subDecP = Long.parseLong(decS.substring(0, digits));
@@ -319,7 +302,7 @@ public final class DoubleFormatUtil {
     // to have this algorithm
     long exp = Double.doubleToRawLongBits(value) & 0x7ff0000000000000L;
     exp = exp >> 52;
-    return (int)(exp - 1023L);
+        return (int)(exp - 1023L);
   }
 
   /**
@@ -335,8 +318,8 @@ public final class DoubleFormatUtil {
     // Use 4.999999999999999 instead of 5 since in some cases, 5.0 / 1eN > 5e-N
     // (e.g. for N = 37, 42, 45, 66, ...)
     return source == 0.0
-      || Math.abs(source) < 4.999999999999999 / tenPowDouble(Math.max(decimals,
-        precision) + 1);
+        || Math.abs(source) < 4.999999999999999 / tenPowDouble(Math.max(decimals,
+          precision) + 1);
   }
 
   /**
@@ -348,13 +331,13 @@ public final class DoubleFormatUtil {
   public static long tenPow(final int n) {
     assert n >= 0;
     return n < POWERS_OF_TEN_LONG.length ? POWERS_OF_TEN_LONG[n]
-      : (long)Math.pow(10, n);
+        : (long)Math.pow(10, n);
   }
 
   private static double tenPowDouble(final int n) {
     assert n >= 0;
     return n < POWERS_OF_TEN_DOUBLE.length ? POWERS_OF_TEN_DOUBLE[n]
-      : Math.pow(10, n);
+        : Math.pow(10, n);
   }
 
   /**
@@ -392,6 +375,23 @@ public final class DoubleFormatUtil {
     // if scale >= 308, 10^308 ~= Infinity
     final double decExp = Math.log10(source);
     return scale >= 308 || decExp + scale >= 14.5;
+  }
+
+  /**
+   * Most used power of ten (to avoid the cost of Math.pow(10, n)
+   */
+  private static final long[] POWERS_OF_TEN_LONG = new long[19];
+
+  private static final double[] POWERS_OF_TEN_DOUBLE = new double[30];
+
+  static {
+    POWERS_OF_TEN_LONG[0] = 1L;
+    for (int i = 1; i < POWERS_OF_TEN_LONG.length; i++) {
+      POWERS_OF_TEN_LONG[i] = POWERS_OF_TEN_LONG[i - 1] * 10L;
+    }
+    for (int i = 0; i < POWERS_OF_TEN_DOUBLE.length; i++) {
+      POWERS_OF_TEN_DOUBLE[i] = Double.parseDouble("1e" + i);
+    }
   }
 
   private DoubleFormatUtil() {

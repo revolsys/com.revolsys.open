@@ -143,7 +143,7 @@ public class GeometryTestUtil {
     for (int ringIndex = 0; ringIndex < ringCount; ringIndex++) {
       final double[] coordinates = new double[axisCount * 5];
 
-      final double offset = (delta / 100) * ringIndex;
+      final double offset = delta / 100 * ringIndex;
       final double size = delta - offset * 2;
 
       final double[] firstPoint = coordinates(geometryFactory, delta);

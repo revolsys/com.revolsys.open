@@ -47,8 +47,8 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   @Override
   public JdbcFieldDefinition clone() {
     return new PostgreSQLGeometryJdbcFieldDefinition(getDbName(), getName(),
-      getType(), isRequired(), getDescription(), getProperties(), srid,
-      axisCount, geometryFactory);
+      getType(), isRequired(), getDescription(), getProperties(), this.srid,
+      this.axisCount, this.geometryFactory);
   }
 
   public Object getInsertUpdateValue(Object object) throws SQLException {
@@ -57,7 +57,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     } else {
       if (object instanceof com.revolsys.jts.geom.Geometry) {
         final com.revolsys.jts.geom.Geometry geometry = (com.revolsys.jts.geom.Geometry)object;
-        object = geometry.convert(geometryFactory);
+        object = geometry.convert(this.geometryFactory);
       }
       Geometry geometry = null;
 
@@ -79,7 +79,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         geometry = toPgPoint(point);
       } else if (object instanceof Point) {
         final Point coordinates = (Point)object;
-        final com.revolsys.jts.geom.Point point = geometryFactory.point(coordinates);
+        final com.revolsys.jts.geom.Point point = this.geometryFactory.point(coordinates);
         geometry = toPgPoint(point);
       } else if (object instanceof com.revolsys.jts.geom.MultiPoint) {
         final com.revolsys.jts.geom.MultiPoint point = (com.revolsys.jts.geom.MultiPoint)object;
@@ -136,17 +136,17 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       final Geometry geometry = pgGeometry.getGeometry();
       final int type = geometry.getType();
       if (type == Geometry.POINT) {
-        return toJtsPoint(geometryFactory, (Point)geometry);
+        return toJtsPoint(this.geometryFactory, (Point)geometry);
       } else if (type == Geometry.LINESTRING) {
-        return toJtsLineString(geometryFactory, (LineString)geometry);
+        return toJtsLineString(this.geometryFactory, (LineString)geometry);
       } else if (type == Geometry.POLYGON) {
-        return toJtsPolygon(geometryFactory, (Polygon)geometry);
+        return toJtsPolygon(this.geometryFactory, (Polygon)geometry);
       } else if (type == Geometry.MULTIPOINT) {
-        return toJtsMultiPoint(geometryFactory, (MultiPoint)geometry);
+        return toJtsMultiPoint(this.geometryFactory, (MultiPoint)geometry);
       } else if (type == Geometry.MULTILINESTRING) {
-        return toJtsMultiLineString(geometryFactory, (MultiLineString)geometry);
+        return toJtsMultiLineString(this.geometryFactory, (MultiLineString)geometry);
       } else if (type == Geometry.MULTIPOLYGON) {
-        return toJtsMultiPolygon(geometryFactory, (MultiPolygon)geometry);
+        return toJtsMultiPolygon(this.geometryFactory, (MultiPolygon)geometry);
       } else {
         throw new RuntimeException("Unsopported postgis geometry type " + type);
       }
@@ -158,7 +158,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   public Object toJdbc(final Object object) throws SQLException {
     Geometry geometry = null;
     if (object instanceof com.revolsys.jts.geom.Geometry) {
-      final com.revolsys.jts.geom.Geometry rsGeometry = ((com.revolsys.jts.geom.Geometry)object).convert(geometryFactory);
+      final com.revolsys.jts.geom.Geometry rsGeometry = ((com.revolsys.jts.geom.Geometry)object).convert(this.geometryFactory);
       if (rsGeometry instanceof com.revolsys.jts.geom.Point) {
         final com.revolsys.jts.geom.Point point = (com.revolsys.jts.geom.Point)rsGeometry;
         geometry = toPgPoint(point);
@@ -180,7 +180,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       }
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;
-      boundingBox = boundingBox.convert(geometryFactory, 2);
+      boundingBox = boundingBox.convert(this.geometryFactory, 2);
       final double minX = boundingBox.getMinX();
       final double minY = boundingBox.getMinY();
       final double maxX = boundingBox.getMaxX();
@@ -195,19 +195,19 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   private com.revolsys.jts.geom.LineString toJtsLineString(
     final GeometryFactory factory, final LineString lineString) {
     final Point[] points = lineString.getPoints();
-    final double[] coordinates = new double[points.length * axisCount];
+    final double[] coordinates = new double[points.length * this.axisCount];
     for (int i = 0; i < points.length; i++) {
       final Point point = points[i];
-      coordinates[i * axisCount] = point.x;
-      coordinates[i * axisCount + 1] = point.y;
-      if (axisCount > 2) {
-        coordinates[i * axisCount + 2] = point.z;
-        if (axisCount > 3) {
-          coordinates[i * axisCount + 3] = point.m;
+      coordinates[i * this.axisCount] = point.x;
+      coordinates[i * this.axisCount + 1] = point.y;
+      if (this.axisCount > 2) {
+        coordinates[i * this.axisCount + 2] = point.z;
+        if (this.axisCount > 3) {
+          coordinates[i * this.axisCount + 3] = point.m;
         }
       }
     }
-    return factory.lineString(axisCount, coordinates);
+    return factory.lineString(this.axisCount, coordinates);
   }
 
   private com.revolsys.jts.geom.Geometry toJtsMultiLineString(
@@ -256,7 +256,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   private com.revolsys.jts.geom.Point toJtsPoint(final GeometryFactory factory,
     final Point point) {
-    switch (axisCount) {
+    switch (this.axisCount) {
       case 3:
         return factory.point(point.x, point.y, point.z);
       case 4:
@@ -276,20 +276,20 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       if (!points[0].equals(points[vertexCount - 1])) {
         vertexCount++;
       }
-      final double[] coordinates = new double[vertexCount * axisCount];
+      final double[] coordinates = new double[vertexCount * this.axisCount];
 
       for (int i = 0; i < vertexCount; i++) {
         final Point point = points[i % points.length];
-        coordinates[i * axisCount + 0] = point.x;
-        coordinates[i * axisCount + 1] = point.y;
-        if (axisCount > 2) {
-          coordinates[i * axisCount + 2] = point.z;
-          if (axisCount > 3) {
-            coordinates[i * axisCount + 3] = point.m;
+        coordinates[i * this.axisCount + 0] = point.x;
+        coordinates[i * this.axisCount + 1] = point.y;
+        if (this.axisCount > 2) {
+          coordinates[i * this.axisCount + 2] = point.z;
+          if (this.axisCount > 3) {
+            coordinates[i * this.axisCount + 3] = point.m;
           }
         }
       }
-      rings.add(factory.linearRing(axisCount, coordinates));
+      rings.add(factory.linearRing(this.axisCount, coordinates));
     }
     return factory.polygon(rings);
   }
@@ -324,7 +324,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         } else {
           throw new RuntimeException(
             "GeometryCollection must contain a single LineString not a "
-              + firstGeometry.getClass());
+                + firstGeometry.getClass());
         }
       } else {
         throw new RuntimeException("MultiLineString has more than one geometry");
@@ -346,7 +346,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       } else {
         throw new RuntimeException(
           "Geometry must contain only LineStrings not a "
-            + subGeometry.getClass());
+              + subGeometry.getClass());
       }
     }
     return toPgMultiLineString(geometry.getSrid(), pgLineStrings);
@@ -371,7 +371,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         pgPoints.add(pgPoint);
       } else {
         throw new RuntimeException("Geometry must contain only Point not a "
-          + subGeometry.getClass());
+            + subGeometry.getClass());
       }
     }
     return toPgMultiPoint(geometry.getSrid(), pgPoints);
@@ -396,7 +396,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         pgPolygons.add(pgPolygon);
       } else {
         throw new RuntimeException("Geometry must contain only Polygons not a "
-          + subGeometry.getClass());
+            + subGeometry.getClass());
       }
     }
     return toPgMultiPolygon(geometry.getSrid(), pgPolygons);
@@ -451,11 +451,11 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         } else {
           throw new RuntimeException(
             "GeometryCollection must contain a single Point not a "
-              + firstGeometry.getClass());
+                + firstGeometry.getClass());
         }
       } else {
         throw new RuntimeException(
-          "GeometryCollection has more than one geometry");
+            "GeometryCollection has more than one geometry");
       }
     } else {
       throw new RuntimeException("Expecting a point");
@@ -469,13 +469,13 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       final double y = line.getY(i);
       final double x = line.getX(i);
 
-      if (axisCount > 2) {
+      if (this.axisCount > 2) {
         double z = line.getZ(i);
         if (Double.isNaN(z)) {
           z = 0;
         }
         pgPoint = new Point(x, y, z);
-        if (axisCount > 3) {
+        if (this.axisCount > 3) {
           double m = line.getM(i);
           if (Double.isNaN(m)) {
             m = 0;
@@ -518,11 +518,11 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         } else {
           throw new RuntimeException(
             "GeometryCollection must contain a single Polygon not a "
-              + firstGeometry.getClass());
+                + firstGeometry.getClass());
         }
       } else {
         throw new RuntimeException("Expecting a single Polygon not a "
-          + object.getClass() + " with more than one geometry");
+            + object.getClass() + " with more than one geometry");
       }
     } else if (object == null) {
       return null;

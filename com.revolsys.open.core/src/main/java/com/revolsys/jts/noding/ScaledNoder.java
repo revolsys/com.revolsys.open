@@ -76,29 +76,29 @@ public class ScaledNoder implements Noder {
     this.noder = noder;
     this.scaleFactor = scaleFactor;
     // no need to scale if input precision is already integral
-    isScaled = !isIntegerPrecision();
+    this.isScaled = !isIntegerPrecision();
   }
 
   @Override
   public void computeNodes(final Collection<NodedSegmentString> inputSegStrings) {
     Collection<NodedSegmentString> intSegStrings = inputSegStrings;
-    if (isScaled) {
+    if (this.isScaled) {
       intSegStrings = scale(inputSegStrings);
     }
-    noder.computeNodes(intSegStrings);
+    this.noder.computeNodes(intSegStrings);
   }
 
   @Override
   public Collection<NodedSegmentString> getNodedSubstrings() {
-    final Collection<NodedSegmentString> segments = noder.getNodedSubstrings();
-    if (isScaled) {
+    final Collection<NodedSegmentString> segments = this.noder.getNodedSubstrings();
+    if (this.isScaled) {
       return rescale(segments);
     }
     return segments;
   }
 
   public boolean isIntegerPrecision() {
-    return scaleFactor == 1.0;
+    return this.scaleFactor == 1.0;
   }
 
   private Collection<NodedSegmentString> rescale(
@@ -117,8 +117,8 @@ public class ScaledNoder implements Noder {
     final int vertexCount = points.getVertexCount();
     final double[] coordinates = new double[vertexCount * axisCount];
     for (int i = 0; i < vertexCount; i++) {
-      final double x = points.getX(i) / scaleFactor + offsetX;
-      final double y = points.getY(i) / scaleFactor + offsetY;
+      final double x = points.getX(i) / this.scaleFactor + this.offsetX;
+      final double y = points.getY(i) / this.scaleFactor + this.offsetY;
       CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, x, y);
       for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
         final double value = points.getCoordinate(i, axisIndex);
@@ -153,8 +153,8 @@ public class ScaledNoder implements Noder {
     int j = 0;
     for (int i = 0; i < vertexCount; i++) {
       final Point point = segment.getCoordinate(i);
-      final double x = Math.round((point.getX() - offsetX) * scaleFactor);
-      final double y = Math.round((point.getY() - offsetY) * scaleFactor);
+      final double x = Math.round((point.getX() - this.offsetX) * this.scaleFactor);
+      final double y = Math.round((point.getY() - this.offsetY) * this.scaleFactor);
       final double z = point.getZ();
       if (i == 0 || x != previousX && y != previousY) {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, x, y, z);

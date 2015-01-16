@@ -3,6 +3,11 @@ package com.revolsys.parallel.channel;
 @SuppressWarnings("serial")
 public class ClosedException extends RuntimeException {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public ClosedException() {
     super();
   }

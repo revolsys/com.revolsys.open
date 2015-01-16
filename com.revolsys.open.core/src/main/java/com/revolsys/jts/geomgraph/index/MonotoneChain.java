@@ -43,13 +43,13 @@ public class MonotoneChain {
   MonotoneChainEdge mce;
   int chainIndex;
 
-  public MonotoneChain(MonotoneChainEdge mce, int chainIndex) {
+  public MonotoneChain(final MonotoneChainEdge mce, final int chainIndex) {
     this.mce = mce;
     this.chainIndex = chainIndex;
   }
 
-  public void computeIntersections(MonotoneChain mc, SegmentIntersector si)
+  public void computeIntersections(final MonotoneChain mc, final SegmentIntersector si)
   {
-    this.mce.computeIntersectsForChain(chainIndex, mc.mce, mc.chainIndex, si);
+    this.mce.computeIntersectsForChain(this.chainIndex, mc.mce, mc.chainIndex, si);
   }
 }

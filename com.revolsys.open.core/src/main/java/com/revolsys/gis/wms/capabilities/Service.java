@@ -21,35 +21,35 @@ public class Service {
   private String accessConstraints;
 
   public String getAbstractDescription() {
-    return abstractDescription;
+    return this.abstractDescription;
   }
 
   public String getAccessConstraints() {
-    return accessConstraints;
+    return this.accessConstraints;
   }
 
   public ContactInformation getContactInformation() {
-    return contactInformation;
+    return this.contactInformation;
   }
 
   public String getFees() {
-    return fees;
+    return this.fees;
   }
 
   public List<String> getKeywords() {
-    return keywords;
+    return this.keywords;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public URL getOnlineResource() {
-    return onlineResource;
+    return this.onlineResource;
   }
 
   public String getTitle() {
-    return title;
+    return this.title;
   }
 
   public void setAbstractDescription(final String abstractDescription) {

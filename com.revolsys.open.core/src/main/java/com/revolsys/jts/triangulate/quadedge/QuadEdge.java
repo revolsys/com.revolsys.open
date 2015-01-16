@@ -39,9 +39,9 @@ import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;
 
 /**
- * A class that represents the edge data structure which implements the quadedge algebra. 
+ * A class that represents the edge data structure which implements the quadedge algebra.
  * The quadedge algebra was described in a well-known paper by Guibas and Stolfi,
- * "Primitives for the manipulation of general subdivisions and the computation of Voronoi diagrams", 
+ * "Primitives for the manipulation of general subdivisions and the computation of Voronoi diagrams",
  * <i>ACM Transactions on Graphics</i>, 4(2), 1985, 75-123.
  * <p>
  * Each edge object is part of a quartet of 4 edges,
@@ -49,11 +49,11 @@ import com.revolsys.jts.geom.segment.LineSegmentDouble;
  * Any edge in the group may be accessed using a series of {@link #rot()} operations.
  * Quadedges in a subdivision are linked together via their <tt>next</tt> references.
  * The linkage between the quadedge quartets determines the topology
- * of the subdivision. 
+ * of the subdivision.
  * <p>
  * The edge class does not contain separate information for vertice or faces; a vertex is implicitly
  * defined as a ring of edges (created using the <tt>next</tt> field).
- * 
+ *
  * @author David Skea
  * @author Martin Davis
  */
@@ -63,7 +63,7 @@ public class QuadEdge {
    * b, in such a way that all three have the same left face after the
    * connection is complete. Additionally, the data pointers of the new edge
    * are set.
-   * 
+   *
    * @return the connected edge.
    */
   public static QuadEdge connect(final QuadEdge a, final QuadEdge b) {
@@ -75,7 +75,7 @@ public class QuadEdge {
 
   /**
    * Creates a new QuadEdge quartet from {@link Vertex} o to {@link Vertex} d.
-   * 
+   *
    * @param o
    *          the origin Vertex
    * @param d
@@ -107,15 +107,15 @@ public class QuadEdge {
   /**
    * Splices two edges together or apart.
    * Splice affects the two edge rings around the origins of a and b, and, independently, the two
-   * edge rings around the left faces of <tt>a</tt> and <tt>b</tt>. 
+   * edge rings around the left faces of <tt>a</tt> and <tt>b</tt>.
    * In each case, (i) if the two rings are distinct,
    * Splice will combine them into one, or (ii) if the two are the same ring, Splice will break it
    * into two separate pieces. Thus, Splice can be used both to attach the two edges together, and
    * to break them apart.
-   * 
+   *
    * @param a an edge to splice
    * @param b an edge to splice
-   * 
+   *
    */
   public static void splice(final QuadEdge a, final QuadEdge b) {
     final QuadEdge alpha = a.oNext().rot();
@@ -134,7 +134,7 @@ public class QuadEdge {
 
   /**
    * Turns an edge counterclockwise inside its enclosing quadrilateral.
-   * 
+   *
    * @param e the quadedge to turn
    */
   public static void swap(final QuadEdge e) {
@@ -160,7 +160,7 @@ public class QuadEdge {
   // private int visitedKey = 0;
 
   /**
-   * Quadedges must be made using {@link makeEdge}, 
+   * Quadedges must be made using {@link makeEdge},
    * to ensure proper construction.
    */
   private QuadEdge() {
@@ -176,12 +176,12 @@ public class QuadEdge {
    *
    */
   public void delete() {
-    rot = null;
+    this.rot = null;
   }
 
   /**
    * Gets the vertex for the edge's destination
-   * 
+   *
    * @return the destination vertex
    */
   public final Vertex dest() {
@@ -190,7 +190,7 @@ public class QuadEdge {
 
   /**
    * Gets the next CCW edge around (into) the destination of this edge.
-   * 
+   *
    * @return the next destination edge.
    */
   public final QuadEdge dNext() {
@@ -199,7 +199,7 @@ public class QuadEdge {
 
   /**
    * Gets the next CW edge around (into) the destination of this edge.
-   * 
+   *
    * @return the previous destination edge.
    */
   public final QuadEdge dPrev() {
@@ -207,9 +207,9 @@ public class QuadEdge {
   }
 
   /**
-   * Tests if this quadedge and another have the same line segment geometry, 
+   * Tests if this quadedge and another have the same line segment geometry,
    * regardless of orientation.
-   * 
+   *
    * @param qe a quadege
    * @return true if the quadedges are based on the same line segment regardless of orientation
    */
@@ -226,35 +226,35 @@ public class QuadEdge {
   /**
    * Tests if this quadedge and another have the same line segment geometry
    * with the same orientation.
-   * 
+   *
    * @param qe a quadege
    * @return true if the quadedges are based on the same line segment
    */
   public boolean equalsOriented(final QuadEdge qe) {
     if (orig().getCoordinate().equals(2,qe.orig().getCoordinate())
-      && dest().getCoordinate().equals(2,qe.dest().getCoordinate())) {
+        && dest().getCoordinate().equals(2,qe.dest().getCoordinate())) {
       return true;
     }
     return false;
   }
 
   /***************************************************************************
-   * QuadEdge Algebra 
+   * QuadEdge Algebra
    ***************************************************************************
    */
 
   /**
    * Gets the external data value for this edge.
-   * 
+   *
    * @return the data object
    */
   public Object getData() {
-    return data;
+    return this.data;
   }
 
   /**
    * Gets the length of the geometry of this quadedge.
-   * 
+   *
    * @return the length of the quadedge
    */
   public double getLength() {
@@ -266,7 +266,7 @@ public class QuadEdge {
    * The primary edge is the one for which the origin
    * and destination coordinates are ordered
    * according to the standard {@link Coordinates} ordering
-   * 
+   *
    * @return the primary quadedge
    */
   public QuadEdge getPrimary() {
@@ -279,25 +279,25 @@ public class QuadEdge {
 
   /**
    * Gets the dual of this edge, directed from its left to its right.
-   * 
+   *
    * @return the inverse rotated edge.
    */
   public final QuadEdge invRot() {
-    return rot.sym();
+    return this.rot.sym();
   }
 
   /**
    * Tests whether this edge has been deleted.
-   * 
+   *
    * @return true if this edge has not been deleted.
    */
   public boolean isLive() {
-    return rot != null;
+    return this.rot != null;
   }
 
   /**
    * Gets the CCW edge around the left face following this edge.
-   * 
+   *
    * @return the next left face edge.
    */
   public final QuadEdge lNext() {
@@ -306,61 +306,61 @@ public class QuadEdge {
 
   /**
    * Gets the CCW edge around the left face before this edge.
-   * 
+   *
    * @return the previous left face edge.
    */
   public final QuadEdge lPrev() {
-    return next.sym();
+    return this.next.sym();
   }
 
   /**
    * Gets the next CCW edge around the origin of this edge.
-   * 
+   *
    * @return the next linked edge.
    */
   public final QuadEdge oNext() {
-    return next;
+    return this.next;
   }
 
   /**
    * Gets the next CW edge around (from) the origin of this edge.
-   * 
+   *
    * @return the previous edge.
    */
   public final QuadEdge oPrev() {
-    return rot.next.rot;
+    return this.rot.next.rot;
   }
 
   /**
    * Gets the vertex for the edge's origin
-   * 
+   *
    * @return the origin vertex
    */
   public final Vertex orig() {
-    return vertex;
+    return this.vertex;
   }
 
   /**
    * Gets the edge around the right face ccw following this edge.
-   * 
+   *
    * @return the next right face edge.
    */
   public final QuadEdge rNext() {
-    return rot.next.invRot();
+    return this.rot.next.invRot();
   }
 
   /**
    * Gets the dual of this edge, directed from its right to its left.
-   * 
+   *
    * @return the rotated edge
    */
   public final QuadEdge rot() {
-    return rot;
+    return this.rot;
   }
 
   /**
    * Gets the edge around the right face ccw before this edge.
-   * 
+   *
    * @return the previous right face edge.
    */
   public final QuadEdge rPrev() {
@@ -369,7 +369,7 @@ public class QuadEdge {
 
   /**
    * Sets the external data value for this edge.
-   * 
+   *
    * @param data an object containing external data
    */
   public void setData(final Object data) {
@@ -378,7 +378,7 @@ public class QuadEdge {
 
   /**
    * Sets the vertex for this edge's destination
-   * 
+   *
    * @param d the destination vertex
    */
   void setDest(final Vertex d) {
@@ -387,7 +387,7 @@ public class QuadEdge {
 
   /**
    * Sets the connected edge
-   * 
+   *
    * @param next edge
    */
   public void setNext(final QuadEdge next) {
@@ -399,41 +399,41 @@ public class QuadEdge {
    **********************************************************************************************/
   /**
    * Sets the vertex for this edge's origin
-   * 
+   *
    * @param o the origin vertex
    */
   void setOrig(final Vertex o) {
-    vertex = o;
+    this.vertex = o;
   }
 
   /**
    * Gets the edge from the destination to the origin of this edge.
-   * 
+   *
    * @return the sym of the edge
    */
   public final QuadEdge sym() {
-    return rot.rot;
+    return this.rot.rot;
   }
 
   /**
    * Creates a {@link LineSegmentDouble} representing the
    * geometry of this edge.
-   * 
+   *
    * @return a LineSegmentDouble
    */
   public LineSegment toLineSegment() {
-    return new LineSegmentDouble(vertex.getCoordinate(), dest().getCoordinate());
+    return new LineSegmentDouble(this.vertex.getCoordinate(), dest().getCoordinate());
   }
 
   /**
-   * Converts this edge to a WKT two-point <tt>LINESTRING</tt> indicating 
+   * Converts this edge to a WKT two-point <tt>LINESTRING</tt> indicating
    * the geometry of this edge.
-   * 
+   *
    * @return a String representing this edge's geometry
    */
   @Override
   public String toString() {
-    final Point p0 = vertex.getCoordinate();
+    final Point p0 = this.vertex.getCoordinate();
     final Point p1 = dest().getCoordinate();
     return EWktWriter.lineString(p0, p1);
   }

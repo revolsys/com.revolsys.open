@@ -304,12 +304,12 @@ public class Graph<T> {
    */
   public List<Node<T>> findNodes(final Edge<T> edge, final double distance) {
     final IsPointOnLineEdgeFilter<T> filter = new IsPointOnLineEdgeFilter<T>(
-      edge, distance);
+        edge, distance);
 
     final Node<T> fromNode = edge.getFromNode();
 
     final Comparator<Node<T>> comparator = new NodeDistanceComparator<T>(
-      fromNode);
+        fromNode);
 
     final com.revolsys.jts.geom.BoundingBox envelope = filter.getEnvelope();
     return getNodes(filter, comparator, envelope);
@@ -329,7 +329,7 @@ public class Graph<T> {
     } else {
       final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
       final Visitor<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(
-        geometry, distance, results);
+          geometry, distance, results);
       BoundingBox envelope = geometry.getBoundingBox();
       envelope = envelope.expand(distance);
       getNodeIndex().visit(envelope, visitor);
@@ -361,7 +361,7 @@ public class Graph<T> {
   public List<Node<T>> findNodes(final Point point, final double distance) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>();
     final Visitor<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<T>(
-      point, distance, results);
+        point, distance, results);
     BoundingBox envelope = new BoundingBoxDoubleGf(point);
     envelope = envelope.expand(distance);
     getNodeIndex().visit(envelope, visitor);
@@ -496,7 +496,7 @@ public class Graph<T> {
   public List<Edge<T>> getEdges(final Filter<Edge<T>> filter,
     final com.revolsys.jts.geom.BoundingBox envelope) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(
-      filter);
+        filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     edgeIndex.visit(envelope, results);
     final List<Edge<T>> edges = results.getList();
@@ -518,7 +518,7 @@ public class Graph<T> {
     final Comparator<Edge<T>> comparator,
     final com.revolsys.jts.geom.BoundingBox envelope) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>(
-      filter);
+        filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
     edgeIndex.visit(envelope, results);
     final List<Edge<T>> targetEdges = results.getList();
@@ -640,7 +640,7 @@ public class Graph<T> {
 
   public List<Node<T>> getNodes() {
     final List<Integer> nodeIds = new ArrayList<Integer>(
-      this.nodesIdsByCoordinates.values());
+        this.nodesIdsByCoordinates.values());
     return new NodeList<T>(this, nodeIds);
   }
 
@@ -680,7 +680,7 @@ public class Graph<T> {
     final Comparator<Node<T>> comparator,
     final com.revolsys.jts.geom.BoundingBox envelope) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<Node<T>>(
-      filter);
+        filter);
     final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
     nodeIndex.visit(envelope, results);
     final List<Node<T>> nodes = results.getList();
@@ -856,7 +856,7 @@ public class Graph<T> {
     final Point newPoint = new PointDouble(x, y, z);
     final Node<Record> newNode = graph.getNode(midPoint);
     if (!Node.hasEdgesBetween(typePath, node1, newNode)
-      && !Node.hasEdgesBetween(typePath, node2, newNode)) {
+        && !Node.hasEdgesBetween(typePath, node2, newNode)) {
       if (node1.equals(2, newNode)) {
         moveNode(typePath, node2, node1, newPoint);
       } else if (node2.equals(2, newNode)) {
@@ -1259,7 +1259,7 @@ public class Graph<T> {
         List<LineString> lines;
         final int coordinateIndex = result.get("coordinateIndex").intValue();
         final int coordinateDistance = result.get("coordinateDistance")
-          .intValue();
+            .intValue();
         final int segmentDistance = result.get("segmentDistance").intValue();
         if (coordinateIndex == 0) {
           if (coordinateDistance == 0) {

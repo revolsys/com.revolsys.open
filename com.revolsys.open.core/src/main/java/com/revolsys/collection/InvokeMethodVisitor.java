@@ -45,7 +45,7 @@ public class InvokeMethodVisitor<T> implements Visitor<T> {
     for (final Method method : object.getClass().getMethods()) {
       final String name = method.getName();
       if (name.equals(methodName)
-        && method.getParameterTypes().length == this.parameters.length) {
+          && method.getParameterTypes().length == this.parameters.length) {
         this.method = method;
       }
     }
@@ -56,14 +56,14 @@ public class InvokeMethodVisitor<T> implements Visitor<T> {
 
   @Override
   public String toString() {
-    return object.getClass() + "." + methodName + parameters;
+    return this.object.getClass() + "." + this.methodName + this.parameters;
   }
 
   @Override
   public boolean visit(final T item) {
     try {
-      parameters[parameters.length - 1] = item;
-      return (Boolean)method.invoke(object, parameters);
+      this.parameters[this.parameters.length - 1] = item;
+      return (Boolean)this.method.invoke(this.object, this.parameters);
     } catch (final Throwable e) {
       ExceptionUtil.throwUncheckedException(e);
       return false;

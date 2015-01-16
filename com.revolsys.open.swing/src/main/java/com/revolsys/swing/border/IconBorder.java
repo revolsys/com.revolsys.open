@@ -52,6 +52,11 @@ import org.jdesktop.swingx.icon.EmptyIcon;
 public class IconBorder implements Border, Serializable {
 
   /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * An empty icon.
    */
   public static final Icon EMPTY_ICON = new EmptyIcon(16, 16);

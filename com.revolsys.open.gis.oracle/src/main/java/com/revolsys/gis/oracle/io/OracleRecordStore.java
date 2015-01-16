@@ -124,7 +124,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(") = 1");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryField.getClass());
+          + geometryField.getClass());
     }
   }
 
@@ -166,7 +166,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(") = 1");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryField.getClass());
+          + geometryField.getClass());
     }
   }
 
@@ -213,8 +213,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     } else if (geometryField instanceof ArcSdeStGeometryFieldDefinition) {
       final Column column = (Column)withinDistance.getGeometry1Value();
       final GeometryFactory geometryFactory = column.getField()
-        .getRecordDefinition()
-        .getGeometryFactory();
+          .getRecordDefinition()
+          .getGeometryFactory();
       final Value geometry2Value = (Value)withinDistance.getGeometry2Value();
       final Value distanceValue = (Value)withinDistance.getDistanceValue();
       final Number distance = (Number)distanceValue.getValue();
@@ -249,7 +249,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(")");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-        + geometryField.getClass());
+          + geometryField.getClass());
     }
   }
 
@@ -375,12 +375,12 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       setPrimaryKeySql("SELECT distinct cols.table_name, cols.column_name FROM all_constraints cons, all_cons_columns cols WHERE cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner AND cons.owner =?");
 
       setSchemaPermissionsSql("select distinct p.owner \"SCHEMA_NAME\" "
-        + "from ALL_TAB_PRIVS_RECD P "
-        + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
+          + "from ALL_TAB_PRIVS_RECD P "
+          + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
       setTablePermissionsSql("select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\" "
-        + "from ALL_TAB_PRIVS_RECD P "
-        + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
-        + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') ");
+          + "from ALL_TAB_PRIVS_RECD P "
+          + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
+          + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') ");
 
       addRecordStoreExtension(new ArcSdeStGeometryRecordStoreExtension());
       addRecordStoreExtension(new ArcSdeBinaryGeometryRecordStoreExtension());
@@ -393,7 +393,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
     setIteratorFactory(new RecordStoreIteratorFactory(this,
-      "createOracleIterator"));
+        "createOracleIterator"));
   }
 
   @Override

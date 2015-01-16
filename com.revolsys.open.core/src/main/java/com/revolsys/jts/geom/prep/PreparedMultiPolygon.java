@@ -55,15 +55,20 @@ import com.revolsys.jts.operation.predicate.RectangleIntersects;
  * A prepared version for {@link MultiPolygonal} geometries.
  * This class supports both {@link MultiPolygon}s and {@link MultiMultiPolygon}s.
  * <p>
- * This class does <b>not</b> support MultiMultiPolygons which are non-valid 
- * (e.g. with overlapping elements). 
+ * This class does <b>not</b> support MultiMultiPolygons which are non-valid
+ * (e.g. with overlapping elements).
  * <p>
  * Instances of this class are thread-safe and immutable.
- * 
+ *
  * @author mbdavis
  *
  */
 public class PreparedMultiPolygon extends AbstractMultiPolygon {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final boolean isRectangle;
 
   // create these lazily, since they are expensive
@@ -81,7 +86,7 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
   @Override
   public boolean contains(final Geometry g) {
     if (envelopeCovers(g)) {
-      if (isRectangle) {
+      if (this.isRectangle) {
         return RectangleContains.contains(getMultiPolygon(), g);
       } else {
         final PreparedPolygonContains contains = new PreparedPolygonContains(
@@ -100,7 +105,7 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
       /**
        * Do point-in-poly tests first, since they are cheaper and may result
        * in a quick negative result.
-       * 
+       *
        * If a point of any test components does not lie in the target interior, result is false
        */
       final boolean isAllInPrepGeomAreaInterior = AbstractPreparedPolygonContains.isAllTestComponentsInTargetInterior(
@@ -143,76 +148,76 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
   public boolean covers(final Geometry geometry) {
     if (!envelopeCovers(geometry)) {
       return false;
-    } else if (isRectangle) {
+    } else if (this.isRectangle) {
       return true;
     } else {
-      return new PreparedPolygonCovers(this, multiPolygon).covers(geometry);
+      return new PreparedPolygonCovers(this, this.multiPolygon).covers(geometry);
     }
   }
 
   @Override
   public BoundingBox getBoundingBox() {
-    return multiPolygon.getBoundingBox();
+    return this.multiPolygon.getBoundingBox();
   }
 
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    return multiPolygon.getGeometries();
+    return this.multiPolygon.getGeometries();
   }
 
   @Override
   public <V extends Geometry> V getGeometry(final int partIndex) {
-    return multiPolygon.getGeometry(partIndex);
+    return this.multiPolygon.getGeometry(partIndex);
   }
 
   @Override
   public int getGeometryCount() {
-    return multiPolygon.getGeometryCount();
+    return this.multiPolygon.getGeometryCount();
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return multiPolygon.getGeometryFactory();
+    return this.multiPolygon.getGeometryFactory();
   }
 
   /**
    * Gets the indexed intersection finder for this geometry.
-   * 
+   *
    * @return the intersection finder
    */
   public synchronized FastSegmentSetIntersectionFinder getIntersectionFinder() {
     /**
-     * MD - Another option would be to use a simple scan for 
-     * segment testing for small geometries.  
-     * However, testing indicates that there is no particular advantage 
+     * MD - Another option would be to use a simple scan for
+     * segment testing for small geometries.
+     * However, testing indicates that there is no particular advantage
      * to this approach.
      */
-    if (segIntFinder == null) {
-      segIntFinder = new FastSegmentSetIntersectionFinder(
+    if (this.segIntFinder == null) {
+      this.segIntFinder = new FastSegmentSetIntersectionFinder(
         SegmentStringUtil.extractSegmentStrings(getMultiPolygon()));
     }
-    return segIntFinder;
+    return this.segIntFinder;
   }
 
   public MultiPolygon getMultiPolygon() {
-    return multiPolygon;
+    return this.multiPolygon;
   }
 
   public synchronized PointOnGeometryLocator getPointLocator() {
-    if (pia == null) {
-      pia = new IndexedPointInAreaLocator(getMultiPolygon());
+    if (this.pia == null) {
+      this.pia = new IndexedPointInAreaLocator(getMultiPolygon());
     }
 
-    return pia;
+    return this.pia;
   }
 
   /**
    * Gets the list of representative points for this geometry.
    * One vertex is included for every component of the geometry
    * (i.e. including one for every ring of polygonal geometries).
-   * 
+   *
    * Do not modify the returned list!
-   * 
+   *
    * @return a List of Coordinate
    */
   public List<Point> getRepresentativePoints() {
@@ -226,14 +231,14 @@ public class PreparedMultiPolygon extends AbstractMultiPolygon {
   @Override
   public boolean intersects(final Geometry geometry) {
     if (envelopesIntersect(geometry)) {
-      if (isRectangle) {
+      if (this.isRectangle) {
         return RectangleIntersects.intersects(getMultiPolygon().getPolygon(0),
           geometry);
       } else {
         /**
          * Do point-in-poly tests first, since they are cheaper and may result in a
          * quick positive result.
-         * 
+         *
          * If a point of any test components lie in target, result is true
          */
         final boolean isInPrepGeomArea = AbstractPreparedPolygonContains.isAnyTestComponentInTarget(

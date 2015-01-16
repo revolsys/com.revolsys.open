@@ -30,25 +30,25 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
   }
 
   public void close() {
-    closed = true;
+    this.closed = true;
   }
 
   protected abstract void doWrite(T value);
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public boolean isClosed() {
-    return closed;
+    return this.closed;
   }
 
   @Override
   public String toString() {
-    if (name == null) {
+    if (this.name == null) {
       return super.toString();
     } else {
-      return name;
+      return this.name;
     }
   }
 
@@ -56,14 +56,14 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
    * Writes an Object to the Channel. This method also ensures only one of the
    * writers can actually be writing at any time. All other writers are blocked
    * until it completes the write.
-   * 
+   *
    * @param value The object to write to the Channel.
    */
   @Override
   public void write(final T value) {
-    synchronized (writeMonitor) {
-      synchronized (monitor) {
-        if (closed) {
+    synchronized (this.writeMonitor) {
+      synchronized (this.monitor) {
+        if (this.closed) {
           throw new ClosedException();
         }
         doWrite(value);
@@ -73,11 +73,11 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
 
   @Override
   public void writeConnect() {
-    synchronized (monitor) {
-      if (writeClosed) {
+    synchronized (this.monitor) {
+      if (this.writeClosed) {
         throw new IllegalStateException("Cannot connect to a closed channel");
       } else {
-        numWriters++;
+        this.numWriters++;
       }
 
     }
@@ -85,11 +85,11 @@ public abstract class AbstractChannelOutput<T> implements ChannelOutput<T> {
 
   @Override
   public void writeDisconnect() {
-    synchronized (monitor) {
-      if (!writeClosed) {
-        numWriters--;
-        if (numWriters <= 0) {
-          writeClosed = true;
+    synchronized (this.monitor) {
+      if (!this.writeClosed) {
+        this.numWriters--;
+        if (this.numWriters <= 0) {
+          this.writeClosed = true;
         }
       }
     }

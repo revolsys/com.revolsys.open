@@ -15,14 +15,14 @@ public class TypeNamesFilter implements Filter<Record> {
   }
 
   public TypeNamesFilter(final String typePath) {
-    typePaths.add(typePath);
+    this.typePaths.add(typePath);
   }
 
   @Override
   public boolean accept(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     final String typePath = recordDefinition.getPath();
-    return typePaths.contains(typePath);
+    return this.typePaths.contains(typePath);
   }
 
   /**
@@ -40,10 +40,10 @@ public class TypeNamesFilter implements Filter<Record> {
    */
   @Override
   public String toString() {
-    if (typePaths.size() == 1) {
-      return "typePath=" + typePaths.iterator().next();
+    if (this.typePaths.size() == 1) {
+      return "typePath=" + this.typePaths.iterator().next();
     } else {
-      return "typePath in " + typePaths;
+      return "typePath in " + this.typePaths;
     }
   }
 

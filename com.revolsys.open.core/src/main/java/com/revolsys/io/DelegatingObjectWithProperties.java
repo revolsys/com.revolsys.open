@@ -23,26 +23,26 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
   @Override
   public void clearProperties() {
     if (getObject() == null) {
-      properties.clear();
+      this.properties.clear();
     } else {
       getObject().clearProperties();
     }
   }
 
   protected void close() {
-    properties = null;
-    object = null;
+    this.properties = null;
+    this.object = null;
   }
 
   @SuppressWarnings("unchecked")
   public <V extends ObjectWithProperties> V getObject() {
-    return (V)object;
+    return (V)this.object;
   }
 
   @Override
   public final Map<String, Object> getProperties() {
     if (getObject() == null) {
-      return properties;
+      return this.properties;
     } else {
       return getObject().getProperties();
     }
@@ -80,9 +80,9 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
 
   @Override
   public void removeProperty(final String propertyName) {
-    object.removeProperty(propertyName);
+    this.object.removeProperty(propertyName);
     if (getObject() == null) {
-      properties.remove(propertyName);
+      this.properties.remove(propertyName);
     } else {
       getObject().removeProperty(propertyName);
     }
@@ -105,7 +105,7 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
   @Override
   public final void setProperty(final String name, final Object value) {
     if (getObject() == null) {
-      properties.put(name, value);
+      this.properties.put(name, value);
     } else {
       getObject().setProperty(name, value);
     }
@@ -125,10 +125,10 @@ public class DelegatingObjectWithProperties implements ObjectWithProperties {
 
   @Override
   public String toString() {
-    if (object == null) {
+    if (this.object == null) {
       return super.toString();
     } else {
-      return object.toString();
+      return this.object.toString();
     }
   }
 }

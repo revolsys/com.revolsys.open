@@ -74,7 +74,7 @@ RecordStoreProxy, RecordStoreConnectionMapProxy {
 
     final List<RecordStoreConnectionRegistry> registries = new ArrayList<>();
     for (final RecordStoreConnectionRegistry registry : RecordStoreConnectionManager.get()
-      .getVisibleConnectionRegistries()) {
+        .getVisibleConnectionRegistries()) {
       if (!registry.isReadOnly()) {
         registries.add(registry);
       }

@@ -10,7 +10,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 
 public interface Record extends Map<String, Object>, Comparable<Record>,
-  Identifiable {
+Identifiable {
   /**
    * Create a clone of the data object.
    *

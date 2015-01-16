@@ -44,19 +44,46 @@ public class Interval {
 
   public Interval()
   {
-    min = 0.0;
-    max = 0.0;
+    this.min = 0.0;
+    this.max = 0.0;
   }
 
-  public Interval(double min, double max)
+  public Interval(final double min, final double max)
   {
     init(min, max);
   }
-  public Interval(Interval interval)
+  public Interval(final Interval interval)
   {
     init(interval.min, interval.max);
   }
-  public void init(double min, double max)
+  public boolean contains(final double p)
+  {
+    return p >= this.min && p <= this.max;
+  }
+  public boolean contains(final double min, final double max)
+  {
+    return min >= this.min && max <= this.max;
+  }
+  public boolean contains(final Interval interval)
+  {
+    return contains(interval.min, interval.max);
+  }
+  public void expandToInclude(final Interval interval)
+  {
+    if (interval.max > this.max) {
+      this.max = interval.max;
+    }
+    if (interval.min < this.min) {
+      this.min = interval.min;
+    }
+  }
+
+  public double getMax() { return this.max; }
+  public double getMin() { return this.min; }
+
+  public double getWidth() { return this.max - this.min; }
+
+  public void init(final double min, final double max)
   {
     this.min = min;
     this.max = max;
@@ -65,41 +92,21 @@ public class Interval {
       this.max = min;
     }
   }
-  public double getMin() { return min; }
-  public double getMax() { return max; }
-  public double getWidth() { return max - min; }
-
-  public void expandToInclude(Interval interval)
+  public boolean overlaps(final double min, final double max)
   {
-    if (interval.max > max) max = interval.max;
-    if (interval.min < min) min = interval.min;
+    if (this.min > max || this.max < min) {
+      return false;
+    }
+    return true;
   }
-  public boolean overlaps(Interval interval)
+  public boolean overlaps(final Interval interval)
   {
     return overlaps(interval.min, interval.max);
   }
 
-  public boolean overlaps(double min, double max)
-  {
-    if (this.min > max || this.max < min) return false;
-    return true;
-  }
-
-  public boolean contains(Interval interval)
-  {
-    return contains(interval.min, interval.max);
-  }
-  public boolean contains(double min, double max)
-  {
-    return (min >= this.min && max <= this.max);
-  }
-  public boolean contains(double p)
-  {
-    return (p >= this.min && p <= this.max);
-  }
-
+  @Override
   public String toString()
   {
-    return "[" + min + ", " + max + "]";
+    return "[" + this.min + ", " + this.max + "]";
   }
 }

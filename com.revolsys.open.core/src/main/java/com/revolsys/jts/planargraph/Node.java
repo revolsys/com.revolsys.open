@@ -86,21 +86,21 @@ public class Node extends GraphComponent {
    * Adds an outgoing DirectedEdge to this Node.
    */
   public void addOutEdge(final DirectedEdge de) {
-    deStar.add(de);
+    this.deStar.add(de);
   }
 
   /**
    * Returns the location of this Node.
    */
   public Point getCoordinate() {
-    return pt;
+    return this.pt;
   }
 
   /**
    * Returns the number of edges around this Node.
    */
   public int getDegree() {
-    return deStar.getDegree();
+    return this.deStar.getDegree();
   }
 
   /**
@@ -108,14 +108,14 @@ public class Node extends GraphComponent {
    * by angle with the positive x-axis.
    */
   public int getIndex(final Edge edge) {
-    return deStar.getIndex(edge);
+    return this.deStar.getIndex(edge);
   }
 
   /**
    * Returns the collection of DirectedEdges that leave this Node.
    */
   public DirectedEdgeStar getOutEdges() {
-    return deStar;
+    return this.deStar;
   }
 
   /**
@@ -125,14 +125,14 @@ public class Node extends GraphComponent {
    */
   @Override
   public boolean isRemoved() {
-    return pt == null;
+    return this.pt == null;
   }
 
   /**
    * Removes this node from its containing graph.
    */
   void remove() {
-    pt = null;
+    this.pt = null;
   }
 
   /**
@@ -140,7 +140,7 @@ public class Node extends GraphComponent {
    * Does not change the state of the directed edge.
    */
   public void remove(final DirectedEdge de) {
-    deStar.remove(de);
+    this.deStar.remove(de);
   }
 
 }

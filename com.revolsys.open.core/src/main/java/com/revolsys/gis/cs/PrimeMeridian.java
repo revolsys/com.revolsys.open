@@ -6,7 +6,7 @@ import com.revolsys.data.equals.EqualsRegistry;
 
 public class PrimeMeridian implements Serializable {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -2580130961723669616L;
 
@@ -41,19 +41,19 @@ public class PrimeMeridian implements Serializable {
       return true;
     } else if (object instanceof PrimeMeridian) {
       final PrimeMeridian primeMeridian = (PrimeMeridian)object;
-      return longitude == primeMeridian.longitude;
+      return this.longitude == primeMeridian.longitude;
     }
     return false;
   }
 
   public boolean equalsExact(final PrimeMeridian primeMeridian) {
-    if (!EqualsRegistry.equal(authority, primeMeridian.authority)) {
+    if (!EqualsRegistry.equal(this.authority, primeMeridian.authority)) {
       return false;
-    } else if (deprecated != primeMeridian.deprecated) {
+    } else if (this.deprecated != primeMeridian.deprecated) {
       return false;
-    } else if (longitude != longitude) {
+    } else if (this.longitude != this.longitude) {
       return false;
-    } else if (!EqualsRegistry.equal(name, primeMeridian.name)) {
+    } else if (!EqualsRegistry.equal(this.name, primeMeridian.name)) {
       return false;
     } else {
       return true;
@@ -61,29 +61,29 @@ public class PrimeMeridian implements Serializable {
   }
 
   public Authority getAuthority() {
-    return authority;
+    return this.authority;
   }
 
   public double getLongitude() {
-    return longitude;
+    return this.longitude;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   @Override
   public int hashCode() {
-    final long temp = Double.doubleToLongBits(longitude);
-    return (int)(temp ^ (temp >>> 32));
+    final long temp = Double.doubleToLongBits(this.longitude);
+    return (int)(temp ^ temp >>> 32);
   }
 
   public boolean isDeprecated() {
-    return deprecated;
+    return this.deprecated;
   }
 
   @Override
   public String toString() {
-    return name;
+    return this.name;
   }
 }

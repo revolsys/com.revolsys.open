@@ -20,7 +20,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class GmlRecordWriter extends AbstractRecordWriter implements
-  GmlConstants {
+GmlConstants {
   public static final void srsName(final XmlWriter out,
     final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -32,8 +32,6 @@ public class GmlRecordWriter extends AbstractRecordWriter implements
 
   private GeometryFactory geometryFactory;
 
-  private final RecordDefinition recordDefinition;
-
   private boolean opened;
 
   private final XmlWriter out;
@@ -44,7 +42,6 @@ public class GmlRecordWriter extends AbstractRecordWriter implements
 
   public GmlRecordWriter(final RecordDefinition recordDefinition,
     final Writer out) {
-    this.recordDefinition = recordDefinition;
     this.out = new XmlWriter(out);
     this.qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (this.qualifiedName == null) {
@@ -78,17 +75,6 @@ public class GmlRecordWriter extends AbstractRecordWriter implements
 
     writeFooter();
     this.out.close();
-  }
-
-  private void envelope(final GeometryFactory geometryFactory,
-    final BoundingBox areaBoundingBox) {
-    this.out.startTag(ENVELOPE);
-    srsName(this.out, geometryFactory);
-    this.out.element(LOWER_CORNER, areaBoundingBox.getMinX() + " "
-      + areaBoundingBox.getMinY());
-    this.out.element(UPPER_CORNER, areaBoundingBox.getMaxX() + " "
-      + areaBoundingBox.getMaxY());
-    this.out.endTag(ENVELOPE);
   }
 
   @Override

@@ -44,14 +44,14 @@ public class AreaPrecisionPerfTest {
       coordinates[nrVertices] = coordinates[0];
 
       final LinearRing g1 = GeometryFactory.floating3()
-        .linearRing(coordinates);
+          .linearRing(coordinates);
       final Polygon polygon = GeometryFactory.floating3().polygon(g1);
       // System.out.println(polygon);
 
       final double area = originalSignedArea(coordinates);
       final double area2 = accurateSignedArea(coordinates);
       final double exactArea = 0.5 * nrVertices
-        * Math.sin(2 * Math.PI / nrVertices);
+          * Math.sin(2 * Math.PI / nrVertices);
 
       final double eps = exactArea - area;
       final double eps2 = exactArea - area2;

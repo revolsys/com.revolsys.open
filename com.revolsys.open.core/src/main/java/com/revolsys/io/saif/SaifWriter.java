@@ -192,7 +192,7 @@ public class SaifWriter extends AbstractRecordWriter {
     exportsSerializer.fieldName("handles");
     exportsSerializer.startCollection("Set");
     writeExport(exportsSerializer, "GlobalMetadata", "GlobalMetadata",
-      "globmeta.osn");
+        "globmeta.osn");
     for (final Map<String, Object> export : this.exports.values()) {
       final String compositeType = (String)export.get("compositeType");
       final String referenceId = (String)export.get("referenceId");
@@ -404,7 +404,7 @@ public class SaifWriter extends AbstractRecordWriter {
             this.tempDirectory, "imports.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);
         } else if (Path.getName(typePath).endsWith(
-          "InternallyReferencedObjects")) {
+            "InternallyReferencedObjects")) {
           serializer = createSerializer("/InternallyReferencedObject",
             new File(this.tempDirectory, "internal.dir"), Long.MAX_VALUE);
           this.serializers.put(typePath, serializer);

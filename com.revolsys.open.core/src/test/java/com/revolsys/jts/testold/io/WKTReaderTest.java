@@ -70,7 +70,7 @@ public class WKTReaderTest extends TestCase {
   }
 
   private void assertReaderEquals(final String expected, final String sourceWkt)
-    throws ParseException {
+      throws ParseException {
     final Geometry actualGeometry = this.reader.read(sourceWkt);
     final String actualWkt = actualGeometry.toWkt();
     assertEquals(expected, actualWkt);
@@ -81,16 +81,16 @@ public class WKTReaderTest extends TestCase {
     assertEquals(
       "GEOMETRYCOLLECTION(POINT(10 10),POINT(30 30),LINESTRING(15 15,20 20))",
       this.reader.read(
-        "GEOMETRYCOLLECTION (POINT(10 10), POINT(30 30), LINESTRING(15 15, 20 20))")
-        .toWkt());
+          "GEOMETRYCOLLECTION (POINT(10 10), POINT(30 30), LINESTRING(15 15, 20 20))")
+          .toWkt());
     assertEquals(
       "GEOMETRYCOLLECTION(POINT(10 10),LINEARRING EMPTY,LINESTRING(15 15,20 20))",
       this.reader.read(
-        "GEOMETRYCOLLECTION(POINT(10 10),LINEARRING EMPTY,LINESTRING(15 15, 20 20))")
-        .toWkt());
+          "GEOMETRYCOLLECTION(POINT(10 10),LINEARRING EMPTY,LINESTRING(15 15, 20 20))")
+          .toWkt());
     assertReaderEquals(
       "GEOMETRYCOLLECTION(POINT(10 10),LINEARRING(10 10,20 20,30 40,10 10),LINESTRING(15 15,20 20))",
-      "GEOMETRYCOLLECTION(POINT(10 10),LINEARRING(10 10,20 20,30 40,10 10),LINESTRING(15 15,20 20))");
+        "GEOMETRYCOLLECTION(POINT(10 10),LINEARRING(10 10,20 20,30 40,10 10),LINESTRING(15 15,20 20))");
     assertEquals("GEOMETRYCOLLECTION EMPTY",
       this.reader.read("GEOMETRYCOLLECTION EMPTY").toWkt());
   }
@@ -153,8 +153,8 @@ public class WKTReaderTest extends TestCase {
     assertEquals(
       "MULTIPOLYGON(((10 10,10 20,20 20,20 15,10 10)),((60 60,70 70,80 60,60 60)))",
       this.reader.read(
-        "MULTIPOLYGON(((10 10, 10 20, 20 20, 20 15, 10 10)), ((60 60, 70 70, 80 60, 60 60)))")
-        .toWkt());
+          "MULTIPOLYGON(((10 10, 10 20, 20 20, 20 15, 10 10)), ((60 60, 70 70, 80 60, 60 60)))")
+          .toWkt());
 
     assertEquals("MULTIPOLYGON EMPTY", this.reader.read("MULTIPOLYGON EMPTY")
       .toWkt());

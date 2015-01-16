@@ -42,7 +42,7 @@ import com.revolsys.jts.geom.LineString;
  * @version 1.7
  */
 public class OrientedCoordinateArray implements
-  Comparable<OrientedCoordinateArray> {
+Comparable<OrientedCoordinateArray> {
   private static int compareOriented(final LineString points1,
     final boolean orientation1, final LineString points2,
     final boolean orientation2) {
@@ -127,16 +127,16 @@ public class OrientedCoordinateArray implements
 
   @Override
   public int compareTo(final OrientedCoordinateArray oca) {
-    final int comp = compareOriented(getPoints(), orientation, oca.getPoints(),
+    final int comp = compareOriented(getPoints(), this.orientation, oca.getPoints(),
       oca.getOrientation());
     return comp;
   }
 
   public boolean getOrientation() {
-    return orientation;
+    return this.orientation;
   }
 
   public LineString getPoints() {
-    return points;
+    return this.points;
   }
 }

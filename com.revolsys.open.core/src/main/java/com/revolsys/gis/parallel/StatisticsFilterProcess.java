@@ -12,44 +12,44 @@ public class StatisticsFilterProcess extends FilterProcess<Record> {
 
   @Override
   protected void destroy() {
-    if (acceptStatistics != null) {
-      acceptStatistics.disconnect();
+    if (this.acceptStatistics != null) {
+      this.acceptStatistics.disconnect();
     }
-    if (rejectStatistics != null) {
-      rejectStatistics.disconnect();
+    if (this.rejectStatistics != null) {
+      this.rejectStatistics.disconnect();
     }
   }
 
   public Statistics getAcceptStatistics() {
-    return acceptStatistics;
+    return this.acceptStatistics;
   }
 
   public Statistics getRejectStatistics() {
-    return rejectStatistics;
+    return this.rejectStatistics;
   }
 
   @Override
   protected void init() {
     super.init();
-    if (acceptStatistics != null) {
-      acceptStatistics.connect();
+    if (this.acceptStatistics != null) {
+      this.acceptStatistics.connect();
     }
-    if (rejectStatistics != null) {
-      rejectStatistics.connect();
+    if (this.rejectStatistics != null) {
+      this.rejectStatistics.connect();
     }
   }
 
   @Override
   protected void postAccept(final Record object) {
-    if (acceptStatistics != null) {
-      acceptStatistics.add(object);
+    if (this.acceptStatistics != null) {
+      this.acceptStatistics.add(object);
     }
   }
 
   @Override
   protected void postReject(final Record object) {
-    if (rejectStatistics != null) {
-      rejectStatistics.add(object);
+    if (this.rejectStatistics != null) {
+      this.rejectStatistics.add(object);
     }
   }
 

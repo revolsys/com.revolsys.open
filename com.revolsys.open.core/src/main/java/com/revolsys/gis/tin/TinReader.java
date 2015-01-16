@@ -66,7 +66,7 @@ public class TinReader {
   }
 
   public void close() {
-    FileUtil.closeSilent(in);
+    FileUtil.closeSilent(this.in);
   }
 
   public TriangulatedIrregularNetwork read() {
@@ -85,7 +85,7 @@ public class TinReader {
     if (!line.startsWith("VERT ")) {
       throw new IllegalArgumentException("Expecting VERT not " + line);
     }
-    BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory);
+    BoundingBox boundingBox = new BoundingBoxDoubleGf(this.geometryFactory);
 
     final int numNodes = Integer.parseInt(line.substring(5));
     for (int i = 1; i <= numNodes; i++) {
@@ -132,7 +132,7 @@ public class TinReader {
 
   private String readLine() {
     try {
-      return in.readLine();
+      return this.in.readLine();
     } catch (final IOException e) {
       throw new RuntimeException("Unable to read line", e);
     }

@@ -5,7 +5,7 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.jts.geom.Point;
 
 public class NodeWithinDistanceOfCoordinateVisitor<T> implements
-  Visitor<Node<T>> {
+Visitor<Node<T>> {
   private final Point coordinates;
 
   private final Visitor<Node<T>> matchVisitor;
@@ -23,8 +23,8 @@ public class NodeWithinDistanceOfCoordinateVisitor<T> implements
   public boolean visit(final Node<T> node) {
     final Point coordinate = node;
     final double distance = this.coordinates.distance(coordinate);
-    if (distance <= maxDistance) {
-      matchVisitor.visit(node);
+    if (distance <= this.maxDistance) {
+      this.matchVisitor.visit(node);
     }
     return true;
   }

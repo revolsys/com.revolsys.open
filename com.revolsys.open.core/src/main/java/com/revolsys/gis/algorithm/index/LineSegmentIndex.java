@@ -15,6 +15,11 @@ import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 
 public class LineSegmentIndex extends QuadTree<LineSegment> {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public LineSegmentIndex() {
   }
 

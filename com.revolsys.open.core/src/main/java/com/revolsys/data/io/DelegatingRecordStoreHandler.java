@@ -29,7 +29,7 @@ public class DelegatingRecordStoreHandler implements InvocationHandler {
   public static <T extends RecordStore> T create(final String label,
     final Map<String, ? extends Object> config) {
     final ClassLoader classLoader = Thread.currentThread()
-      .getContextClassLoader();
+        .getContextClassLoader();
     final Class<?>[] interfaces = new Class<?>[] {
       RecordStoreFactoryRegistry.getRecordStoreInterfaceClass(config)
     };

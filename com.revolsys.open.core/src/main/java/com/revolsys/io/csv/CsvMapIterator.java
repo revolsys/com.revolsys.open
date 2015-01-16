@@ -18,13 +18,8 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
   private final CsvIterator in;
 
   /**
-   * The current record number.
-   */
-  private int recordCount = 0;
-
-  /**
    * Constructs CSVReader with supplied separator and quote char.
-   * 
+   *
    * @param reader
    * @throws IOException
    */
@@ -34,28 +29,28 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
   }
 
   public void close() {
-    in.close();
+    this.in.close();
   }
 
   /**
    * Returns <tt>true</tt> if the iteration has more elements.
-   * 
+   *
    * @return <tt>true</tt> if the iterator has more elements.
    */
   @Override
   public boolean hasNext() {
-    return in.hasNext();
+    return this.in.hasNext();
   }
 
   /**
    * Return the next Record from the iterator.
-   * 
+   *
    * @return The Record
    */
   @Override
   public Map<String, Object> next() {
     if (hasNext()) {
-      final List<String> record = in.next();
+      final List<String> record = this.in.next();
       return parseMap(record);
     } else {
       throw new NoSuchElementException("No more elements");
@@ -63,10 +58,9 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
   }
 
   private Map<String, Object> parseMap(final List<String> record) {
-    recordCount++;
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
-    for (int i = 0; i < fieldNames.size() && i < record.size(); i++) {
-      final String fieldName = fieldNames.get(i);
+    for (int i = 0; i < this.fieldNames.size() && i < record.size(); i++) {
+      final String fieldName = this.fieldNames.get(i);
       final String value = record.get(i);
       if (value != null) {
         map.put(fieldName, value);
@@ -77,12 +71,12 @@ public class CsvMapIterator implements Iterator<Map<String, Object>> {
 
   /**
    * Read the record header block.
-   * 
+   *
    * @throws IOException If there was an error reading the header.
    */
   private void readRecordHeader() throws IOException {
     if (hasNext()) {
-      fieldNames = in.next();
+      this.fieldNames = this.in.next();
     }
   }
 

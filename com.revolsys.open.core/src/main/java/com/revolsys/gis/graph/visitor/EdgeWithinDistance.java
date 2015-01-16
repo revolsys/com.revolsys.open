@@ -17,15 +17,7 @@ import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
 public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements
-  Filter<Edge<T>> {
-  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
-    final Point point, final double maxDistance) {
-    final GeometryFactory geometryFactory = GeometryFactory.floating3();
-    final Geometry geometry = geometryFactory.point(point);
-    return edgesWithinDistance(graph, geometry, maxDistance);
-
-  }
-
+Filter<Edge<T>> {
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
     final Geometry geometry, final double maxDistance) {
     if (geometry == null) {
@@ -49,6 +41,14 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements
 
   }
 
+  public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
+    final Point point, final double maxDistance) {
+    final GeometryFactory geometryFactory = GeometryFactory.floating3();
+    final Geometry geometry = geometryFactory.point(point);
+    return edgesWithinDistance(graph, geometry, maxDistance);
+
+  }
+
   private final Geometry geometry;
 
   private final double maxDistance;
@@ -68,8 +68,8 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>> implements
   @Override
   public boolean accept(final Edge<T> edge) {
     final LineString line = edge.getLine();
-    final double distance = line.distance(geometry);
-    if (distance <= maxDistance) {
+    final double distance = line.distance(this.geometry);
+    if (distance <= this.maxDistance) {
       return true;
     } else {
       return false;

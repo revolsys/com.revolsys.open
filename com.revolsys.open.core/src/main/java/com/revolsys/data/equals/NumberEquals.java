@@ -23,7 +23,7 @@ public class NumberEquals implements Equals<Object> {
     final Collection<String> exclude) {
     try {
       if (object1 == null) {
-        return (object2 == null);
+        return object2 == null;
       } else if (object2 == null) {
         return false;
       } else {

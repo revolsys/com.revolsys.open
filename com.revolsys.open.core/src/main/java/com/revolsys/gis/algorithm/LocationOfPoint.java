@@ -51,7 +51,7 @@ public class LocationOfPoint {
   /**
    * Tests whether a location given by a <index, segmentFraction> pair is
    * located after a {@link LineStringLocation}.
-   * 
+   *
    * @param i the segment index
    * @param segFrac the fraction along the segment
    * @param loc a location
@@ -65,7 +65,7 @@ public class LocationOfPoint {
 
   /**
    * Find the nearest location along a {@link LineString} to a given point.
-   * 
+   *
    * @param inputPt the coordinate to locate
    * @return the location of the nearest point
    */
@@ -75,7 +75,7 @@ public class LocationOfPoint {
     double minFrac = -1.0;
 
     int i = 0;
-    for (final Segment segment : line.segments()) {
+    for (final Segment segment : this.line.segments()) {
       final double segDistance = segment.distance(inputPt);
       final double segFrac = segmentFraction(segment, inputPt);
 
@@ -86,7 +86,7 @@ public class LocationOfPoint {
       }
       i++;
     }
-    return new LineStringLocation(line, minIndex, minFrac);
+    return new LineStringLocation(this.line, minIndex, minFrac);
   }
 
   /**
@@ -96,7 +96,7 @@ public class LocationOfPoint {
    * this is not possible, the value returned will equal
    * <code>minLocation</code>. (An example where this is not possible is when
    * minLocation = [end of line] ).
-   * 
+   *
    * @param inputPt the coordinate to locate
    * @param minLocation the minimum location for the point location
    * @return the location of the nearest point
@@ -108,11 +108,11 @@ public class LocationOfPoint {
     }
 
     // sanity check for minLocation at or past end of line
-    if (minLocation.getSegmentIndex() > line.getSegmentCount()) {
-      return new LineStringLocation(line, line.getSegmentCount(), 1.0);
+    if (minLocation.getSegmentIndex() > this.line.getSegmentCount()) {
+      return new LineStringLocation(this.line, this.line.getSegmentCount(), 1.0);
     } else {
       final int startIndex = minLocation.getSegmentIndex();
-      final Segment segment = line.getSegment(startIndex - 1);
+      final Segment segment = this.line.getSegment(startIndex - 1);
       double minDistance = Double.MAX_VALUE;
       LineStringLocation nextClosestLocation = minLocation;
       int i = startIndex;
@@ -122,7 +122,7 @@ public class LocationOfPoint {
         final double segFrac = segment.segmentFraction(inputPt);
 
         if (segDistance < minDistance && isGreater(i, segFrac, minLocation)) {
-          nextClosestLocation = new LineStringLocation(line, i, segFrac);
+          nextClosestLocation = new LineStringLocation(this.line, i, segFrac);
           minDistance = segDistance;
         }
         i++;
@@ -132,7 +132,7 @@ public class LocationOfPoint {
        * initialized to minLocation
        */
       Assert.isTrue(nextClosestLocation.compareTo(minLocation) >= 0,
-        "computed location is before specified minimum location");
+          "computed location is before specified minimum location");
       return nextClosestLocation;
     }
   }

@@ -6,7 +6,7 @@ import java.util.Collection;
 
 public abstract class AbstractEquals<T> implements Equals<T> {
   private Reference<EqualsRegistry> equalsRegistry = new WeakReference<EqualsRegistry>(
-    EqualsInstance.INSTANCE);
+      EqualsInstance.INSTANCE);
 
   @Override
   public boolean equals(final T object1, final T object2,
@@ -24,7 +24,7 @@ public abstract class AbstractEquals<T> implements Equals<T> {
     Collection<String> exclude);
 
   public EqualsRegistry getEqualsRegistry() {
-    return equalsRegistry.get();
+    return this.equalsRegistry.get();
   }
 
   @Override

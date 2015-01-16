@@ -20,7 +20,7 @@ public class ListReorderableTransferHandler extends TransferHandler {
   private static final long serialVersionUID = 1L;
 
   private final DataFlavor localObjectFlavor = new DataFlavor(int[].class,
-    "Integer[]");
+      "Integer[]");
 
   private final String mimeType = this.localObjectFlavor.getMimeType();
 

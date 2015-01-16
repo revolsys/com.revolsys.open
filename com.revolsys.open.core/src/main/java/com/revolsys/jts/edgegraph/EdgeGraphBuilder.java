@@ -8,7 +8,7 @@ import com.revolsys.jts.geom.LineString;
 
 /**
  * Builds an edge graph from geometries containing edges.
- * 
+ *
  * @author mdavis
  *
  */
@@ -26,10 +26,10 @@ public class EdgeGraphBuilder {
   }
 
   /**
-   * Adds the edges in a collection of {@link Geometry}s to the graph. 
+   * Adds the edges in a collection of {@link Geometry}s to the graph.
    * May be called multiple times.
    * Any dimension of Geometry may be added.
-   * 
+   *
    * @param geometries the geometries to be added
    */
   public void add(final Collection geometries) {
@@ -40,11 +40,11 @@ public class EdgeGraphBuilder {
   }
 
   /**
-   * Adds the edges of a Geometry to the graph. 
+   * Adds the edges of a Geometry to the graph.
    * May be called multiple times.
    * Any dimension of Geometry may be added; the constituent edges are
    * extracted.
-   * 
+   *
    * @param geometry geometry to be added
    */
   public void add(final Geometry geometry) {
@@ -56,12 +56,12 @@ public class EdgeGraphBuilder {
   private void add(final LineString lineString) {
     final LineString seq = lineString;
     for (int i = 1; i < seq.getVertexCount(); i++) {
-      graph.addEdge(seq.getPoint(i - 1), seq.getPoint(i));
+      this.graph.addEdge(seq.getPoint(i - 1), seq.getPoint(i));
     }
   }
 
   public EdgeGraph getGraph() {
-    return graph;
+    return this.graph;
   }
 
 }

@@ -43,12 +43,10 @@ import com.revolsys.jts.geom.impl.PointDouble;
  * @version 1.7
  */
 public class SegmentNode implements Comparable {
-  private final NodedSegmentString segString;
-
   public final Point coord; // the point of intersection
 
   public final int segmentIndex; // the index of the containing line segment in
-                                 // the parent edge
+  // the parent edge
 
   private final int segmentOctant;
 
@@ -57,11 +55,10 @@ public class SegmentNode implements Comparable {
   public SegmentNode(final NodedSegmentString segString,
     final Point coord, final int segmentIndex,
     final int segmentOctant) {
-    this.segString = segString;
     this.coord = new PointDouble(coord);
     this.segmentIndex = segmentIndex;
     this.segmentOctant = segmentOctant;
-    isInterior = !coord.equals(2,segString.getCoordinate(segmentIndex));
+    this.isInterior = !coord.equals(2,segString.getCoordinate(segmentIndex));
   }
 
   /**
@@ -73,46 +70,46 @@ public class SegmentNode implements Comparable {
   public int compareTo(final Object obj) {
     final SegmentNode other = (SegmentNode)obj;
 
-    if (segmentIndex < other.segmentIndex) {
+    if (this.segmentIndex < other.segmentIndex) {
       return -1;
     }
-    if (segmentIndex > other.segmentIndex) {
+    if (this.segmentIndex > other.segmentIndex) {
       return 1;
     }
 
-    if (coord.equals(2,other.coord)) {
+    if (this.coord.equals(2,other.coord)) {
       return 0;
     }
 
-    return SegmentPointComparator.compare(segmentOctant, coord, other.coord);
+    return SegmentPointComparator.compare(this.segmentOctant, this.coord, other.coord);
     // return segment.compareNodePosition(this, other);
   }
 
   /**
    * Gets the {@link Coordinates} giving the location of this node.
-   * 
+   *
    * @return the coordinate of the node
    */
   public Point getCoordinate() {
-    return coord;
+    return this.coord;
   }
 
   public boolean isEndPoint(final int maxSegmentIndex) {
-    if (segmentIndex == 0 && !isInterior) {
+    if (this.segmentIndex == 0 && !this.isInterior) {
       return true;
     }
-    if (segmentIndex == maxSegmentIndex) {
+    if (this.segmentIndex == maxSegmentIndex) {
       return true;
     }
     return false;
   }
 
   public boolean isInterior() {
-    return isInterior;
+    return this.isInterior;
   }
 
   public void print(final PrintStream out) {
-    out.print(coord);
-    out.print(" seg # = " + segmentIndex);
+    out.print(this.coord);
+    out.print(" seg # = " + this.segmentIndex);
   }
 }

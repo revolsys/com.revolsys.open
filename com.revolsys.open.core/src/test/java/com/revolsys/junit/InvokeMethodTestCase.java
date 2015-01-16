@@ -32,6 +32,6 @@ public class InvokeMethodTestCase extends TestCase {
 
   @Override
   protected void runTest() throws Throwable {
-    Property.invoke(object, methodName, parameters);
+    Property.invoke(this.object, this.methodName, this.parameters);
   }
 }

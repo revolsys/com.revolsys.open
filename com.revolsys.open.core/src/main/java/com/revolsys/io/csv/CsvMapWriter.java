@@ -37,16 +37,16 @@ public class CsvMapWriter extends AbstractMapWriter {
    */
   @Override
   public void close() {
-    FileUtil.closeSilent(out);
+    FileUtil.closeSilent(this.out);
   }
 
   @Override
   public void flush() {
-    out.flush();
+    this.out.flush();
   }
 
   public List<String> getFieldNames() {
-    return fieldNames;
+    return this.fieldNames;
   }
 
   public void setFieldNames(final Collection<String> fieldNames) {
@@ -62,10 +62,10 @@ public class CsvMapWriter extends AbstractMapWriter {
   @Override
   public void write(final Map<String, ? extends Object> values) {
     final List<Object> fieldValues = new ArrayList<Object>();
-    if (fieldNames == null) {
+    if (this.fieldNames == null) {
       setFieldNames(values.keySet());
     }
-    for (final String fieldName : fieldNames) {
+    for (final String fieldName : this.fieldNames) {
       final Object value = values.get(fieldName);
       fieldValues.add(value);
     }
@@ -75,21 +75,21 @@ public class CsvMapWriter extends AbstractMapWriter {
   public void write(final Object... values) {
     for (int i = 0; i < values.length; i++) {
       if (i > 0) {
-        out.write(fieldSeparator);
+        this.out.write(this.fieldSeparator);
       }
       final Object value = values[i];
       if (value != null) {
         String string = StringConverterRegistry.toString(value);
-        if (useQuotes) {
+        if (this.useQuotes) {
           string = string.replaceAll("\"", "\"\"");
-          out.write('"');
-          out.write(string);
-          out.write('"');
+          this.out.write('"');
+          this.out.write(string);
+          this.out.write('"');
         } else {
-          out.write(string);
+          this.out.write(string);
         }
       }
     }
-    out.println();
+    this.out.println();
   }
 }

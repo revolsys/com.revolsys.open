@@ -45,9 +45,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.shape.GeometricShapeBuilder;
 
 /**
- * Creates random point sets contained in a 
- * region defined by either a rectangular or a polygonal extent. 
- * 
+ * Creates random point sets contained in a
+ * region defined by either a rectangular or a polygonal extent.
+ *
  * @author mbdavis
  *
  */
@@ -76,8 +76,8 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
 
   @Override
   protected Point createCoord(final double x, final double y) {
-    return new PointDouble(geometryFactory.makePrecise(0, x),
-      geometryFactory.makePrecise(1, y));
+    return new PointDouble(this.geometryFactory.makePrecise(0, x),
+      this.geometryFactory.makePrecise(1, y));
   }
 
   protected Point createRandomCoord(final BoundingBox env) {
@@ -88,28 +88,28 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
 
   @Override
   public Geometry getGeometry() {
-    final Point[] pts = new Point[numPts];
+    final Point[] pts = new Point[this.numPts];
     int i = 0;
-    while (i < numPts) {
+    while (i < this.numPts) {
       final Point p = createRandomCoord(getExtent());
-      if (extentLocator != null && !isInExtent(p)) {
+      if (this.extentLocator != null && !isInExtent(p)) {
         continue;
       }
       pts[i++] = p;
     }
-    return geometryFactory.multiPoint(pts);
+    return this.geometryFactory.multiPoint(pts);
   }
 
   protected boolean isInExtent(final Point p) {
-    if (extentLocator != null) {
-      return extentLocator.locate(p) != Location.EXTERIOR;
+    if (this.extentLocator != null) {
+      return this.extentLocator.locate(p) != Location.EXTERIOR;
     }
     return getExtent().covers(p);
   }
 
   /**
    * Sets a polygonal mask.
-   * 
+   *
    * @param mask
    * @throws IllegalArgumentException if the mask is not polygonal
    */
@@ -119,7 +119,7 @@ public class RandomPointsBuilder extends GeometricShapeBuilder {
     }
     this.maskPoly = mask;
     setExtent(mask.getBoundingBox());
-    extentLocator = new IndexedPointInAreaLocator(mask);
+    this.extentLocator = new IndexedPointInAreaLocator(mask);
   }
 
 }

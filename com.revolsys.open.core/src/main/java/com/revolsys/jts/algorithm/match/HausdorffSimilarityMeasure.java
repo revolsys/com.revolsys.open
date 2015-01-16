@@ -45,9 +45,9 @@ import com.revolsys.jts.geom.Geometry;
  * <p>
  * The measure is computed by computing the Hausdorff distance
  * between the input geometries, and then normalizing
- * this by dividing it by the diagonal distance across 
+ * this by dividing it by the diagonal distance across
  * the envelope of the combined geometries.
- * 
+ *
  * @author mbdavis
  *
  */
@@ -58,11 +58,6 @@ public class HausdorffSimilarityMeasure implements SimilarityMeasure {
    * return gv.measure(); }
    */
 
-  /*
-   * Densify a small amount to increase accuracy of Hausdorff distance
-   */
-  private static final double DENSIFY_FRACTION = 0.25;
-
   public static double diagonalSize(final BoundingBox env) {
     if (env.isEmpty()) {
       return 0.0;
@@ -72,6 +67,11 @@ public class HausdorffSimilarityMeasure implements SimilarityMeasure {
     final double hgt = env.getHeight();
     return Math.sqrt(width * width + hgt * hgt);
   }
+
+  /*
+   * Densify a small amount to increase accuracy of Hausdorff distance
+   */
+  private static final double DENSIFY_FRACTION = 0.25;
 
   public HausdorffSimilarityMeasure() {
   }

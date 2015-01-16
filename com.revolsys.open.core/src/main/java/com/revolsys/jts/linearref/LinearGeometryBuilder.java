@@ -81,55 +81,55 @@ public class LinearGeometryBuilder {
    * @param pt the Point to add
    */
   public void add(final Point pt, final boolean allowRepeatedPoints) {
-    if (coordList == null) {
-      coordList = new CoordinateList();
+    if (this.coordList == null) {
+      this.coordList = new CoordinateList();
     }
-    coordList.add(pt, allowRepeatedPoints);
-    lastPt = pt;
+    this.coordList.add(pt, allowRepeatedPoints);
+    this.lastPt = pt;
   }
 
   /**
    * Terminate the current LineString.
    */
   public void endLine() {
-    if (coordList == null) {
+    if (this.coordList == null) {
       return;
     }
-    if (ignoreInvalidLines && coordList.size() < 2) {
-      coordList = null;
+    if (this.ignoreInvalidLines && this.coordList.size() < 2) {
+      this.coordList = null;
       return;
     }
-    final Point[] rawPts = coordList.toCoordinateArray();
+    final Point[] rawPts = this.coordList.toCoordinateArray();
     Point[] pts = rawPts;
-    if (fixInvalidLines) {
+    if (this.fixInvalidLines) {
       pts = validCoordinateSequence(rawPts);
     }
 
-    coordList = null;
+    this.coordList = null;
     LineString line = null;
     try {
-      line = geomFact.lineString(pts);
+      line = this.geomFact.lineString(pts);
     } catch (final IllegalArgumentException ex) {
       // exception is due to too few points in line.
       // only propagate if not ignoring short lines
-      if (!ignoreInvalidLines) {
+      if (!this.ignoreInvalidLines) {
         throw ex;
       }
     }
 
     if (line != null) {
-      lines.add(line);
+      this.lines.add(line);
     }
   }
 
   public Geometry getGeometry() {
     // end last line in case it was not done by user
     endLine();
-    return geomFact.buildGeometry(lines);
+    return this.geomFact.buildGeometry(this.lines);
   }
 
   public Point getLastCoordinate() {
-    return lastPt;
+    return this.lastPt;
   }
 
   /**

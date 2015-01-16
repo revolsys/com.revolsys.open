@@ -45,7 +45,7 @@ import com.revolsys.jts.planargraph.Node;
  * @version 1.7
  */
 class PolygonizeDirectedEdge
-    extends DirectedEdge
+extends DirectedEdge
 {
 
   private EdgeRing edgeRing = null;
@@ -63,8 +63,8 @@ class PolygonizeDirectedEdge
    *                  whether this DirectedEdge's direction is the same as or
    *                  opposite to that of the parent Edge (if any)
    */
-  public PolygonizeDirectedEdge(Node from, Node to, Point directionPt,
-      boolean edgeDirection)
+  public PolygonizeDirectedEdge(final Node from, final Node to, final Point directionPt,
+    final boolean edgeDirection)
   {
     super(from, to, directionPt, edgeDirection);
   }
@@ -72,34 +72,34 @@ class PolygonizeDirectedEdge
   /**
    * Returns the identifier attached to this directed edge.
    */
-  public long getLabel() { return label; }
-  /**
-   * Attaches an identifier to this directed edge.
-   */
-  public void setLabel(long label) { this.label = label; }
+  public long getLabel() { return this.label; }
   /**
    * Returns the next directed edge in the EdgeRing that this directed edge is a member
    * of.
    */
-  public PolygonizeDirectedEdge getNext()  {    return next;  }
-  /**
-   * Sets the next directed edge in the EdgeRing that this directed edge is a member
-   * of.
-   */
-  public void setNext(PolygonizeDirectedEdge next)  {   this.next = next;  }
+  public PolygonizeDirectedEdge getNext()  {    return this.next;  }
   /**
    * Returns the ring of directed edges that this directed edge is
    * a member of, or null if the ring has not been set.
    * @see #setRing(EdgeRing)
    */
-  public boolean isInRing() { return edgeRing != null; }
+  public boolean isInRing() { return this.edgeRing != null; }
+  /**
+   * Attaches an identifier to this directed edge.
+   */
+  public void setLabel(final long label) { this.label = label; }
+  /**
+   * Sets the next directed edge in the EdgeRing that this directed edge is a member
+   * of.
+   */
+  public void setNext(final PolygonizeDirectedEdge next)  {   this.next = next;  }
   /**
    * Sets the ring of directed edges that this directed edge is
    * a member of.
    */
-  public void setRing(EdgeRing edgeRing)
+  public void setRing(final EdgeRing edgeRing)
   {
-      this.edgeRing = edgeRing;
+    this.edgeRing = edgeRing;
   }
 
 }

@@ -152,7 +152,7 @@ public class StatisticsMap {
 
   public String toTsv(final Writer out, final String... fieldNames) {
     try (
-      TsvWriter tsv = new TsvWriter(out);) {
+        TsvWriter tsv = new TsvWriter(out);) {
       tsv.write(Arrays.asList(fieldNames));
       for (final Entry<String, Statistics> entry : this.statisticsMap.entrySet()) {
         final String category = entry.getKey();

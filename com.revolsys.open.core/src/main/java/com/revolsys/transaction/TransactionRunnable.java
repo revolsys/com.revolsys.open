@@ -22,10 +22,10 @@ public class TransactionRunnable implements Runnable {
   @Override
   public void run() {
     try (
-      Transaction transaction = new Transaction(transactionManager,
-        transactionDefinition)) {
+        Transaction transaction = new Transaction(this.transactionManager,
+          this.transactionDefinition)) {
       try {
-        runnable.run();
+        this.runnable.run();
       } catch (final Throwable e) {
         throw transaction.setRollbackOnly(e);
       }

@@ -154,18 +154,6 @@ public class CreateRandomShapeFunctions {
     return new PointDouble(x0, y0);
   }
 
-  private static int randomQuadrant(final int exclude) {
-    while (true) {
-      int quad = (int)(Math.random() * 4);
-      if (quad > 3) {
-        quad = 3;
-      }
-      if (quad != exclude) {
-        return quad;
-      }
-    }
-  }
-
   public static Geometry randomRadialPoints(final Geometry g, final int nPts) {
     final BoundingBox env = FunctionsUtil.getEnvelopeOrDefault(g);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);

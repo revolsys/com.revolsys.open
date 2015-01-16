@@ -39,39 +39,40 @@ import java.util.Collection;
  * Locates {@link QuadEdge}s in a {@link QuadEdgeSubdivision},
  * optimizing the search by starting in the
  * locality of the last edge found.
- * 
+ *
  * @author Martin Davis
  */
 public class LastFoundQuadEdgeLocator implements QuadEdgeLocator {
-    private QuadEdgeSubdivision subdiv;
-    private QuadEdge            lastEdge = null;
+  private final QuadEdgeSubdivision subdiv;
+  private QuadEdge            lastEdge = null;
 
-    public LastFoundQuadEdgeLocator(QuadEdgeSubdivision subdiv) {
-        this.subdiv = subdiv;
-        init();
+  public LastFoundQuadEdgeLocator(final QuadEdgeSubdivision subdiv) {
+    this.subdiv = subdiv;
+    init();
+  }
+
+  private QuadEdge findEdge() {
+    final Collection edges = this.subdiv.getEdges();
+    // assume there is an edge - otherwise will get an exception
+    return (QuadEdge) edges.iterator().next();
+  }
+
+  private void init() {
+    this.lastEdge = findEdge();
+  }
+
+  /**
+   * Locates an edge e, such that either v is on e, or e is an edge of a triangle containing v.
+   * The search starts from the last located edge amd proceeds on the general direction of v.
+   */
+  @Override
+  public QuadEdge locate(final Vertex v) {
+    if (! this.lastEdge.isLive()) {
+      init();
     }
 
-    private void init() {
-        lastEdge = findEdge();
-    }
-
-    private QuadEdge findEdge() {
-        Collection edges = subdiv.getEdges();
-        // assume there is an edge - otherwise will get an exception
-        return (QuadEdge) edges.iterator().next();
-    }
-
-    /**
-     * Locates an edge e, such that either v is on e, or e is an edge of a triangle containing v.
-     * The search starts from the last located edge amd proceeds on the general direction of v.
-     */
-    public QuadEdge locate(Vertex v) {
-        if (! lastEdge.isLive()) {
-            init();
-        }
-
-        QuadEdge e = subdiv.locateFromEdge(v, lastEdge);
-        lastEdge = e;
-        return e;
-    }
+    final QuadEdge e = this.subdiv.locateFromEdge(v, this.lastEdge);
+    this.lastEdge = e;
+    return e;
+  }
 }

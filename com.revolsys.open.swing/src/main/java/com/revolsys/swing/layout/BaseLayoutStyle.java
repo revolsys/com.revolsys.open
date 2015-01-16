@@ -14,7 +14,7 @@ public class BaseLayoutStyle extends LayoutStyle {
   @Override
   public int getContainerGap(final JComponent component, final int position,
     final Container parent) {
-    return containerGap;
+    return this.containerGap;
   }
 
   @Override

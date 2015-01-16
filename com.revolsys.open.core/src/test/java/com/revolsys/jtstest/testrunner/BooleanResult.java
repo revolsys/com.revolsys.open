@@ -48,11 +48,12 @@ public class BooleanResult implements Result {
       return false;
     }
     final BooleanResult otherBooleanResult = (BooleanResult)other;
-    return result == otherBooleanResult.result;
+    return this.result == otherBooleanResult.result;
   }
 
+  @Override
   public Boolean getResult() {
-    return result;
+    return this.result;
   }
 
   @Override
@@ -67,11 +68,11 @@ public class BooleanResult implements Result {
 
   @Override
   public String toShortString() {
-    return result ? "true" : "false";
+    return this.result ? "true" : "false";
   }
 
   @Override
   public String toString() {
-    return Boolean.toString(result);
+    return Boolean.toString(this.result);
   }
 }

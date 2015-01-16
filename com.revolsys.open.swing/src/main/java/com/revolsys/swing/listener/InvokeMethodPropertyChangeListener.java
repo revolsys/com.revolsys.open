@@ -9,7 +9,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public class InvokeMethodPropertyChangeListener implements
-  PropertyChangeListener, NonWeakListener {
+PropertyChangeListener, NonWeakListener {
 
   private final boolean invokeLater;
 
@@ -56,6 +56,6 @@ public class InvokeMethodPropertyChangeListener implements
 
   @Override
   public String toString() {
-    return Property.toString(object, methodName, parameters);
+    return Property.toString(this.object, this.methodName, this.parameters);
   }
 }

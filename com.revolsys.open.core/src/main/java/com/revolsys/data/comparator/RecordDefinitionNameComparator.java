@@ -5,7 +5,7 @@ import java.util.Comparator;
 import com.revolsys.data.record.schema.RecordDefinition;
 
 public class RecordDefinitionNameComparator implements
-  Comparator<RecordDefinition> {
+Comparator<RecordDefinition> {
   public static int compareTypeNames(final RecordDefinition recordDefinition1,
     final RecordDefinition recordDefinition2) {
     final String typePath1 = recordDefinition1.getPath();

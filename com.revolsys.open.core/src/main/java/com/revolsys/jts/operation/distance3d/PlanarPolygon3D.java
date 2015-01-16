@@ -51,23 +51,11 @@ import com.revolsys.jts.math.Vector3D;
  * 3D polygons are assumed to lie in a single plane.
  * The plane best fitting the polygon coordinates is
  * computed and is represented by a {@link Plane3D}.
- * 
+ *
  * @author mdavis
  *
  */
 public class PlanarPolygon3D {
-
-  private static Point project(final Point p, final int facingPlane) {
-    switch (facingPlane) {
-      case Plane3D.XY_PLANE:
-        return new PointDouble(p.getX(), p.getY(), Point.NULL_ORDINATE);
-      case Plane3D.XZ_PLANE:
-        return new PointDouble(p.getX(), p.getZ(), Point.NULL_ORDINATE);
-        // Plane3D.YZ
-      default:
-        return new PointDouble(p.getY(), p.getZ(), Point.NULL_ORDINATE);
-    }
-  }
 
   private static LineString project(final LineString seq,
     final int facingPlane) {
@@ -81,6 +69,18 @@ public class PlanarPolygon3D {
     }
   }
 
+  private static Point project(final Point p, final int facingPlane) {
+    switch (facingPlane) {
+      case Plane3D.XY_PLANE:
+        return new PointDouble(p.getX(), p.getY(), Point.NULL_ORDINATE);
+      case Plane3D.XZ_PLANE:
+        return new PointDouble(p.getX(), p.getZ(), Point.NULL_ORDINATE);
+        // Plane3D.YZ
+      default:
+        return new PointDouble(p.getY(), p.getZ(), Point.NULL_ORDINATE);
+    }
+  }
+
   private final Plane3D plane;
 
   private final Polygon poly;
@@ -89,17 +89,17 @@ public class PlanarPolygon3D {
 
   public PlanarPolygon3D(final Polygon poly) {
     this.poly = poly;
-    plane = findBestFitPlane(poly);
-    facingPlane = plane.closestAxisPlane();
+    this.plane = findBestFitPlane(poly);
+    this.facingPlane = this.plane.closestAxisPlane();
   }
 
   /**
    * Computes an average normal vector from a list of polygon coordinates.
    * Uses Newell's method, which is based
    * on the fact that the vector with components
-   * equal to the areas of the projection of the polygon onto 
+   * equal to the areas of the projection of the polygon onto
    * the Cartesian axis planes is normal.
-   * 
+   *
    * @param seq the sequence of coordinates for the polygon
    * @return a normal vector
    */
@@ -121,7 +121,7 @@ public class PlanarPolygon3D {
     sum[1] /= n;
     sum[2] /= n;
     final Vector3D norm = Vector3D.create(new PointDouble(sum))
-      .normalize();
+        .normalize();
     return norm;
   }
 
@@ -130,7 +130,7 @@ public class PlanarPolygon3D {
    * in a sequence.
    * If the sequence lies in a single plane,
    * the computed point also lies in the plane.
-   * 
+   *
    * @param seq a coordinate sequence
    * @return a Point with averaged ordinates
    */
@@ -149,14 +149,14 @@ public class PlanarPolygon3D {
   }
 
   /**
-   * Finds a best-fit plane for the polygon, 
+   * Finds a best-fit plane for the polygon,
    * by sampling a few points from the exterior ring.
    * <p>
    * The algorithm used is Newell's algorithm:
    * - a base point for the plane is determined from the average of all vertices
    * - the normal vector is determined by
    *   computing the area of the projections on each of the axis planes
-   * 
+   *
    * @param poly the polygon to determine the plane for
    * @return the best-fit plane
    */
@@ -168,20 +168,20 @@ public class PlanarPolygon3D {
   }
 
   public Plane3D getPlane() {
-    return plane;
+    return this.plane;
   }
 
   public Polygon getPolygon() {
-    return poly;
+    return this.poly;
   }
 
   public boolean intersects(final Point intPt) {
-    if (Location.EXTERIOR == locate(intPt, poly.getExteriorRing())) {
+    if (Location.EXTERIOR == locate(intPt, this.poly.getExteriorRing())) {
       return false;
     }
 
-    for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      if (Location.INTERIOR == locate(intPt, poly.getInteriorRing(i))) {
+    for (int i = 0; i < this.poly.getNumInteriorRing(); i++) {
+      if (Location.INTERIOR == locate(intPt, this.poly.getInteriorRing(i))) {
         return false;
       }
     }
@@ -190,16 +190,16 @@ public class PlanarPolygon3D {
 
   public boolean intersects(final Point pt, final LineString ring) {
     final LineString seq = ring;
-    final LineString seqProj = project(seq, facingPlane);
-    final Point ptProj = project(pt, facingPlane);
+    final LineString seqProj = project(seq, this.facingPlane);
+    final Point ptProj = project(pt, this.facingPlane);
     return Location.EXTERIOR != RayCrossingCounter.locatePointInRing(ptProj,
       seqProj);
   }
 
   private Location locate(final Point pt, final LineString ring) {
     final LineString seq = ring;
-    final LineString seqProj = project(seq, facingPlane);
-    final Point ptProj = project(pt, facingPlane);
+    final LineString seqProj = project(seq, this.facingPlane);
+    final Point ptProj = project(pt, this.facingPlane);
     return RayCrossingCounter.locatePointInRing(ptProj, seqProj);
   }
 

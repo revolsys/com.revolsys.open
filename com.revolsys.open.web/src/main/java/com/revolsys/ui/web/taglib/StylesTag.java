@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,7 @@ import com.revolsys.ui.web.config.WebUiContext;
  * "page" attribute. The following line will appear in the output for each
  * style.
  * </p>
- * 
+ *
  * <pre>
  *       &lt;link rel=&quot;stylesheet&quot; href=&quot;/style/main.css&quot; text=&quot;text/css&quot; /&gt;
  * </pre>
@@ -48,7 +48,7 @@ import com.revolsys.ui.web.config.WebUiContext;
  * <p>
  * <b>Example</b>
  * </p>
- * 
+ *
  * <pre>
  *       &lt;%@ taglib uri=&quot;http://dev.nhigh.com/taglibs/nhigh&quot; prefix=&quot;nhigh&quot; %&gt;
  *       &lt;html&gt;
@@ -64,7 +64,7 @@ import com.revolsys.ui.web.config.WebUiContext;
  * <dd><code>page</code> - A PageDefinition bean containing the defintion of
  * this page.</dd>
  * </dl>
- * 
+ *
  * @author P. D. Austin
  * @version 1.0
  * @see Page#getStyles()
@@ -79,7 +79,7 @@ public class StylesTag extends TagSupport {
 
   /**
    * Process the end tag.
-   * 
+   *
    * @return EVAL_PAGE
    * @throws JspException If there was an exception processing the tag.
    */
@@ -90,7 +90,7 @@ public class StylesTag extends TagSupport {
 
   /**
    * Process the start tag.
-   * 
+   *
    * @return SKIP_BODY
    * @throws JspException If there was an exception processing the tag.
    */
@@ -106,7 +106,7 @@ public class StylesTag extends TagSupport {
           if (contextPath.equals("/")) {
             contextPath = "";
           }
-          final JspWriter out = pageContext.getOut();
+          final JspWriter out = this.pageContext.getOut();
           final Iterator styleIter = styles.iterator();
           while (styleIter.hasNext()) {
             final String style = (String)styleIter.next();
@@ -116,7 +116,7 @@ public class StylesTag extends TagSupport {
           }
         }
       }
-      final SiteNodeController controller = (SiteNodeController)pageContext.findAttribute("rsWebController");
+      final SiteNodeController controller = (SiteNodeController)this.pageContext.findAttribute("rsWebController");
       if (controller instanceof PageController) {
         final PageController page = (PageController)controller;
         serializeElements(page.getStyles());
@@ -131,12 +131,12 @@ public class StylesTag extends TagSupport {
 
   /**
    * Write out the HTML tags for each element.
-   * 
+   *
    * @param styles The styles.
    * @throws IOException If there was an error writing the styles.
    */
   private void serializeElements(final Collection styles) throws IOException {
-    final JspWriter out = pageContext.getOut();
+    final JspWriter out = this.pageContext.getOut();
     final Iterator elements = styles.iterator();
     while (elements.hasNext()) {
       final Element element = (Element)elements.next();

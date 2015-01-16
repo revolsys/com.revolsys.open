@@ -177,9 +177,9 @@ public class Page extends Component {
     if (o instanceof Page) {
       final Page p = (Page)o;
       if (super.equals(o)
-        && p.menuId == this.menuId
-        && p.path.equals(this.path)
-        && (p.title == this.title || p.title != null && this.title != null
+          && p.menuId == this.menuId
+          && p.path.equals(this.path)
+          && (p.title == this.title || p.title != null && this.title != null
           && p.title.equals(this.title))
           && p.properties.equals(this.properties)) {
         return true;
@@ -210,13 +210,13 @@ public class Page extends Component {
     return this.arguments;
   }
 
-  public List<Attribute> getFields() {
-    return this.attributes;
-  }
-
   public String getExpandedTitle() {
     final Map<String, Object> parameters = Collections.<String, Object> emptyMap();
     return getTitle(parameters);
+  }
+
+  public List<Attribute> getFields() {
+    return this.attributes;
   }
 
   public String getFullPath() {
@@ -234,7 +234,7 @@ public class Page extends Component {
 
   public String getFullUrl(final Map<String, ? extends Object> parameters) {
     final Map<String, Object> uriParameters = new HashMap<String, Object>(
-      parameters);
+        parameters);
     final HttpServletRequest request = HttpServletUtils.getRequest();
     if (request != null) {
 

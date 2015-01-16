@@ -8,11 +8,11 @@ public class AuthorityUrl {
   private URL onlineResource;
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public URL getOnlineResource() {
-    return onlineResource;
+    return this.onlineResource;
   }
 
   public void setName(final String name) {

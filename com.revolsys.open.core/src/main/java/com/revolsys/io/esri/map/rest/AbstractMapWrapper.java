@@ -7,7 +7,7 @@ import java.util.Map;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 
 public class AbstractMapWrapper {
 
@@ -21,17 +21,17 @@ public class AbstractMapWrapper {
     if (extent == null) {
       return null;
     } else {
-      final Double minX = CollectionUtil.getDoubleValue(extent, "xmin");
-      final Double minY = CollectionUtil.getDoubleValue(extent, "ymin");
-      final Double maxX = CollectionUtil.getDoubleValue(extent, "xmax");
-      final Double maxY = CollectionUtil.getDoubleValue(extent, "ymax");
+      final Double minX = Maps.getDoubleValue(extent, "xmin");
+      final Double minY = Maps.getDoubleValue(extent, "ymin");
+      final Double maxX = Maps.getDoubleValue(extent, "xmax");
+      final Double maxY = Maps.getDoubleValue(extent, "ymax");
 
       GeometryFactory geometryFactory;
       final Map<String, Object> spatialReference = (Map<String, Object>)extent.get("spatialReference");
       if (spatialReference == null) {
         geometryFactory = GeometryFactory.floating3();
       } else {
-        Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
+        Integer srid = Maps.getInteger(spatialReference, "wkid");
         if (srid == 102100) {
           srid = 3857;
         }
@@ -98,7 +98,7 @@ public class AbstractMapWrapper {
     if (spatialReference == null) {
       return GeometryFactory.floating3();
     } else {
-      Integer srid = CollectionUtil.getInteger(spatialReference, "wkid");
+      Integer srid = Maps.getInteger(spatialReference, "wkid");
       if (srid == 102100) {
         srid = 3857;
       } else if (srid == 102190) {
@@ -115,7 +115,7 @@ public class AbstractMapWrapper {
   }
 
   public Map<String, Object> getValues() {
-    return values;
+    return this.values;
   }
 
   protected void setValues(final Map<String, Object> values) {

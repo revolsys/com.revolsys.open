@@ -8,13 +8,11 @@
 
 package org.gdal.ogr;
 
-import java.lang.ref.WeakReference;
 import java.lang.ref.ReferenceQueue;
-import java.util.Set;
-import java.util.HashSet;
+import java.lang.ref.WeakReference;
 import java.util.Collections;
-
-import org.gdal.ogr.Feature;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /* This class enables to finalize native resources associated with the object */
@@ -32,70 +30,73 @@ class FeatureNative extends WeakReference {
   static
   {
     cleanupThread = new Thread() {
-        public void run()
+      @Override
+      public void run()
+      {
+        while(true)
         {
-            while(true)
-            {
-                try
-                {
-                    FeatureNative nativeObject =
-                        (FeatureNative) refQueue.remove();
-                    if (nativeObject != null)
-                        nativeObject.delete();
-                }
-                catch(InterruptedException ie) {}
+          try
+          {
+            final FeatureNative nativeObject =
+                (FeatureNative) refQueue.remove();
+            if (nativeObject != null) {
+              nativeObject.delete();
             }
+          }
+          catch(final InterruptedException ie) {}
         }
+      }
     };
     try
     {
-        cleanupThread.setName("Feature" + "NativeObjectsCleaner");
-        cleanupThread.setDaemon(true);
-        cleanupThread.start();
+      cleanupThread.setName("Feature" + "NativeObjectsCleaner");
+      cleanupThread.setDaemon(true);
+      cleanupThread.start();
     }
-    catch (SecurityException se)
+    catch (final SecurityException se)
     {
-        //System.err.println("could not start daemon thread");
-        cleanupThread = null;
+      //System.err.println("could not start daemon thread");
+      cleanupThread = null;
     }
   }
 
-  public FeatureNative(Feature javaObject, long cPtr) {
+  public FeatureNative(final Feature javaObject, final long cPtr) {
     super(javaObject, refQueue);
 
     if (cleanupThread == null)
     {
-        /* We didn't manage to have a daemon cleanup thread */
-        /* so let's clean manually */
-        while(true)
-        {
-            FeatureNative nativeObject =
-                (FeatureNative) refQueue.poll();
-            if (nativeObject != null)
-                nativeObject.delete();
-            else
-                break;
+      /* We didn't manage to have a daemon cleanup thread */
+      /* so let's clean manually */
+      while(true)
+      {
+        final FeatureNative nativeObject =
+            (FeatureNative) refQueue.poll();
+        if (nativeObject != null) {
+          nativeObject.delete();
+        } else {
+          break;
         }
+      }
     }
 
     refList.add(this);
 
-    swigCPtr = cPtr;
+    this.swigCPtr = cPtr;
+  }
+
+  public void delete()
+  {
+    refList.remove(this);
+    if(this.swigCPtr != 0) {
+      ogrJNI.delete_Feature(this.swigCPtr);
+    }
+    this.swigCPtr = 0;
   }
 
   public void dontDisposeNativeResources()
   {
-      refList.remove(this);
-      swigCPtr = 0;
-  }
-
-  public void delete() 
-  {
     refList.remove(this);
-    if(swigCPtr != 0) {
-      ogrJNI.delete_Feature(swigCPtr);
-    }
-    swigCPtr = 0;
+    this.swigCPtr = 0;
   }
 
 

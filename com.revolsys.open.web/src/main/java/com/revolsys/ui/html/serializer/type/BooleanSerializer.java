@@ -4,13 +4,13 @@ import com.revolsys.io.xml.XmlWriter;
 
 /**
  * Serialize a date with just the date fields.
- * 
+ *
  * @author Paul Austin
  */
 public class BooleanSerializer implements TypeSerializer {
   /**
    * Serialize the value to the XML writer.
-   * 
+   *
    * @param out The XML writer to serialize to.
    * @param value The object to get the value from.
    */

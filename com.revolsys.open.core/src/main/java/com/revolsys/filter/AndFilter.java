@@ -21,7 +21,7 @@ public class AndFilter<T> implements Filter<T> {
 
   @Override
   public boolean accept(final T object) {
-    for (final Filter<T> filter : filters) {
+    for (final Filter<T> filter : this.filters) {
       final boolean accept = filter.accept(object);
       if (!accept) {
 
@@ -32,11 +32,11 @@ public class AndFilter<T> implements Filter<T> {
   }
 
   public void addFilter(final Filter<T> filter) {
-    filters.add(filter);
+    this.filters.add(filter);
   }
 
   @Override
   public String toString() {
-    return "AND" + filters;
+    return "AND" + this.filters;
   }
 }

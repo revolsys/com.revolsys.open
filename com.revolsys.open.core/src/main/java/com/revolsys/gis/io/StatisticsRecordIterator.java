@@ -16,46 +16,46 @@ public class StatisticsRecordIterator implements RecordIterator {
 
   @Override
   public void close() {
-    reader.close();
-    statistics.disconnect();
+    this.reader.close();
+    this.statistics.disconnect();
   }
 
   /**
    * @return the reader
    */
   public RecordIterator getReader() {
-    return reader;
+    return this.reader;
   }
 
   /**
    * @return the stats
    */
   public Statistics getStatistics() {
-    return statistics;
+    return this.statistics;
   }
 
   @Override
   public boolean hasNext() {
-    return reader.hasNext();
+    return this.reader.hasNext();
   }
 
   @Override
   public Record next() {
-    final Record object = reader.next();
+    final Record object = this.reader.next();
     if (object != null) {
-      statistics.add(object);
+      this.statistics.add(object);
     }
     return object;
   }
 
   @Override
   public void open() {
-    reader.open();
+    this.reader.open();
   }
 
   @Override
   public void remove() {
-    reader.remove();
+    this.reader.remove();
 
   }
 
@@ -64,7 +64,7 @@ public class StatisticsRecordIterator implements RecordIterator {
    */
   public void setReader(final RecordIterator reader) {
     this.reader = reader;
-    if (statistics == null) {
+    if (this.statistics == null) {
       setStatistics(new Statistics("Read " + reader.toString()));
     }
   }
@@ -84,7 +84,7 @@ public class StatisticsRecordIterator implements RecordIterator {
 
   @Override
   public String toString() {
-    return reader.toString();
+    return this.reader.toString();
   }
 
 }

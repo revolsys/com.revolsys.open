@@ -47,7 +47,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
  *
  * <h2>Algorithm</h2>
  * <ul>
- *   <li>Find a Y value which is close to the centre of 
+ *   <li>Find a Y value which is close to the centre of
  *       the geometry's vertical extent but is different
  *       to any of it's Y ordinates.
  *   <li>Create a horizontal bisector line using the Y value
@@ -55,7 +55,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
  *   <li>Find the intersection between the geometry
  *       and the horizontal bisector line.
  *       The intersection is a collection of lines and points.
- *   <li>Pick the midpoint of the largest intersection geometry  
+ *   <li>Pick the midpoint of the largest intersection geometry
  * </ul>
  *
  * <h3>KNOWN BUGS</h3>
@@ -69,51 +69,117 @@ import com.revolsys.jts.geom.impl.PointDouble;
  */
 public class InteriorPointArea {
 
-  private static double avg(double a, double b)
+  /**
+   * Finds a safe bisector Y ordinate
+   * by projecting to the Y axis
+   * and finding the Y-ordinate interval
+   * which contains the centre of the Y extent.
+   * The centre of this interval is returned as the bisector Y-ordinate.
+   *
+   * @author mdavis
+   *
+   */
+  private static class SafeBisectorFinder
+  {
+    public static double getBisectorY(final Polygon poly)
+    {
+      final SafeBisectorFinder finder = new SafeBisectorFinder(poly);
+      return finder.getBisectorY();
+    }
+
+    private final Polygon poly;
+
+    private final double centreY;
+    private double hiY = Double.MAX_VALUE;
+    private double loY = -Double.MAX_VALUE;
+
+    public SafeBisectorFinder(final Polygon poly) {
+      this.poly = poly;
+
+      // initialize using extremal values
+      this.hiY = poly.getBoundingBox().getMaxY();
+      this.loY = poly.getBoundingBox().getMinY();
+      this.centreY = avg(this.loY, this.hiY);
+    }
+
+    public double getBisectorY()
+    {
+      process(this.poly.getExteriorRing());
+      for (int i = 0; i < this.poly.getNumInteriorRing(); i++) {
+        process(this.poly.getInteriorRing(i));
+      }
+      final double bisectY = avg(this.hiY, this.loY);
+      return bisectY;
+    }
+
+    private void process(final LineString line) {
+      final LineString seq = line;
+      for (int i = 0; i < seq.getVertexCount(); i++) {
+        final double y = seq.getY(i);
+        updateInterval(y);
+      }
+    }
+
+    private void updateInterval(final double y) {
+      if (y <= this.centreY) {
+        if (y > this.loY) {
+          this.loY = y;
+        }
+      }
+      else if (y > this.centreY) {
+        if (y < this.hiY) {
+          this.hiY = y;
+        }
+      }
+    }
+  }
+
+  private static double avg(final double a, final double b)
   {
     return (a + b) / 2.0;
   }
+  /**
+   * Returns the centre point of the envelope.
+   * @param envelope the envelope to analyze
+   * @return the centre of the envelope
+   */
+  public static Point centre(final BoundingBox envelope) {
+    return new PointDouble(avg(envelope.getMinX(),
+      envelope.getMaxX()),
+      avg(envelope.getMinY(), envelope.getMaxY()), Point.NULL_ORDINATE);
+  }
+  private final GeometryFactory factory;
 
-  private GeometryFactory factory;
   private Point interiorPoint = null;
+
   private double maxWidth = 0.0;
 
   /**
    * Creates a new interior point finder
    * for an areal geometry.
-   * 
+   *
    * @param g an areal geometry
    */
-  public InteriorPointArea(Geometry g)
+  public InteriorPointArea(final Geometry g)
   {
-    factory = g.getGeometryFactory();
+    this.factory = g.getGeometryFactory();
     add(g);
-  }
-  
-  /**
-   * Gets the computed interior point.
-   * 
-   * @return the coordinate of an interior point
-   */
-  public Point getInteriorPoint()
-  {
-    return interiorPoint;
   }
 
   /**
    * Tests the interior vertices (if any)
    * defined by an areal Geometry for the best inside point.
    * If a component Geometry is not of dimension 2 it is not tested.
-   * 
+   *
    * @param geom the geometry to add
    */
-  private void add(Geometry geom)
+  private void add(final Geometry geom)
   {
     if (geom instanceof Polygon) {
       addPolygon(geom);
     }
     else if (geom instanceof GeometryCollection) {
-      GeometryCollection gc = (GeometryCollection) geom;
+      final GeometryCollection gc = (GeometryCollection) geom;
       for (int i = 0; i < gc.getGeometryCount(); i++) {
         add(gc.getGeometry(i));
       }
@@ -124,57 +190,43 @@ public class InteriorPointArea {
    * Finds an interior point of a Polygon.
    * @param geometry the geometry to analyze
    */
-  private void addPolygon(Geometry geometry) {
-    if (geometry.isEmpty())
+  private void addPolygon(final Geometry geometry) {
+    if (geometry.isEmpty()) {
       return;
-    
+    }
+
     Point intPt;
     double width = 0;
-    
-    LineString bisector = horizontalBisector(geometry);
+
+    final LineString bisector = horizontalBisector(geometry);
     if (bisector.getLength() == 0.0) {
       width = 0;
       intPt = bisector.getPoint();
     }
     else {
-      Geometry intersections = bisector.intersection(geometry);
-      Geometry widestIntersection = widestGeometry(intersections);
+      final Geometry intersections = bisector.intersection(geometry);
+      final Geometry widestIntersection = widestGeometry(intersections);
       width = widestIntersection.getBoundingBox().getWidth();
       intPt = centre(widestIntersection.getBoundingBox());
     }
-    if (interiorPoint == null || width > maxWidth) {
-      interiorPoint = intPt;
-      maxWidth = width;
+    if (this.interiorPoint == null || width > this.maxWidth) {
+      this.interiorPoint = intPt;
+      this.maxWidth = width;
     }
   }
 
-  //@return if geometry is a collection, the widest sub-geometry; otherwise,
-  //the geometry itself
-  private Geometry widestGeometry(Geometry geometry) {
-    if (!(geometry instanceof GeometryCollection)) {
-        return geometry;
-    }
-    return widestGeometry((GeometryCollection) geometry);
+  /**
+   * Gets the computed interior point.
+   *
+   * @return the coordinate of an interior point
+   */
+  public Point getInteriorPoint()
+  {
+    return this.interiorPoint;
   }
 
-  private Geometry widestGeometry(GeometryCollection gc) {
-    if (gc.isEmpty()) {
-        return gc;
-    }
-
-    Geometry widestGeometry = gc.getGeometry(0);
-    // scan remaining geom components to see if any are wider
-    for (int i = 1; i < gc.getGeometryCount(); i++) { 
-        if (gc.getGeometry(i).getBoundingBox().getWidth() >
-            widestGeometry.getBoundingBox().getWidth()) {
-            widestGeometry = gc.getGeometry(i);
-        }
-    }
-    return widestGeometry;
-  }
-
-  protected LineString horizontalBisector(Geometry geometry) {
-    BoundingBox envelope = geometry.getBoundingBox();
+  protected LineString horizontalBisector(final Geometry geometry) {
+    final BoundingBox envelope = geometry.getBoundingBox();
 
     /**
      * Original algorithm.  Fails when geometry contains a horizontal
@@ -182,86 +234,36 @@ public class InteriorPointArea {
      */
     // Assert: for areas, minx <> maxx
     //double avgY = avg(envelope.getMinY(), envelope.getMaxY());
-    
-    double bisectY = SafeBisectorFinder.getBisectorY((Polygon) geometry);
-    return factory.lineString(new Point[] {
-            new PointDouble((double)envelope.getMinX(), bisectY, Point.NULL_ORDINATE),
-            new PointDouble((double)envelope.getMaxX(), bisectY, Point.NULL_ORDINATE)
-        });
+
+    final double bisectY = SafeBisectorFinder.getBisectorY((Polygon) geometry);
+    return this.factory.lineString(new Point[] {
+      new PointDouble(envelope.getMinX(), bisectY, Point.NULL_ORDINATE),
+      new PointDouble(envelope.getMaxX(), bisectY, Point.NULL_ORDINATE)
+    });
   }
 
-  /**
-   * Returns the centre point of the envelope.
-   * @param envelope the envelope to analyze
-   * @return the centre of the envelope
-   */
-  public static Point centre(BoundingBox envelope) {
-      return new PointDouble((double)avg(envelope.getMinX(),
-              envelope.getMaxX()),
-          avg(envelope.getMinY(), envelope.getMaxY()), Point.NULL_ORDINATE);
+  //@return if geometry is a collection, the widest sub-geometry; otherwise,
+  //the geometry itself
+  private Geometry widestGeometry(final Geometry geometry) {
+    if (!(geometry instanceof GeometryCollection)) {
+      return geometry;
+    }
+    return widestGeometry((GeometryCollection) geometry);
   }
 
-  /**
-   * Finds a safe bisector Y ordinate
-   * by projecting to the Y axis
-   * and finding the Y-ordinate interval
-   * which contains the centre of the Y extent.
-   * The centre of this interval is returned as the bisector Y-ordinate.
-   * 
-   * @author mdavis
-   *
-   */
-  private static class SafeBisectorFinder 
-  {
-	  public static double getBisectorY(Polygon poly)
-	  {
-		  SafeBisectorFinder finder = new SafeBisectorFinder(poly);
-		  return finder.getBisectorY();
-	  }
-	  
-	  private Polygon poly;
-	  
-	  private double centreY;
-	  private double hiY = Double.MAX_VALUE;
-	  private double loY = -Double.MAX_VALUE;
-	  
-	  public SafeBisectorFinder(Polygon poly) {
-		  this.poly = poly;
-		  
-		  // initialize using extremal values
-		  hiY = poly.getBoundingBox().getMaxY();
-		  loY = poly.getBoundingBox().getMinY();
-		  centreY = avg(loY, hiY);
-	  }
-	  
-	  public double getBisectorY()
-	  {
-		  process(poly.getExteriorRing());
-		  for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-			  process(poly.getInteriorRing(i));
-		  }
-		  double bisectY = avg(hiY, loY);
-		  return bisectY;
-	  }
+  private Geometry widestGeometry(final GeometryCollection gc) {
+    if (gc.isEmpty()) {
+      return gc;
+    }
 
-	private void process(LineString line) {
-		LineString seq = line;
-		for (int i = 0; i < seq.getVertexCount(); i++) {
-			double y = seq.getY(i);
-			updateInterval(y);
-		}
-	}
-
-	private void updateInterval(double y) {
-		if (y <= centreY) {
-			if (y > loY)
-				loY = y;
-		}
-		else if (y > centreY) {
-			if (y < hiY) {
-				hiY = y;
-			}
-		}
-	}
+    Geometry widestGeometry = gc.getGeometry(0);
+    // scan remaining geom components to see if any are wider
+    for (int i = 1; i < gc.getGeometryCount(); i++) {
+      if (gc.getGeometry(i).getBoundingBox().getWidth() >
+      widestGeometry.getBoundingBox().getWidth()) {
+        widestGeometry = gc.getGeometry(i);
+      }
+    }
+    return widestGeometry;
   }
 }

@@ -17,9 +17,6 @@ import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 
 public class DeletedPredicate implements HighlightPredicate {
 
-  private static final Border BORDER = BorderFactory.createLineBorder(
-    WebColors.Red, 2);
-
   public static void add(final RecordLayerTable table) {
     final RecordLayerTableModel model = (RecordLayerTableModel)table.getModel();
     final Highlighter highlighter = getHighlighter(model);
@@ -30,6 +27,9 @@ public class DeletedPredicate implements HighlightPredicate {
     final DeletedPredicate predicate = new DeletedPredicate(model);
     return new BorderHighlighter(predicate, BORDER);
   }
+
+  private static final Border BORDER = BorderFactory.createLineBorder(
+    WebColors.Red, 2);
 
   private final RecordLayerTableModel model;
 

@@ -16,12 +16,12 @@ public class ReferenceEntrySet<K, V> extends AbstractSet<Entry<K, V>> {
 
   @Override
   public Iterator<Entry<K, V>> iterator() {
-    return new ReferenceEntryIterator<K, V>(collection);
+    return new ReferenceEntryIterator<K, V>(this.collection);
   }
 
   @Override
   public int size() {
-    return collection.size();
+    return this.collection.size();
   }
 
 }

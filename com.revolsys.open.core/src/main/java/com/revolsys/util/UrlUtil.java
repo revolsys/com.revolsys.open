@@ -58,8 +58,8 @@ public final class UrlUtil {
               final String[] values = (String[])value;
               for (int i = 0; i < values.length; i++) {
                 query.append(name)
-                  .append('=')
-                  .append(URLEncoder.encode(values[i], "US-ASCII"));
+                .append('=')
+                .append(URLEncoder.encode(values[i], "US-ASCII"));
                 if (i < values.length - 1) {
                   query.append('&');
                 }
@@ -75,16 +75,16 @@ public final class UrlUtil {
                     query.append('&');
                   }
                   query.append(name)
-                    .append('=')
-                    .append(
-                      URLEncoder.encode(childValue.toString(), "US-ASCII"));
+                  .append('=')
+                  .append(
+                    URLEncoder.encode(childValue.toString(), "US-ASCII"));
                 }
               }
 
             } else {
               query.append(name)
-                .append('=')
-                .append(URLEncoder.encode(value.toString(), "US-ASCII"));
+              .append('=')
+              .append(URLEncoder.encode(value.toString(), "US-ASCII"));
             }
           } catch (final UnsupportedEncodingException e) {
             throw new Error(e);
@@ -107,8 +107,8 @@ public final class UrlUtil {
           final String[] values = (String[])value;
           for (int i = 0; i < values.length; i++) {
             query.append(name)
-              .append('=')
-              .append(URLEncoder.encode(values[i], "US-ASCII"));
+            .append('=')
+            .append(URLEncoder.encode(values[i], "US-ASCII"));
             if (i < values.length - 1) {
               query.append('&');
             }
@@ -124,15 +124,15 @@ public final class UrlUtil {
                 query.append('&');
               }
               query.append(name)
-                .append('=')
-                .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
+              .append('=')
+              .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
             }
           }
 
         } else {
           query.append(name)
-            .append('=')
-            .append(URLEncoder.encode(value.toString(), "US-ASCII"));
+          .append('=')
+          .append(URLEncoder.encode(value.toString(), "US-ASCII"));
         }
       } catch (final UnsupportedEncodingException e) {
         throw new Error(e);
@@ -149,8 +149,8 @@ public final class UrlUtil {
    */
   public static String cleanPath(final String url) {
     return url.replaceAll("/+", "/")
-      .replaceAll("^((\\w)+:)/", "$1//")
-      .replaceAll("^file://", "file:///");
+        .replaceAll("^((\\w)+:)/", "$1//")
+        .replaceAll("^file://", "file:///");
   }
 
   public static String getContent(final String urlString) {
@@ -352,7 +352,7 @@ public final class UrlUtil {
         return new URL(parent, encodedChild);
       } catch (final MalformedURLException e) {
         throw new IllegalArgumentException("Cannot create child URL for "
-          + parent + " + " + child);
+            + parent + " + " + child);
       }
     }
   }
@@ -435,15 +435,15 @@ public final class UrlUtil {
   private static final String IP4_ADDRESS = "\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}";
 
   private static final String DOMAIN = "(?:" + IP4_ADDRESS + "|" + DOMAIN_NAME
-    + ")";
+      + ")";
 
   private static final String WORD_CHARACTERS = "a-zA-Z0-9\\+!#$%&'*+-/=?^_`{}|~";
 
   private static final String LOCAL_PART = "[" + WORD_CHARACTERS + "]["
-    + WORD_CHARACTERS + "\\.]*[" + WORD_CHARACTERS + "]?";
+      + WORD_CHARACTERS + "\\.]*[" + WORD_CHARACTERS + "]?";
 
   private static final String EMAIL_RE = "^(" + LOCAL_PART + ")@(" + DOMAIN
-    + ")$";
+      + ")$";
 
   private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_RE);
 

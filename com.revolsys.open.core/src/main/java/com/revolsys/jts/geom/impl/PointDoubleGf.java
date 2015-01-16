@@ -41,10 +41,10 @@ import com.revolsys.jts.geom.Point;
  *
  * A <code>Point</code> is topologically valid if and only if:
  * <ul>
- * <li>the coordinate which defines it (if any) is a valid coordinate 
+ * <li>the coordinate which defines it (if any) is a valid coordinate
  * (i.e does not have an <code>NaN</code> X or Y ordinate)
  * </ul>
- * 
+ *
  *@version 1.7
  */
 public class PointDoubleGf extends PointDouble {
@@ -62,8 +62,8 @@ public class PointDoubleGf extends PointDouble {
   private Object userData;
 
   /**
-  * The {@link GeometryFactory} used to create this Geometry
-  */
+   * The {@link GeometryFactory} used to create this Geometry
+   */
   private final GeometryFactory geometryFactory;
 
   public PointDoubleGf(final GeometryFactory geometryFactory) {
@@ -82,24 +82,24 @@ public class PointDoubleGf extends PointDouble {
 
   @Override
   public int getAxisCount() {
-    return geometryFactory.getAxisCount();
+    return this.geometryFactory.getAxisCount();
   }
 
   @Override
   public BoundingBox getBoundingBox() {
-    if (boundingBox == null) {
+    if (this.boundingBox == null) {
       if (isEmpty()) {
-        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
+        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
-        boundingBox = computeBoundingBox();
+        this.boundingBox = computeBoundingBox();
       }
     }
-    return boundingBox;
+    return this.boundingBox;
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   /**
@@ -109,7 +109,7 @@ public class PointDoubleGf extends PointDouble {
    */
   @Override
   public Object getUserData() {
-    return userData;
+    return this.userData;
   }
 
   @Override

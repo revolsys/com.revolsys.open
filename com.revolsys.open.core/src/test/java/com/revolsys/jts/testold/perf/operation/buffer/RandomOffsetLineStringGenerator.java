@@ -13,8 +13,8 @@ import com.revolsys.jts.geom.segment.LineSegmentDouble;
  * in terms of how far they deviate from a given line segment,
  * and how much they twist around.
  * <p>
- * The method is to recursively perturb line segment midpoints by a random offset.  
- * 
+ * The method is to recursively perturb line segment midpoints by a random offset.
+ *
  * @author mbdavis
  *
  */

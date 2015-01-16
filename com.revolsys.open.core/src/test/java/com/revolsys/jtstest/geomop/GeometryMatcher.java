@@ -37,12 +37,12 @@ import com.revolsys.jts.geom.Geometry;
 /**
  * An interface for classes which can determine whether
  * two geometries match, within a given tolerance.
- * 
+ *
  * @author mbdavis
  *
  */
-public interface GeometryMatcher 
+public interface GeometryMatcher
 {
-	void setTolerance(double tolerance);
-	boolean match(Geometry a, Geometry b);
+  boolean match(Geometry a, Geometry b);
+  void setTolerance(double tolerance);
 }

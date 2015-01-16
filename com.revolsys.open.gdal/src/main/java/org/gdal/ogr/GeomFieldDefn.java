@@ -11,109 +11,110 @@ package org.gdal.ogr;
 import org.gdal.osr.SpatialReference;
 
 public class GeomFieldDefn {
-  private long swigCPtr;
-  protected boolean swigCMemOwn;
-
-  protected GeomFieldDefn(long cPtr, boolean cMemoryOwn) {
-    if (cPtr == 0)
-        throw new RuntimeException();
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
+  protected static long getCPtr(final GeomFieldDefn obj) {
+    return obj == null ? 0 : obj.swigCPtr;
   }
-  
-  protected static long getCPtr(GeomFieldDefn obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
-
-  protected void finalize() {
-    delete();
-  }
-
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        ogrJNI.delete_GeomFieldDefn(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
-  }
-
-  private Object parentReference;
-
-  protected static long getCPtrAndDisown(GeomFieldDefn obj) {
+  protected static long getCPtrAndDisown(final GeomFieldDefn obj) {
     if (obj != null)
     {
-        obj.swigCMemOwn= false;
-        obj.parentReference = null;
+      obj.swigCMemOwn= false;
     }
     return getCPtr(obj);
   }
 
-  /* Ensure that the GC doesn't collect any parent instance set from Java */
-  protected void addReference(Object reference) {
-    parentReference = reference;
-  }
+  private long swigCPtr;
 
-  public boolean equals(Object obj) {
-    boolean equal = false;
-    if (obj instanceof GeomFieldDefn)
-      equal = (((GeomFieldDefn)obj).swigCPtr == this.swigCPtr);
-    return equal;
-  }
-
-  public int hashCode() {
-     return (int)swigCPtr;
-  }
-
-
-  public GeomFieldDefn(String name_null_ok, int field_type) {
-    this(ogrJNI.new_GeomFieldDefn__SWIG_0(name_null_ok, field_type), true);
-  }
-
-  public GeomFieldDefn(String name_null_ok) {
-    this(ogrJNI.new_GeomFieldDefn__SWIG_1(name_null_ok), true);
-  }
+  protected boolean swigCMemOwn;
 
   public GeomFieldDefn() {
     this(ogrJNI.new_GeomFieldDefn__SWIG_2(), true);
   }
 
-  public String GetName() {
-    return ogrJNI.GeomFieldDefn_GetName(swigCPtr, this);
+  protected GeomFieldDefn(final long cPtr, final boolean cMemoryOwn) {
+    if (cPtr == 0) {
+      throw new RuntimeException();
+    }
+    this.swigCMemOwn = cMemoryOwn;
+    this.swigCPtr = cPtr;
   }
 
-  public String GetNameRef() {
-    return ogrJNI.GeomFieldDefn_GetNameRef(swigCPtr, this);
+  public GeomFieldDefn(final String name_null_ok) {
+    this(ogrJNI.new_GeomFieldDefn__SWIG_1(name_null_ok), true);
   }
 
-  public void SetName(String name) {
-    ogrJNI.GeomFieldDefn_SetName(swigCPtr, this, name);
+  public GeomFieldDefn(final String name_null_ok, final int field_type) {
+    this(ogrJNI.new_GeomFieldDefn__SWIG_0(name_null_ok, field_type), true);
+  }
+
+  /* Ensure that the GC doesn't collect any parent instance set from Java */
+  protected void addReference(final Object reference) {
+  }
+
+  public synchronized void delete() {
+    if (this.swigCPtr != 0) {
+      if (this.swigCMemOwn) {
+        this.swigCMemOwn = false;
+        ogrJNI.delete_GeomFieldDefn(this.swigCPtr);
+      }
+      this.swigCPtr = 0;
+    }
+  }
+
+
+  @Override
+  public boolean equals(final Object obj) {
+    boolean equal = false;
+    if (obj instanceof GeomFieldDefn) {
+      equal = ((GeomFieldDefn)obj).swigCPtr == this.swigCPtr;
+    }
+    return equal;
+  }
+
+  @Override
+  protected void finalize() {
+    delete();
   }
 
   public int GetFieldType() {
-    return ogrJNI.GeomFieldDefn_GetFieldType(swigCPtr, this);
+    return ogrJNI.GeomFieldDefn_GetFieldType(this.swigCPtr, this);
   }
 
-  public void SetType(int type) {
-    ogrJNI.GeomFieldDefn_SetType(swigCPtr, this, type);
+  public String GetName() {
+    return ogrJNI.GeomFieldDefn_GetName(this.swigCPtr, this);
+  }
+
+  public String GetNameRef() {
+    return ogrJNI.GeomFieldDefn_GetNameRef(this.swigCPtr, this);
   }
 
   public SpatialReference GetSpatialRef() {
-    long cPtr = ogrJNI.GeomFieldDefn_GetSpatialRef(swigCPtr, this);
-    return (cPtr == 0) ? null : new SpatialReference(cPtr, true);
+    final long cPtr = ogrJNI.GeomFieldDefn_GetSpatialRef(this.swigCPtr, this);
+    return cPtr == 0 ? null : new SpatialReference(cPtr, true);
   }
 
-  public void SetSpatialRef(SpatialReference srs) {
-    ogrJNI.GeomFieldDefn_SetSpatialRef(swigCPtr, this, SpatialReference.getCPtr(srs), srs);
+  @Override
+  public int hashCode() {
+    return (int)this.swigCPtr;
   }
 
   public int IsIgnored() {
-    return ogrJNI.GeomFieldDefn_IsIgnored(swigCPtr, this);
+    return ogrJNI.GeomFieldDefn_IsIgnored(this.swigCPtr, this);
   }
 
-  public void SetIgnored(int bIgnored) {
-    ogrJNI.GeomFieldDefn_SetIgnored(swigCPtr, this, bIgnored);
+  public void SetIgnored(final int bIgnored) {
+    ogrJNI.GeomFieldDefn_SetIgnored(this.swigCPtr, this, bIgnored);
+  }
+
+  public void SetName(final String name) {
+    ogrJNI.GeomFieldDefn_SetName(this.swigCPtr, this, name);
+  }
+
+  public void SetSpatialRef(final SpatialReference srs) {
+    ogrJNI.GeomFieldDefn_SetSpatialRef(this.swigCPtr, this, SpatialReference.getCPtr(srs), srs);
+  }
+
+  public void SetType(final int type) {
+    ogrJNI.GeomFieldDefn_SetType(this.swigCPtr, this, type);
   }
 
 }

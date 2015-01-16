@@ -99,13 +99,13 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
     boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
     final List<BoundingBox> boundingBoxes = new ArrayList<>();
     final double minX = Math.floor(boundingBox.getMinX() * TILE_SCALE_X)
-      / TILE_SCALE_X;
+        / TILE_SCALE_X;
     final double minY = Math.floor(boundingBox.getMinY() * TILE_SCALE_Y)
-      / TILE_SCALE_Y;
+        / TILE_SCALE_Y;
     final double maxX = Math.ceil(boundingBox.getMaxX() * TILE_SCALE_X)
-      / TILE_SCALE_X;
+        / TILE_SCALE_X;
     final double maxY = Math.ceil(boundingBox.getMaxY() * TILE_SCALE_Y)
-      / TILE_SCALE_Y;
+        / TILE_SCALE_Y;
     int indexY = 0;
     for (double y = minY; y < maxY;) {
       int indexX = 0;

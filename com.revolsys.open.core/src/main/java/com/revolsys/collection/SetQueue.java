@@ -10,12 +10,12 @@ public class SetQueue<E> extends AbstractQueue<E> {
 
   @Override
   public Iterator<E> iterator() {
-    return set.iterator();
+    return this.set.iterator();
   }
 
   @Override
   public boolean offer(final E o) {
-    set.add(o);
+    this.set.add(o);
     return true;
   }
 
@@ -44,6 +44,6 @@ public class SetQueue<E> extends AbstractQueue<E> {
 
   @Override
   public int size() {
-    return set.size();
+    return this.set.size();
   }
 }

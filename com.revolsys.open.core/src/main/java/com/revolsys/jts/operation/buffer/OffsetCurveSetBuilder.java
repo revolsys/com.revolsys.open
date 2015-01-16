@@ -131,17 +131,17 @@ public class OffsetCurveSetBuilder {
     if (points != null && points.getVertexCount() >= 2) {
       final Label label = new Label(0, Location.BOUNDARY, leftLoc, rightLoc);
       final NodedSegmentString segment = new NodedSegmentString(points, label);
-      curveList.add(segment);
+      this.curveList.add(segment);
     }
   }
 
   private void addLineString(final LineString line) {
     // a zero or negative width buffer of a line/point is empty
-    if (distance <= 0.0 && !curveBuilder.getBufferParameters().isSingleSided()) {
+    if (this.distance <= 0.0 && !this.curveBuilder.getBufferParameters().isSingleSided()) {
       return;
     } else {
       final LineString points = CleanDuplicatePoints.clean(line);
-      final LineString curve = curveBuilder.getLineCurve(points, distance);
+      final LineString curve = this.curveBuilder.getLineCurve(points, this.distance);
       addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
     }
   }
@@ -151,17 +151,17 @@ public class OffsetCurveSetBuilder {
    */
   private void addPoint(final Point point) {
     // a zero or negative width buffer of a line/point is empty
-    if (distance > 0.0) {
-      final LineString curve = curveBuilder.getPointCurve(point, distance);
+    if (this.distance > 0.0) {
+      final LineString curve = this.curveBuilder.getPointCurve(point, this.distance);
       addCurve(curve, Location.EXTERIOR, Location.INTERIOR);
     }
   }
 
   private void addPolygon(final Polygon p) {
-    double offsetDistance = distance;
+    double offsetDistance = this.distance;
     int offsetSide = Position.LEFT;
-    if (distance < 0.0) {
-      offsetDistance = -distance;
+    if (this.distance < 0.0) {
+      offsetDistance = -this.distance;
       offsetSide = Position.RIGHT;
     }
 
@@ -170,11 +170,11 @@ public class OffsetCurveSetBuilder {
     final LineString shellCoord = CleanDuplicatePoints.clean((LineString)shell);
     // optimization - don't bother computing buffer
     // if the polygon would be completely eroded
-    if (distance < 0.0 && isErodedCompletely(shell, distance)) {
+    if (this.distance < 0.0 && isErodedCompletely(shell, this.distance)) {
       return;
     }
     // don't attempt to buffer a polygon with too few distinct vertices
-    if (distance <= 0.0 && shellCoord.getVertexCount() < 3) {
+    if (this.distance <= 0.0 && shellCoord.getVertexCount() < 3) {
       return;
     }
 
@@ -188,7 +188,7 @@ public class OffsetCurveSetBuilder {
 
       // optimization - don't bother computing buffer for this hole
       // if the hole would be completely covered
-      if (!(distance > 0.0 && isErodedCompletely(hole, -distance))) {
+      if (!(this.distance > 0.0 && isErodedCompletely(hole, -this.distance))) {
         // Holes are topologically labeled opposite to the shell, since
         // the interior of the polygon lies on their opposite side
         // (on the left, if the hole is oriented CCW)
@@ -217,7 +217,7 @@ public class OffsetCurveSetBuilder {
     final Location cwRightLoc) {
     // don't bother adding ring if it is "flat" and will disappear in the output
     if (offsetDistance == 0.0
-      && points.getVertexCount() < LinearRing.MINIMUM_VALID_SIZE) {
+        && points.getVertexCount() < LinearRing.MINIMUM_VALID_SIZE) {
       return;
     }
 
@@ -228,7 +228,7 @@ public class OffsetCurveSetBuilder {
       rightLoc = cwLeftLoc;
       side = Position.opposite(side);
     }
-    final LineString curve = curveBuilder.getRingCurve(points, side,
+    final LineString curve = this.curveBuilder.getRingCurve(points, side,
       offsetDistance);
     addCurve(curve, leftLoc, rightLoc);
   }
@@ -241,8 +241,8 @@ public class OffsetCurveSetBuilder {
    * @return a Collection of SegmentStrings representing the raw buffer curves
    */
   public List<NodedSegmentString> getCurves() {
-    add(geometry);
-    return curveList;
+    add(this.geometry);
+    return this.curveList;
   }
 
   /**

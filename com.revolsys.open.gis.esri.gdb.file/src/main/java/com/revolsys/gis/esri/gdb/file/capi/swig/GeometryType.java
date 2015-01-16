@@ -19,7 +19,7 @@ public enum GeometryType {
   public static GeometryType swigToEnum(final int swigValue) {
     final GeometryType[] swigValues = GeometryType.class.getEnumConstants();
     if (swigValue < swigValues.length && swigValue >= 0
-      && swigValues[swigValue].swigValue == swigValue) {
+        && swigValues[swigValue].swigValue == swigValue) {
       return swigValues[swigValue];
     }
     for (final GeometryType swigEnum : swigValues) {

@@ -49,19 +49,19 @@ import com.revolsys.jts.noding.SegmentStringUtil;
  * A base class containing the logic for computes the <tt>contains</tt>
  * and <tt>covers</tt> spatial relationship predicates
  * for a {@link PreparedPolygon} relative to all other {@link Geometry} classes.
- * Uses short-circuit tests and indexing to improve performance. 
+ * Uses short-circuit tests and indexing to improve performance.
  * <p>
  * Contains and covers are very similar, and differ only in how certain
- * cases along the boundary are handled.  These cases require 
- * full topological evaluation to handle, so all the code in 
+ * cases along the boundary are handled.  These cases require
+ * full topological evaluation to handle, so all the code in
  * this class is common to both predicates.
  * <p>
  * It is not possible to short-circuit in all cases, in particular
  * in the case where line segments of the test geometry touches the originalGeometry linework.
  * In this case full topology must be computed.
- * (However, if the test geometry consists of only points, this 
+ * (However, if the test geometry consists of only points, this
  * <i>can</i> be evaluated in an optimized fashion.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -78,10 +78,10 @@ abstract class AbstractPreparedPolygonContains {
   }
 
   /**
-   * Tests whether all components of the test Geometry 
+   * Tests whether all components of the test Geometry
    * are contained in the interior of the target geometry.
    * Handles both linear and point components.
-   * 
+   *
    * @param geom a geometry to test
    * @return true if all componenta of the argument are contained in the target geometry interior
    */
@@ -97,9 +97,9 @@ abstract class AbstractPreparedPolygonContains {
   }
 
   /**
-   * Tests whether any component of the target geometry 
-   * intersects the test geometry (which must be an areal geometry) 
-   * 
+   * Tests whether any component of the target geometry
+   * intersects the test geometry (which must be an areal geometry)
+   *
    * @param geom the test geometry
    * @param repPts the representative points of the target geometry
    * @return true if any component intersects the areal test geometry
@@ -120,7 +120,7 @@ abstract class AbstractPreparedPolygonContains {
    * Tests whether any component of the test Geometry intersects
    * the area of the target geometry.
    * Handles test geometries with both linear and point components.
-   * 
+   *
    * @param geom a geometry to test
    * @return true if any component of the argument intersects the prepared area geometry
    */
@@ -139,7 +139,7 @@ abstract class AbstractPreparedPolygonContains {
    * Tests whether any component of the test Geometry intersects
    * the interior of the target geometry.
    * Handles test geometries with both linear and point components.
-   * 
+   *
    * @param geom a geometry to test
    * @return true if any component of the argument intersects the prepared area geometry interior
    */
@@ -156,7 +156,7 @@ abstract class AbstractPreparedPolygonContains {
 
   /**
    * This flag controls a difference between contains and covers.
-   * 
+   *
    * For contains the value is true.
    * For covers the value is false.
    */
@@ -182,7 +182,7 @@ abstract class AbstractPreparedPolygonContains {
   /**
    * Evaluate the <tt>contains</tt> or <tt>covers</tt> relationship
    * for the given geometry.
-   * 
+   *
    * @param geometry the test geometry
    * @return true if the test geometry is contained
    */
@@ -190,7 +190,7 @@ abstract class AbstractPreparedPolygonContains {
     /**
      * Do point-in-poly tests first, since they are cheaper and may result
      * in a quick negative result.
-     * 
+     *
      * If a point of any test components does not lie in target, result is false
      */
     final boolean isAllInTargetArea = isAllTestComponentsInTarget(
@@ -200,14 +200,14 @@ abstract class AbstractPreparedPolygonContains {
     }
 
     /**
-     * If the test geometry consists of only Points, 
+     * If the test geometry consists of only Points,
      * then it is now sufficient to test if any of those
      * points lie in the interior of the target geometry.
      * If so, the test is contained.
      * If not, all points are on the boundary of the area,
      * which implies not contained.
      */
-    if (requireSomePointInInterior && geometry.getDimension() == 0) {
+    if (this.requireSomePointInInterior && geometry.getDimension() == 0) {
       final boolean isAnyInTargetInterior = isAnyTestComponentInTargetInterior(
         getPointLocator(), geometry);
       return isAnyInTargetInterior;
@@ -216,7 +216,7 @@ abstract class AbstractPreparedPolygonContains {
     /**
      * Check if there is any intersection between the line segments
      * in target and test.
-     * In some important cases, finding a proper interesection implies that the 
+     * In some important cases, finding a proper interesection implies that the
      * test geometry is NOT contained.
      * These cases are:
      * <ul>
@@ -234,35 +234,35 @@ abstract class AbstractPreparedPolygonContains {
     // find all intersection types which exist
     findAndClassifyIntersections(geometry);
 
-    if (properIntersectionImpliesNotContained && hasProperIntersection) {
+    if (properIntersectionImpliesNotContained && this.hasProperIntersection) {
       return false;
     }
 
     /**
-     * If all intersections are proper 
+     * If all intersections are proper
      * (i.e. no non-proper intersections occur)
      * we can conclude that the test geometry is not contained in the target area,
      * by the Epsilon-Neighbourhood Exterior Intersection condition.
-     * In real-world data this is likely to be by far the most common situation, 
+     * In real-world data this is likely to be by far the most common situation,
      * since natural data is unlikely to have many exact vertex segment intersections.
      * Thus this check is very worthwhile, since it avoid having to perform
      * a full topological check.
-     * 
+     *
      * (If non-proper (vertex) intersections ARE found, this may indicate
      * a situation where two shells touch at a single vertex, which admits
      * the case where a line could cross between the shells and still be wholely contained in them.
      */
-    if (hasSegmentIntersection && !hasNonProperIntersection) {
+    if (this.hasSegmentIntersection && !this.hasNonProperIntersection) {
       return false;
     }
 
     /**
      * If there is a segment intersection and the situation is not one
      * of the ones above, the only choice is to compute the full topological
-     * relationship.  This is because contains/covers is very sensitive 
+     * relationship.  This is because contains/covers is very sensitive
      * to the situation along the boundary of the target.
      */
-    if (hasSegmentIntersection) {
+    if (this.hasSegmentIntersection) {
       return fullTopologicalPredicate(geometry);
       // System.out.println(geom);
     }
@@ -275,7 +275,7 @@ abstract class AbstractPreparedPolygonContains {
     if (geometry instanceof Polygonal) {
       // TODO: generalize this to handle GeometryCollections
       final boolean isTargetInTestArea = isAnyTargetComponentInAreaTest(
-        geometry, preparedGeometry);
+        geometry, this.preparedGeometry);
       if (isTargetInTestArea) {
         return false;
       }
@@ -291,26 +291,26 @@ abstract class AbstractPreparedPolygonContains {
 
     getIntersectionFinder().intersects(lineSegStr, intDetector);
 
-    hasSegmentIntersection = intDetector.hasIntersection();
-    hasProperIntersection = intDetector.hasProperIntersection();
-    hasNonProperIntersection = intDetector.hasNonProperIntersection();
+    this.hasSegmentIntersection = intDetector.hasIntersection();
+    this.hasProperIntersection = intDetector.hasProperIntersection();
+    this.hasNonProperIntersection = intDetector.hasNonProperIntersection();
   }
 
   /**
    * Computes the full topological predicate.
    * Used when short-circuit tests are not conclusive.
-   * 
+   *
    * @param geom the test geometry
    * @return true if this prepared originalGeometry has the relationship with the test geometry
    */
   protected abstract boolean fullTopologicalPredicate(Geometry geom);
 
   private FastSegmentSetIntersectionFinder getIntersectionFinder() {
-    if (preparedGeometry instanceof PreparedPolygon) {
-      final PreparedPolygon preparedPolygon = (PreparedPolygon)preparedGeometry;
+    if (this.preparedGeometry instanceof PreparedPolygon) {
+      final PreparedPolygon preparedPolygon = (PreparedPolygon)this.preparedGeometry;
       return preparedPolygon.getIntersectionFinder();
-    } else if (preparedGeometry instanceof PreparedMultiPolygon) {
-      final PreparedMultiPolygon preparedPolygon = (PreparedMultiPolygon)preparedGeometry;
+    } else if (this.preparedGeometry instanceof PreparedMultiPolygon) {
+      final PreparedMultiPolygon preparedPolygon = (PreparedMultiPolygon)this.preparedGeometry;
       return preparedPolygon.getIntersectionFinder();
     } else {
       return null;
@@ -318,15 +318,15 @@ abstract class AbstractPreparedPolygonContains {
   }
 
   public Geometry getOriginalGeometry() {
-    return originalGeometry;
+    return this.originalGeometry;
   }
 
   private PointOnGeometryLocator getPointLocator() {
-    if (preparedGeometry instanceof PreparedPolygon) {
-      final PreparedPolygon preparedPolygon = (PreparedPolygon)preparedGeometry;
+    if (this.preparedGeometry instanceof PreparedPolygon) {
+      final PreparedPolygon preparedPolygon = (PreparedPolygon)this.preparedGeometry;
       return preparedPolygon.getPointLocator();
-    } else if (preparedGeometry instanceof PreparedMultiPolygon) {
-      final PreparedMultiPolygon preparedPolygon = (PreparedMultiPolygon)preparedGeometry;
+    } else if (this.preparedGeometry instanceof PreparedMultiPolygon) {
+      final PreparedMultiPolygon preparedPolygon = (PreparedMultiPolygon)this.preparedGeometry;
       return preparedPolygon.getPointLocator();
     } else {
       return null;
@@ -337,22 +337,22 @@ abstract class AbstractPreparedPolygonContains {
     final Geometry testGeom) {
     /**
      * If the test geometry is polygonal we have the A/A situation.
-     * In this case, a proper intersection indicates that 
+     * In this case, a proper intersection indicates that
      * the Epsilon-Neighbourhood Exterior Intersection condition exists.
      * This condition means that in some small
      * area around the intersection point, there must exist a situation
      * where the interior of the test intersects the exterior of the target.
-     * This implies the test is NOT contained in the target. 
+     * This implies the test is NOT contained in the target.
      */
     if (testGeom instanceof Polygonal) {
       return true;
     }
     /**
-     * A single shell with no holes allows concluding that 
-     * a proper intersection implies not contained 
-     * (due to the Epsilon-Neighbourhood Exterior Intersection condition) 
+     * A single shell with no holes allows concluding that
+     * a proper intersection implies not contained
+     * (due to the Epsilon-Neighbourhood Exterior Intersection condition)
      */
-    if (isSingleShell(originalGeometry)) {
+    if (isSingleShell(this.originalGeometry)) {
       return true;
     }
     return false;
@@ -360,7 +360,7 @@ abstract class AbstractPreparedPolygonContains {
 
   /**
    * Tests whether a geometry consists of a single originalGeometry with no holes.
-   *  
+   *
    * @return true if the geometry is a single originalGeometry with no holes
    */
   private boolean isSingleShell(final Geometry geom) {

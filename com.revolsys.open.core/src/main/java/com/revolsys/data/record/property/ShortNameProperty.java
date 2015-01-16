@@ -4,8 +4,6 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 
 public class ShortNameProperty extends AbstractRecordDefinitionProperty {
-  static final String PROPERTY_NAME = "http://revolsys.com/gis/shortName";
-
   public static ShortNameProperty getProperty(final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     return getProperty(recordDefinition);
@@ -33,6 +31,8 @@ public class ShortNameProperty extends AbstractRecordDefinitionProperty {
     }
   }
 
+  static final String PROPERTY_NAME = "http://revolsys.com/gis/shortName";
+
   private boolean useForSequence = true;
 
   private String shortName;
@@ -46,7 +46,7 @@ public class ShortNameProperty extends AbstractRecordDefinitionProperty {
 
   @Override
   public ShortNameProperty clone() {
-    return new ShortNameProperty(shortName);
+    return new ShortNameProperty(this.shortName);
   }
 
   @Override
@@ -55,11 +55,11 @@ public class ShortNameProperty extends AbstractRecordDefinitionProperty {
   }
 
   public String getShortName() {
-    return shortName;
+    return this.shortName;
   }
 
   public boolean isUseForSequence() {
-    return useForSequence;
+    return this.useForSequence;
   }
 
   public void setShortName(final String shortName) {
@@ -72,6 +72,6 @@ public class ShortNameProperty extends AbstractRecordDefinitionProperty {
 
   @Override
   public String toString() {
-    return shortName;
+    return this.shortName;
   }
 }

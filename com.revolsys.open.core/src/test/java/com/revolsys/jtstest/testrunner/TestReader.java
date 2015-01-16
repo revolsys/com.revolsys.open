@@ -98,11 +98,11 @@ public class TestReader {
   }
 
   private double createPrecisionModel(final Element precisionModelElement)
-    throws TestParseException {
+      throws TestParseException {
     final Attribute scaleAttribute = precisionModelElement.getAttribute("scale");
     if (scaleAttribute == null) {
       throw new TestParseException(
-        "Missing scale attribute in <precisionModel>");
+          "Missing scale attribute in <precisionModel>");
     }
     double scale;
     try {
@@ -110,7 +110,7 @@ public class TestReader {
     } catch (final DataConversionException e) {
       throw new TestParseException(
         "Could not convert scale attribute to double: "
-          + scaleAttribute.getValue());
+            + scaleAttribute.getValue());
     }
     return scale;
   }
@@ -123,7 +123,7 @@ public class TestReader {
       final Element runElement = document.getRootElement();
       if (!runElement.getName().equalsIgnoreCase("run")) {
         throw new TestParseException("Expected <run> but encountered <"
-          + runElement.getName() + ">");
+            + runElement.getName() + ">");
       }
       return parseTestRun(parent, runElement, testFile, runIndex);
     } catch (final IllegalArgumentException e) {
@@ -188,7 +188,7 @@ public class TestReader {
    * @throws TestParseException if a parsing error was encountered
    */
   private GeometryOperation parseGeometryOperation(final Element runElement)
-    throws TestParseException {
+      throws TestParseException {
     final Element goElement = runElement.getChild("geometryOperation");
     if (goElement == null) {
       return GEOMETRY_FUNCTION_OPERATION;
@@ -212,7 +212,7 @@ public class TestReader {
    * @throws TestParseException
    */
   private double parsePrecisionModel(final Element runElement)
-    throws TestParseException {
+      throws TestParseException {
     final Element precisionModelElement = runElement.getChild("precisionModel");
     if (precisionModelElement == null) {
       return 0;
@@ -225,9 +225,9 @@ public class TestReader {
     if (scaleAttribute != null || typeAttribute != null
         && typeAttribute.getValue().trim().equalsIgnoreCase("FIXED")) {
       if (typeAttribute != null
-        && typeAttribute.getValue().trim().equalsIgnoreCase("FLOATING")) {
+          && typeAttribute.getValue().trim().equalsIgnoreCase("FLOATING")) {
         throw new TestParseException(
-          "scale attribute not allowed in floating <precisionModel>");
+            "scale attribute not allowed in floating <precisionModel>");
       }
       return createPrecisionModel(precisionModelElement);
     }
@@ -244,7 +244,7 @@ public class TestReader {
    * @throws TestParseException if a parsing error was encountered
    */
   private ResultMatcher parseResultMatcher(final Element runElement)
-    throws TestParseException {
+      throws TestParseException {
     final Element goElement = runElement.getChild("resultMatcher");
     if (goElement == null) {
       return EQUALITY_RESULT_MATCHER;
@@ -264,7 +264,7 @@ public class TestReader {
    */
   private List<TestCase> parseTestCases(final List caseElements,
     final File testFile, final TestFile testRun, final double tolerance)
-    throws Throwable {
+        throws Throwable {
     this.wktorbReader = new WKTOrWKBReader(this.geometryFactory);
     final Vector<TestCase> testCases = new Vector<>();
     int caseIndex = 0;
@@ -285,8 +285,8 @@ public class TestReader {
           absoluteWktFile(bWktFile, testRun));
         final TestCase testCase = new TestCase(
           descElement != null ? descElement.getTextTrim() : "", a, b, aWktFile,
-          bWktFile, testRun, caseIndex,
-          ((LineNumberElement)caseElement).getStartLine());
+            bWktFile, testRun, caseIndex,
+            ((LineNumberElement)caseElement).getStartLine());
         final List testElements = caseElement.getChildren("test");
         // if (testElements.size() == 0) {
         // throw new TestParseException("Missing <test> in <case>");
@@ -300,7 +300,7 @@ public class TestReader {
       } catch (final Exception e) {
         throw new IllegalArgumentException(
           "An exception occurred while parsing <case> " + caseIndex + " in "
-            + testFile, e);
+              + testFile, e);
       }
     }
     return testCases;
@@ -312,7 +312,7 @@ public class TestReader {
    */
   private TestFile parseTestRun(final TestDirectory parent,
     final Element runElement, final File testFile, final int runIndex)
-    throws Throwable {
+        throws Throwable {
 
     // ----------- <workspace> (optional) ------------------
     File workspace = null;
@@ -329,7 +329,7 @@ public class TestReader {
       }
       if (!workspace.isDirectory()) {
         throw new TestParseException("<workspace> is not a directory: "
-          + workspace);
+            + workspace);
       }
     }
 
@@ -396,7 +396,7 @@ public class TestReader {
         String arg3 = opElement.getAttribute("arg3") == null ? null
           : opElement.getAttribute("arg3").getValue().trim();
         if (arg3 == null
-          && nameAttribute.getValue().trim().equalsIgnoreCase("relate")) {
+            && nameAttribute.getValue().trim().equalsIgnoreCase("relate")) {
           arg3 = opElement.getAttribute("pattern") == null ? null
             : opElement.getAttribute("pattern").getValue().trim();
         }
@@ -411,20 +411,20 @@ public class TestReader {
           nameAttribute.getValue().trim(), testCase.getTestRun());
         final GeometryOperationTest test = new GeometryOperationTest(testCase,
           testIndex, descElement != null ? descElement.getTextTrim() : "",
-          nameAttribute.getValue().trim(), arg1, arguments, result, tolerance);
+            nameAttribute.getValue().trim(), arg1, arguments, result, tolerance);
 
         tests.add(test);
       } catch (final Exception e) {
         throw new IllegalArgumentException(
           "An exception occurred while parsing <test> " + testIndex
-            + " in <case> " + caseIndex + " in " + testFile, e);
+          + " in <case> " + caseIndex + " in " + testFile, e);
       }
     }
     return tests;
   }
 
   private double parseTolerance(final Element runElement)
-    throws TestParseException {
+      throws TestParseException {
     double tolerance = 0.0;
     // Note: the tolerance element applies to the coordinate-by-coordinate
     // comparisons of spatial functions. It does not apply to binary predicates.
@@ -435,7 +435,7 @@ public class TestReader {
         tolerance = Double.parseDouble(toleranceElement.getTextTrim());
       } catch (final NumberFormatException e) {
         throw new TestParseException("Could not parse tolerance from string: "
-          + toleranceElement.getTextTrim());
+            + toleranceElement.getTextTrim());
       }
     }
     return tolerance;
@@ -463,7 +463,7 @@ public class TestReader {
   }
 
   private BooleanResult toBooleanResult(final String value)
-    throws TestParseException {
+      throws TestParseException {
     if (value.equalsIgnoreCase("true")) {
       return new BooleanResult(true);
     } else if (value.equalsIgnoreCase("false")) {
@@ -475,7 +475,7 @@ public class TestReader {
   }
 
   private DoubleResult toDoubleResult(final String value)
-    throws TestParseException {
+      throws TestParseException {
     try {
       return new DoubleResult(Double.valueOf(value));
     } catch (final NumberFormatException e) {
@@ -501,7 +501,7 @@ public class TestReader {
   }
 
   private IntegerResult toIntegerResult(final String value)
-    throws TestParseException {
+      throws TestParseException {
     try {
       return new IntegerResult(Integer.valueOf(value));
     } catch (final NumberFormatException e) {
@@ -538,7 +538,7 @@ public class TestReader {
   }
 
   private File wktFile(final Element geometryElement, final TestFile testRun)
-    throws TestParseException {
+      throws TestParseException {
     if (geometryElement == null) {
       return null;
     }
@@ -547,7 +547,7 @@ public class TestReader {
     }
     if (!geometryElement.getTextTrim().equals("")) {
       throw new TestParseException(
-        "WKT specified both in-line and in external file");
+          "WKT specified both in-line and in external file");
     }
 
     final File wktFile = new File(geometryElement.getAttribute("file")
@@ -557,11 +557,11 @@ public class TestReader {
 
     if (!absoluteWktFile.exists()) {
       throw new TestParseException("WKT file does not exist: "
-        + absoluteWktFile);
+          + absoluteWktFile);
     }
     if (absoluteWktFile.isDirectory()) {
       throw new TestParseException("WKT file is a directory: "
-        + absoluteWktFile);
+          + absoluteWktFile);
     }
 
     return wktFile;

@@ -54,20 +54,20 @@ public abstract class GeometricShapeBuilder {
   }
 
   protected Point createCoord(final double x, final double y) {
-    return new PointDouble(geometryFactory.makePrecise(0, x),
-      geometryFactory.makePrecise(1, y));
+    return new PointDouble(this.geometryFactory.makePrecise(0, x),
+      this.geometryFactory.makePrecise(1, y));
   }
 
   public Point getCentre() {
-    return extent.getCentre();
+    return this.extent.getCentre();
   }
 
   public double getDiameter() {
-    return Math.min(extent.getHeight(), extent.getWidth());
+    return Math.min(this.extent.getHeight(), this.extent.getWidth());
   }
 
   public BoundingBox getExtent() {
-    return extent;
+    return this.extent;
   }
 
   public abstract Geometry getGeometry();

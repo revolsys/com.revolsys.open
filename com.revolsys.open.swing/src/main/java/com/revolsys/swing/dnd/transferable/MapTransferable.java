@@ -14,7 +14,7 @@ import com.revolsys.io.csv.CsvUtil;
 public class MapTransferable implements Transferable {
 
   public static final DataFlavor MAP_FLAVOR = new DataFlavor(Map.class,
-    "Java Map");
+      "Java Map");
 
   private final Map<String, Object> map;
 
@@ -32,7 +32,7 @@ public class MapTransferable implements Transferable {
 
   @Override
   public Object getTransferData(final DataFlavor flavor)
-    throws UnsupportedFlavorException, IOException {
+      throws UnsupportedFlavorException, IOException {
     if (MAP_FLAVOR.equals(flavor)) {
       return this.map;
     } else if (DataFlavor.stringFlavor.equals(flavor)) {

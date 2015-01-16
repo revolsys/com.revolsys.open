@@ -110,8 +110,8 @@ public class MenuView extends ObjectView {
     final Menu menu = (Menu)getObject();
     if (menu != null) {
       final List menuItems = new ArrayList();
-      for (final Iterator items = menu.getItems().iterator(); items.hasNext();) {
-        final MenuItem menuItem = (MenuItem)items.next();
+      for (final Object element : menu.getItems()) {
+        final MenuItem menuItem = (MenuItem)element;
         if (menuItem.isVisible()) {
           menuItems.add(menuItem);
         }

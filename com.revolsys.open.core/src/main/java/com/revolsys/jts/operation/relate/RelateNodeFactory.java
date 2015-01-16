@@ -44,6 +44,7 @@ import com.revolsys.jts.geomgraph.NodeMap;
  * @version 1.7
  */
 public class RelateNodeFactory extends NodeFactory {
+  @Override
   public Node createNode(final Point coord) {
     return new RelateNode(coord, new EdgeEndBundleStar());
   }

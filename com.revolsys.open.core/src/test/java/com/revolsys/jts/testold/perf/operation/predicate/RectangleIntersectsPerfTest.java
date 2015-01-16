@@ -48,6 +48,11 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 import com.revolsys.jts.util.Stopwatch;
 
 public class RectangleIntersectsPerfTest {
+  public static void main(final String[] args) {
+    final RectangleIntersectsPerfTest test = new RectangleIntersectsPerfTest();
+    test.test();
+  }
+
   static final int MAX_ITER = 10;
 
   static final int NUM_AOI_PTS = 2000;
@@ -60,11 +65,6 @@ public class RectangleIntersectsPerfTest {
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
-
-  public static void main(final String[] args) {
-    final RectangleIntersectsPerfTest test = new RectangleIntersectsPerfTest();
-    test.test();
-  }
 
   Stopwatch sw = new Stopwatch();
 
@@ -85,11 +85,11 @@ public class RectangleIntersectsPerfTest {
   }
 
   /**
-   * Creates a set of rectangular Polygons which 
+   * Creates a set of rectangular Polygons which
    * cover the given envelope.
-   * The rectangles   
+   * The rectangles
    * At least nRect rectangles are created.
-   * 
+   *
    * @param env
    * @param nRect
    * @param rectSize

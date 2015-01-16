@@ -20,8 +20,8 @@ import com.revolsys.io.directory.DirectoryRecordStore;
 import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractRecordAndGeometryReaderFactory extends
-  AbstractGeometryReaderFactory implements RecordReaderFactory,
-  MapReaderFactory, RecordStoreFactory {
+AbstractGeometryReaderFactory implements RecordReaderFactory,
+MapReaderFactory, RecordStoreFactory {
 
   private final ArrayRecordFactory recordFactory = new ArrayRecordFactory();
 

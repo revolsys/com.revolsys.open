@@ -62,7 +62,7 @@ public class NodeMap
    * @return the added node
    */
   public Node add(final Node n) {
-    nodeMap.put(n.getCoordinate(), n);
+    this.nodeMap.put(n.getCoordinate(), n);
     return n;
   }
 
@@ -70,7 +70,7 @@ public class NodeMap
    * Returns the Node at the given location, or null if no Node was there.
    */
   public Node find(final Point coord) {
-    return (Node)nodeMap.get(coord);
+    return (Node)this.nodeMap.get(coord);
   }
 
   /**
@@ -78,14 +78,14 @@ public class NodeMap
    * by angle with the positive x-axis.
    */
   public Iterator iterator() {
-    return nodeMap.values().iterator();
+    return this.nodeMap.values().iterator();
   }
 
   /**
    * Removes the Node at the given location, and returns it (or null if no Node was there).
    */
   public Node remove(final Point pt) {
-    return (Node)nodeMap.remove(pt);
+    return (Node)this.nodeMap.remove(pt);
   }
 
   /**
@@ -93,7 +93,7 @@ public class NodeMap
    * by angle with the positive x-axis.
    */
   public Collection values() {
-    return nodeMap.values();
+    return this.nodeMap.values();
   }
 
 }

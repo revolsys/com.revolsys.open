@@ -22,7 +22,6 @@ package com.revolsys.gis.parallel;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -39,7 +38,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
 public class AddDefaultValuesProcess extends
-  AbstractInOutProcess<Record, Record> {
+AbstractInOutProcess<Record, Record> {
   private static final Logger log = Logger.getLogger(AddDefaultValuesProcess.class);
 
   private Set<String> excludedFieldNames = new HashSet<String>();
@@ -117,9 +116,7 @@ public class AddDefaultValuesProcess extends
 
   private void processDefaultValues(final Record record,
     final Map<String, Object> defaultValues) {
-    for (final Iterator<Entry<String, Object>> defaults = defaultValues.entrySet()
-      .iterator(); defaults.hasNext();) {
-      final Entry<String, Object> defaultValue = defaults.next();
+    for (Entry<String, Object> defaultValue : defaultValues.entrySet()) {
       final String key = defaultValue.getKey();
       final Object value = defaultValue.getValue();
       setDefaultValue(record, key, value);
@@ -139,7 +136,7 @@ public class AddDefaultValuesProcess extends
     final int dotIndex = key.indexOf('.');
     if (dotIndex == -1) {
       if (record.getValue(key) == null
-        && !this.excludedFieldNames.contains(key)) {
+          && !this.excludedFieldNames.contains(key)) {
         log.info("Adding attribute " + key + "=" + value);
         record.setValue(key, value);
       }

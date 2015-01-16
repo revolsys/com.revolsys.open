@@ -173,7 +173,7 @@ abstract public class EdgeEndStar {
       final Label label = e.getLabel();
       for (int geomi = 0; geomi < 2; geomi++) {
         if (label.isLine(geomi)
-          && label.getLocation(geomi) == Location.BOUNDARY) {
+            && label.getLocation(geomi) == Location.BOUNDARY) {
           hasDimensionalCollapseEdge[geomi] = true;
         }
       }
@@ -203,8 +203,8 @@ abstract public class EdgeEndStar {
 
   public int findIndex(final EdgeEnd eSearch) {
     iterator(); // force edgelist to be computed
-    for (int i = 0; i < edgeList.size(); i++) {
-      final EdgeEnd e = (EdgeEnd)edgeList.get(i);
+    for (int i = 0; i < this.edgeList.size(); i++) {
+      final EdgeEnd e = (EdgeEnd)this.edgeList.get(i);
       if (e == eSearch) {
         return i;
       }
@@ -225,34 +225,34 @@ abstract public class EdgeEndStar {
   }
 
   public int getDegree() {
-    return edgeMap.size();
+    return this.edgeMap.size();
   }
 
   public List getEdges() {
-    if (edgeList == null) {
-      edgeList = new ArrayList(edgeMap.values());
+    if (this.edgeList == null) {
+      this.edgeList = new ArrayList(this.edgeMap.values());
     }
-    return edgeList;
+    return this.edgeList;
   }
 
   private Location getLocation(final int geomIndex, final Point p,
     final GeometryGraph[] geom) {
     // compute location only on demand
-    if (ptInAreaLocation[geomIndex] == Location.NONE) {
-      ptInAreaLocation[geomIndex] = SimplePointInAreaLocator.locate(p,
+    if (this.ptInAreaLocation[geomIndex] == Location.NONE) {
+      this.ptInAreaLocation[geomIndex] = SimplePointInAreaLocator.locate(p,
         geom[geomIndex].getGeometry());
     }
-    return ptInAreaLocation[geomIndex];
+    return this.ptInAreaLocation[geomIndex];
   }
 
   public EdgeEnd getNextCW(final EdgeEnd ee) {
     getEdges();
-    final int i = edgeList.indexOf(ee);
+    final int i = this.edgeList.indexOf(ee);
     int iNextCW = i - 1;
     if (i == 0) {
-      iNextCW = edgeList.size() - 1;
+      iNextCW = this.edgeList.size() - 1;
     }
-    return (EdgeEnd)edgeList.get(iNextCW);
+    return (EdgeEnd)this.edgeList.get(iNextCW);
   }
 
   /**
@@ -265,8 +265,8 @@ abstract public class EdgeEndStar {
    * since the list of edges has now changed
    */
   protected void insertEdgeEnd(final EdgeEnd e, final Object obj) {
-    edgeMap.put(e, obj);
-    edgeList = null; // edge list has changed - clear the cache
+    this.edgeMap.put(e, obj);
+    this.edgeList = null; // edge list has changed - clear the cache
   }
 
   public boolean isAreaLabelsConsistent(final GeometryGraph geomGraph) {
@@ -304,7 +304,7 @@ abstract public class EdgeEndStar {
       final EdgeEnd e = (EdgeEnd)it.next();
       final Label label = e.getLabel();
       if (label.isArea(geomIndex)
-        && label.getLocation(geomIndex, Position.LEFT) != Location.NONE) {
+          && label.getLocation(geomIndex, Position.LEFT) != Location.NONE) {
         startLoc = label.getLocation(geomIndex, Position.LEFT);
       }
     }
@@ -335,7 +335,7 @@ abstract public class EdgeEndStar {
           }
           if (leftLoc == Location.NONE) {
             Assert.shouldNeverReachHere("found single null side (at "
-              + e.getCoordinate() + ")");
+                + e.getCoordinate() + ")");
           }
           currLoc = leftLoc;
         } else {
@@ -347,7 +347,7 @@ abstract public class EdgeEndStar {
            */
           Assert.isTrue(
             label.getLocation(geomIndex, Position.LEFT) == Location.NONE,
-            "found single null side");
+              "found single null side");
           label.setLocation(geomIndex, Position.RIGHT, currLoc);
           label.setLocation(geomIndex, Position.LEFT, currLoc);
         }

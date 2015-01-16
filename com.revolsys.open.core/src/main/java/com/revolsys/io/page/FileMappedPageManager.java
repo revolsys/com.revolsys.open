@@ -37,67 +37,67 @@ public class FileMappedPageManager implements PageManager {
   public FileMappedPageManager(final File file) {
     try {
       this.randomAccessFile = new RandomAccessFile(file, "rw");
-      fileChannel = randomAccessFile.getChannel();
+      this.fileChannel = this.randomAccessFile.getChannel();
     } catch (final FileNotFoundException e) {
       throw new IllegalArgumentException("Unable to open file "
-        + file.getAbsolutePath(), e);
+          + file.getAbsolutePath(), e);
     }
   }
 
   @Override
   public synchronized Page createPage() {
-    synchronized (pages) {
+    synchronized (this.pages) {
       Page page;
-      if (freePageIndexes.isEmpty()) {
+      if (this.freePageIndexes.isEmpty()) {
         try {
-          final int index = (int)(randomAccessFile.length() / pageSize);
-          final long offset = (long)index * pageSize;
-          randomAccessFile.setLength(offset + pageSize);
-          final FileChannel channel = randomAccessFile.getChannel();
+          final int index = (int)(this.randomAccessFile.length() / this.pageSize);
+          final long offset = (long)index * this.pageSize;
+          this.randomAccessFile.setLength(offset + this.pageSize);
+          final FileChannel channel = this.randomAccessFile.getChannel();
           final MappedByteBuffer buffer = channel.map(MapMode.READ_WRITE,
-            offset, pageSize);
+            offset, this.pageSize);
           page = new FileMappedPage(this, index, buffer);
 
-          pages.put(page.getIndex(), page);
+          this.pages.put(page.getIndex(), page);
         } catch (final IOException e) {
           throw new RuntimeException(e);
         }
       } else {
-        final Iterator<Integer> iterator = freePageIndexes.iterator();
+        final Iterator<Integer> iterator = this.freePageIndexes.iterator();
         final Integer pageIndex = iterator.next();
         iterator.remove();
         page = loadPage(pageIndex);
       }
-      pagesInUse.add(page);
+      this.pagesInUse.add(page);
       return page;
     }
   }
 
   @Override
   public Page createTempPage() {
-    return new ByteArrayPage(this, -1, pageSize);
+    return new ByteArrayPage(this, -1, this.pageSize);
   }
 
   @Override
   public int getNumPages() {
-    return pages.size();
+    return this.pages.size();
   }
 
   @Override
   public synchronized Page getPage(final int index) {
-    synchronized (pages) {
-      if (freePageIndexes.contains(index)) {
+    synchronized (this.pages) {
+      if (this.freePageIndexes.contains(index)) {
         throw new IllegalArgumentException("Page does not exist " + index);
       } else {
-        Page page = pages.get(index);
+        Page page = this.pages.get(index);
         if (page == null) {
           page = loadPage(index);
         }
-        if (pagesInUse.contains(page)) {
+        if (this.pagesInUse.contains(page)) {
           throw new IllegalArgumentException("Page is currently being used "
-            + index);
+              + index);
         } else {
-          pagesInUse.add(page);
+          this.pagesInUse.add(page);
           page.setOffset(0);
           return page;
         }
@@ -107,15 +107,15 @@ public class FileMappedPageManager implements PageManager {
 
   @Override
   public int getPageSize() {
-    return pageSize;
+    return this.pageSize;
   }
 
   private Page loadPage(final int index) {
     try {
-      final MappedByteBuffer buffer = fileChannel.map(MapMode.READ_WRITE,
-        (long)index * pageSize, pageSize);
+      final MappedByteBuffer buffer = this.fileChannel.map(MapMode.READ_WRITE,
+        (long)index * this.pageSize, this.pageSize);
       final Page page = new FileMappedPage(this, index, buffer);
-      pages.put(index, page);
+      this.pages.put(index, page);
       return page;
     } catch (final IOException e) {
       throw new RuntimeException(e);
@@ -125,15 +125,15 @@ public class FileMappedPageManager implements PageManager {
   @Override
   public synchronized void releasePage(final Page page) {
     write(page);
-    pagesInUse.remove(page);
+    this.pagesInUse.remove(page);
   }
 
   @Override
   public synchronized void removePage(final Page page) {
-    synchronized (pages) {
+    synchronized (this.pages) {
       page.clear();
       write(page);
-      freePageIndexes.add(page.getIndex());
+      this.freePageIndexes.add(page.getIndex());
     }
   }
 

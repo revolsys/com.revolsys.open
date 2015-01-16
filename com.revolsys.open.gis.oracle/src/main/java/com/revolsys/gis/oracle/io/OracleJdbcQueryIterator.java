@@ -23,7 +23,7 @@ public class OracleJdbcQueryIterator extends JdbcQueryIterator {
       return sql;
     }
     sql = "SELECT * FROM (SELECT V.*,ROWNUM \"ROWN\" FROM (" + sql
-      + ") V ) WHERE ROWN ";
+        + ") V ) WHERE ROWN ";
     final int startRowNum = offset + 1;
     final int endRowNum = offset + limit;
     if (offset > 0) {

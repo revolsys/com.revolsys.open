@@ -24,36 +24,36 @@ public class ProcessQueueWorker extends Thread {
   }
 
   public Process getProcess() {
-    return process;
+    return this.process;
   }
 
   @Override
   public void run() {
-    queue.addWorker(this);
+    this.queue.addWorker(this);
     try {
       while (true) {
-        process = in.read(queue.getMaxWorkerIdleTime());
-        if (process == null) {
+        this.process = this.in.read(this.queue.getMaxWorkerIdleTime());
+        if (this.process == null) {
           return;
         } else {
           try {
-            process.run();
+            this.process.run();
           } catch (final Exception e) {
             if (e instanceof ThreadInterruptedException) {
               throw (ThreadInterruptedException)e;
             } else {
-              final Class<? extends Process> processClass = process.getClass();
+              final Class<? extends Process> processClass = this.process.getClass();
               final Logger log = Logger.getLogger(processClass);
               log.error(e.getMessage(), e);
             }
           }
         }
-        process = null;
+        this.process = null;
       }
     } catch (final ClosedException e) {
       return;
     } finally {
-      queue.removeWorker(this);
+      this.queue.removeWorker(this);
     }
   }
 

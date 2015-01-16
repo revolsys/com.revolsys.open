@@ -404,7 +404,7 @@ public class GeometryStyle extends MarkerStyle {
   public void setLineOpacity(final double lineOpacity) {
     if (lineOpacity < 0 || lineOpacity > 1) {
       throw new IllegalArgumentException(
-        "Line opacity must be between 0.0 - 1.0");
+          "Line opacity must be between 0.0 - 1.0");
     } else {
       this.lineOpacity = (int)(255 * lineOpacity);
       this.lineColor = WebColors.setAlpha(this.lineColor, this.lineOpacity);
@@ -483,7 +483,7 @@ public class GeometryStyle extends MarkerStyle {
   public void setPolygonFillOpacity(final double polygonFillOpacity) {
     if (polygonFillOpacity < 0 || polygonFillOpacity > 1) {
       throw new IllegalArgumentException(
-        "Polygon fill opacity must be between 0.0 - 1.0");
+          "Polygon fill opacity must be between 0.0 - 1.0");
     } else {
       this.polygonFillOpacity = (int)(255 * polygonFillOpacity);
       this.polygonFill = WebColors.setAlpha(this.polygonFill,

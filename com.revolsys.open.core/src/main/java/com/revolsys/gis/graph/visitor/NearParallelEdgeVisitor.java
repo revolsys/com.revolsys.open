@@ -21,17 +21,17 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
 
   @Override
   public BoundingBox getEnvelope() {
-    BoundingBox envelope = line.getBoundingBox();
-    envelope = envelope.expand(maxDistance);
+    BoundingBox envelope = this.line.getBoundingBox();
+    envelope = envelope.expand(this.maxDistance);
     return envelope;
   }
 
   private boolean isAlmostParallel(final LineString matchLine) {
-    if (line.getBoundingBox().distance(matchLine.getBoundingBox()) > maxDistance) {
+    if (this.line.getBoundingBox().distance(matchLine.getBoundingBox()) > this.maxDistance) {
       return false;
     }
-    final LineString coords = line;
-    final LineString matchCoords = line;
+    final LineString coords = this.line;
+    final LineString matchCoords = this.line;
     Point previousCoordinate = coords.getPoint(0);
     for (int i = 1; i < coords.getVertexCount(); i++) {
       final Point coordinate = coords.getPoint(i);
@@ -39,7 +39,7 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
       for (int j = 1; j < coords.getVertexCount(); j++) {
         final Point matchCoordinate = matchCoords.getPoint(i);
         final double distance = LineSegmentUtil.distanceLineLine(previousCoordinate, coordinate, previousMatchCoordinate, matchCoordinate);
-        if (distance <= maxDistance) {
+        if (distance <= this.maxDistance) {
           final double angle1 = Angle.normalizePositive(previousCoordinate.angle2d(coordinate));
           final double angle2 = Angle.normalizePositive(previousMatchCoordinate.angle2d(matchCoordinate));
           final double angleDiff = Math.abs(angle1 - angle2);

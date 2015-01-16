@@ -34,13 +34,10 @@ BeanNameAware {
 
   private String servletName;
 
-  private String beanName;
-
   @PreDestroy
   public void destroy() {
     setApplicationContext(null);
     this.servletName = null;
-    this.beanName = null;
   }
 
   @Override
@@ -85,7 +82,6 @@ BeanNameAware {
 
   @Override
   public void setBeanName(final String name) {
-    this.beanName = name;
     if (this.servletName == null) {
       this.servletName = name;
     }

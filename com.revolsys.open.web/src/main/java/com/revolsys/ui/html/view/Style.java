@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,32 +37,32 @@ public class Style extends Element {
    * @return Returns the content.
    */
   public String getContent() {
-    return content;
+    return this.content;
   }
 
   public String getFile() {
-    return file;
+    return this.file;
   }
 
   /**
    * @return Returns the type.
    */
   public String getType() {
-    return type;
+    return this.type;
   }
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    if (content != null) {
+    if (this.content != null) {
       out.startTag(HtmlUtil.STYLE);
-      out.attribute(HtmlUtil.ATTR_TYPE, type);
-      out.write(content);
+      out.attribute(HtmlUtil.ATTR_TYPE, this.type);
+      out.write(this.content);
       out.endTag(HtmlUtil.STYLE);
     } else {
       out.startTag(HtmlUtil.LINK);
       out.attribute(HtmlUtil.ATTR_REL, "stylesheet");
-      out.attribute(HtmlUtil.ATTR_HREF, file);
-      out.attribute(HtmlUtil.ATTR_TYPE, type);
+      out.attribute(HtmlUtil.ATTR_HREF, this.file);
+      out.attribute(HtmlUtil.ATTR_TYPE, this.type);
       out.endTag(HtmlUtil.LINK);
     }
   }
@@ -90,6 +90,6 @@ public class Style extends Element {
 
   @Override
   public String toString() {
-    return file;
+    return this.file;
   }
 }

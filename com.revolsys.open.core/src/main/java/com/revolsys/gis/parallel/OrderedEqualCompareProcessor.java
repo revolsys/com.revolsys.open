@@ -92,8 +92,8 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
     final String geometryFieldName2 = this.recordDefinition2.getGeometryFieldName();
     for (final String fieldName : this.fieldNames) {
       if (!this.equalExclude.contains(fieldName)
-        && !fieldName.equals(geometryFieldName1)
-        && !fieldName.equals(geometryFieldName2)) {
+          && !fieldName.equals(geometryFieldName1)
+          && !fieldName.equals(geometryFieldName2)) {
         final Object value1 = object1.getValue(fieldName);
         final Object value2 = object2.getValue(fieldName);
         if (!valueEquals(value1, value2)) {
@@ -133,9 +133,9 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
   private void initAttributes() {
     final List<String> fieldNames1 = new ArrayList<>(
-      this.recordDefinition1.getFieldNames());
+        this.recordDefinition1.getFieldNames());
     final List<String> fieldNames2 = new ArrayList<>(
-      this.recordDefinition2.getFieldNames());
+        this.recordDefinition2.getFieldNames());
     this.fieldNames.addAll(fieldNames1);
     this.fieldNames.retainAll(fieldNames2);
     fieldNames1.removeAll(this.fieldNames);
@@ -155,10 +155,10 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
   protected void logNoMatch(final Record object, final boolean other) {
     if (other) {
       RecordLog.warn(getClass(), this.otherName + " has no match in "
-        + this.sourceName, object);
+          + this.sourceName, object);
     } else {
       RecordLog.warn(getClass(), this.sourceName + " has no match in "
-        + this.otherName, object);
+          + this.otherName, object);
     }
   }
 
@@ -227,7 +227,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
 
         if (readObject != null) {
           if (previousEqualObject != null
-            && EqualsInstance.INSTANCE.equals(previousEqualObject, readObject)) {
+              && EqualsInstance.INSTANCE.equals(previousEqualObject, readObject)) {
             if (index == 0) {
               RecordLog.error(getClass(), "Duplicate in " + this.sourceName,
                 readObject);
@@ -249,7 +249,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
             final Object value = readObject.getValue(this.fieldName);
             if (value == null) {
               RecordLog.error(getClass(), "Missing key value for "
-                + this.fieldName, readObject);
+                  + this.fieldName, readObject);
             } else if (objects[oppositeIndex] == null) {
               objects[index] = readObject;
               guard[index] = false;
@@ -279,7 +279,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
                   otherObject);
                 if (!geometryEquals) {
                   final String geometryFieldName = sourceObject.getRecordDefinition()
-                    .getGeometryFieldName();
+                      .getGeometryFieldName();
                   notEqualFieldNames.add(geometryFieldName);
                 }
                 if (!notEqualFieldNames.isEmpty()) {
@@ -372,7 +372,7 @@ public class OrderedEqualCompareProcessor extends AbstractInProcess<Record> {
       }
     } else if (value1 instanceof String && value2 instanceof String) {
       if (!Property.hasValue((String)value1)
-        && !Property.hasValue((String)value2)) {
+          && !Property.hasValue((String)value2)) {
         return true;
       }
     }

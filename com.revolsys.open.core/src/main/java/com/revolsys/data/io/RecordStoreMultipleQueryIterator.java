@@ -7,7 +7,7 @@ import com.revolsys.collection.AbstractMultipleIterator;
 import com.revolsys.data.record.Record;
 
 public class RecordStoreMultipleQueryIterator extends
-  AbstractMultipleIterator<Record> {
+AbstractMultipleIterator<Record> {
 
   private RecordStoreQueryReader reader;
 
@@ -20,17 +20,17 @@ public class RecordStoreMultipleQueryIterator extends
   @Override
   public void doClose() {
     super.doClose();
-    reader = null;
+    this.reader = null;
   }
 
   @Override
   public AbstractIterator<Record> getNextIterator()
-    throws NoSuchElementException {
-    if (reader == null) {
+      throws NoSuchElementException {
+    if (this.reader == null) {
       throw new NoSuchElementException();
     } else {
-      final AbstractIterator<Record> iterator = reader.createQueryIterator(queryIndex);
-      queryIndex++;
+      final AbstractIterator<Record> iterator = this.reader.createQueryIterator(this.queryIndex);
+      this.queryIndex++;
       return iterator;
     }
   }

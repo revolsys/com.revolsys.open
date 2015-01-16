@@ -22,7 +22,7 @@ public class NodeAttributes {
   protected static class Methods {
     public static Set<Double> edgeAngles(final Node<?> node) {
       final Set<Double> angles = new TreeSet<Double>(
-        new NumericComparator<Double>());
+          new NumericComparator<Double>());
       for (final Edge<?> edge : node.getInEdges()) {
         final double toAngle = edge.getToAngle();
         angles.add(toAngle);
@@ -214,7 +214,7 @@ public class NodeAttributes {
     final String fieldName = NodeAttributes.class.getName() + "." + name;
     if (!node.hasAttribute(fieldName)) {
       final ObjectAttributeProxy<T, V> proxy = new InvokeMethodObjectAttributeProxy<T, V>(
-        Methods.class, name, Node.class);
+          Methods.class, name, Node.class);
       node.setAttribute(fieldName, proxy);
     }
     final V value = (V)node.getField(fieldName);

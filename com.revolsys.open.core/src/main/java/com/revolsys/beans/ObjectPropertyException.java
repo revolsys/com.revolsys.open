@@ -4,6 +4,10 @@ package com.revolsys.beans;
  * An exception that wraps an object and property that caused the exception.
  */
 public class ObjectPropertyException extends ObjectException {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private final String propertyName;
 
   public ObjectPropertyException(final Object object, final String propertyName) {

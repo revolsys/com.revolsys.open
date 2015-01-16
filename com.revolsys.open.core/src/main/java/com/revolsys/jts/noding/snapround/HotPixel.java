@@ -86,15 +86,15 @@ public class HotPixel {
   /**
    * Creates a new hot pixel, using a given scale factor.
    * The scale factor must be strictly positive (non-zero).
-   * 
+   *
    * @param pt the coordinate at the centre of the pixel
    * @param scaleFactor the scaleFactor determining the pixel size.  Must be > 0
    * @param li the intersector to use for testing intersection with line segments
-   * 
+   *
    */
   public HotPixel(final Point pt, final double scaleFactor,
     final LineIntersector li) {
-    originalPt = pt;
+    this.originalPt = pt;
     this.pt = pt;
     this.scaleFactor = scaleFactor;
     this.li = li;
@@ -134,28 +134,28 @@ public class HotPixel {
 
   /**
    * Gets the coordinate this hot pixel is based at.
-   * 
+   *
    * @return the coordinate of the pixel
    */
   public Point getCoordinate() {
-    return originalPt;
+    return this.originalPt;
   }
 
   /**
    * Returns a "safe" envelope that is guaranteed to contain the hot pixel.
-   * The envelope returned will be larger than the exact envelope of the 
+   * The envelope returned will be larger than the exact envelope of the
    * pixel.
-   * 
+   *
    * @return an envelope which contains the hot pixel
    */
   public BoundingBox getSafeEnvelope() {
-    if (safeEnv == null) {
-      final double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / scaleFactor;
-      safeEnv = new BoundingBoxDoubleGf(2, originalPt.getX() - safeTolerance,
-        originalPt.getY() - safeTolerance, originalPt.getX() + safeTolerance,
-        originalPt.getY() + safeTolerance);
+    if (this.safeEnv == null) {
+      final double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / this.scaleFactor;
+      this.safeEnv = new BoundingBoxDoubleGf(2, this.originalPt.getX() - safeTolerance,
+        this.originalPt.getY() - safeTolerance, this.originalPt.getX() + safeTolerance,
+        this.originalPt.getY() + safeTolerance);
     }
-    return safeEnv;
+    return this.safeEnv;
   }
 
   private Point getScaled(final Point p) {
@@ -164,27 +164,27 @@ public class HotPixel {
 
   private void initCorners(final Point pt) {
     final double tolerance = 0.5;
-    minx = pt.getX() - tolerance;
-    maxx = pt.getX() + tolerance;
-    miny = pt.getY() - tolerance;
-    maxy = pt.getY() + tolerance;
+    this.minx = pt.getX() - tolerance;
+    this.maxx = pt.getX() + tolerance;
+    this.miny = pt.getY() - tolerance;
+    this.maxy = pt.getY() + tolerance;
 
-    corner[0] = new PointDouble(maxx, maxy, Point.NULL_ORDINATE);
-    corner[1] = new PointDouble(minx, maxy, Point.NULL_ORDINATE);
-    corner[2] = new PointDouble(minx, miny, Point.NULL_ORDINATE);
-    corner[3] = new PointDouble(maxx, miny, Point.NULL_ORDINATE);
+    this.corner[0] = new PointDouble(this.maxx, this.maxy, Point.NULL_ORDINATE);
+    this.corner[1] = new PointDouble(this.minx, this.maxy, Point.NULL_ORDINATE);
+    this.corner[2] = new PointDouble(this.minx, this.miny, Point.NULL_ORDINATE);
+    this.corner[3] = new PointDouble(this.maxx, this.miny, Point.NULL_ORDINATE);
   }
 
   /**
-   * Tests whether the line segment (p0-p1) 
+   * Tests whether the line segment (p0-p1)
    * intersects this hot pixel.
-   * 
+   *
    * @param p0 the first coordinate of the line segment to test
    * @param p1 the second coordinate of the line segment to test
    * @return true if the line segment intersects this hot pixel
    */
   public boolean intersects(final Point p0, final Point p1) {
-    if (scaleFactor == 1.0) {
+    if (this.scaleFactor == 1.0) {
       return intersectsScaled(p0, p1);
     }
 
@@ -197,25 +197,25 @@ public class HotPixel {
     final double segMiny = Math.min(p0.getY(), p1.getY());
     final double segMaxy = Math.max(p0.getY(), p1.getY());
 
-    final boolean isOutsidePixelEnv = maxx < segMinx || minx > segMaxx
-      || maxy < segMiny || miny > segMaxy;
-    if (isOutsidePixelEnv) {
-      return false;
-    }
-    final boolean intersects = intersectsToleranceSquare(p0, p1);
+    final boolean isOutsidePixelEnv = this.maxx < segMinx || this.minx > segMaxx
+        || this.maxy < segMiny || this.miny > segMaxy;
+        if (isOutsidePixelEnv) {
+          return false;
+        }
+        final boolean intersects = intersectsToleranceSquare(p0, p1);
 
-    Assert.isTrue(!(isOutsidePixelEnv && intersects), "Found bad envelope test");
+        Assert.isTrue(!(isOutsidePixelEnv && intersects), "Found bad envelope test");
 
-    return intersects;
+        return intersects;
   }
 
   /**
    * Tests whether the segment p0-p1 intersects the hot pixel tolerance square.
    * Because the tolerance square point set is partially open (along the
    * top and right) the test needs to be more sophisticated than
-   * simply checking for any intersection.  
+   * simply checking for any intersection.
    * However, it can take advantage of the fact that the hot pixel edges
-   * do not lie on the coordinate grid.  
+   * do not lie on the coordinate grid.
    * It is sufficient to check if any of the following occur:
    * <ul>
    * <li>a proper intersection between the segment and any hot pixel edge
@@ -233,29 +233,29 @@ public class HotPixel {
     boolean intersectsLeft = false;
     boolean intersectsBottom = false;
 
-    li.computeIntersection(p0, p1, corner[0], corner[1]);
-    if (li.isProper()) {
+    this.li.computeIntersection(p0, p1, this.corner[0], this.corner[1]);
+    if (this.li.isProper()) {
       return true;
     }
 
-    li.computeIntersection(p0, p1, corner[1], corner[2]);
-    if (li.isProper()) {
+    this.li.computeIntersection(p0, p1, this.corner[1], this.corner[2]);
+    if (this.li.isProper()) {
       return true;
     }
-    if (li.hasIntersection()) {
+    if (this.li.hasIntersection()) {
       intersectsLeft = true;
     }
 
-    li.computeIntersection(p0, p1, corner[2], corner[3]);
-    if (li.isProper()) {
+    this.li.computeIntersection(p0, p1, this.corner[2], this.corner[3]);
+    if (this.li.isProper()) {
       return true;
     }
-    if (li.hasIntersection()) {
+    if (this.li.hasIntersection()) {
       intersectsBottom = true;
     }
 
-    li.computeIntersection(p0, p1, corner[3], corner[0]);
-    if (li.isProper()) {
+    this.li.computeIntersection(p0, p1, this.corner[3], this.corner[0]);
+    if (this.li.isProper()) {
       return true;
     }
 
@@ -263,10 +263,10 @@ public class HotPixel {
       return true;
     }
 
-    if (p0.equals(pt)) {
+    if (p0.equals(this.pt)) {
       return true;
     }
-    if (p1.equals(pt)) {
+    if (p1.equals(this.pt)) {
       return true;
     }
 
@@ -274,7 +274,7 @@ public class HotPixel {
   }
 
   private double scale(final double val) {
-    return Math.round(val * scaleFactor);
+    return Math.round(val * this.scaleFactor);
   }
 
 }

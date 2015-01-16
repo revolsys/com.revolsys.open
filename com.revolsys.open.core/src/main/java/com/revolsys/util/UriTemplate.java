@@ -44,6 +44,11 @@ import org.springframework.web.util.UriUtils;
 public class UriTemplate implements Serializable {
 
   /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Static inner class to parse URI template strings into a matching regular expression.
    */
   private static class Parser {
@@ -173,8 +178,8 @@ public class UriTemplate implements Serializable {
     if (uriVariableValues.length != this.variableNames.size()) {
       throw new IllegalArgumentException(
         "Invalid amount of variables values in [" + this.uriTemplate
-          + "]: expected " + this.variableNames.size() + "; got "
-          + uriVariableValues.length);
+        + "]: expected " + this.variableNames.size() + "; got "
+        + uriVariableValues.length);
     }
     final Matcher matcher = NAMES_PATTERN.matcher(this.uriTemplate);
     final StringBuffer buffer = new StringBuffer();
@@ -208,8 +213,8 @@ public class UriTemplate implements Serializable {
     if (uriVariableValues.length != this.variableNames.size()) {
       throw new IllegalArgumentException(
         "Invalid amount of variables values in [" + this.uriTemplate
-          + "]: expected " + this.variableNames.size() + "; got "
-          + uriVariableValues.length);
+        + "]: expected " + this.variableNames.size() + "; got "
+        + uriVariableValues.length);
     }
     final Matcher matcher = NAMES_PATTERN.matcher(this.uriTemplate);
     final StringBuffer buffer = new StringBuffer();
@@ -247,7 +252,7 @@ public class UriTemplate implements Serializable {
   public Map<String, String> match(final String uri) {
     Assert.notNull(uri, "'uri' must not be null");
     final Map<String, String> result = new LinkedHashMap<String, String>(
-      this.variableNames.size());
+        this.variableNames.size());
     final Matcher matcher = this.matchPattern.matcher(uri);
     if (matcher.find()) {
       for (int i = 1; i <= matcher.groupCount(); i++) {

@@ -21,7 +21,7 @@ import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.util.Property;
 
 public class RecordStoreSchemaTreeNode extends LazyLoadTreeNode implements
-  RecordStoreConnectionMapProxy {
+RecordStoreConnectionMapProxy {
 
   public static final ImageIcon ICON_SCHEMA = Icons.getIcon("folder_table");
 

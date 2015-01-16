@@ -7,11 +7,11 @@ public class DEGeoDataset extends DEDataset {
   private SpatialReference spatialReference;
 
   public Envelope getExtent() {
-    return extent;
+    return this.extent;
   }
 
   public SpatialReference getSpatialReference() {
-    return spatialReference;
+    return this.spatialReference;
   }
 
   public void setExtent(final Envelope extent) {

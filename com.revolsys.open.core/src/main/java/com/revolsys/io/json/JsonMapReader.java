@@ -10,7 +10,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.Reader;
 
 public class JsonMapReader extends AbstractReader<Map<String, Object>>
-  implements Reader<Map<String, Object>> {
+implements Reader<Map<String, Object>> {
 
   private final java.io.Reader in;
 
@@ -33,20 +33,20 @@ public class JsonMapReader extends AbstractReader<Map<String, Object>>
 
   @Override
   public void close() {
-    FileUtil.closeSilent(in);
+    FileUtil.closeSilent(this.in);
   }
 
   @Override
   public Iterator<Map<String, Object>> iterator() {
-    if (iterator == null) {
+    if (this.iterator == null) {
       try {
-        iterator = new JsonMapIterator(in, single);
+        this.iterator = new JsonMapIterator(this.in, this.single);
       } catch (final IOException e) {
         throw new IllegalArgumentException("Unable to create Iterator:"
-          + e.getMessage(), e);
+            + e.getMessage(), e);
       }
     }
-    return iterator;
+    return this.iterator;
   }
 
   @Override

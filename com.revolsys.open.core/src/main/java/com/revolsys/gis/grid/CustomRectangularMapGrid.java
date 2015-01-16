@@ -27,9 +27,9 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     if (coordinates.length == 2) {
       final double x1 = coordinates[0];
       final double y1 = coordinates[1];
-      final double x2 = x1 + tileWidth;
-      final double y2 = y1 + tileHeight;
-      return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
+      final double x2 = x1 + this.tileWidth;
+      final double y2 = y1 + this.tileHeight;
+      return new BoundingBoxDoubleGf(this.geometryFactory, 2, x1, y1, x2, y2);
     } else {
       return null;
     }
@@ -37,7 +37,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public CoordinateSystem getCoordinateSystem() {
-    return geometryFactory.getCoordinateSystem();
+    return this.geometryFactory.getCoordinateSystem();
   }
 
   @Override
@@ -47,7 +47,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public double getGridValue(final double origin, final double gridSize,
@@ -57,26 +57,26 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     return minX;
   }
 
+  @Override
+  public String getMapTileName(final double x, final double y) {
+    final double tileX = getGridValue(this.originX, this.tileWidth, x);
+    final double tileY = getGridValue(this.originY, this.tileHeight, y);
+
+    return MathUtil.toString(tileX, 1) + "_" + MathUtil.toString(tileY, 1);
+  }
+
   public String getMapTileName(final Point coordinates) {
     final double x = coordinates.getX();
     final double y = coordinates.getY();
     return getMapTileName(x, y);
   }
 
-  @Override
-  public String getMapTileName(final double x, final double y) {
-    final double tileX = getGridValue(originX, tileWidth, x);
-    final double tileY = getGridValue(originY, tileHeight, y);
-
-    return MathUtil.toString(tileX, 1) + "_" + MathUtil.toString(tileY, 1);
-  }
-
   public double getOriginX() {
-    return originX;
+    return this.originX;
   }
 
   public double getOriginY() {
-    return originY;
+    return this.originY;
   }
 
   @Override
@@ -101,7 +101,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public double getTileHeight() {
-    return tileHeight;
+    return this.tileHeight;
   }
 
   @Override
@@ -109,20 +109,20 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
     final BoundingBox envelope = boundingBox.convert(getGeometryFactory());
 
     final List<RectangularMapTile> tiles = new ArrayList<RectangularMapTile>();
-    final double minX = getGridValue(originX, tileWidth, envelope.getMinX());
-    final double minY = getGridValue(originY, tileHeight, envelope.getMinY());
-    final double maxX = getGridValue(originX, tileWidth, envelope.getMaxX());
-    final double maxY = getGridValue(originY, tileHeight, envelope.getMaxY());
+    final double minX = getGridValue(this.originX, this.tileWidth, envelope.getMinX());
+    final double minY = getGridValue(this.originY, this.tileHeight, envelope.getMinY());
+    final double maxX = getGridValue(this.originX, this.tileWidth, envelope.getMaxX());
+    final double maxY = getGridValue(this.originY, this.tileHeight, envelope.getMaxY());
 
-    final int numX = (int)Math.ceil((maxX - minX) / tileWidth);
-    final int numY = (int)Math.ceil((maxY - minY) / tileWidth);
+    final int numX = (int)Math.ceil((maxX - minX) / this.tileWidth);
+    final int numY = (int)Math.ceil((maxY - minY) / this.tileWidth);
     if (numX > 8 || numY > 8) {
       return tiles;
     }
     for (int i = 0; i < numY; i++) {
-      final double y = minY + i * tileHeight;
+      final double y = minY + i * this.tileHeight;
       for (int j = 0; j < numX; j++) {
-        final double x = minX + j * tileWidth;
+        final double x = minX + j * this.tileWidth;
         final RectangularMapTile tile = getTileByLocation(x, y);
         tiles.add(tile);
       }
@@ -132,7 +132,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public double getTileWidth() {
-    return tileWidth;
+    return this.tileWidth;
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

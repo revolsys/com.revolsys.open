@@ -23,13 +23,13 @@ public class EdgeList<T> extends AbstractList<Edge<T>> {
   @Override
   public boolean add(final Edge<T> edge) {
     final int edgeId = edge.getId();
-    return edgeIds.add(edgeId);
+    return this.edgeIds.add(edgeId);
   }
 
   @Override
   public void add(final int index, final Edge<T> edge) {
     final int edgeId = edge.getId();
-    edgeIds.add(index, edgeId);
+    this.edgeIds.add(index, edgeId);
   }
 
   @Override
@@ -54,8 +54,8 @@ public class EdgeList<T> extends AbstractList<Edge<T>> {
 
   @Override
   public Edge<T> get(final int index) {
-    final Integer edgeId = edgeIds.get(index);
-    return graph.getEdge(edgeId);
+    final Integer edgeId = this.edgeIds.get(index);
+    return this.graph.getEdge(edgeId);
   }
 
   @Override
@@ -64,7 +64,7 @@ public class EdgeList<T> extends AbstractList<Edge<T>> {
       @SuppressWarnings("unchecked")
       final Edge<T> edge = (Edge<T>)o;
       final Object id = edge.getId();
-      return edgeIds.remove(id);
+      return this.edgeIds.remove(id);
     } else {
       return false;
     }
@@ -82,13 +82,13 @@ public class EdgeList<T> extends AbstractList<Edge<T>> {
   @Override
   public Edge<T> set(final int index, final Edge<T> edge) {
     final int edgeId = edge.getId();
-    edgeIds.set(index, edgeId);
+    this.edgeIds.set(index, edgeId);
     return edge;
   }
 
   @Override
   public int size() {
-    return edgeIds.size();
+    return this.edgeIds.size();
   }
 
 }

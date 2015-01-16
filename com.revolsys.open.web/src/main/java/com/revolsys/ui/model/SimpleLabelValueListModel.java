@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,29 +31,32 @@ public class SimpleLabelValueListModel implements LabelValueListModel {
 
   public void add(final String label, final Object value) {
     if (value != null) {
-      labels.add(label);
-      values.put(label, value.toString());
+      this.labels.add(label);
+      this.values.put(label, value.toString());
     } else {
-      labels.add(label);
-      values.put(label, value);
+      this.labels.add(label);
+      this.values.put(label, value);
     }
   }
 
   public void add(final String label, final String value) {
-    labels.add(label);
-    values.put(label, value);
+    this.labels.add(label);
+    this.values.put(label, value);
   }
 
+  @Override
   public String getLabel(final int index) {
-    return (String)labels.get(index);
+    return (String)this.labels.get(index);
   }
 
+  @Override
   public int getSize() {
-    return labels.size();
+    return this.labels.size();
   }
 
+  @Override
   public String getValue(final int index) {
     final String label = getLabel(index);
-    return (String)values.get(label);
+    return (String)this.values.get(label);
   }
 }

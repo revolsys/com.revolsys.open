@@ -26,14 +26,14 @@ public class IOUtil {
     final String ext = FileUtil.extension(filename);
     if (ext.equalsIgnoreCase(".shp")) {
       try (
-        GeometryReader reader = AbstractGeometryReaderFactory.geometryReader(new FileSystemResource(
-          filename))) {
+          GeometryReader reader = AbstractGeometryReaderFactory.geometryReader(new FileSystemResource(
+            filename))) {
         final List<Geometry> geometries = reader.read();
         if (geometries.isEmpty()) {
           return geomFact.geometryCollection();
         } else {
           final GeometryFactory geometryFactory = geometries.get(0)
-            .getGeometryFactory();
+              .getGeometryFactory();
           return geometryFactory.geometryCollection(geometries);
         }
       }
@@ -65,7 +65,7 @@ public class IOUtil {
 
   /**
    * Reads one or more WKT geometries from a string.
-   * 
+   *
    * @param wkt
    * @param geomFact
    * @return the geometry read
@@ -89,13 +89,6 @@ public class IOUtil {
   private static Geometry readGeometryFromWKBHexFile(final String filename,
     final GeometryFactory geomFact) throws ParseException, IOException {
     return readGeometriesFromWKBHexString(FileUtil.readText(filename), geomFact);
-  }
-
-  private static Geometry readGeometryFromWKBHexString(final String wkbHexFile,
-    final GeometryFactory geomFact) throws ParseException, IOException {
-    final WKBReader reader = new WKBReader(geomFact);
-    final String wkbHex = cleanHex(wkbHexFile);
-    return reader.read(WKBReader.hexToBytes(wkbHex));
   }
 
 }

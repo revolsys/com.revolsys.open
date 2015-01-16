@@ -7,7 +7,7 @@ public interface MapSerializer {
   /**
    * <p>Convert the object to a Map of property name, value pairs. The values can be one of
    * the following supported types. Other values should be converted to one of these values.</p>
-   * 
+   *
    * <ul>
    *   <li>boolean or {@link Boolean}</li>
    *   <li>byte or {@link Byte}</li>

@@ -18,8 +18,6 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
 public class GeometryStylePreview extends JPanel {
-  private static final long serialVersionUID = 1L;
-
   public static GeneralPath getLineShape(final int size) {
     final GeneralPath path = new GeneralPath();
     path.moveTo(0.19 * size, 0.19 * size);
@@ -42,6 +40,8 @@ public class GeometryStylePreview extends JPanel {
     path.closePath();
     return path;
   }
+
+  private static final long serialVersionUID = 1L;
 
   private Shape shape = getLineShape(100);
 

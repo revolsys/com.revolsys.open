@@ -46,18 +46,16 @@ import com.revolsys.jtstest.testrunner.Result;
  * convenient and noticeable way of flagging the problem when using the TestRunner).
  * All other Geometry methods are executed normally.
  * <p>
- * In order to eliminate the need to specify the precise result of an overlay, 
+ * In order to eliminate the need to specify the precise result of an overlay,
  * this class forces the final return value to be <tt>GEOMETRYCOLLECTION EMPTY</tt>.
  * <p>
  * This class can be used via the <tt>-geomop</tt> command-line option
  * or by the <tt>&lt;geometryOperation&gt;</tt> XML test file setting.
- * 
+ *
  * @author Martin Davis
  *
  */
 public class OverlayValidatedGeometryOperation implements GeometryOperation {
-  private static final double AREA_DIFF_TOL = 5.0;
-
   public static double areaDiff(final Geometry g0, final Geometry g1) {
     final double areaA = g0.getArea();
     final double areaAdiffB = g0.difference(g1).getArea();
@@ -96,6 +94,8 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
     return -1;
   }
 
+  private static final double AREA_DIFF_TOL = 5.0;
+
   private final boolean returnEmptyGC = true;
 
   private GeometryMethodOperation chainOp = new GeometryMethodOperation();
@@ -107,7 +107,7 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
   /**
    * Creates a new operation which chains to the given {@link GeometryMethodOperation}
    * for non-intercepted methods.
-   * 
+   *
    * @param chainOp the operation to chain to
    */
   public OverlayValidatedGeometryOperation(final GeometryMethodOperation chainOp) {
@@ -119,19 +119,19 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
     // System.out.println("Area diff = " + areaDiff);
     if (Math.abs(areaDiff) > AREA_DIFF_TOL) {
       final String msg = "Operation result is invalid [AreaTest] (" + areaDiff
-        + ")";
+          + ")";
       reportError(msg);
     }
   }
 
   @Override
   public Class getReturnType(final String opName) {
-    return chainOp.getReturnType(opName);
+    return this.chainOp.getReturnType(opName);
   }
 
   /**
    * Invokes the named operation
-   * 
+   *
    * @param opName
    * @param geometry
    * @param args
@@ -146,7 +146,7 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
 
     // if not an overlay op, do the default
     if (opCode < 0) {
-      return chainOp.invoke(opName, geometry, args);
+      return this.chainOp.invoke(opName, geometry, args);
     }
     return invokeValidatedOverlayOp(opCode, geometry, args);
   }
@@ -154,7 +154,7 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
   /**
    * Invokes an overlay op, optionally using snapping,
    * and optionally validating the result.
-   * 
+   *
    * @param opCode
    * @param g0
    * @param args
@@ -173,10 +173,10 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
     areaValidate(g0, g1);
 
     /**
-     * Return an empty GeometryCollection as the result.  
+     * Return an empty GeometryCollection as the result.
      * This allows the test case to avoid specifying an exact result
      */
-    if (returnEmptyGC) {
+    if (this.returnEmptyGC) {
       result = result.getGeometryFactory().geometryCollection();
     }
 
@@ -196,7 +196,7 @@ public class OverlayValidatedGeometryOperation implements GeometryOperation {
     if (!validator.isValid(opCode)) {
       final Point invalidLoc = validator.getInvalidLocation();
       final String msg = "Operation result is invalid [OverlayResultValidator] ( "
-        + EWktWriter.point(invalidLoc) + " )";
+          + EWktWriter.point(invalidLoc) + " )";
       reportError(msg);
     }
   }

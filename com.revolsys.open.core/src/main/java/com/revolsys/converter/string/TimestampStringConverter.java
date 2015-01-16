@@ -7,8 +7,6 @@ import com.revolsys.util.DateUtil;
 import com.revolsys.util.Property;
 
 public class TimestampStringConverter implements StringConverter<Timestamp> {
-  private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-
   public TimestampStringConverter() {
   }
 

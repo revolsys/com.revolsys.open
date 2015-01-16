@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -75,9 +75,9 @@ public class MultiSelectField extends Field {
     final String stringValue,
     final String label) {
     final FieldValue option = new FieldValue(value, stringValue, label);
-    options.add(option);
-    optionMap.put(stringValue, option);
-    optionValueMap.put(value, option);
+    this.options.add(option);
+    this.optionMap.put(stringValue, option);
+    this.optionValueMap.put(value, option);
   }
 
   public void addOption(final String label) {
@@ -90,7 +90,7 @@ public class MultiSelectField extends Field {
 
   @Override
   public boolean hasValue() {
-    return !selectedValues.isEmpty();
+    return !this.selectedValues.isEmpty();
   }
 
   @Override
@@ -105,13 +105,12 @@ public class MultiSelectField extends Field {
         }
       }
     } else {
-      for (int i = 0; i < parameterValues.length; i++) {
-        final String stringValue = parameterValues[i];
-        final FieldValue option = (FieldValue)optionMap.get(stringValue);
+      for (final String stringValue : parameterValues) {
+        final FieldValue option = (FieldValue)this.optionMap.get(stringValue);
         if (option != null) {
-          selectedValues.put(option.getStringValue(), option.getValue());
+          this.selectedValues.put(option.getStringValue(), option.getValue());
         } else {
-          hasInvalidOptions = true;
+          this.hasInvalidOptions = true;
         }
       }
     }
@@ -123,15 +122,15 @@ public class MultiSelectField extends Field {
     if (!super.isValid()) {
       valid = false;
     } else if (hasValue()) {
-      if (hasInvalidOptions) {
+      if (this.hasInvalidOptions) {
         addValidationError("Invalid Value");
         valid = false;
       }
       if (valid) {
-        if (selectedValues.isEmpty()) {
+        if (this.selectedValues.isEmpty()) {
           setValue(Collections.EMPTY_LIST);
         } else {
-          setValue(new ArrayList(selectedValues.values()));
+          setValue(new ArrayList(this.selectedValues.values()));
         }
       }
     }
@@ -143,9 +142,9 @@ public class MultiSelectField extends Field {
     out.startTag(HtmlUtil.SELECT);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_MULTIPLE, "multiple");
-    out.attribute(HtmlUtil.ATTR_SIZE, String.valueOf(size));
-    if (onChange != null) {
-      out.attribute(HtmlUtil.ATTR_ON_CHANGE, onChange);
+    out.attribute(HtmlUtil.ATTR_SIZE, String.valueOf(this.size));
+    if (this.onChange != null) {
+      out.attribute(HtmlUtil.ATTR_ON_CHANGE, this.onChange);
     }
     serializeOptions(out);
     out.endTag(HtmlUtil.SELECT);
@@ -153,17 +152,17 @@ public class MultiSelectField extends Field {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "fieldActions");
     final String baseUrl = "javascript:setMutliSelectAllSelected('"
-      + getForm().getName() + "','" + getName() + "'";
+        + getForm().getName() + "','" + getName() + "'";
     HtmlUtil.serializeA(out, null, baseUrl + ",true)", "select all");
     HtmlUtil.serializeA(out, null, baseUrl + ",false)", "select none");
     out.endTag(HtmlUtil.DIV);
   }
 
   private void serializeOptions(final XmlWriter out) {
-    for (final Iterator optionIter = options.iterator(); optionIter.hasNext();) {
+    for (final Iterator optionIter = this.options.iterator(); optionIter.hasNext();) {
       final FieldValue option = (FieldValue)optionIter.next();
       out.startTag(HtmlUtil.OPTION);
-      if (selectedValues.containsKey(option.getStringValue())) {
+      if (this.selectedValues.containsKey(option.getStringValue())) {
         out.attribute(HtmlUtil.ATTR_SELECTED, "true");
       }
       if (!option.getStringValue().equals(option.getLabel())) {
@@ -180,15 +179,15 @@ public class MultiSelectField extends Field {
 
   @Override
   public void setValue(final Object object) {
-    selectedValues.clear();
+    this.selectedValues.clear();
     final List valueList = (List)object;
     super.setValue(valueList);
     if (valueList != null) {
       for (final Iterator values = valueList.iterator(); values.hasNext();) {
         final Object value = values.next();
-        final FieldValue option = (FieldValue)optionValueMap.get(value);
+        final FieldValue option = (FieldValue)this.optionValueMap.get(value);
         if (option != null) {
-          selectedValues.put(option.getStringValue(), option.getValue());
+          this.selectedValues.put(option.getStringValue(), option.getValue());
         }
       }
     }

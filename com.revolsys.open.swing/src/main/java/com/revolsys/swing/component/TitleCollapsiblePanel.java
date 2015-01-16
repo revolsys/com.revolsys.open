@@ -15,6 +15,11 @@ import com.revolsys.swing.SwingUtil;
 
 public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final JXCollapsiblePane collapsible;
 
   private final ComponentFactory<?> componentFactory;
@@ -36,21 +41,21 @@ public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
     this.componentFactory = componentFactory;
 
     SwingUtil.setTitledBorder(this, title);
-    collapsible = new JXCollapsiblePane();
-    collapsible.setCollapsed(true);
-    collapsible.setOpaque(false);
-    ((JXPanel)collapsible.getContentPane()).setOpaque(false);
-    add(collapsible);
+    this.collapsible = new JXCollapsiblePane();
+    this.collapsible.setCollapsed(true);
+    this.collapsible.setOpaque(false);
+    ((JXPanel)this.collapsible.getContentPane()).setOpaque(false);
+    add(this.collapsible);
 
     if (component != null) {
-      collapsible.add(component);
-      created = true;
+      this.collapsible.add(component);
+      this.created = true;
     }
     addMouseListener(this);
   }
 
   public boolean isCollapsed() {
-    return collapsible.isCollapsed();
+    return this.collapsible.isCollapsed();
   }
 
   @Override
@@ -84,15 +89,15 @@ public class TitleCollapsiblePanel extends BasePanel implements MouseListener {
   public void setCollapsed(final boolean collapsed) {
     if (collapsed == false) {
       synchronized (this) {
-        if (!created) {
-          created = true;
-          if (componentFactory != null) {
-            final Component component = componentFactory.createComponent();
-            collapsible.add(component);
+        if (!this.created) {
+          this.created = true;
+          if (this.componentFactory != null) {
+            final Component component = this.componentFactory.createComponent();
+            this.collapsible.add(component);
           }
         }
       }
     }
-    collapsible.setCollapsed(collapsed);
+    this.collapsible.setCollapsed(collapsed);
   }
 }

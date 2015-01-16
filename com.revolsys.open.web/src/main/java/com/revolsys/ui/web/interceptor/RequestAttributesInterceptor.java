@@ -30,7 +30,7 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
   @Override
   public void afterCompletion(final HttpServletRequest request,
     final HttpServletResponse response, final Object handler, final Exception ex)
-    throws Exception {
+        throws Exception {
   }
 
   public Map<String, Map<String, Object>> getAttributeMappings() {
@@ -47,7 +47,7 @@ public class RequestAttributesInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(final HttpServletRequest request,
     final HttpServletResponse response, final Object handler)
-    throws ServletException {
+        throws ServletException {
     final String path = this.urlPathHelper.getLookupPathForRequest(request);
     for (final Entry<String, Map<String, Object>> mapping : this.attributeMappings.entrySet()) {
       final String pattern = mapping.getKey();

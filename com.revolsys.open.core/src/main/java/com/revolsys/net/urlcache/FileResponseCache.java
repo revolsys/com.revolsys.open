@@ -45,7 +45,7 @@ public class FileResponseCache extends ResponseCache {
 
   @Override
   public CacheRequest put(final URI uri, final URLConnection connection)
-    throws IOException {
+      throws IOException {
     final File file = toFile(uri);
     if (file != null) {
 
@@ -64,7 +64,7 @@ public class FileResponseCache extends ResponseCache {
   private File toFile(final URI uri) {
     final String scheme = uri.getScheme();
     if (scheme.equals("http") || scheme.equals("https")) {
-      File file = new File(directory, scheme);
+      File file = new File(this.directory, scheme);
       final String host = uri.getHost();
       file = new File(file, host);
       final int port = uri.getPort();

@@ -24,7 +24,7 @@ public class FgdbField extends FieldDefinition {
   }
 
   public boolean setValue(final Record record, final EndianInput in)
-    throws IOException {
+      throws IOException {
     final Object value = read(in);
     final String name = getName();
     record.setValue(name, value);

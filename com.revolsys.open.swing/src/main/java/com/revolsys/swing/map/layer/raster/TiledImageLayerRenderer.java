@@ -21,8 +21,8 @@ import com.revolsys.swing.parallel.RunnableSwingWorkerManager;
 import com.revolsys.util.Property;
 
 public class TiledImageLayerRenderer extends
-  AbstractLayerRenderer<AbstractTiledImageLayer> implements
-  PropertyChangeListener {
+AbstractLayerRenderer<AbstractTiledImageLayer> implements
+PropertyChangeListener {
 
   private final Map<MapTile, MapTile> cachedTiles = new HashMap<MapTile, MapTile>();
 
@@ -47,13 +47,13 @@ public class TiledImageLayerRenderer extends
       final BoundingBox newBoundingBox = (BoundingBox)newValue;
       synchronized (this.cachedTiles) {
         final List<MapTile> mapTiles = new ArrayList<MapTile>(
-          this.cachedTiles.keySet());
+            this.cachedTiles.keySet());
         final GeometryFactory newGeometryFactory = newBoundingBox.getGeometryFactory();
         for (final MapTile mapTile : mapTiles) {
           final BoundingBox boundingBox = mapTile.getBoundingBox();
           final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
           if (!geometryFactory.equals(newGeometryFactory)
-            || !newBoundingBox.intersects(boundingBox)) {
+              || !newBoundingBox.intersects(boundingBox)) {
             this.cachedTiles.remove(boundingBox);
           }
         }
@@ -75,12 +75,12 @@ public class TiledImageLayerRenderer extends
     final double resolution = layer.getResolution(viewport);
     synchronized (this.cachedTiles) {
       if (resolution != this.resolution
-        || geometryFactory != this.geometryFactory) {
+          || geometryFactory != this.geometryFactory) {
         this.resolution = resolution;
         this.geometryFactory = geometryFactory;
         this.cachedTiles.clear();
-        tileLoaderManager.removeTasks(loadingTasks);
-        loadingTasks.clear();
+        tileLoaderManager.removeTasks(this.loadingTasks);
+        this.loadingTasks.clear();
       }
     }
     final List<Runnable> tasks = new ArrayList<Runnable>();
@@ -106,14 +106,14 @@ public class TiledImageLayerRenderer extends
         }
       }
     }
-    synchronized (loadingTasks) {
-      loadingTasks.addAll(tasks);
+    synchronized (this.loadingTasks) {
+      this.loadingTasks.addAll(tasks);
       tileLoaderManager.addTasks(tasks);
     }
   }
 
   public void setLoaded(final TileLoadTask tileLoadTask) {
-    loadingTasks.remove(tileLoadTask);
+    this.loadingTasks.remove(tileLoadTask);
     getLayer().firePropertyChange("loading", false, true);
   }
 

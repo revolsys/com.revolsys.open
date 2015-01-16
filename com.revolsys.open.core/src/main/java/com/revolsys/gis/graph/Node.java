@@ -396,14 +396,12 @@ Externalizable {
   public boolean hasEdge(final Edge<T> edge) {
     if (edge.getGraph() == getGraph()) {
       final int edgeId = edge.getId();
-      for (int i = 0; i < this.inEdgeIds.length; i++) {
-        final int inEdgeId = this.inEdgeIds[i];
+      for (final int inEdgeId : this.inEdgeIds) {
         if (inEdgeId == edgeId) {
           return true;
         }
       }
-      for (int i = 0; i < this.outEdgeIds.length; i++) {
-        final int inEdgeId = this.outEdgeIds[i];
+      for (final int inEdgeId : this.outEdgeIds) {
         if (inEdgeId == edgeId) {
           return true;
         }

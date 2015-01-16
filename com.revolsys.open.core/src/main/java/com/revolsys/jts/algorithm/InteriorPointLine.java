@@ -60,19 +60,19 @@ public class InteriorPointLine {
   private Point interiorPoint = null;
 
   public InteriorPointLine(final Geometry g) {
-    centroid = g.getCentroid();
+    this.centroid = g.getCentroid();
     addInterior(g);
-    if (interiorPoint == null) {
+    if (this.interiorPoint == null) {
       addEndpoints(g);
     }
   }
 
   private void add(final double x, final double y) {
-    final double dist = MathUtil.distance(centroid.getX(), centroid.getY(), x,
+    final double dist = MathUtil.distance(this.centroid.getX(), this.centroid.getY(), x,
       y);
-    if (dist < minDistance) {
-      interiorPoint = new PointDouble(x, y);
-      minDistance = dist;
+    if (dist < this.minDistance) {
+      this.interiorPoint = new PointDouble(x, y);
+      this.minDistance = dist;
     }
   }
 
@@ -123,7 +123,7 @@ public class InteriorPointLine {
   }
 
   public Point getInteriorPoint() {
-    return interiorPoint;
+    return this.interiorPoint;
   }
 
 }

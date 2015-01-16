@@ -40,7 +40,7 @@ public class RecordGeometryAreaComparitor implements Comparator<Record> {
           if (clockwise2) {
             return 0;
           } else {
-            if (clockwise) {
+            if (this.clockwise) {
               compare = -1;
             } else {
               compare = 1;
@@ -48,7 +48,7 @@ public class RecordGeometryAreaComparitor implements Comparator<Record> {
           }
         } else {
           if (clockwise2) {
-            if (clockwise) {
+            if (this.clockwise) {
               compare = 1;
             } else {
               compare = -1;
@@ -59,7 +59,7 @@ public class RecordGeometryAreaComparitor implements Comparator<Record> {
         }
       }
     }
-    if (decending) {
+    if (this.decending) {
       return -compare;
     } else {
       return compare;

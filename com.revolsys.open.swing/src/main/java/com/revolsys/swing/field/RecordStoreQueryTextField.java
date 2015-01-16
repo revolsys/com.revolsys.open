@@ -61,9 +61,9 @@ import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.util.Property;
 
 public class RecordStoreQueryTextField extends TextField implements
-  DocumentListener, KeyListener, MouseListener, FocusListener,
-  ListDataListener, ItemSelectable, Field, ListSelectionListener,
-  HighlightPredicate {
+DocumentListener, KeyListener, MouseListener, FocusListener,
+ListDataListener, ItemSelectable, Field, ListSelectionListener,
+HighlightPredicate {
   private static final Icon ICON_DELETE = Icons.getIcon("delete");
 
   private static final long serialVersionUID = 1L;
@@ -87,7 +87,7 @@ public class RecordStoreQueryTextField extends TextField implements
   public Record selectedItem;
 
   private final Map<String, String> valueToDisplayMap = new LruMap<String, String>(
-    100);
+      100);
 
   private Object originalValue;
 
@@ -319,7 +319,7 @@ public class RecordStoreQueryTextField extends TextField implements
         }
         this.list.setSelectedIndex(selectedIndex);
         e.consume();
-      break;
+        break;
       case KeyEvent.VK_ENTER:
         if (size > 0) {
           if (selectedIndex >= 0 && selectedIndex < size) {
@@ -335,7 +335,7 @@ public class RecordStoreQueryTextField extends TextField implements
       case KeyEvent.VK_TAB:
         return;
       default:
-      break;
+        break;
     }
     showMenu();
   }
@@ -457,7 +457,7 @@ public class RecordStoreQueryTextField extends TextField implements
       if (this.below) {
         x = 0;
         final Insets screenInsets = Toolkit.getDefaultToolkit()
-          .getScreenInsets(getGraphicsConfiguration());
+            .getScreenInsets(getGraphicsConfiguration());
 
         final Rectangle bounds = getGraphicsConfiguration().getBounds();
         final int menuHeight = this.menu.getBounds().height;

@@ -72,6 +72,7 @@ import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -92,10 +93,10 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   public static GeometryFactory create(final Map<String, Object> properties) {
-    final int srid = CollectionUtil.getInteger(properties, "srid", 0);
-    final int axisCount = CollectionUtil.getInteger(properties, "axisCount", 2);
-    final double scaleXY = CollectionUtil.getDouble(properties, "scaleXy", 0.0);
-    final double scaleZ = CollectionUtil.getDouble(properties, "scaleZ", 0.0);
+    final int srid = Maps.getInteger(properties, "srid", 0);
+    final int axisCount = Maps.getInteger(properties, "axisCount", 2);
+    final double scaleXY = Maps.getDouble(properties, "scaleXy", 0.0);
+    final double scaleZ = Maps.getDouble(properties, "scaleZ", 0.0);
     return GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
   }
 
@@ -284,6 +285,21 @@ public class GeometryFactory implements Serializable, MapSerializer {
       return create(properties);
     } else {
       return null;
+    }
+  }
+
+  public static String getAxisName(final int axisIndex) {
+    switch (axisIndex) {
+      case 0:
+        return "X";
+      case 1:
+        return "Y";
+      case 2:
+        return "Z";
+      case 3:
+        return "M";
+      default:
+        return String.valueOf(axisIndex);
     }
   }
 
@@ -1516,20 +1532,5 @@ public class GeometryFactory implements Serializable, MapSerializer {
     string.append(", scales=");
     string.append(Arrays.toString(this.scales));
     return string.toString();
-  }
-
-  public static String getAxisName(final int axisIndex) {
-    switch (axisIndex) {
-      case 0:
-        return "X";
-      case 1:
-        return "Y";
-      case 2:
-        return "Z";
-      case 3:
-        return "M";
-      default:
-        return String.valueOf(axisIndex);
-    }
   }
 }

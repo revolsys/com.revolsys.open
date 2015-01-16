@@ -10,18 +10,18 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class RecordValidationProcess extends
-  BaseInOutProcess<Record, Record> {
+BaseInOutProcess<Record, Record> {
   private final RecordValidator validator = new RecordValidator();
 
   @Override
   protected void process(final Channel<Record> in,
     final Channel<Record> out, final Record object) {
-    validator.isValid(object);
+    this.validator.isValid(object);
     out.write(object);
   }
 
   public void setValidators(
     final Map<DataType, FieldValueValidator> validators) {
-    validator.addValidators(validators);
+    this.validator.addValidators(validators);
   }
 }

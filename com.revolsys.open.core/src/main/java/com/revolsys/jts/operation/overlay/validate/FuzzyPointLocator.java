@@ -49,7 +49,7 @@ import com.revolsys.jts.geom.Polygon;
  * If a point is not clearly in the Interior or Exterior,
  * it is considered to be on the Boundary.
  * In other words, if the point is within the tolerance of the Boundary,
- * it is considered to be on the Boundary; otherwise, 
+ * it is considered to be on the Boundary; otherwise,
  * whether it is Interior or Exterior is determined directly.
  *
  * @author Martin Davis
@@ -68,12 +68,12 @@ public class FuzzyPointLocator {
     final double boundaryDistanceTolerance) {
     this.g = g;
     this.boundaryDistanceTolerance = boundaryDistanceTolerance;
-    linework = extractLinework(g);
+    this.linework = extractLinework(g);
   }
 
   /**
    * Extracts linework for polygonal components.
-   * 
+   *
    * @param geometry the geometry from which to extract
    * @return a lineal geometry containing the extracted linework
    */
@@ -99,21 +99,21 @@ public class FuzzyPointLocator {
 
     // now we know point must be clearly inside or outside geometry, so return
     // actual location value
-    return ptLocator.locate(pt, g);
+    return this.ptLocator.locate(pt, this.g);
   }
 
   private boolean isWithinToleranceOfBoundary(final Point pt) {
     final double x = pt.getX();
     final double y = pt.getY();
-    for (int i = 0; i < linework.getGeometryCount(); i++) {
-      final LineString line = (LineString)linework.getGeometry(i);
+    for (int i = 0; i < this.linework.getGeometryCount(); i++) {
+      final LineString line = (LineString)this.linework.getGeometry(i);
       for (int j = 0; j < line.getVertexCount() - 1; j++) {
         final double x1 = line.getX(j);
         final double y1 = line.getY(j + 1);
         final double x2 = line.getX(j);
         final double y2 = line.getY(j + 1);
         final double dist = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
-        if (dist <= boundaryDistanceTolerance) {
+        if (dist <= this.boundaryDistanceTolerance) {
           return true;
         }
       }

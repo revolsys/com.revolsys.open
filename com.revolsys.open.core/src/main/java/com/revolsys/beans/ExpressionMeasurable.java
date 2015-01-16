@@ -41,7 +41,7 @@ public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
 
   @Override
   public BigDecimal decimalValue(final Unit<Q> arg0, final MathContext arg1)
-    throws ArithmeticException {
+      throws ArithmeticException {
     throw new UnsupportedOperationException();
   }
 
@@ -58,16 +58,16 @@ public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
 
   @Override
   public Unit<Q> getUnit() {
-    return unit;
+    return this.unit;
   }
 
   @Override
   public Double getValue() {
-    if (expression == null) {
+    if (this.expression == null) {
       return Double.NaN;
     } else {
       try {
-        return Double.valueOf(JexlUtil.evaluateExpression(context, expression)
+        return Double.valueOf(JexlUtil.evaluateExpression(this.context, this.expression)
           .toString());
       } catch (final NullPointerException e) {
         return 0.0;
@@ -86,7 +86,7 @@ public class ExpressionMeasurable<Q extends Quantity> extends Measure<Q> {
     } else {
       final UnitConverter unitConverter = this.unit.getConverterTo(unit);
       final Unit<Q> transformedUnit = this.unit.transform(unitConverter);
-      return new ExpressionMeasurable<Q>(expression, context, transformedUnit);
+      return new ExpressionMeasurable<Q>(this.expression, this.context, transformedUnit);
     }
   }
 }

@@ -44,7 +44,7 @@ import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
 
 /**
  * Tests Voronoi diagram generation
- * 
+ *
  */
 public class VoronoiTest extends TestCase {
 
@@ -75,7 +75,7 @@ public class VoronoiTest extends TestCase {
     } else {
       // result = builder.getEdges(geomFact);
     }
-  //  System.out.println(result);
+    //  System.out.println(result);
 
     Geometry expectedEdges = this.reader.read(expectedWKT);
     result = result.normalize();

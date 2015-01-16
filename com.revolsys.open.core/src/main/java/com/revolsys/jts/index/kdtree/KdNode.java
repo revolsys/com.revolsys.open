@@ -38,7 +38,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * A node of a {@link KdTree}, which represents one or more points in the same location.
- * 
+ *
  * @author dskea
  */
 public class KdNode {
@@ -55,49 +55,49 @@ public class KdNode {
 
   /**
    * Creates a new KdNode.
-   * 
-   * @param p point location of new node
-   * @param data a data objects to associate with this node
-   */
-  public KdNode(final Point p, final Object data) {
-    this.p = new PointDouble(p);
-    left = null;
-    right = null;
-    count = 1;
-    this.data = data;
-  }
-
-  /**
-   * Creates a new KdNode.
-   * 
+   *
    * @param _x coordinate of point
    * @param _y coordinate of point
    * @param data a data objects to associate with this node
    */
   public KdNode(final double _x, final double _y, final Object data) {
-    p = new PointDouble(_x, _y, Point.NULL_ORDINATE);
-    left = null;
-    right = null;
-    count = 1;
+    this.p = new PointDouble(_x, _y, Point.NULL_ORDINATE);
+    this.left = null;
+    this.right = null;
+    this.count = 1;
+    this.data = data;
+  }
+
+  /**
+   * Creates a new KdNode.
+   *
+   * @param p point location of new node
+   * @param data a data objects to associate with this node
+   */
+  public KdNode(final Point p, final Object data) {
+    this.p = new PointDouble(p);
+    this.left = null;
+    this.right = null;
+    this.count = 1;
     this.data = data;
   }
 
   /**
    * Returns the location of this node
-   * 
+   *
    * @return p location of this node
    */
   public Point getCoordinate() {
-    return p;
+    return this.p;
   }
 
   /**
    * Returns the number of inserted points that are coincident at this location.
-   * 
+   *
    * @return number of inserted points that this node represents
    */
   public int getCount() {
-    return count;
+    return this.count;
   }
 
   /**
@@ -105,66 +105,66 @@ public class KdNode {
    * @return
    */
   public Object getData() {
-    return data;
+    return this.data;
   }
 
   /**
    * Returns the left node of the tree
-   * 
+   *
    * @return left node
    */
   public KdNode getLeft() {
-    return left;
+    return this.left;
   }
 
   /**
    * Returns the right node of the tree
-   * 
+   *
    * @return right node
    */
   public KdNode getRight() {
-    return right;
+    return this.right;
   }
 
   /**
    * Returns the X coordinate of the node
-   * 
+   *
    * @retrun X coordiante of the node
    */
   public double getX() {
-    return p.getX();
+    return this.p.getX();
   }
 
   /**
    * Returns the Y coordinate of the node
-   * 
+   *
    * @return Y coordiante of the node
    */
   public double getY() {
-    return p.getY();
+    return this.p.getY();
   }
 
   // Increments counts of points at this location
   void increment() {
-    count = count + 1;
+    this.count = this.count + 1;
   }
 
   /**
    * Tests whether more than one point with this value have been inserted (up to the tolerance)
-   * 
+   *
    * @return true if more than one point have been inserted with this value
    */
   public boolean isRepeated() {
-    return count > 1;
+    return this.count > 1;
   }
 
   // Sets left node value
   void setLeft(final KdNode _left) {
-    left = _left;
+    this.left = _left;
   }
 
   // Sets right node value
   void setRight(final KdNode _right) {
-    right = _right;
+    this.right = _right;
   }
 }

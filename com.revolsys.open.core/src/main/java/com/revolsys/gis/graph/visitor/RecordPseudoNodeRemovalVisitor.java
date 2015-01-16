@@ -28,7 +28,7 @@ import com.revolsys.util.ObjectProcessor;
  */
 public class RecordPseudoNodeRemovalVisitor extends
 AbstractNodeListenerVisitor<Record> implements FilterProxy<Node<Record>>,
-  ObjectProcessor<RecordGraph> {
+ObjectProcessor<RecordGraph> {
 
   private Filter<Node<Record>> filter;
 

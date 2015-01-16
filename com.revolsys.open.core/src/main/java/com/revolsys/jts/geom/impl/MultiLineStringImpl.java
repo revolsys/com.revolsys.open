@@ -50,7 +50,7 @@ import com.revolsys.jts.geom.prep.PreparedMultiLineString;
  *@version 1.7
  */
 public class MultiLineStringImpl extends AbstractMultiLineString implements
-  MultiLineString {
+MultiLineString {
 
   private static final long serialVersionUID = 8166665132445433741L;
 
@@ -69,7 +69,7 @@ public class MultiLineStringImpl extends AbstractMultiLineString implements
       this.lines = null;
     } else if (hasNullElements(lines)) {
       throw new IllegalArgumentException(
-        "geometries must not contain null elements");
+          "geometries must not contain null elements");
     } else {
       this.lines = new LineString[lines.length];
       for (int i = 0; i < lines.length; i++) {

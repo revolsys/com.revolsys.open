@@ -19,30 +19,30 @@ public class StatisticsIterator implements Iterator<Record> {
    * @return the stats
    */
   public Statistics getStatistics() {
-    return statistics;
+    return this.statistics;
   }
 
   @Override
   public boolean hasNext() {
-    final boolean hasNext = iterator.hasNext();
+    final boolean hasNext = this.iterator.hasNext();
     if (!hasNext) {
-      statistics.disconnect();
+      this.statistics.disconnect();
     }
     return hasNext;
   }
 
   @Override
   public Record next() {
-    final Record object = iterator.next();
+    final Record object = this.iterator.next();
     if (object != null) {
-      statistics.add(object);
+      this.statistics.add(object);
     }
     return object;
   }
 
   @Override
   public void remove() {
-    iterator.remove();
+    this.iterator.remove();
   }
 
   /**

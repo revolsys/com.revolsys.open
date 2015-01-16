@@ -18,12 +18,12 @@ public class TargetBeanProcess implements Process {
 
   @Override
   public String getBeanName() {
-    return beanName;
+    return this.beanName;
   }
 
   public Process getProcess() {
     try {
-      return (Process)bean.getObject();
+      return (Process)this.bean.getObject();
     } catch (final Exception e) {
       throw new RuntimeException("Unable to get process bean ", e);
     }
@@ -31,15 +31,15 @@ public class TargetBeanProcess implements Process {
 
   @Override
   public ProcessNetwork getProcessNetwork() {
-    return processNetwork;
+    return this.processNetwork;
   }
 
   public BeanFactory getTargetBeanFactory() {
-    return bean.getTargetBeanFactory();
+    return this.bean.getTargetBeanFactory();
   }
 
   public boolean isInstanceCreated() {
-    return bean.isInstanceCreated();
+    return this.bean.isInstanceCreated();
   }
 
   @Override
@@ -58,10 +58,10 @@ public class TargetBeanProcess implements Process {
 
   @Override
   public String toString() {
-    if (bean == null) {
-      return "Target=" + beanName;
+    if (this.bean == null) {
+      return "Target=" + this.beanName;
     } else {
-      return bean.toString();
+      return this.bean.toString();
     }
   }
 }

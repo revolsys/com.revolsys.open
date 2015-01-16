@@ -44,7 +44,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.Segment;
 
 /**
- * Generates points offset by a given distance 
+ * Generates points offset by a given distance
  * from both sides of the midpoint of
  * all segments in a {@link Geometry}.
  * Can be used to generate probe points for
@@ -69,10 +69,10 @@ public class OffsetPointGenerator {
   }
 
   /**
-   * Generates the two points which are offset from the 
+   * Generates the two points which are offset from the
    * midpoint of the segment <tt>(p0, p1)</tt> by the
    * <tt>offsetDistance</tt>.
-   * 
+   *
    * @param p0 the first point of the segment to offset from
    * @param p1 the second point of the segment to offset from
    */
@@ -90,12 +90,12 @@ public class OffsetPointGenerator {
     final double midX = (x2 + x1) / 2;
     final double midY = (y2 + y1) / 2;
 
-    if (doLeft) {
+    if (this.doLeft) {
       final Point offsetLeft = new PointDouble(midX - uy, midY + ux);
       offsetPts.add(offsetLeft);
     }
 
-    if (doRight) {
+    if (this.doRight) {
       final Point offsetRight = new PointDouble(midX + uy, midY - ux);
       offsetPts.add(offsetRight);
     }
@@ -119,7 +119,7 @@ public class OffsetPointGenerator {
    */
   public List getPoints(final double offsetDistance) {
     final List offsetPts = new ArrayList();
-    final List lines = g.getGeometryComponents(LineString.class);
+    final List lines = this.g.getGeometryComponents(LineString.class);
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString line = (LineString)i.next();
       extractPoints(line, offsetDistance, offsetPts);
@@ -130,7 +130,7 @@ public class OffsetPointGenerator {
 
   /**
    * Set the sides on which to generate offset points.
-   * 
+   *
    * @param doLeft
    * @param doRight
    */

@@ -212,7 +212,7 @@ class PolygonizeGraph extends PlanarGraph {
    * Finds and labels all edgerings in the graph.
    * The edge rings are labelling with unique integers.
    * The labelling allows detecting cut edges.
-   * 
+   *
    * @param dirEdges a List of the DirectedEdges in the graph
    * @return a List of DirectedEdges, one for each edge ring found
    */
@@ -312,7 +312,7 @@ class PolygonizeGraph extends PlanarGraph {
    * and computes the depth parity (odd or even)
    * relative to the exterior of the graph.
    * If the client has requested that the output
-   * be polygonally valid, only odd polygons will be constructed. 
+   * be polygonally valid, only odd polygons will be constructed.
    *
    */
   public void computeDepthParity() {
@@ -328,7 +328,7 @@ class PolygonizeGraph extends PlanarGraph {
   /**
    * Traverses all connected edges, computing the depth parity
    * of the associated polygons.
-   * 
+   *
    * @param de
    */
   private void computeDepthParity(final PolygonizeDirectedEdge de) {
@@ -374,14 +374,14 @@ class PolygonizeGraph extends PlanarGraph {
   public List deleteCutEdges() {
     computeNextCWEdges();
     // label the current set of edgerings
-    findLabeledEdgeRings(dirEdges);
+    findLabeledEdgeRings(this.dirEdges);
 
     /**
      * Cut Edges are edges where both dirEdges have the same label.
      * Delete them, and record them
      */
     final List cutLines = new ArrayList();
-    for (final Iterator i = dirEdges.iterator(); i.hasNext();) {
+    for (final Iterator i = this.dirEdges.iterator(); i.hasNext();) {
       final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)i.next();
       if (de.isMarked()) {
         continue;
@@ -450,7 +450,7 @@ class PolygonizeGraph extends PlanarGraph {
 
   private EdgeRing findEdgeRing(final PolygonizeDirectedEdge startDE) {
     PolygonizeDirectedEdge de = startDE;
-    final EdgeRing er = new EdgeRing(factory);
+    final EdgeRing er = new EdgeRing(this.factory);
     do {
       er.add(de);
       de.setRing(er);
@@ -472,13 +472,13 @@ class PolygonizeGraph extends PlanarGraph {
     // by deleteCutEdges()
     computeNextCWEdges();
     // clear labels of all edges in graph
-    label(dirEdges, -1);
-    final List maximalRings = findLabeledEdgeRings(dirEdges);
+    label(this.dirEdges, -1);
+    final List maximalRings = findLabeledEdgeRings(this.dirEdges);
     convertMaximalToMinimalEdgeRings(maximalRings);
 
     // find all edgerings (which will now be minimal ones, as required)
     final List edgeRingList = new ArrayList();
-    for (final Iterator i = dirEdges.iterator(); i.hasNext();) {
+    for (final Iterator i = this.dirEdges.iterator(); i.hasNext();) {
       final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)i.next();
       if (de.isMarked()) {
         continue;

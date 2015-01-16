@@ -45,8 +45,6 @@ import com.revolsys.jts.io.WKTReader;
  * @version 1.7
  */
 public class WKTOrWKBReader {
-  private static final int MAX_CHARS_TO_CHECK = 6;
-
   private static boolean isHex(final String str, final int maxCharsToTest) {
     for (int i = 0; i < maxCharsToTest && i < str.length(); i++) {
       final char ch = str.charAt(i);
@@ -68,20 +66,22 @@ public class WKTOrWKBReader {
     return false;
   }
 
+  private static final int MAX_CHARS_TO_CHECK = 6;
+
   private final WKTReader wktReader;
 
   private final WKBReader wkbReader;
 
   public WKTOrWKBReader(final GeometryFactory geomFactory) {
-    wktReader = new WKTReader(geomFactory);
-    wkbReader = new WKBReader(geomFactory);
+    this.wktReader = new WKTReader(geomFactory);
+    this.wkbReader = new WKBReader(geomFactory);
   }
 
   public Geometry read(final String geomStr) throws ParseException {
     final String trimStr = geomStr.trim();
     if (isHex(trimStr, MAX_CHARS_TO_CHECK)) {
-      return wkbReader.read(WKBReader.hexToBytes(trimStr));
+      return this.wkbReader.read(WKBReader.hexToBytes(trimStr));
     }
-    return wktReader.read(trimStr);
+    return this.wktReader.read(trimStr);
   }
 }

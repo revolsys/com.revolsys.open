@@ -39,7 +39,7 @@ public class EpsgAuthority implements Authority, Serializable {
 
   @Override
   public String getCode() {
-    return code;
+    return this.code;
   }
 
   @Override

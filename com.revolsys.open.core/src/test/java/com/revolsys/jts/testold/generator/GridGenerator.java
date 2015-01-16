@@ -40,16 +40,16 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 /**
- * This class should be used to generate a grid of bounding boxes, 
+ * This class should be used to generate a grid of bounding boxes,
  * most useful when creating multiple geometries.
  *
- * Successive calls to create() will walk the user though the grid. 
+ * Successive calls to create() will walk the user though the grid.
  * Use canCreate() and reset() to control the walk through the grid.
- * 
+ *
  * @see #canCreate()
  * @see #reset()
- * 
- * @author David Zwiers, Vivid Solutions. 
+ *
+ * @author David Zwiers, Vivid Solutions.
  */
 public class GridGenerator extends GeometryGenerator {
 
@@ -74,9 +74,9 @@ public class GridGenerator extends GeometryGenerator {
   }
 
   /**
-   * 
+   *
    * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
-   * 
+   *
    * @throws NoSuchElementException when all the grids have been created (@see #create())
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
    */
@@ -87,18 +87,18 @@ public class GridGenerator extends GeometryGenerator {
   }
 
   /**
-   * 
-   * @return BoundingBoxDoubleGf 
-   * 
+   *
+   * @return BoundingBoxDoubleGf
+   *
    * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
-   * 
+   *
    * @throws NoSuchElementException when all the grids have been created (@see #create())
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
    */
   public BoundingBox createEnv() {
     if (!canCreate()) {
       throw new NoSuchElementException(
-        "There are not any grids left to create.");
+          "There are not any grids left to create.");
     }
     if (this.geometryFactory == null) {
       throw new NullPointerException("GeometryFactoryI is not declared");
@@ -162,7 +162,7 @@ public class GridGenerator extends GeometryGenerator {
   public void setDimensions(final int dimensions) {
     if (dimensions != 2) {
       throw new IllegalStateException(
-        "MAY NOT CHANGE GridGenerator's Dimensions");
+          "MAY NOT CHANGE GridGenerator's Dimensions");
     }
   }
 
@@ -172,7 +172,7 @@ public class GridGenerator extends GeometryGenerator {
   public void setNumberColumns(final int numberColumns) {
     if (numberColumns <= 0) {
       throw new IndexOutOfBoundsException(
-        "Index sizes must be positive, non zero");
+          "Index sizes must be positive, non zero");
     }
     this.numberColumns = numberColumns;
   }
@@ -183,7 +183,7 @@ public class GridGenerator extends GeometryGenerator {
   public void setNumberRows(final int numberRows) {
     if (numberRows <= 0) {
       throw new IndexOutOfBoundsException(
-        "Index sizes must be positive, non zero");
+          "Index sizes must be positive, non zero");
     }
     this.numberRows = numberRows;
   }

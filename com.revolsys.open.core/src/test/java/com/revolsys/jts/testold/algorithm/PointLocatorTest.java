@@ -76,14 +76,14 @@ public class PointLocatorTest extends TestCase {
     runPtLocator(
       Location.INTERIOR,
       new PointDouble((double)0, 0, Point.NULL_ORDINATE),
-      "POLYGON ((-40 80, -40 -80, 20 0, 20 -100, 40 40, 80 -80, 100 80, 140 -20, 120 140, 40 180,     60 40, 0 120, -20 -20, -40 80))");
+        "POLYGON ((-40 80, -40 -80, 20 0, 20 -100, 40 40, 80 -80, 100 80, 140 -20, 120 140, 40 180,     60 40, 0 120, -20 -20, -40 80))");
   }
 
   public void testPointLocatorLinearRingLineString() throws Exception {
     runPtLocator(
       Location.BOUNDARY,
       new PointDouble((double)0, 0, Point.NULL_ORDINATE),
-      "GEOMETRYCOLLECTION( LINESTRING(0 0, 10 10), LINEARRING(10 10, 10 20, 20 10, 10 10))");
+        "GEOMETRYCOLLECTION( LINESTRING(0 0, 10 10), LINEARRING(10 10, 10 20, 20 10, 10 10))");
   }
 
   public void testPointLocatorPointInsideLinearRing() throws Exception {

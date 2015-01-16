@@ -176,8 +176,8 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
       final int eventColumn = event.getColumn();
       final int row = event.getFirstRow();
       if (type == TableModelEvent.UPDATE
-        && eventColumn == TableModelEvent.ALL_COLUMNS
-        && row == TableModelEvent.HEADER_ROW) {
+          && eventColumn == TableModelEvent.ALL_COLUMNS
+          && row == TableModelEvent.HEADER_ROW) {
         createDefaultColumnsFromModel();
         final TableColumnModel columnModel = getColumnModel();
         for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {

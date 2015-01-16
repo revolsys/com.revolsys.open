@@ -67,6 +67,16 @@ public class NodeMap implements Iterable<Node> {
     n.add(e);
   }
 
+  public Node addNode(final Node n) {
+    final Node node = this.nodeMap.get(n.getCoordinate());
+    if (node == null) {
+      this.nodeMap.put(n.getCoordinate(), n);
+      return n;
+    }
+    node.mergeLabel(n);
+    return node;
+  }
+
   /**
    * Factory function - subclasses can override to create their own types of nodes
    */
@@ -77,21 +87,11 @@ public class NodeMap implements Iterable<Node> {
    * This method expects that a node has a coordinate value.
    */
   public Node addNode(final Point coord) {
-    Node node = nodeMap.get(coord);
+    Node node = this.nodeMap.get(coord);
     if (node == null) {
-      node = nodeFact.createNode(coord);
-      nodeMap.put(coord, node);
+      node = this.nodeFact.createNode(coord);
+      this.nodeMap.put(coord, node);
     }
-    return node;
-  }
-
-  public Node addNode(final Node n) {
-    final Node node = nodeMap.get(n.getCoordinate());
-    if (node == null) {
-      nodeMap.put(n.getCoordinate(), n);
-      return n;
-    }
-    node.mergeLabel(n);
     return node;
   }
 
@@ -99,7 +99,7 @@ public class NodeMap implements Iterable<Node> {
    * @return the node if found; null otherwise
    */
   public Node find(final Point coord) {
-    return nodeMap.get(coord);
+    return this.nodeMap.get(coord);
   }
 
   public Collection<Node> getBoundaryNodes(final int geomIndex) {
@@ -114,7 +114,7 @@ public class NodeMap implements Iterable<Node> {
 
   @Override
   public Iterator<Node> iterator() {
-    return nodeMap.values().iterator();
+    return this.nodeMap.values().iterator();
   }
 
   public void print(final PrintStream out) {
@@ -124,6 +124,6 @@ public class NodeMap implements Iterable<Node> {
   }
 
   public Collection<Node> values() {
-    return nodeMap.values();
+    return this.nodeMap.values();
   }
 }

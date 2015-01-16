@@ -55,6 +55,10 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  */
 public class PreparedGeometryCollection extends AbstractGeometryCollection {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private final GeometryCollection geometryCollection;
 
   public PreparedGeometryCollection(final GeometryCollection geometryCollection) {

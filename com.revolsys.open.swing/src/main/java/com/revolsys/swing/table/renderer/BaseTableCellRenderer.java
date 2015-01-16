@@ -4,6 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
@@ -53,9 +54,9 @@ public class BaseTableCellRenderer extends DefaultTableRenderer {
       columnIndex))) {
       if (component instanceof JLabel) {
         final JLabel label = (JLabel)component;
-        label.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
-        label.setHorizontalTextPosition(JLabel.RIGHT);
-        label.setHorizontalAlignment(JLabel.RIGHT);
+        label.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        label.setHorizontalTextPosition(SwingConstants.RIGHT);
+        label.setHorizontalAlignment(SwingConstants.RIGHT);
       }
     }
     return component;

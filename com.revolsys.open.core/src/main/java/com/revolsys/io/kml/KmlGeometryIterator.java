@@ -74,10 +74,9 @@ Kml22Constants {
     if (Property.hasValue(coordinatesListString)) {
       int axisCount = 2;
       final String[] coordinatesListArray = coordinatesListString.trim().split(
-        "\\s+");
+          "\\s+");
       final List<Point> points = new ArrayList<>();
-      for (int i = 0; i < coordinatesListArray.length; i++) {
-        final String coordinatesString = coordinatesListArray[i];
+      for (final String coordinatesString : coordinatesListArray) {
         final String[] coordinatesArray = coordinatesString.split(",");
         final double[] coordinates = new double[coordinatesArray.length];
         for (int axisIndex = 0; axisIndex < coordinatesArray.length; axisIndex++) {
@@ -171,7 +170,7 @@ Kml22Constants {
     while (!StaxUtils.isEndElementLocalName(this.in, POINT)
         && this.in.nextTag() == XMLStreamConstants.START_ELEMENT) {
       if (points == null
-        && StaxUtils.matchElementLocalName(this.in, COORDINATES)) {
+          && StaxUtils.matchElementLocalName(this.in, COORDINATES)) {
         points = parseCoordinates();
       } else {
         StaxUtils.skipSubTree(this.in);

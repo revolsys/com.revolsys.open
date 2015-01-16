@@ -102,7 +102,7 @@ public class ArcSdeBinaryGeometryQueryIterator extends AbstractIterator<Record> 
     try {
 
       final List<String> fieldNames = new ArrayList<String>(
-        this.query.getFieldNames());
+          this.query.getFieldNames());
       if (fieldNames.isEmpty()) {
         this.attributes.addAll(this.recordDefinition.getFields());
         fieldNames.addAll(this.recordDefinition.getFieldNames());
@@ -141,8 +141,8 @@ public class ArcSdeBinaryGeometryQueryIterator extends AbstractIterator<Record> 
           SeFilter.METHOD_ENVP);
         this.seQuery.setSpatialConstraints(SeQuery.SE_SPATIAL_FIRST, false,
           new SeFilter[] {
-            filter
-          });
+          filter
+        });
       }
       // TODO where clause
       // TODO how to load geometry for non-spatial queries

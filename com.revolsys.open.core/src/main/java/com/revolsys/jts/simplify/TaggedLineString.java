@@ -43,10 +43,10 @@ import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.Segment;
 
 /**
- * Represents a {@link LineString} which can be modified to a simplified shape.  
+ * Represents a {@link LineString} which can be modified to a simplified shape.
  * This class provides an attribute which specifies the minimum allowable length
  * for the modified result.
- * 
+ *
  * @version 1.7
  */
 class TaggedLineString {
@@ -82,52 +82,52 @@ class TaggedLineString {
   }
 
   public void addToResult(final LineSegment seg) {
-    resultSegs.add(seg);
+    this.resultSegs.add(seg);
   }
 
   public LinearRing asLinearRing() {
-    return parentLine.getGeometryFactory().linearRing(
-      extractCoordinates(resultSegs));
+    return this.parentLine.getGeometryFactory().linearRing(
+      extractCoordinates(this.resultSegs));
   }
 
   public LineString asLineString() {
-    return parentLine.getGeometryFactory().lineString(
-      extractCoordinates(resultSegs));
+    return this.parentLine.getGeometryFactory().lineString(
+      extractCoordinates(this.resultSegs));
   }
 
   public int getMinimumSize() {
-    return minimumSize;
+    return this.minimumSize;
   }
 
   public LineString getParent() {
-    return parentLine;
+    return this.parentLine;
   }
 
   public Point[] getResultCoordinates() {
-    return extractCoordinates(resultSegs);
+    return extractCoordinates(this.resultSegs);
   }
 
   public int getResultSize() {
-    final int resultSegsSize = resultSegs.size();
+    final int resultSegsSize = this.resultSegs.size();
     return resultSegsSize == 0 ? 0 : resultSegsSize + 1;
   }
 
   public TaggedLineSegment getSegment(final int i) {
-    return segs[i];
+    return this.segs[i];
   }
 
   public TaggedLineSegment[] getSegments() {
-    return segs;
+    return this.segs;
   }
 
   private void init() {
-    segs = new TaggedLineSegment[parentLine.getVertexCount() - 1];
+    this.segs = new TaggedLineSegment[this.parentLine.getVertexCount() - 1];
     int i = 0;
-    for (final Segment segment : parentLine.segments()) {
+    for (final Segment segment : this.parentLine.segments()) {
       final TaggedLineSegment seg = new TaggedLineSegment(segment.getPoint(0)
         .clonePoint(), segment.getPoint(1).clonePoint(),
-        parentLine, i);
-      segs[i] = seg;
+        this.parentLine, i);
+      this.segs[i] = seg;
       i++;
     }
   }

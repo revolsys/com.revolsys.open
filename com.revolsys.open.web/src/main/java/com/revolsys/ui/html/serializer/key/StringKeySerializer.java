@@ -11,17 +11,18 @@ public class StringKeySerializer extends AbstractKeySerializer {
     super(name);
   }
 
-  public StringKeySerializer(final String name, String label) {
+  public StringKeySerializer(final String name, final String label) {
     super(name);
     setLabel(label);
   }
 
   /**
    * Serialize the value to the XML writer.
-   * 
+   *
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
    */
+  @Override
   public void serialize(final XmlWriter out, final Object object) {
     final Object value = JavaBeanUtil.getProperty(object, getName());
     if (value == null) {

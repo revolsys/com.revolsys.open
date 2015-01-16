@@ -21,13 +21,14 @@ public class ObjectPropertyValuesController implements Controller {
   private int maxResults = 25;
 
   public DataAccessObject<?> getDataAccessObject() {
-    return dataAccessObject;
+    return this.dataAccessObject;
   }
 
   public int getMaxResults() {
-    return maxResults;
+    return this.maxResults;
   }
 
+  @Override
   public ModelAndView handleRequest(
     final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
@@ -37,7 +38,7 @@ public class ObjectPropertyValuesController implements Controller {
       final String propertyName = path.substring(index + 1);
       final String query = request.getParameter("q");
       final String limit = request.getParameter("limit");
-      int max = maxResults;
+      int max = this.maxResults;
       if (limit != null) {
         try {
           max = Integer.parseInt(limit);
@@ -49,7 +50,7 @@ public class ObjectPropertyValuesController implements Controller {
       where.put(propertyName, "%" + query + "%");
       final Map<String, Boolean> order = Collections.singletonMap(propertyName,
         true);
-      final List<String> results = dataAccessObject.list(propertyName, where,
+      final List<String> results = this.dataAccessObject.list(propertyName, where,
         order, max);
       response.setContentType("text/plain");
       final PrintWriter writer = response.getWriter();

@@ -7,6 +7,11 @@ import com.revolsys.jts.geom.LinearRing;
 import com.revolsys.jts.geom.Polygon;
 
 public class PolygonVertex extends AbstractVertex {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private int vertexIndex;
 
   private int ringIndex;

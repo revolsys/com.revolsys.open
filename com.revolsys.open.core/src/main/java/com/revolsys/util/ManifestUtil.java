@@ -13,8 +13,6 @@ import org.apache.log4j.Logger;
 import com.revolsys.io.FileUtil;
 
 public class ManifestUtil {
-  private static final Logger LOG = Logger.getLogger(ManifestUtil.class);
-
   public static String getImplementationVersion(final String implementationTitle) {
     final Manifest manifest = getManifestByImplementationTitle(implementationTitle);
     if (manifest != null) {
@@ -40,8 +38,8 @@ public class ManifestUtil {
     final String implementationTitle) {
     try {
       final Enumeration resources = Thread.currentThread()
-        .getContextClassLoader()
-        .getResources("META-INF/MANIFEST.MF");
+          .getContextClassLoader()
+          .getResources("META-INF/MANIFEST.MF");
       while (resources.hasMoreElements()) {
         final URL url = (URL)resources.nextElement();
 
@@ -62,4 +60,6 @@ public class ManifestUtil {
     }
     return null;
   }
+
+  private static final Logger LOG = Logger.getLogger(ManifestUtil.class);
 }

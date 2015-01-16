@@ -8,12 +8,6 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 public class SpelUtil {
-  public static final SpelParserConfiguration CONFIGURATION = new SpelParserConfiguration(
-    true, true);
-
-  public static final SpelExpressionParser PARSER = new SpelExpressionParser(
-    CONFIGURATION);
-
   @SuppressWarnings("unchecked")
   public static <V> V getValue(final Expression expression,
     final Object object, final Map<String, Object> parameters) {
@@ -47,4 +41,10 @@ public class SpelUtil {
     final Expression expression = PARSER.parseExpression(expressionString);
     return expression;
   }
+
+  public static final SpelParserConfiguration CONFIGURATION = new SpelParserConfiguration(
+    true, true);
+
+  public static final SpelExpressionParser PARSER = new SpelExpressionParser(
+    CONFIGURATION);
 }

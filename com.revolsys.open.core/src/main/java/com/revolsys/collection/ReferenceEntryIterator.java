@@ -18,13 +18,13 @@ public class ReferenceEntryIterator<K, V> extends AbstractIterator<Entry<K, V>> 
   @Override
   protected void doClose() {
     super.doClose();
-    iterator = null;
+    this.iterator = null;
   }
 
   @Override
   protected Entry<K, V> getNext() throws NoSuchElementException {
-    while (iterator.hasNext()) {
-      final Entry<K, Reference<V>> entry = iterator.next();
+    while (this.iterator.hasNext()) {
+      final Entry<K, Reference<V>> entry = this.iterator.next();
       final K key = entry.getKey();
       final Reference<V> reference = entry.getValue();
       if (reference != null) {

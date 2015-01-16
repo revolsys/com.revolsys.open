@@ -30,8 +30,8 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2, lon, lat, lon - tileWidth, lat
-      + tileHeight);
+    return new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2, lon, lat, lon - this.tileWidth, lat
+      + this.tileHeight);
   }
 
   @Override
@@ -69,12 +69,12 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     } else {
       row = zone - 'c';
     }
-    return MIN_LAT + row * tileHeight;
+    return MIN_LAT + row * this.tileHeight;
   }
 
   public double getLongitude(final String sheet) {
     final int zone = getHorizontalZone(sheet);
-    return MIN_LON + (zone - 1) * tileWidth;
+    return MIN_LON + (zone - 1) * this.tileWidth;
   }
 
   @Override
@@ -84,7 +84,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
       letter = 'x';
     } else {
       final double latFloor = Math.floor(y);
-      final int row = (int)((latFloor - MIN_LAT) / tileHeight);
+      final int row = (int)((latFloor - MIN_LAT) / this.tileHeight);
       letter = (char)('c' + row);
       if (letter >= 'n') {
         letter += 2;
@@ -93,7 +93,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
       }
     }
     final double lonFloor = Math.floor(x);
-    final int zone = (int)((lonFloor - MIN_LON) / tileWidth) + 1;
+    final int zone = (int)((lonFloor - MIN_LON) / this.tileWidth) + 1;
 
     return zone + String.valueOf(letter);
 
@@ -102,7 +102,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   /**
    * Get the sheet which is the specified number of sheets east and/or north
    * from the current sheet.
-   * 
+   *
    * @param sheet The current sheet.
    * @param east The number of sheets east.
    * @param north The number of sheets north.
@@ -176,22 +176,22 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public double getTileHeight() {
-    return tileHeight;
+    return this.tileHeight;
   }
 
   @Override
   public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
     final com.revolsys.jts.geom.BoundingBox envelope = boundingBox.convert(getGeometryFactory());
     final List<RectangularMapTile> tiles = new ArrayList<RectangularMapTile>();
-    final int minXCeil = (int)Math.ceil(envelope.getMinX() / tileWidth);
-    final double minX = minXCeil * tileWidth;
+    final int minXCeil = (int)Math.ceil(envelope.getMinX() / this.tileWidth);
+    final double minX = minXCeil * this.tileWidth;
 
-    final int maxXCeil = (int)Math.ceil(envelope.getMaxX() / tileWidth) + 1;
+    final int maxXCeil = (int)Math.ceil(envelope.getMaxX() / this.tileWidth) + 1;
 
-    final int minYFloor = (int)Math.floor(envelope.getMinY() / tileHeight);
-    final double minY = minYFloor * tileHeight;
+    final int minYFloor = (int)Math.floor(envelope.getMinY() / this.tileHeight);
+    final double minY = minYFloor * this.tileHeight;
 
-    final int maxYCeil = (int)Math.ceil(envelope.getMaxY() / tileHeight);
+    final int maxYCeil = (int)Math.ceil(envelope.getMaxY() / this.tileHeight);
 
     final int numX = maxXCeil - minXCeil;
     final int numY = maxYCeil - minYFloor;
@@ -199,9 +199,9 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
       return tiles;
     }
     for (int y = 0; y < numY; y++) {
-      final double lat = minY + y * tileHeight;
+      final double lat = minY + y * this.tileHeight;
       for (int x = 0; x < numX; x++) {
-        final double lon = minX + x * tileWidth;
+        final double lon = minX + x * this.tileWidth;
         final RectangularMapTile tile = getTileByLocation(lon, lat);
         tiles.add(tile);
       }
@@ -211,7 +211,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   @Override
   public double getTileWidth() {
-    return tileWidth;
+    return this.tileWidth;
   }
 
   public char getVerticalZone(final String sheet) {

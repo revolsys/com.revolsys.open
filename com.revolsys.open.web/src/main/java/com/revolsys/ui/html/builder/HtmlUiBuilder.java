@@ -184,8 +184,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
   public HtmlUiBuilder() {
     final Class<?> clazz = getClass();
     final Method[] methods = clazz.getMethods();
-    for (int i = 0; i < methods.length; i++) {
-      final Method method = methods[i];
+    for (final Method method : methods) {
       final String name = method.getName();
 
       final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -602,7 +601,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
     final List<List<String>> rows = new ArrayList<>();
     try (
-      Reader<Record> reader = recordStore.query(query)) {
+        Reader<Record> reader = recordStore.query(query)) {
       for (final Record record : reader) {
         final List<String> row = new ArrayList<String>();
         for (final KeySerializer serializer : serializers) {

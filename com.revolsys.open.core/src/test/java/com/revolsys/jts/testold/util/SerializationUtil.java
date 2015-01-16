@@ -8,7 +8,7 @@ import java.io.ObjectOutputStream;
 
 public class SerializationUtil {
   public static Object deserialize(final byte[] data) throws IOException,
-    ClassNotFoundException {
+  ClassNotFoundException {
     final ObjectInputStream in = new ObjectInputStream(
       new ByteArrayInputStream(data));
     return in.readObject();

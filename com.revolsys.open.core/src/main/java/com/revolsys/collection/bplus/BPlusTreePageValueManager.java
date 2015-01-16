@@ -28,23 +28,23 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
   @Override
   public void disposeBytes(final byte[] bytes) {
     final int pageIndex = MethodPageValueManager.getIntValue(bytes);
-    Page dataPage = pageManager.getPage(pageIndex);
+    Page dataPage = this.pageManager.getPage(pageIndex);
     dataPage.setOffset(0);
     byte pageType = dataPage.readByte();
     while (pageType == BPlusTreeMap.EXTENDED) {
       BPlusTreeMap.skipHeader(dataPage);
       final int nextPageIndex = dataPage.readInt();
-      pageManager.removePage(dataPage);
-      dataPage = pageManager.getPage(nextPageIndex);
+      this.pageManager.removePage(dataPage);
+      dataPage = this.pageManager.getPage(nextPageIndex);
       dataPage.setOffset(0);
       pageType = dataPage.readByte();
     }
     if (pageType == BPlusTreeMap.DATA) {
-      pageManager.removePage(dataPage);
-      pageManager.releasePage(dataPage);
+      this.pageManager.removePage(dataPage);
+      this.pageManager.releasePage(dataPage);
     } else {
       throw new IllegalArgumentException("Expecting a data page "
-        + BPlusTreeMap.DATA + " not " + pageType);
+          + BPlusTreeMap.DATA + " not " + pageType);
     }
   }
 
@@ -55,20 +55,20 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
 
   @Override
   public byte[] getBytes(final T value) {
-    final byte[] valueBytes = valueSerializer.getBytes(value);
+    final byte[] valueBytes = this.valueSerializer.getBytes(value);
 
     int offset = 0;
-    final int pageSize = pageManager.getPageSize();
-    Page page = pageManager.createPage();
+    final int pageSize = this.pageManager.getPageSize();
+    Page page = this.pageManager.createPage();
     try {
       final int pageIndex = page.getIndex();
       while (valueBytes.length + 3 > offset + pageSize) {
-        final Page nextPage = pageManager.createPage();
+        final Page nextPage = this.pageManager.createPage();
         BPlusTreeMap.writePageHeader(page, BPlusTreeMap.EXTENDED);
         page.writeInt(nextPage.getIndex());
         page.writeBytes(valueBytes, offset, pageSize - 7);
         BPlusTreeMap.setNumBytes(page);
-        pageManager.releasePage(page);
+        this.pageManager.releasePage(page);
         page = nextPage;
         offset += pageSize - 7;
       }
@@ -79,14 +79,14 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
 
       return PageValueManager.INT.getBytes(pageIndex);
     } finally {
-      pageManager.releasePage(page);
+      this.pageManager.releasePage(page);
     }
   }
 
   @Override
   public <V extends T> V getValue(final byte[] indexBytes) {
     final int pageIndex = MethodPageValueManager.getIntValue(indexBytes);
-    Page dataPage = pageManager.getPage(pageIndex);
+    Page dataPage = this.pageManager.getPage(pageIndex);
     try {
       dataPage.setOffset(0);
       byte pageType = dataPage.readByte();
@@ -98,8 +98,8 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
         final byte[] bytes = dataPage.readBytes(numBytes);
         pageBytes.add(bytes);
         size += bytes.length;
-        pageManager.releasePage(dataPage);
-        dataPage = pageManager.getPage(nextPageIndex);
+        this.pageManager.releasePage(dataPage);
+        dataPage = this.pageManager.getPage(nextPageIndex);
         dataPage.setOffset(0);
         pageType = dataPage.readByte();
       }
@@ -111,7 +111,7 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
 
       } else {
         throw new IllegalArgumentException("Expecting a data page "
-          + BPlusTreeMap.DATA + " not " + pageType);
+            + BPlusTreeMap.DATA + " not " + pageType);
       }
       final byte[] valueBytes = new byte[size];
       int offset = 0;
@@ -119,9 +119,9 @@ public class BPlusTreePageValueManager<T> implements PageValueManager<T> {
         System.arraycopy(bytes, 0, valueBytes, offset, bytes.length);
         offset += bytes.length;
       }
-      return valueSerializer.getValue(valueBytes);
+      return this.valueSerializer.getValue(valueBytes);
     } finally {
-      pageManager.releasePage(dataPage);
+      this.pageManager.releasePage(dataPage);
     }
   }
 

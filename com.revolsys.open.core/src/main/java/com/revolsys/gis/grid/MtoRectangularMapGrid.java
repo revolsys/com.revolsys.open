@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
   private static final Pattern NAME_PATTERN = Pattern.compile("^"
-    + MtoConstants.REGEX_MTO + ".*");
+      + MtoConstants.REGEX_MTO + ".*");
 
   public MtoRectangularMapGrid() {
     this(MtoConstants.WIDTH_QUARTER, MtoConstants.HEIGHT_QUARTER);
@@ -29,11 +29,11 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
 
       double latitude = getLatitude(blockName, letter, number50k);
       latitude += GridUtil.getLetter16Row(letter12.charAt(0))
-        * MtoConstants.HEIGHT_TWELTH;
+          * MtoConstants.HEIGHT_TWELTH;
       latitude += GridUtil.getNumberRow100(number100)
-        * MtoConstants.HEIGHT_HUNDRETH;
+          * MtoConstants.HEIGHT_HUNDRETH;
       latitude += GridUtil.getLetter4Row(letter4.charAt(0))
-        * MtoConstants.HEIGHT_QUARTER;
+          * MtoConstants.HEIGHT_QUARTER;
 
       return latitude;
     } else {
@@ -66,11 +66,11 @@ public class MtoRectangularMapGrid extends Nts50000RectangularMapGrid {
 
       double longitude = getLongitude(blockName, letter, number50k);
       longitude -= GridUtil.getLetter16Col(letter12.charAt(0))
-        * MtoConstants.WIDTH_TWELTH;
+          * MtoConstants.WIDTH_TWELTH;
       longitude -= GridUtil.getNumberCol100(number100)
-        * MtoConstants.WIDTH_HUNDRETH;
+          * MtoConstants.WIDTH_HUNDRETH;
       longitude -= GridUtil.getLetter4Col(letter4.charAt(0))
-        * MtoConstants.WIDTH_QUARTER;
+          * MtoConstants.WIDTH_QUARTER;
 
       return longitude;
     } else {

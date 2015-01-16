@@ -32,7 +32,7 @@ public class RelateBoundaryNodeRuleTest extends TestCase {
 
   void runRelateTest(final String wkt1, final String wkt2,
     final BoundaryNodeRule bnRule, final String expectedIM)
-    throws ParseException {
+        throws ParseException {
     final Geometry g1 = this.rdr.read(wkt1);
     final Geometry g2 = this.rdr.read(wkt2);
     final IntersectionMatrix im = RelateOp.relate(g1, g2, bnRule);
@@ -65,7 +65,7 @@ public class RelateBoundaryNodeRuleTest extends TestCase {
     // under MultiValent, A has a boundary node but B does not - A.bdy / B.bdy =
     // F and A.int
     runRelateTest(a, b, BoundaryNodeRule.MULTIVALENT_ENDPOINT_BOUNDARY_RULE,
-      "0F1FFF1F2");
+        "0F1FFF1F2");
   }
 
   public void testLineStringSelfIntTouchAtEndpoint() throws Exception {

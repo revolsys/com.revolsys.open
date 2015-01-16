@@ -9,7 +9,12 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 public class PolygonSegment extends AbstractSegment implements
-  Iterator<Segment> {
+Iterator<Segment> {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private int segmentIndex;
 
   private int ringIndex;
@@ -28,7 +33,7 @@ public class PolygonSegment extends AbstractSegment implements
       if (ring == null) {
         return Double.NaN;
       } else {
-        return ring.getCoordinate(segmentIndex + vertexIndex, axisIndex);
+        return ring.getCoordinate(this.segmentIndex + vertexIndex, axisIndex);
       }
     }
   }
@@ -37,9 +42,9 @@ public class PolygonSegment extends AbstractSegment implements
   public Vertex getGeometryVertex(final int index) {
     final Polygon polygon = getPolygon();
     if (index == 0) {
-      return polygon.getVertex(ringIndex, segmentIndex);
+      return polygon.getVertex(this.ringIndex, this.segmentIndex);
     } else if (index == 1) {
-      return polygon.getVertex(ringIndex, segmentIndex + 1);
+      return polygon.getVertex(this.ringIndex, this.segmentIndex + 1);
     } else {
       return null;
     }
@@ -54,25 +59,25 @@ public class PolygonSegment extends AbstractSegment implements
     if (polygon == null) {
       return null;
     } else {
-      return polygon.getRing(ringIndex);
+      return polygon.getRing(this.ringIndex);
     }
   }
 
   @Override
   public int getRingIndex() {
-    return ringIndex;
+    return this.ringIndex;
   }
 
   @Override
   public int[] getSegmentId() {
     return new int[] {
-      ringIndex, segmentIndex
+      this.ringIndex, this.segmentIndex
     };
   }
 
   @Override
   public int getSegmentIndex() {
-    return segmentIndex;
+    return this.segmentIndex;
   }
 
   @Override
@@ -104,25 +109,25 @@ public class PolygonSegment extends AbstractSegment implements
   @Override
   public boolean isLineEnd() {
     final LineString line = getRing();
-    return segmentIndex == line.getSegmentCount();
+    return this.segmentIndex == line.getSegmentCount();
   }
 
   @Override
   public boolean isLineStart() {
-    return segmentIndex == 0;
+    return this.segmentIndex == 0;
   }
 
   @Override
   public Segment next() {
     final Polygon polygon = getPolygon();
-    segmentIndex++;
-    while (ringIndex < polygon.getRingCount()) {
-      final LinearRing ring = polygon.getRing(ringIndex);
-      if (segmentIndex < ring.getSegmentCount()) {
+    this.segmentIndex++;
+    while (this.ringIndex < polygon.getRingCount()) {
+      final LinearRing ring = polygon.getRing(this.ringIndex);
+      if (this.segmentIndex < ring.getSegmentCount()) {
         return this;
       } else {
-        ringIndex++;
-        segmentIndex = 0;
+        this.ringIndex++;
+        this.segmentIndex = 0;
       }
     }
     throw new NoSuchElementException();

@@ -46,20 +46,14 @@ import com.revolsys.jtstest.testrunner.StringUtil;
 /**
  * A {@link GeometryFunction} which calls a static
  * {@link Method}.
- * 
+ *
  * @author Martin Davis
  *
  */
 public class StaticMethodGeometryFunction extends BaseGeometryFunction {
-  private static final String FUNCTIONS_SUFFIX = "Functions";
-
-  private static final String PARAMETERS_SUFFIX = "Parameters";
-
-  private static final String DESCRIPTION_SUFFIX = "Description";
-
   /**
    * Creates an arg array which includes the target geometry as the first argument
-   * 
+   *
    * @param g
    * @param arg
    * @return
@@ -78,7 +72,7 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
   }
 
   public static StaticMethodGeometryFunction createFunction(final Method method) {
-    Assert.assertTrue(Geometry.class.isAssignableFrom((method.getParameterTypes())[0]));
+    Assert.assertTrue(Geometry.class.isAssignableFrom(method.getParameterTypes()[0]));
 
     final Class clz = method.getDeclaringClass();
 
@@ -91,6 +85,24 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
 
     return new StaticMethodGeometryFunction(category, funcName, description,
       paramNames, paramTypes, returnType, method);
+  }
+
+  public static Object dynamicCall(final String clzName,
+    final String methodName, final Class[] methodParamTypes,
+    final Object[] methodArgs) throws ClassNotFoundException,
+    SecurityException, NoSuchMethodException, IllegalArgumentException,
+    InstantiationException, IllegalAccessException, InvocationTargetException {
+    final Class clz = Class.forName(clzName);
+
+    final Class[] constParTypes = new Class[] {
+      String.class, String.class
+    };
+    final Constructor constr = clz.getConstructor(new Class[0]);
+    final Object dummyto = constr.newInstance(new Object[0]);
+
+    final Method meth = clz.getMethod(methodName, methodParamTypes);
+    final Object result = meth.invoke(dummyto, methodArgs);
+    return result;
   }
 
   private static String extractCategory(final String className) {
@@ -106,7 +118,7 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
 
   /**
    * Java doesn't permit accessing the original code parameter names, unfortunately.
-   * 
+   *
    * @param method
    * @return
    */
@@ -143,64 +155,6 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
     return jClassName.substring(lastDotPos + 1, jClassName.length());
   }
 
-  private static String invocationErrMsg(final InvocationTargetException ex) {
-    final Throwable targetEx = ex.getTargetException();
-    final String msg = getClassname(targetEx.getClass()) + ": "
-      + targetEx.getMessage();
-    return msg;
-  }
-
-  public static Object invoke(final Method method, final Object target,
-    final Object[] args) {
-    Object result;
-    try {
-      result = method.invoke(target, args);
-    } catch (final InvocationTargetException ex) {
-      final Throwable t = ex.getCause();
-      if (t instanceof RuntimeException) {
-        throw (RuntimeException)t;
-      }
-      throw new RuntimeException(invocationErrMsg(ex));
-    } catch (final Exception ex) {
-      System.out.println(ex.getMessage());
-      throw new RuntimeException(ex.getMessage());
-    }
-    return result;
-  }
-
-  private final Method method;
-
-  public StaticMethodGeometryFunction(final String category, final String name,
-    final String description, final String[] parameterNames,
-    final Class[] parameterTypes, final Class returnType, final Method method) {
-    super(category, name, description, parameterNames, parameterTypes,
-      returnType);
-    this.method = method;
-  }
-
-  @Override
-  public Object invoke(final Geometry g, final Object[] arg) {
-    return invoke(method, null, createFullArgs(g, arg));
-  }
-
-  public static Object dynamicCall(final String clzName,
-    final String methodName, final Class[] methodParamTypes,
-    final Object[] methodArgs) throws ClassNotFoundException,
-    SecurityException, NoSuchMethodException, IllegalArgumentException,
-    InstantiationException, IllegalAccessException, InvocationTargetException {
-    final Class clz = Class.forName(clzName);
-  
-    final Class[] constParTypes = new Class[] {
-      String.class, String.class
-    };
-    final Constructor constr = clz.getConstructor(new Class[0]);
-    final Object dummyto = constr.newInstance(new Object[0]);
-  
-    final Method meth = clz.getMethod(methodName, methodParamTypes);
-    final Object result = meth.invoke(dummyto, methodArgs);
-    return result;
-  }
-
   public static String[] getStringArrayClassField(final Class clz,
     final String name) {
     try {
@@ -222,5 +176,51 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
     } catch (final IllegalAccessException ex) {
     }
     return null;
+  }
+
+  private static String invocationErrMsg(final InvocationTargetException ex) {
+    final Throwable targetEx = ex.getTargetException();
+    final String msg = getClassname(targetEx.getClass()) + ": "
+        + targetEx.getMessage();
+    return msg;
+  }
+
+  public static Object invoke(final Method method, final Object target,
+    final Object[] args) {
+    Object result;
+    try {
+      result = method.invoke(target, args);
+    } catch (final InvocationTargetException ex) {
+      final Throwable t = ex.getCause();
+      if (t instanceof RuntimeException) {
+        throw (RuntimeException)t;
+      }
+      throw new RuntimeException(invocationErrMsg(ex));
+    } catch (final Exception ex) {
+      System.out.println(ex.getMessage());
+      throw new RuntimeException(ex.getMessage());
+    }
+    return result;
+  }
+
+  private static final String FUNCTIONS_SUFFIX = "Functions";
+
+  private static final String PARAMETERS_SUFFIX = "Parameters";
+
+  private static final String DESCRIPTION_SUFFIX = "Description";
+
+  private final Method method;
+
+  public StaticMethodGeometryFunction(final String category, final String name,
+    final String description, final String[] parameterNames,
+    final Class[] parameterTypes, final Class returnType, final Method method) {
+    super(category, name, description, parameterNames, parameterTypes,
+      returnType);
+    this.method = method;
+  }
+
+  @Override
+  public Object invoke(final Geometry g, final Object[] arg) {
+    return invoke(this.method, null, createFullArgs(g, arg));
   }
 }

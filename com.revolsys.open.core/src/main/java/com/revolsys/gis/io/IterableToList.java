@@ -18,14 +18,14 @@ public class IterableToList<T> extends AbstractFactoryBean<List<T>> {
   @Override
   protected List<T> createInstance() throws Exception {
     final List<T> list = new ArrayList<T>();
-    for (final T value : iterable) {
+    for (final T value : this.iterable) {
       list.add(value);
     }
     return list;
   }
 
   public Iterable<T> getIterable() {
-    return iterable;
+    return this.iterable;
   }
 
   @Override

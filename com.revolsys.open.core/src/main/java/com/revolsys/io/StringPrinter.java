@@ -4,13 +4,13 @@ import java.io.PrintWriter;
 
 public class StringPrinter {
 
-  private String string;
+  private final String string;
 
-  public StringPrinter(String string) {
+  public StringPrinter(final String string) {
     this.string = string;
   }
 
-  public void write(PrintWriter out) {
-    out.print(string);
+  public void write(final PrintWriter out) {
+    out.print(this.string);
   }
 }

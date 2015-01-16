@@ -39,12 +39,12 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.prep.PreparedPolygon;
 
 /**
- * Stress tests {@link PreparedPolygon} for 
- * correctness of 
+ * Stress tests {@link PreparedPolygon} for
+ * correctness of
  * {@link PreparedPolygon#contains(Geometry)}
  * and {@link PreparedPolygon#intersects(Geometry)}
  * operations.
- * 
+ *
  * @author Owner
  *
  */

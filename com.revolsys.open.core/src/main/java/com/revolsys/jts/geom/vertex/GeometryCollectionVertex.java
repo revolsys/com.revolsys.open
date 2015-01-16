@@ -6,6 +6,11 @@ import com.revolsys.jts.geom.Geometry;
 
 public class GeometryCollectionVertex extends AbstractVertex {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private int partIndex = -1;
 
   private Vertex vertex;
@@ -172,7 +177,7 @@ public class GeometryCollectionVertex extends AbstractVertex {
       this.partIndex = vertexId[0];
       final Geometry geometryCollection = getGeometryCollection();
       if (this.partIndex >= 0
-        && this.partIndex < geometryCollection.getGeometryCount()) {
+          && this.partIndex < geometryCollection.getGeometryCount()) {
         final Geometry part = geometryCollection.getGeometry(this.partIndex);
         if (part != null) {
           final int[] partVertexId = new int[vertexId.length - 1];

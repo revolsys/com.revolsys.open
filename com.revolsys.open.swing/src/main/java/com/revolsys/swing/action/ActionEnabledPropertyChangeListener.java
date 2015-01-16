@@ -8,7 +8,7 @@ import javax.swing.Action;
 import com.revolsys.swing.parallel.Invoke;
 
 public class ActionEnabledPropertyChangeListener implements
-  PropertyChangeListener {
+PropertyChangeListener {
 
   private final Action action;
 

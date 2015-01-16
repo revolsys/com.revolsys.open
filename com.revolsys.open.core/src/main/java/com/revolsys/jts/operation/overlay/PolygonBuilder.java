@@ -79,9 +79,9 @@ public class PolygonBuilder {
     final List<MaximalEdgeRing> maxEdgeRings = buildMaximalEdgeRings(dirEdges);
     final List<EdgeRing> freeHoleList = new ArrayList<>();
     final List<MaximalEdgeRing> edgeRings = buildMinimalEdgeRings(maxEdgeRings,
-      shellList, freeHoleList);
-    sortShellsAndHoles(edgeRings, shellList, freeHoleList);
-    placeFreeHoles(shellList, freeHoleList);
+      this.shellList, freeHoleList);
+    sortShellsAndHoles(edgeRings, this.shellList, freeHoleList);
+    placeFreeHoles(this.shellList, freeHoleList);
   }
 
   /**
@@ -103,7 +103,7 @@ public class PolygonBuilder {
       if (de.isInResult() && de.getLabel().isArea()) {
         // if this edge has not yet been processed
         if (de.getEdgeRing() == null) {
-          final MaximalEdgeRing er = new MaximalEdgeRing(de, geometryFactory);
+          final MaximalEdgeRing er = new MaximalEdgeRing(de, this.geometryFactory);
           maxEdgeRings.add(er);
           er.setInResult();
         }
@@ -141,7 +141,7 @@ public class PolygonBuilder {
    * see if any of them contain the point.
    */
   public boolean containsPoint(final Point point) {
-    for (final EdgeRing shell : shellList) {
+    for (final EdgeRing shell : this.shellList) {
       if (shell.containsPoint(point)) {
         return true;
       }
@@ -217,8 +217,8 @@ public class PolygonBuilder {
 
   public List<Polygon> getPolygons() {
     final List<Polygon> polygons = new ArrayList<>();
-    for (final EdgeRing edgeRing : shellList) {
-      final Polygon polygon = edgeRing.toPolygon(geometryFactory);
+    for (final EdgeRing edgeRing : this.shellList) {
+      final Polygon polygon = edgeRing.toPolygon(this.geometryFactory);
       polygons.add(polygon);
     }
     return polygons;

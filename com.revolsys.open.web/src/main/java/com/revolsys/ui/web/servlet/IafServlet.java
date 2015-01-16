@@ -18,7 +18,6 @@ package com.revolsys.ui.web.servlet;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -101,8 +100,8 @@ public final class IafServlet extends HttpServlet {
     final HttpServletResponse response) throws ServletException, IOException {
     if (!response.isCommitted()) {
       getServletConfig().getServletContext()
-        .getRequestDispatcher(path)
-        .forward(request, response);
+      .getRequestDispatcher(path)
+      .forward(request, response);
     }
   }
 
@@ -145,8 +144,8 @@ public final class IafServlet extends HttpServlet {
    */
   private void processArguments(final Page page,
     final HttpServletRequest request) throws ActionException {
-    for (final Iterator arguments = page.getArguments().iterator(); arguments.hasNext();) {
-      final Argument argument = (Argument)arguments.next();
+    for (final Object element : page.getArguments()) {
+      final Argument argument = (Argument)element;
       final String name = argument.getName();
       Object value = null;
       String stringValue = request.getParameter(name);
@@ -177,8 +176,8 @@ public final class IafServlet extends HttpServlet {
    */
   private void processAttributes(final Page page,
     final HttpServletRequest request) throws ActionException {
-    for (final Iterator attributes = page.getFields().iterator(); attributes.hasNext();) {
-      final Attribute attribute = (Attribute)attributes.next();
+    for (final Object element : page.getFields()) {
+      final Attribute attribute = (Attribute)element;
       final String name = attribute.getName();
       final AttributeLoader loader = attribute.getLoader();
       Object value = null;

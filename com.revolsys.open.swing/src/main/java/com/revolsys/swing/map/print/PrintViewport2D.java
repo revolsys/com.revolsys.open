@@ -13,8 +13,6 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 
 public class PrintViewport2D extends Viewport2D {
-  private final PageFormat pageFormat;
-
   private final Rectangle2D contentRect;
 
   private final int dpi;
@@ -23,7 +21,6 @@ public class PrintViewport2D extends Viewport2D {
     final PageFormat pageFormat, final BoundingBox boundingBox,
     final Rectangle2D contentRect, final int dpi) {
     super(map);
-    this.pageFormat = pageFormat;
     this.contentRect = contentRect;
     this.dpi = dpi;
     BoundingBox newBoundingBox = boundingBox;
@@ -54,16 +51,16 @@ public class PrintViewport2D extends Viewport2D {
    */
   @Override
   public Unit<Length> getScreenUnit() {
-    return NonSI.INCH.divide(dpi);
+    return NonSI.INCH.divide(this.dpi);
   }
 
   @Override
   public int getViewHeightPixels() {
-    return (int)contentRect.getHeight();
+    return (int)this.contentRect.getHeight();
   }
 
   @Override
   public int getViewWidthPixels() {
-    return (int)contentRect.getWidth();
+    return (int)this.contentRect.getWidth();
   }
 }

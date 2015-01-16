@@ -21,7 +21,7 @@ import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.util.JavaBeanUtil;
 
 public class MarkerStylePanel extends BaseStylePanel implements
-  PropertyChangeListener {
+PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private final MarkerStyleRenderer geometryStyleRenderer;
@@ -49,15 +49,15 @@ public class MarkerStylePanel extends BaseStylePanel implements
       panel.add(stylePanels, BorderLayout.CENTER);
 
       this.previews = new JPanel(new VerticalLayout(5));
-      SwingUtil.setTitledBorder(previews, "Preview");
+      SwingUtil.setTitledBorder(this.previews, "Preview");
 
       final JPanel previewContainer = new JPanel(new VerticalLayout());
       previewContainer.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
       previewContainer.setBackground(WebColors.White);
-      previewContainer.add(previews);
+      previewContainer.add(this.previews);
       panel.add(previewContainer, BorderLayout.EAST);
 
-      addMarkerStylePanel(stylePanels, markerStyle);
+      addMarkerStylePanel(stylePanels, this.markerStyle);
       this.previews.add(new MarkerStylePreview(this.markerStyle));
     }
   }

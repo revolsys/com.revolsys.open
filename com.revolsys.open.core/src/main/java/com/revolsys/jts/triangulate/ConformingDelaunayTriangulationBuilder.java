@@ -52,9 +52,9 @@ import com.revolsys.jts.triangulate.quadedge.Vertex;
 
 /**
  * A utility class which creates Conforming Delaunay Trianglulations
- * from collections of points and linear constraints, and extract the resulting 
- * triangulation edges or triangles as geometries. 
- * 
+ * from collections of points and linear constraints, and extract the resulting
+ * triangulation edges or triangles as geometries.
+ *
  * @author Martin Davis
  *
  */
@@ -91,35 +91,35 @@ public class ConformingDelaunayTriangulationBuilder {
   }
 
   private void create() {
-    if (subdiv != null) {
+    if (this.subdiv != null) {
       return;
     }
 
-    final BoundingBoxDoubleGf siteEnv = DelaunayTriangulationBuilder.envelope(siteCoords);
+    final BoundingBoxDoubleGf siteEnv = DelaunayTriangulationBuilder.envelope(this.siteCoords);
 
     List segments = new ArrayList();
-    if (constraintLines != null) {
-      siteEnv.expandToInclude(constraintLines.getBoundingBox());
-      createVertices(constraintLines);
-      segments = createConstraintSegments(constraintLines);
+    if (this.constraintLines != null) {
+      siteEnv.expandToInclude(this.constraintLines.getBoundingBox());
+      createVertices(this.constraintLines);
+      segments = createConstraintSegments(this.constraintLines);
     }
-    final List sites = createSiteVertices(siteCoords);
+    final List sites = createSiteVertices(this.siteCoords);
 
     final ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(
-      sites, tolerance);
+      sites, this.tolerance);
 
-    cdt.setConstraints(segments, new ArrayList(constraintVertexMap.values()));
+    cdt.setConstraints(segments, new ArrayList(this.constraintVertexMap.values()));
 
     cdt.formInitialDelaunay();
     cdt.enforceConstraints();
-    subdiv = cdt.getSubdivision();
+    this.subdiv = cdt.getSubdivision();
   }
 
   private List<ConstraintVertex> createSiteVertices(
     final Collection<Point> coords) {
     final List<ConstraintVertex> verts = new ArrayList<>();
     for (final Point coord : coords) {
-      if (constraintVertexMap.containsKey(coord)) {
+      if (this.constraintVertexMap.containsKey(coord)) {
         continue;
       }
       verts.add(new ConstraintVertex(coord));
@@ -130,50 +130,50 @@ public class ConformingDelaunayTriangulationBuilder {
   private void createVertices(final Geometry geom) {
     for (final Point coordinate : geom.vertices()) {
       final Vertex v = new ConstraintVertex(coordinate);
-      constraintVertexMap.put(v.getCoordinate(), v);
+      this.constraintVertexMap.put(v.getCoordinate(), v);
     }
   }
 
   /**
    * Gets the edges of the computed triangulation as a {@link MultiLineString}.
-   * 
+   *
    * @param geomFact the geometry factory to use to create the output
    * @return the edges of the triangulation
    */
   public Geometry getEdges(final GeometryFactory geomFact) {
     create();
-    return subdiv.getEdges(geomFact);
+    return this.subdiv.getEdges(geomFact);
   }
 
   /**
    * Gets the QuadEdgeSubdivision which models the computed triangulation.
-   * 
+   *
    * @return the subdivision containing the triangulation
    */
   public QuadEdgeSubdivision getSubdivision() {
     create();
-    return subdiv;
+    return this.subdiv;
   }
 
   /**
-   * Gets the faces of the computed triangulation as a {@link GeometryCollection} 
+   * Gets the faces of the computed triangulation as a {@link GeometryCollection}
    * of {@link Polygon}.
-   * 
+   *
    * @param geomFact the geometry factory to use to create the output
    * @return the faces of the triangulation
    */
   public Geometry getTriangles(final GeometryFactory geomFact) {
     create();
-    return subdiv.getTriangles(geomFact);
+    return this.subdiv.getTriangles(geomFact);
   }
 
   /**
    * Sets the linear constraints to be conformed to.
    * All linear components in the input will be used as constraints.
-   * The constraint vertices do not have to be disjoint from 
+   * The constraint vertices do not have to be disjoint from
    * the site vertices.
    * The constraints must not contain duplicate segments (up to orientation).
-   * 
+   *
    * @param constraintLines the lines to constraint to
    */
   public void setConstraints(final Geometry constraintLines) {
@@ -184,21 +184,21 @@ public class ConformingDelaunayTriangulationBuilder {
    * Sets the sites (point or vertices) which will be triangulated.
    * All vertices of the given geometry will be used as sites.
    * The site vertices do not have to contain the constraint
-   * vertices as well; any site vertices which are 
+   * vertices as well; any site vertices which are
    * identical to a constraint vertex will be removed
    * from the site vertex set.
-   * 
+   *
    * @param geom the geometry from which the sites will be extracted.
    */
   public void setSites(final Geometry geom) {
-    siteCoords = DelaunayTriangulationBuilder.extractUniqueCoordinates(geom);
+    this.siteCoords = DelaunayTriangulationBuilder.extractUniqueCoordinates(geom);
   }
 
   /**
    * Sets the snapping tolerance which will be used
    * to improved the robustness of the triangulation computation.
    * A tolerance of 0.0 specifies that no snapping will take place.
-   * 
+   *
    * @param tolerance the tolerance distance to use
    */
   public void setTolerance(final double tolerance) {

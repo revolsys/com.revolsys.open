@@ -22,12 +22,12 @@ public class FileCacheResponse extends CacheResponse {
 
   @Override
   public InputStream getBody() throws IOException {
-    return new FileInputStream(file);
+    return new FileInputStream(this.file);
   }
 
   @Override
   public Map<String, List<String>> getHeaders() throws IOException {
-    return headers;
+    return this.headers;
   }
 
 }

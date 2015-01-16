@@ -13,7 +13,7 @@ import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 
 public abstract class AbstractGeometryReaderFactory extends AbstractIoFactory
-  implements GeometryReaderFactory {
+implements GeometryReaderFactory {
   public static GeometryReader geometryReader(final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final GeometryReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
@@ -37,24 +37,24 @@ public abstract class AbstractGeometryReaderFactory extends AbstractIoFactory
 
   @Override
   public Set<CoordinateSystem> getCoordinateSystems() {
-    return coordinateSystems;
+    return this.coordinateSystems;
   }
 
   @Override
   public boolean isBinary() {
-    return binary;
+    return this.binary;
   }
 
   @Override
   public boolean isCoordinateSystemSupported(
     final CoordinateSystem coordinateSystem) {
-    return coordinateSystems.contains(coordinateSystem);
+    return this.coordinateSystems.contains(coordinateSystem);
   }
 
   protected void setCoordinateSystems(
     final CoordinateSystem... coordinateSystems) {
     setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
-      Arrays.asList(coordinateSystems)));
+        Arrays.asList(coordinateSystems)));
   }
 
   protected void setCoordinateSystems(

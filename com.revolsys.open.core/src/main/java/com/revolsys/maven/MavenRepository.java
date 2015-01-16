@@ -118,9 +118,9 @@ public class MavenRepository implements URLStreamHandlerFactory {
             final File file = recordDefinitionResource.getFile();
             if (file.delete()) {
               LoggerFactory.getLogger(getClass())
-                .error(
-                  "Deleting corrupt maven resource" + recordDefinitionResource,
-                  e);
+              .error(
+                "Deleting corrupt maven resource" + recordDefinitionResource,
+                e);
             }
           } catch (final IOException ioe) {
           }

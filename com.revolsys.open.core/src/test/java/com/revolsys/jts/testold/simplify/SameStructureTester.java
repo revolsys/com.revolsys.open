@@ -29,7 +29,7 @@ public class SameStructureTester {
     }
 
     Assert.shouldNeverReachHere("Unsupported Geometry class: "
-      + g1.getClass().getName());
+        + g1.getClass().getName());
     return false;
   }
 

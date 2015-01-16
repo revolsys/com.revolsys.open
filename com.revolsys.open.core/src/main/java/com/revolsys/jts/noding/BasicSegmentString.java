@@ -65,7 +65,7 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public Point getCoordinate(final int i) {
-    return points.getPoint(i);
+    return this.points.getPoint(i);
   }
 
   /**
@@ -75,12 +75,12 @@ public class BasicSegmentString implements SegmentString {
    */
   @Override
   public Object getData() {
-    return data;
+    return this.data;
   }
 
   @Override
   public LineString getPoints() {
-    return points;
+    return this.points;
   }
 
   /**
@@ -91,7 +91,7 @@ public class BasicSegmentString implements SegmentString {
    * @return the octant of the segment at the vertex
    */
   public int getSegmentOctant(final int index) {
-    if (index == points.getVertexCount() - 1) {
+    if (index == this.points.getVertexCount() - 1) {
       return -1;
     }
     return Octant.octant(getCoordinate(index), getCoordinate(index + 1));
@@ -99,7 +99,7 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public boolean isClosed() {
-    return points.getPoint(0).equals(points.getPoint(points.getVertexCount() - 1));
+    return this.points.getPoint(0).equals(this.points.getPoint(this.points.getVertexCount() - 1));
   }
 
   /**
@@ -114,11 +114,11 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public int size() {
-    return points.getVertexCount();
+    return this.points.getVertexCount();
   }
 
   @Override
   public String toString() {
-    return points.toString();
+    return this.points.toString();
   }
 }

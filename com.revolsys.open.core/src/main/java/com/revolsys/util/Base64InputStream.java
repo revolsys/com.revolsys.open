@@ -4,7 +4,7 @@ package com.revolsys.util;
  * A {@link Base64InputStream} will read data from another
  * <tt>java.io.InputStream</tt>, given in the constructor, and encode/decode
  * to/from Base64 notation on the fly.
- * 
+ *
  * @see Base64
  * @since 1.3
  */
@@ -30,7 +30,7 @@ public class Base64InputStream extends java.io.FilterInputStream {
 
   /**
    * Constructs a {@link Base64InputStream} in DECODE mode.
-   * 
+   *
    * @param in the <tt>java.io.InputStream</tt> from which to read data.
    * @since 1.3
    */
@@ -42,7 +42,7 @@ public class Base64InputStream extends java.io.FilterInputStream {
    * Constructs a {@link Base64InputStream} in either ENCODE or DECODE mode.
    * <p>
    * Valid options:
-   * 
+   *
    * <pre>
    *   ENCODE or DECODE: Encode or Decode as data is read.
    *   DONT_BREAK_LINES: don't break lines at 76 characters
@@ -51,7 +51,7 @@ public class Base64InputStream extends java.io.FilterInputStream {
    * </pre>
    * <p>
    * Example: <code>new Base64.InputStream( in, Base64.DECODE )</code>
-   * 
+   *
    * @param in the <tt>java.io.InputStream</tt> from which to read data.
    * @param options Specified options
    * @see Base64#ENCODE
@@ -63,8 +63,8 @@ public class Base64InputStream extends java.io.FilterInputStream {
     super(in);
     this.breakLines = (options & Base64.DONT_BREAK_LINES) != Base64.DONT_BREAK_LINES;
     this.encode = (options & Base64.ENCODE) == Base64.ENCODE;
-    this.bufferLength = encode ? 4 : 3;
-    this.buffer = new byte[bufferLength];
+    this.bufferLength = this.encode ? 4 : 3;
+    this.buffer = new byte[this.bufferLength];
     this.position = -1;
     this.lineLength = 0;
     this.options = options; // Record for later, mostly to determine which
@@ -75,20 +75,20 @@ public class Base64InputStream extends java.io.FilterInputStream {
   /**
    * Reads enough of the input stream to convert to/from Base64 and returns
    * the next byte.
-   * 
+   *
    * @return next byte
    * @since 1.3
    */
   @Override
   public int read() throws java.io.IOException {
     // Do we need to get data?
-    if (position < 0) {
-      if (encode) {
+    if (this.position < 0) {
+      if (this.encode) {
         final byte[] b3 = new byte[3];
         int numBinaryBytes = 0;
         for (int i = 0; i < 3; i++) {
           try {
-            final int b = in.read();
+            final int b = this.in.read();
 
             // If end of stream, b is -1.
             if (b >= 0) {
@@ -107,9 +107,9 @@ public class Base64InputStream extends java.io.FilterInputStream {
         } // end for: each needed input byte
 
         if (numBinaryBytes > 0) {
-          Base64.encode3to4(b3, 0, numBinaryBytes, buffer, 0, options);
-          position = 0;
-          numSigBytes = 4;
+          Base64.encode3to4(b3, 0, numBinaryBytes, this.buffer, 0, this.options);
+          this.position = 0;
+          this.numSigBytes = 4;
         } // end if: got data
         else {
           return -1;
@@ -124,8 +124,8 @@ public class Base64InputStream extends java.io.FilterInputStream {
           // Read four "meaningful" bytes:
           int b = 0;
           do {
-            b = in.read();
-          } while (b >= 0 && decodabet[b & 0x7f] <= Base64.WHITE_SPACE_ENC);
+            b = this.in.read();
+          } while (b >= 0 && this.decodabet[b & 0x7f] <= Base64.WHITE_SPACE_ENC);
 
           if (b < 0) {
             break; // Reads a -1 if end of stream
@@ -135,8 +135,8 @@ public class Base64InputStream extends java.io.FilterInputStream {
         } // end for: each needed input byte
 
         if (i == 4) {
-          numSigBytes = Base64.decode4to3(b4, 0, buffer, 0, options);
-          position = 0;
+          this.numSigBytes = Base64.decode4to3(b4, 0, this.buffer, 0, this.options);
+          this.position = 0;
         } // end if: got four characters
         else if (i == 0) {
           return -1;
@@ -150,25 +150,25 @@ public class Base64InputStream extends java.io.FilterInputStream {
     } // end else: get data
 
     // Got data?
-    if (position >= 0) {
+    if (this.position >= 0) {
       // End of relevant data?
-      if ( /* !encode && */position >= numSigBytes) {
+      if ( /* !encode && */this.position >= this.numSigBytes) {
         return -1;
       }
 
-      if (encode && breakLines && lineLength >= Base64.MAX_LINE_LENGTH) {
-        lineLength = 0;
+      if (this.encode && this.breakLines && this.lineLength >= Base64.MAX_LINE_LENGTH) {
+        this.lineLength = 0;
         return '\n';
       } // end if
       else {
-        lineLength++; // This isn't important when decoding
+        this.lineLength++; // This isn't important when decoding
         // but throwing an extra "if" seems
         // just as wasteful.
 
-        final int b = buffer[position++];
+        final int b = this.buffer[this.position++];
 
-        if (position >= bufferLength) {
-          position = -1;
+        if (this.position >= this.bufferLength) {
+          this.position = -1;
         }
 
         return b & 0xFF; // This is how you "cast" a byte that's
@@ -187,7 +187,7 @@ public class Base64InputStream extends java.io.FilterInputStream {
    * Calls {@link #read()} repeatedly until the end of stream is reached or
    * <var>len</var> bytes are read. Returns number of bytes read into array or
    * -1 if end of stream is encountered.
-   * 
+   *
    * @param dest array to hold values
    * @param off offset for array
    * @param len max number of bytes to read into array
@@ -196,7 +196,7 @@ public class Base64InputStream extends java.io.FilterInputStream {
    */
   @Override
   public int read(final byte[] dest, final int off, final int len)
-    throws java.io.IOException {
+      throws java.io.IOException {
     int i;
     int b;
     for (i = 0; i < len; i++) {

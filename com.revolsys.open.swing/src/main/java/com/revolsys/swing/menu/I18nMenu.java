@@ -6,7 +6,7 @@ import javax.swing.JMenu;
 @SuppressWarnings("serial")
 public class I18nMenu extends JMenu {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 

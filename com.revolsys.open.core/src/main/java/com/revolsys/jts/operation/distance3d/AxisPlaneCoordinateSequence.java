@@ -38,33 +38,21 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.impl.AbstractLineString;
 
 /**
- * A LineString wrapper which 
+ * A LineString wrapper which
  * projects 3D coordinates into one of the
  * three Cartesian axis planes,
  * using the standard orthonormal projection
  * (i.e. simply selecting the appropriate ordinates into the XY ordinates).
  * The projected data is represented as 2D coordinates.
- * 
+ *
  * @author mdavis
  *
  */
 public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
-  private static final int[] XY_INDEX = new int[] {
-    0, 1
-  };
-
-  private static final int[] XZ_INDEX = new int[] {
-    0, 2
-  };
-
-  private static final int[] YZ_INDEX = new int[] {
-    1, 2
-  };
-
   /**
    * Creates a wrapper projecting to the XY plane.
-   * 
+   *
    * @param seq the sequence to be projected
    * @return a sequence which projects coordinates
    */
@@ -78,7 +66,7 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
   /**
    * Creates a wrapper projecting to the XZ plane.
-   * 
+   *
    * @param seq the sequence to be projected
    * @return a sequence which projects coordinates
    */
@@ -88,13 +76,30 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
   /**
    * Creates a wrapper projecting to the YZ plane.
-   * 
+   *
    * @param seq the sequence to be projected
    * @return a sequence which projects coordinates
    */
   public static LineString projectToYZ(final LineString seq) {
     return new AxisPlaneCoordinateSequence(seq, YZ_INDEX);
   }
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  private static final int[] XY_INDEX = new int[] {
+    0, 1
+  };
+
+  private static final int[] XZ_INDEX = new int[] {
+    0, 2
+  };
+
+  private static final int[] YZ_INDEX = new int[] {
+    1, 2
+  };
 
   private final LineString seq;
 
@@ -121,17 +126,17 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
     if (ordinateIndex > 1) {
       return 0;
     }
-    return seq.getCoordinate(index, indexMap[ordinateIndex]);
+    return this.seq.getCoordinate(index, this.indexMap[ordinateIndex]);
   }
 
   @Override
   public double[] getCoordinates() {
-    return seq.getCoordinates();
+    return this.seq.getCoordinates();
   }
 
   @Override
   public int getVertexCount() {
-    return seq.getVertexCount();
+    return this.seq.getVertexCount();
   }
 
   @Override
@@ -151,7 +156,7 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
   @Override
   public boolean isEmpty() {
-    return seq.isEmpty();
+    return this.seq.isEmpty();
   }
 
 }

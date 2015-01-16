@@ -19,7 +19,12 @@ public class OutsideBoundaryObjects {
   private Geometry preparedBoundary;
 
   public boolean addObject(final Record object) {
-    return objects.add(object);
+    return this.objects.add(object);
+  }
+
+  public boolean boundaryContains(final Geometry geometry) {
+    return geometry == null || this.boundary == null
+        || this.preparedBoundary.contains(geometry);
   }
 
   public boolean boundaryContains(final Record object) {
@@ -27,20 +32,15 @@ public class OutsideBoundaryObjects {
     return boundaryContains(geometry);
   }
 
-  public boolean boundaryContains(final Geometry geometry) {
-    return geometry == null || boundary == null
-      || preparedBoundary.contains(geometry);
-  }
-
   public void clear() {
-    objects = new LinkedHashSet<Record>();
+    this.objects = new LinkedHashSet<Record>();
   }
 
   public void expandBoundary(final Geometry geometry) {
-    if (boundary == null) {
+    if (this.boundary == null) {
       setBoundary(geometry);
     } else {
-      setBoundary(boundary.union(geometry));
+      setBoundary(this.boundary.union(geometry));
     }
   }
 
@@ -52,15 +52,15 @@ public class OutsideBoundaryObjects {
   }
 
   public Geometry getBoundary() {
-    return boundary;
+    return this.boundary;
   }
 
   public Set<Record> getObjects() {
-    return objects;
+    return this.objects;
   }
 
   public boolean removeObject(final Record object) {
-    return objects.remove(object);
+    return this.objects.remove(object);
   }
 
   public void setBoundary(final Geometry boundary) {

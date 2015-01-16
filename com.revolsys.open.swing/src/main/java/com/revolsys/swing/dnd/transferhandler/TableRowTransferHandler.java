@@ -19,7 +19,7 @@ public class TableRowTransferHandler extends TransferHandler {
   private static final long serialVersionUID = 1L;
 
   private final DataFlavor localObjectFlavor = new DataFlavor(Integer.class,
-    "Integer Row Index");
+      "Integer Row Index");
 
   private final String mimeType = this.localObjectFlavor.getMimeType();
 

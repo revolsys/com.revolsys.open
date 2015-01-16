@@ -57,7 +57,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
 public class NodedSegmentString implements NodableSegmentString {
   /**
    * Gets the {@link SegmentString}s which result from splitting this string at node points.
-   * 
+   *
    * @param segments a Collection of NodedSegmentStrings
    * @return a Collection of NodedSegmentStrings representing the substrings
    */
@@ -89,17 +89,6 @@ public class NodedSegmentString implements NodableSegmentString {
   }
 
   /**
-   * Adds an intersection node for a given point and segment to this segment string.
-   * 
-   * @param point the location of the intersection
-   * @param segmentIndex the index of the segment containing the intersection
-   */
-  @Override
-  public void addIntersection(final Point point, final int segmentIndex) {
-    addIntersectionNode(point, segmentIndex);
-  }
-
-  /**
    * Add an SegmentNode for intersection intIndex.
    * An intersection that falls exactly on a vertex
    * of the SegmentString is normalized
@@ -113,9 +102,20 @@ public class NodedSegmentString implements NodableSegmentString {
 
   /**
    * Adds an intersection node for a given point and segment to this segment string.
+   *
+   * @param point the location of the intersection
+   * @param segmentIndex the index of the segment containing the intersection
+   */
+  @Override
+  public void addIntersection(final Point point, final int segmentIndex) {
+    addIntersectionNode(point, segmentIndex);
+  }
+
+  /**
+   * Adds an intersection node for a given point and segment to this segment string.
    * If an intersection already exists for this exact location, the existing
    * node will be returned.
-   * 
+   *
    * @param point the location of the intersection
    * @param segmentIndex the index of the segment containing the intersection
    * @return the intersection node for the point
@@ -137,7 +137,7 @@ public class NodedSegmentString implements NodableSegmentString {
     /**
      * Add the intersection point to edge intersection list.
      */
-    final SegmentNode ei = nodeList.add(point, normalizedSegmentIndex);
+    final SegmentNode ei = this.nodeList.add(point, normalizedSegmentIndex);
     return ei;
   }
 
@@ -154,7 +154,7 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public Point getCoordinate(final int i) {
-    return points.getPoint(i);
+    return this.points.getPoint(i);
   }
 
   /**
@@ -164,16 +164,16 @@ public class NodedSegmentString implements NodableSegmentString {
    */
   @Override
   public Object getData() {
-    return data;
+    return this.data;
   }
 
   public SegmentNodeList getNodeList() {
-    return nodeList;
+    return this.nodeList;
   }
 
   @Override
   public LineString getPoints() {
-    return points;
+    return this.points;
   }
 
   /**
@@ -215,17 +215,17 @@ public class NodedSegmentString implements NodableSegmentString {
 
   @Override
   public int size() {
-    return points.getVertexCount();
+    return this.points.getVertexCount();
   }
 
   @Override
   public String toString() {
-    if (points == null || points.getVertexCount() == 0) {
-      return "LINESTRING EMPTY\t" + data;
-    } else if (points.getVertexCount() < 2) {
-      return GeometryFactory.floating(0, 2).point(points) + "\t" + data;
+    if (this.points == null || this.points.getVertexCount() == 0) {
+      return "LINESTRING EMPTY\t" + this.data;
+    } else if (this.points.getVertexCount() < 2) {
+      return GeometryFactory.floating(0, 2).point(this.points) + "\t" + this.data;
     } else {
-      return GeometryFactory.floating(0, 2).lineString(points) + "\t" + data;
+      return GeometryFactory.floating(0, 2).lineString(this.points) + "\t" + this.data;
     }
   }
 }

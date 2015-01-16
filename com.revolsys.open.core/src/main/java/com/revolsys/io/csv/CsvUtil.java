@@ -13,7 +13,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 public final class CsvUtil {
   /**
    * Convert a to a CSV string with a header row and a data row.
-   * 
+   *
    * @param map The to convert to CSV
    * @return The CSV string.
    */
@@ -58,17 +58,14 @@ public final class CsvUtil {
     return map;
   }
 
-  private CsvUtil() {
-  }
-
   /*
    * Replaces whitespace with spaces
    */
-  public static void writeColumns(StringWriter out,
-    Collection<? extends Object> columns, char fieldSeparator,
-    char recordSeparator) {
+  public static void writeColumns(final StringWriter out,
+    final Collection<? extends Object> columns, final char fieldSeparator,
+    final char recordSeparator) {
     boolean first = true;
-    for (Object value : columns) {
+    for (final Object value : columns) {
       if (first) {
         first = false;
       } else {
@@ -82,6 +79,9 @@ public final class CsvUtil {
       }
     }
     out.write(recordSeparator);
+  }
+
+  private CsvUtil() {
   }
 
 }

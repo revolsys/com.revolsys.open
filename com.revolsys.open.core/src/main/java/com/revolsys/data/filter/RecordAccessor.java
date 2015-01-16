@@ -12,6 +12,10 @@ public class RecordAccessor implements PropertyAccessor {
   @SuppressWarnings("serial")
   private static class RecordAccessException extends AccessException {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     private final String key;
 
     public RecordAccessException(final String key) {

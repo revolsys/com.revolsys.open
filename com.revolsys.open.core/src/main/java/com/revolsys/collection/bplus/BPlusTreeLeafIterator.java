@@ -24,20 +24,20 @@ class BPlusTreeLeafIterator<T> extends AbstractIterator<T> {
   public BPlusTreeLeafIterator(final BPlusTreeMap<?, ?> map, final boolean key) {
     this.map = map;
     this.key = key;
-    modCount = map.getModCount();
+    this.modCount = map.getModCount();
   }
 
   @Override
   protected T getNext() throws NoSuchElementException {
-    if (map.getModCount() == modCount) {
-      while (currentValues.isEmpty() || currentIndex >= currentValues.size()) {
-        if (nextPageId < 0) {
+    if (this.map.getModCount() == this.modCount) {
+      while (this.currentValues.isEmpty() || this.currentIndex >= this.currentValues.size()) {
+        if (this.nextPageId < 0) {
           throw new NoSuchElementException();
         } else {
-          nextPageId = map.getLeafValues(currentValues, nextPageId, key);
+          this.nextPageId = this.map.getLeafValues(this.currentValues, this.nextPageId, this.key);
         }
       }
-      final T value = currentValues.get(currentIndex++);
+      final T value = this.currentValues.get(this.currentIndex++);
       return value;
     } else {
       throw new ConcurrentModificationException();

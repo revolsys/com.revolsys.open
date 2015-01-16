@@ -38,9 +38,9 @@ import com.revolsys.jts.geom.Point;
 
 /**
  * An interface for factories which create a {@link ConstraintVertex}
- * 
+ *
  * @author Martin Davis
  */
 public interface ConstraintVertexFactory {
-    ConstraintVertex createVertex(Point p, Segment constraintSeg);
+  ConstraintVertex createVertex(Point p, Segment constraintSeg);
 }

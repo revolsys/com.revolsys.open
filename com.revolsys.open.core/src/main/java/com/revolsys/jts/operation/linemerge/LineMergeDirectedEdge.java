@@ -38,8 +38,8 @@ import com.revolsys.jts.planargraph.Node;
 import com.revolsys.jts.util.Assert;
 
 /**
- * A {@link com.revolsys.jts.planargraph.DirectedEdge} of a 
- * {@link LineMergeGraph}. 
+ * A {@link com.revolsys.jts.planargraph.DirectedEdge} of a
+ * {@link LineMergeGraph}.
  *
  * @version 1.7
  */
@@ -62,7 +62,7 @@ public class LineMergeDirectedEdge extends DirectedEdge {
 
   /**
    * Returns the directed edge that starts at this directed edge's end point, or null
-   * if there are zero or multiple directed edges starting there.  
+   * if there are zero or multiple directed edges starting there.
    * @return the directed edge
    */
   public LineMergeDirectedEdge getNext() {

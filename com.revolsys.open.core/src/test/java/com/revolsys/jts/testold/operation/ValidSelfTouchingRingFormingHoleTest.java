@@ -19,11 +19,11 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  * @version 1.7
  */
 public class ValidSelfTouchingRingFormingHoleTest extends TestCase {
-  private static WKTReader rdr = new WKTReader();
-
   public static void main(final String[] args) {
     junit.textui.TestRunner.run(ValidSelfTouchingRingFormingHoleTest.class);
   }
+
+  private static WKTReader rdr = new WKTReader();
 
   public ValidSelfTouchingRingFormingHoleTest(final String name) {
     super(name);

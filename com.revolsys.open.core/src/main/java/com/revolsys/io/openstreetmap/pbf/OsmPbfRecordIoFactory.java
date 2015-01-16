@@ -14,7 +14,7 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
 
 public class OsmPbfRecordIoFactory extends
-  AbstractRecordAndGeometryReaderFactory {
+AbstractRecordAndGeometryReaderFactory {
   public OsmPbfRecordIoFactory() {
     super("Open Street Map PBF", true);
     addMediaTypeAndFileExtension("application/x-pbf+osm", "osm.pbf");

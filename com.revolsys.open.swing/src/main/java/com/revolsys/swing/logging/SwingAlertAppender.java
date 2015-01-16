@@ -13,7 +13,7 @@ public class SwingAlertAppender extends AppenderSkeleton {
   @Override
   protected void append(final LoggingEvent event) {
     if (event.getLevel().equals(Level.ERROR)) {
-      hasError = true;
+      this.hasError = true;
       LoggingEventPanel.showDialog(SwingUtil.getActiveWindow(), event);
     }
   }
@@ -23,7 +23,7 @@ public class SwingAlertAppender extends AppenderSkeleton {
   }
 
   public boolean isHasError() {
-    return hasError;
+    return this.hasError;
   }
 
   @Override

@@ -31,7 +31,7 @@ public class PreparedGeometryTeeOperation extends TeeGeometryOperation {
   /**
    * Creates a new operation which chains to the given {@link GeometryMethodOperation}
    * for non-intercepted methods.
-   * 
+   *
    * @param chainOp the operation to chain to
    */
   public PreparedGeometryTeeOperation(final GeometryMethodOperation chainOp) {
@@ -54,7 +54,7 @@ public class PreparedGeometryTeeOperation extends TeeGeometryOperation {
 
     if (pgResult != expected) {
       throw new IllegalStateException(
-        "Geometry.contains result does not match expected");
+          "Geometry.contains result does not match expected");
     }
 
     // System.out.println("Results match!");
@@ -67,7 +67,7 @@ public class PreparedGeometryTeeOperation extends TeeGeometryOperation {
 
     if (pgResult != expected) {
       throw new IllegalStateException(
-        "Geometry.containsProperly result does not match expected");
+          "Geometry.containsProperly result does not match expected");
     }
 
     // System.out.println("Results match!");
@@ -80,7 +80,7 @@ public class PreparedGeometryTeeOperation extends TeeGeometryOperation {
 
     if (pgResult != expected) {
       throw new IllegalStateException(
-        "Geometry.covers result does not match expected");
+          "Geometry.covers result does not match expected");
     }
 
     // System.out.println("Results match!");
@@ -94,7 +94,7 @@ public class PreparedGeometryTeeOperation extends TeeGeometryOperation {
     if (pgResult != expected) {
       // pg.intersects(g2);
       throw new IllegalStateException(
-        "Geometry.intersects result does not match expected");
+          "Geometry.intersects result does not match expected");
     }
 
     // System.out.println("Results match!");

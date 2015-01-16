@@ -7,7 +7,7 @@ import java.io.ObjectOutput;
 import java.lang.reflect.Method;
 
 public class InvokeMethodObjectAttributeProxy<T, O> extends
-  AbstractObjectAttributeProxy<T, O> implements Externalizable {
+AbstractObjectAttributeProxy<T, O> implements Externalizable {
 
   private static final long serialVersionUID = 1L;
 
@@ -46,8 +46,8 @@ public class InvokeMethodObjectAttributeProxy<T, O> extends
   @Override
   public T createValue(final O value) {
     try {
-      if (parameters == null) {
-        return (T)method.invoke(object, value);
+      if (this.parameters == null) {
+        return (T)this.method.invoke(this.object, value);
       } else {
         final Object[] parameters = new Object[this.parameters.length + 1];
         parameters[0] = value;
@@ -55,7 +55,7 @@ public class InvokeMethodObjectAttributeProxy<T, O> extends
           final Object parameter = this.parameters[i];
           parameters[i + 1] = parameter;
         }
-        return (T)method.invoke(object, parameters);
+        return (T)this.method.invoke(this.object, parameters);
       }
     } catch (final Throwable e) {
       throw new RuntimeException(e);
@@ -64,14 +64,14 @@ public class InvokeMethodObjectAttributeProxy<T, O> extends
 
   public void init() {
     try {
-      final Class<?>[] parameterClasses = new Class<?>[parameters.length + 1];
-      parameterClasses[0] = parameterClass;
-      for (int i = 0; i < parameters.length; i++) {
-        final Object parameter = parameters[i];
+      final Class<?>[] parameterClasses = new Class<?>[this.parameters.length + 1];
+      parameterClasses[0] = this.parameterClass;
+      for (int i = 0; i < this.parameters.length; i++) {
+        final Object parameter = this.parameters[i];
         parameterClasses[i + 1] = parameter.getClass();
       }
-      for (final Method method : clazz.getMethods()) {
-        if (method.getName().equals(methodName)) {
+      for (final Method method : this.clazz.getMethods()) {
+        if (method.getName().equals(this.methodName)) {
           final Class<?>[] parameterTypes = method.getParameterTypes();
           if (parameterTypes.length == parameterClasses.length) {
             boolean matched = true;
@@ -94,39 +94,39 @@ public class InvokeMethodObjectAttributeProxy<T, O> extends
     } catch (final Throwable e) {
       throw new RuntimeException(e);
     }
-    if (method == null) {
-      throw new IllegalArgumentException("Method could not be found " + clazz
-        + "." + methodName);
+    if (this.method == null) {
+      throw new IllegalArgumentException("Method could not be found " + this.clazz
+        + "." + this.methodName);
     }
   }
 
   @Override
   public void readExternal(final ObjectInput in) throws IOException,
-    ClassNotFoundException {
+  ClassNotFoundException {
     final String className = (String)in.readObject();
-    clazz = Class.forName(className);
+    this.clazz = Class.forName(className);
 
-    methodName = (String)in.readObject();
+    this.methodName = (String)in.readObject();
 
     final String parameterClassName = (String)in.readObject();
-    parameterClass = Class.forName(parameterClassName);
+    this.parameterClass = Class.forName(parameterClassName);
 
-    parameters = (Object[])in.readObject();
+    this.parameters = (Object[])in.readObject();
 
     init();
   }
 
   @Override
   public String toString() {
-    return method.toString();
+    return this.method.toString();
   }
 
   @Override
   public void writeExternal(final ObjectOutput out) throws IOException {
-    out.writeObject(clazz.getName());
-    out.writeObject(methodName);
-    out.writeObject(parameterClass.getName());
-    out.writeObject(parameters);
+    out.writeObject(this.clazz.getName());
+    out.writeObject(this.methodName);
+    out.writeObject(this.parameterClass.getName());
+    out.writeObject(this.parameters);
   }
 
 }

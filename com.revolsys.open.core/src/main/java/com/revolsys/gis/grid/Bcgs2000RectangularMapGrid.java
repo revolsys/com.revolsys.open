@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class Bcgs2000RectangularMapGrid extends Bcgs20000RectangularMapGrid {
   private static final Pattern NAME_PATTERN = Pattern.compile("^"
-    + BcgsConstants.REGEX_2000 + ".*");
+      + BcgsConstants.REGEX_2000 + ".*");
 
   public Bcgs2000RectangularMapGrid() {
     this(BcgsConstants.WIDTH_2000, BcgsConstants.HEIGHT_2000);

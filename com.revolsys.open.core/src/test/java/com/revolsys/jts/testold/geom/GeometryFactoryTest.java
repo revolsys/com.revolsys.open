@@ -62,15 +62,11 @@ public class GeometryFactoryTest extends TestCase {
   }
 
   private void checkCreateGeometryExact(final String wkt) throws ParseException {
-    final Geometry g = geometryFactory.geometry(wkt);
+    final Geometry g = this.geometryFactory.geometry(wkt);
     final Geometry g2 = this.geometryFactory.geometry(g);
     if (!g.equals(2,g2)) {
       failNotEquals("Geometry not equal exact", g, g2);
     }
-  }
-
-  private Geometry read(final String wkt) throws ParseException {
-    return this.reader.read(wkt);
   }
 
   public void testCreateGeometry() throws ParseException {

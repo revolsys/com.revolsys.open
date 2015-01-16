@@ -36,18 +36,18 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * Intersects two sets of {@link SegmentString}s using 
+ * Intersects two sets of {@link SegmentString}s using
  * brute-force comparison.
  *
  * @version 1.7
  */
 public class SimpleSegmentSetMutualIntersector implements
-  SegmentSetMutualIntersector {
+SegmentSetMutualIntersector {
   private final Collection baseSegStrings;
 
   /**
    * Constructs a new intersector for a given set of {@link SegmentStrings}.
-   * 
+   *
    * @param baseSegStrings the base segment strings to intersect
    */
   public SimpleSegmentSetMutualIntersector(final Collection segStrings) {
@@ -57,7 +57,7 @@ public class SimpleSegmentSetMutualIntersector implements
   /**
    * Processes all of the segment pairs in the given segment strings
    * using the given SegmentIntersector.
-   * 
+   *
    * @param ss0 a Segment string
    * @param ss1 a segment string
    * @param segInt the segment intersector to use
@@ -76,17 +76,17 @@ public class SimpleSegmentSetMutualIntersector implements
   }
 
   /**
-   * Calls {@link SegmentIntersector#processIntersections(SegmentString, int, SegmentString, int)} 
+   * Calls {@link SegmentIntersector#processIntersections(SegmentString, int, SegmentString, int)}
    * for all <i>candidate</i> intersections between
-   * the given collection of SegmentStrings and the set of base segments. 
-   * 
+   * the given collection of SegmentStrings and the set of base segments.
+   *
    * @param a set of segments to intersect
    * @param the segment intersector to use
    */
   @Override
   public void process(final Collection segStrings,
     final SegmentIntersector segInt) {
-    for (final Iterator i = baseSegStrings.iterator(); i.hasNext();) {
+    for (final Iterator i = this.baseSegStrings.iterator(); i.hasNext();) {
       final SegmentString baseSS = (SegmentString)i.next();
       for (final Iterator j = segStrings.iterator(); j.hasNext();) {
         final SegmentString ss = (SegmentString)j.next();

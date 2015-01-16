@@ -23,7 +23,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
 public class KmlIoFactory extends AbstractRecordAndGeometryWriterFactory
-  implements MapWriterFactory, GeometryReaderFactory {
+implements MapWriterFactory, GeometryReaderFactory {
 
   public static final Set<CoordinateSystem> COORDINATE_SYSTEMS = Collections.singleton(EpsgCoordinateSystems.wgs84());
 
@@ -34,17 +34,17 @@ public class KmlIoFactory extends AbstractRecordAndGeometryWriterFactory
   }
 
   @Override
+  public GeometryReader createGeometryReader(final Resource resource) {
+    final KmlGeometryIterator iterator = new KmlGeometryIterator(resource);
+    return new GeometryReader(iterator);
+  }
+
+  @Override
   public Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
     return new KmlRecordWriter(writer);
-  }
-
-  @Override
-  public GeometryReader createGeometryReader(final Resource resource) {
-    final KmlGeometryIterator iterator = new KmlGeometryIterator(resource);
-    return new GeometryReader(iterator);
   }
 
   @Override

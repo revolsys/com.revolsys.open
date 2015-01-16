@@ -17,7 +17,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
 public class WktIoFactory extends AbstractRecordAndGeometryIoFactory
-  implements WktConstants {
+implements WktConstants {
   public WktIoFactory() {
     super(WktConstants.DESCRIPTION, false, false);
     addMediaTypeAndFileExtension(MEDIA_TYPE, FILE_EXTENSION);

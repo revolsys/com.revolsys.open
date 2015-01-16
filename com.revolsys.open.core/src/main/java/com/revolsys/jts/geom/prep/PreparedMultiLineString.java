@@ -49,11 +49,16 @@ import com.revolsys.jts.noding.SegmentStringUtil;
  * A prepared version for {@link Lineal} geometries.
  * <p>
  * Instances of this class are thread-safe.
- * 
+ *
  * @author mbdavis
  *
  */
 public class PreparedMultiLineString extends AbstractMultiLineString {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private FastSegmentSetIntersectionFinder segIntFinder = null;
 
   private final MultiLineString multiLine;
@@ -64,41 +69,41 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
 
   @Override
   public BoundingBox getBoundingBox() {
-    return multiLine.getBoundingBox();
+    return this.multiLine.getBoundingBox();
   }
 
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    return multiLine.getGeometries();
+    return this.multiLine.getGeometries();
   }
 
   @Override
   public <V extends Geometry> V getGeometry(final int partIndex) {
-    return multiLine.getGeometry(partIndex);
+    return this.multiLine.getGeometry(partIndex);
   }
 
   @Override
   public int getGeometryCount() {
-    return multiLine.getGeometryCount();
+    return this.multiLine.getGeometryCount();
   };
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return multiLine.getGeometryFactory();
+    return this.multiLine.getGeometryFactory();
   }
 
   public synchronized FastSegmentSetIntersectionFinder getIntersectionFinder() {
     /**
-     * MD - Another option would be to use a simple scan for 
-     * segment testing for small geometries.  
-     * However, testing indicates that there is no particular advantage 
+     * MD - Another option would be to use a simple scan for
+     * segment testing for small geometries.
+     * However, testing indicates that there is no particular advantage
      * to this approach.
      */
-    if (segIntFinder == null) {
-      segIntFinder = new FastSegmentSetIntersectionFinder(
-        SegmentStringUtil.extractSegmentStrings(multiLine));
+    if (this.segIntFinder == null) {
+      this.segIntFinder = new FastSegmentSetIntersectionFinder(
+        SegmentStringUtil.extractSegmentStrings(this.multiLine));
     }
-    return segIntFinder;
+    return this.segIntFinder;
   }
 
   @Override
@@ -132,7 +137,7 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
          */
         return true;
       } else if (dimension == 0) {
-        /** 
+        /**
          * For L/P case, need to check if any points lie on line(s)
          */
         return isAnyTestPointInTarget(geometry);
@@ -148,7 +153,7 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
    * Tests whether any representative point of the test Geometry intersects
    * the target geometry.
    * Only handles test geometries which are Puntal (dimension 0)
-   * 
+   *
    * @param geom a Puntal geometry to test
    * @return true if any point of the argument intersects the prepared geometry
    */
@@ -159,7 +164,7 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
      */
     final PointLocator locator = new PointLocator();
     for (final Vertex vertex : geometry.vertices()) {
-      if (locator.intersects(vertex, multiLine)) {
+      if (locator.intersects(vertex, this.multiLine)) {
         return true;
       }
     }
@@ -168,7 +173,7 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
 
   @Override
   public boolean isEmpty() {
-    return multiLine.isEmpty();
+    return this.multiLine.isEmpty();
   }
 
   @Override

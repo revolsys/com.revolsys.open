@@ -53,16 +53,8 @@ public class InteriorPointPoint {
   private Point interiorPoint = null;
 
   public InteriorPointPoint(final Geometry g) {
-    centroid = g.getCentroid().getPoint();
+    this.centroid = g.getCentroid().getPoint();
     add(g);
-  }
-
-  private void add(final Point point) {
-    final double dist = point.distance(centroid);
-    if (dist < minDistance) {
-      interiorPoint = new PointDouble(point);
-      minDistance = dist;
-    }
   }
 
   /**
@@ -81,7 +73,15 @@ public class InteriorPointPoint {
     }
   }
 
+  private void add(final Point point) {
+    final double dist = point.distance(this.centroid);
+    if (dist < this.minDistance) {
+      this.interiorPoint = new PointDouble(point);
+      this.minDistance = dist;
+    }
+  }
+
   public Point getInteriorPoint() {
-    return interiorPoint;
+    return this.interiorPoint;
   }
 }

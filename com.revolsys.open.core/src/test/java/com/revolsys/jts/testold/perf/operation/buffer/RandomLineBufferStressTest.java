@@ -40,9 +40,9 @@ import com.revolsys.jts.operation.buffer.validate.BufferResultValidator;
 /**
  * Test buffers generated around set of random linestrings.
  * Intended to stress-test the correctness of buffer generation.
- * The random linestring sets tend to have numerous holes when buffered, 
+ * The random linestring sets tend to have numerous holes when buffered,
  * which is a good test.
- * 
+ *
  * @version 1.7
  */
 public class RandomLineBufferStressTest {
@@ -60,8 +60,6 @@ public class RandomLineBufferStressTest {
     2);
 
   WKTReader rdr = new WKTReader(this.geometryFactory);
-
-  private int caseCount = 0;
 
   public RandomLineBufferStressTest() {
   }
@@ -102,7 +100,6 @@ public class RandomLineBufferStressTest {
 
   void runCase(final Geometry line, final double dist, final double lineScale,
     final int numPts) throws Exception {
-    this.caseCount++;
     // System.out.println("Running case " + this.caseCount + "  (line scale = "
     // + lineScale + "  buffer dist = " + dist + "  num pts = " + numPts +
     // " )");

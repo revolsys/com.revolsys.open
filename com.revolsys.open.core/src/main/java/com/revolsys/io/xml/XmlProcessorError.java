@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@ import javax.xml.stream.Location;
 /**
  * The XmlProcessorError class is used to record the information about an error
  * in processing an XML document by the {@link XmlProcessor} class.
- * 
+ *
  * @author Paul Austin
  */
 public class XmlProcessorError {
@@ -38,7 +38,7 @@ public class XmlProcessorError {
 
   /**
    * Construct a new XmlProcessorError.
-   * 
+   *
    * @param message The error message.
    * @param relatedInformation Additional information about the error.
    * @param location The location of the error.
@@ -56,52 +56,52 @@ public class XmlProcessorError {
   /**
    * Get the exception that caused the error. This method will return the
    * relatedInformation if it is an instance of Throwable.
-   * 
+   *
    * @return The exception that caused the error.
    */
   public final Throwable getException() {
-    return exception;
+    return this.exception;
   }
 
   /**
    * Get the location of the error.
-   * 
+   *
    * @return The location of the error.
    */
   public final Location getLocation() {
-    return location;
+    return this.location;
   }
 
   /**
    * Get the error message.
-   * 
+   *
    * @return The error message.
    */
   public final String getMessage() {
-    return message;
+    return this.message;
   }
 
   /**
    * Get additional information about the error.
-   * 
+   *
    * @return Additional information about the error.
    */
   public final Object getRelatedInformation() {
-    return relatedInformation;
+    return this.relatedInformation;
   }
 
   /**
    * Get the string representation of the error.
-   * 
+   *
    * @return The string representation of the error.
    */
   @Override
   public String toString() {
-    if (location != null) {
-      return "[" + location.getLineNumber() + ", " + location.getColumnNumber()
-        + "] " + message;
+    if (this.location != null) {
+      return "[" + this.location.getLineNumber() + ", " + this.location.getColumnNumber()
+          + "] " + this.message;
     } else {
-      return message;
+      return this.message;
 
     }
   }

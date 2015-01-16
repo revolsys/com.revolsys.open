@@ -31,10 +31,10 @@ public class CompareProcessor extends AbstractMergeProcess {
   private final boolean cleanDuplicatePoints = true;
 
   private Statistics duplicateOtherStatistics = new Statistics(
-    "Duplicate Other");
+      "Duplicate Other");
 
   private Statistics duplicateSourceStatistics = new Statistics(
-    "Duplicate Source");
+      "Duplicate Source");
 
   private Factory<Filter<Record>, Record> equalFilterFactory;
 
@@ -43,17 +43,17 @@ public class CompareProcessor extends AbstractMergeProcess {
   private Filter<Record> excludeFilter;
 
   private Statistics excludeNotEqualOtherStatistics = new Statistics(
-    "Exclude Not Equal Other");
+      "Exclude Not Equal Other");
 
   private Statistics excludeNotEqualSourceStatistics = new Statistics(
-    "Exclude Not Equal Source");
+      "Exclude Not Equal Source");
 
   private String label;
 
   private Statistics notEqualOtherStatistics = new Statistics("Not Equal Other");
 
   private Statistics notEqualSourceStatistics = new Statistics(
-    "Not Equal Source");
+      "Not Equal Source");
 
   private RecordQuadTree otherIndex = new RecordQuadTree();
 
@@ -70,20 +70,20 @@ public class CompareProcessor extends AbstractMergeProcess {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof Point) {
       boolean add = true;
-      if (cleanDuplicatePoints) {
-        final List<Record> objects = otherPointMap.getRecords(object);
+      if (this.cleanDuplicatePoints) {
+        final List<Record> objects = this.otherPointMap.getRecords(object);
         if (!objects.isEmpty()) {
-          final Filter<Record> filter = equalFilterFactory.create(object);
+          final Filter<Record> filter = this.equalFilterFactory.create(object);
           add = !FilterUtil.matches(objects, filter);
         }
         if (add) {
-          otherPointMap.add(object);
+          this.otherPointMap.add(object);
         } else {
-          duplicateOtherStatistics.add(object);
+          this.duplicateOtherStatistics.add(object);
         }
       }
     } else if (geometry instanceof LineString) {
-      otherIndex.insert(object);
+      this.otherIndex.insert(object);
     }
   }
 
@@ -92,81 +92,81 @@ public class CompareProcessor extends AbstractMergeProcess {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof Point) {
       boolean add = true;
-      if (cleanDuplicatePoints) {
-        final List<Record> objects = sourcePointMap.getRecords(object);
+      if (this.cleanDuplicatePoints) {
+        final List<Record> objects = this.sourcePointMap.getRecords(object);
         if (!objects.isEmpty()) {
-          final Filter<Record> filter = equalFilterFactory.create(object);
+          final Filter<Record> filter = this.equalFilterFactory.create(object);
           add = !FilterUtil.matches(objects, filter);
         }
       }
       if (add) {
-        sourcePointMap.add(object);
+        this.sourcePointMap.add(object);
       } else {
-        duplicateSourceStatistics.add(object);
+        this.duplicateSourceStatistics.add(object);
       }
     } else if (geometry instanceof LineString) {
-      sourceObjects.add(object);
+      this.sourceObjects.add(object);
     }
   }
 
   public Statistics getDuplicateOtherStatistics() {
-    return duplicateOtherStatistics;
+    return this.duplicateOtherStatistics;
   }
 
   public Statistics getDuplicateSourceStatistics() {
-    return duplicateSourceStatistics;
+    return this.duplicateSourceStatistics;
   }
 
   public Factory<Filter<Record>, Record> getEqualFilterFactory() {
-    return equalFilterFactory;
+    return this.equalFilterFactory;
   }
 
   public Statistics getEqualStatistics() {
-    return equalStatistics;
+    return this.equalStatistics;
   }
 
   public Filter<Record> getExcludeFilter() {
-    return excludeFilter;
+    return this.excludeFilter;
   }
 
   public Statistics getExcludeNotEqualOtherStatistics() {
-    return excludeNotEqualOtherStatistics;
+    return this.excludeNotEqualOtherStatistics;
   }
 
   public Statistics getExcludeNotEqualSourceStatistics() {
-    return excludeNotEqualSourceStatistics;
+    return this.excludeNotEqualSourceStatistics;
   }
 
   public String getLabel() {
-    return label;
+    return this.label;
   }
 
   public Statistics getNotEqualOtherStatistics() {
-    return notEqualOtherStatistics;
+    return this.notEqualOtherStatistics;
   }
 
   public Statistics getNotEqualSourceStatistics() {
-    return notEqualSourceStatistics;
+    return this.notEqualSourceStatistics;
   }
 
   public boolean isLogNotEqualSource() {
-    return logNotEqualSource;
+    return this.logNotEqualSource;
   }
 
   private void logError(final Record object, final String message,
     final boolean source) {
-    if (excludeFilter == null || !excludeFilter.accept(object)) {
+    if (this.excludeFilter == null || !this.excludeFilter.accept(object)) {
       if (source) {
-        notEqualSourceStatistics.add(object);
+        this.notEqualSourceStatistics.add(object);
       } else {
-        notEqualOtherStatistics.add(object);
+        this.notEqualOtherStatistics.add(object);
       }
       RecordLog.error(getClass(), message, object);
     } else {
       if (source) {
-        excludeNotEqualSourceStatistics.add(object);
+        this.excludeNotEqualSourceStatistics.add(object);
       } else {
-        excludeNotEqualOtherStatistics.add(object);
+        this.excludeNotEqualOtherStatistics.add(object);
       }
     }
   }
@@ -176,28 +176,28 @@ public class CompareProcessor extends AbstractMergeProcess {
     final LineEqualIgnoreDirectionFilter lineEqualFilter = new LineEqualIgnoreDirectionFilter(
       sourceLine, 3);
     final Filter<Record> geometryFilter = new RecordGeometryFilter<LineString>(
-      lineEqualFilter);
-    final Filter<Record> equalFilter = equalFilterFactory.create(sourceObject);
+        lineEqualFilter);
+    final Filter<Record> equalFilter = this.equalFilterFactory.create(sourceObject);
     final Filter<Record> filter = new AndFilter<Record>(equalFilter,
-      geometryFilter);
+        geometryFilter);
 
-    final Record otherObject = otherIndex.queryFirst(sourceObject, filter);
+    final Record otherObject = this.otherIndex.queryFirst(sourceObject, filter);
     if (otherObject != null) {
-      equalStatistics.add(sourceObject);
+      this.equalStatistics.add(sourceObject);
       removeObject(sourceObject);
       removeOtherObject(otherObject);
     }
   }
 
   private void processExactLineMatches() {
-    for (final Record object : new ArrayList<Record>(sourceObjects)) {
+    for (final Record object : new ArrayList<Record>(this.sourceObjects)) {
       processExactLineMatch(object);
     }
   }
 
   private void processExactPointMatch(final Record sourceObject) {
-    final Filter<Record> equalFilter = equalFilterFactory.create(sourceObject);
-    final Record otherObject = otherPointMap.getFirstMatch(sourceObject,
+    final Filter<Record> equalFilter = this.equalFilterFactory.create(sourceObject);
+    final Record otherObject = this.otherPointMap.getFirstMatch(sourceObject,
       equalFilter);
     if (otherObject != null) {
       final Point sourcePoint = sourceObject.getGeometryValue();
@@ -207,7 +207,7 @@ public class CompareProcessor extends AbstractMergeProcess {
       final double otherZ = otherPoint.getZ();
 
       if (sourceZ == otherZ || Double.isNaN(sourceZ) && Double.isNaN(otherZ)) {
-        equalStatistics.add(sourceObject);
+        this.equalStatistics.add(sourceObject);
         removeObject(sourceObject);
         removeOtherObject(otherObject);
       }
@@ -216,7 +216,7 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   private void processExactPointMatches() {
     for (final Record object : new ArrayList<Record>(
-      sourcePointMap.getAll())) {
+        this.sourcePointMap.getAll())) {
       processExactPointMatch(object);
     }
   }
@@ -224,9 +224,9 @@ public class CompareProcessor extends AbstractMergeProcess {
   @Override
   protected void processObjects(final RecordDefinition recordDefinition,
     final Channel<Record> out) {
-    if (otherIndex.size() + otherPointMap.size() == 0) {
-      if (logNotEqualSource) {
-        for (final Record object : sourceObjects) {
+    if (this.otherIndex.size() + this.otherPointMap.size() == 0) {
+      if (this.logNotEqualSource) {
+        for (final Record object : this.sourceObjects) {
           logError(object, "Source missing in Other", true);
         }
       }
@@ -235,20 +235,20 @@ public class CompareProcessor extends AbstractMergeProcess {
       processExactLineMatches();
       processPartialMatches();
     }
-    for (final Record object : otherIndex.getAll()) {
+    for (final Record object : this.otherIndex.getAll()) {
       logError(object, "Other missing in Source", false);
     }
-    for (final Record object : otherPointMap.getAll()) {
+    for (final Record object : this.otherPointMap.getAll()) {
       logError(object, "Other missing in Source", false);
     }
-    if (logNotEqualSource) {
-      for (final Record object : sourceObjects) {
+    if (this.logNotEqualSource) {
+      for (final Record object : this.sourceObjects) {
         logError(object, "Source missing in Other", true);
       }
     }
-    sourceObjects.clear();
-    otherIndex = new RecordQuadTree();
-    otherPointMap.clear();
+    this.sourceObjects.clear();
+    this.otherIndex = new RecordQuadTree();
+    this.otherPointMap.clear();
   }
 
   private void processPartialMatch(final Record sourceObject) {
@@ -259,15 +259,15 @@ public class CompareProcessor extends AbstractMergeProcess {
       final LineIntersectsFilter intersectsFilter = new LineIntersectsFilter(
         sourceLine);
       final Filter<Record> geometryFilter = new RecordGeometryFilter<LineString>(
-        intersectsFilter);
-      final Filter<Record> equalFilter = equalFilterFactory.create(sourceObject);
+          intersectsFilter);
+      final Filter<Record> equalFilter = this.equalFilterFactory.create(sourceObject);
       final Filter<Record> filter = new AndFilter<Record>(equalFilter,
-        geometryFilter);
-      final List<Record> otherObjects = otherIndex.queryList(
+          geometryFilter);
+      final List<Record> otherObjects = this.otherIndex.queryList(
         sourceGeometry, filter);
       if (!otherObjects.isEmpty()) {
         final LineMatchGraph<Record> graph = new LineMatchGraph<Record>(
-          sourceObject, sourceLine);
+            sourceObject, sourceLine);
         for (final Record otherObject : otherObjects) {
           final LineString otherLine = otherObject.getGeometryValue();
           graph.add(otherLine);
@@ -279,7 +279,7 @@ public class CompareProcessor extends AbstractMergeProcess {
         } else {
           removeObject(sourceObject);
           if (nonMatchedLines.getGeometryCount() == 1
-            && nonMatchedLines.getGeometry(0).getLength() == 1) {
+              && nonMatchedLines.getGeometry(0).getLength() == 1) {
           } else {
             for (int j = 0; j < nonMatchedLines.getGeometryCount(); j++) {
               final Geometry newGeometry = nonMatchedLines.getGeometry(j);
@@ -306,21 +306,21 @@ public class CompareProcessor extends AbstractMergeProcess {
   }
 
   private void processPartialMatches() {
-    for (final Record object : new ArrayList<Record>(sourceObjects)) {
+    for (final Record object : new ArrayList<Record>(this.sourceObjects)) {
       processPartialMatch(object);
     }
   }
 
   private void removeObject(final Record object) {
-    sourceObjects.remove(object);
+    this.sourceObjects.remove(object);
   }
 
   private void removeOtherObject(final Record object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry instanceof Point) {
-      otherPointMap.remove(object);
+      this.otherPointMap.remove(object);
     } else {
-      otherIndex.remove(object);
+      this.otherIndex.remove(object);
     }
   }
 
@@ -343,34 +343,34 @@ public class CompareProcessor extends AbstractMergeProcess {
 
   @Override
   protected void setUp() {
-    equalStatistics.connect();
-    notEqualSourceStatistics.connect();
-    notEqualOtherStatistics.connect();
-    duplicateSourceStatistics.connect();
-    duplicateOtherStatistics.connect();
-    excludeNotEqualSourceStatistics.connect();
-    excludeNotEqualOtherStatistics.connect();
+    this.equalStatistics.connect();
+    this.notEqualSourceStatistics.connect();
+    this.notEqualOtherStatistics.connect();
+    this.duplicateSourceStatistics.connect();
+    this.duplicateOtherStatistics.connect();
+    this.excludeNotEqualSourceStatistics.connect();
+    this.excludeNotEqualOtherStatistics.connect();
   }
 
   @Override
   protected void tearDown() {
-    sourceObjects = null;
-    sourcePointMap.clear();
-    otherPointMap = null;
-    otherIndex = null;
-    equalStatistics.disconnect();
-    notEqualSourceStatistics.disconnect();
-    notEqualOtherStatistics.disconnect();
-    duplicateSourceStatistics.disconnect();
-    duplicateOtherStatistics.disconnect();
-    excludeNotEqualSourceStatistics.disconnect();
-    excludeNotEqualOtherStatistics.disconnect();
-    equalStatistics = null;
-    notEqualSourceStatistics = null;
-    notEqualOtherStatistics = null;
-    duplicateSourceStatistics = null;
-    duplicateOtherStatistics = null;
-    excludeNotEqualSourceStatistics = null;
-    excludeNotEqualOtherStatistics = null;
+    this.sourceObjects = null;
+    this.sourcePointMap.clear();
+    this.otherPointMap = null;
+    this.otherIndex = null;
+    this.equalStatistics.disconnect();
+    this.notEqualSourceStatistics.disconnect();
+    this.notEqualOtherStatistics.disconnect();
+    this.duplicateSourceStatistics.disconnect();
+    this.duplicateOtherStatistics.disconnect();
+    this.excludeNotEqualSourceStatistics.disconnect();
+    this.excludeNotEqualOtherStatistics.disconnect();
+    this.equalStatistics = null;
+    this.notEqualSourceStatistics = null;
+    this.notEqualOtherStatistics = null;
+    this.duplicateSourceStatistics = null;
+    this.duplicateOtherStatistics = null;
+    this.excludeNotEqualSourceStatistics = null;
+    this.excludeNotEqualOtherStatistics = null;
   }
 }

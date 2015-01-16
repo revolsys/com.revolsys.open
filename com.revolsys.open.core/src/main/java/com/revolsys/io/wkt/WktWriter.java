@@ -117,7 +117,7 @@ public class WktWriter {
         write(out, geometryCollection);
       } else {
         throw new IllegalArgumentException("Unknown geometry type"
-          + geometry.getClass());
+            + geometry.getClass());
       }
     }
   }
@@ -151,7 +151,7 @@ public class WktWriter {
         write(out, geometryCollection, axisCount);
       } else {
         throw new IllegalArgumentException("Unknown geometry type"
-          + geometry.getClass());
+            + geometry.getClass());
       }
     }
   }

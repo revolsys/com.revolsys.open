@@ -73,7 +73,7 @@ public abstract class PlanarGraph {
    * to ensure the edges added are of the right class.
    */
   protected void add(final DirectedEdge dirEdge) {
-    dirEdges.add(dirEdge);
+    this.dirEdges.add(dirEdge);
   }
 
   /**
@@ -82,7 +82,7 @@ public abstract class PlanarGraph {
    * Only subclasses can add Edges, to ensure the edges added are of the right class.
    */
   protected void add(final Edge edge) {
-    edges.add(edge);
+    this.edges.add(edge);
     add(edge.getDirEdge(0));
     add(edge.getDirEdge(1));
   }
@@ -90,11 +90,11 @@ public abstract class PlanarGraph {
   /**
    * Adds a node to the map, replacing any that is already at that location.
    * Only subclasses can add Nodes, to ensure Nodes are of the right type.
-   * 
+   *
    * @param node the node to add
    */
   protected void add(final Node node) {
-    nodeMap.add(node);
+    this.nodeMap.add(node);
   }
 
   /**
@@ -104,7 +104,7 @@ public abstract class PlanarGraph {
    * @return <code>true</code> if the graph contains the directed edge
    */
   public boolean contains(final DirectedEdge de) {
-    return dirEdges.contains(de);
+    return this.dirEdges.contains(de);
   }
 
   /**
@@ -114,7 +114,7 @@ public abstract class PlanarGraph {
    * @return <code>true</code> if the graph contains the edge
    */
   public boolean contains(final Edge e) {
-    return edges.contains(e);
+    return this.edges.contains(e);
   }
 
   /**
@@ -125,7 +125,7 @@ public abstract class PlanarGraph {
    * @see #add(DirectedEdge)
    */
   public Iterator dirEdgeIterator() {
-    return dirEdges.iterator();
+    return this.dirEdges.iterator();
   }
 
   /**
@@ -135,7 +135,7 @@ public abstract class PlanarGraph {
    * @see #add(Edge)
    */
   public Iterator edgeIterator() {
-    return edges.iterator();
+    return this.edges.iterator();
   }
 
   /**
@@ -147,7 +147,7 @@ public abstract class PlanarGraph {
    * or <code>null</code> if this graph contains no node at the location
    */
   public Node findNode(final Point pt) {
-    return (Node)nodeMap.find(pt);
+    return this.nodeMap.find(pt);
   }
 
   /**
@@ -169,18 +169,18 @@ public abstract class PlanarGraph {
    * @see #add(Edge)
    */
   public Collection getEdges() {
-    return edges;
+    return this.edges;
   }
 
   public Collection getNodes() {
-    return nodeMap.values();
+    return this.nodeMap.values();
   }
 
   /**
    * Returns an Iterator over the Nodes in this PlanarGraph.
    */
   public Iterator nodeIterator() {
-    return nodeMap.iterator();
+    return this.nodeMap.iterator();
   }
 
   /**
@@ -200,7 +200,7 @@ public abstract class PlanarGraph {
 
     de.getFromNode().remove(de);
     de.remove();
-    dirEdges.remove(de);
+    this.dirEdges.remove(de);
   }
 
   /**
@@ -213,7 +213,7 @@ public abstract class PlanarGraph {
   public void remove(final Edge edge) {
     remove(edge.getDirEdge(0));
     remove(edge.getDirEdge(1));
-    edges.remove(edge);
+    this.edges.remove(edge);
     edge.remove();
   }
 
@@ -232,16 +232,16 @@ public abstract class PlanarGraph {
         remove(sym);
       }
       // remove this diredge from the graph collection
-      dirEdges.remove(de);
+      this.dirEdges.remove(de);
 
       final Edge edge = de.getEdge();
       if (edge != null) {
-        edges.remove(edge);
+        this.edges.remove(edge);
       }
 
     }
     // remove the node from the graph
-    nodeMap.remove(node.getCoordinate());
+    this.nodeMap.remove(node.getCoordinate());
     node.remove();
   }
 

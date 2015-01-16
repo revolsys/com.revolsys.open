@@ -12,7 +12,7 @@ import com.revolsys.i18n.I18nCharSequence;
 public class I18nAction extends AbstractAction {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 256392126027298835L;
 
@@ -89,11 +89,11 @@ public class I18nAction extends AbstractAction {
         final I18nCharSequence i18nName = (I18nCharSequence)name;
         i18nName.getI18n().addListener("locale",
           new PropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent evt) {
-              putValue(NAME, name.toString());
-            }
-          });
+          @Override
+          public void propertyChange(final PropertyChangeEvent evt) {
+            putValue(NAME, name.toString());
+          }
+        });
       }
     }
   }
@@ -105,11 +105,11 @@ public class I18nAction extends AbstractAction {
         final I18nCharSequence i18nName = (I18nCharSequence)shortDescription;
         i18nName.getI18n().addListener("locale",
           new PropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent evt) {
-              putValue(SHORT_DESCRIPTION, shortDescription.toString());
-            }
-          });
+          @Override
+          public void propertyChange(final PropertyChangeEvent evt) {
+            putValue(SHORT_DESCRIPTION, shortDescription.toString());
+          }
+        });
       }
     }
   }

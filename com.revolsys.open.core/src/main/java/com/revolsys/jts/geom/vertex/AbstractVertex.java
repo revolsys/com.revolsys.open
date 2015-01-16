@@ -10,6 +10,10 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public abstract class AbstractVertex extends AbstractPoint implements Vertex {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   protected final Geometry geometry;
 
   public AbstractVertex(final Geometry geometry) {

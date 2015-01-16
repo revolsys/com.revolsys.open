@@ -16,7 +16,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
 public class SplitCrossingEdgesVisitor<T> extends
-  AbstractEdgeListenerVisitor<T> {
+AbstractEdgeListenerVisitor<T> {
 
   public static final String CROSSING_EDGES = "Crossing edges";
 
@@ -26,21 +26,21 @@ public class SplitCrossingEdgesVisitor<T> extends
 
   public SplitCrossingEdgesVisitor(final Graph<T> graph) {
     this.graph = graph;
-    splitEdgesCloseToNodeVisitor = new SplitEdgesCloseToNodeVisitor<T>(graph,
-      CROSSING_EDGES, 1);
+    this.splitEdgesCloseToNodeVisitor = new SplitEdgesCloseToNodeVisitor<T>(graph,
+        CROSSING_EDGES, 1);
   }
 
   @Override
   public void addNodeListener(final NodeEventListener<T> listener) {
-    splitEdgesCloseToNodeVisitor.addNodeListener(listener);
+    this.splitEdgesCloseToNodeVisitor.addNodeListener(listener);
   }
 
   public Collection<Edge<T>> getNewEdges() {
-    return splitEdgesCloseToNodeVisitor.getNewEdges();
+    return this.splitEdgesCloseToNodeVisitor.getNewEdges();
   }
 
   public Collection<T> getSplitObjects() {
-    return splitEdgesCloseToNodeVisitor.getSplitObjects();
+    return this.splitEdgesCloseToNodeVisitor.getSplitObjects();
   }
 
   public List<Edge<T>> queryCrosses(final IdObjectIndex<Edge<T>> edgeIndex,
@@ -60,16 +60,16 @@ public class SplitCrossingEdgesVisitor<T> extends
   }
 
   public void setNewEdges(final Collection<Edge<T>> newEdges) {
-    splitEdgesCloseToNodeVisitor.setNewEdges(newEdges);
+    this.splitEdgesCloseToNodeVisitor.setNewEdges(newEdges);
   }
 
   public void setSplitObjects(final Collection<T> splitObjects) {
-    splitEdgesCloseToNodeVisitor.setSplitObjects(splitObjects);
+    this.splitEdgesCloseToNodeVisitor.setSplitObjects(splitObjects);
   }
 
   @Override
   public boolean visit(final Edge<T> edge) {
-    final IdObjectIndex<Edge<T>> edgeIndex = graph.getEdgeIndex();
+    final IdObjectIndex<Edge<T>> edgeIndex = this.graph.getEdgeIndex();
     final LineString line = edge.getLine();
     final List<Edge<T>> crossings = queryCrosses(edgeIndex, line);
     crossings.remove(edge);
@@ -80,10 +80,10 @@ public class SplitCrossingEdgesVisitor<T> extends
         final Point intersection = LineStringUtil.getCrossingIntersection(line,
           crossLine);
         if (intersection != null) {
-          final Point point = graph.getPrecisionModel().getPreciseCoordinates(
+          final Point point = this.graph.getPrecisionModel().getPreciseCoordinates(
             intersection);
-          final Node<T> node = graph.getNode(point);
-          splitEdgesCloseToNodeVisitor.visit(node);
+          final Node<T> node = this.graph.getNode(point);
+          this.splitEdgesCloseToNodeVisitor.visit(node);
         }
       }
     }

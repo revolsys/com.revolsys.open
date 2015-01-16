@@ -8,7 +8,7 @@ import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.RecordFactory;
 
 public class FileRecordReaderFactory extends
-  AbstractFactoryBean<RecordReader> {
+AbstractFactoryBean<RecordReader> {
 
   private RecordFactory factory = new ArrayRecordFactory();
 
@@ -16,19 +16,19 @@ public class FileRecordReaderFactory extends
 
   @Override
   public RecordReader createInstance() throws Exception {
-    return RecordIo.recordReader(resource, factory);
+    return RecordIo.recordReader(this.resource, this.factory);
   }
 
   @Override
   protected void destroyInstance(final RecordReader reader)
-    throws Exception {
+      throws Exception {
     reader.close();
-    factory = null;
-    resource = null;
+    this.factory = null;
+    this.resource = null;
   }
 
   public RecordFactory getFactory() {
-    return factory;
+    return this.factory;
   }
 
   @Override
@@ -37,7 +37,7 @@ public class FileRecordReaderFactory extends
   }
 
   public Resource getResource() {
-    return resource;
+    return this.resource;
   }
 
   public void setFactory(final RecordFactory factory) {

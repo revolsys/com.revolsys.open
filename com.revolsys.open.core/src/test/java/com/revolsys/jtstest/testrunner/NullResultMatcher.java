@@ -37,14 +37,14 @@ import com.revolsys.jts.geom.Geometry;
 /**
  * A {@link ResultMatcher} which always passes.
  * This is useful if the expected result of an operation is not known.
- * 
+ *
  * @author mbdavis
  *
  */
 public class NullResultMatcher implements ResultMatcher {
   /**
    * Always reports a match.
-   * 
+   *
    * @return true always
    */
   @Override

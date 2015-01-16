@@ -95,7 +95,7 @@ class LengthIndexOfPoint {
     }
 
     // sanity check for minIndex at or past end of line
-    final double endIndex = linearGeom.getLength();
+    final double endIndex = this.linearGeom.getLength();
     if (endIndex < minIndex) {
       return endIndex;
     }
@@ -105,7 +105,7 @@ class LengthIndexOfPoint {
      * Return the minDistanceLocation found.
      */
     Assert.isTrue(closestAfter >= minIndex,
-      "computed index is before specified minimum index");
+        "computed index is before specified minimum index");
     return closestAfter;
   }
 
@@ -115,7 +115,7 @@ class LengthIndexOfPoint {
 
     double ptMeasure = minIndex;
     double segmentStartMeasure = 0.0;
-    final LinearIterator it = new LinearIterator(linearGeom);
+    final LinearIterator it = new LinearIterator(this.linearGeom);
     while (it.hasNext()) {
       if (!it.isEndOfLine()) {
         final Point p0 = it.getSegmentStart();

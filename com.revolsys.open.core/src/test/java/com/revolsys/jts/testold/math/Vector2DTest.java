@@ -7,11 +7,11 @@ import com.revolsys.jts.math.Vector2D;
 
 public class Vector2DTest extends TestCase {
 
-  private static final double TOLERANCE = 1E-5;
-
   public static void main(final String args[]) {
     TestRunner.run(Vector2DTest.class);
   }
+
+  private static final double TOLERANCE = 1E-5;
 
   public Vector2DTest(final String name) {
     super(name);

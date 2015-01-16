@@ -8,7 +8,12 @@ import com.revolsys.jts.geom.MultiLineString;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 public class MultiLineStringSegment extends AbstractSegment implements
-  Iterator<Segment> {
+Iterator<Segment> {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private int segmentIndex;
 
   private int partIndex;
@@ -28,7 +33,7 @@ public class MultiLineStringSegment extends AbstractSegment implements
       if (part == null) {
         return Double.NaN;
       } else {
-        return part.getCoordinate(segmentIndex + vertexIndex, axisIndex);
+        return part.getCoordinate(this.segmentIndex + vertexIndex, axisIndex);
       }
     }
   }
@@ -37,9 +42,9 @@ public class MultiLineStringSegment extends AbstractSegment implements
   public Vertex getGeometryVertex(final int index) {
     final MultiLineString line = getMultiLineString();
     if (index == 0) {
-      return line.getVertex(partIndex, segmentIndex);
+      return line.getVertex(this.partIndex, this.segmentIndex);
     } else if (index == 1) {
-      return line.getVertex(partIndex, segmentIndex + 1);
+      return line.getVertex(this.partIndex, this.segmentIndex + 1);
     } else {
       return null;
     }
@@ -54,25 +59,25 @@ public class MultiLineStringSegment extends AbstractSegment implements
     if (multiLine == null) {
       return null;
     } else {
-      return multiLine.getGeometry(partIndex);
+      return multiLine.getGeometry(this.partIndex);
     }
   }
 
   @Override
   public int getPartIndex() {
-    return partIndex;
+    return this.partIndex;
   }
 
   @Override
   public int[] getSegmentId() {
     return new int[] {
-      partIndex, segmentIndex
+      this.partIndex, this.segmentIndex
     };
   }
 
   @Override
   public int getSegmentIndex() {
-    return segmentIndex;
+    return this.segmentIndex;
   }
 
   @Override
@@ -104,25 +109,25 @@ public class MultiLineStringSegment extends AbstractSegment implements
   @Override
   public boolean isLineEnd() {
     final LineString line = getPart();
-    return segmentIndex == line.getSegmentCount() - 1;
+    return this.segmentIndex == line.getSegmentCount() - 1;
   }
 
   @Override
   public boolean isLineStart() {
-    return segmentIndex == 0;
+    return this.segmentIndex == 0;
   }
 
   @Override
   public Segment next() {
     final MultiLineString multiLineString = getMultiLineString();
-    segmentIndex++;
-    while (partIndex < multiLineString.getGeometryCount()) {
+    this.segmentIndex++;
+    while (this.partIndex < multiLineString.getGeometryCount()) {
       final LineString part = getPart();
-      if (segmentIndex < part.getSegmentCount()) {
+      if (this.segmentIndex < part.getSegmentCount()) {
         return this;
       } else {
-        partIndex++;
-        segmentIndex = 0;
+        this.partIndex++;
+        this.segmentIndex = 0;
       }
     }
     throw new NoSuchElementException();

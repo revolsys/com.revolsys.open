@@ -10,7 +10,7 @@ import com.revolsys.i18n.I18n;
 public class I18nJFrame extends JFrame {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 205569343155489552L;
 
@@ -18,7 +18,7 @@ public class I18nJFrame extends JFrame {
   }
 
   public I18nJFrame(final Class<?> clazz, final String title)
-    throws HeadlessException {
+      throws HeadlessException {
     setTitle(title);
   }
 

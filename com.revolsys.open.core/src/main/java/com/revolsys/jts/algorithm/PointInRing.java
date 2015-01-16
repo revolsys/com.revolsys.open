@@ -41,7 +41,7 @@ import com.revolsys.jts.geom.Point;
  * a ring.
  *
  * @version 1.7
- * 
+ *
  * @see PointOnGeometryLocator
  */
 public interface PointInRing {

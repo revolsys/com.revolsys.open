@@ -87,16 +87,6 @@ public class SchemaMapper {
   }
 
   /**
-   * Get the FieldDefinition that the specified attribute maps to.
-   *
-   * @param attribute The attribute to map.
-   * @return The mapped attribute.
-   */
-  public FieldDefinition getFieldMapping(final FieldDefinition attribute) {
-    return this.attributeMapping.get(attribute);
-  }
-
-  /**
    * Get the RecordDefinition that the specified class maps to.
    *
    * @param type The class to map.
@@ -104,6 +94,16 @@ public class SchemaMapper {
    */
   public RecordDefinition getClassMapping(final RecordDefinition type) {
     return this.typeMapping.get(type);
+  }
+
+  /**
+   * Get the FieldDefinition that the specified attribute maps to.
+   *
+   * @param attribute The attribute to map.
+   * @return The mapped attribute.
+   */
+  public FieldDefinition getFieldMapping(final FieldDefinition attribute) {
+    return this.attributeMapping.get(attribute);
   }
 
   /**

@@ -6,13 +6,13 @@
  You may obtain a copy of the License at
 
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
- 
+
  $URL$
  $Author$
  $Date$
@@ -38,16 +38,17 @@ public class BreadcrumbController implements Controller {
   private boolean addSlash;
 
   public BreadcrumbController() {
-    urlPathHelper.setAlwaysUseFullPath(true);
+    this.urlPathHelper.setAlwaysUseFullPath(true);
   }
 
+  @Override
   public ModelAndView handleRequest(
     final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
-    final String path = urlPathHelper.getOriginatingRequestUri(request);
-    final String contextPath = urlPathHelper.getOriginatingContextPath(request);
+    final String path = this.urlPathHelper.getOriginatingRequestUri(request);
+    final String contextPath = this.urlPathHelper.getOriginatingContextPath(request);
     final PathBreadcrumbView view = new PathBreadcrumbView(contextPath, path,
-      addSlash);
+      this.addSlash);
     final PrintWriter writer = response.getWriter();
     view.serialize(writer, false);
     writer.flush();
@@ -55,7 +56,7 @@ public class BreadcrumbController implements Controller {
   }
 
   public boolean isAddSlash() {
-    return addSlash;
+    return this.addSlash;
   }
 
   public void setAddSlash(final boolean addSlash) {

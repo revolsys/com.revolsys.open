@@ -54,12 +54,12 @@ import com.revolsys.jts.noding.NodingValidator;
  * <code>GeometryPrecisionReducer</code> may be used to do this.
  * <p>
  * This class does <b>not</b> dissolve the output linework,
- * so there may be duplicate linestrings in the output.  
+ * so there may be duplicate linestrings in the output.
  * Subsequent processing (e.g. polygonization) may require
  * the linework to be unique.  Using <code>UnaryUnion</code> is one way
  * to do this (although this is an inefficient approach).
- * 
- * 
+ *
+ *
  */
 public class GeometryNoder {
   private GeometryFactory geomFact;
@@ -71,7 +71,7 @@ public class GeometryNoder {
   /**
    * Creates a new noder which snap-rounds to a grid specified
    * by the given scale.
-   * 
+   *
    * @param pm the precision model for the grid to snap-round to
    */
   public GeometryNoder(final double scale) {
@@ -89,25 +89,25 @@ public class GeometryNoder {
   }
 
   /**
-   * Nodes the linework of a set of Geometrys using SnapRounding. 
-   * 
+   * Nodes the linework of a set of Geometrys using SnapRounding.
+   *
    * @param geometries a Collection of Geometrys of any type
    * @return a List of LineStrings representing the noded linework of the input
    */
   public List<LineString> node(final Collection<? extends Geometry> geometries) {
     // get geometry factory
     final Geometry geom0 = geometries.iterator().next();
-    geomFact = geom0.getGeometryFactory();
+    this.geomFact = geom0.getGeometryFactory();
 
     final Collection<LineString> lines = extractLines(geometries);
     final List<NodedSegmentString> segStrings = toSegmentStrings(lines);
     // Noder sr = new SimpleSnapRounder(pm);
-    final Noder sr = new MCIndexSnapRounder(scale);
+    final Noder sr = new MCIndexSnapRounder(this.scale);
     sr.computeNodes(segStrings);
     final Collection<NodedSegmentString> nodedLines = sr.getNodedSubstrings();
 
     // TODO: improve this to check for full snap-rounded correctness
-    if (isValidityChecked) {
+    if (this.isValidityChecked) {
       final NodingValidator nv = new NodingValidator(nodedLines);
       nv.checkValid();
     }
@@ -117,7 +117,7 @@ public class GeometryNoder {
 
   /**
    * Sets whether noding validity is checked after noding is performed.
-   * 
+   *
    * @param isValidityChecked
    */
   public void setValidate(final boolean isValidityChecked) {
@@ -129,7 +129,7 @@ public class GeometryNoder {
     final List<LineString> lines = new ArrayList<>();
     for (final NodedSegmentString ss : segStrings) {
       if (ss.size() > 1) {
-        lines.add(geomFact.lineString(ss.getPoints()));
+        lines.add(this.geomFact.lineString(ss.getPoints()));
       }
     }
     return lines;

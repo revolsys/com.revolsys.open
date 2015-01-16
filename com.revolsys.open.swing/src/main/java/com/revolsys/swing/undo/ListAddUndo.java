@@ -28,7 +28,7 @@ public class ListAddUndo extends AbstractUndoableEdit {
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      if (index == -1 || list.indexOf(value) != index) {
+      if (this.index == -1 || this.list.indexOf(this.value) != this.index) {
         return true;
       }
     }
@@ -38,7 +38,7 @@ public class ListAddUndo extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      if (index > -1 && index < list.size() && list.get(index) == value) {
+      if (this.index > -1 && this.index < this.list.size() && this.list.get(this.index) == this.value) {
         return true;
       }
     }
@@ -47,14 +47,14 @@ public class ListAddUndo extends AbstractUndoableEdit {
 
   @Override
   protected void doRedo() {
-    if (index == -1) {
-      index = list.size();
+    if (this.index == -1) {
+      this.index = this.list.size();
     }
-    list.add(index, value);
+    this.list.add(this.index, this.value);
   }
 
   @Override
   protected void doUndo() {
-    list.remove(value);
+    this.list.remove(this.value);
   }
 }

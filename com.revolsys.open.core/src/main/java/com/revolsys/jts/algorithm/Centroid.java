@@ -42,31 +42,31 @@ import com.revolsys.jts.geom.segment.Segment;
 
 /**
  * Computes the centroid of a {@link Geometry} of any dimension.
- * If the geometry is nominally of higher dimension, 
- * but has lower <i>effective</i> dimension 
+ * If the geometry is nominally of higher dimension,
+ * but has lower <i>effective</i> dimension
  * (i.e. contains only components
- * having zero length or area), 
+ * having zero length or area),
  * the centroid will be computed as for the equivalent lower-dimension geometry.
  * If the input geometry is empty, a
  * <code>null</code> Point is returned.
- * 
+ *
  * <h2>Algorithm</h2>
  * <ul>
- * <li><b>Dimension 2</b> - the centroid is computed 
+ * <li><b>Dimension 2</b> - the centroid is computed
  * as the weighted sum of the centroids
  * of a decomposition of the area into (possibly overlapping) triangles.
  * Holes and multipolygons are handled correctly.
  * See <code>http://www.faqs.org/faqs/graphics/algorithms-faq/</code>
  * for further details of the basic approach.
- * 
+ *
  * <li><b>Dimension 1</b> - Computes the average of the midpoints
  * of all line segments weighted by the segment length.
  * Zero-length lines are treated as points.
- * 
+ *
  * <li><b>Dimension 0</b> - Compute the average coordinate for all points.
  * Repeated points are all included in the average.
  * </ul>
- * 
+ *
  * @version 1.7
  */
 public class Centroid {
@@ -76,12 +76,12 @@ public class Centroid {
    */
   private static double area2(final Point p1, final Point p2, final Point p3) {
     return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY())
-      - (p3.getX() - p1.getX()) * (p2.getY() - p1.getY());
+        - (p3.getX() - p1.getX()) * (p2.getY() - p1.getY());
   }
 
   /**
    * Computes the centroid point of a geometry.
-   * 
+   *
    * @param geom the geometry to use
    * @return the centroid point, or null if the geometry is empty
    */
@@ -115,7 +115,7 @@ public class Centroid {
    * Creates a new instance for computing the centroid of a geometry
    */
   public Centroid(final Geometry geom) {
-    areaBasePt = null;
+    this.areaBasePt = null;
     add(geom);
   }
 
@@ -155,7 +155,7 @@ public class Centroid {
     for (final Segment segment : line.segments()) {
       final Point point1 = segment.getPoint(0);
       final Point point2 = segment.getPoint(1);
-      addTriangle(areaBasePt, point1, point2, isPositiveArea);
+      addTriangle(this.areaBasePt, point1, point2, isPositiveArea);
     }
     addLineSegments(line);
   }
@@ -163,7 +163,7 @@ public class Centroid {
   /**
    * Adds the line segments defined by an array of coordinates
    * to the linear centroid accumulators.
-   * 
+   *
    * @param pts an array of {@link Coordinates}s
    */
   private void addLineSegments(final LineString line) {
@@ -180,11 +180,11 @@ public class Centroid {
 
         final double midx = (x1 + x2) / 2;
         final double midy = (y1 + y2) / 2;
-        lineCenterX += segmentLen * midx;
-        lineCenterY += segmentLen * midy;
+        this.lineCenterX += segmentLen * midx;
+        this.lineCenterY += segmentLen * midy;
       }
     }
-    totalLength += lineLen;
+    this.totalLength += lineLen;
     if (lineLen == 0.0 && line.getVertexCount() > 0) {
       addPoint(line.getVertex(0).clonePoint());
     }
@@ -195,9 +195,9 @@ public class Centroid {
    * @param pt a {@link Coordinates}
    */
   private void addPoint(final Point pt) {
-    ptCount += 1;
-    centSumX += pt.getX();
-    centSumY += pt.getY();
+    this.ptCount += 1;
+    this.centSumX += pt.getX();
+    this.centSumY += pt.getY();
   }
 
   private void addShell(final LineString line) {
@@ -208,27 +208,27 @@ public class Centroid {
     for (final Segment segment : line.segments()) {
       final Point point1 = segment.getPoint(0);
       final Point point2 = segment.getPoint(1);
-      addTriangle(areaBasePt, point1, point2, isPositiveArea);
+      addTriangle(this.areaBasePt, point1, point2, isPositiveArea);
     }
     addLineSegments(line);
   }
 
   private void addTriangle(final Point p0, final Point p1, final Point p2,
     final boolean isPositiveArea) {
-    final double sign = (isPositiveArea) ? 1.0 : -1.0;
+    final double sign = isPositiveArea ? 1.0 : -1.0;
 
     final double triangleCent3X = p0.getX() + p1.getX() + p2.getX();
     final double triangleCent3Y = p0.getY() + p1.getY() + p2.getY();
 
     final double area2 = area2(p0, p1, p2);
-    cg3X += sign * area2 * triangleCent3X;
-    cg3Y += sign * area2 * triangleCent3Y;
-    areasum2 += sign * area2;
+    this.cg3X += sign * area2 * triangleCent3X;
+    this.cg3Y += sign * area2 * triangleCent3Y;
+    this.areasum2 += sign * area2;
   }
 
   /**
    * Gets the computed centroid.
-   * 
+   *
    * @return the computed centroid, or null if the input is empty
    */
   public Point getCentroid() {
@@ -238,22 +238,22 @@ public class Centroid {
      * Degenerate geometry are computed using their effective dimension
      * (e.g. areas may degenerate to lines or points)
      */
-    if (Math.abs(areasum2) > 0.0) {
+    if (Math.abs(this.areasum2) > 0.0) {
       /**
        * Input contains areal geometry
        */
-      return new PointDouble(cg3X / 3 / areasum2, cg3Y / 3 / areasum2);
-    } else if (totalLength > 0.0) {
+      return new PointDouble(this.cg3X / 3 / this.areasum2, this.cg3Y / 3 / this.areasum2);
+    } else if (this.totalLength > 0.0) {
       /**
        * Input contains lineal geometry
        */
-      return new PointDouble(lineCenterX / totalLength, lineCenterY
-        / totalLength);
-    } else if (ptCount > 0) {
+      return new PointDouble(this.lineCenterX / this.totalLength, this.lineCenterY
+        / this.totalLength);
+    } else if (this.ptCount > 0) {
       /**
        * Input contains puntal geometry only
        */
-      return new PointDouble(centSumX / ptCount, centSumY / ptCount);
+      return new PointDouble(this.centSumX / this.ptCount, this.centSumY / this.ptCount);
     } else {
       return null;
     }

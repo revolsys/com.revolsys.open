@@ -45,8 +45,8 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordStore extends AbstractObjectWithProperties
@@ -721,7 +721,7 @@ implements RecordStore {
 
   protected void setConnectionProperties(
     final Map<String, ? extends Object> connectionProperties) {
-    this.connectionProperties = CollectionUtil.createHashMap(connectionProperties);
+    this.connectionProperties = Maps.createHashMap(connectionProperties);
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

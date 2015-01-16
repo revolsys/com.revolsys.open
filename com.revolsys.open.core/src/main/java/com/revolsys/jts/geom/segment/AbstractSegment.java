@@ -6,7 +6,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public abstract class AbstractSegment extends AbstractLineSegment implements
-  Segment {
+Segment {
   private static final long serialVersionUID = 1L;
 
   protected final Geometry geometry;
@@ -42,12 +42,12 @@ public abstract class AbstractSegment extends AbstractLineSegment implements
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry() {
-    return (V)geometry;
+    return (V)this.geometry;
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometry.getGeometryFactory();
+    return this.geometry.getGeometryFactory();
   }
 
   @Override

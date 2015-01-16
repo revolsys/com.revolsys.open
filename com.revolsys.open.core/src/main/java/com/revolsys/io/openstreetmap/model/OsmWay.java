@@ -63,7 +63,7 @@ public class OsmWay extends OsmElement {
       return true;
     } else if (Arrays.asList("bare_rock", "fell", "glacier, landuse=grass",
       "grassland", "heath", "mud", "scree", "sand", "scrub", "tree", "wetland",
-      "wood").contains(getTag("natural"))) {
+        "wood").contains(getTag("natural"))) {
       return true;
     }
     return false;

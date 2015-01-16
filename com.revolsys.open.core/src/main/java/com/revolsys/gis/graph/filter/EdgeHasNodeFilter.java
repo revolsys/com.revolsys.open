@@ -13,6 +13,6 @@ public class EdgeHasNodeFilter<T> implements Filter<Edge<T>> {
 
   @Override
   public boolean accept(final Edge<T> edge) {
-    return edge.hasNode(node);
+    return edge.hasNode(this.node);
   }
 }

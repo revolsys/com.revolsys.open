@@ -45,11 +45,11 @@ import com.revolsys.jts.geom.Polygon;
 /**
  * Polygonizes a set of {@link Geometry}s which contain linework that
  * represents the edges of a planar graph.
- * All types of Geometry are accepted as input;  
+ * All types of Geometry are accepted as input;
  * the constituent linework is extracted as the edges to be polygonized.
  * The processed edges must be correctly noded; that is, they must only meet
  * at their endpoints.  The Polygonizer will run on incorrectly noded input
- * but will not form polygons from non-noded edges, 
+ * but will not form polygons from non-noded edges,
  * and will report them as errors.
  * <p>
  * The Polygonizer reports the follow kinds of errors:
@@ -140,21 +140,21 @@ public class Polygonizer {
    */
   private void add(final LineString line) {
     // create a new graph using the factory from the input Geometry
-    if (graph == null) {
-      graph = new PolygonizeGraph(line.getGeometryFactory());
+    if (this.graph == null) {
+      this.graph = new PolygonizeGraph(line.getGeometryFactory());
     }
-    graph.addEdge(line);
+    this.graph.addEdge(line);
   }
 
   private void findShellsAndHoles(final List edgeRingList) {
-    holeList = new ArrayList();
-    shellList = new ArrayList();
+    this.holeList = new ArrayList();
+    this.shellList = new ArrayList();
     for (final Iterator i = edgeRingList.iterator(); i.hasNext();) {
       final EdgeRing er = (EdgeRing)i.next();
       if (er.isHole()) {
-        holeList.add(er);
+        this.holeList.add(er);
       } else {
-        shellList.add(er);
+        this.shellList.add(er);
       }
 
     }
@@ -178,7 +178,7 @@ public class Polygonizer {
    */
   public Collection getCutEdges() {
     polygonize();
-    return cutEdges;
+    return this.cutEdges;
   }
 
   /**
@@ -187,7 +187,7 @@ public class Polygonizer {
    */
   public Collection getDangles() {
     polygonize();
-    return dangles;
+    return this.dangles;
   }
 
   /**
@@ -196,7 +196,7 @@ public class Polygonizer {
    */
   public Collection getInvalidRingLines() {
     polygonize();
-    return invalidRingLines;
+    return this.invalidRingLines;
   }
 
   /**
@@ -205,7 +205,7 @@ public class Polygonizer {
    */
   public Collection getPolygons() {
     polygonize();
-    return polyList;
+    return this.polyList;
   }
 
   /**
@@ -213,49 +213,49 @@ public class Polygonizer {
    */
   private void polygonize() {
     // check if already computed
-    if (polyList != null) {
+    if (this.polyList != null) {
       return;
     }
-    polyList = new ArrayList();
+    this.polyList = new ArrayList();
 
     // if no geometries were supplied it's possible that graph is null
-    if (graph == null) {
+    if (this.graph == null) {
       return;
     }
 
-    dangles = graph.deleteDangles();
-    cutEdges = graph.deleteCutEdges();
-    final List edgeRingList = graph.getEdgeRings();
+    this.dangles = this.graph.deleteDangles();
+    this.cutEdges = this.graph.deleteCutEdges();
+    final List edgeRingList = this.graph.getEdgeRings();
 
     // Debug.printTime("Build Edge Rings");
 
     List validEdgeRingList = new ArrayList();
-    invalidRingLines = new ArrayList();
-    if (isCheckingRingsValid) {
-      findValidRings(edgeRingList, validEdgeRingList, invalidRingLines);
+    this.invalidRingLines = new ArrayList();
+    if (this.isCheckingRingsValid) {
+      findValidRings(edgeRingList, validEdgeRingList, this.invalidRingLines);
     } else {
       validEdgeRingList = edgeRingList;
     }
     // Debug.printTime("Validate Rings");
 
     findShellsAndHoles(validEdgeRingList);
-    assignHolesToShells(holeList, shellList);
+    assignHolesToShells(this.holeList, this.shellList);
 
     // Debug.printTime("Assign Holes");
 
-    polyList = new ArrayList();
-    for (final Iterator i = shellList.iterator(); i.hasNext();) {
+    this.polyList = new ArrayList();
+    for (final Iterator i = this.shellList.iterator(); i.hasNext();) {
       final EdgeRing er = (EdgeRing)i.next();
-      polyList.add(er.getPolygon());
+      this.polyList.add(er.getPolygon());
     }
   }
 
   /**
-   * Allows disabling the valid ring checking, 
+   * Allows disabling the valid ring checking,
    * to optimize situations where invalid rings are not expected.
    * <p>
    * The default is <code>true</code.
-   * 
+   *
    * @param isCheckingRingsValid true if generated rings should be checked for validity
    */
   public void setCheckRingsValid(final boolean isCheckingRingsValid) {

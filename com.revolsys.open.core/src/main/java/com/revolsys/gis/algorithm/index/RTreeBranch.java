@@ -13,12 +13,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class RTreeBranch<T> extends RTreeNode<T> implements
-  Iterable<RTreeNode<T>> {
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -6766833009366142439L;
+Iterable<RTreeNode<T>> {
 
   private RTreeNode<T>[] nodes;
 
@@ -29,7 +24,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
 
   @SuppressWarnings("unchecked")
   public RTreeBranch(final int size) {
-    nodes = ArrayUtil.create(RTreeNode.class, size);
+    this.nodes = ArrayUtil.create(RTreeNode.class, size);
   }
 
   protected RTreeBranch(final int size, final List<RTreeNode<T>> nodes) {
@@ -40,14 +35,14 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   }
 
   private void add(final RTreeNode<T> node) {
-    nodes[size] = node;
-    size++;
+    this.nodes[this.size] = node;
+    this.size++;
     setBoundingBox(getBoundingBox().expandToInclude(node.getBoundingBox()));
   }
 
   public List<RTreeNode<T>> getNodes() {
     final List<RTreeNode<T>> nodes = new ArrayList<RTreeNode<T>>();
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < this.size; i++) {
       final RTreeNode<T> node = this.nodes[i];
       nodes.add(node);
     }
@@ -55,7 +50,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   }
 
   public int getSize() {
-    return size;
+    return this.size;
   }
 
   @Override
@@ -66,8 +61,8 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   @Override
   public boolean remove(final LinkedList<RTreeNode<T>> path,
     final BoundingBox envelope, final T object) {
-    for (int i = 0; i < size; i++) {
-      final RTreeNode<T> node = nodes[i];
+    for (int i = 0; i < this.size; i++) {
+      final RTreeNode<T> node = this.nodes[i];
       if (node.contains(envelope)) {
         if (node.remove(path, envelope, object)) {
           path.addFirst(this);
@@ -84,10 +79,10 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
       final RTreeNode<T> newNode = newNodes.get(i);
       add(newNode);
     }
-    for (int i = 0; i < size - newNodes.size() + 1; i++) {
-      final RTreeNode<T> childNode = nodes[i];
+    for (int i = 0; i < this.size - newNodes.size() + 1; i++) {
+      final RTreeNode<T> childNode = this.nodes[i];
       if (childNode == node) {
-        nodes[i] = newNodes.get(0);
+        this.nodes[i] = newNodes.get(0);
         return;
       }
     }
@@ -96,21 +91,21 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   @SuppressWarnings("unchecked")
   public List<RTreeNode<T>> split(final RTreeNode<T> node,
     final List<RTreeNode<T>> newNodes) {
-    final RTreeBranch<T> branch1 = new RTreeBranch<T>(nodes.length);
-    final RTreeBranch<T> branch2 = new RTreeBranch<T>(nodes.length);
+    final RTreeBranch<T> branch1 = new RTreeBranch<T>(this.nodes.length);
+    final RTreeBranch<T> branch2 = new RTreeBranch<T>(this.nodes.length);
 
     // TODO Add some ordering to the results
-    final int midPoint = (int)Math.ceil(size / 2.0);
+    final int midPoint = (int)Math.ceil(this.size / 2.0);
     for (int i = 0; i <= midPoint; i++) {
-      final RTreeNode<T> childNode = nodes[i];
+      final RTreeNode<T> childNode = this.nodes[i];
       if (childNode == node) {
         branch1.add(newNodes.get(0));
       } else {
         branch1.add(childNode);
       }
     }
-    for (int i = midPoint + 1; i < size; i++) {
-      final RTreeNode<T> childNode = nodes[i];
+    for (int i = midPoint + 1; i < this.size; i++) {
+      final RTreeNode<T> childNode = this.nodes[i];
       if (childNode == node) {
         branch1.add(newNodes.get(0));
       } else {
@@ -125,8 +120,8 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   @Override
   protected void updateEnvelope() {
     BoundingBox boundingBox = new BoundingBoxDoubleGf();
-    for (int i = 0; i < size; i++) {
-      final BoundingBox envelope = nodes[i].getBoundingBox();
+    for (int i = 0; i < this.size; i++) {
+      final BoundingBox envelope = this.nodes[i].getBoundingBox();
       boundingBox = boundingBox.expandToInclude(envelope);
     }
     setBoundingBox(boundingBox);
@@ -136,8 +131,8 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
   @Override
   public boolean visit(final BoundingBox envelope, final Filter<T> filter,
     final Visitor<T> visitor) {
-    for (int i = 0; i < size; i++) {
-      final RTreeNode<T> node = nodes[i];
+    for (int i = 0; i < this.size; i++) {
+      final RTreeNode<T> node = this.nodes[i];
       if (envelope.intersects(node.getBoundingBox())) {
         if (!node.visit(envelope, filter, visitor)) {
           return false;
@@ -149,8 +144,8 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
 
   @Override
   public boolean visit(final BoundingBox envelope, final Visitor<T> visitor) {
-    for (int i = 0; i < size; i++) {
-      final RTreeNode<T> node = nodes[i];
+    for (int i = 0; i < this.size; i++) {
+      final RTreeNode<T> node = this.nodes[i];
       if (envelope.intersects(node.getBoundingBox())) {
         if (!node.visit(envelope, visitor)) {
           return false;
@@ -162,8 +157,8 @@ public class RTreeBranch<T> extends RTreeNode<T> implements
 
   @Override
   public boolean visit(final Visitor<T> visitor) {
-    for (int i = 0; i < size; i++) {
-      final RTreeNode<T> node = nodes[i];
+    for (int i = 0; i < this.size; i++) {
+      final RTreeNode<T> node = this.nodes[i];
       if (!node.visit(visitor)) {
         return false;
       }

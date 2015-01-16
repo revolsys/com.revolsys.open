@@ -44,11 +44,11 @@ import com.revolsys.jts.geom.impl.PointDouble;
  * (or to put it another way, although they contain four
  * coordinates they only actually contain 4 ordinates
  * worth of information).
- * The algorithm used takes advantage of the symmetry of 
- * the geometric situation 
+ * The algorithm used takes advantage of the symmetry of
+ * the geometric situation
  * to optimize performance by minimizing the number
  * of line intersection tests.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -69,8 +69,8 @@ public class RectangleLineIntersector {
   /**
    * Creates a new intersector for the given query rectangle,
    * specified as an {@link BoundingBoxDoubleGf}.
-   * 
-   * 
+   *
+   *
    * @param rectEnv the query rectangle, specified as an BoundingBoxDoubleGf
    */
   public RectangleLineIntersector(final BoundingBox rectEnv) {
@@ -81,20 +81,20 @@ public class RectangleLineIntersector {
      * relative to the Left side of the rectangle.
      * Index 0 is the left side, 1 is the right side.
      */
-    diagUp0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(),
+    this.diagUp0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMinY(),
       Point.NULL_ORDINATE);
-    diagUp1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(),
+    this.diagUp1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMaxY(),
       Point.NULL_ORDINATE);
-    diagDown0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(),
+    this.diagDown0 = new PointDouble(rectEnv.getMinX(), rectEnv.getMaxY(),
       Point.NULL_ORDINATE);
-    diagDown1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(),
+    this.diagDown1 = new PointDouble(rectEnv.getMaxX(), rectEnv.getMinY(),
       Point.NULL_ORDINATE);
   }
 
   /**
-   * Tests whether the query rectangle intersects a 
+   * Tests whether the query rectangle intersects a
    * given line segment.
-   * 
+   *
    * @param p0 the first endpoint of the segment
    * @param p1 the second endpoint of the segment
    * @return true if the rectangle intersects the segment
@@ -107,7 +107,7 @@ public class RectangleLineIntersector {
      * rectangle envelope, there is no intersection
      */
     final BoundingBox segEnv = new BoundingBoxDoubleGf(p0, p1);
-    if (!rectEnv.intersects(segEnv)) {
+    if (!this.rectEnv.intersects(segEnv)) {
       return false;
     }
 
@@ -115,10 +115,10 @@ public class RectangleLineIntersector {
      * If either segment endpoint lies in the rectangle,
      * there is an intersection.
      */
-    if (p0.intersects(rectEnv)) {
+    if (p0.intersects(this.rectEnv)) {
       return true;
     }
-    if (p1.intersects(rectEnv)) {
+    if (p1.intersects(this.rectEnv)) {
       return true;
     }
 
@@ -146,29 +146,29 @@ public class RectangleLineIntersector {
 
     /**
      * Since we now know that neither segment endpoint
-     * lies in the rectangle, there are two possible 
+     * lies in the rectangle, there are two possible
      * situations:
      * 1) the segment is disjoint to the rectangle
      * 2) the segment crosses the rectangle completely.
-     * 
-     * In the case of a crossing, the segment must intersect 
+     *
+     * In the case of a crossing, the segment must intersect
      * a diagonal of the rectangle.
-     * 
-     * To distinguish these two cases, it is sufficient 
-     * to test intersection with 
+     *
+     * To distinguish these two cases, it is sufficient
+     * to test intersection with
      * a single diagonal of the rectangle,
      * namely the one with slope "opposite" to the slope
      * of the segment.
      * (Note that if the segment is axis-parallel,
      * it must intersect both diagonals, so this is
-     * still sufficient.)  
+     * still sufficient.)
      */
     if (isSegUpwards) {
-      li.computeIntersection(p0, p1, diagDown0, diagDown1);
+      this.li.computeIntersection(p0, p1, this.diagDown0, this.diagDown1);
     } else {
-      li.computeIntersection(p0, p1, diagUp0, diagUp1);
+      this.li.computeIntersection(p0, p1, this.diagUp0, this.diagUp1);
     }
-    if (li.hasIntersection()) {
+    if (this.li.hasIntersection()) {
       return true;
     }
     return false;

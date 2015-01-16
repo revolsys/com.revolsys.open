@@ -48,20 +48,20 @@ public class Between extends Condition {
   }
 
   @Override
-  public void appendDefaultSql(Query query,
+  public void appendDefaultSql(final Query query,
     final RecordStore recordStore, final StringBuilder buffer) {
-    column.appendSql(query, recordStore, buffer);
+    this.column.appendSql(query, recordStore, buffer);
     buffer.append(" BETWEEN ");
-    min.appendSql(query, recordStore, buffer);
+    this.min.appendSql(query, recordStore, buffer);
     buffer.append(" AND ");
-    max.appendSql(query, recordStore, buffer);
+    this.max.appendSql(query, recordStore, buffer);
   }
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    index = column.appendParameters(index, statement);
-    index = min.appendParameters(index, statement);
-    index = max.appendParameters(index, statement);
+    index = this.column.appendParameters(index, statement);
+    index = this.min.appendParameters(index, statement);
+    index = this.max.appendParameters(index, statement);
     return index;
   }
 
@@ -90,24 +90,24 @@ public class Between extends Condition {
   }
 
   public Column getColumn() {
-    return column;
+    return this.column;
   }
 
   public Value getMax() {
-    return max;
+    return this.max;
   }
 
   public Value getMin() {
-    return min;
+    return this.min;
   }
 
   @Override
   public List<QueryValue> getQueryValues() {
-    return Arrays.<QueryValue> asList(column, min, max);
+    return Arrays.<QueryValue> asList(this.column, this.min, this.max);
   }
 
   @Override
   public String toString() {
-    return column + " BETWEEN " + min + " AND " + max;
+    return this.column + " BETWEEN " + this.min + " AND " + this.max;
   }
 }

@@ -10,15 +10,15 @@ public class Attribution {
   private ImageUrl logoUrl;
 
   public ImageUrl getLogoUrl() {
-    return logoUrl;
+    return this.logoUrl;
   }
 
   public URL getOnlineResource() {
-    return onlineResource;
+    return this.onlineResource;
   }
 
   public String getTitle() {
-    return title;
+    return this.title;
   }
 
   public void setLogoUrl(final ImageUrl logoUrl) {

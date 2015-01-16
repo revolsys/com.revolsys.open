@@ -20,7 +20,7 @@ public class DeleteFiles {
 
   @PostConstruct
   public void deleteFiles() {
-    for (String filePattern : filePatterns) {
+    for (String filePattern : this.filePatterns) {
       if (!filePattern.startsWith("file:")) {
         filePattern = "file:" + filePattern;
       }
@@ -28,10 +28,10 @@ public class DeleteFiles {
         for (final Resource resource : RESOLVER.getResources(filePattern)) {
           final File file = resource.getFile();
           if (file.isDirectory()) {
-            if (deleteDirectories) {
+            if (this.deleteDirectories) {
               if (!FileUtil.deleteDirectory(file, true)) {
                 throw new RuntimeException("Unable to delete directory: "
-                  + file);
+                    + file);
               }
             }
           } else if (file.exists()) {
@@ -47,11 +47,11 @@ public class DeleteFiles {
   }
 
   public List<String> getFilePatterns() {
-    return filePatterns;
+    return this.filePatterns;
   }
 
   public boolean isDeleteDirectories() {
-    return deleteDirectories;
+    return this.deleteDirectories;
   }
 
   public void setDeleteDirectories(final boolean deleteDirectories) {

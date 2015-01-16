@@ -12,7 +12,7 @@ public class I18nCharSequence implements CharSequence {
 
   /**
    * Get the character at the specified index.
-   * 
+   *
    * @param index The index.
    * @return The character.
    */
@@ -22,13 +22,13 @@ public class I18nCharSequence implements CharSequence {
   }
 
   public I18n getI18n() {
-    return i18n;
+    return this.i18n;
 
   }
 
   /**
    * Get the length of the char sequence.
-   * 
+   *
    * @return The length;
    */
   @Override
@@ -43,12 +43,12 @@ public class I18nCharSequence implements CharSequence {
 
   /**
    * Get the
-   * 
+   *
    * @return
    */
   @Override
   public String toString() {
-    return i18n.getString(key);
+    return this.i18n.getString(this.key);
   }
 
 }

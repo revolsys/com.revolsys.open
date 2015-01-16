@@ -7,7 +7,7 @@ public class TableRow extends ElementContainer {
   public TableRow() {
   }
 
-  public TableRow(Element... elements) {
+  public TableRow(final Element... elements) {
     super(elements);
   }
 

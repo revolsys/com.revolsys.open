@@ -161,7 +161,7 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
         processKey(beanFactory, key, (String)properties.get(key));
       } catch (final BeansException ex) {
         final String msg = "Could not process key [" + key
-          + "] in PropertyOverrideConfigurer";
+            + "] in PropertyOverrideConfigurer";
         if (this.ignoreInvalidKeys) {
           if (getLog().isDebugEnabled()) {
             getLog().debug(msg, ex);

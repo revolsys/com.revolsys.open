@@ -12,7 +12,7 @@ import java.lang.ref.WeakReference;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.field.InvokeMethodStringConverter;
@@ -21,7 +21,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public class SelectMapScale extends JComboBox implements ItemListener,
-  PropertyChangeListener, ActionListener {
+PropertyChangeListener, ActionListener {
   private static final long serialVersionUID = 1L;
 
   private final Reference<MapPanel> map;
@@ -33,7 +33,7 @@ public class SelectMapScale extends JComboBox implements ItemListener,
     setEditable(true);
     final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(
       MapScale.class, "formatScale");
-    renderer.setHorizontalAlignment(JLabel.RIGHT);
+    renderer.setHorizontalAlignment(SwingConstants.RIGHT);
     final SelectMapScaleEditor editor = new SelectMapScaleEditor(getEditor(),
       renderer);
     setEditor(editor);
@@ -95,8 +95,8 @@ public class SelectMapScale extends JComboBox implements ItemListener,
           currentScale = ((Number)currentValue).doubleValue();
         } else if (Property.hasValue(currentValue)) {
           final String scaleString = currentValue.toString()
-            .replaceAll("1:", "")
-            .replaceAll("[^0-9\\.]+", "");
+              .replaceAll("1:", "")
+              .replaceAll("[^0-9\\.]+", "");
           if (Property.hasValue(scaleString)) {
             try {
               currentScale = Double.valueOf(scaleString);

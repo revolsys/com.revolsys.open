@@ -11,21 +11,21 @@ public class SetPropertyValue {
   private Object value;
 
   public Object getBean() {
-    return bean;
+    return this.bean;
   }
 
   public String getPropertyName() {
-    return propertyName;
+    return this.propertyName;
   }
 
   public Object getValue() {
-    return value;
+    return this.value;
   }
 
   @PostConstruct
   public void init() {
-    if (bean != null && propertyName != null) {
-      JavaBeanUtil.setProperty(bean, propertyName, value);
+    if (this.bean != null && this.propertyName != null) {
+      JavaBeanUtil.setProperty(this.bean, this.propertyName, this.value);
     }
   }
 

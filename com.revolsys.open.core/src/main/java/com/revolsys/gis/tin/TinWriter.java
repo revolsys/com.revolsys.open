@@ -29,42 +29,42 @@ public class TinWriter {
 
   public TinWriter(final Resource resource) {
     this.out = SpringUtil.getPrintWriter(resource);
-    out.println("TIN");
+    this.out.println("TIN");
   }
 
   public void close() {
-    out.close();
+    this.out.close();
   }
 
   public void write(final TriangulatedIrregularNetwork tin) {
-    out.println("BEGT");
+    this.out.println("BEGT");
 
-    out.print("TNAM tin-");
-    out.println(++tinIndex);
+    this.out.print("TNAM tin-");
+    this.out.println(++this.tinIndex);
 
-    out.println("TCOL 255 255 255");
+    this.out.println("TCOL 255 255 255");
 
     int nodeIndex = 0;
     final Map<Point, Integer> nodeMap = new HashMap<Point, Integer>();
     final Set<Point> nodes = tin.getNodes();
-    out.print("VERT ");
-    out.println(nodes.size());
+    this.out.print("VERT ");
+    this.out.println(nodes.size());
     for (final Point point : nodes) {
       nodeMap.put(point, ++nodeIndex);
-      out.print(point.getX());
-      out.print(' ');
-      out.print(point.getY());
-      out.print(' ');
-      out.println(point.getZ());
+      this.out.print(point.getX());
+      this.out.print(' ');
+      this.out.print(point.getY());
+      this.out.print(' ');
+      this.out.println(point.getZ());
     }
 
     final List<Triangle> triangles = tin.getTriangles();
-    out.print("TRI ");
-    out.println(triangles.size());
+    this.out.print("TRI ");
+    this.out.println(triangles.size());
     for (final Triangle triangle : triangles) {
       for (int i = 0; i < 3; i++) {
         if (i > 0) {
-          out.print(' ');
+          this.out.print(' ');
         }
         final Point point = triangle.getPoint(i);
         final Integer index = nodeMap.get(point);
@@ -74,11 +74,11 @@ public class TinWriter {
           System.out.println(tin.getBoundingBox().toPolygon());
           throw new NullPointerException();
         }
-        out.print(index);
+        this.out.print(index);
       }
-      out.println();
+      this.out.println();
     }
 
-    out.println("ENDT");
+    this.out.println("ENDT");
   }
 }

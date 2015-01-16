@@ -38,13 +38,13 @@ public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
     }
     if (valueType != null) {
       final TypeConverter converter = getBeanTypeConverter();
-      for (final List<T> list : sourceLists) {
+      for (final List<T> list : this.sourceLists) {
         for (final Object value : list) {
           result.add(converter.convertIfNecessary(value, valueType));
         }
       }
     } else {
-      for (final List<T> list : sourceLists) {
+      for (final List<T> list : this.sourceLists) {
         result.addAll(list);
       }
     }
@@ -57,11 +57,11 @@ public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
   }
 
   public List<List<T>> getSourceLists() {
-    return sourceLists;
+    return this.sourceLists;
   }
 
   public Class<List<T>> getTargetListClass() {
-    return targetListClass;
+    return this.targetListClass;
   }
 
   public void setSourceLists(final List<List<T>> sourceLists) {
@@ -73,7 +73,7 @@ public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
    * qualified class name when defined in a Spring application context.
    * <p>
    * Default is a <code>java.util.ArrayList</code>.
-   * 
+   *
    * @see java.util.ArrayList
    */
   public void setTargetListClass(final Class<List<T>> targetListClass) {
@@ -82,7 +82,7 @@ public class ListFactoryBean<T> extends AbstractFactoryBean<List> {
     }
     if (!List.class.isAssignableFrom(targetListClass)) {
       throw new IllegalArgumentException(
-        "'targetListClass' must implement [java.util.List]");
+          "'targetListClass' must implement [java.util.List]");
     }
     this.targetListClass = targetListClass;
   }

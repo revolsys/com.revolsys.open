@@ -64,7 +64,7 @@ RecordReader {
       }
       if (this.boundingBox != null) {
         final FieldDefinition geometryField = query.getRecordDefinition()
-          .getGeometryField();
+            .getGeometryField();
         query.and(F.envelopeIntersects(geometryField, this.boundingBox));
       }
 

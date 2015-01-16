@@ -41,45 +41,15 @@ import com.revolsys.jts.geom.segment.Segment;
  * Specifies and implements various fundamental Computational Geometric
  * algorithms. The algorithms supplied in this class are robust for
  * double-precision floating point.
- * 
+ *
  * @version 1.7
  */
 public class CGAlgorithms {
 
   /**
-   * A value that indicates an orientation of clockwise, or a right turn.
-   */
-  public static final int CLOCKWISE = -1;
-
-  /**
-   * A value that indicates an orientation of clockwise, or a right turn.
-   */
-  public static final int RIGHT = CLOCKWISE;
-
-  /**
-   * A value that indicates an orientation of counterclockwise, or a left turn.
-   */
-  public static final int COUNTERCLOCKWISE = 1;
-
-  /**
-   * A value that indicates an orientation of counterclockwise, or a left turn.
-   */
-  public static final int LEFT = COUNTERCLOCKWISE;
-
-  /**
-   * A value that indicates an orientation of collinear, or no turn (straight).
-   */
-  public static final int COLLINEAR = 0;
-
-  /**
-   * A value that indicates an orientation of collinear, or no turn (straight).
-   */
-  public static final int STRAIGHT = COLLINEAR;
-
-  /**
    * Computes the perpendicular distance from a point p to the (infinite) line
    * containing the points AB
-   * 
+   *
    * @param p
    *          the point to compute the distance for
    * @param A
@@ -96,10 +66,10 @@ public class CGAlgorithms {
      * Then the distance from C to P = |s|*L.
      */
     final double len2 = (B.getX() - A.getX()) * (B.getX() - A.getX())
-      + (B.getY() - A.getY()) * (B.getY() - A.getY());
+        + (B.getY() - A.getY()) * (B.getY() - A.getY());
     final double s = ((A.getY() - p.getY()) * (B.getX() - A.getX()) - (A.getX() - p.getX())
-      * (B.getY() - A.getY()))
-      / len2;
+        * (B.getY() - A.getY()))
+        / len2;
 
     return Math.abs(s) * Math.sqrt(len2);
   }
@@ -114,7 +84,7 @@ public class CGAlgorithms {
    * This algorithm is <b>only</b> guaranteed to work with valid rings. If the
    * ring is invalid (e.g. self-crosses or touches), the computed result may not
    * be correct.
-   * 
+   *
    * @param ring
    *          an array of Point forming a ring
    * @return true if the ring is oriented counter-clockwise.
@@ -127,7 +97,7 @@ public class CGAlgorithms {
     // sanity check
     if (nPts < 3) {
       throw new IllegalArgumentException(
-        "Ring has fewer than 4 points, so orientation cannot be determined");
+          "Ring has fewer than 4 points, so orientation cannot be determined");
     }
 
     // find highest point
@@ -175,7 +145,7 @@ public class CGAlgorithms {
      * If disc is exactly 0, lines are collinear. There are two possible cases:
      * (1) the lines lie along the x axis in opposite directions (2) the lines
      * lie on top of one another
-     * 
+     *
      * (1) is handled by checking if next is left of prev ==> CCW (2) will never
      * happen if the ring is valid, so don't check for it (Might want to assert
      * this)
@@ -183,10 +153,10 @@ public class CGAlgorithms {
     boolean counterClockwise = false;
     if (disc == 0) {
       // poly is CCW if prev x is right of next x
-      counterClockwise = (prev.getX() > next.getX());
+      counterClockwise = prev.getX() > next.getX();
     } else {
       // if area is positive, points are ordered CCW
-      counterClockwise = (disc > 0);
+      counterClockwise = disc > 0;
     }
     return counterClockwise;
   }
@@ -194,7 +164,7 @@ public class CGAlgorithms {
   /**
    * Tests whether a point lies on the line segments defined by a list of
    * coordinates.
-   * 
+   *
    * @return true if the point is a vertex of the line or lies in the interior
    *         of a line segment in the linestring
    */
@@ -214,6 +184,36 @@ public class CGAlgorithms {
   public static boolean isPointInRing(final Point point, final LineString ring) {
     return RayCrossingCounter.locatePointInRing(point, ring) != Location.EXTERIOR;
   }
+
+  /**
+   * A value that indicates an orientation of clockwise, or a right turn.
+   */
+  public static final int CLOCKWISE = -1;
+
+  /**
+   * A value that indicates an orientation of clockwise, or a right turn.
+   */
+  public static final int RIGHT = CLOCKWISE;
+
+  /**
+   * A value that indicates an orientation of counterclockwise, or a left turn.
+   */
+  public static final int COUNTERCLOCKWISE = 1;
+
+  /**
+   * A value that indicates an orientation of counterclockwise, or a left turn.
+   */
+  public static final int LEFT = COUNTERCLOCKWISE;
+
+  /**
+   * A value that indicates an orientation of collinear, or no turn (straight).
+   */
+  public static final int COLLINEAR = 0;
+
+  /**
+   * A value that indicates an orientation of collinear, or no turn (straight).
+   */
+  public static final int STRAIGHT = COLLINEAR;
 
   public CGAlgorithms() {
   }

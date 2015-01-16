@@ -7,11 +7,11 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class GeometryProjection extends
-  BaseInOutProcess<Record, Record> {
+BaseInOutProcess<Record, Record> {
   private GeometryFactory geometryFactory;
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   @Override
@@ -20,7 +20,7 @@ public class GeometryProjection extends
     final Geometry geometry = object.getGeometryValue();
 
     if (geometry != null) {
-      final Geometry projectedGeometry = geometry.copy(geometryFactory);
+      final Geometry projectedGeometry = geometry.copy(this.geometryFactory);
       if (geometry != projectedGeometry) {
         object.setGeometryValue(projectedGeometry);
       }

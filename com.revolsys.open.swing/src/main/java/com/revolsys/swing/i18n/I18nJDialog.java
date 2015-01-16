@@ -10,7 +10,7 @@ import com.revolsys.i18n.I18n;
 public class I18nJDialog extends JDialog {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -5408536069204690176L;
 

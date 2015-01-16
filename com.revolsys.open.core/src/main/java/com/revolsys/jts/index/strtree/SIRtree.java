@@ -48,39 +48,53 @@ import java.util.List;
  */
 public class SIRtree extends AbstractSTRtree {
 
-  private Comparator comparator = new Comparator() {
-    public int compare(Object o1, Object o2) {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  private final Comparator comparator = new Comparator() {
+    @Override
+    public int compare(final Object o1, final Object o2) {
       return compareDoubles(
-          ((Interval)((Boundable)o1).getBounds()).getCentre(),
-          ((Interval)((Boundable)o2).getBounds()).getCentre());
+        ((Interval)((Boundable)o1).getBounds()).getCentre(),
+        ((Interval)((Boundable)o2).getBounds()).getCentre());
     }
   };
 
-  private IntersectsOp intersectsOp = new IntersectsOp() {
-    public boolean intersects(Object aBounds, Object bBounds) {
+  private final IntersectsOp intersectsOp = new IntersectsOp() {
+    @Override
+    public boolean intersects(final Object aBounds, final Object bBounds) {
       return ((Interval)aBounds).intersects((Interval)bBounds);
     }
   };
-  
+
   /**
    * Constructs an SIRtree with the default node capacity.
    */
   public SIRtree() { this(10); }
-   
+
   /**
    * Constructs an SIRtree with the given maximum number of child nodes that
    * a node may have
    */
-  public SIRtree(int nodeCapacity) {
+  public SIRtree(final int nodeCapacity) {
     super(nodeCapacity);
   }
 
-  protected AbstractNode createNode(int level) {
+  @Override
+  protected AbstractNode createNode(final int level) {
     return new AbstractNode(level) {
+      /**
+       *
+       */
+      private static final long serialVersionUID = 1L;
+
+      @Override
       protected Object computeBounds() {
         Interval bounds = null;
-        for (Iterator i = getChildBoundables().iterator(); i.hasNext(); ) {
-          Boundable childBoundable = (Boundable) i.next();
+        for (final Iterator i = getChildBoundables().iterator(); i.hasNext(); ) {
+          final Boundable childBoundable = (Boundable) i.next();
           if (bounds == null) {
             bounds = new Interval((Interval)childBoundable.getBounds());
           }
@@ -93,17 +107,27 @@ public class SIRtree extends AbstractSTRtree {
     };
   }
 
+  @Override
+  protected Comparator getComparator() {
+    return this.comparator;
+  }
+
+  @Override
+  protected IntersectsOp getIntersectsOp() {
+    return this.intersectsOp;
+  }
+
   /**
    * Inserts an item having the given bounds into the tree.
    */
-  public void insert(double x1, double x2, Object item) {
+  public void insert(final double x1, final double x2, final Object item) {
     super.insert(new Interval(Math.min(x1, x2), Math.max(x1, x2)), item);
   }
 
   /**
    * Returns items whose bounds intersect the given value.
    */
-  public List query(double x) {
+  public List query(final double x) {
     return query(x, x);
   }
 
@@ -111,16 +135,8 @@ public class SIRtree extends AbstractSTRtree {
    * Returns items whose bounds intersect the given bounds.
    * @param x1 possibly equal to x2
    */
-  public List query(double x1, double x2) {
+  public List query(final double x1, final double x2) {
     return super.query(new Interval(Math.min(x1, x2), Math.max(x1, x2)));
-  }
-
-  protected IntersectsOp getIntersectsOp() {
-    return intersectsOp;
-  }
-
-  protected Comparator getComparator() {
-    return comparator;
   }
 
 }

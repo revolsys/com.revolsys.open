@@ -16,7 +16,7 @@ public class MapKeySetEntrySet<K, V> extends AbstractSet<Entry<K, V>> {
 
   @Override
   public void clear() {
-    map.clear();
+    this.map.clear();
   }
 
   /**
@@ -27,7 +27,7 @@ public class MapKeySetEntrySet<K, V> extends AbstractSet<Entry<K, V>> {
     if (o instanceof BPlusTreeMap.Entry) {
       @SuppressWarnings("unchecked")
       final Entry<K, V> e = (Entry<K, V>)o;
-      final Entry<K, V> candidate = new MapKeyEntry<K, V>(map, e.getKey());
+      final Entry<K, V> candidate = new MapKeyEntry<K, V>(this.map, e.getKey());
       return candidate != null && candidate.equals(e);
     } else {
       return false;
@@ -36,16 +36,16 @@ public class MapKeySetEntrySet<K, V> extends AbstractSet<Entry<K, V>> {
 
   @Override
   public Iterator<Map.Entry<K, V>> iterator() {
-    return new MapKeySetEntryIterator<K, V>(map);
+    return new MapKeySetEntryIterator<K, V>(this.map);
   }
 
   @Override
   public boolean remove(final Object o) {
-    return map.remove(o) != null;
+    return this.map.remove(o) != null;
   }
 
   @Override
   public int size() {
-    return map.size();
+    return this.map.size();
   }
 }

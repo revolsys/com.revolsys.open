@@ -61,9 +61,9 @@ public class TriangulatedIrregularNetwork {
     this.boundingBox = boundingBox;
     setGeometryFactory(geometryFactory);
     if (loadMode) {
-      triangleIndex = new RTree<Triangle>();
+      this.triangleIndex = new RTree<Triangle>();
     } else {
-      circumCircleIndex = new RTree<Triangle>();
+      this.circumCircleIndex = new RTree<Triangle>();
       final double minX = geometryFactory.makeXyPrecise(boundingBox.getMinX() - 100);
       final double minY = geometryFactory.makeXyPrecise(boundingBox.getMinY() - 100);
       final double maxX = geometryFactory.makeXyPrecise(boundingBox.getMaxX() + 100);
@@ -168,7 +168,7 @@ public class TriangulatedIrregularNetwork {
     for (int i = 1; i < 3; i++) {
       final Point triCorner = triangle.getPoint(i);
       if (!triCorner.equals(2, intersectCoord)
-        && !previousCoord.equals(2, intersectCoord)) {
+          && !previousCoord.equals(2, intersectCoord)) {
         final double distance = new LineSegmentDoubleGF(previousCoord,
           triCorner).distance(intersectCoord);
         if (distance == 0) {
@@ -193,7 +193,7 @@ public class TriangulatedIrregularNetwork {
     final double y2 = lc1.getY();
     final double z1 = breakline.getElevation(lc0);
     final double z2 = breakline.getElevation(lc1);
-    final LineSegment lineSegment = new LineSegmentDoubleGF(geometryFactory, 3,
+    final LineSegment lineSegment = new LineSegmentDoubleGF(this.geometryFactory, 3,
       x1, y1, z1, x2, y2, z2);
     addBreaklineIntersect(triangle, lineSegment);
   }
@@ -201,7 +201,7 @@ public class TriangulatedIrregularNetwork {
   /**
    * Split a triangle where the line segment i0 -> i1 is fully contained in the
    * triangle. Creates 3 new triangles.
-   * 
+   *
    * @param triangle
    * @param coordinates The coordinates of the triangle.
    * @param index The index of the closest corner to i0.
@@ -253,18 +253,18 @@ public class TriangulatedIrregularNetwork {
   protected void addTriangle(final Triangle triangle) {
     for (int i = 0; i < 3; i++) {
       final Point point = triangle.getPoint(i);
-      if (!nodes.contains(point)) {
-        nodes.add(point);
+      if (!this.nodes.contains(point)) {
+        this.nodes.add(point);
       }
     }
-    if (circumCircleIndex != null) {
+    if (this.circumCircleIndex != null) {
       final Circle circle = triangle.getCircumcircle();
       final BoundingBox envelope = circle.getEnvelopeInternal();
-      circumCircleIndex.put(envelope, triangle);
+      this.circumCircleIndex.put(envelope, triangle);
     }
-    if (triangleIndex != null) {
+    if (this.triangleIndex != null) {
       final BoundingBoxDoubleGf envelope = triangle.getEnvelopeInternal();
-      triangleIndex.put(envelope, triangle);
+      this.triangleIndex.put(envelope, triangle);
     }
   }
 
@@ -286,7 +286,7 @@ public class TriangulatedIrregularNetwork {
    * will be 5 triangles created. The triangle coordinate t0 will be part of two
    * triangles, the other two triangle coordinates will be part of 3 triangles.
    * l1 must not be closer than l0 to t0.
-   * 
+   *
    * @param triangle TODO
    * @param t0 The first triangle coordinate.
    * @param t1 The second triangle coordinate.
@@ -325,7 +325,7 @@ public class TriangulatedIrregularNetwork {
 
   private void addTriangleTouchingOneEdge(final Triangle triangle,
     final Point lc0, final Point lc1, final int edgeIndex) {
-    final Point cPrevious = triangle.getPoint((edgeIndex) % 3);
+    final Point cPrevious = triangle.getPoint(edgeIndex % 3);
     final Point cNext = triangle.getPoint((edgeIndex + 1) % 3);
     final Point cOpposite = triangle.getPoint((edgeIndex + 2) % 3);
     if (CoordinatesUtil.orientationIndex(cPrevious, lc0, lc1) == CGAlgorithms.COLLINEAR) {
@@ -360,7 +360,7 @@ public class TriangulatedIrregularNetwork {
           Triangle.createClockwiseTriangle(lc0, lc1, cOpposite),
           Triangle.createClockwiseTriangle(lc0, cNext, cOpposite));
       }
-    } else if (endEdge == ((startEdge + 1) % 3)) {
+    } else if (endEdge == (startEdge + 1) % 3) {
       replaceTriangle(triangle,
         Triangle.createClockwiseTriangle(cPrevious, lc0, cOpposite),
         Triangle.createClockwiseTriangle(lc0, lc1, cOpposite),
@@ -374,38 +374,38 @@ public class TriangulatedIrregularNetwork {
   }
 
   public void finishEditing() {
-    if (circumCircleIndex != null) {
-      if (triangleIndex == null) {
-        triangleIndex = new RTree<Triangle>();
-        for (final Triangle triangle : circumCircleIndex.findAll()) {
+    if (this.circumCircleIndex != null) {
+      if (this.triangleIndex == null) {
+        this.triangleIndex = new RTree<Triangle>();
+        for (final Triangle triangle : this.circumCircleIndex.findAll()) {
           final Circle circumcircle = triangle.getCircumcircle();
           final BoundingBox circleEnvelope = circumcircle.getEnvelopeInternal();
-          circumCircleIndex.remove(circleEnvelope, triangle);
+          this.circumCircleIndex.remove(circleEnvelope, triangle);
 
           final BoundingBox envelope = circumcircle.getEnvelopeInternal();
-          triangleIndex.put(envelope, triangle);
+          this.triangleIndex.put(envelope, triangle);
         }
       }
-      circumCircleIndex = null;
+      this.circumCircleIndex = null;
     }
   }
 
   public BoundingBox getBoundingBox() {
-    return boundingBox;
+    return this.boundingBox;
   }
 
   private EnvelopeSpatialIndex<Triangle> getCircumcircleIndex() {
-    if (circumCircleIndex == null) {
-      circumCircleIndex = new RTree<Triangle>();
-      if (triangleIndex != null) {
-        for (final Triangle triangle : triangleIndex.findAll()) {
+    if (this.circumCircleIndex == null) {
+      this.circumCircleIndex = new RTree<Triangle>();
+      if (this.triangleIndex != null) {
+        for (final Triangle triangle : this.triangleIndex.findAll()) {
           final Circle circumcircle = triangle.getCircumcircle();
           final BoundingBox envelope = circumcircle.getEnvelopeInternal();
-          circumCircleIndex.put(envelope, triangle);
+          this.circumCircleIndex.put(envelope, triangle);
         }
       }
     }
-    return circumCircleIndex;
+    return this.circumCircleIndex;
   }
 
   public LineString getElevation(final LineString line) {
@@ -441,7 +441,7 @@ public class TriangulatedIrregularNetwork {
   }
 
   public double getElevation(final Point coordinate) {
-    final Point point = geometryFactory.createCoordinates(coordinate);
+    final Point point = this.geometryFactory.createCoordinates(coordinate);
     final List<Triangle> triangles = getTriangles(coordinate);
     for (final Triangle triangle : triangles) {
       final Point t0 = triangle.getP0();
@@ -488,7 +488,7 @@ public class TriangulatedIrregularNetwork {
   }
 
   public Set<Point> getNodes() {
-    return Collections.unmodifiableSet(nodes);
+    return Collections.unmodifiableSet(this.nodes);
   }
 
   private Point getOtherCoordinates(final LineString coords, final int i1,
@@ -500,7 +500,7 @@ public class TriangulatedIrregularNetwork {
   /**
    * Get the index of the corner or a triangle opposite corners i1 -> i2. i1 and
    * i2 must have different values in the range 0..2.
-   * 
+   *
    * @param i1
    * @param i2
    * @return
@@ -510,30 +510,30 @@ public class TriangulatedIrregularNetwork {
   }
 
   public int getSize() {
-    if (circumCircleIndex != null) {
-      return circumCircleIndex.getSize();
-    } else if (triangleIndex != null) {
-      return triangleIndex.getSize();
+    if (this.circumCircleIndex != null) {
+      return this.circumCircleIndex.getSize();
+    } else if (this.triangleIndex != null) {
+      return this.triangleIndex.getSize();
     } else {
       return 0;
     }
   }
 
   public EnvelopeSpatialIndex<Triangle> getTriangleIndex() {
-    if (triangleIndex == null) {
-      triangleIndex = new RTree<Triangle>();
-      for (final Triangle triangle : circumCircleIndex.findAll()) {
-        triangleIndex.put(triangle.getEnvelopeInternal(), triangle);
+    if (this.triangleIndex == null) {
+      this.triangleIndex = new RTree<Triangle>();
+      for (final Triangle triangle : this.circumCircleIndex.findAll()) {
+        this.triangleIndex.put(triangle.getEnvelopeInternal(), triangle);
       }
     }
-    return triangleIndex;
+    return this.triangleIndex;
   }
 
   public List<Triangle> getTriangles() {
-    if (circumCircleIndex != null) {
-      return circumCircleIndex.findAll();
-    } else if (triangleIndex != null) {
-      return triangleIndex.findAll();
+    if (this.circumCircleIndex != null) {
+      return this.circumCircleIndex.findAll();
+    } else if (this.triangleIndex != null) {
+      return this.triangleIndex.findAll();
     } else {
       return Collections.emptyList();
     }
@@ -568,11 +568,11 @@ public class TriangulatedIrregularNetwork {
   }
 
   public void insertEdge(LineSegment breakline) {
-    breakline = breakline.getIntersection(boundingBox);
+    breakline = breakline.getIntersection(this.boundingBox);
     if (!breakline.isEmpty()) {
       final List<Triangle> triangles = getTriangles(breakline);
       for (final Triangle triangle : triangles) {
-        final LineSegment intersection = triangle.intersection(geometryFactory,
+        final LineSegment intersection = triangle.intersection(this.geometryFactory,
           breakline);
         if (intersection != null) {
           final double length = intersection.getLength();
@@ -598,10 +598,10 @@ public class TriangulatedIrregularNetwork {
   }
 
   public void insertNode(final Point coordinate) {
-    if (boundingBox.covers(coordinate)) {
+    if (this.boundingBox.covers(coordinate)) {
       final Point point = new PointDouble(
-        geometryFactory.createCoordinates(coordinate), 3);
-      if (!nodes.contains(point)) {
+        this.geometryFactory.createCoordinates(coordinate), 3);
+      if (!this.nodes.contains(point)) {
         final List<Triangle> triangles = getTrianglesCircumcircleIntersections(point);
         if (!triangles.isEmpty()) {
           final AngleFromPointComparator comparator = new AngleFromPointComparator(
@@ -648,18 +648,18 @@ public class TriangulatedIrregularNetwork {
   }
 
   private void removeTriangle(final Triangle triangle) {
-    if (triangleIndex != null) {
+    if (this.triangleIndex != null) {
       final BoundingBoxDoubleGf envelope = triangle.getEnvelopeInternal();
-      triangleIndex.remove(envelope, triangle);
+      this.triangleIndex.remove(envelope, triangle);
     }
-    if (circumCircleIndex != null) {
+    if (this.circumCircleIndex != null) {
       final Circle circumcircle = triangle.getCircumcircle();
       final BoundingBox envelope = circumcircle.getEnvelopeInternal();
-      if (!circumCircleIndex.remove(envelope, triangle)) {
+      if (!this.circumCircleIndex.remove(envelope, triangle)) {
         System.err.println(circumcircle.toGeometry());
         System.err.println(envelope.toPolygon(1));
         System.err.println(triangle);
-        circumCircleIndex.remove(envelope, triangle);
+        this.circumCircleIndex.remove(envelope, triangle);
       }
     }
   }

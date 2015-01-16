@@ -17,32 +17,32 @@ public class Style {
   private FormatUrl styleUrl;
 
   public void addLegendUrl(final ImageUrl legendUrl) {
-    legendUrls.add(legendUrl);
+    this.legendUrls.add(legendUrl);
 
   }
 
   public String getAbstractDescription() {
-    return abstractDescription;
+    return this.abstractDescription;
   }
 
   public List<ImageUrl> getLegendUrls() {
-    return legendUrls;
+    return this.legendUrls;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public FormatUrl getStyleSheetUrl() {
-    return styleSheetUrl;
+    return this.styleSheetUrl;
   }
 
   public FormatUrl getStyleUrl() {
-    return styleUrl;
+    return this.styleUrl;
   }
 
   public String getTitle() {
-    return title;
+    return this.title;
   }
 
   public void setAbstractDescription(final String abstractDescription) {

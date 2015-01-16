@@ -23,16 +23,16 @@ public abstract class AbstractMultipleProcess extends AbstractProcess {
   }
 
   public void addProcess(final Process process) {
-    processes.add(process);
+    this.processes.add(process);
   }
 
   public List<Process> getProcesses() {
-    return processes;
+    return this.processes;
   }
 
   @Override
   public String toString() {
-    return CollectionUtil.toString("\n  ", processes);
+    return CollectionUtil.toString("\n  ", this.processes);
   }
 
 }

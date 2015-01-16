@@ -60,7 +60,7 @@ public class Preference {
   }
 
   public void cancelChanges() {
-    field.setFieldValue(StringConverterRegistry.toObject(valueClass, savedValue));
+    this.field.setFieldValue(StringConverterRegistry.toObject(this.valueClass, this.savedValue));
   }
 
   @Override
@@ -69,9 +69,9 @@ public class Preference {
       return true;
     } else if (object instanceof Preference) {
       final Preference other = (Preference)object;
-      if (EqualsRegistry.equal(other.applicationName, applicationName)) {
-        if (EqualsRegistry.equal(other.path, path)) {
-          if (EqualsRegistry.equal(other.propertyName, propertyName)) {
+      if (EqualsRegistry.equal(other.applicationName, this.applicationName)) {
+        if (EqualsRegistry.equal(other.path, this.path)) {
+          if (EqualsRegistry.equal(other.propertyName, this.propertyName)) {
             return true;
           }
         }
@@ -81,60 +81,60 @@ public class Preference {
   }
 
   public String getApplicationName() {
-    return applicationName;
+    return this.applicationName;
   }
 
   public Field getField() {
-    return field;
+    return this.field;
   }
 
   public JComponent getFieldComponent() {
-    return fieldComponent;
+    return this.fieldComponent;
   }
 
   public String getPath() {
-    return path;
+    return this.path;
   }
 
   public String getPropertyName() {
-    return propertyName;
+    return this.propertyName;
   }
 
   public Object getSavedValue() {
-    return savedValue;
+    return this.savedValue;
   }
 
   public Object getValue() {
-    return value;
+    return this.value;
   }
 
   public Class<?> getValueClass() {
-    return valueClass;
+    return this.valueClass;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    if (applicationName != null) {
-      result = prime * result + applicationName.hashCode();
+    if (this.applicationName != null) {
+      result = prime * result + this.applicationName.hashCode();
     }
-    if (path != null) {
-      result = prime * result + path.hashCode();
+    if (this.path != null) {
+      result = prime * result + this.path.hashCode();
     }
-    if (propertyName != null) {
-      result = prime * result + propertyName.hashCode();
+    if (this.propertyName != null) {
+      result = prime * result + this.propertyName.hashCode();
     }
     return result;
   }
 
   public boolean isValid() {
-    return field.isFieldValid();
+    return this.field.isFieldValid();
   }
 
   public void saveChanges() {
-    final Object value = field.getFieldValue();
-    OS.setPreference(applicationName, path, propertyName, value);
-    savedValue = value;
+    final Object value = this.field.getFieldValue();
+    OS.setPreference(this.applicationName, this.path, this.propertyName, value);
+    this.savedValue = value;
   }
 }

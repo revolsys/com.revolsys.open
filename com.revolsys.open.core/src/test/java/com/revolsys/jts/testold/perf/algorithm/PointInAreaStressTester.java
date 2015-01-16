@@ -45,7 +45,7 @@ import com.revolsys.jts.util.Stopwatch;
 /**
  * Creates a perturbed, buffered grid and tests a set
  * of points against using two PointInArea classes.
- * 
+ *
  * @author mbdavis
  *
  */
@@ -79,7 +79,7 @@ public class PointInAreaStressTester {
   }
 
   /**
-   * 
+   *
    * @return true if all point locations were computed correctly
    */
   public boolean run() {
@@ -134,7 +134,7 @@ public class PointInAreaStressTester {
   }
 
   /**
-   * 
+   *
    * @param p
    * @return true if the point location is determined to be the same by both PIA locaters
    */
@@ -147,7 +147,7 @@ public class PointInAreaStressTester {
     this.locationCount[loc1.getIndex()]++;
 
     if ((loc1 == Location.BOUNDARY || loc2 == Location.BOUNDARY)
-      && this.ignoreBoundaryResults) {
+        && this.ignoreBoundaryResults) {
       return true;
     }
 

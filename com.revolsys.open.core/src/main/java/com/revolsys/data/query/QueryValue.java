@@ -117,7 +117,7 @@ public abstract class QueryValue implements Cloneable {
       try {
         final SQLParser sqlParser = new SQLParser();
         final StatementNode statement = sqlParser.parseStatement("SELECT * FROM "
-          + recordDefinition.getName() + " WHERE " + whereClause);
+            + recordDefinition.getName() + " WHERE " + whereClause);
         if (statement instanceof CursorNode) {
           final CursorNode selectStatement = (CursorNode)statement;
           final ResultSetNode resultSetNode = selectStatement.getResultSetNode();
@@ -131,7 +131,7 @@ public abstract class QueryValue implements Cloneable {
         return null;
       } catch (final Throwable e) {
         throw new IllegalArgumentException("Invalid where clause: "
-          + whereClause, e);
+            + whereClause, e);
       }
     } else {
       return null;
@@ -182,7 +182,7 @@ public abstract class QueryValue implements Cloneable {
         return (V)new Or(leftCondition, rightCondition);
       } else {
         throw new IllegalArgumentException("Binary logical operator "
-          + operator + " not supported.");
+            + operator + " not supported.");
       }
     } else if (expression instanceof BinaryOperatorNode) {
       final BinaryOperatorNode binaryOperatorNode = (BinaryOperatorNode)expression;
@@ -204,17 +204,17 @@ public abstract class QueryValue implements Cloneable {
             final Object value = ((Value)rightCondition).getValue();
             if (value == null) {
               throw new IllegalArgumentException("Values can't be null for "
-                + operator + " use IS NULL or IS NOT NULL instead.");
+                  + operator + " use IS NULL or IS NOT NULL instead.");
             } else {
               final CodeTable codeTable = recordDefinition.getCodeTableByColumn(name);
               if (codeTable == null
-                || attribute == recordDefinition.getIdField()) {
+                  || attribute == recordDefinition.getIdField()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
                   final Object convertedValue = StringConverterRegistry.toObject(
                     typeClass, value);
                   if (convertedValue == null
-                    || !typeClass.isAssignableFrom(typeClass)) {
+                      || !typeClass.isAssignableFrom(typeClass)) {
                     throw new IllegalArgumentException(name + "='" + value
                       + "' is not a valid "
                       + attribute.getType().getValidationName());
@@ -257,7 +257,7 @@ public abstract class QueryValue implements Cloneable {
         }
       } else {
         throw new IllegalArgumentException("Unsupported binary operator "
-          + operator);
+            + operator);
       }
     } else if (expression instanceof ColumnReference) {
       final ColumnReference column = (ColumnReference)expression;
@@ -369,7 +369,7 @@ public abstract class QueryValue implements Cloneable {
       return null;
     } else {
       throw new IllegalArgumentException("Unsupported expression"
-        + expression.getClass() + " " + expression);
+          + expression.getClass() + " " + expression);
     }
   }
 

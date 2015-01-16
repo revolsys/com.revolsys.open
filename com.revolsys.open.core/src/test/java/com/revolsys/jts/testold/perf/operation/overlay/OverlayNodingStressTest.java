@@ -14,13 +14,13 @@ import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
 /**
  * Tests Noding checking during overlay.
  * Intended to show that noding check failures due to robustness
- * problems do not occur very often (i.e. that the heuristic is 
+ * problems do not occur very often (i.e. that the heuristic is
  * not triggering so often that a large performance penalty would be incurred.)
- * 
+ *
  * The class generates test geometries for input to overlay which contain almost parallel lines
  * - this should cause noding failures relatively frequently.
  *
- * Can also be used to check that the cross-snapping heuristic fix for robustness 
+ * Can also be used to check that the cross-snapping heuristic fix for robustness
  * failures works well.  If snapping ever fails to fix a case,
  * an exception is thrown.  It is expected (and has been observed)
  * that cross-snapping works extremely well on this dataset.
@@ -28,19 +28,17 @@ import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
  * @version 1.7
  */
 public class OverlayNodingStressTest extends TestCase {
+  public static void main(final String[] args) {
+    junit.textui.TestRunner.run(OverlayNodingStressTest.class);
+  }
+
   private static final int ITER_LIMIT = 10000;
 
   private static final int BATCH_SIZE = 20;
 
   private static final double MAX_DISPLACEMENT = 60;
 
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(OverlayNodingStressTest.class);
-  }
-
   private final Random rand = new Random((long)(Math.PI * 10e8));
-
-  private int failureCount = 0;
 
   private Geometry baseAccum = null;
 
@@ -64,7 +62,6 @@ public class OverlayNodingStressTest extends TestCase {
     try {
       final Geometry intTrial = base.intersection(testGeom);
     } catch (final Exception ex) {
-      this.failureCount++;
     }
 
     // this will throw an intersection if a robustness error occurs,
@@ -168,13 +165,13 @@ class RotatedRectangleFactory {
     final Point[] pts = new Point[] {
       new PointDouble(base.getX() + posx + widthOffsetx, base.getY() + posy
         + widthOffsety, Point.NULL_ORDINATE),
-      new PointDouble(base.getX() + posx - widthOffsetx, base.getY() + posy
-        - widthOffsety, Point.NULL_ORDINATE),
-      new PointDouble(base.getX() + negx - widthOffsetx, base.getY() + negy
-        - widthOffsety, Point.NULL_ORDINATE),
-      new PointDouble(base.getX() + negx + widthOffsetx, base.getY() + negy
-        + widthOffsety, Point.NULL_ORDINATE),
-      new PointDouble(0.0, 0, Point.NULL_ORDINATE),
+        new PointDouble(base.getX() + posx - widthOffsetx, base.getY() + posy
+          - widthOffsety, Point.NULL_ORDINATE),
+          new PointDouble(base.getX() + negx - widthOffsetx, base.getY() + negy
+            - widthOffsety, Point.NULL_ORDINATE),
+            new PointDouble(base.getX() + negx + widthOffsetx, base.getY() + negy
+              + widthOffsety, Point.NULL_ORDINATE),
+              new PointDouble(0.0, 0, Point.NULL_ORDINATE),
     };
     // close polygon
     pts[4] = new PointDouble(pts[0]);

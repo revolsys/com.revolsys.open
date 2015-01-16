@@ -218,8 +218,8 @@ MouseListener, CaretListener, ItemListener {
       "Add Unary Condition", ICON, this, "actionAddLikeCondition");
     this.likeConditionField = new TextField(20);
     this.likePanel = new BasePanel(SwingUtil.createLabel("LIKE"), new JLabel(
-      " '%"), this.likeConditionField, new JLabel("%' "),
-      likeConditionAddButton);
+        " '%"), this.likeConditionField, new JLabel("%' "),
+        likeConditionAddButton);
     GroupLayoutUtil.makeColumns(this.likePanel, false);
 
     final JButton inConditionAddButton = InvokeMethodAction.createButton("",
@@ -270,7 +270,7 @@ MouseListener, CaretListener, ItemListener {
 
     this.sqlPrefix = "SELECT * FROM "
         + this.recordDefinition.getPath().substring(1).replace('/', '.')
-      + " WHERE";
+        + " WHERE";
 
     final JPanel filterTextPanel = new JPanel(new BorderLayout());
     filterTextPanel.setOpaque(false);
@@ -786,7 +786,7 @@ MouseListener, CaretListener, ItemListener {
               final FieldDefinition attribute = this.recordDefinition.getField(name);
               final CodeTable codeTable = this.recordDefinition.getCodeTableByColumn(name);
               if (codeTable == null
-                || attribute == this.recordDefinition.getIdField()) {
+                  || attribute == this.recordDefinition.getIdField()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
                   final Object convertedValue = StringConverterRegistry.toObject(

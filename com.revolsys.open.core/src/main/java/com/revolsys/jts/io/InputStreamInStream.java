@@ -39,17 +39,18 @@ import java.io.InputStream;
  * An adapter to allow an {@link InputStream} to be used as an {@link InStream}
  */
 public class InputStreamInStream
-	implements InStream
+implements InStream
 {
-  private InputStream is;
+  private final InputStream is;
 
-  public InputStreamInStream(InputStream is)
+  public InputStreamInStream(final InputStream is)
   {
     this.is = is;
   }
 
-  public void read(byte[] buf) throws IOException
+  @Override
+  public void read(final byte[] buf) throws IOException
   {
-    is.read(buf);
+    this.is.read(buf);
   }
 }

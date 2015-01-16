@@ -18,7 +18,7 @@ public class SqlDateEditor extends PropertyEditorSupport {
     if (value == null) {
       return "";
     } else {
-      return DateUtil.format(pattern, value);
+      return DateUtil.format(this.pattern, value);
     }
   }
 
@@ -27,7 +27,7 @@ public class SqlDateEditor extends PropertyEditorSupport {
     if (text == null || text.trim().length() == 0) {
       setValue(null);
     } else {
-      final java.util.Date date = DateUtil.getDate(pattern, text);
+      final java.util.Date date = DateUtil.getDate(this.pattern, text);
       final long time = date.getTime();
       final Date sqlDate = new Date(time);
       setValue(sqlDate);

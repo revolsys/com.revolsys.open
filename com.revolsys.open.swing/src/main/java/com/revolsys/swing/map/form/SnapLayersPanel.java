@@ -17,6 +17,7 @@ import javax.swing.ListModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -119,7 +120,7 @@ ListSelectionListener {
     layerPathsScrollPane.setPreferredSize(new Dimension(350, 400));
     this.fieldsPanel.add(layerPathsScrollPane);
 
-    final ToolBar toolBar = new ToolBar(ToolBar.VERTICAL);
+    final ToolBar toolBar = new ToolBar(SwingConstants.VERTICAL);
     toolBar.setOpaque(false);
     toolBar.setMinimumSize(new Dimension(25, 25));
     this.fieldsPanel.add(toolBar);

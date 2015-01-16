@@ -48,7 +48,7 @@ import com.revolsys.jts.util.BoundingBoxUtil;
  * Supports adding and removing items.
  *
  * @author Martin Davis
- * 
+ *
  */
 @Deprecated
 class LineSegmentIndex {
@@ -58,13 +58,12 @@ class LineSegmentIndex {
   }
 
   public void add(final LineSegment seg) {
-    index.insert(new BoundingBoxDoubleGf(seg.getP0(), seg.getP1()), seg);
+    this.index.insert(new BoundingBoxDoubleGf(seg.getP0(), seg.getP1()), seg);
   }
 
   public void add(final TaggedLineString line) {
     final TaggedLineSegment[] segs = line.getSegments();
-    for (int i = 0; i < segs.length; i++) {
-      final TaggedLineSegment seg = segs[i];
+    for (final TaggedLineSegment seg : segs) {
       add(seg);
     }
   }
@@ -73,7 +72,7 @@ class LineSegmentIndex {
     final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(querySeg.getP0(), querySeg.getP1());
 
     final LineSegmentVisitor visitor = new LineSegmentVisitor(querySeg);
-    index.visit(env, visitor);
+    this.index.visit(env, visitor);
     final List itemsFound = visitor.getItems();
 
     // List listQueryItems = index.query(env);
@@ -85,7 +84,7 @@ class LineSegmentIndex {
   }
 
   public void remove(final LineSegment seg) {
-    index.remove(new BoundingBoxDoubleGf(seg.getP0(), seg.getP1()), seg);
+    this.index.remove(new BoundingBoxDoubleGf(seg.getP0(), seg.getP1()), seg);
   }
 }
 
@@ -104,14 +103,14 @@ class LineSegmentVisitor implements Visitor<LineSegment> {
   }
 
   public List<LineSegment> getItems() {
-    return items;
+    return this.items;
   }
 
   @Override
   public boolean visit(final LineSegment seg) {
-    if (BoundingBoxUtil.intersects(seg.getP0(), seg.getP1(), querySeg.getP0(),
-      querySeg.getP1())) {
-      items.add(seg);
+    if (BoundingBoxUtil.intersects(seg.getP0(), seg.getP1(), this.querySeg.getP0(),
+      this.querySeg.getP1())) {
+      this.items.add(seg);
     }
     return true;
   }

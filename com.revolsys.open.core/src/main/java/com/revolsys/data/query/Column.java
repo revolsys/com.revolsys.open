@@ -37,7 +37,7 @@ public class Column extends QueryValue {
 
   @Override
   public Column clone() {
-    return new Column(name);
+    return new Column(this.name);
   }
 
   @Override
@@ -51,20 +51,20 @@ public class Column extends QueryValue {
   }
 
   public FieldDefinition getField() {
-    return attribute;
+    return this.attribute;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   @Override
   public String getStringValue(final Map<String, Object> record) {
     final Object value = getValue(record);
-    if (attribute == null) {
+    if (this.attribute == null) {
       return StringConverterRegistry.toString(value);
     } else {
-      final Class<?> typeClass = attribute.getTypeClass();
+      final Class<?> typeClass = this.attribute.getTypeClass();
       return StringConverterRegistry.toString(typeClass, value);
     }
   }
@@ -78,15 +78,15 @@ public class Column extends QueryValue {
 
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    attribute = recordDefinition.getField(getName());
+    this.attribute = recordDefinition.getField(getName());
   }
 
   @Override
   public String toString() {
-    if (name.matches("([A-Z][_A-Z1-9]*\\.)?[A-Z][_A-Z1-9]*")) {
-      return name;
+    if (this.name.matches("([A-Z][_A-Z1-9]*\\.)?[A-Z][_A-Z1-9]*")) {
+      return this.name;
     } else {
-      return "\"" + name + "\"";
+      return "\"" + this.name + "\"";
     }
   }
 }

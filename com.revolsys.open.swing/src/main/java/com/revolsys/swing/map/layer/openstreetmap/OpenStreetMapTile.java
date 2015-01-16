@@ -73,6 +73,6 @@ public class OpenStreetMapTile extends MapTile {
   @Override
   public String toString() {
     return this.layer + " " + this.zoomLevel + "/" + this.tileX + "/"
-      + this.tileY;
+        + this.tileY;
   }
 }

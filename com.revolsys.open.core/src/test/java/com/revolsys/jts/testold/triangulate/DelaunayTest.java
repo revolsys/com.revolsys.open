@@ -43,15 +43,15 @@ import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
 
 /**
  * Tests Delaunay Triangulatin classes
- * 
+ *
  */
 public class DelaunayTest extends TestCase {
-
-  static final double COMPARISON_TOLERANCE = 1.0e-7;
 
   public static void main(final String args[]) {
     TestRunner.run(DelaunayTest.class);
   }
+
+  static final double COMPARISON_TOLERANCE = 1.0e-7;
 
   private final GeometryFactory geomFact = GeometryFactory.floating3();
 
@@ -73,7 +73,7 @@ public class DelaunayTest extends TestCase {
     } else {
       result = builder.getEdges(this.geomFact);
     }
-  //  System.out.println(result);
+    //  System.out.println(result);
 
     Geometry expected = this.reader.read(expectedWKT);
     result = result.normalize();
@@ -82,7 +82,7 @@ public class DelaunayTest extends TestCase {
   }
 
   void runDelaunayEdges(final String sitesWKT, final String expectedWKT)
-    throws ParseException {
+      throws ParseException {
     runDelaunay(sitesWKT, false, expectedWKT);
   }
 

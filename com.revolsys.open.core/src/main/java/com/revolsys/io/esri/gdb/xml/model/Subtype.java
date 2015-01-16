@@ -10,15 +10,15 @@ public class Subtype {
   private List<SubtypeFieldInfo> fieldInfos;
 
   public List<SubtypeFieldInfo> getFieldInfos() {
-    return fieldInfos;
+    return this.fieldInfos;
   }
 
   public int getSubtypeCode() {
-    return subtypeCode;
+    return this.subtypeCode;
   }
 
   public String getSubtypePath() {
-    return subtypePath;
+    return this.subtypePath;
   }
 
   public void setFieldInfos(final List<SubtypeFieldInfo> fieldInfos) {

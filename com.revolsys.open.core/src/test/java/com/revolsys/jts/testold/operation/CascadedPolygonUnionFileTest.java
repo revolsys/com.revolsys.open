@@ -13,7 +13,7 @@ import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 /**
  * Large-scale tests of {@link CascadedPolygonUnion}
  * using data from files.
- * 
+ *
  * @author mbdavis
  *
  */
@@ -25,7 +25,7 @@ public class CascadedPolygonUnionFileTest extends TestCase {
   }
 
   private void runTestResource(final String file, final double minimumMeasure)
-    throws IOException, ParseException {
+      throws IOException, ParseException {
     final List<Geometry> geometries = InteriorPointTest.getTestGeometries(file);
     assertTrue(tester.test(geometries, minimumMeasure));
   }

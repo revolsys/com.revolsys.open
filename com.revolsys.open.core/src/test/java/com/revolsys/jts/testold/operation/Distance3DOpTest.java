@@ -10,13 +10,13 @@ import com.revolsys.jts.io.WKTReader;
 import com.revolsys.jts.operation.distance3d.Distance3DOp;
 
 public class Distance3DOpTest extends TestCase {
-  static GeometryFactory geomFact = GeometryFactory.floating3();
-
-  static WKTReader rdr = new WKTReader();
-
   public static void main(final String args[]) {
     TestRunner.run(Distance3DOpTest.class);
   }
+
+  static GeometryFactory geomFact = GeometryFactory.floating3();
+
+  static WKTReader rdr = new WKTReader();
 
   String polyHoleFlat = "POLYGON ((100 200 0, 200 200 0, 200 100 0, 100 100 0, 100 200 0), (120 180 0, 180 180 0, 180 120 0, 120 120 0, 120 180 0))";
 
@@ -83,16 +83,16 @@ public class Distance3DOpTest extends TestCase {
   }
 
   /**
-   * Many of these tests exhibit robustness errors 
+   * Many of these tests exhibit robustness errors
    * due to numerical roundoff in the distance algorithm mathematics.
-   * This happens when computing nearly-coincident lines 
+   * This happens when computing nearly-coincident lines
    * with very large ordinate values
    */
   public void testCrossSegmentsRobust() {
     checkDistance("LINESTRING (0 0 0, 10000000 10000000 1 )",
       "LINESTRING (0 0 1, 10000000 10000000 0 )", 0, 0.001); // expected is 0,
-                                                             // but actual is
-                                                             // larger
+    // but actual is
+    // larger
 
     checkDistance("LINESTRING (-10000 -10000 0, 10000 10000 1 )",
       "LINESTRING (-10000 -10000 1, 10000 10000 0 )", 0);
@@ -100,12 +100,12 @@ public class Distance3DOpTest extends TestCase {
     // previous case with X,Y scaled by 1000 - exposes robustness issue
     checkDistance("LINESTRING (-10000000 -10000000 0, 10000000 10000000 1 )",
       "LINESTRING (-10000000 -10000000 1, 10000000 10000000 0 )", 0, 0.02); // expected
-                                                                            // is
-                                                                            // 0,
-                                                                            // but
-                                                                            // actual
-                                                                            // is
-                                                                            // larger
+    // is
+    // 0,
+    // but
+    // actual
+    // is
+    // larger
 
     // works because lines are orthogonal, so doesn't hit roundoff problems
     checkDistance("LINESTRING (20000000 10000000 20, 10000000 20000000 10 )",
@@ -279,7 +279,7 @@ public class Distance3DOpTest extends TestCase {
   }
 
   /**
-   * A case proving that polygon/polygon distance requires 
+   * A case proving that polygon/polygon distance requires
    * computing distance between all rings, not just the shells.
    */
   public void testPolygonPolygonLinkedThruHoles() {

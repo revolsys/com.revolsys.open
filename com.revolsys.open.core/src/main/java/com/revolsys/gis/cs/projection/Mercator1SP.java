@@ -32,7 +32,7 @@ public class Mercator1SP extends AbstractCoordinatesProjection {
     this.lambda0 = Math.toRadians(centralMeridian);
     this.a = spheroid.getSemiMajorAxis();
     this.e = spheroid.getEccentricity();
-    this.eOver2 = e / 2;
+    this.eOver2 = this.e / 2;
 
   }
 
@@ -40,19 +40,19 @@ public class Mercator1SP extends AbstractCoordinatesProjection {
   public void inverse(final double x, final double y,
     final double[] targetCoordinates, final int targetOffset,
     final int targetAxisCount) {
-    final double dX = x - x0;
-    final double dY = y - y0;
+    final double dX = x - this.x0;
+    final double dY = y - this.y0;
 
-    final double lambda = dX / a + lambda0;
+    final double lambda = dX / this.a + this.lambda0;
 
-    final double t = Math.pow(Math.E, -dY / a);
+    final double t = Math.pow(Math.E, -dY / this.a);
     // TODO phi
     double phi = Angle.PI_OVER_2 - 2 * Math.atan(t);
     double delta = 10e010;
     do {
-      final double eSinPhi = e * Math.sin(phi);
+      final double eSinPhi = this.e * Math.sin(phi);
       final double phi1 = Angle.PI_OVER_2 - 2
-        * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), eOver2));
+          * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2));
       delta = Math.abs(phi1 - phi);
       phi = phi1;
     } while (delta > 1.0e-011);
@@ -65,12 +65,12 @@ public class Mercator1SP extends AbstractCoordinatesProjection {
   public void project(final double lambda, final double phi,
     final double[] targetCoordinates, final int targetOffset,
     final int targetAxisCount) {
-    final double x = a * (lambda - lambda0);
+    final double x = this.a * (lambda - this.lambda0);
 
-    final double eSinPhi = e * Math.sin(phi);
-    final double y = a
-      * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2)
-        * Math.pow((1 - eSinPhi) / (1 + eSinPhi), eOver2));
+    final double eSinPhi = this.e * Math.sin(phi);
+    final double y = this.a
+        * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2)
+          * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2));
 
     targetCoordinates[targetOffset * targetAxisCount] = x;
     targetCoordinates[targetOffset * targetAxisCount + 1] = y;

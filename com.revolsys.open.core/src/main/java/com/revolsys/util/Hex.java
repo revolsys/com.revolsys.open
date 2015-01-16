@@ -16,7 +16,7 @@ public class Hex {
     final StringBuilder hexString = new StringBuilder();
     for (final byte c : bytes) {
       final String hexChar = Integer.toString((c & 0xff) + 0x100, 16)
-        .substring(1);
+          .substring(1);
       hexString.append(hexChar);
     }
     return hexString.toString();

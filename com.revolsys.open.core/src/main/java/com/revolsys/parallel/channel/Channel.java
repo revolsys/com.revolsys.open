@@ -46,7 +46,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
 
   /**
    * Constructs a new Channel<T> with the specified ChannelValueStore.
-   * 
+   *
    * @param data The ChannelValueStore used to store the data for the Channel
    */
   public Channel(final ChannelValueStore<T> data) {
@@ -64,19 +64,19 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
   }
 
   public void close() {
-    closed = true;
+    this.closed = true;
   }
 
   @Override
   public boolean disable() {
-    alt = null;
-    return (data.getState() != ChannelValueStore.EMPTY);
+    this.alt = null;
+    return this.data.getState() != ChannelValueStore.EMPTY;
   }
 
   @Override
   public boolean enable(final MultiInputSelector alt) {
-    synchronized (monitor) {
-      if (data.getState() == ChannelValueStore.EMPTY) {
+    synchronized (this.monitor) {
+      if (this.data.getState() == ChannelValueStore.EMPTY) {
         this.alt = alt;
         return false;
       } else {
@@ -86,20 +86,20 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   @Override
   public boolean isClosed() {
-    if (!closed) {
-      if (writeClosed) {
-        if (data.getState() == ChannelValueStore.EMPTY) {
+    if (!this.closed) {
+      if (this.writeClosed) {
+        if (this.data.getState() == ChannelValueStore.EMPTY) {
           close();
         }
       }
     }
 
-    return closed;
+    return this.closed;
   }
 
   @Override
@@ -111,7 +111,7 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
    * Reads an Object from the Channel. This method also ensures only one of the
    * readers can actually be reading at any time. All other readers are blocked
    * until it completes the read.
-   * 
+   *
    * @return The object returned from the Channel.
    */
   @Override
@@ -124,34 +124,34 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
    * readers can actually be reading at any time. All other readers are blocked
    * until it completes the read. If no data is available to be read after the
    * timeout the method will return null.
-   * 
+   *
    * @param timeout The maximum time to wait in milliseconds.
    * @return The object returned from the Channel.
    */
   @Override
   public T read(final long timeout) {
-    synchronized (readMonitor) {
-      synchronized (monitor) {
+    synchronized (this.readMonitor) {
+      synchronized (this.monitor) {
         if (isClosed()) {
           throw new ClosedException();
         }
-        if (data.getState() == ChannelValueStore.EMPTY) {
+        if (this.data.getState() == ChannelValueStore.EMPTY) {
           try {
-            ThreadUtil.pause(monitor, timeout);
+            ThreadUtil.pause(this.monitor, timeout);
             if (isClosed()) {
               throw new ClosedException();
             }
           } catch (final ThreadInterruptedException e) {
             close();
-            monitor.notifyAll();
+            this.monitor.notifyAll();
             throw new ClosedException();
           }
         }
-        if (data.getState() == ChannelValueStore.EMPTY) {
+        if (this.data.getState() == ChannelValueStore.EMPTY) {
           return null;
         } else {
-          final T value = data.get();
-          monitor.notifyAll();
+          final T value = this.data.get();
+          this.monitor.notifyAll();
           return value;
         }
       }
@@ -160,11 +160,11 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
 
   @Override
   public void readConnect() {
-    synchronized (monitor) {
+    synchronized (this.monitor) {
       if (isClosed()) {
         throw new IllegalStateException("Cannot connect to a closed channel");
       } else {
-        numReaders++;
+        this.numReaders++;
       }
 
     }
@@ -172,12 +172,12 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
 
   @Override
   public void readDisconnect() {
-    synchronized (monitor) {
-      if (!closed) {
-        numReaders--;
-        if (numReaders <= 0) {
+    synchronized (this.monitor) {
+      if (!this.closed) {
+        this.numReaders--;
+        if (this.numReaders <= 0) {
           close();
-          monitor.notifyAll();
+          this.monitor.notifyAll();
         }
       }
 
@@ -186,10 +186,10 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
 
   @Override
   public String toString() {
-    if (name == null) {
-      return data.toString();
+    if (this.name == null) {
+      return this.data.toString();
     } else {
-      return name;
+      return this.name;
     }
   }
 
@@ -197,32 +197,32 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
    * Writes an Object to the Channel. This method also ensures only one of the
    * writers can actually be writing at any time. All other writers are blocked
    * until it completes the write.
-   * 
+   *
    * @param value The object to write to the Channel.
    */
   @Override
   public void write(final T value) {
-    synchronized (writeMonitor) {
-      synchronized (monitor) {
-        if (closed) {
+    synchronized (this.writeMonitor) {
+      synchronized (this.monitor) {
+        if (this.closed) {
           throw new ClosedException();
         }
-        final MultiInputSelector tempAlt = alt;
-        data.put(value);
+        final MultiInputSelector tempAlt = this.alt;
+        this.data.put(value);
         if (tempAlt != null) {
           tempAlt.schedule();
         } else {
-          monitor.notifyAll();
+          this.monitor.notifyAll();
         }
-        if (data.getState() == ChannelValueStore.FULL) {
+        if (this.data.getState() == ChannelValueStore.FULL) {
           try {
-            ThreadUtil.pause(monitor);
-            if (closed) {
+            ThreadUtil.pause(this.monitor);
+            if (this.closed) {
               throw new ClosedException();
             }
           } catch (final ThreadInterruptedException e) {
             close();
-            monitor.notifyAll();
+            this.monitor.notifyAll();
             throw new ClosedException(e);
           }
         }
@@ -232,11 +232,11 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
 
   @Override
   public void writeConnect() {
-    synchronized (monitor) {
-      if (writeClosed) {
+    synchronized (this.monitor) {
+      if (this.writeClosed) {
         throw new IllegalStateException("Cannot connect to a closed channel");
       } else {
-        numWriters++;
+        this.numWriters++;
       }
 
     }
@@ -244,16 +244,16 @@ public class Channel<T> implements SelectableChannelInput<T>, ChannelOutput<T> {
 
   @Override
   public void writeDisconnect() {
-    synchronized (monitor) {
-      if (!writeClosed) {
-        numWriters--;
-        if (numWriters <= 0) {
-          writeClosed = true;
-          final MultiInputSelector tempAlt = alt;
+    synchronized (this.monitor) {
+      if (!this.writeClosed) {
+        this.numWriters--;
+        if (this.numWriters <= 0) {
+          this.writeClosed = true;
+          final MultiInputSelector tempAlt = this.alt;
           if (tempAlt != null) {
             tempAlt.closeChannel();
           } else {
-            monitor.notifyAll();
+            this.monitor.notifyAll();
           }
         }
       }

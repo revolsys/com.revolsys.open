@@ -43,13 +43,12 @@ import com.revolsys.jts.noding.InteriorIntersectionFinderAdder;
 import com.revolsys.jts.noding.MCIndexNoder;
 import com.revolsys.jts.noding.NodedSegmentString;
 import com.revolsys.jts.noding.Noder;
-import com.revolsys.jts.noding.NodingValidator;
 import com.revolsys.jts.noding.SegmentString;
 
 /**
  * Uses Snap Rounding to compute a rounded,
  * fully noded arrangement from a set of {@link SegmentString}s.
- * Implements the Snap Rounding technique described in 
+ * Implements the Snap Rounding technique described in
  * papers by Hobby, Guibas & Marimont, and Goodrich et al.
  * Snap Rounding assumes that all vertices lie on a uniform grid;
  * hence the precision model of the input must be fixed precision,
@@ -77,18 +76,8 @@ public class MCIndexSnapRounder implements Noder {
   private Collection nodedSegStrings;
 
   public MCIndexSnapRounder(final double scale) {
-    li = new RobustLineIntersector(scale);
-    scaleFactor = scale;
-  }
-
-  private void checkCorrectness(final Collection inputSegmentStrings) {
-    final Collection resultSegStrings = NodedSegmentString.getNodedSubstrings(inputSegmentStrings);
-    final NodingValidator nv = new NodingValidator(resultSegStrings);
-    try {
-      nv.checkValid();
-    } catch (final Exception ex) {
-      ex.printStackTrace();
-    }
+    this.li = new RobustLineIntersector(scale);
+    this.scaleFactor = scale;
   }
 
   /**
@@ -96,8 +85,8 @@ public class MCIndexSnapRounder implements Noder {
    */
   private void computeIntersectionSnaps(final Collection<Point> snapPts) {
     for (final Point snapPt : snapPts) {
-      final HotPixel hotPixel = new HotPixel(snapPt, scaleFactor, li);
-      pointSnapper.snap(hotPixel);
+      final HotPixel hotPixel = new HotPixel(snapPt, this.scaleFactor, this.li);
+      this.pointSnapper.snap(hotPixel);
     }
   }
 
@@ -105,9 +94,9 @@ public class MCIndexSnapRounder implements Noder {
   public void computeNodes(
     final Collection<NodedSegmentString> inputSegmentStrings) {
     this.nodedSegStrings = inputSegmentStrings;
-    noder = new MCIndexNoder();
-    pointSnapper = new MCIndexPointSnapper(noder.getIndex());
-    snapRound(inputSegmentStrings, li);
+    this.noder = new MCIndexNoder();
+    this.pointSnapper = new MCIndexPointSnapper(this.noder.getIndex());
+    snapRound(inputSegmentStrings, this.li);
 
     // testing purposes only - remove in final version
     // checkCorrectness(inputSegmentStrings);
@@ -125,14 +114,14 @@ public class MCIndexSnapRounder implements Noder {
   }
 
   /**
-   * Snaps segments to the vertices of a Segment String.  
+   * Snaps segments to the vertices of a Segment String.
    */
   private void computeVertexSnaps(final NodedSegmentString segment) {
     final LineString points = segment.getPoints();
     for (int i = 0; i < points.getVertexCount(); i++) {
       final Point point = points.getPoint(i);
-      final HotPixel hotPixel = new HotPixel(point, scaleFactor, li);
-      final boolean isNodeAdded = pointSnapper.snap(hotPixel, segment, i);
+      final HotPixel hotPixel = new HotPixel(point, this.scaleFactor, this.li);
+      final boolean isNodeAdded = this.pointSnapper.snap(hotPixel, segment, i);
       // if a node is created for a vertex, that vertex must be noded too
       if (isNodeAdded) {
         segment.addIntersection(point, i);
@@ -152,14 +141,14 @@ public class MCIndexSnapRounder implements Noder {
     final LineIntersector li) {
     final InteriorIntersectionFinderAdder intFinderAdder = new InteriorIntersectionFinderAdder(
       li);
-    noder.setSegmentIntersector(intFinderAdder);
-    noder.computeNodes(segStrings);
+    this.noder.setSegmentIntersector(intFinderAdder);
+    this.noder.computeNodes(segStrings);
     return intFinderAdder.getInteriorIntersections();
   }
 
   @Override
   public Collection<NodedSegmentString> getNodedSubstrings() {
-    return NodedSegmentString.getNodedSubstrings(nodedSegStrings);
+    return NodedSegmentString.getNodedSubstrings(this.nodedSegStrings);
   }
 
   private void snapRound(final Collection segStrings, final LineIntersector li) {

@@ -4,7 +4,7 @@ public interface IoConstants {
   String CSS_CLASS = "cssClass";
 
   String DESCRIPTION_PROPERTY = "java:" + IoConstants.class.getName()
-    + ".description";
+      + ".description";
 
   String GEOMETRY_FACTORY = "geometryFactory";
 
@@ -13,17 +13,17 @@ public interface IoConstants {
   String JSONP_PROPERTY = "java:" + IoConstants.class.getName() + ".jsonp";
 
   String JSON_LIST_ROOT_PROPERTY = "java:" + IoConstants.class.getName()
-    + ".jsonListRoot";
+      + ".jsonListRoot";
 
   String SINGLE_OBJECT_PROPERTY = "java:" + IoConstants.class.getName()
-    + ".singleObject";
+      + ".singleObject";
 
   String TITLE_PROPERTY = "java:" + IoConstants.class.getName() + ".title";
 
   String WRAP_PROPERTY = "java:" + IoConstants.class.getName() + ".wrap";
 
   String GEOMETRY_TYPE = "java:" + IoConstants.class.getName()
-    + ".geometryType";
+      + ".geometryType";
 
   String WRITE_NULLS = "writeNulls";
 }

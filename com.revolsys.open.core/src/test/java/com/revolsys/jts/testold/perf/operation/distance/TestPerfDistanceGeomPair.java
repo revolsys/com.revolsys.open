@@ -10,13 +10,13 @@ import com.revolsys.jts.util.Stopwatch;
 
 public class TestPerfDistanceGeomPair {
 
-  static final int MAX_ITER = 100;
-
   public static void main(final String[] args) {
     final TestPerfDistanceGeomPair test = new TestPerfDistanceGeomPair();
     // test.test();
     test.test2();
   }
+
+  static final int MAX_ITER = 100;
 
   boolean testFailed = false;
 

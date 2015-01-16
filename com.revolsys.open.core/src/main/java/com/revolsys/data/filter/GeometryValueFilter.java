@@ -7,21 +7,21 @@ import com.revolsys.jts.geom.Geometry;
 public class GeometryValueFilter implements Filter<Record> {
   private final Geometry geometry;
 
-  public GeometryValueFilter(final Record object) {
-    this(object.getGeometryValue());
-  }
-
   public GeometryValueFilter(final Geometry geometry) {
     this.geometry = geometry;
+  }
+
+  public GeometryValueFilter(final Record object) {
+    this(object.getGeometryValue());
   }
 
   @Override
   public boolean accept(final Record object) {
     final Geometry value = object.getGeometryValue();
-    if (value == geometry) {
+    if (value == this.geometry) {
       return true;
-    } else if (value != null && geometry != null) {
-      return value.equals(geometry);
+    } else if (value != null && this.geometry != null) {
+      return value.equals(this.geometry);
     } else {
       return false;
     }
@@ -29,7 +29,7 @@ public class GeometryValueFilter implements Filter<Record> {
 
   @Override
   public String toString() {
-    return " geometry == " + geometry;
+    return " geometry == " + this.geometry;
   }
 
 }

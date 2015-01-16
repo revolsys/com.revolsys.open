@@ -130,7 +130,7 @@ public class ConvexHull {
 
     @Override
     public int compare(final Point p1, final Point p2) {
-      return polarCompare(origin, p1, p2);
+      return polarCompare(this.origin, p1, p2);
     }
 
   }
@@ -142,14 +142,14 @@ public class ConvexHull {
    * <p>
    * This method does <i>not</i> first check the point against the envelope of
    * the ring.
-   * 
+   *
    * @param p
    *          point to check for ring inclusion
    * @param ring
    *          an array of coordinates representing the ring (which must have
    *          first point identical to last point)
    * @return true if p is inside ring
-   * 
+   *
    * @see locatePointInRing
    */
   public static boolean isPointInRing(final Point p, final Point... ring) {
@@ -173,7 +173,7 @@ public class ConvexHull {
    * Create a new convex hull construction for the input {@link Coordinates} array.
    */
   public ConvexHull(final Point[] pts, final GeometryFactory geomFactory) {
-    inputPts = UniqueCoordinateArrayFilter.getUniquePointsArray(Arrays.asList(pts));
+    this.inputPts = UniqueCoordinateArrayFilter.getUniquePointsArray(Arrays.asList(pts));
     // inputPts = pts;
     this.geomFactory = geomFactory;
   }
@@ -195,8 +195,8 @@ public class ConvexHull {
         continue;
       }
       if (previousDistinctCoordinate != null
-        && isBetween(previousDistinctCoordinate, currentCoordinate,
-          nextCoordinate)) {
+          && isBetween(previousDistinctCoordinate, currentCoordinate,
+            nextCoordinate)) {
         continue;
       }
       cleanedRing.add(currentCoordinate);
@@ -217,28 +217,28 @@ public class ConvexHull {
         pts[0] = inputPts[i];
       }
       if (inputPts[i].getX() - inputPts[i].getY() < pts[1].getX()
-        - pts[1].getY()) {
+          - pts[1].getY()) {
         pts[1] = inputPts[i];
       }
       if (inputPts[i].getY() > pts[2].getY()) {
         pts[2] = inputPts[i];
       }
       if (inputPts[i].getX() + inputPts[i].getY() > pts[3].getX()
-        + pts[3].getY()) {
+          + pts[3].getY()) {
         pts[3] = inputPts[i];
       }
       if (inputPts[i].getX() > pts[4].getX()) {
         pts[4] = inputPts[i];
       }
       if (inputPts[i].getX() - inputPts[i].getY() > pts[5].getX()
-        - pts[5].getY()) {
+          - pts[5].getY()) {
         pts[5] = inputPts[i];
       }
       if (inputPts[i].getY() < pts[6].getY()) {
         pts[6] = inputPts[i];
       }
       if (inputPts[i].getX() + inputPts[i].getY() < pts[7].getX()
-        + pts[7].getY()) {
+          + pts[7].getY()) {
         pts[7] = inputPts[i];
       }
     }
@@ -273,20 +273,20 @@ public class ConvexHull {
    */
   public Geometry getConvexHull() {
 
-    if (inputPts.length == 0) {
-      return geomFactory.geometryCollection();
+    if (this.inputPts.length == 0) {
+      return this.geomFactory.geometryCollection();
     }
-    if (inputPts.length == 1) {
-      return geomFactory.point(inputPts[0]);
+    if (this.inputPts.length == 1) {
+      return this.geomFactory.point(this.inputPts[0]);
     }
-    if (inputPts.length == 2) {
-      return geomFactory.lineString(inputPts);
+    if (this.inputPts.length == 2) {
+      return this.geomFactory.lineString(this.inputPts);
     }
 
-    Point[] reducedPts = inputPts;
+    Point[] reducedPts = this.inputPts;
     // use heuristic to reduce points, if large
-    if (inputPts.length > 50) {
-      reducedPts = reduce(inputPts);
+    if (this.inputPts.length > 50) {
+      reducedPts = reduce(this.inputPts);
     }
     // sort points for Graham scan.
     final Point[] sortedPts = preSort(reducedPts);
@@ -303,7 +303,7 @@ public class ConvexHull {
 
   /**
    * Uses the Graham Scan algorithm to compute the convex hull vertices.
-   * 
+   *
    * @param c a list of points, with at least 3 entries
    * @return a Stack containing the ordered points of the convex hull ring
    */
@@ -317,7 +317,7 @@ public class ConvexHull {
       p = ps.pop();
       // check for empty stack to guard against robustness problems
       while (!ps.empty()
-        && CGAlgorithmsDD.orientationIndex(ps.peek(), p, c[i]) > 0) {
+          && CGAlgorithmsDD.orientationIndex(ps.peek(), p, c[i]) > 0) {
         p = ps.pop();
       }
       p = ps.push(p);
@@ -365,13 +365,13 @@ public class ConvexHull {
 
     coordinates = cleanRing(coordinates);
     if (coordinates.length == 3) {
-      return geomFactory.lineString(coordinates[0], coordinates[1]);
+      return this.geomFactory.lineString(coordinates[0], coordinates[1]);
       // return new LineString(new Point[]{coordinates[0],
       // coordinates[1]},
       // geometry.getPrecisionModel(), geometry.getSRID());
     }
-    final LinearRing ring = geomFactory.linearRing(coordinates);
-    return geomFactory.polygon(ring);
+    final LinearRing ring = this.geomFactory.linearRing(coordinates);
+    return this.geomFactory.polygon(ring);
   }
 
   /*
@@ -416,8 +416,8 @@ public class ConvexHull {
     // the same minimum y coordinate choose the one with the minimu x.
     // This focal point is put in array location pts[0].
     for (int i = 1; i < pts.length; i++) {
-      if ((pts[i].getY() < pts[0].getY())
-        || ((pts[i].getY() == pts[0].getY()) && (pts[i].getX() < pts[0].getX()))) {
+      if (pts[i].getY() < pts[0].getY()
+          || pts[i].getY() == pts[0].getY() && pts[i].getX() < pts[0].getX()) {
         t = pts[0];
         pts[0] = pts[i];
         pts[i] = t;
@@ -444,7 +444,7 @@ public class ConvexHull {
    * Note that even if the method used to determine the polygon vertices
    * is not 100% robust, this does not affect the robustness of the convex hull.
    * <p>
-   * To satisfy the requirements of the Graham Scan algorithm, 
+   * To satisfy the requirements of the Graham Scan algorithm,
    * the returned array has at least 3 entries.
    *
    * @param pts the points to reduce
@@ -465,8 +465,8 @@ public class ConvexHull {
 
     // add points defining polygon
     final Set<Point> reducedSet = new TreeSet<Point>();
-    for (int i = 0; i < polyPts.length; i++) {
-      reducedSet.add(polyPts[i]);
+    for (final Point polyPt : polyPts) {
+      reducedSet.add(polyPt);
     }
     /**
      * Add all unique points not in the interior poly.

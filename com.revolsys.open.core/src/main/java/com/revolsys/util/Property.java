@@ -76,8 +76,7 @@ public final class Property {
       try {
         final BeanInfo beanInfo = Introspector.getBeanInfo(beanClass);
         final PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
-        for (int i = 0; i < props.length; i++) {
-          final PropertyDescriptor property = props[i];
+        for (final PropertyDescriptor property : props) {
           if (property.getName().equals(name)) {
             return property;
           }

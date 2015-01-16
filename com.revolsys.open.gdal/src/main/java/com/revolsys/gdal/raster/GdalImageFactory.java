@@ -19,7 +19,7 @@ public class GdalImageFactory extends AbstractGeoReferencedImageFactory {
 
   @Override
   public boolean isAvailable() {
-    return Gdal.isDriverAvailable(driverName);
+    return Gdal.isDriverAvailable(this.driverName);
   }
 
   @Override

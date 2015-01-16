@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,7 +68,7 @@ import com.revolsys.util.CaseConverter;
  * For example the process method for the XML element BankAccount would have the
  * following signature.
  * </p>
- * 
+ *
  * <pre>
  * public BankAccount processBankAccount(XMLStreamReader parser);
  * </pre>
@@ -77,7 +77,7 @@ import com.revolsys.util.CaseConverter;
  * following signature. <b>Note that the part of the method name for the XML
  * element must have the same case as the XML element name.
  * </p>
- * 
+ *
  * <pre>
  * public String processfirstName(XMLStreamReader parser);
  * </pre>
@@ -97,7 +97,7 @@ import com.revolsys.util.CaseConverter;
  * expected the {@link StaxUtils#skipSubTree(XMLStreamReader)} method is used to
  * skip to the end of the element.
  * </p>
- * 
+ *
  * <pre>
  * public Person processPerson(final XMLStreamReader parser)
  *   throws XMLStreamException, IOException {
@@ -113,7 +113,7 @@ import com.revolsys.util.CaseConverter;
  * Family element that has one or more Person or Pet child elements. If an
  * unexpected element occurs and error will be recorded.
  * </p>
- * 
+ *
  * <pre>
  * public Family processFamily(final XMLStreamReader parser)
  *   throws XMLStreamException, IOException {
@@ -132,25 +132,13 @@ import com.revolsys.util.CaseConverter;
  *   return family;
  * }
  * </pre>
- * 
+ *
  * @author Paul Austin
  */
 public abstract class XmlProcessor {
-  static {
-    registerEnumConverter(Enum.class);
-  }
-
-  /** The arguments a processor method must have. */
-  private static final Class<?>[] PROCESS_METHOD_ARGS = new Class[] {
-    XMLStreamReader.class
-  };
-
-  /** The cache of processor classes to method caches. */
-  private static final Map<Class<?>, Map<String, Method>> PROCESSOR_METHOD_CACHE = new HashMap<Class<?>, Map<String, Method>>();
-
   /**
    * Create the cache of process methods from the specified class.
-   * 
+   *
    * @param processorClass The XmlPorcessor class.
    * @return The map of method names to process methods.
    */
@@ -161,8 +149,7 @@ public abstract class XmlProcessor {
       methodCache = new HashMap<String, Method>();
       PROCESSOR_METHOD_CACHE.put(processorClass, methodCache);
       final Method[] methods = processorClass.getMethods();
-      for (int i = 0; i < methods.length; i++) {
-        final Method method = methods[i];
+      for (final Method method : methods) {
         final String methodName = method.getName();
         if (methodName.startsWith("process")) {
           if (Arrays.equals(method.getParameterTypes(), PROCESS_METHOD_ARGS)) {
@@ -182,6 +169,18 @@ public abstract class XmlProcessor {
     convertUtils.register(enumConverter, enumClass);
   }
 
+  static {
+    registerEnumConverter(Enum.class);
+  }
+
+  /** The arguments a processor method must have. */
+  private static final Class<?>[] PROCESS_METHOD_ARGS = new Class[] {
+    XMLStreamReader.class
+  };
+
+  /** The cache of processor classes to method caches. */
+  private static final Map<Class<?>, Map<String, Method>> PROCESSOR_METHOD_CACHE = new HashMap<Class<?>, Map<String, Method>>();
+
   /** The context for processing of the XML Document. */
   private XmlProcessorContext context = new SimpleXmlProcessorContext();
 
@@ -197,14 +196,14 @@ public abstract class XmlProcessor {
 
   /**
    * Construct a new XmlProcessor for the XML Namespace URI.
-   * 
+   *
    * @param namespaceUri The XML Namespace URI.
    */
   protected XmlProcessor(final String namespaceUri) {
     this.namespaceUri = namespaceUri;
-    typePathConverterMap.put(XmlConstants.XS_SHORT, new ShortConverter());
-    typePathConverterMap.put(XmlConstants.XS_INT, new IntegerConverter());
-    methodCache = getMethodCache(getClass());
+    this.typePathConverterMap.put(XmlConstants.XS_SHORT, new ShortConverter());
+    this.typePathConverterMap.put(XmlConstants.XS_INT, new IntegerConverter());
+    this.methodCache = getMethodCache(getClass());
   }
 
   public XmlProcessor(final String namespaceUri,
@@ -215,26 +214,26 @@ public abstract class XmlProcessor {
 
   /**
    * Get the context for processing the XML Document.
-   * 
+   *
    * @return The context for processing the XML Document.
    */
   public final XmlProcessorContext getContext() {
-    return context;
+    return this.context;
   }
 
   public String getNamespaceUri() {
-    return namespaceUri;
+    return this.namespaceUri;
   }
 
   /**
    * Get the method to process the XML element.
-   * 
+   *
    * @param element The element to process.
    * @return The method to process the XML element.
    */
   private Method getProcessMethod(final QName element) {
     final String elementName = element.getLocalPart();
-    final Method method = methodCache.get(elementName);
+    final Method method = this.methodCache.get(elementName);
     return method;
   }
 
@@ -268,7 +267,7 @@ public abstract class XmlProcessor {
             try {
               String propertyName;
               if (tagName.length() > 1
-                && Character.isLowerCase(tagName.charAt(1))) {
+                  && Character.isLowerCase(tagName.charAt(1))) {
                 propertyName = CaseConverter.toLowerFirstChar(tagName);
               } else {
                 propertyName = tagName;
@@ -332,7 +331,7 @@ public abstract class XmlProcessor {
    * For example the process method for the XML element BankAccount would have
    * the following signature.
    * </p>
-   * 
+   *
    * <pre>
    * public BankAccount processBankAccount(XMLStreamReader parser);
    * </pre>
@@ -341,11 +340,11 @@ public abstract class XmlProcessor {
    * following signature. <b>Note that the part of the method name for the XML
    * element must have the same case as the XML element name.
    * </p>
-   * 
+   *
    * <pre>
    * public String processfirstName(XMLStreamReader parser);
    * </pre>
-   * 
+   *
    * @param parser The STAX XML parser.
    * @return The object representation of the XML subtree.
    * @throws IOException If an I/O exception occurs.
@@ -353,7 +352,7 @@ public abstract class XmlProcessor {
    */
   @SuppressWarnings("unchecked")
   public <T> T process(final XMLStreamReader parser) throws XMLStreamException,
-    IOException {
+  IOException {
     final QName element = parser.getName();
 
     final String tagName = element.getLocalPart();
@@ -361,22 +360,22 @@ public abstract class XmlProcessor {
     boolean hasMapping = false;
     Class<?> objectClass = null;
     if (xsiName == null) {
-      objectClass = tagNameClassMap.get(tagName);
-      if (tagNameClassMap.containsKey(tagName)) {
-        objectClass = tagNameClassMap.get(tagName);
+      objectClass = this.tagNameClassMap.get(tagName);
+      if (this.tagNameClassMap.containsKey(tagName)) {
+        objectClass = this.tagNameClassMap.get(tagName);
         hasMapping = true;
       }
     } else {
       final String xsiLocalName = xsiName.getLocalPart();
-      final Converter converter = typePathConverterMap.get(xsiName);
+      final Converter converter = this.typePathConverterMap.get(xsiName);
       if (converter != null) {
         final String text = StaxUtils.getElementText(parser);
         return (T)converter.convert(null, text);
-      } else if (tagNameClassMap.containsKey(xsiLocalName)) {
-        objectClass = tagNameClassMap.get(xsiLocalName);
+      } else if (this.tagNameClassMap.containsKey(xsiLocalName)) {
+        objectClass = this.tagNameClassMap.get(xsiLocalName);
         hasMapping = true;
-      } else if (tagNameClassMap.containsKey(tagName)) {
-        objectClass = tagNameClassMap.get(tagName);
+      } else if (this.tagNameClassMap.containsKey(tagName)) {
+        objectClass = this.tagNameClassMap.get(tagName);
         hasMapping = true;
       }
     }
@@ -413,7 +412,7 @@ public abstract class XmlProcessor {
 
   /**
    * Set the context for processing the XML Document.
-   * 
+   *
    * @param context The context for processing the XML Document.
    */
   public final void setContext(final XmlProcessorContext context) {

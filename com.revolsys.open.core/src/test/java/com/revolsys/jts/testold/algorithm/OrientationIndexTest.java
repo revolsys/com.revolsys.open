@@ -46,25 +46,6 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class OrientationIndexTest extends TestCase {
 
-  private static WKTReader reader = new WKTReader();
-
-  // private CGAlgorithms rcga = new CGAlgorithms();
-
-  /**
-   * Tests whether the orientations around a triangle of points
-   * are all equal (as is expected if the orientation predicate is correct)
-   * 
-   * @param pts an array of three points
-   * @return true if all the orientations around the triangle are equal
-   */
-  public static boolean isAllOrientationsEqual(final Point[] pts) {
-    final int[] orient = new int[3];
-    orient[0] = RobustDeterminant.orientationIndex(pts[0], pts[1], pts[2]);
-    orient[1] = RobustDeterminant.orientationIndex(pts[1], pts[2], pts[0]);
-    orient[2] = RobustDeterminant.orientationIndex(pts[2], pts[0], pts[1]);
-    return orient[0] == orient[1] && orient[0] == orient[2];
-  }
-
   public static boolean isAllOrientationsEqual(final double p0x,
     final double p0y, final double p1x, final double p1y, final double p2x,
     final double p2y) {
@@ -76,9 +57,28 @@ public class OrientationIndexTest extends TestCase {
     return isAllOrientationsEqual(pts);
   }
 
+  // private CGAlgorithms rcga = new CGAlgorithms();
+
+  /**
+   * Tests whether the orientations around a triangle of points
+   * are all equal (as is expected if the orientation predicate is correct)
+   *
+   * @param pts an array of three points
+   * @return true if all the orientations around the triangle are equal
+   */
+  public static boolean isAllOrientationsEqual(final Point[] pts) {
+    final int[] orient = new int[3];
+    orient[0] = RobustDeterminant.orientationIndex(pts[0], pts[1], pts[2]);
+    orient[1] = RobustDeterminant.orientationIndex(pts[1], pts[2], pts[0]);
+    orient[2] = RobustDeterminant.orientationIndex(pts[2], pts[0], pts[1]);
+    return orient[0] == orient[1] && orient[0] == orient[2];
+  }
+
   public static void main(final String args[]) {
     TestRunner.run(OrientationIndexTest.class);
   }
+
+  private static WKTReader reader = new WKTReader();
 
   public OrientationIndexTest(final String name) {
     super(name);
@@ -89,9 +89,9 @@ public class OrientationIndexTest extends TestCase {
     final Point[] pts2 = {
       new PointDouble(1.0000000000004998, -7.989685402102996,
         Point.NULL_ORDINATE),
-      new PointDouble(10.0, -7.004368924503866, Point.NULL_ORDINATE),
-      new PointDouble(1.0000000000005, -7.989685402102996,
-        Point.NULL_ORDINATE),
+        new PointDouble(10.0, -7.004368924503866, Point.NULL_ORDINATE),
+        new PointDouble(1.0000000000005, -7.989685402102996,
+          Point.NULL_ORDINATE),
     };
     assertTrue(isAllOrientationsEqual(pts2));
   }

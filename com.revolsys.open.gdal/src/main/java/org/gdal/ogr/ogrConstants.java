@@ -8,7 +8,6 @@
 
 package org.gdal.ogr;
 
-import org.gdal.osr.SpatialReference;
 
 public interface ogrConstants {
   public final static int wkb25DBit = 0x80000000;

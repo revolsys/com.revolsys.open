@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,19 +23,19 @@ public class DynamicMenu extends Menu {
 
   public DynamicMenu(final String name, final String title, final String uri,
     final String anchor, final String condition, final MenuItemLoader loader)
-    throws Exception {
+        throws Exception {
     super(name, title, uri, anchor, condition);
     this.loader = loader;
   }
 
   @Override
   public Collection getItems() {
-    return loader.getItems();
+    return this.loader.getItems();
   }
 
   @Override
   public String getTitle() {
-    String title = loader.getTitle();
+    String title = this.loader.getTitle();
     if (title == null) {
       title = super.getTitle();
     }
@@ -44,7 +44,7 @@ public class DynamicMenu extends Menu {
 
   @Override
   public String getUri() {
-    String uri = loader.getUri();
+    String uri = this.loader.getUri();
     if (uri == null) {
       uri = super.getUri();
     }

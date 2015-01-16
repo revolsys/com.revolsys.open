@@ -79,10 +79,10 @@ class RightmostEdgeFinder {
       // <FIX> MD 19 Sep 03 - NO! we can test all vertices, since the rightmost
       // must have a non-horiz segment adjacent to it
       final Point point = edge.getCoordinate(i);
-      if (minCoord == null || point.getX() > minCoord.getX()) {
-        minDe = de;
-        minIndex = i;
-        minCoord = point;
+      if (this.minCoord == null || point.getX() > this.minCoord.getX()) {
+        this.minDe = de;
+        this.minIndex = i;
+        this.minCoord = point;
       }
       // }
     }
@@ -103,9 +103,9 @@ class RightmostEdgeFinder {
      * If the rightmost point is a node, we need to identify which of
      * the incident edges is rightmost.
      */
-    Assert.isTrue(minIndex != 0 || minCoord.equals(minDe.getCoordinate()),
-      "inconsistency in rightmost processing");
-    if (minIndex == 0) {
+    Assert.isTrue(this.minIndex != 0 || this.minCoord.equals(this.minDe.getCoordinate()),
+        "inconsistency in rightmost processing");
+    if (this.minIndex == 0) {
       findRightmostEdgeAtNode();
     } else {
       findRightmostEdgeAtVertex();
@@ -114,22 +114,22 @@ class RightmostEdgeFinder {
      * now check that the extreme side is the R side.
      * If not, use the sym instead.
      */
-    orientedDe = minDe;
-    final int rightmostSide = getRightmostSide(minDe, minIndex);
+    this.orientedDe = this.minDe;
+    final int rightmostSide = getRightmostSide(this.minDe, this.minIndex);
     if (rightmostSide == Position.LEFT) {
-      orientedDe = minDe.getSym();
+      this.orientedDe = this.minDe.getSym();
     }
   }
 
   private void findRightmostEdgeAtNode() {
-    final Node node = minDe.getNode();
+    final Node node = this.minDe.getNode();
     final DirectedEdgeStar star = (DirectedEdgeStar)node.getEdges();
-    minDe = star.getRightmostEdge();
+    this.minDe = star.getRightmostEdge();
     // the DirectedEdge returned by the previous call is not
     // necessarily in the forward direction. Use the sym edge if it isn't.
-    if (!minDe.isForward()) {
-      minDe = minDe.getSym();
-      minIndex = minDe.getEdge().getNumPoints() - 1;
+    if (!this.minDe.isForward()) {
+      this.minDe = this.minDe.getSym();
+      this.minIndex = this.minDe.getEdge().getNumPoints() - 1;
     }
   }
 
@@ -139,34 +139,34 @@ class RightmostEdgeFinder {
      * If these segments are both above or below the rightmost point, we need to
      * determine their relative orientation to decide which is rightmost.
      */
-    final Edge edge = minDe.getEdge();
-    Assert.isTrue(minIndex > 0 && minIndex < edge.getNumPoints(),
-      "rightmost point expected to be interior vertex of edge");
-    final Point pPrev = edge.getCoordinate(minIndex - 1);
-    final Point pNext = edge.getCoordinate(minIndex + 1);
-    final int orientation = CGAlgorithmsDD.orientationIndex(minCoord, pNext, pPrev);
+    final Edge edge = this.minDe.getEdge();
+    Assert.isTrue(this.minIndex > 0 && this.minIndex < edge.getNumPoints(),
+        "rightmost point expected to be interior vertex of edge");
+    final Point pPrev = edge.getCoordinate(this.minIndex - 1);
+    final Point pNext = edge.getCoordinate(this.minIndex + 1);
+    final int orientation = CGAlgorithmsDD.orientationIndex(this.minCoord, pNext, pPrev);
     boolean usePrev = false;
     // both segments are below min point
-    if (pPrev.getY() < minCoord.getY() && pNext.getY() < minCoord.getY()
-      && orientation == CGAlgorithms.COUNTERCLOCKWISE) {
+    if (pPrev.getY() < this.minCoord.getY() && pNext.getY() < this.minCoord.getY()
+        && orientation == CGAlgorithms.COUNTERCLOCKWISE) {
       usePrev = true;
-    } else if (pPrev.getY() > minCoord.getY() && pNext.getY() > minCoord.getY()
-      && orientation == CGAlgorithms.CLOCKWISE) {
+    } else if (pPrev.getY() > this.minCoord.getY() && pNext.getY() > this.minCoord.getY()
+        && orientation == CGAlgorithms.CLOCKWISE) {
       usePrev = true;
     }
     // if both segments are on the same side, do nothing - either is safe
     // to select as a rightmost segment
     if (usePrev) {
-      minIndex = minIndex - 1;
+      this.minIndex = this.minIndex - 1;
     }
   }
 
   public Point getCoordinate() {
-    return minCoord;
+    return this.minCoord;
   }
 
   public DirectedEdge getEdge() {
-    return orientedDe;
+    return this.orientedDe;
   }
 
   private int getRightmostSide(final DirectedEdge de, final int index) {
@@ -179,7 +179,7 @@ class RightmostEdgeFinder {
       // Assert.shouldNeverReachHere("problem with finding rightmost side of segment at "
       // + de.getCoordinate());
       // testing only
-      minCoord = null;
+      this.minCoord = null;
       checkForRightmostCoordinate(de);
     }
     return side;

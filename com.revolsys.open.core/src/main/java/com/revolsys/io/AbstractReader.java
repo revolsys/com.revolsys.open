@@ -5,13 +5,13 @@
  * $Revision: 2377 $
 
  * Copyright 2004-2007 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,16 +30,16 @@ import com.revolsys.collection.Visitor;
  * which provides implementations of {@link #read()} and {@link #visit(Visitor)}
  * which use the {@link Reader#iterator()} method which must be implemented by
  * subclasses.
- * 
+ *
  * @author Paul Austin
  * @param <T> The type of object being read.
  */
 public abstract class AbstractReader<T> extends AbstractObjectWithProperties
-  implements Reader<T> {
+implements Reader<T> {
 
   /**
    * Read all items and return a List containing the items.
-   * 
+   *
    * @return The list of items.
    */
   @Override
@@ -56,7 +56,7 @@ public abstract class AbstractReader<T> extends AbstractObjectWithProperties
   /**
    * Visit each item returned from the reader until all items have been visited
    * or the visit method returns false.
-   * 
+   *
    * @param visitor The visitor.
    */
   @Override

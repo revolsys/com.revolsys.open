@@ -6,7 +6,7 @@ import javax.swing.filechooser.FileFilter;
 
 /**
  * Compares the description of the two FileFilters.
- * 
+ *
  * @author Paul Austin
  */
 public class FileFilterComparator implements Comparator<FileFilter> {
@@ -14,7 +14,7 @@ public class FileFilterComparator implements Comparator<FileFilter> {
    * Compares its two arguments for order. Returns a negative integer, zero, or
    * a positive integer as the description of the first filter is less than,
    * equal to, or greater than the description of the second.
-   * 
+   *
    * @param f1 the first filter to be compared.
    * @param f2 the second filter to be compared.
    * @return a negative integer, zero, or a positive integer as the first

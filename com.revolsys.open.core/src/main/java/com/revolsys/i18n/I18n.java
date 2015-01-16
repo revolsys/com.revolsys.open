@@ -10,13 +10,6 @@ import java.util.ResourceBundle;
 import com.revolsys.beans.AbstractPropertyChangeObject;
 
 public final class I18n extends AbstractPropertyChangeObject {
-  private static final I18n NULL_INSTANCE = new I18n();
-
-  /** The map from category names to I18n instances. */
-  private static Map<String, WeakReference<I18n>> instances = new HashMap<String, WeakReference<I18n>>();
-
-  private static Locale locale = Locale.getDefault();
-
   public static CharSequence getCharSequence(final Class<?> clazz,
     final String key) {
     final I18n i18n = I18n.getInstance(clazz);
@@ -99,6 +92,13 @@ public final class I18n extends AbstractPropertyChangeObject {
     }
   }
 
+  private static final I18n NULL_INSTANCE = new I18n();
+
+  /** The map from category names to I18n instances. */
+  private static Map<String, WeakReference<I18n>> instances = new HashMap<String, WeakReference<I18n>>();
+
+  private static Locale locale = Locale.getDefault();
+
   private ResourceBundle resourceBundle;
 
   private String resourcePath;
@@ -110,7 +110,7 @@ public final class I18n extends AbstractPropertyChangeObject {
 
   /**
    * Construct an I18n instance for the category.
-   * 
+   *
    * @param resourcePath The path to the language files.
    */
   private I18n(final ClassLoader classLoader, final String resourcePath) {
@@ -127,14 +127,14 @@ public final class I18n extends AbstractPropertyChangeObject {
    * Get the I18n text from the language file associated with this instance. If
    * no label is defined then a default string is created from the last part of
    * the key.
-   * 
+   *
    * @param key The key of the text in the language file.
    * @return The I18Nized text.
    */
   public String getString(final String key) {
-    if (resourceBundle != null) {
+    if (this.resourceBundle != null) {
       try {
-        return resourceBundle.getString(key);
+        return this.resourceBundle.getString(key);
       } catch (final java.util.MissingResourceException e) {
 
       }
@@ -144,13 +144,13 @@ public final class I18n extends AbstractPropertyChangeObject {
   }
 
   private void loadResourceBundle() {
-    final ClassLoader classLoader = classLoaderReference.get();
-    resourceBundle = ResourceBundle.getBundle(resourcePath,
+    final ClassLoader classLoader = this.classLoaderReference.get();
+    this.resourceBundle = ResourceBundle.getBundle(this.resourcePath,
       Locale.getDefault(), classLoader);
   }
 
   @Override
   public String toString() {
-    return resourcePath;
+    return this.resourcePath;
   }
 }

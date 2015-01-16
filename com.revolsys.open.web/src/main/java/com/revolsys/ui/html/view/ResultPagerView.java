@@ -25,7 +25,7 @@ public class ResultPagerView extends Element {
 
   /**
    * Construct a new ResultPagerView.
-   * 
+   *
    * @param resultPager The result pager.
    * @param newBaseUrl The base URL.
    * @param newParameters The parameters to include in the URLs.
@@ -39,7 +39,7 @@ public class ResultPagerView extends Element {
 
   /**
    * Serialize a link to the specified page number title and contents.
-   * 
+   *
    * @param out The XML Writer.
    * @param pageNumber The page number.
    * @param title The title of the link.
@@ -51,8 +51,8 @@ public class ResultPagerView extends Element {
     final int pageNumber,
     final String title,
     final String contents) {
-    parameters.put("page", String.valueOf(pageNumber));
-    final String url = UrlUtil.getUrl(baseUrl, parameters);
+    this.parameters.put("page", String.valueOf(pageNumber));
+    final String url = UrlUtil.getUrl(this.baseUrl, this.parameters);
     out.startTag(HtmlUtil.A);
     out.attribute(HtmlUtil.ATTR_HREF, url);
     out.attribute(HtmlUtil.ATTR_TITLE, title);
@@ -62,12 +62,12 @@ public class ResultPagerView extends Element {
 
   /**
    * Serialize the view.
-   * 
+   *
    * @param out The XML Writer.
    */
   @Override
   public final void serializeElement(final XmlWriter out) {
-    final int numPages = pager.getNumPages();
+    final int numPages = this.pager.getNumPages();
 
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "pager");
@@ -81,18 +81,18 @@ public class ResultPagerView extends Element {
     out.startTag(HtmlUtil.TD);
     out.attribute(HtmlUtil.ATTR_CLASS, "records");
     out.text("records ");
-    out.text(pager.getStartIndex());
+    out.text(this.pager.getStartIndex());
     out.text(" - ");
-    out.text(pager.getEndIndex());
-    if (pager.getNumResults() > pager.getEndIndex()) {
+    out.text(this.pager.getEndIndex());
+    if (this.pager.getNumResults() > this.pager.getEndIndex()) {
       out.text(" of ");
-      out.text(pager.getNumResults());
+      out.text(this.pager.getNumResults());
     }
     out.endTag(HtmlUtil.TD);
 
     if (numPages > 1) {
 
-      if (pager.isFirstPage()) {
+      if (this.pager.isFirstPage()) {
         out.startTag(HtmlUtil.TD);
         out.attribute(HtmlUtil.ATTR_CLASS, "first");
         out.entityRef("nbsp");
@@ -104,10 +104,10 @@ public class ResultPagerView extends Element {
         out.endTag(HtmlUtil.TD);
       }
 
-      if (pager.hasPreviousPage()) {
+      if (this.pager.hasPreviousPage()) {
         out.startTag(HtmlUtil.TD);
         out.attribute(HtmlUtil.ATTR_CLASS, "previous");
-        pageLink(out, pager.getPreviousPageNumber(), "Previous Page", "<");
+        pageLink(out, this.pager.getPreviousPageNumber(), "Previous Page", "<");
         out.endTag(HtmlUtil.TD);
       } else {
         out.startTag(HtmlUtil.TD);
@@ -123,7 +123,7 @@ public class ResultPagerView extends Element {
           serializePageLink(out, pageNumber);
         }
       } else {
-        final int currentPageNumber = pager.getPageNumber();
+        final int currentPageNumber = this.pager.getPageNumber();
         final int fromPage = Math.max(1,
           Math.min(currentPageNumber - 3, numPages - 6));
         final int toPage = Math.min(numPages, fromPage + 6);
@@ -139,10 +139,10 @@ public class ResultPagerView extends Element {
       }
       out.endTag(HtmlUtil.TD);
 
-      if (pager.hasNextPage()) {
+      if (this.pager.hasNextPage()) {
         out.startTag(HtmlUtil.TD);
         out.attribute(HtmlUtil.ATTR_CLASS, "next");
-        pageLink(out, pager.getNextPageNumber(), "Next Page", ">");
+        pageLink(out, this.pager.getNextPageNumber(), "Next Page", ">");
         out.endTag(HtmlUtil.TD);
       } else {
         out.startTag(HtmlUtil.TD);
@@ -151,7 +151,7 @@ public class ResultPagerView extends Element {
         out.endTag(HtmlUtil.TD);
       }
 
-      if (pager.isLastPage()) {
+      if (this.pager.isLastPage()) {
         out.startTag(HtmlUtil.TD);
         out.attribute(HtmlUtil.ATTR_CLASS, "last");
         out.entityRef("nbsp");
@@ -172,7 +172,7 @@ public class ResultPagerView extends Element {
 
   /**
    * Serialize a link to the specified page number.
-   * 
+   *
    * @param out The XML Writer.
    * @param pageNumber The page number.
    * @throws IOException If there was an exception serializing.
@@ -180,7 +180,7 @@ public class ResultPagerView extends Element {
   private void serializePageLink(final XmlWriter out, final int pageNumber) {
     final String contents = String.valueOf(pageNumber);
     final String title = "Page " + pageNumber;
-    if (pageNumber == pager.getPageNumber()) {
+    if (pageNumber == this.pager.getPageNumber()) {
       HtmlUtil.serializeSpan(out, "pageNum selected", contents);
     } else {
       pageLink(out, pageNumber, title, contents);

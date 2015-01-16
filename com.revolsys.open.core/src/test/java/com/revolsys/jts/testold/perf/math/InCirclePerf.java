@@ -6,9 +6,9 @@ import com.revolsys.jts.util.Stopwatch;
 
 /**
  * Test performance of evaluating Triangle predicate computations
- * using 
+ * using
  * various extended precision APIs.
- * 
+ *
  * @author Martin Davis
  *
  */

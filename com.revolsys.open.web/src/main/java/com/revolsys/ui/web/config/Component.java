@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,11 +55,11 @@ public class Component {
   public Component(final Component component) {
     this.name = component.name;
     this.file = component.file;
-    fields.putAll(component.fields);
-    actions.addAll(component.actions);
-    scripts.addAll(component.scripts);
-    styles.addAll(component.styles);
-    onLoads.addAll(component.onLoads);
+    this.fields.putAll(component.fields);
+    this.actions.addAll(component.actions);
+    this.scripts.addAll(component.scripts);
+    this.styles.addAll(component.styles);
+    this.onLoads.addAll(component.onLoads);
   }
 
   public Component(final String name) {
@@ -77,7 +77,7 @@ public class Component {
   }
 
   public void addAction(final ActionConfig actionConfig) {
-    actions.add(actionConfig);
+    this.actions.add(actionConfig);
   }
 
   public void addActions(final Collection actionConfigs) {
@@ -85,28 +85,28 @@ public class Component {
   }
 
   public void addField(final Field field) {
-    fields.put(field.getName(), EMPTY_STRING);
+    this.fields.put(field.getName(), EMPTY_STRING);
   }
 
   public void addField(final String name) {
-    fields.put(name, EMPTY_STRING);
+    this.fields.put(name, EMPTY_STRING);
   }
 
   public void addField(final String name, final String value) {
-    final String lastValue = (String)fields.get(name);
+    final String lastValue = (String)this.fields.get(name);
     if (lastValue != EMPTY_STRING) {
       throw new IllegalArgumentException("Value already exists for the field "
-        + name);
+          + name);
     }
-    fields.put(name, value);
+    this.fields.put(name, value);
   }
 
   public void addOnLoad(final OnLoad onLoad) {
-    onLoads.add(onLoad.getScript());
+    this.onLoads.add(onLoad.getScript());
   }
 
   public void addOnLoad(final String onLoad) {
-    onLoads.add(onLoad);
+    this.onLoads.add(onLoad);
   }
 
   public void addOnLoads(final Collection onLoads) {
@@ -114,11 +114,11 @@ public class Component {
   }
 
   public void addScript(final Script script) {
-    scripts.add(script.getFile());
+    this.scripts.add(script.getFile());
   }
 
   public void addScript(final String script) {
-    scripts.add(script);
+    this.scripts.add(script);
   }
 
   public void addScripts(final Collection scripts) {
@@ -126,11 +126,11 @@ public class Component {
   }
 
   public void addStyle(final String style) {
-    styles.add(style);
+    this.styles.add(style);
   }
 
   public void addStyle(final Style style) {
-    styles.add(style.getFile());
+    this.styles.add(style.getFile());
   }
 
   public void addStyles(final Collection styles) {
@@ -146,9 +146,9 @@ public class Component {
   public boolean equals(final Object o) {
     if (o instanceof Component) {
       final Component c = (Component)o;
-      if (equalsWithNull(c.name, name) && equalsWithNull(c.file, file)
-        && c.styles.equals(styles) && c.scripts.equals(scripts)
-        && c.onLoads.equals(onLoads)) {
+      if (equalsWithNull(c.name, this.name) && equalsWithNull(c.file, this.file)
+          && c.styles.equals(this.styles) && c.scripts.equals(this.scripts)
+          && c.onLoads.equals(this.onLoads)) {
         return true;
       }
     }
@@ -166,11 +166,11 @@ public class Component {
   }
 
   public Collection getActions() {
-    return actions;
+    return this.actions;
   }
 
   public String getArea() {
-    return area;
+    return this.area;
   }
 
   public String getField(final String name) {
@@ -178,41 +178,41 @@ public class Component {
   }
 
   public String getFile() {
-    return file;
+    return this.file;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public Collection getOnLoads() {
-    return onLoads;
+    return this.onLoads;
   }
 
   public Collection getScripts() {
-    return scripts;
+    return this.scripts;
   }
 
   public Collection getStyles() {
-    return styles;
+    return this.styles;
   }
 
   /**
    * Generate the hash code for the object.
-   * 
+   *
    * @return The hashCode.
    */
   @Override
   public int hashCode() {
-    if (name != null) {
-      return name.hashCode();
+    if (this.name != null) {
+      return this.name.hashCode();
     } else {
       return super.hashCode();
     }
   }
 
   public void includeComponent(final PageContext context)
-    throws ServletException, IOException {
+      throws ServletException, IOException {
     context.getOut().flush();
     context.include(getFile());
   }
@@ -221,7 +221,7 @@ public class Component {
     final ServletContext context,
     final HttpServletRequest request,
     final HttpServletResponse response) throws ServletException, IOException {
-    final Iterator i = actions.iterator();
+    final Iterator i = this.actions.iterator();
     while (i.hasNext()) {
       final ActionConfig actionConfig = (ActionConfig)i.next();
       final IafAction action = actionConfig.getAction();
@@ -249,10 +249,10 @@ public class Component {
   }
 
   public void setPage(final Page page) {
-    page.addActions(actions);
-    page.addScripts(scripts);
-    page.addStyles(styles);
-    page.addOnLoads(onLoads);
+    page.addActions(this.actions);
+    page.addScripts(this.scripts);
+    page.addStyles(this.styles);
+    page.addOnLoads(this.onLoads);
   }
 
   /**

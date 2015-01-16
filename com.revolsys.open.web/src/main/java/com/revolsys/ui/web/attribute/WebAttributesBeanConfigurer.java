@@ -9,7 +9,7 @@ import org.springframework.web.context.ServletContextAware;
 import com.revolsys.spring.config.AttributesBeanConfigurer;
 
 public class WebAttributesBeanConfigurer extends AttributesBeanConfigurer
-  implements ServletContextAware {
+implements ServletContextAware {
 
   @SuppressWarnings("unchecked")
   @Override

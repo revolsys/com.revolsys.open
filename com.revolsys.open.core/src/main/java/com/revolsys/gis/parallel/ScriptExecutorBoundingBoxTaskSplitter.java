@@ -11,7 +11,7 @@ import com.revolsys.parallel.channel.ChannelOutput;
 import com.revolsys.parallel.tools.ScriptExecutorRunnable;
 
 public class ScriptExecutorBoundingBoxTaskSplitter extends
-  BoundingBoxTaskSplitter {
+BoundingBoxTaskSplitter {
 
   private String scriptName;
 
@@ -27,51 +27,51 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
 
   @Override
   public void execute(final BoundingBox boundingBox) {
-    outsideBoundaryObjects.expandBoundary(boundingBox.toGeometry());
+    this.outsideBoundaryObjects.expandBoundary(boundingBox.toGeometry());
 
     final ScriptExecutorRunnable executor = new ScriptExecutorRunnable(
-      scriptName, attributes);
+      this.scriptName, this.attributes);
     executor.setLogScriptInfo(isLogScriptInfo());
     executor.addBean("boundingBox", boundingBox);
     final Set<Record> objects = this.outsideBoundaryObjects.getAndClearObjects();
     executor.addBean("outsideBoundaryObjects", objects);
-    executor.addBeans(beans);
-    executor.addBeans(inChannels);
-    executor.addBeans(outChannels);
+    executor.addBeans(this.beans);
+    executor.addBeans(this.inChannels);
+    executor.addBeans(this.outChannels);
     executor.run();
   }
 
-  public Map<String, Object> getFields() {
-    return attributes;
+  public Map<String, Object> getBeans() {
+    return this.beans;
   }
 
-  public Map<String, Object> getBeans() {
-    return beans;
+  public Map<String, Object> getFields() {
+    return this.attributes;
   }
 
   public Map<String, ChannelInput<?>> getInChannels() {
-    return inChannels;
+    return this.inChannels;
   }
 
   public Map<String, ChannelOutput<?>> getOutChannels() {
-    return outChannels;
+    return this.outChannels;
   }
 
   public OutsideBoundaryObjects getOutsideBoundaryObjects() {
-    return outsideBoundaryObjects;
+    return this.outsideBoundaryObjects;
   }
 
   public String getScriptName() {
-    return scriptName;
+    return this.scriptName;
   }
 
   @Override
   protected void postRun() {
     super.postRun();
-    for (final ChannelInput<?> in : inChannels.values()) {
+    for (final ChannelInput<?> in : this.inChannels.values()) {
       in.readDisconnect();
     }
-    for (final ChannelOutput<?> out : outChannels.values()) {
+    for (final ChannelOutput<?> out : this.outChannels.values()) {
       out.writeDisconnect();
     }
 
@@ -80,10 +80,10 @@ public class ScriptExecutorBoundingBoxTaskSplitter extends
   @Override
   protected void preRun() {
     super.preRun();
-    for (final ChannelInput<?> in : inChannels.values()) {
+    for (final ChannelInput<?> in : this.inChannels.values()) {
       in.readConnect();
     }
-    for (final ChannelOutput<?> out : outChannels.values()) {
+    for (final ChannelOutput<?> out : this.outChannels.values()) {
       out.writeConnect();
     }
   }

@@ -10,7 +10,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 public class JLabelListCellRenderer extends BasicComboBoxRenderer {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -8014837570227669960L;
 

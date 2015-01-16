@@ -11,14 +11,14 @@ import com.revolsys.jts.triangulate.DelaunayTriangulationBuilder;
 import com.revolsys.jts.util.Stopwatch;
 
 public class VoronoiPerfTest {
-  final static GeometryFactory geomFact = GeometryFactory.floating3();
-
-  final static double SIDE_LEN = 10.0;
-
   public static void main(final String args[]) {
     final VoronoiPerfTest test = new VoronoiPerfTest();
     test.run();
   }
+
+  final static GeometryFactory geomFact = GeometryFactory.floating3();
+
+  final static double SIDE_LEN = 10.0;
 
   List randomPoints(final int nPts) {
     final List pts = new ArrayList();
@@ -29,7 +29,7 @@ public class VoronoiPerfTest {
       for (int j = 0; j < nSide; j++) {
         final double x = i * SIDE_LEN + SIDE_LEN * Math.random();
         final double y = j * SIDE_LEN + SIDE_LEN * Math.random();
-        pts.add(new PointDouble((double)x, y, Point.NULL_ORDINATE));
+        pts.add(new PointDouble(x, y, Point.NULL_ORDINATE));
       }
     }
     return pts;
@@ -51,7 +51,7 @@ public class VoronoiPerfTest {
     builder.setSites(pts);
 
     final Geometry g = builder.getEdges(geomFact);
-  //  System.out.println("# pts: " + pts.size() + "  --  " + sw.getTimeString());
+    //  System.out.println("# pts: " + pts.size() + "  --  " + sw.getTimeString());
     // System.out.println(g);
   }
 }

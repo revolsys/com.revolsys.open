@@ -39,34 +39,27 @@ package com.revolsys.jts.index.sweepline;
  * @version 1.7
  */
 public class SweepLineEvent
-  implements Comparable
+implements Comparable
 {
   public static final int INSERT = 1;
   public static final int DELETE = 2;
 
-  private double xValue;
+  private final double xValue;
   private int eventType;
-  private SweepLineEvent insertEvent; // null if this is an INSERT event
+  private final SweepLineEvent insertEvent; // null if this is an INSERT event
   private int deleteEventIndex;
 
   SweepLineInterval sweepInt;
-  public SweepLineEvent(double x, SweepLineEvent insertEvent, SweepLineInterval sweepInt)
+  public SweepLineEvent(final double x, final SweepLineEvent insertEvent, final SweepLineInterval sweepInt)
   {
-    xValue = x;
+    this.xValue = x;
     this.insertEvent = insertEvent;
     this.eventType = INSERT;
-    if (insertEvent != null)
-      eventType = DELETE;
+    if (insertEvent != null) {
+      this.eventType = DELETE;
+    }
     this.sweepInt = sweepInt;
   }
-
-  public boolean isInsert() { return insertEvent == null; }
-  public boolean isDelete() { return insertEvent != null; }
-  public SweepLineEvent getInsertEvent() { return insertEvent; }
-  public int getDeleteEventIndex() { return deleteEventIndex; }
-  public void setDeleteEventIndex(int deleteEventIndex) { this.deleteEventIndex = deleteEventIndex; }
-
-  SweepLineInterval getInterval() { return sweepInt; }
 
   /**
    * ProjectionEvents are ordered first by their x-value, and then by their eventType.
@@ -74,14 +67,31 @@ public class SweepLineEvent
    * items whose Insert and Delete events occur at the same x-value will be
    * correctly handled.
    */
-  public int compareTo(Object o) {
-    SweepLineEvent pe = (SweepLineEvent) o;
-    if (xValue < pe.xValue) return  -1;
-    if (xValue > pe.xValue) return   1;
-    if (eventType < pe.eventType) return  -1;
-    if (eventType > pe.eventType) return   1;
+  @Override
+  public int compareTo(final Object o) {
+    final SweepLineEvent pe = (SweepLineEvent) o;
+    if (this.xValue < pe.xValue) {
+      return  -1;
+    }
+    if (this.xValue > pe.xValue) {
+      return   1;
+    }
+    if (this.eventType < pe.eventType) {
+      return  -1;
+    }
+    if (this.eventType > pe.eventType) {
+      return   1;
+    }
     return 0;
   }
+  public int getDeleteEventIndex() { return this.deleteEventIndex; }
+  public SweepLineEvent getInsertEvent() { return this.insertEvent; }
+  SweepLineInterval getInterval() { return this.sweepInt; }
+  public boolean isDelete() { return this.insertEvent != null; }
+
+  public boolean isInsert() { return this.insertEvent == null; }
+
+  public void setDeleteEventIndex(final int deleteEventIndex) { this.deleteEventIndex = deleteEventIndex; }
 
 
 }

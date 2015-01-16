@@ -35,9 +35,9 @@ package com.revolsys.jts.geom;
 
 /**
  *  Constants representing the different topological locations
- *  which can occur in a {@link Geometry}. 
- *  The constants are also used as the row and column indices 
- *  of DE-9IM {@link IntersectionMatrix}es. 
+ *  which can occur in a {@link Geometry}.
+ *  The constants are also used as the row and column indices
+ *  of DE-9IM {@link IntersectionMatrix}es.
  *
  *@version 1.7
  */
@@ -46,20 +46,20 @@ public enum Location {
    *  Used for uninitialized location values.
    */
   NONE(-1), /**
-            * The location value for the interior of a geometry.
-            * Also, DE-9IM row index of the interior of the first geometry and column index of
-            *  the interior of the second geometry. 
-            */
+   * The location value for the interior of a geometry.
+   * Also, DE-9IM row index of the interior of the first geometry and column index of
+   *  the interior of the second geometry.
+   */
   INTERIOR(0), /**
-               * The location value for the boundary of a geometry.
-               * Also, DE-9IM row index of the boundary of the first geometry and column index of
-               *  the boundary of the second geometry. 
-               */
+   * The location value for the boundary of a geometry.
+   * Also, DE-9IM row index of the boundary of the first geometry and column index of
+   *  the boundary of the second geometry.
+   */
   BOUNDARY(1), /**
-               * The location value for the exterior of a geometry.
-               * Also, DE-9IM row index of the exterior of the first geometry and column index of
-               *  the exterior of the second geometry. 
-               */
+   * The location value for the exterior of a geometry.
+   * Also, DE-9IM row index of the exterior of the first geometry and column index of
+   *  the exterior of the second geometry.
+   */
   EXTERIOR(2);
 
   /**
@@ -80,7 +80,7 @@ public enum Location {
   }
 
   public int getIndex() {
-    return index;
+    return this.index;
   }
 
   @Override

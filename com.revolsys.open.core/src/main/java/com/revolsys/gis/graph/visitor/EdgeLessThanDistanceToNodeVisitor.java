@@ -13,7 +13,7 @@ import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
 public class EdgeLessThanDistanceToNodeVisitor<T> extends
-  DelegatingVisitor<Edge<T>> {
+DelegatingVisitor<Edge<T>> {
   public static <T> List<Edge<T>> edgesWithinDistance(final Graph<T> graph,
     final Node<T> node, final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<Edge<T>>();
@@ -45,9 +45,9 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends
   @Override
   public boolean visit(final Edge<T> edge) {
     final com.revolsys.jts.geom.BoundingBox envelope = edge.getEnvelope();
-    if (this.envelope.distance(envelope) < maxDistance) {
-      if (!edge.hasNode(node)) {
-        if (edge.isLessThanDistance(node, maxDistance)) {
+    if (this.envelope.distance(envelope) < this.maxDistance) {
+      if (!edge.hasNode(this.node)) {
+        if (edge.isLessThanDistance(this.node, this.maxDistance)) {
           super.visit(edge);
         }
       }

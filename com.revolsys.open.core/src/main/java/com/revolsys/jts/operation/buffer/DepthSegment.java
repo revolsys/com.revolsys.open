@@ -4,9 +4,9 @@ import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;
 
 /**
-  * A segment from a directed edge which has been assigned a depth value
-  * for its sides.
-  */
+ * A segment from a directed edge which has been assigned a depth value
+ * for its sides.
+ */
 public class DepthSegment implements Comparable<DepthSegment> {
   private final LineSegment upwardSeg;
 
@@ -14,7 +14,7 @@ public class DepthSegment implements Comparable<DepthSegment> {
 
   public DepthSegment(final LineSegment seg, final int depth) {
     // input seg is assumed to be normalized
-    upwardSeg = new LineSegmentDouble(seg);
+    this.upwardSeg = new LineSegmentDouble(seg);
     // upwardSeg.normalize();
     this.leftDepth = depth;
   }
@@ -37,7 +37,7 @@ public class DepthSegment implements Comparable<DepthSegment> {
      * try and compute a determinate orientation for the segments.
      * Test returns 1 if other is left of this (i.e. this > other)
      */
-    int orientIndex = upwardSeg.orientationIndex(other.upwardSeg);
+    int orientIndex = this.upwardSeg.orientationIndex(other.upwardSeg);
 
     /**
      * If comparison between this and other is indeterminate,
@@ -47,7 +47,7 @@ public class DepthSegment implements Comparable<DepthSegment> {
      * -1 if this is leftmost
      */
     if (orientIndex == 0) {
-      orientIndex = -1 * other.upwardSeg.orientationIndex(upwardSeg);
+      orientIndex = -1 * other.upwardSeg.orientationIndex(this.upwardSeg);
     }
 
     // if orientation is determinate, return it
@@ -80,7 +80,7 @@ public class DepthSegment implements Comparable<DepthSegment> {
   }
 
   public int getLeftDepth() {
-    return leftDepth;
+    return this.leftDepth;
   }
 
 }

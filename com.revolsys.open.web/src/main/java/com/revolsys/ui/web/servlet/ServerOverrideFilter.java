@@ -18,17 +18,17 @@ public class ServerOverrideFilter extends SavedRequestFilter {
   @Override
   protected void doFilterInternal(final HttpServletRequest request,
     final HttpServletResponse response, final FilterChain filterChain)
-    throws ServletException, IOException {
+        throws ServletException, IOException {
     if (request.getCharacterEncoding() == null) {
       request.setCharacterEncoding("UTF-8");
     }
     final HttpServletRequest overrideRequest = new ServerOverrideHttpServletRequest(
-      serverUrl, request);
+      this.serverUrl, request);
     super.doFilterInternal(overrideRequest, response, filterChain);
   }
 
   public String getServerUrl() {
-    return serverUrl;
+    return this.serverUrl;
   }
 
   public void setServerUrl(final String serverUrl) {

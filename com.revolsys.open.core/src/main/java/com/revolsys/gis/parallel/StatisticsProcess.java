@@ -12,22 +12,22 @@ public class StatisticsProcess extends BaseInOutProcess<Record, Record> {
   @Override
   protected void postRun(final Channel<Record> in,
     final Channel<Record> out) {
-    if (statistics != null) {
-      statistics.disconnect();
+    if (this.statistics != null) {
+      this.statistics.disconnect();
     }
   }
 
   @Override
   protected void preRun(final Channel<Record> in,
     final Channel<Record> out) {
-    statistics = new Statistics(getBeanName());
-    statistics.connect();
+    this.statistics = new Statistics(getBeanName());
+    this.statistics.connect();
   }
 
   @Override
   protected void process(final Channel<Record> in,
     final Channel<Record> out, final Record object) {
-    statistics.add(object);
+    this.statistics.add(object);
     out.write(object);
   }
 

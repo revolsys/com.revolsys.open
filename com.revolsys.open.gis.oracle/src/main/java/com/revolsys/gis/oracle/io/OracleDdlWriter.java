@@ -38,11 +38,11 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     if (Property.hasValue(shortName) && shortNameProperty.isUseForSequence()) {
       final String schema = JdbcUtils.getSchemaName(typePath);
       final String sequenceName = schema + "." + shortName.toUpperCase()
-        + "_SEQ";
+          + "_SEQ";
       return sequenceName;
     } else {
       final String tableName = JdbcUtils.getQualifiedTableName(typePath)
-        .toUpperCase();
+          .toUpperCase();
       return tableName + "_SEQ";
     }
   }

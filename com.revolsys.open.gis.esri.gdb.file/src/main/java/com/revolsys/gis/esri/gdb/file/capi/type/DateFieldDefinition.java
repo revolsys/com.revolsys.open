@@ -24,7 +24,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
   public DateFieldDefinition(final Field field) {
     super(field.getName(), DataTypes.DATE,
       BooleanStringConverter.getBoolean(field.getRequired())
-        || !field.isIsNullable());
+      || !field.isIsNullable());
   }
 
   @Override
@@ -35,7 +35,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore recordStore = getRecordStore();
+    final CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
@@ -73,8 +73,8 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
         Date date = (Date)value;
         if (date.before(MIN_DATE)) {
           RecordLog.warn(getClass(), name + "=" + date + " is before "
-            + MIN_DATE + " which is not supported by ESRI File Geodatabases",
-            object);
+              + MIN_DATE + " which is not supported by ESRI File Geodatabases",
+              object);
           if (isRequired()) {
             date = MIN_DATE;
           } else {
@@ -83,8 +83,8 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
           }
         } else if (date.after(MAX_DATE)) {
           RecordLog.warn(getClass(), name + "=" + date + " is after "
-            + MAX_DATE + " which is not supported by ESRI File Geodatabases",
-            object);
+              + MAX_DATE + " which is not supported by ESRI File Geodatabases",
+              object);
           if (isRequired()) {
             date = MAX_DATE;
           } else {
@@ -101,7 +101,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
         }
       } else {
         throw new IllegalArgumentException("Expecting a java,util.Date not "
-          + value.getClass() + " " + value);
+            + value.getClass() + " " + value);
       }
     }
   }

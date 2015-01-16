@@ -46,8 +46,8 @@ public class CoordinatesUtil {
       // MD - not sure what we can do to prevent this (robustness problem)
       // Idea - can we condition which edges we choose?
       throw new IllegalStateException(ex.getMessage() + " POLYGON((" + x1 + " "
-        + y1 + "," + x2 + " " + y2 + "," + x3 + " " + y3 + "," + x1 + " " + y1
-        + "))");
+          + y1 + "," + x2 + " " + y2 + "," + x3 + " " + y3 + "," + x1 + " " + y1
+          + "))");
     }
     return cc;
   }
@@ -107,7 +107,7 @@ public class CoordinatesUtil {
 
   /**
    * Computes the 3-dimensional Euclidean distance to another location.
-   * 
+   *
    * @param c a coordinate
    * @return the 3-dimensional Euclidean distance between the locations
    */
@@ -160,7 +160,7 @@ public class CoordinatesUtil {
   public static double getElevation(final Point coordinate, final Point c0,
     final Point c1) {
     final double fraction = coordinate.distance(c0) / c0.distance(c1);
-    final double z = c0.getZ() + (c1.getZ() - c0.getZ()) * (fraction);
+    final double z = c0.getZ() + (c1.getZ() - c0.getZ()) * fraction;
     return z;
   }
 
@@ -190,18 +190,18 @@ public class CoordinatesUtil {
   /**
    * Methods for computing and working with octants of the Cartesian plane
    * Octants are numbered as follows:
-   * 
+   *
    * <pre>
    *  \2|1/
    * 3 \|/ 0
    * ---+--
    * 4 /|\ 7
    * /5|6\
-   * 
+   *
    * <pre>
    * If line segments lie along a coordinate axis, the octant is the lower of the two
    * possible values.
-   * 
+   *
    * Returns the octant of a directed line segment (specified as x and y
    * displacements, which cannot both be 0).
    */

@@ -11,6 +11,17 @@ import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 import com.revolsys.jts.util.Stopwatch;
 
 public class UnionPerfTester {
+  public static void run(final String testName, final int testType,
+    final List polys) {
+    final UnionPerfTester test = new UnionPerfTester(polys);
+    test.run(testName, testType);
+  }
+
+  public static void runAll(final List polys) {
+    final UnionPerfTester test = new UnionPerfTester(polys);
+    test.runAll();
+  }
+
   public static final int CASCADED = 1;
 
   public static final int ITERATED = 2;
@@ -25,17 +36,6 @@ public class UnionPerfTester {
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
-
-  public static void run(final String testName, final int testType,
-    final List polys) {
-    final UnionPerfTester test = new UnionPerfTester(polys);
-    test.run(testName, testType);
-  }
-
-  public static void runAll(final List polys) {
-    final UnionPerfTester test = new UnionPerfTester(polys);
-    test.runAll();
-  }
 
   Stopwatch sw = new Stopwatch();
 
@@ -57,12 +57,12 @@ public class UnionPerfTester {
         itemEnv.expandToInclude(((Geometry)o).getBoundingBox());
       }
     }
-  //  System.out.println(this.factory.toGeometry(itemEnv));
+    //  System.out.println(this.factory.toGeometry(itemEnv));
   }
 
   public void run(final String testName, final int testType) {
-  //  System.out.println();
-  //  System.out.println("======= Union Algorithm: " + testName + " ===========");
+    //  System.out.println();
+    //  System.out.println("======= Union Algorithm: " + testName + " ===========");
 
     final Stopwatch sw = new Stopwatch();
     for (int i = 0; i < MAX_ITER; i++) {
@@ -70,23 +70,23 @@ public class UnionPerfTester {
       switch (testType) {
         case CASCADED:
           union = unionCascaded(this.polys);
-        break;
+          break;
         case ITERATED:
           union = unionAllSimple(this.polys);
-        break;
+          break;
         case BUFFER0:
           union = unionAllBuffer(this.polys);
-        break;
+          break;
       }
 
       // printFormatted(union);
 
     }
-  //  System.out.println("Finished in " + sw.getTimeString());
+    //  System.out.println("Finished in " + sw.getTimeString());
   }
 
   public void runAll() {
-  //  System.out.println("# items: " + this.polys.size());
+    //  System.out.println("# items: " + this.polys.size());
     run("Cascaded", CASCADED, this.polys);
     // run("Buffer-0", BUFFER0, polys);
 

@@ -46,7 +46,7 @@ import com.revolsys.jtstest.testrunner.Result;
 /**
  * Invokes a named operation on a set of arguments,
  * the first of which is a {@link Geometry}.
- * This class provides operations which are the methods 
+ * This class provides operations which are the methods
  * defined on the Geometry class.
  * Other {@link GeometryOperation} classes can delegate to
  * instances of this class to run standard Geometry methods.
@@ -57,16 +57,16 @@ import com.revolsys.jtstest.testrunner.Result;
 public class GeometryMethodOperation implements GeometryOperation {
   public static Class getGeometryReturnType(final String functionName) {
     final Method[] methods = Geometry.class.getMethods();
-    for (int i = 0; i < methods.length; i++) {
-      if (methods[i].getName().equalsIgnoreCase(functionName)) {
-        final Class returnClass = methods[i].getReturnType();
+    for (final Method method : methods) {
+      if (method.getName().equalsIgnoreCase(functionName)) {
+        final Class returnClass = method.getReturnType();
         /**
          * Filter out only acceptable classes. (For instance, don't accept the
          * relate()=>IntersectionMatrix method)
          */
         if (returnClass == boolean.class
-          || Geometry.class.isAssignableFrom(returnClass)
-          || returnClass == double.class || returnClass == int.class) {
+            || Geometry.class.isAssignableFrom(returnClass)
+            || returnClass == double.class || returnClass == int.class) {
           return returnClass;
         }
       }
@@ -92,8 +92,8 @@ public class GeometryMethodOperation implements GeometryOperation {
 
   private static int nonNullItemCount(final Object[] obj) {
     int count = 0;
-    for (int i = 0; i < obj.length; i++) {
-      if (obj[i] != null) {
+    for (final Object element : obj) {
+      if (element != null) {
         count++;
       }
     }
@@ -169,11 +169,11 @@ public class GeometryMethodOperation implements GeometryOperation {
 
     for (int i = 0; i < args.length; i++) {
       final boolean isCompatible = convertArg(parameterTypes[i], args[i],
-        convArg);
+        this.convArg);
       if (!isCompatible) {
         return false;
       }
-      actualArgs[i] = convArg[0];
+      actualArgs[i] = this.convArg[0];
     }
     return true;
   }
@@ -181,12 +181,12 @@ public class GeometryMethodOperation implements GeometryOperation {
   private Method getGeometryMethod(final String opName, final Object[] args,
     final Object[] actualArgs) {
     // could index methods by name for efficiency...
-    for (int i = 0; i < geometryMethods.length; i++) {
-      if (!geometryMethods[i].getName().equalsIgnoreCase(opName)) {
+    for (int i = 0; i < this.geometryMethods.length; i++) {
+      if (!this.geometryMethods[i].getName().equalsIgnoreCase(opName)) {
         continue;
       }
-      if (convertArgs(geometryMethods[i].getParameterTypes(), args, actualArgs)) {
-        return geometryMethods[i];
+      if (convertArgs(this.geometryMethods[i].getParameterTypes(), args, actualArgs)) {
+        return this.geometryMethods[i];
       }
     }
     return null;
@@ -232,7 +232,7 @@ public class GeometryMethodOperation implements GeometryOperation {
       throw (Error)t;
     }
     throw new JTSTestReflectionException("Unsupported result type: "
-      + method.getReturnType());
+        + method.getReturnType());
   }
 
 }

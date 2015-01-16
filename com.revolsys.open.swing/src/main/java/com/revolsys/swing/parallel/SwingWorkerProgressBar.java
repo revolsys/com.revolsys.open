@@ -13,7 +13,7 @@ import org.jdesktop.swingx.JXBusyLabel;
 import com.revolsys.swing.SwingUtil;
 
 public class SwingWorkerProgressBar extends JPanel implements
-  PropertyChangeListener {
+PropertyChangeListener {
   private static final long serialVersionUID = -5112492385171847107L;
 
   private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(16, 16));
@@ -22,7 +22,7 @@ public class SwingWorkerProgressBar extends JPanel implements
     super(new BorderLayout(2, 2));
     this.busyLabel.setDelay(200);
     Invoke.getPropertyChangeSupport()
-      .addPropertyChangeListener("workers", this);
+    .addPropertyChangeListener("workers", this);
     add(this.busyLabel, BorderLayout.WEST);
   }
 

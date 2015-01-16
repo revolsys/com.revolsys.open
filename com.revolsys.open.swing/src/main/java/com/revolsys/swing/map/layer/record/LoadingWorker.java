@@ -33,7 +33,7 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
     Query query = this.layer.getQuery();
     final FieldDefinition geometryField = this.layer.getGeometryField();
     if (query != null && geometryField != null
-      && !queryBoundingBox.isEmpty()) {
+        && !queryBoundingBox.isEmpty()) {
       query = query.clone();
       query.and(F.envelopeIntersects(geometryField, queryBoundingBox));
       final List<LayerRecord> records = this.layer.query(query);
@@ -69,7 +69,7 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
     } catch (final Throwable t) {
       final String typePath = this.layer.getTypePath();
       LoggerFactory.getLogger(getClass())
-        .error("Unable to load " + typePath, t);
+      .error("Unable to load " + typePath, t);
       this.layer.clearLoading(this.viewportBoundingBox);
     }
   }

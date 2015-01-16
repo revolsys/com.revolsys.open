@@ -17,14 +17,23 @@ import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.util.Stopwatch;
 
 /**
- * Tests performance of {@link IndexedFacetDistance} versus standard 
+ * Tests performance of {@link IndexedFacetDistance} versus standard
  * {@link DistanceOp}
- * using a grid of points to a target set of lines 
- * 
+ * using a grid of points to a target set of lines
+ *
  * @author Martin Davis
  *
  */
 public class TestPerfDistanceLinesPoints {
+  public static void main(final String[] args) {
+    final TestPerfDistanceLinesPoints test = new TestPerfDistanceLinesPoints();
+    try {
+      test.test();
+    } catch (final Exception ex) {
+      ex.printStackTrace();
+    }
+  }
+
   static final boolean USE_INDEXED_DIST = true;
 
   static GeometryFactory geomFact = GeometryFactory.floating3();
@@ -36,15 +45,6 @@ public class TestPerfDistanceLinesPoints {
   static final double EXTENT = 1000;
 
   static final int NUM_PTS_SIDE = 100;
-
-  public static void main(final String[] args) {
-    final TestPerfDistanceLinesPoints test = new TestPerfDistanceLinesPoints();
-    try {
-      test.test();
-    } catch (final Exception ex) {
-      ex.printStackTrace();
-    }
-  }
 
   boolean verbose = true;
 

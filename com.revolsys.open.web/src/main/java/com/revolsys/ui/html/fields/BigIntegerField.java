@@ -18,7 +18,7 @@ public class BigIntegerField extends NumberField {
   }
 
   @Override
-  public Number getNumber(String value) {
+  public Number getNumber(final String value) {
     return new BigInteger(value);
   }
 

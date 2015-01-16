@@ -20,7 +20,7 @@ public class SavedRequestFilter extends OncePerRequestFilter {
     final FilterChain filterChain) throws ServletException, IOException {
     final HttpServletRequest savedRequest = HttpServletUtils.getRequest();
     final HttpServletResponse savedResponse = HttpServletUtils.getResponse();
-      try {
+    try {
       HttpServletUtils.setRequestAndResponse(request,response);
       filterChain.doFilter(request, response);
     } finally {

@@ -43,7 +43,7 @@ public class WKBWriterTest extends TestCase {
     assertEquals(0x20, b);
 
     final int srid = (wkb[5] & 0xff) << 24 | (wkb[6] & 0xff) << 16
-      | (wkb[7] & 0xff) << 8 | wkb[8] & 0xff;
+        | (wkb[7] & 0xff) << 8 | wkb[8] & 0xff;
 
     assertEquals(1234, srid);
 

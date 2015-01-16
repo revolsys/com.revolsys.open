@@ -48,11 +48,11 @@ import com.revolsys.jts.index.strtree.STRtree;
  * on {@link MonotoneChain}s and a {@link SpatialIndex}.
  *
  * Thread-safe and immutable.
- * 
+ *
  * @version 1.7
  */
 public class MCIndexSegmentSetMutualIntersector implements
-  SegmentSetMutualIntersector {
+SegmentSetMutualIntersector {
   public class SegmentOverlapAction extends MonotoneChainOverlapAction {
     private SegmentIntersector si = null;
 
@@ -65,21 +65,21 @@ public class MCIndexSegmentSetMutualIntersector implements
       final MonotoneChain mc2, final int start2) {
       final SegmentString ss1 = (SegmentString)mc1.getContext();
       final SegmentString ss2 = (SegmentString)mc2.getContext();
-      si.processIntersections(ss1, start1, ss2, start2);
+      this.si.processIntersections(ss1, start1, ss2, start2);
     }
 
   }
 
   /**
-  * The {@link SpatialIndex} used should be something that supports
-  * envelope (range) queries efficiently (such as a 
-  *  {@link STRtree}.
-  */
+   * The {@link SpatialIndex} used should be something that supports
+   * envelope (range) queries efficiently (such as a
+   *  {@link STRtree}.
+   */
   private final STRtree index = new STRtree();
 
   /**
    * Constructs a new intersector for a given set of {@link SegmentStrings}.
-   * 
+   *
    * @param baseSegStrings the base segment strings to intersect
    */
   public MCIndexSegmentSetMutualIntersector(final Collection baseSegStrings) {
@@ -91,7 +91,7 @@ public class MCIndexSegmentSetMutualIntersector implements
       segStr);
     for (final Iterator i = segChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
-      index.insert(mc.getEnvelope(), mc);
+      this.index.insert(mc.getEnvelope(), mc);
     }
   }
 
@@ -104,15 +104,15 @@ public class MCIndexSegmentSetMutualIntersector implements
     }
   }
 
-  /** 
+  /**
    * Gets the index constructed over the base segment strings.
-   * 
+   *
    * NOTE: To retain thread-safety, treat returned value as immutable!
-   * 
+   *
    * @return the constructed index
    */
   public SpatialIndex getIndex() {
-    return index;
+    return this.index;
   }
 
   private void initBaseSegments(final Collection segStrings) {
@@ -120,7 +120,7 @@ public class MCIndexSegmentSetMutualIntersector implements
       addToIndex((SegmentString)i.next());
     }
     // build index to ensure thread-safety
-    index.build();
+    this.index.build();
   }
 
   private void intersectChains(final List monoChains,
@@ -130,7 +130,7 @@ public class MCIndexSegmentSetMutualIntersector implements
 
     for (final Iterator i = monoChains.iterator(); i.hasNext();) {
       final MonotoneChain queryChain = (MonotoneChain)i.next();
-      final List overlapChains = index.query(queryChain.getEnvelope());
+      final List overlapChains = this.index.query(queryChain.getEnvelope());
       for (final Iterator j = overlapChains.iterator(); j.hasNext();) {
         final MonotoneChain testChain = (MonotoneChain)j.next();
         queryChain.computeOverlaps(testChain, overlapAction);
@@ -142,10 +142,10 @@ public class MCIndexSegmentSetMutualIntersector implements
   }
 
   /**
-   * Calls {@link SegmentIntersector#processIntersections(SegmentString, int, SegmentString, int)} 
+   * Calls {@link SegmentIntersector#processIntersections(SegmentString, int, SegmentString, int)}
    * for all <i>candidate</i> intersections between
-   * the given collection of SegmentStrings and the set of indexed segments. 
-   * 
+   * the given collection of SegmentStrings and the set of indexed segments.
+   *
    * @param a set of segments to intersect
    * @param the segment intersector to use
    */

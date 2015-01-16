@@ -6,7 +6,7 @@ import com.revolsys.data.equals.EqualsRegistry;
 
 public class Datum implements Serializable {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 4603557237435332398L;
 
@@ -51,15 +51,15 @@ public class Datum implements Serializable {
   public boolean equals(final Object object) {
     if (object instanceof Datum) {
       final Datum datum = (Datum)object;
-      if (EqualsRegistry.equal(authority, datum.getAuthority())) {
+      if (EqualsRegistry.equal(this.authority, datum.getAuthority())) {
         return true;
-      } else if (name == null) {
+      } else if (this.name == null) {
         if (datum.name != null) {
           return false;
         }
         // } else if (!name.equalsIgnoreCase(datum.name)) {
         // return false;
-      } else if (!EqualsRegistry.equal(spheroid, datum.spheroid)) {
+      } else if (!EqualsRegistry.equal(this.spheroid, datum.spheroid)) {
         return false;
       } else {
         return true;
@@ -69,15 +69,15 @@ public class Datum implements Serializable {
   }
 
   public boolean equalsExact(final Datum datum) {
-    if (!EqualsRegistry.equal(authority, datum.authority)) {
+    if (!EqualsRegistry.equal(this.authority, datum.authority)) {
       return false;
-    } else if (deprecated != datum.deprecated) {
+    } else if (this.deprecated != datum.deprecated) {
       return false;
-    } else if (!EqualsRegistry.equal(name, datum.name)) {
+    } else if (!EqualsRegistry.equal(this.name, datum.name)) {
       return false;
-    } else if (!primeMeridian.equalsExact(primeMeridian)) {
+    } else if (!this.primeMeridian.equalsExact(this.primeMeridian)) {
       return false;
-    } else if (!spheroid.equalsExact(datum.spheroid)) {
+    } else if (!this.spheroid.equalsExact(datum.spheroid)) {
       return false;
     } else {
       return true;
@@ -85,40 +85,40 @@ public class Datum implements Serializable {
   }
 
   public Authority getAuthority() {
-    return authority;
+    return this.authority;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public PrimeMeridian getPrimeMeridian() {
-    return primeMeridian;
+    return this.primeMeridian;
   }
 
   public Spheroid getSpheroid() {
-    return spheroid;
+    return this.spheroid;
   }
 
   public ToWgs84 getToWgs84() {
-    return toWgs84;
+    return this.toWgs84;
   }
 
   @Override
   public int hashCode() {
-    if (spheroid != null) {
-      return spheroid.hashCode();
+    if (this.spheroid != null) {
+      return this.spheroid.hashCode();
     } else {
       return 1;
     }
   }
 
   public boolean isDeprecated() {
-    return deprecated;
+    return this.deprecated;
   }
 
   @Override
   public String toString() {
-    return name;
+    return this.name;
   }
 }

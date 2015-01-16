@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,13 +38,13 @@ public class Layout extends Component {
 
   public Layout(final Layout layout) {
     super(layout);
-    page = layout.page;
-    areas.addAll(layout.areas);
+    this.page = layout.page;
+    this.areas.addAll(layout.areas);
     final Iterator keys = layout.components.keySet().iterator();
     while (keys.hasNext()) {
       final String key = (String)keys.next();
       final Component component = (Component)layout.components.get(key);
-      components.put(key, component.clone());
+      this.components.put(key, component.clone());
     }
   }
 
@@ -55,11 +55,11 @@ public class Layout extends Component {
   }
 
   public void addArea(final Area area) {
-    areas.add(area.getName());
+    this.areas.add(area.getName());
   }
 
   public void addArea(final String name) {
-    areas.add(name);
+    this.areas.add(name);
   }
 
   @Override
@@ -71,8 +71,8 @@ public class Layout extends Component {
   public boolean equals(final Object o) {
     if (o instanceof Layout) {
       final Layout l = (Layout)o;
-      if (super.equals(o) && l.page == page && l.areas.equals(areas)
-        && l.components.equals(components)) {
+      if (super.equals(o) && l.page == this.page && l.areas.equals(this.areas)
+          && l.components.equals(this.components)) {
         return true;
       }
     }
@@ -84,12 +84,12 @@ public class Layout extends Component {
   }
 
   public Component getComponent(final String name) {
-    return (Component)components.get(name);
+    return (Component)this.components.get(name);
   }
 
   /**
    * Generate the hash code for the object.
-   * 
+   *
    * @return The hashCode.
    */
   @Override
@@ -99,7 +99,7 @@ public class Layout extends Component {
 
   @Override
   public void includeComponent(final PageContext context) throws IOException,
-    ServletException {
+  ServletException {
     final WebUiContext niceContext = WebUiContext.get();
     niceContext.pushLayout(this);
     context.getOut().flush();
@@ -108,15 +108,15 @@ public class Layout extends Component {
   }
 
   public boolean isPage() {
-    return page;
+    return this.page;
   }
 
   public void setComponent(final String name, final Component component) {
-    if (!areas.contains(name)) {
+    if (!this.areas.contains(name)) {
       throw new IllegalArgumentException(new StringBuilder(
         "Area does not exist with name ").append(name).toString());
     }
-    components.put(name, component);
+    this.components.put(name, component);
   }
 
   /**
@@ -129,7 +129,7 @@ public class Layout extends Component {
   @Override
   public void setPage(final Page page) {
     super.setPage(page);
-    final Iterator children = components.values().iterator();
+    final Iterator children = this.components.values().iterator();
     while (children.hasNext()) {
       final Component component = (Component)children.next();
       component.setPage(page);

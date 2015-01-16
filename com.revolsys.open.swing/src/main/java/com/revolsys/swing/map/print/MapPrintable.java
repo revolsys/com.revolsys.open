@@ -55,7 +55,7 @@ public class MapPrintable implements Printable {
     this.contentRect = contentRect;
     this.dpi = dpi;
     this.rulerSizePixels = rulerSizePixels;
-    millimetre = Measure.valueOf(1, SI.MILLIMETRE).doubleValue(
+    this.millimetre = Measure.valueOf(1, SI.MILLIMETRE).doubleValue(
       NonSI.INCH.divide(dpi));
     this.minorDivisions = minorDivisions;
     this.majorDivisions = minorDivisions * 5;
@@ -64,18 +64,18 @@ public class MapPrintable implements Printable {
 
   private void drawFooter(final Graphics2D graphics2d) {
     graphics2d.setFont(new Font("Arial", Font.PLAIN, 12));
-    final String sheetName = (char)('A' + column) + "" + row;
-    final String text = boundingBox.getCoordinateSystem().getName() + " - 1:"
-      + scale + " - " + sheetName;
+    final String sheetName = (char)('A' + this.column) + "" + this.row;
+    final String text = this.boundingBox.getCoordinateSystem().getName() + " - 1:"
+        + this.scale + " - " + sheetName;
 
     graphics2d.drawString(text, 0,
-      (float)(contentRect.getMaxY() + rulerSizePixels * 2));
+      (float)(this.contentRect.getMaxY() + this.rulerSizePixels * 2));
   }
 
   private void drawRuler(final PrintViewport2D viewport,
     final Graphics2D graphics2d) {
     final double unit = viewport.getModelUnitsPerViewUnit();
-    final float lineWidth = (float)(unit * millimetre / 10);
+    final float lineWidth = (float)(unit * this.millimetre / 10);
     // final boolean savedUseModelCoordinates = viewport.setUseModelCoordinates(
     // true, graphics2d);
     try {
@@ -84,21 +84,21 @@ public class MapPrintable implements Printable {
 
       final double rulerHeight = unit * this.rulerSizePixels;
 
-      final double minX = boundingBox.getMinX();
-      final double maxX = boundingBox.getMaxX();
-      final double minY = boundingBox.getMinY();
-      final double maxY = boundingBox.getMaxY();
+      final double minX = this.boundingBox.getMinX();
+      final double maxX = this.boundingBox.getMaxX();
+      final double minY = this.boundingBox.getMinY();
+      final double maxY = this.boundingBox.getMaxY();
 
       final double width = maxX - minX;
       final double height = maxY - minY;
 
-      final int startXIndex = (int)Math.ceil(minX / minorDivisions);
-      final int endXIndex = (int)Math.ceil(maxX / minorDivisions);
+      final int startXIndex = (int)Math.ceil(minX / this.minorDivisions);
+      final int endXIndex = (int)Math.ceil(maxX / this.minorDivisions);
       final AffineTransform modelToScreenTransform = viewport.getModelToScreenTransform();
       for (int i = startXIndex; i < endXIndex; i++) {
-        final double x = i * minorDivisions;
+        final double x = i * this.minorDivisions;
         double currentRulerHeight;
-        if (x % majorDivisions < minorDivisions) {
+        if (x % this.majorDivisions < this.minorDivisions) {
           graphics2d.setColor(Color.BLACK);
           currentRulerHeight = rulerHeight;
           // final boolean saved2 = viewport.setUseModelCoordinates(false,
@@ -107,13 +107,13 @@ public class MapPrintable implements Printable {
             graphics2d.setFont(new Font("Arial", Font.PLAIN, 12));
             final double[] coord = new double[2];
             modelToScreenTransform.transform(new double[] {
-              x + unit * millimetre, minY - unit * millimetre * 4.5
+              x + unit * this.millimetre, minY - unit * this.millimetre * 4.5
             }, 0, coord, 0, 1);
 
             graphics2d.drawString(String.valueOf((int)x), (float)coord[0],
               (float)coord[1]);
             modelToScreenTransform.transform(new double[] {
-              x + unit * millimetre, maxY + unit * millimetre * 2.25
+              x + unit * this.millimetre, maxY + unit * this.millimetre * 2.25
             }, 0, coord, 0, 1);
 
             graphics2d.drawString(String.valueOf((int)x), (float)coord[0],
@@ -131,12 +131,12 @@ public class MapPrintable implements Printable {
           + currentRulerHeight));
       }
 
-      final int startYIndex = (int)Math.ceil(minY / minorDivisions);
-      final int endYIndex = (int)Math.ceil(maxY / minorDivisions);
+      final int startYIndex = (int)Math.ceil(minY / this.minorDivisions);
+      final int endYIndex = (int)Math.ceil(maxY / this.minorDivisions);
       for (int i = startYIndex; i < endYIndex; i++) {
-        final double y = i * minorDivisions;
+        final double y = i * this.minorDivisions;
         double currentRulerHeight;
-        if (y % majorDivisions < minorDivisions) {
+        if (y % this.majorDivisions < this.minorDivisions) {
           graphics2d.setColor(Color.BLACK);
           currentRulerHeight = rulerHeight;
           graphics2d.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -145,13 +145,13 @@ public class MapPrintable implements Printable {
           // graphics2d);
           try {
             modelToScreenTransform.transform(new double[] {
-              minX - unit * millimetre * 2.25, y + unit * millimetre
+              minX - unit * this.millimetre * 2.25, y + unit * this.millimetre
             }, 0, coord, 0, 1);
             drawString(graphics2d, String.valueOf((int)y), coord[0], coord[1],
               -Math.PI / 2);
 
             modelToScreenTransform.transform(new double[] {
-              maxX + unit * millimetre * 4.5, y + unit * millimetre
+              maxX + unit * this.millimetre * 4.5, y + unit * this.millimetre
             }, 0, coord, 0, 1);
             drawString(graphics2d, String.valueOf((int)y), coord[0], coord[1],
               -Math.PI / 2);
@@ -191,45 +191,45 @@ public class MapPrintable implements Printable {
   public int print(final Graphics graphics, final PageFormat pageFormat,
     final int pageIndex) throws PrinterException {
     final Graphics2D graphics2d = (Graphics2D)graphics;
-    final PrintViewport2D viewport = new PrintViewport2D(map, graphics2d,
-      pageFormat, boundingBox, contentRect, dpi);
-    graphics2d.translate(pageFormat.getImageableX() * dpi / 72.0,
-      pageFormat.getImageableX() * dpi / 72.0);
+    final PrintViewport2D viewport = new PrintViewport2D(this.map, graphics2d,
+      pageFormat, this.boundingBox, this.contentRect, this.dpi);
+    graphics2d.translate(pageFormat.getImageableX() * this.dpi / 72.0,
+      pageFormat.getImageableX() * this.dpi / 72.0);
     drawFooter(graphics2d);
 
-    graphics2d.translate(contentRect.getMinX(), contentRect.getMinY());
+    graphics2d.translate(this.contentRect.getMinX(), this.contentRect.getMinY());
     drawRuler(viewport, graphics2d);
-    graphics2d.clip(new Rectangle2D.Double(0, 0, contentRect.getWidth(),
-      contentRect.getHeight()));
+    graphics2d.clip(new Rectangle2D.Double(0, 0, this.contentRect.getWidth(),
+      this.contentRect.getHeight()));
 
     final LayerGroup map = viewport.getProject();
 
     map.getRenderer().render(viewport);
 
     final double unit = viewport.getModelUnitsPerViewUnit();
-    final float lineWidth = (float)(unit * millimetre / 5);
+    final float lineWidth = (float)(unit * this.millimetre / 5);
     // final boolean saved = viewport.setUseModelCoordinates(true, graphics2d);
     try {
       graphics2d.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_BUTT,
         BasicStroke.JOIN_BEVEL));
 
-      final double minX = boundingBox.getMinX();
-      final double maxX = boundingBox.getMaxX();
-      final double minY = boundingBox.getMinY();
-      final double maxY = boundingBox.getMaxY();
+      final double minX = this.boundingBox.getMinX();
+      final double maxX = this.boundingBox.getMaxX();
+      final double minY = this.boundingBox.getMinY();
+      final double maxY = this.boundingBox.getMaxY();
 
-      final int startXIndex = (int)Math.ceil(minX / majorDivisions);
-      final int endXIndex = (int)Math.ceil(maxX / majorDivisions);
+      final int startXIndex = (int)Math.ceil(minX / this.majorDivisions);
+      final int endXIndex = (int)Math.ceil(maxX / this.majorDivisions);
       graphics2d.setColor(Color.GRAY);
       for (int i = startXIndex; i < endXIndex; i++) {
-        final double x = i * majorDivisions;
+        final double x = i * this.majorDivisions;
         graphics2d.draw(new Line2D.Double(x, minY, x, maxY));
       }
 
-      final int startYIndex = (int)Math.ceil(minY / majorDivisions);
-      final int endYIndex = (int)Math.ceil(maxY / majorDivisions);
+      final int startYIndex = (int)Math.ceil(minY / this.majorDivisions);
+      final int endYIndex = (int)Math.ceil(maxY / this.majorDivisions);
       for (int i = startYIndex; i < endYIndex; i++) {
-        final double y = i * majorDivisions;
+        final double y = i * this.majorDivisions;
         graphics2d.draw(new Line2D.Double(minX, y, maxX, y));
       }
     } finally {

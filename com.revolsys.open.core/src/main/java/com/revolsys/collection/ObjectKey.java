@@ -18,16 +18,16 @@ public class ObjectKey {
   }
 
   public Object getValue() {
-    return value;
+    return this.value;
   }
 
   @Override
   public int hashCode() {
-    return value.hashCode();
+    return this.value.hashCode();
   }
 
   @Override
   public String toString() {
-    return value.toString();
+    return this.value.toString();
   }
 }

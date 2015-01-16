@@ -11,7 +11,7 @@ import org.apache.commons.beanutils.MethodUtils;
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 public class InvokeMethodStringConverter extends ObjectToStringConverter
-  implements ListCellRenderer {
+implements ListCellRenderer {
 
   private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
@@ -31,7 +31,7 @@ public class InvokeMethodStringConverter extends ObjectToStringConverter
   }
 
   public int getHorizontalAlignment() {
-    return horizontalAlignment;
+    return this.horizontalAlignment;
   }
 
   @Override
@@ -42,7 +42,7 @@ public class InvokeMethodStringConverter extends ObjectToStringConverter
       cellHasFocus);
     final String text = getPreferredStringForItem(value);
     this.renderer.setText(text);
-    this.renderer.setHorizontalAlignment(horizontalAlignment);
+    this.renderer.setHorizontalAlignment(this.horizontalAlignment);
     return this.renderer;
   }
 
@@ -56,13 +56,13 @@ public class InvokeMethodStringConverter extends ObjectToStringConverter
           final Class<?> clazz = (Class<?>)this.object;
           return (String)MethodUtils.invokeStaticMethod(clazz, this.methodName,
             new Object[] {
-              item
-            });
+            item
+          });
         } else {
           return (String)MethodUtils.invokeMethod(this.object, this.methodName,
             new Object[] {
-              item
-            });
+            item
+          });
         }
       } catch (final Throwable e) {
         throw new RuntimeException("Unable to invoke " + this, e);

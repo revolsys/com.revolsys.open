@@ -34,7 +34,7 @@ public class FontChooserField extends ComboBox {
 
   public static String[] getFontNames() {
     return GraphicsEnvironment.getLocalGraphicsEnvironment()
-      .getAvailableFontFamilyNames();
+        .getAvailableFontFamilyNames();
   }
 
   private static final long serialVersionUID = 1L;
@@ -44,6 +44,11 @@ public class FontChooserField extends ComboBox {
   private static final Map<String, Reference<Font>> fontCache = new HashMap<>();
 
   private static final ListCellRenderer RENDERER = new DefaultListCellRenderer() {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public Component getListCellRendererComponent(final JList list,
       final Object value, final int index, final boolean isSelected,

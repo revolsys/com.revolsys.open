@@ -27,7 +27,7 @@ public class PbfFieldDecoder {
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param primitiveBlock
    *            The primitive block containing the fields to be decoded.
    */
@@ -46,31 +46,31 @@ public class PbfFieldDecoder {
 
   /**
    * Decodes a raw latitude value into degrees.
-   * 
+   *
    * @param rawLatitude
    *            The PBF encoded value.
    * @return The latitude in degrees.
    */
   public double decodeLatitude(final long rawLatitude) {
     return COORDINATE_SCALING_FACTOR
-      * (this.coordLatitudeOffset + this.coordGranularity * rawLatitude);
+        * (this.coordLatitudeOffset + this.coordGranularity * rawLatitude);
   }
 
   /**
    * Decodes a raw longitude value into degrees.
-   * 
+   *
    * @param rawLongitude
    *            The PBF encoded value.
    * @return The longitude in degrees.
    */
   public double decodeLongitude(final long rawLongitude) {
     return COORDINATE_SCALING_FACTOR
-      * (this.coordLongitudeOffset + this.coordGranularity * rawLongitude);
+        * (this.coordLongitudeOffset + this.coordGranularity * rawLongitude);
   }
 
   /**
    * Decodes a raw string into a String.
-   * 
+   *
    * @param rawString
    *            The PBF encoding string.
    * @return The string as a String.
@@ -81,7 +81,7 @@ public class PbfFieldDecoder {
 
   /**
    * Decodes a raw timestamp value into a Date.
-   * 
+   *
    * @param rawTimestamp
    *            The PBF encoded timestamp.
    * @return The timestamp as a Date.

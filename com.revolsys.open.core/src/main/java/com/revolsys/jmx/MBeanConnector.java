@@ -12,23 +12,23 @@ public class MBeanConnector {
 
   public void close() {
     try {
-      jmxConnector.close();
+      this.jmxConnector.close();
     } catch (final IOException e) {
       e.printStackTrace();
     }
   }
 
   public void connect(final String connectionUrl) {
-    jmxConnector = JmxUtil.getJmxConnector(connectionUrl);
-    connection = JmxUtil.getMbeanServerConnection(jmxConnector);
+    this.jmxConnector = JmxUtil.getJmxConnector(connectionUrl);
+    this.connection = JmxUtil.getMbeanServerConnection(this.jmxConnector);
   }
 
   public MBeanServerConnection getConnection() {
-    return connection;
+    return this.connection;
   }
 
   public JMXConnector getJmxConnector() {
-    return jmxConnector;
+    return this.jmxConnector;
   }
 
   public void setConnection(final MBeanServerConnection connection) {

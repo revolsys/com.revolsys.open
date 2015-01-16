@@ -11,7 +11,7 @@ import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
 
 public class PageLinkKeySerializer extends AbstractKeySerializer implements
-  HtmlUiBuilderAware<HtmlUiBuilder<?>> {
+HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   private String pageName;
 
   private Map<String, String> parameterKeys = new LinkedHashMap<String, String>();
@@ -19,17 +19,18 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
   private HtmlUiBuilder<?> uiBuilder;
 
   public String getPageName() {
-    return pageName;
+    return this.pageName;
   }
 
   public Map<String, String> getParameterKeys() {
-    return parameterKeys;
+    return this.parameterKeys;
   }
 
   public HtmlUiBuilder<?> getUiBuilder() {
-    return uiBuilder;
+    return this.uiBuilder;
   }
 
+  @Override
   public void serialize(final XmlWriter out, final Object object) {
     try {
       HtmlUiBuilder<? extends Object> uiBuilder = this.uiBuilder;
@@ -51,9 +52,9 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
         key = parts[i + 1];
 
       }
-      uiBuilder.serializeLink(out, currentObject, key, pageName, parameterKeys);
+      uiBuilder.serializeLink(out, currentObject, key, this.pageName, this.parameterKeys);
     } catch (final Throwable e) {
-      Logger.getLogger(getClass()).error("Unable to serialize " + pageName, e);
+      Logger.getLogger(getClass()).error("Unable to serialize " + this.pageName, e);
     }
   }
 
@@ -61,6 +62,7 @@ public class PageLinkKeySerializer extends AbstractKeySerializer implements
     out.text(getLabel());
   }
 
+  @Override
   public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
     if (this.uiBuilder == null) {
       this.uiBuilder = uiBuilder;

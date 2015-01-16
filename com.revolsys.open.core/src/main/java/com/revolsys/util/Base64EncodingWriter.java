@@ -14,7 +14,7 @@ public class Base64EncodingWriter extends java.io.PrintWriter {
   public Base64EncodingWriter(final java.io.Writer out) {
     super(out);
     this.bufferLength = 3;
-    this.buffer = new byte[bufferLength];
+    this.buffer = new byte[this.bufferLength];
     this.position = 0;
   }
 
@@ -22,37 +22,36 @@ public class Base64EncodingWriter extends java.io.PrintWriter {
   public void close() {
     flush();
     super.close();
-    buffer = null;
+    this.buffer = null;
   }
 
   @Override
   public void flush() {
-    if (position > 0) {
+    if (this.position > 0) {
       writeBuffer();
-      position = 0;
+      this.position = 0;
     }
 
   }
 
   public void print(final byte[] bytes) {
-    for (int i = 0; i < bytes.length; i++) {
-      final byte b = bytes[i];
+    for (final byte b : bytes) {
       write(b);
     }
   }
 
   public void write(final byte b) {
-    buffer[position++] = b;
-    if (position >= bufferLength) {
+    this.buffer[this.position++] = b;
+    if (this.position >= this.bufferLength) {
       writeBuffer();
-      position = 0;
+      this.position = 0;
     }
   }
 
   @Override
   public void write(final char[] characters, final int off, final int len) {
     try {
-      final byte[] bytes = String.valueOf(characters).getBytes(charset);
+      final byte[] bytes = String.valueOf(characters).getBytes(this.charset);
       for (int i = 0; i < len; i++) {
         write(bytes[off + i]);
       }
@@ -64,7 +63,7 @@ public class Base64EncodingWriter extends java.io.PrintWriter {
   @Override
   public void write(final int character) {
     try {
-      final byte[] bytes = String.valueOf(character).getBytes(charset);
+      final byte[] bytes = String.valueOf(character).getBytes(this.charset);
       print(bytes);
     } catch (final UnsupportedEncodingException e) {
       throw new RuntimeException(e);
@@ -72,12 +71,12 @@ public class Base64EncodingWriter extends java.io.PrintWriter {
   }
 
   private void writeBuffer() {
-    final int inBuff = ((buffer[0] << 24) >>> 8) | ((buffer[1] << 24) >>> 16)
-      | ((buffer[2] << 24) >>> 24);
-    write(Base64Constants.URL_SAFE_ALPHABET[(inBuff >>> 18)]);
-    write(Base64Constants.URL_SAFE_ALPHABET[(inBuff >>> 12) & 0x3f]);
-    write(Base64Constants.URL_SAFE_ALPHABET[(inBuff >>> 6) & 0x3f]);
-    write(Base64Constants.URL_SAFE_ALPHABET[(inBuff) & 0x3f]);
+    final int inBuff = this.buffer[0] << 24 >>> 8 | this.buffer[1] << 24 >>> 16
+        | this.buffer[2] << 24 >>> 24;
+    write(Base64Constants.URL_SAFE_ALPHABET[inBuff >>> 18]);
+    write(Base64Constants.URL_SAFE_ALPHABET[inBuff >>> 12 & 0x3f]);
+    write(Base64Constants.URL_SAFE_ALPHABET[inBuff >>> 6 & 0x3f]);
+    write(Base64Constants.URL_SAFE_ALPHABET[inBuff & 0x3f]);
   }
 
 }

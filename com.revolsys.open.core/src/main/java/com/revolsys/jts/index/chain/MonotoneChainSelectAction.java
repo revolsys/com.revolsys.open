@@ -48,17 +48,17 @@ public class MonotoneChainSelectAction {
   /**
    * This is a convenience method which can be overridden to obtain the actual
    * line segment which is selected.
-   * 
+   *
    * @param seg
    */
   public void select(final LineSegment seg) {
   }
 
   /**
-   * This method is overridden 
-   * to process a segment 
+   * This method is overridden
+   * to process a segment
    * in the context of the parent chain.
-   * 
+   *
    * @param mc the parent chain
    * @param startIndex the index of the start vertex of the segment being processed
    */

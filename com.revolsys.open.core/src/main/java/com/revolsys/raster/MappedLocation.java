@@ -11,10 +11,10 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 
 public class MappedLocation extends AbstractPropertyChangeObject implements
-  MapSerializer {
+MapSerializer {
   public static Point targetPointToPixel(final BoundingBox boundingBox,
     final Point point, final int imageWidth, final int imageHeight) {
     return toImagePoint(boundingBox, point, imageWidth, imageHeight);
@@ -57,7 +57,7 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
       final int vertexOffset = vertexIndex * 2;
       final double xPercent = targetCoordinates[vertexOffset] / imageWidth;
       final double yPercent = (imageHeight - targetCoordinates[vertexOffset + 1])
-        / imageHeight;
+          / imageHeight;
 
       final double modelWidth = boundingBox.getWidth();
       final double modelHeight = boundingBox.getHeight();
@@ -77,8 +77,8 @@ public class MappedLocation extends AbstractPropertyChangeObject implements
   private GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
 
   public MappedLocation(final Map<String, Object> map) {
-    final double sourceX = CollectionUtil.getDouble(map, "sourceX", 0.0);
-    final double sourceY = CollectionUtil.getDouble(map, "sourceY", 0.0);
+    final double sourceX = Maps.getDouble(map, "sourceX", 0.0);
+    final double sourceY = Maps.getDouble(map, "sourceY", 0.0);
     this.sourcePixel = new PointDouble(sourceX, sourceY);
     this.targetPoint = this.geometryFactory.geometry((String)map.get("target"));
   }

@@ -22,15 +22,15 @@ import com.revolsys.jts.util.GeometricShapeFactory;
  * Tests all geometries with both 2 and 3 dimensions and both byte orderings.
  */
 public class WKBTest extends TestCase {
+  public static void main(final String args[]) {
+    TestRunner.run(WKBTest.class);
+  }
+
   static CoordinateSequenceComparator comp2 = new CoordinateSequenceComparator(
     2);
 
   static CoordinateSequenceComparator comp3 = new CoordinateSequenceComparator(
     3);
-
-  public static void main(final String args[]) {
-    TestRunner.run(WKBTest.class);
-  }
 
   private final GeometryFactory geomFactory = GeometryFactory.floating3();
 
@@ -95,7 +95,7 @@ public class WKBTest extends TestCase {
   }
 
   private void runWKBTestCoordinateArray(final String wkt) throws IOException,
-    ParseException {
+  ParseException {
     final GeometryFactory geomFactory = GeometryFactory.floating3();
     final WKTReader rdr = new WKTReader(geomFactory);
     final Geometry g = rdr.read(wkt);
@@ -108,7 +108,7 @@ public class WKBTest extends TestCase {
   }
 
   private void runWKBTestPackedCoordinate(final String wkt) throws IOException,
-    ParseException {
+  ParseException {
     final GeometryFactory geomFactory = GeometryFactory.floating(0, 2);
     final WKTReader rdr = new WKTReader(geomFactory);
     final Geometry g = rdr.read(wkt);

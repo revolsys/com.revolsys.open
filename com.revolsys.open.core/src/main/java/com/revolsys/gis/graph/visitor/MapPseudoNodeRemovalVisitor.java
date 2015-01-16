@@ -9,8 +9,8 @@ import com.revolsys.gis.graph.Node;
 import com.revolsys.util.ObjectProcessor;
 
 public class MapPseudoNodeRemovalVisitor extends
-  AbstractNodeListenerVisitor<Map<String, Object>> implements
-  ObjectProcessor<Graph<Map<String, Object>>> {
+AbstractNodeListenerVisitor<Map<String, Object>> implements
+ObjectProcessor<Graph<Map<String, Object>>> {
 
   public MapPseudoNodeRemovalVisitor() {
   }

@@ -8,6 +8,25 @@ import java.util.TreeMap;
 import com.revolsys.data.equals.EqualsRegistry;
 
 public class Projection implements Serializable, Comparable<Projection> {
+  public static void addAlias(String name, final String normalizedName) {
+    name = name.toLowerCase().replaceAll("[^a-z0-9]", "");
+    PROJECTION_ALIASES.put(name, normalizedName);
+  }
+
+  public static String getNormalizedName(final String name) {
+    if (name == null) {
+      return null;
+    } else {
+      final String searchName = name.toLowerCase().replaceAll("[^a-z0-9]", "");
+      final String normalizedName = PROJECTION_ALIASES.get(searchName);
+      if (normalizedName == null) {
+        return name;
+      } else {
+        return normalizedName;
+      }
+    }
+  }
+
   public static final String ALBERS_EQUAL_AREA = "Albers_Equal_Area";
 
   public static final String LAMBERT_CONIC_CONFORMAL_1SP = "Lambert_Conic_Conformal_(1SP)";
@@ -23,10 +42,10 @@ public class Projection implements Serializable, Comparable<Projection> {
   public static final String MERCATOR_1SP_SPHERICAL = "Mercator_(1SP)_(Spherical)";
 
   public static final String MERCATOR_2SP = "Mercator_(2SP)";
-
   public static final String POPULAR_VISUALISATION_PSEUDO_MERCATOR = "Popular_Visualisation_Pseudo_Mercator";
 
   private static final Map<String, String> PROJECTION_ALIASES = new TreeMap<>();
+
   static {
     for (final String alias : Arrays.asList(ALBERS_EQUAL_AREA, "Albers",
       "Albers_Equal_Area_Conic", "Albers_Conic_Equal_Area")) {
@@ -53,30 +72,11 @@ public class Projection implements Serializable, Comparable<Projection> {
   }
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 6199958151692874551L;
 
   public static final String TRANSVERSE_MERCATOR = "Transverse_Mercator";
-
-  public static void addAlias(String name, final String normalizedName) {
-    name = name.toLowerCase().replaceAll("[^a-z0-9]", "");
-    PROJECTION_ALIASES.put(name, normalizedName);
-  }
-
-  public static String getNormalizedName(final String name) {
-    if (name == null) {
-      return null;
-    } else {
-      final String searchName = name.toLowerCase().replaceAll("[^a-z0-9]", "");
-      final String normalizedName = PROJECTION_ALIASES.get(searchName);
-      if (normalizedName == null) {
-        return name;
-      } else {
-        return normalizedName;
-      }
-    }
-  }
 
   private Authority authority;
 
@@ -103,7 +103,7 @@ public class Projection implements Serializable, Comparable<Projection> {
   public boolean equals(final Object obj) {
     if (obj instanceof Projection) {
       final Projection projection = (Projection)obj;
-      if (EqualsRegistry.equal(authority, projection.authority)) {
+      if (EqualsRegistry.equal(this.authority, projection.authority)) {
         return true;
       } else {
         return getNormalizedName().equals(projection.getNormalizedName());
@@ -113,15 +113,15 @@ public class Projection implements Serializable, Comparable<Projection> {
   }
 
   public Authority getAuthority() {
-    return authority;
+    return this.authority;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public String getNormalizedName() {
-    return normalizedName;
+    return this.normalizedName;
   }
 
   @Override

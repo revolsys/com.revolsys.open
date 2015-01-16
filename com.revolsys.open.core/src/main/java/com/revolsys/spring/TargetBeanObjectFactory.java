@@ -12,7 +12,7 @@ import org.springframework.beans.factory.ObjectFactory;
 class TargetBeanObjectFactory implements ObjectFactory, Serializable {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -1734089673416157600L;
 

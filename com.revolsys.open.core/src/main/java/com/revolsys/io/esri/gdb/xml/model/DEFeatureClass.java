@@ -30,43 +30,43 @@ public class DEFeatureClass extends DETable {
   }
 
   public String getAreaFieldName() {
-    return areaFieldName;
+    return this.areaFieldName;
   }
 
   public Envelope getExtent() {
-    return extent;
+    return this.extent;
   }
 
   public String getFeatureType() {
-    return featureType;
+    return this.featureType;
   }
 
   public String getLengthFieldName() {
-    return lengthFieldName;
+    return this.lengthFieldName;
   }
 
   public String getShapeFieldName() {
-    return shapeFieldName;
+    return this.shapeFieldName;
   }
 
   public GeometryType getShapeType() {
-    return shapeType;
+    return this.shapeType;
   }
 
   public SpatialReference getSpatialReference() {
-    return spatialReference;
+    return this.spatialReference;
   }
 
   public boolean isHasM() {
-    return hasM;
+    return this.hasM;
   }
 
   public boolean isHasSpatialIndex() {
-    return hasSpatialIndex;
+    return this.hasSpatialIndex;
   }
 
   public boolean isHasZ() {
-    return hasZ;
+    return this.hasZ;
   }
 
   public void setAreaFieldName(final String areaFieldName) {

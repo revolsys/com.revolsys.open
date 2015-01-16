@@ -43,6 +43,12 @@ import com.revolsys.jts.math.Vector2D;
 import com.revolsys.jts.shape.GeometricShapeBuilder;
 
 public class KochSnowflakeBuilder extends GeometricShapeBuilder {
+  public static int recursionLevelForSize(final int numPts) {
+    final double pow4 = numPts / 3;
+    final double exp = Math.log(pow4) / Math.log(4);
+    return (int)exp;
+  }
+
   private static final double ONE_THIRD = 1.0 / 3.0;
 
   /**
@@ -54,12 +60,6 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
 
   private static final double TWO_THIRDS = 2.0 / 3.0;
 
-  public static int recursionLevelForSize(final int numPts) {
-    final double pow4 = numPts / 3;
-    final double exp = Math.log(pow4) / Math.log(4);
-    return (int)exp;
-  }
-
   private final CoordinateList coordList = new CoordinateList();
 
   public KochSnowflakeBuilder(final GeometryFactory geomFactory) {
@@ -67,7 +67,7 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
   }
 
   private void addSegment(final Point p0, final Point p1) {
-    coordList.add(p1);
+    this.coordList.add(p1);
   }
 
   public void addSide(final int level, final Point p0, final Point p1) {
@@ -111,17 +111,17 @@ public class KochSnowflakeBuilder extends GeometricShapeBuilder {
     addSide(level, p0, p1);
     addSide(level, p1, p2);
     addSide(level, p2, p0);
-    coordList.closeRing();
-    return coordList.toCoordinateArray();
+    this.coordList.closeRing();
+    return this.coordList.toCoordinateArray();
   }
 
   @Override
   public Geometry getGeometry() {
-    final int level = recursionLevelForSize(numPts);
+    final int level = recursionLevelForSize(this.numPts);
     final LineSegment baseLine = getSquareBaseLine();
     final Point[] pts = getBoundary(level, baseLine.getPoint(0),
       baseLine.getLength());
-    return geometryFactory.polygon(geometryFactory.linearRing(pts));
+    return this.geometryFactory.polygon(this.geometryFactory.linearRing(pts));
   }
 
 }

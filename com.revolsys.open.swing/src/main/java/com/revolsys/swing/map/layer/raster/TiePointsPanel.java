@@ -28,7 +28,7 @@ import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.Property;
 
 public class TiePointsPanel extends TablePanel implements
-  PropertyChangeListener {
+PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private static final List<String> COLUMN_NAMES = Arrays.asList(
@@ -146,8 +146,8 @@ public class TiePointsPanel extends TablePanel implements
       final Project project = Project.get();
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()
-        .convert(geometryFactory)
-        .expand(200);
+          .convert(geometryFactory)
+          .expand(200);
       project.setViewBoundingBox(boundingBox);
 
     }

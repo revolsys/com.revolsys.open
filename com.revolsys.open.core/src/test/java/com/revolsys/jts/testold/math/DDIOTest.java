@@ -7,9 +7,9 @@ import com.revolsys.jts.math.DD;
 
 /**
  * Tests I/O for {@link DD}s.
- * 
+ *
  * @author mbdavis
- * 
+ *
  */
 public class DDIOTest extends TestCase {
   public static void main(final String args[]) {
@@ -26,7 +26,7 @@ public class DDIOTest extends TestCase {
     final double err = xdd.subtract(expectedVal).doubleValue();
     final double relErr = err / xdd.doubleValue();
 
-  //  System.out.println("Parsed= " + xdd + " rel err= " + relErr);
+    //  System.out.println("Parsed= " + xdd + " rel err= " + relErr);
 
     assertTrue(err <= relErrBound);
   }
@@ -48,7 +48,7 @@ public class DDIOTest extends TestCase {
 
   private void checkSciNotation(final DD x, final String expectedStr) {
     final String xStr = x.toSciNotation();
-  //  System.out.println("Sci Notation: " + xStr);
+    //  System.out.println("Sci Notation: " + xStr);
     assertEquals(xStr, expectedStr);
   }
 
@@ -58,7 +58,7 @@ public class DDIOTest extends TestCase {
 
   private void checkStandardNotation(final DD x, final String expectedStr) {
     final String xStr = x.toStandardNotation();
-  //  System.out.println("Standard Notation: " + xStr);
+    //  System.out.println("Standard Notation: " + xStr);
     assertEquals(expectedStr, xStr);
   }
 
@@ -80,9 +80,9 @@ public class DDIOTest extends TestCase {
       1e-32);
     checkParse("-1.05e-10",
       DD.valueOf(105.)
-        .divide(DD.valueOf(100.))
-        .divide(DD.valueOf(1.0E10))
-        .negate(), 1e-32);
+      .divide(DD.valueOf(100.))
+      .divide(DD.valueOf(1.0E10))
+      .negate(), 1e-32);
 
     /**
      * The Java double-precision constant 1.4 gives rise to a value which
@@ -130,17 +130,17 @@ public class DDIOTest extends TestCase {
 
     // cases where hi is a power of 10 and lo is negative
     checkStandardNotation(DD.valueOf(1e12).subtract(DD.valueOf(1)),
-      "999999999999.0");
+        "999999999999.0");
     checkStandardNotation(DD.valueOf(1e14).subtract(DD.valueOf(1)),
-      "99999999999999.0");
+        "99999999999999.0");
     checkStandardNotation(DD.valueOf(1e16).subtract(DD.valueOf(1)),
-      "9999999999999999.0");
+        "9999999999999999.0");
 
     final DD num8Dec = DD.valueOf(-379363639).divide(DD.valueOf(100000000));
     checkStandardNotation(num8Dec, "-3.79363639");
 
     checkStandardNotation(new DD(-3.79363639, 8.039137357367426E-17),
-      "-3.7936363900000000000000000");
+        "-3.7936363900000000000000000");
 
     checkStandardNotation(DD.valueOf(34).divide(DD.valueOf(1000)), "0.034");
     checkStandardNotation(1.05e3, "1050.0");
@@ -150,9 +150,9 @@ public class DDIOTest extends TestCase {
   }
 
   /**
-   * Tests that printing values with many decimal places works. 
+   * Tests that printing values with many decimal places works.
    * This tests the correctness and robustness of both output and input.
-   * 
+   *
    * @param x
    */
   void writeAndReadSqrt(final double x) {
@@ -173,7 +173,7 @@ public class DDIOTest extends TestCase {
 
   /**
    * This routine simply tests for robustness of the toString function.
-   * 
+   *
    * @param xdd
    */
   void writeRepeatedSqr(DD xdd) {
@@ -190,7 +190,7 @@ public class DDIOTest extends TestCase {
       final double x = xdd.doubleValue();
       final DD xSqr = xdd.sqr();
       final String s = xSqr.toString();
-    //  System.out.println(count + ": " + s);
+      //  System.out.println(count + ": " + s);
 
       final DD xSqr2 = DD.parse(s);
 
@@ -200,7 +200,7 @@ public class DDIOTest extends TestCase {
 
   /**
    * This routine simply tests for robustness of the toString function.
-   * 
+   *
    * @param xdd
    */
   void writeRepeatedSqrt(DD xdd) {

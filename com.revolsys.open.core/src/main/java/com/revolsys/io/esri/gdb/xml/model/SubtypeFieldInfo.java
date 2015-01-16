@@ -8,15 +8,15 @@ public class SubtypeFieldInfo {
   private Object defaultValue;
 
   public Object getDefaultValue() {
-    return defaultValue;
+    return this.defaultValue;
   }
 
   public String getDomainName() {
-    return domainName;
+    return this.domainName;
   }
 
   public String getFieldName() {
-    return fieldName;
+    return this.fieldName;
   }
 
   public void setDefaultValue(final Object defaultValue) {

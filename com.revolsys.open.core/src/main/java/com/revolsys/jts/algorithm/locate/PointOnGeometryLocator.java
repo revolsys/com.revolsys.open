@@ -39,15 +39,15 @@ import com.revolsys.jts.geom.Point;
 /**
  * An interface for classes which determine the {@link Location} of
  * points in a {@link Geometry}.
- * 
+ *
  * @author Martin Davis
  */
 public interface PointOnGeometryLocator {
   /**
    * Determines the {@link Location} of a point in the {@link Geometry}.
-   * 
+   *
    * @param p the point to test
-   * @return the location of the point in the geometry  
+   * @return the location of the point in the geometry
    */
   Location locate(Point p);
 }

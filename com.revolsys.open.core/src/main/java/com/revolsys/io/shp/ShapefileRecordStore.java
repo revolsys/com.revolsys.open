@@ -12,12 +12,9 @@ import com.revolsys.io.Writer;
 
 public class ShapefileRecordStore extends AbstractRecordStore {
 
-  private final File directory;
-
   private ShapefileDirectoryWriter writer;
 
   public ShapefileRecordStore(final File directory) {
-    this.directory = directory;
     directory.mkdirs();
     this.writer = new ShapefileDirectoryWriter(directory);
     this.writer.setLogCounts(false);

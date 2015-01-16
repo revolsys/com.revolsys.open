@@ -5,10 +5,6 @@ import com.revolsys.jts.operation.distance.IndexedFacetDistance;
 
 public class CachedBABDistance {
 
-  private static Geometry cacheGeom = null;
-
-  private static IndexedFacetDistance babDist;
-
   static double getDistance(final Geometry g1, final Geometry g2) {
     if (cacheGeom != g1) {
       babDist = new IndexedFacetDistance(g1);
@@ -16,6 +12,10 @@ public class CachedBABDistance {
     }
     return babDist.getDistance(g2);
   }
+
+  private static Geometry cacheGeom = null;
+
+  private static IndexedFacetDistance babDist;
 
   public CachedBABDistance() {
     super();

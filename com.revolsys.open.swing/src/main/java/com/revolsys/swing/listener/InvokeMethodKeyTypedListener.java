@@ -1,7 +1,7 @@
 /* *****************************************************************************
  The Open Java Unified Mapping Platform (OpenJUMP) is an extensible, interactive
  GUI for visualizing and manipulating spatial features with geometry and
- attributes. 
+ attributes.
 
  Copyright (C) 2007  Revolution Systems Inc.
 
@@ -20,7 +20,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
  For more information see:
- 
+
  http://openjump.org/
 
  ******************************************************************************/
@@ -35,7 +35,7 @@ import com.revolsys.swing.parallel.Invoke;
 /**
  * An ActionListener that invokes the method on the object when the action is
  * performed.
- * 
+ *
  * @author Paul Austin
  */
 public class InvokeMethodKeyTypedListener extends KeyAdapter {

@@ -16,16 +16,16 @@ import com.revolsys.jts.testold.junit.GeometryUtils;
 /**
  * Large-scale tests of {@link CascadedPolygonUnion}
  * using synthetic datasets.
- * 
+ *
  * @author mbdavis
  *
  */
 public class CascadedPolygonUnionTest extends TestCase {
-  private static CascadedPolygonUnionTester tester = new CascadedPolygonUnionTester();
-
   public static void main(final String[] args) {
     junit.textui.TestRunner.run(CascadedPolygonUnionTest.class);
   }
+
+  private static CascadedPolygonUnionTester tester = new CascadedPolygonUnionTester();
 
   GeometryFactory geomFact = GeometryFactory.floating3();
 

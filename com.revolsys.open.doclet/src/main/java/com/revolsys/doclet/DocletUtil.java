@@ -153,7 +153,7 @@ public class DocletUtil {
       if (qualifiedTypeName.startsWith(packagePrefix)) {
         final String baseUrl = entry.getValue();
         final String url = baseUrl + qualifiedTypeName.replaceAll("\\.", "/")
-          + ".html?is-external=true";
+            + ".html?is-external=true";
         return url;
       }
     }
@@ -207,8 +207,8 @@ public class DocletUtil {
     final ClassDoc classDoc = type.asClassDoc();
     final ClassDoc annotationDoc = type.asAnnotationTypeDoc();
     final boolean included = annotationDoc != null
-      && annotationDoc.isIncluded() || classDoc != null
-      && classDoc.isIncluded();
+        && annotationDoc.isIncluded() || classDoc != null
+        && classDoc.isIncluded();
     return included;
   }
 
@@ -328,7 +328,7 @@ public class DocletUtil {
               if (referencedMemberName.indexOf('(') < 0) {
                 final ExecutableMemberDoc executableDoc = (ExecutableMemberDoc)referencedMember;
                 referencedMemberName = referencedMemberName
-                  + executableDoc.signature();
+                    + executableDoc.signature();
               }
               if (StringUtils.hasText(referencedMemberName)) {
                 label = referencedMemberName;
@@ -444,6 +444,6 @@ public class DocletUtil {
   static {
     addPackageUrl("java.", "http://docs.oracle.com/javase/6/docs/api/");
     addPackageUrl("com.revolsys.jts.",
-      "http://tsusiatsoftware.net/jts/javadoc/");
+        "http://tsusiatsoftware.net/jts/javadoc/");
   }
 }

@@ -41,7 +41,7 @@ import com.revolsys.jtstest.testrunner.GeometryResult;
 import com.revolsys.jtstest.testrunner.Result;
 
 /**
- * A {@link GeometryOperation} which validates the results of the 
+ * A {@link GeometryOperation} which validates the results of the
  * {@link Geometry} <tt>buffer()</tt> method.
  * If an invalid result is found, an exception is thrown (this is the most
  * convenient and noticeable way of flagging the problem when using the TestRunner).
@@ -74,7 +74,7 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
   /**
    * Creates a new operation which chains to the given {@link GeometryMethodOperation}
    * for non-intercepted methods.
-   * 
+   *
    * @param chainOp the operation to chain to
    */
   public BufferValidatedGeometryOperation(final GeometryMethodOperation chainOp) {
@@ -84,10 +84,10 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
   private void checkContainment(final Geometry geom, final Geometry buffer) {
     boolean isCovered = true;
     String errMsg = "";
-    if (distance > 0) {
+    if (this.distance > 0) {
       isCovered = buffer.covers(geom);
       errMsg = "Geometry is not contained in (positive) buffer";
-    } else if (distance < 0) {
+    } else if (this.distance < 0) {
       errMsg = "Geometry does not contain (negative) buffer";
       // covers is always false for empty geometries, so don't bother testing
       // them
@@ -123,12 +123,12 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
 
   @Override
   public Class getReturnType(final String opName) {
-    return chainOp.getReturnType(opName);
+    return this.chainOp.getReturnType(opName);
   }
 
   /**
    * Invokes the named operation
-   * 
+   *
    * @param opName
    * @param geometry
    * @param args
@@ -142,18 +142,18 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
     final boolean isBufferOp = opName.equalsIgnoreCase("buffer");
     // if not a buffer op, do the default
     if (!isBufferOp) {
-      return chainOp.invoke(opName, geometry, args);
+      return this.chainOp.invoke(opName, geometry, args);
     }
     parseArgs(args);
     return invokeBufferOpValidated(geometry, args);
   }
 
   private Geometry invokeBuffer(final Geometry geom) {
-    if (argCount == 1) {
-      return geom.buffer(distance);
+    if (this.argCount == 1) {
+      return geom.buffer(this.distance);
     }
-    if (argCount == 2) {
-      return geom.buffer(distance, quadSegments);
+    if (this.argCount == 2) {
+      return geom.buffer(this.distance, this.quadSegments);
     }
     Assert.shouldNeverReachHere("Unknown or unhandled buffer method");
     return null;
@@ -169,10 +169,10 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
     validate(geometry, result);
 
     /**
-     * Return an empty GeometryCollection as the result.  
+     * Return an empty GeometryCollection as the result.
      * This allows the test case to avoid specifying an exact result
      */
-    if (returnEmptyGC) {
+    if (this.returnEmptyGC) {
       result = result.getGeometryFactory().geometryCollection();
     }
     return new GeometryResult(result);
@@ -180,18 +180,18 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
 
   private boolean isEmptyBufferExpected(final Geometry geom) {
     final boolean isNegativeBufferOfNonAreal = geom.getDimension() < 2
-      && distance <= 0.0;
+        && this.distance <= 0.0;
     return isNegativeBufferOfNonAreal;
   }
 
   private void parseArgs(final Object[] args) {
-    argCount = args.length;
-    distance = Double.parseDouble((String)args[0]);
-    if (argCount >= 2) {
-      quadSegments = Integer.parseInt((String)args[1]);
+    this.argCount = args.length;
+    this.distance = Double.parseDouble((String)args[0]);
+    if (this.argCount >= 2) {
+      this.quadSegments = Integer.parseInt((String)args[1]);
     }
-    if (argCount >= 3) {
-      endCapStyle = Integer.parseInt((String)args[2]);
+    if (this.argCount >= 3) {
+      this.endCapStyle = Integer.parseInt((String)args[2]);
     }
   }
 
@@ -213,7 +213,7 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
     checkContainment(geom, buffer);
 
     // could also check distances of boundaries
-    checkDistance(geom, distance, buffer);
+    checkDistance(geom, this.distance, buffer);
     // need special check for negative buffers which disappear. Somehow need to
     // find maximum inner circle - via skeleton?
   }

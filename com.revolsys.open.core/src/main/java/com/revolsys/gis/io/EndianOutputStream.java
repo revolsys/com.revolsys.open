@@ -5,13 +5,13 @@
  * $Revision: 1314 $
 
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,14 +38,14 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
   @Override
   public void close() throws IOException {
     flush();
-    out.close();
+    this.out.close();
     super.close();
   }
 
   @Override
   public void flush() {
     try {
-      out.flush();
+      this.out.flush();
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
@@ -53,31 +53,31 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
 
   @Override
   public long getFilePointer() throws IOException {
-    return written;
+    return this.written;
   }
 
   @Override
   public long length() throws IOException {
-    return written;
+    return this.written;
   }
 
   @Override
   public void write(final byte[] b) throws IOException {
-    out.write(b);
-    written += b.length;
+    this.out.write(b);
+    this.written += b.length;
   }
 
   @Override
   public void write(final byte[] b, final int off, final int len)
-    throws IOException {
-    out.write(b, off, len);
-    written += len;
+      throws IOException {
+    this.out.write(b, off, len);
+    this.written += len;
   }
 
   @Override
   public void write(final int b) throws IOException {
-    out.write(b);
-    written++;
+    this.out.write(b);
+    this.written++;
   }
 
   @Override
@@ -112,11 +112,11 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
 
   @Override
   public void writeInt(final int i) throws IOException {
-    writeBuffer[0] = (byte)(i >>> 24);
-    writeBuffer[1] = (byte)(i >>> 16);
-    writeBuffer[2] = (byte)(i >>> 8);
-    writeBuffer[3] = (byte)(i >>> 0);
-    write(writeBuffer, 0, 4);
+    this.writeBuffer[0] = (byte)(i >>> 24);
+    this.writeBuffer[1] = (byte)(i >>> 16);
+    this.writeBuffer[2] = (byte)(i >>> 8);
+    this.writeBuffer[3] = (byte)(i >>> 0);
+    write(this.writeBuffer, 0, 4);
   }
 
   @Override
@@ -133,50 +133,50 @@ public class EndianOutputStream extends OutputStream implements EndianOutput {
 
   @Override
   public void writeLEInt(final int i) throws IOException {
-    writeBuffer[0] = (byte)(i >>> 0);
-    writeBuffer[1] = (byte)(i >>> 8);
-    writeBuffer[2] = (byte)(i >>> 16);
-    writeBuffer[3] = (byte)(i >>> 24);
-    write(writeBuffer, 0, 4);
+    this.writeBuffer[0] = (byte)(i >>> 0);
+    this.writeBuffer[1] = (byte)(i >>> 8);
+    this.writeBuffer[2] = (byte)(i >>> 16);
+    this.writeBuffer[3] = (byte)(i >>> 24);
+    write(this.writeBuffer, 0, 4);
   }
 
   @Override
   public void writeLELong(final long l) throws IOException {
-    writeBuffer[0] = (byte)(l >>> 0);
-    writeBuffer[1] = (byte)(l >>> 8);
-    writeBuffer[2] = (byte)(l >>> 16);
-    writeBuffer[3] = (byte)(l >>> 24);
-    writeBuffer[4] = (byte)(l >>> 32);
-    writeBuffer[5] = (byte)(l >>> 40);
-    writeBuffer[6] = (byte)(l >>> 48);
-    writeBuffer[7] = (byte)(l >>> 56);
-    write(writeBuffer, 0, 8);
+    this.writeBuffer[0] = (byte)(l >>> 0);
+    this.writeBuffer[1] = (byte)(l >>> 8);
+    this.writeBuffer[2] = (byte)(l >>> 16);
+    this.writeBuffer[3] = (byte)(l >>> 24);
+    this.writeBuffer[4] = (byte)(l >>> 32);
+    this.writeBuffer[5] = (byte)(l >>> 40);
+    this.writeBuffer[6] = (byte)(l >>> 48);
+    this.writeBuffer[7] = (byte)(l >>> 56);
+    write(this.writeBuffer, 0, 8);
   }
 
   @Override
   public void writeLEShort(final short s) throws IOException {
-    writeBuffer[0] = (byte)(s >>> 0);
-    writeBuffer[1] = (byte)(s >>> 8);
-    write(writeBuffer, 0, 2);
+    this.writeBuffer[0] = (byte)(s >>> 0);
+    this.writeBuffer[1] = (byte)(s >>> 8);
+    write(this.writeBuffer, 0, 2);
   }
 
   @Override
   public void writeLong(final long l) throws IOException {
-    writeBuffer[0] = (byte)(l >>> 56);
-    writeBuffer[1] = (byte)(l >>> 48);
-    writeBuffer[2] = (byte)(l >>> 40);
-    writeBuffer[3] = (byte)(l >>> 32);
-    writeBuffer[4] = (byte)(l >>> 24);
-    writeBuffer[5] = (byte)(l >>> 16);
-    writeBuffer[6] = (byte)(l >>> 8);
-    writeBuffer[7] = (byte)(l >>> 0);
-    write(writeBuffer, 0, 8);
+    this.writeBuffer[0] = (byte)(l >>> 56);
+    this.writeBuffer[1] = (byte)(l >>> 48);
+    this.writeBuffer[2] = (byte)(l >>> 40);
+    this.writeBuffer[3] = (byte)(l >>> 32);
+    this.writeBuffer[4] = (byte)(l >>> 24);
+    this.writeBuffer[5] = (byte)(l >>> 16);
+    this.writeBuffer[6] = (byte)(l >>> 8);
+    this.writeBuffer[7] = (byte)(l >>> 0);
+    write(this.writeBuffer, 0, 8);
   }
 
   @Override
   public void writeShort(final short s) throws IOException {
-    writeBuffer[0] = (byte)(s >>> 8);
-    writeBuffer[1] = (byte)(s >>> 0);
-    write(writeBuffer, 0, 2);
+    this.writeBuffer[0] = (byte)(s >>> 8);
+    this.writeBuffer[1] = (byte)(s >>> 0);
+    write(this.writeBuffer, 0, 2);
   }
 }

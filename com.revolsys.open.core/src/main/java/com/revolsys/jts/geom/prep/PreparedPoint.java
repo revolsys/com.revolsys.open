@@ -39,6 +39,10 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.AbstractPoint;
 
 public class PreparedPoint extends AbstractPoint {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private final Point point;
 
   public PreparedPoint(final Point point) {
@@ -47,17 +51,17 @@ public class PreparedPoint extends AbstractPoint {
 
   @Override
   public BoundingBox getBoundingBox() {
-    return point.getBoundingBox();
+    return this.point.getBoundingBox();
   }
 
   @Override
   public double getCoordinate(final int axisIndex) {
-    return point.getCoordinate(axisIndex);
+    return this.point.getCoordinate(axisIndex);
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return point.getGeometryFactory();
+    return this.point.getGeometryFactory();
   }
 
   /**
@@ -80,6 +84,6 @@ public class PreparedPoint extends AbstractPoint {
 
   @Override
   public boolean isEmpty() {
-    return point.isEmpty();
+    return this.point.isEmpty();
   }
 }

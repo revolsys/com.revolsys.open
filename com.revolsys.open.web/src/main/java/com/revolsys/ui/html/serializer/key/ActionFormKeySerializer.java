@@ -24,7 +24,7 @@ import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
 public class ActionFormKeySerializer extends AbstractKeySerializer implements
-  HtmlUiBuilderAware<HtmlUiBuilder<?>> {
+HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   public static void serialize(final XmlWriter out, final Object object,
     final HtmlUiBuilder<?> uiBuilder, final List<String> parameterNames,
     final Map<String, String> parameterNameMap, final String target,
@@ -102,19 +102,19 @@ public class ActionFormKeySerializer extends AbstractKeySerializer implements
   }
 
   public String getCssClass() {
-    return cssClass;
+    return this.cssClass;
   }
 
   public Map<String, String> getParameterNameMap() {
-    return parameterNameMap;
+    return this.parameterNameMap;
   }
 
   public List<String> getParameterNames() {
-    return parameterNames;
+    return this.parameterNames;
   }
 
   public String getTarget() {
-    return target;
+    return this.target;
   }
 
   @Override

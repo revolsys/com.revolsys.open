@@ -11,7 +11,7 @@ import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.connection.AbstractConnectionRegistry;
 import com.revolsys.io.json.JsonMapIoFactory;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public class RecordStoreConnectionRegistry extends
@@ -77,12 +77,12 @@ AbstractConnectionRegistry<RecordStoreConnection> {
   @Override
   protected RecordStoreConnection loadConnection(final File recordStoreFile) {
     final Map<String, ? extends Object> config = JsonMapIoFactory.toMap(recordStoreFile);
-    String name = CollectionUtil.getString(config, "name");
+    String name = Maps.getString(config, "name");
     if (!Property.hasValue(name)) {
       name = FileUtil.getBaseName(recordStoreFile);
     }
     try {
-      final Map<String, Object> connectionProperties = CollectionUtil.get(
+      final Map<String, Object> connectionProperties = Maps.get(
         config, "connection", Collections.<String, Object> emptyMap());
       if (connectionProperties.isEmpty()) {
         LoggerFactory.getLogger(getClass()).error(

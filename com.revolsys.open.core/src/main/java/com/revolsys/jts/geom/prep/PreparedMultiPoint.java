@@ -41,6 +41,10 @@ import com.revolsys.jts.geom.MultiPoint;
 import com.revolsys.jts.geom.impl.AbstractMultiPoint;
 
 public class PreparedMultiPoint extends AbstractMultiPoint {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private final MultiPoint multiPoint;
 
   public PreparedMultiPoint(final MultiPoint multiPoint) {
@@ -49,27 +53,27 @@ public class PreparedMultiPoint extends AbstractMultiPoint {
 
   @Override
   public BoundingBox getBoundingBox() {
-    return multiPoint.getBoundingBox();
+    return this.multiPoint.getBoundingBox();
   }
 
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    return multiPoint.getGeometries();
+    return this.multiPoint.getGeometries();
   }
 
   @Override
   public <V extends Geometry> V getGeometry(final int partIndex) {
-    return multiPoint.getGeometry(partIndex);
+    return this.multiPoint.getGeometry(partIndex);
   }
 
   @Override
   public int getGeometryCount() {
-    return multiPoint.getGeometryCount();
+    return this.multiPoint.getGeometryCount();
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return multiPoint.getGeometryFactory();
+    return this.multiPoint.getGeometryFactory();
   }
 
   /**
@@ -92,7 +96,7 @@ public class PreparedMultiPoint extends AbstractMultiPoint {
 
   @Override
   public boolean isEmpty() {
-    return multiPoint.isEmpty();
+    return this.multiPoint.isEmpty();
   }
 
   @Override

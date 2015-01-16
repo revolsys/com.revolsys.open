@@ -42,13 +42,13 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Polygonal;
 
 /**
- * Optimized implementation of the <tt>contains</tt> spatial predicate 
+ * Optimized implementation of the <tt>contains</tt> spatial predicate
  * for cases where the first {@link Geometry} is a rectangle.
  * This class works for all input geometries, including
  * {@link GeometryCollection}s.
  * <p>
  * As a further optimization,
- * this class can be used to test 
+ * this class can be used to test
  * many geometries against a single
  * rectangle in a slightly more efficient way.
  *
@@ -58,7 +58,7 @@ public class RectangleContains {
 
   /**
    * Tests whether a rectangle contains a given geometry.
-   * 
+   *
    * @param rectangle a rectangular Polygon
    * @param b a Geometry of any type
    * @return true if the geometries intersect
@@ -76,12 +76,12 @@ public class RectangleContains {
    * @param rectangle a rectangular geometry
    */
   public RectangleContains(final Polygonal rectangle) {
-    rectEnv = rectangle.getBoundingBox();
+    this.rectEnv = rectangle.getBoundingBox();
   }
 
   public boolean contains(final Geometry geom) {
     // the test geometry must be wholly contained in the rectangle envelope
-    if (!rectEnv.covers(geom.getBoundingBox())) {
+    if (!this.rectEnv.covers(geom.getBoundingBox())) {
       return false;
     }
 
@@ -131,11 +131,11 @@ public class RectangleContains {
 
     // we already know that the segment is contained in the rectangle envelope
     if (p0.getX() == p1.getX()) {
-      if (p0.getX() == rectEnv.getMinX() || p0.getX() == rectEnv.getMaxX()) {
+      if (p0.getX() == this.rectEnv.getMinX() || p0.getX() == this.rectEnv.getMaxX()) {
         return true;
       }
     } else if (p0.getY() == p1.getY()) {
-      if (p0.getY() == rectEnv.getMinY() || p0.getY() == rectEnv.getMaxY()) {
+      if (p0.getY() == this.rectEnv.getMinY() || p0.getY() == this.rectEnv.getMaxY()) {
         return true;
       }
     }
@@ -170,19 +170,19 @@ public class RectangleContains {
 
   /**
    * Tests if a point is contained in the boundary of the target rectangle.
-   * 
+   *
    * @param point the point to test
    * @return true if the point is contained in the boundary
    */
   private boolean isPointContainedInBoundary(final Point point) {
     /**
      * contains = false iff the point is properly contained in the rectangle.
-     * 
+     *
      * This code assumes that the point lies in the rectangle envelope
      */
-    return point.getX() == rectEnv.getMinX()
-      || point.getX() == rectEnv.getMaxX() || point.getY() == rectEnv.getMinY()
-      || point.getY() == rectEnv.getMaxY();
+    return point.getX() == this.rectEnv.getMinX()
+        || point.getX() == this.rectEnv.getMaxX() || point.getY() == this.rectEnv.getMinY()
+        || point.getY() == this.rectEnv.getMaxY();
   }
 
 }

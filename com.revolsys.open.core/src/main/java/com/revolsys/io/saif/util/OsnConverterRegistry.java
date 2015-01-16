@@ -25,7 +25,7 @@ public class OsnConverterRegistry {
   }
 
   private void addConverter(final String name, final OsnConverter converter) {
-    converters.put(name, converter);
+    this.converters.put(name, converter);
   }
 
   public OsnConverter getConverter(String name) {
@@ -35,12 +35,12 @@ public class OsnConverterRegistry {
       if (name.startsWith("/")) {
         name = name.substring(1);
       }
-      return converters.get(name);
+      return this.converters.get(name);
     }
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public void init(final GeometryFactory geometryFactory) {

@@ -41,8 +41,6 @@ import com.revolsys.jts.triangulate.VoronoiDiagramBuilder;
 import com.revolsys.jts.triangulate.quadedge.LocateFailureException;
 
 public class TriangulationFunctions {
-  private static final double TRIANGULATION_TOLERANCE = 0.0;
-
   public static Geometry conformingDelaunayEdges(final Geometry sites,
     final Geometry constraints) {
     return conformingDelaunayEdgesWithTolerance(sites, constraints,
@@ -163,5 +161,7 @@ public class TriangulationFunctions {
     mapper.transferData(diagram);
     return diagram;
   }
+
+  private static final double TRIANGULATION_TOLERANCE = 0.0;
 
 }

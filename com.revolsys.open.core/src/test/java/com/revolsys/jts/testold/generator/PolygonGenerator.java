@@ -44,14 +44,51 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.operation.valid.IsValidOp;
 
 /**
- * 
+ *
  * This class is used to create a polygon within the specified bounding box.
- * 
+ *
  * Sucessive calls to create may or may not return the same geometry topology.
  *
- * @author David Zwiers, Vivid Solutions. 
+ * @author David Zwiers, Vivid Solutions.
  */
 public class PolygonGenerator extends GeometryGenerator {
+  private static Polygon createArc(final double x, final double dx,
+    final double y, final double dy, final int nholes, final int npoints,
+    final GeometryFactory gf) {
+    // make outer ring first
+    double radius = dx < dy ? dx / 3 : dy / 3;
+
+    final double cx = x + dx / 2; // center
+    final double cy = y + dy / 2; // center
+
+    final LinearRing outer = createArc(cx, cy, radius, npoints, gf);
+
+    if (nholes == 0) {
+      return gf.polygon(outer);
+    }
+    final List<LinearRing> rings = new ArrayList<LinearRing>();
+    rings.add(outer);
+
+    radius *= .75;
+    int degreesPerHole = 360 / (nholes + 1);
+    int degreesPerGap = degreesPerHole / nholes;
+    degreesPerGap = degreesPerGap < 2 ? 2 : degreesPerGap;
+    degreesPerHole = (360 - degreesPerGap * nholes) / nholes;
+
+    if (degreesPerHole < 2) {
+      throw new RuntimeException("Slices too small for poly. Use Box alg.");
+    }
+
+    final int start = degreesPerGap / 2;
+    for (int i = 0; i < nholes; i++) {
+      final int st = start + i * (degreesPerHole + degreesPerGap); // start
+      // angle
+      rings.add(createTri(cx, cy, st, st + degreesPerHole, radius, gf));
+    }
+
+    return gf.polygon(rings);
+  }
+
   private static LinearRing createArc(final double cx, final double cy,
     final double radius, final int npoints, final GeometryFactory gf) {
 
@@ -161,61 +198,6 @@ public class PolygonGenerator extends GeometryGenerator {
     return gf.polygon(rings);
   }
 
-  protected int numberPoints = 4;
-
-  protected int numberHoles = 0;
-
-  protected int generationAlgorithm = 0;
-
-  /**
-   * Creates rectangular polygons
-   */
-  public static final int BOX = 0;
-
-  /**
-   * Creates polygons whose points will not be rectangular when there are more than 4 points 
-   */
-  public static final int ARC = 1;
-
-  private static final int RUNS = 5;
-
-  private static Polygon createArc(final double x, final double dx,
-    final double y, final double dy, final int nholes, final int npoints,
-    final GeometryFactory gf) {
-    // make outer ring first
-    double radius = dx < dy ? dx / 3 : dy / 3;
-
-    final double cx = x + dx / 2; // center
-    final double cy = y + dy / 2; // center
-
-    final LinearRing outer = createArc(cx, cy, radius, npoints, gf);
-
-    if (nholes == 0) {
-      return gf.polygon(outer);
-    }
-    final List<LinearRing> rings = new ArrayList<LinearRing>();
-    rings.add(outer);
-
-    radius *= .75;
-    int degreesPerHole = 360 / (nholes + 1);
-    int degreesPerGap = degreesPerHole / nholes;
-    degreesPerGap = degreesPerGap < 2 ? 2 : degreesPerGap;
-    degreesPerHole = (360 - degreesPerGap * nholes) / nholes;
-
-    if (degreesPerHole < 2) {
-      throw new RuntimeException("Slices too small for poly. Use Box alg.");
-    }
-
-    final int start = degreesPerGap / 2;
-    for (int i = 0; i < nholes; i++) {
-      final int st = start + i * (degreesPerHole + degreesPerGap); // start
-                                                                   // angle
-      rings.add(createTri(cx, cy, st, st + degreesPerHole, radius, gf));
-    }
-
-    return gf.polygon(rings);
-  }
-
   private static LinearRing createTri(final double cx, final double cy,
     final int startAngle, final int endAngle, final double radius,
     final GeometryFactory gf) {
@@ -238,22 +220,40 @@ public class PolygonGenerator extends GeometryGenerator {
       cxp, cyp);
   }
 
+  protected int numberPoints = 4;
+
+  protected int numberHoles = 0;
+
+  protected int generationAlgorithm = 0;
+
   /**
-   * As the user increases the number of points, the probability of creating a random valid polygon decreases. 
-   * Please take not of this when selecting the generation style, and the number of points. 
-   * 
+   * Creates rectangular polygons
+   */
+  public static final int BOX = 0;
+
+  /**
+   * Creates polygons whose points will not be rectangular when there are more than 4 points
+   */
+  public static final int ARC = 1;
+
+  private static final int RUNS = 5;
+
+  /**
+   * As the user increases the number of points, the probability of creating a random valid polygon decreases.
+   * Please take not of this when selecting the generation style, and the number of points.
+   *
    * May return null if a geometry could not be created.
-   * 
+   *
    * @see #getNumberPoints()
    * @see #setNumberPoints(int)
    * @see #getGenerationAlgorithm()
    * @see #setGenerationAlgorithm(int)
-   * 
+   *
    * @see #BOX
    * @see #ARC
-   * 
+   *
    * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
-   * 
+   *
    * @throws IllegalStateException When the alg is not valid or the number of points is invalid
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
    */
@@ -283,11 +283,11 @@ public class PolygonGenerator extends GeometryGenerator {
         case BOX:
           p = createBox(x, dx, y, dy, this.numberHoles, this.numberPoints,
             this.geometryFactory);
-        break;
+          break;
         case ARC:
           p = createArc(x, dx, y, dy, this.numberHoles, this.numberPoints,
             this.geometryFactory);
-        break;
+          break;
         default:
           throw new IllegalStateException("Invalid Alg. Specified");
       }

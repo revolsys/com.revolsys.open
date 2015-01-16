@@ -100,7 +100,7 @@ public class TestDataBuilder {
     final double yInc = width / nCells;
     for (int i = 0; i < nCells; i++) {
       for (int j = 0; j < nCells; j++) {
-        final Point base = new PointDouble((double)env.getMinX() + i * xInc,
+        final Point base = new PointDouble(env.getMinX() + i * xInc,
           env.getMinY() + j * yInc, Point.NULL_ORDINATE);
         final Geometry line = createLine(base, size, nPts);
         geoms.add(line);

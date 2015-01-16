@@ -34,20 +34,20 @@ public class StaticMethodValuesFilter<T> implements Filter<T> {
   @Override
   public boolean accept(final T object) {
     final Object value = getValue(object);
-    return values.contains(value);
+    return this.values.contains(value);
   }
 
   public Class<?> getMethodClass() {
-    return methodClass;
+    return this.methodClass;
   }
 
   public String getMethodName() {
-    return methodName;
+    return this.methodName;
   }
 
   public Object getValue(final Object object) {
     try {
-      return method.invoke(null, object);
+      return this.method.invoke(null, object);
     } catch (final RuntimeException e) {
       throw e;
     } catch (final Error e) {
@@ -58,25 +58,25 @@ public class StaticMethodValuesFilter<T> implements Filter<T> {
   }
 
   public Collection<? extends Object> getValues() {
-    return values;
+    return this.values;
   }
 
   @PostConstruct
   public void initialize() {
-    final Method[] methods = methodClass.getMethods();
+    final Method[] methods = this.methodClass.getMethods();
     for (final Method method : methods) {
       final String name = method.getName();
-      if (name.equals(methodName) && method.getParameterTypes().length == 1) {
+      if (name.equals(this.methodName) && method.getParameterTypes().length == 1) {
         if (this.method != null) {
           throw new IllegalArgumentException("Multiple method match for "
-            + methodClass + "." + methodName);
+              + this.methodClass + "." + this.methodName);
         }
         this.method = method;
       }
     }
     if (this.method == null) {
-      throw new IllegalArgumentException("No method match for " + methodClass
-        + "." + methodName);
+      throw new IllegalArgumentException("No method match for " + this.methodClass
+        + "." + this.methodName);
     }
   }
 
@@ -94,11 +94,11 @@ public class StaticMethodValuesFilter<T> implements Filter<T> {
 
   @Override
   public String toString() {
-    if (values.size() == 1) {
-      return methodClass.getName() + "." + methodName + "(object)="
-        + values.iterator().next();
+    if (this.values.size() == 1) {
+      return this.methodClass.getName() + "." + this.methodName + "(object)="
+          + this.values.iterator().next();
     } else {
-      return methodClass.getName() + "." + methodName + "(object) in " + values;
+      return this.methodClass.getName() + "." + this.methodName + "(object) in " + this.values;
     }
   }
 }

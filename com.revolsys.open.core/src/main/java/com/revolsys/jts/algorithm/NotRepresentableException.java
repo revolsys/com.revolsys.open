@@ -44,6 +44,11 @@ package com.revolsys.jts.algorithm;
  */
 public class NotRepresentableException extends Exception {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public NotRepresentableException() {
     super("Projective point not representable on the Cartesian plane.");
   }

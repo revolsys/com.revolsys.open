@@ -376,7 +376,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   public void setMarkerFillOpacity(final double markerFillOpacity) {
     if (markerFillOpacity < 0 || markerFillOpacity > 1) {
       throw new IllegalArgumentException(
-        "The opacity must be between 0.0 - 1.0");
+          "The opacity must be between 0.0 - 1.0");
     } else {
       this.markerFillOpacity = (int)(255 * markerFillOpacity);
       this.markerFill = WebColors.setAlpha(this.markerFill,
@@ -411,7 +411,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   public void setMarkerHorizontalAlignment(
     final String markerHorizontalAlignment) {
     this.markerHorizontalAlignment = getWithDefault(markerHorizontalAlignment,
-      "center");
+        "center");
   }
 
   public void setMarkerIgnorePlacement(final String markerIgnorePlacement) {
@@ -430,7 +430,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   public void setMarkerLineOpacity(final double markerLineOpacity) {
     if (markerLineOpacity < 0 || markerLineOpacity > 1) {
       throw new IllegalArgumentException(
-        "The opacity must be between 0.0 - 1.0");
+          "The opacity must be between 0.0 - 1.0");
     } else {
       this.markerLineOpacity = (int)(255 * markerLineOpacity);
       this.markerLineColor = WebColors.setAlpha(this.markerLineColor,
@@ -470,7 +470,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
   public void setMarkerOpacity(final double markerOpacity) {
     if (this.markerLineOpacity < 0 || this.markerLineOpacity > 1) {
       throw new IllegalArgumentException(
-        "The opacity must be between 0.0 - 1.0");
+          "The opacity must be between 0.0 - 1.0");
     } else {
       this.markerOpacity = (int)(255 * markerOpacity);
       setMarkerLineOpacity(markerOpacity);
@@ -519,7 +519,7 @@ public class MarkerStyle implements Cloneable, MapSerializer {
 
   public void setMarkerVerticalAlignment(final String markerVerticalAlignment) {
     this.markerVerticalAlignment = getWithDefault(markerVerticalAlignment,
-      "middle");
+        "middle");
   }
 
   public void setMarkerWidth(final Measure<Length> markerWidth) {

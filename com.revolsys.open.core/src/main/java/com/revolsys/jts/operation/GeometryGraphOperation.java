@@ -54,8 +54,8 @@ public class GeometryGraphOperation {
 
   public GeometryGraphOperation(final Geometry g0, final Geometry g1) {
     this(g0, g1, BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE
-    // BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE
-    );
+      // BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE
+        );
   }
 
   public GeometryGraphOperation(final Geometry g0, final Geometry g1,
@@ -75,16 +75,16 @@ public class GeometryGraphOperation {
       setComputationPrecision(scale1);
     }
 
-    arg = new GeometryGraph[2];
-    arg[0] = new GeometryGraph(0, g0, boundaryNodeRule);
-    arg[1] = new GeometryGraph(1, g1, boundaryNodeRule);
+    this.arg = new GeometryGraph[2];
+    this.arg[0] = new GeometryGraph(0, g0, boundaryNodeRule);
+    this.arg[1] = new GeometryGraph(1, g1, boundaryNodeRule);
   }
 
   public Geometry getArgGeometry(final int i) {
-    return arg[i].getGeometry();
+    return this.arg[i].getGeometry();
   }
 
   protected void setComputationPrecision(final double scale) {
-    li.setScale(scale);
+    this.li.setScale(scale);
   }
 }

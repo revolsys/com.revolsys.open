@@ -46,24 +46,24 @@ public class Parameter implements FactoryBean<Object> {
 
   @Override
   public Object getObject() throws Exception {
-    return value;
+    return this.value;
   }
 
   @Override
   public Class getObjectType() {
-    if (type == null && value != null) {
-      return value.getClass();
+    if (this.type == null && this.value != null) {
+      return this.value.getClass();
     } else {
-      return type;
+      return this.type;
     }
   }
 
   public Class getType() {
-    return type;
+    return this.type;
   }
 
   public Object getValue() {
-    return value;
+    return this.value;
   }
 
   @Override

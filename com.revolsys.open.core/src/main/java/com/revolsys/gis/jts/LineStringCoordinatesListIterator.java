@@ -6,7 +6,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 
 public class LineStringCoordinatesListIterator implements Iterator<LineString>,
-  Iterable<LineString> {
+Iterable<LineString> {
   private final GeometryFactory factory;
 
   private int index = 0;
@@ -25,7 +25,7 @@ public class LineStringCoordinatesListIterator implements Iterator<LineString>,
 
   @Override
   public boolean hasNext() {
-    return index < points.getVertexCount() - 1;
+    return this.index < this.points.getVertexCount() - 1;
   }
 
   @Override
@@ -35,8 +35,8 @@ public class LineStringCoordinatesListIterator implements Iterator<LineString>,
 
   @Override
   public LineString next() {
-    final LineString lineString = factory.lineString(points.subLine(index, 2));
-    index++;
+    final LineString lineString = this.factory.lineString(this.points.subLine(this.index, 2));
+    this.index++;
     return lineString;
   }
 

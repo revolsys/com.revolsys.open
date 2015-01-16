@@ -22,7 +22,7 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry> {
   public KmzGeometryIterator(final Resource resource) {
     try {
       final InputStream in = SpringUtil.getInputStream(resource);
-      zipIn = new ZipInputStream(in);
+      this.zipIn = new ZipInputStream(in);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to reade KMZ file", e);
     }
@@ -30,19 +30,19 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry> {
 
   @Override
   protected void doClose() {
-    FileUtil.closeSilent(kmlIterator, zipIn);
-    kmlIterator = null;
-    zipIn = null;
+    FileUtil.closeSilent(this.kmlIterator, this.zipIn);
+    this.kmlIterator = null;
+    this.zipIn = null;
   }
 
   @Override
   protected void doInit() {
     try {
-      for (ZipEntry entry = zipIn.getNextEntry(); entry != null; entry = zipIn.getNextEntry()) {
+      for (ZipEntry entry = this.zipIn.getNextEntry(); entry != null; entry = this.zipIn.getNextEntry()) {
         final String name = entry.getName();
         final String extension = FileUtil.getFileNameExtension(name);
         if ("kml".equals(extension)) {
-          kmlIterator = new KmlGeometryIterator(zipIn);
+          this.kmlIterator = new KmlGeometryIterator(this.zipIn);
           return;
         }
       }
@@ -53,10 +53,10 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry> {
 
   @Override
   protected Geometry getNext() {
-    if (kmlIterator == null) {
+    if (this.kmlIterator == null) {
       throw new NoSuchElementException();
     } else {
-      return kmlIterator.getNext();
+      return this.kmlIterator.getNext();
     }
   }
 

@@ -63,7 +63,7 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   private void setGeometryFactory(final GeometryFactory geometryFactory) {

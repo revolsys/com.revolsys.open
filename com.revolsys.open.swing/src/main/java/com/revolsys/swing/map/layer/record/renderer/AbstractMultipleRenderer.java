@@ -22,7 +22,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractMultipleRenderer extends
-  AbstractRecordLayerRenderer {
+AbstractRecordLayerRenderer {
   protected static void addMenuItem(final MenuFactory menu, final String type,
     final Class<?> rendererClass) {
     final String iconName = ("style_" + type + "_go").toLowerCase();
@@ -32,7 +32,7 @@ public abstract class AbstractMultipleRenderer extends
       "class", rendererClass, true);
     final InvokeMethodAction action = MenuSourceRunnable.createAction(
       "Convert to " + type + " Style", icon, enableCheck, "convertTo" + type
-        + "Style");
+      + "Style");
     menu.addMenuItem("convert", action);
   }
 

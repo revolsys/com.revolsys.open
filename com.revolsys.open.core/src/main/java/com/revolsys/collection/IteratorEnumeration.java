@@ -31,11 +31,11 @@ public class IteratorEnumeration<T> implements Enumeration<T> {
 
   @Override
   public boolean hasMoreElements() {
-    return iterator.hasNext();
+    return this.iterator.hasNext();
   }
 
   @Override
   public T nextElement() {
-    return iterator.next();
+    return this.iterator.next();
   }
 }

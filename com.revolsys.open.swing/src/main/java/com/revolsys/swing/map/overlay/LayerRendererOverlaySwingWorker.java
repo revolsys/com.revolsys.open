@@ -13,7 +13,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.AbstractSwingWorker;
 
 public class LayerRendererOverlaySwingWorker extends
-  AbstractSwingWorker<Void, Void> {
+AbstractSwingWorker<Void, Void> {
 
   private final LayerRendererOverlay overlay;
 
@@ -37,8 +37,8 @@ public class LayerRendererOverlaySwingWorker extends
         if (imageWidth > 0 && imageHeight > 0 && project != null) {
           final BoundingBox boundingBox = this.referencedImage.getBoundingBox();
           try (
-            final ImageViewport viewport = new ImageViewport(project,
-              imageWidth, imageHeight, boundingBox)) {
+              final ImageViewport viewport = new ImageViewport(project,
+                imageWidth, imageHeight, boundingBox)) {
 
             if (layer != null && layer.isExists() && layer.isVisible()) {
               final LayerRenderer<Layer> renderer = layer.getRenderer();

@@ -8,8 +8,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 
 public class SpatialReference {
 
-  private static final double FLOATING_SCALE = 11258999068426.238;
-
   public static SpatialReference get(final GeometryFactory geometryFactory,
     final String wkt) {
     if (geometryFactory != null) {
@@ -22,6 +20,8 @@ public class SpatialReference {
     }
     return null;
   }
+
+  private static final double FLOATING_SCALE = 11258999068426.238;
 
   private String wkt;
 
@@ -70,117 +70,117 @@ public class SpatialReference {
         if (esriCoordinateSystem != null) {
           final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
           this.wkt = wkt;
-          xOrigin = areaBoundingBox.getMinX();
-          yOrigin = areaBoundingBox.getMinY();
-          xYScale = geometryFactory.getScaleXY();
-          if (xYScale == 0) {
+          this.xOrigin = areaBoundingBox.getMinX();
+          this.yOrigin = areaBoundingBox.getMinY();
+          this.xYScale = geometryFactory.getScaleXY();
+          if (this.xYScale == 0) {
             if (this instanceof ProjectedCoordinateSystem) {
-              xYScale = 1000;
+              this.xYScale = 1000;
             } else {
-              xYScale = 10000000;
+              this.xYScale = 10000000;
             }
           }
-          zOrigin = -100000;
-          zScale = geometryFactory.getScaleZ();
-          if (zScale == 0) {
-            zScale = 10000000;
+          this.zOrigin = -100000;
+          this.zScale = geometryFactory.getScaleZ();
+          if (this.zScale == 0) {
+            this.zScale = 10000000;
           }
-          mOrigin = -100000;
-          mScale = 10000000;
-          xYTolerance = 1.0 / xYScale;
-          zTolerance = 1.0 / zScale;
-          mTolerance = 1.0 / mScale;
-          highPrecision = true;
-          wkid = coordinateSystem.getId();
+          this.mOrigin = -100000;
+          this.mScale = 10000000;
+          this.xYTolerance = 1.0 / this.xYScale;
+          this.zTolerance = 1.0 / this.zScale;
+          this.mTolerance = 1.0 / this.mScale;
+          this.highPrecision = true;
+          this.wkid = coordinateSystem.getId();
         }
       }
     }
   }
 
   public CoordinateSystem getCoordinateSystem() {
-    if (coordinateSystem == null) {
-      coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(latestWKID);
-      if (coordinateSystem == null) {
-        coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(wkid);
+    if (this.coordinateSystem == null) {
+      this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(this.latestWKID);
+      if (this.coordinateSystem == null) {
+        this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(this.wkid);
       }
     }
-    return coordinateSystem;
+    return this.coordinateSystem;
   }
 
   public GeometryFactory getGeometryFactory() {
-    if (geometryFactory == null) {
+    if (this.geometryFactory == null) {
       final CoordinateSystem coordinateSystem = getCoordinateSystem();
       if (coordinateSystem != null) {
-        if (xYScale == FLOATING_SCALE) {
-          geometryFactory = GeometryFactory.fixed(
-            coordinateSystem.getId(), 0.0, zScale);
+        if (this.xYScale == FLOATING_SCALE) {
+          this.geometryFactory = GeometryFactory.fixed(
+            coordinateSystem.getId(), 0.0, this.zScale);
         } else {
-          geometryFactory = GeometryFactory.fixed(
-            coordinateSystem.getId(), xYScale, zScale);
+          this.geometryFactory = GeometryFactory.fixed(
+            coordinateSystem.getId(), this.xYScale, this.zScale);
         }
       }
     }
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public int getLatestWKID() {
-    return latestWKID;
+    return this.latestWKID;
   }
 
   public double getLeftLongitude() {
-    return leftLongitude;
+    return this.leftLongitude;
   }
 
   public double getMOrigin() {
-    return mOrigin;
+    return this.mOrigin;
   }
 
   public double getMScale() {
-    return mScale;
+    return this.mScale;
   }
 
   public double getMTolerance() {
-    return mTolerance;
+    return this.mTolerance;
   }
 
   public int getWKID() {
-    return wkid;
+    return this.wkid;
   }
 
   public String getWKT() {
-    return wkt;
+    return this.wkt;
   }
 
   public double getXOrigin() {
-    return xOrigin;
+    return this.xOrigin;
   }
 
   public double getXYScale() {
-    return xYScale;
+    return this.xYScale;
   }
 
   public double getXYTolerance() {
-    return xYTolerance;
+    return this.xYTolerance;
   }
 
   public double getYOrigin() {
-    return yOrigin;
+    return this.yOrigin;
   }
 
   public double getZOrigin() {
-    return zOrigin;
+    return this.zOrigin;
   }
 
   public double getZScale() {
-    return zScale;
+    return this.zScale;
   }
 
   public double getZTolerance() {
-    return zTolerance;
+    return this.zTolerance;
   }
 
   public boolean isHighPrecision() {
-    return highPrecision;
+    return this.highPrecision;
   }
 
   public void setHighPrecision(final boolean highPrecision) {
@@ -245,6 +245,6 @@ public class SpatialReference {
 
   @Override
   public String toString() {
-    return wkt;
+    return this.wkt;
   }
 }

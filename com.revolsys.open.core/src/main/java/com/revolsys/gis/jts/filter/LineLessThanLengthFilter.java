@@ -15,11 +15,11 @@ public class LineLessThanLengthFilter implements Filter<Geometry> {
 
   @Override
   public boolean accept(final Geometry geometry) {
-    return geometry.getLength() < length;
+    return geometry.getLength() < this.length;
   }
 
   public double getLength() {
-    return length;
+    return this.length;
   }
 
   public void setLength(final double length) {

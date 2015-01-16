@@ -105,7 +105,7 @@ public class ConnectedInteriorTester {
       final DirectedEdge de = (DirectedEdge)it.next();
       // if this edge has not yet been processed
       if (de.isInResult() && de.getEdgeRing() == null) {
-        final MaximalEdgeRing er = new MaximalEdgeRing(de, geometryFactory);
+        final MaximalEdgeRing er = new MaximalEdgeRing(de, this.geometryFactory);
 
         er.linkDirectedEdgesForMinimalEdgeRings();
         final List minEdgeRings = er.buildMinimalRings();
@@ -116,7 +116,7 @@ public class ConnectedInteriorTester {
   }
 
   public Point getCoordinate() {
-    return disconnectedRingcoord;
+    return this.disconnectedRingcoord;
   }
 
   /**
@@ -153,7 +153,7 @@ public class ConnectedInteriorTester {
         // Debug.print("visted? "); Debug.println(de);
         if (!de.isVisited()) {
           // Debug.print("not visited "); Debug.println(de);
-          disconnectedRingcoord = de.getCoordinate();
+          this.disconnectedRingcoord = de.getCoordinate();
           return true;
         }
       }
@@ -164,7 +164,7 @@ public class ConnectedInteriorTester {
   public boolean isInteriorsConnected() {
     // node the edges, in case holes touch the shell
     final List splitEdges = new ArrayList();
-    geomGraph.computeSplitEdges(splitEdges);
+    this.geomGraph.computeSplitEdges(splitEdges);
 
     // form the edges into rings
     final PlanarGraph graph = new PlanarGraph(new OverlayNodeFactory());
@@ -177,7 +177,7 @@ public class ConnectedInteriorTester {
      * Mark all the edges for the edgeRings corresponding to the shells
      * of the input polygons.  Note only ONE ring gets marked for each shell.
      */
-    visitShellInteriors(geomGraph.getGeometry(), graph);
+    visitShellInteriors(this.geomGraph.getGeometry(), graph);
 
     /**
      * If there are any unvisited shell edges
@@ -190,8 +190,8 @@ public class ConnectedInteriorTester {
   }
 
   private void setInteriorEdgesInResult(final PlanarGraph graph) {
-    for (final Iterator it = graph.getEdgeEnds().iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final Object element : graph.getEdgeEnds()) {
+      final DirectedEdge de = (DirectedEdge)element;
       if (de.getLabel().getLocation(0, Position.RIGHT) == Location.INTERIOR) {
         de.setInResult(true);
       }

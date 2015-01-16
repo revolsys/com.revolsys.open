@@ -13,7 +13,7 @@ import org.springframework.web.util.WebUtils;
 
 /**
  * Helper class for annotation-based request mapping.
- * 
+ *
  * @author Juergen Hoeller
  * @since 2.5.2
  */
@@ -21,7 +21,7 @@ abstract class ServletAnnotationMappingUtils {
 
   /**
    * Check whether the given request matches the specified header conditions.
-   * 
+   *
    * @param headers the header conditions, following
    *          {@link RequestMapping#headers()}
    * @param request the current HTTP request to check
@@ -48,10 +48,10 @@ abstract class ServletAnnotationMappingUtils {
             final List<MediaType> valueMediaTypes = MediaType.parseMediaTypes(value);
             boolean found = false;
             for (final Iterator<MediaType> valIter = valueMediaTypes.iterator(); valIter.hasNext()
-              && !found;) {
+                && !found;) {
               final MediaType valueMediaType = valIter.next();
               for (final Iterator<MediaType> reqIter = requestMediaTypes.iterator(); reqIter.hasNext()
-                && !found;) {
+                  && !found;) {
                 final MediaType requestMediaType = reqIter.next();
                 if (valueMediaType.includes(requestMediaType)) {
                   found = true;
@@ -73,7 +73,7 @@ abstract class ServletAnnotationMappingUtils {
 
   /**
    * Check whether the given request matches the specified parameter conditions.
-   * 
+   *
    * @param params the parameter conditions, following
    *          {@link RequestMapping#params()}
    * @param request the current HTTP request to check
@@ -106,7 +106,7 @@ abstract class ServletAnnotationMappingUtils {
 
   /**
    * Check whether the given request matches the specified request methods.
-   * 
+   *
    * @param methods the HTTP request methods to check against
    * @param request the current HTTP request to check
    */
@@ -126,7 +126,7 @@ abstract class ServletAnnotationMappingUtils {
 
   private static boolean isMediaTypeHeader(final String headerName) {
     return "Accept".equalsIgnoreCase(headerName)
-      || "Content-Type".equalsIgnoreCase(headerName);
+        || "Content-Type".equalsIgnoreCase(headerName);
   }
 
 }

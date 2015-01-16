@@ -9,7 +9,7 @@ import com.revolsys.jts.index.ItemVisitor;
 /**
  * A {@link ItemVisitor} implementation which uses a {@link Visitor} to visit
  * each item.
- * 
+ *
  * @author Paul Austin
  * @param <T> The type of item to visit.
  */
@@ -29,7 +29,7 @@ public class IndexItemVisitor implements ItemVisitor {
     final Record object = (Record)item;
     final BoundingBox envelope = object.getGeometryValue().getBoundingBox();
     if (envelope.intersects(this.envelope)) {
-      visitor.visit(object);
+      this.visitor.visit(object);
     }
   }
 }

@@ -13,14 +13,14 @@ public class FixedValueRecord extends BaseRecord {
 
   private final Object value;
 
+  public FixedValueRecord(final Object value) {
+    this(RECORD_DEFINITION, value);
+  }
+
   public FixedValueRecord(final RecordDefinition recordDefinition,
     final Object value) {
     super(recordDefinition);
     this.value = value;
-  }
-
-  public FixedValueRecord(final Object value) {
-    this(RECORD_DEFINITION, value);
   }
 
   @Override
@@ -32,7 +32,7 @@ public class FixedValueRecord extends BaseRecord {
   @Override
   @SuppressWarnings("unchecked")
   public <T> T getValue(final CharSequence name) {
-    return (T)value;
+    return (T)this.value;
   }
 
   @Override
@@ -41,24 +41,24 @@ public class FixedValueRecord extends BaseRecord {
     if (index < 0) {
       return null;
     } else {
-      return (T)value;
+      return (T)this.value;
     }
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <T> T getValueByPath(final CharSequence path) {
-    return (T)value;
+    return (T)this.value;
   }
 
   @Override
   public List<Object> getValues() {
-    return Arrays.asList(value);
+    return Arrays.asList(this.value);
   }
 
   @Override
   public int hashCode() {
-    return value.hashCode();
+    return this.value.hashCode();
   }
 
   @Override

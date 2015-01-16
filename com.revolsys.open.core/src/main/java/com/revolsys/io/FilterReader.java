@@ -22,30 +22,30 @@ public class FilterReader<T> extends AbstractReader<T> {
   @PreDestroy
   public void close() {
     super.close();
-    if (reader != null) {
-      reader.close();
+    if (this.reader != null) {
+      this.reader.close();
     }
-    filter = null;
-    reader = null;
+    this.filter = null;
+    this.reader = null;
   }
 
   protected Filter<T> getFilter() {
-    return filter;
+    return this.filter;
   }
 
   protected Reader<T> getReader() {
-    return reader;
+    return this.reader;
   }
 
   @Override
   public Iterator<T> iterator() {
-    final Iterator<T> iterator = reader.iterator();
-    return new FilterIterator<T>(filter, iterator);
+    final Iterator<T> iterator = this.reader.iterator();
+    return new FilterIterator<T>(this.filter, iterator);
   }
 
   @Override
   public void open() {
-    reader.open();
+    this.reader.open();
   }
 
 }

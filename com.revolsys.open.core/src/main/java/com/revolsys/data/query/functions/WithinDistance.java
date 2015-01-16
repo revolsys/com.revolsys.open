@@ -128,7 +128,7 @@ public class WithinDistance extends Condition {
   @Override
   public String toString() {
     return "DWithin(" + StringConverterRegistry.toString(this.geometry1Value)
-      + "," + StringConverterRegistry.toString(this.geometry2Value) + ","
+        + "," + StringConverterRegistry.toString(this.geometry2Value) + ","
         + StringConverterRegistry.toString(this.distanceValue) + ")";
   }
 

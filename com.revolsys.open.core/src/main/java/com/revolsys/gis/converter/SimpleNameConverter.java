@@ -9,7 +9,7 @@ public class SimpleNameConverter implements NameConverter {
 
   @Override
   public String convert(final String name) {
-    final String newName = names.get(name);
+    final String newName = this.names.get(name);
     if (newName != null) {
       return newName;
     } else {
@@ -18,6 +18,6 @@ public class SimpleNameConverter implements NameConverter {
   }
 
   public void setName(final String name, final String newName) {
-    names.put(name, newName);
+    this.names.put(name, newName);
   }
 }

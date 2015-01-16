@@ -6,7 +6,7 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.util.ObjectProcessor;
 
 public class DeleteEdgeVisitor<T> implements Visitor<Edge<T>>,
-  ObjectProcessor<Graph<T>> {
+ObjectProcessor<Graph<T>> {
   @Override
   public void process(final Graph<T> graph) {
     graph.visitEdges(this);

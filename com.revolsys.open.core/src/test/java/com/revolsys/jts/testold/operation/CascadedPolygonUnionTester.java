@@ -14,7 +14,7 @@ import com.revolsys.jts.operation.union.CascadedPolygonUnion;
 /**
  * Compares the results of CascadedPolygonUnion to Geometry.union()
  * using shape similarity measures.
- * 
+ *
  * @author mbdavis
  *
  */

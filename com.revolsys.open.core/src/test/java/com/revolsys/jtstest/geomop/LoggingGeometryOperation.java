@@ -37,10 +37,10 @@ import com.revolsys.jtstest.testrunner.Result;
 
 /**
  * A {@link GeometryOperation} which logs
- * the input and output from another 
+ * the input and output from another
  * {@link GeometryOperation}.
  * The log is sent to {@link System#out}.
- * 
+ *
  * @author mbdavis
  *
  */
@@ -68,7 +68,7 @@ public class LoggingGeometryOperation implements GeometryOperation {
     for (int i = 0; i < args.length; i++) {
       System.out.println("Arg[" + i + "]: " + args[i]);
     }
-    final Result result = geomOp.invoke(opName, geometry, args);
+    final Result result = this.geomOp.invoke(opName, geometry, args);
     System.out.println("Result==> " + result.toFormattedString());
     return result;
   }

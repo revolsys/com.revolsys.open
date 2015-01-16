@@ -6,17 +6,17 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 public class DataSourceTransactionManagerFactory implements
-  FactoryBean<DataSourceTransactionManager> {
+FactoryBean<DataSourceTransactionManager> {
 
   private DataSource dataSource;
 
   public DataSource getDataSource() {
-    return dataSource;
+    return this.dataSource;
   }
 
   @Override
   public DataSourceTransactionManager getObject() throws Exception {
-    return new DataSourceTransactionManager(dataSource);
+    return new DataSourceTransactionManager(this.dataSource);
   }
 
   @Override

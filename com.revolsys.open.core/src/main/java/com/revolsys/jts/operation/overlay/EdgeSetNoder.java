@@ -53,28 +53,28 @@ import com.revolsys.jts.geomgraph.index.SimpleMCSweepLineIntersector;
  */
 public class EdgeSetNoder {
 
-  private LineIntersector li;
-  private List inputEdges = new ArrayList();
+  private final LineIntersector li;
+  private final List inputEdges = new ArrayList();
 
-  public EdgeSetNoder(LineIntersector li) {
+  public EdgeSetNoder(final LineIntersector li) {
     this.li = li;
   }
 
-  public void addEdges(List edges)
+  public void addEdges(final List edges)
   {
-    inputEdges.addAll(edges);
+    this.inputEdges.addAll(edges);
   }
 
   public List getNodedEdges()
   {
-    EdgeSetIntersector esi = new SimpleMCSweepLineIntersector();
-    SegmentIntersector si = new SegmentIntersector(li, true, false);
-    esi.computeIntersections(inputEdges, si, true);
-//Debug.println("has proper int = " + si.hasProperIntersection());
+    final EdgeSetIntersector esi = new SimpleMCSweepLineIntersector();
+    final SegmentIntersector si = new SegmentIntersector(this.li, true, false);
+    esi.computeIntersections(this.inputEdges, si, true);
+    //Debug.println("has proper int = " + si.hasProperIntersection());
 
-    List splitEdges = new ArrayList();
-    for (Iterator i = inputEdges.iterator(); i.hasNext(); ) {
-      Edge e = (Edge) i.next();
+    final List splitEdges = new ArrayList();
+    for (final Iterator i = this.inputEdges.iterator(); i.hasNext(); ) {
+      final Edge e = (Edge) i.next();
       e.getEdgeIntersectionList().addSplitEdges(splitEdges);
     }
     return splitEdges;

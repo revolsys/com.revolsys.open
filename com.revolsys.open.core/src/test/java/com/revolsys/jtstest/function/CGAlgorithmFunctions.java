@@ -11,7 +11,7 @@ public class CGAlgorithmFunctions {
     final Geometry ptGeom) {
     if (segment.getVertexCount() != 2 || ptGeom.getVertexCount() != 1) {
       throw new IllegalArgumentException(
-        "A must have two points and B must have one");
+          "A must have two points and B must have one");
     }
     final Point[] segPt = CoordinatesListUtil.getCoordinateArray(segment);
 
@@ -24,7 +24,7 @@ public class CGAlgorithmFunctions {
     final Geometry ptGeom) {
     if (segment.getVertexCount() != 2 || ptGeom.getVertexCount() != 1) {
       throw new IllegalArgumentException(
-        "A must have two points and B must have one");
+          "A must have two points and B must have one");
     }
     final Point[] segPt = CoordinatesListUtil.getCoordinateArray(segment);
 

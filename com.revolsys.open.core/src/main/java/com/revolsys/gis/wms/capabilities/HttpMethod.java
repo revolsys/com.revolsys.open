@@ -8,11 +8,11 @@ public class HttpMethod {
   private URL onlineResource;
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public URL getOnlineResource() {
-    return onlineResource;
+    return this.onlineResource;
   }
 
   public void setName(final String name) {
@@ -25,6 +25,6 @@ public class HttpMethod {
 
   @Override
   public String toString() {
-    return name + " " + onlineResource;
+    return this.name + " " + this.onlineResource;
   }
 }

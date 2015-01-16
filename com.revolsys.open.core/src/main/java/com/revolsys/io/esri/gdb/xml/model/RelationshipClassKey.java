@@ -10,15 +10,15 @@ public class RelationshipClassKey {
   private RelKeyRole keyRole;
 
   public String getClassKeyName() {
-    return classKeyName;
+    return this.classKeyName;
   }
 
   public RelKeyRole getKeyRole() {
-    return keyRole;
+    return this.keyRole;
   }
 
   public String getObjectKeyName() {
-    return objectKeyName;
+    return this.objectKeyName;
   }
 
   public void setClassKeyName(final String classKeyName) {

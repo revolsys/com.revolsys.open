@@ -5,6 +5,10 @@ package com.revolsys.beans;
  */
 public class ObjectException extends RuntimeException {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private final Object object;
 
   public ObjectException(final Object object) {

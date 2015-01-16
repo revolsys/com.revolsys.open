@@ -9,7 +9,7 @@ import com.revolsys.io.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.io.esri.gdb.xml.model.enums.FieldType;
 
 public class EsriGeodatabaseXmlFieldTypeRegistry implements
-  EsriGeodatabaseXmlConstants {
+EsriGeodatabaseXmlConstants {
 
   public static final EsriGeodatabaseXmlFieldTypeRegistry INSTANCE = new EsriGeodatabaseXmlFieldTypeRegistry();
 
@@ -73,8 +73,8 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
 
   public void addFieldType(final DataType dataType,
     final EsriGeodatabaseXmlFieldType fieldType) {
-    typeMapping.put(dataType, fieldType);
-    esriToDataType.put(fieldType.getEsriFieldType(), dataType);
+    this.typeMapping.put(dataType, fieldType);
+    this.esriToDataType.put(fieldType.getEsriFieldType(), dataType);
   }
 
   public void addFieldType(final EsriGeodatabaseXmlFieldType fieldType) {
@@ -83,10 +83,10 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements
   }
 
   public DataType getDataType(final FieldType fieldType) {
-    return esriToDataType.get(fieldType);
+    return this.esriToDataType.get(fieldType);
   }
 
   public EsriGeodatabaseXmlFieldType getFieldType(final DataType dataType) {
-    return typeMapping.get(dataType);
+    return this.typeMapping.get(dataType);
   }
 }

@@ -25,7 +25,7 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class NumberTextField extends JXTextField implements Field,
-  DocumentListener, FocusListener {
+DocumentListener, FocusListener {
 
   public static Number createMaximumValue(final DataType dataType,
     final int length, final int scale) {
@@ -390,21 +390,21 @@ public class NumberTextField extends JXTextField implements Field,
         } else if (this.dataType.equals(DataTypes.FLOAT)) {
         } else {
           message = "'" + text + "' is not a valid "
-            + this.dataType.getValidationName() + ".";
+              + this.dataType.getValidationName() + ".";
         }
       } else if ("Infinity".equalsIgnoreCase(text)) {
         if (this.dataType.equals(DataTypes.DOUBLE)) {
         } else if (this.dataType.equals(DataTypes.FLOAT)) {
         } else {
           message = "'" + text + "' is not a valid "
-            + this.dataType.getValidationName() + ".";
+              + this.dataType.getValidationName() + ".";
         }
       } else if ("-Infinity".equalsIgnoreCase(text)) {
         if (this.dataType.equals(DataTypes.DOUBLE)) {
         } else if (this.dataType.equals(DataTypes.FLOAT)) {
         } else {
           message = "'" + text + "' is not a valid "
-            + this.dataType.getValidationName() + ".";
+              + this.dataType.getValidationName() + ".";
         }
       } else {
         try {
@@ -415,11 +415,11 @@ public class NumberTextField extends JXTextField implements Field,
           if (number.scale() > this.scale) {
             message = "Number of decimal places must be < " + this.scale;
           } else if (this.minimumValue != null
-            && this.minimumValue.compareTo(number) > 0) {
+              && this.minimumValue.compareTo(number) > 0) {
             message = MathUtil.toString(number) + " < "
                 + MathUtil.toString(this.minimumValue) + " (minimum)";
           } else if (this.maximumValue != null
-            && this.maximumValue.compareTo(number) < 0) {
+              && this.maximumValue.compareTo(number) < 0) {
             message = MathUtil.toString(number) + " > "
                 + MathUtil.toString(this.maximumValue) + " (maximum)";
           } else {
@@ -432,7 +432,7 @@ public class NumberTextField extends JXTextField implements Field,
           }
         } catch (final Throwable t) {
           message = "'" + text + "' is not a valid "
-            + this.dataType.getValidationName() + ".";
+              + this.dataType.getValidationName() + ".";
         }
       }
     }

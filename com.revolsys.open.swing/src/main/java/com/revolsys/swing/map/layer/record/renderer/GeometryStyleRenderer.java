@@ -33,8 +33,6 @@ import com.revolsys.swing.map.util.GeometryShapeUtil;
 
 public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
 
-  private static final Icon ICON = Icons.getIcon("style_geometry");
-
   public static GeneralPath getLineShape() {
     final GeneralPath path = new GeneralPath();
     path.moveTo(0, 0);
@@ -149,6 +147,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
+  private static final Icon ICON = Icons.getIcon("style_geometry");
+
   private GeometryStyle style;
 
   public GeometryStyleRenderer(final AbstractRecordLayer layer) {
@@ -182,7 +182,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   @Override
   public GeometryStyleRenderer clone() {
     final GeometryStyleRenderer clone = (GeometryStyleRenderer)super.clone();
-    clone.style = style.clone();
+    clone.style = this.style.clone();
     return clone;
   }
 
@@ -201,13 +201,13 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
       Shape shape = null;
       final DataType geometryDataType = layer.getGeometryType();
       if (DataTypes.POINT.equals(geometryDataType)
-        || DataTypes.MULTI_POINT.equals(geometryDataType)) {
-        return style.getMarker().getIcon(geometryStyle);
+          || DataTypes.MULTI_POINT.equals(geometryDataType)) {
+        return this.style.getMarker().getIcon(geometryStyle);
       } else if (DataTypes.LINE_STRING.equals(geometryDataType)
-        || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+          || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
         shape = GeometryStylePreview.getLineShape(16);
       } else if (DataTypes.POLYGON.equals(geometryDataType)
-        || DataTypes.POLYGON.equals(geometryDataType)) {
+          || DataTypes.POLYGON.equals(geometryDataType)) {
         shape = getPolygonShape();
       } else {
         return super.getIcon();
@@ -242,7 +242,7 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     final BoundingBox visibleArea, final AbstractLayer layer,
     final LayerRecord record) {
     final Geometry geometry = record.getGeometryValue();
-    viewport.drawGeometry(geometry, style);
+    viewport.drawGeometry(geometry, this.style);
   }
 
   public void setStyle(final GeometryStyle style) {

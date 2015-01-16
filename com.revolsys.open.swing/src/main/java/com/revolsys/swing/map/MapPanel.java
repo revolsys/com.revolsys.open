@@ -74,7 +74,7 @@ import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -300,7 +300,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   public void addOverlayActionOverride(final String overlayAction,
     final String... overrideOverlayActions) {
     for (final String overrideOverlayAction : overrideOverlayActions) {
-      CollectionUtil.addToSet(this.overlayActionOverrides, overlayAction,
+      Maps.addToSet(this.overlayActionOverrides, overlayAction,
         overrideOverlayAction);
     }
   }
@@ -606,7 +606,7 @@ public class MapPanel extends JPanel implements PropertyChangeListener {
   }
 
   public Cursor getOverlayActionCursor(final String name) {
-    return CollectionUtil.get(this.overlayActionCursors, name,
+    return Maps.get(this.overlayActionCursors, name,
       AbstractOverlay.DEFAULT_CURSOR);
   }
 

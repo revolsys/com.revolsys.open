@@ -27,16 +27,16 @@ public class RecordStoreCache {
   }
 
   private void addBoundingBox(final BoundingBox boundingBox) {
-    synchronized (loadTasks) {
-      if (!loadTasks.containsKey(boundingBox)) {
-        loadTasks.put(boundingBox, new RecordStoreQueryTask(recordStore, typePath,
+    synchronized (this.loadTasks) {
+      if (!this.loadTasks.containsKey(boundingBox)) {
+        this.loadTasks.put(boundingBox, new RecordStoreQueryTask(this.recordStore, this.typePath,
           boundingBox));
       }
     }
   }
 
   public List getObjects(final BoundingBox boundingBox) {
-    final List objects = cachedObejcts.get(boundingBox);
+    final List objects = this.cachedObejcts.get(boundingBox);
     if (objects == null) {
       addBoundingBox(boundingBox);
     }
@@ -44,14 +44,14 @@ public class RecordStoreCache {
   }
 
   public void removeObjects(final BoundingBox boundingBox) {
-    synchronized (loadTasks) {
-      final RecordStoreQueryTask task = loadTasks.get(boundingBox);
+    synchronized (this.loadTasks) {
+      final RecordStoreQueryTask task = this.loadTasks.get(boundingBox);
       if (task != null) {
         task.cancel();
-        loadTasks.remove(task);
+        this.loadTasks.remove(task);
       }
     }
-    cachedObejcts.remove(boundingBox);
+    this.cachedObejcts.remove(boundingBox);
   }
 
 }

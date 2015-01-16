@@ -11,7 +11,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
 public class XhtmlRecordWriterFactory extends
-  AbstractRecordAndGeometryWriterFactory {
+AbstractRecordAndGeometryWriterFactory {
   public XhtmlRecordWriterFactory() {
     super("XHMTL", true, true);
     addMediaTypeAndFileExtension("text/html", "html");

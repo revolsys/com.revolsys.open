@@ -15,7 +15,7 @@ import org.springframework.security.core.Authentication;
  * Internal security-specific EvaluationContext implementation which lazily adds
  * the method parameter values as variables (with the corresponding parameter
  * names) if and when they are required.
- * 
+ *
  * @author Luke Taylor
  * @since 3.0
  */
@@ -46,21 +46,21 @@ public class MethodSecurityEvaluationContext extends StandardEvaluationContext {
   }
 
   private void addArgumentsAsVariables() {
-    final Object[] args = mi.getArguments();
+    final Object[] args = this.mi.getArguments();
 
     if (args.length == 0) {
       return;
     }
 
-    final Object targetObject = mi.getThis();
-    final Method method = AopUtils.getMostSpecificMethod(mi.getMethod(),
+    final Object targetObject = this.mi.getThis();
+    final Method method = AopUtils.getMostSpecificMethod(this.mi.getMethod(),
       targetObject.getClass());
-    final String[] paramNames = parameterNameDiscoverer.getParameterNames(method);
+    final String[] paramNames = this.parameterNameDiscoverer.getParameterNames(method);
 
     if (paramNames == null) {
       logger.warn("Unable to resolve method parameter names for method: "
-        + method
-        + ". Debug symbol information is required if you are using parameter names in expressions.");
+          + method
+          + ". Debug symbol information is required if you are using parameter names in expressions.");
       return;
     }
 
@@ -76,9 +76,9 @@ public class MethodSecurityEvaluationContext extends StandardEvaluationContext {
       return variable;
     }
 
-    if (!argumentsAdded) {
+    if (!this.argumentsAdded) {
       addArgumentsAsVariables();
-      argumentsAdded = true;
+      this.argumentsAdded = true;
     }
 
     return super.lookupVariable(name);

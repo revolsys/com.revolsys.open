@@ -105,8 +105,8 @@ public class MonotoneChain {
   private void computeOverlaps(final int start0, final int end0,
     final MonotoneChain mc, final int start1, final int end1,
     final MonotoneChainOverlapAction mco) {
-    final Point p00 = points.getPoint(start0);
-    final Point p01 = points.getPoint(end0);
+    final Point p00 = this.points.getPoint(start0);
+    final Point p01 = this.points.getPoint(end0);
     final Point p10 = mc.points.getPoint(start1);
     final Point p11 = mc.points.getPoint(end1);
     // terminating condition for the recursion
@@ -145,26 +145,26 @@ public class MonotoneChain {
   /**
    * Determine all the line segments in two chains which may overlap, and process them.
    * <p>
-   * The monotone chain search algorithm attempts to optimize 
+   * The monotone chain search algorithm attempts to optimize
    * performance by not calling the overlap action on chain segments
    * which it can determine do not overlap.
    * However, it *may* call the overlap action on segments
    * which do not actually interact.
    * This saves on the overhead of checking intersection
    * each time, since clients may be able to do this more efficiently.
-   * 
+   *
    * @param searchEnv the search envelope
    * @param mco the overlap action to execute on selected segments
    */
   public void computeOverlaps(final MonotoneChain mc,
     final MonotoneChainOverlapAction mco) {
-    computeOverlaps(start, end, mc, mc.start, mc.end, mco);
+    computeOverlaps(this.start, this.end, mc, mc.start, mc.end, mco);
   }
 
   private void computeSelect(final BoundingBox searchEnv, final int start0,
     final int end0, final MonotoneChainSelectAction mcs) {
-    final Point p0 = points.getPoint(start0);
-    final Point p1 = points.getPoint(end0);
+    final Point p0 = this.points.getPoint(start0);
+    final Point p1 = this.points.getPoint(end0);
     mcs.tempEnv1 = new BoundingBoxDoubleGf(p0, p1);
 
     // Debug.println("trying:" + p0 + p1 + " [ " + start0 + ", " + end0 + " ]");
@@ -193,7 +193,7 @@ public class MonotoneChain {
   }
 
   public Object getContext() {
-    return context;
+    return this.context;
   }
 
   /**
@@ -201,63 +201,63 @@ public class MonotoneChain {
    * Allocates a new array to hold the Coordinates
    */
   public Point[] getCoordinates() {
-    final Point coord[] = new Point[end - start + 1];
+    final Point coord[] = new Point[this.end - this.start + 1];
     int index = 0;
-    for (int i = start; i <= end; i++) {
-      coord[index++] = points.getPoint(i);
+    for (int i = this.start; i <= this.end; i++) {
+      coord[index++] = this.points.getPoint(i);
     }
     return coord;
   }
 
   public int getEndIndex() {
-    return end;
+    return this.end;
   }
 
   public BoundingBoxDoubleGf getEnvelope() {
-    if (env == null) {
-      final Point p0 = points.getPoint(start);
-      final Point p1 = points.getPoint(end);
-      env = new BoundingBoxDoubleGf(p0, p1);
+    if (this.env == null) {
+      final Point p0 = this.points.getPoint(this.start);
+      final Point p1 = this.points.getPoint(this.end);
+      this.env = new BoundingBoxDoubleGf(p0, p1);
     }
-    return env;
+    return this.env;
   }
 
   public int getId() {
-    return id;
+    return this.id;
   }
 
   /**
    * Gets the line segment starting at <code>index</code>
-   * 
+   *
    * @param index index of segment
    * @param ls line segment to extract into
    */
   public LineSegment getLineSegment(final int index) {
-    return new LineSegmentDouble(points.getPoint(index), points.getPoint(index + 1));
+    return new LineSegmentDouble(this.points.getPoint(index), this.points.getPoint(index + 1));
   }
 
   public int getStartIndex() {
-    return start;
+    return this.start;
   }
 
   /**
    * Determine all the line segments in the chain whose envelopes overlap
    * the searchEnvelope, and process them.
    * <p>
-   * The monotone chain search algorithm attempts to optimize 
+   * The monotone chain search algorithm attempts to optimize
    * performance by not calling the select action on chain segments
    * which it can determine are not in the search envelope.
    * However, it *may* call the select action on segments
    * which do not intersect the search envelope.
    * This saves on the overhead of checking envelope intersection
    * each time, since clients may be able to do this more efficiently.
-   * 
+   *
    * @param searchEnv the search envelope
    * @param mcs the select action to execute on selected segments
    */
   public void select(final BoundingBox searchEnv,
     final MonotoneChainSelectAction mcs) {
-    computeSelect(searchEnv, start, end, mcs);
+    computeSelect(searchEnv, this.start, this.end, mcs);
   }
 
   public void setId(final int id) {

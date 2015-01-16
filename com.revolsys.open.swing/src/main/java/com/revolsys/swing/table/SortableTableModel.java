@@ -9,7 +9,7 @@ public interface SortableTableModel extends TableModel {
   /**
    * Set the model to sort on the column. If the column is already sorted the
    * sort order will be reversed, otherwise it will be set to ascending.
-   * 
+   *
    * @param column The column to set as sorted.
    * @return The new sort order.
    */

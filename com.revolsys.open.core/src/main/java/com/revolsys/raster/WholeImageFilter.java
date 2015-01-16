@@ -28,6 +28,11 @@ import java.awt.image.WritableRaster;
 public abstract class WholeImageFilter extends AbstractBufferedImageOp
 implements java.io.Serializable {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   protected Rectangle transformedSpace;
 
   protected Rectangle originalSpace;

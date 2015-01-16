@@ -62,7 +62,7 @@ import com.revolsys.jts.geom.Polygon;
  * <p>
  * A typically usage would be a transformation class that transforms <tt>Polygons</tt> into
  * <tt>Polygons</tt>, <tt>LineStrings</tt> or <tt>Points</tt>, depending on the geometry of the input
- * (For instance, a simplification operation).  
+ * (For instance, a simplification operation).
  * This class would likely need to override the {@link #transformMultiPolygon(MultiPolygon, Geometry)transformMultiPolygon}
  * method to ensure that if input Polygons change type the result is a <tt>GeometryCollection</tt>,
  * not a <tt>MultiPolygon</tt>.
@@ -108,11 +108,6 @@ public abstract class GeometryTransformer {
   private final boolean preserveGeometryCollectionType = true;
 
   /**
-   * <code>true</code> if the output from a collection argument should still be a collection
-   */
-  private final boolean preserveCollections = false;
-
-  /**
    * <code>true</code> if the type of the input should be preserved
    */
   private final boolean preserveType = false;
@@ -135,7 +130,7 @@ public abstract class GeometryTransformer {
    * @return the input geometry
    */
   public Geometry getInputGeometry() {
-    return inputGeom;
+    return this.inputGeom;
   }
 
   public final Geometry transform(final Geometry inputGeom) {
@@ -168,7 +163,7 @@ public abstract class GeometryTransformer {
     }
 
     throw new IllegalArgumentException("Unknown Geometry subtype: "
-      + inputGeom.getClass().getName());
+        + inputGeom.getClass().getName());
   }
 
   /**
@@ -196,25 +191,25 @@ public abstract class GeometryTransformer {
       if (transformGeom == null) {
         continue;
       }
-      if (pruneEmptyGeometry && transformGeom.isEmpty()) {
+      if (this.pruneEmptyGeometry && transformGeom.isEmpty()) {
         continue;
       }
       transGeomList.add(transformGeom);
     }
-    if (preserveGeometryCollectionType) {
-      return factory.geometryCollection(transGeomList);
+    if (this.preserveGeometryCollectionType) {
+      return this.factory.geometryCollection(transGeomList);
     }
-    return factory.buildGeometry(transGeomList);
+    return this.factory.buildGeometry(transGeomList);
   }
 
   /**
    * Transforms a LinearRing.
    * The transformation of a LinearRing may result in a coordinate sequence
    * which does not form a structurally valid ring (i.e. a degnerate ring of 3 or fewer points).
-   * In this case a LineString is returned. 
+   * In this case a LineString is returned.
    * Subclasses may wish to override this method and check for this situation
    * (e.g. a subclass may choose to eliminate degenerate linear rings)
-   * 
+   *
    * @param geom the ring to simplify
    * @param parent the parent geometry
    * @return a LinearRing if the transformation resulted in a structurally valid ring
@@ -223,18 +218,18 @@ public abstract class GeometryTransformer {
   protected Geometry transformLinearRing(final LinearRing geometry,
     final Geometry parent) {
     if (geometry == null) {
-      return factory.linearRing();
+      return this.factory.linearRing();
     } else {
       final LineString points = transformCoordinates(geometry, geometry);
       if (points == null) {
-        return factory.linearRing();
+        return this.factory.linearRing();
       } else {
         final int seqSize = points.getVertexCount();
         // ensure a valid LinearRing
-        if (seqSize > 0 && seqSize < 4 && !preserveType) {
-          return factory.lineString(points);
+        if (seqSize > 0 && seqSize < 4 && !this.preserveType) {
+          return this.factory.lineString(points);
         } else {
-          return factory.linearRing(points);
+          return this.factory.linearRing(points);
         }
       }
     }
@@ -250,7 +245,7 @@ public abstract class GeometryTransformer {
   protected Geometry transformLineString(final LineString geom,
     final Geometry parent) {
     // should check for 1-point sequences and downgrade them to points
-    return factory.lineString(transformCoordinates(geom, geom));
+    return this.factory.lineString(transformCoordinates(geom, geom));
   }
 
   protected Geometry transformMultiLineString(final MultiLineString geom,
@@ -267,7 +262,7 @@ public abstract class GeometryTransformer {
       }
       transGeomList.add(transformGeom);
     }
-    return factory.buildGeometry(transGeomList);
+    return this.factory.buildGeometry(transGeomList);
   }
 
   protected Geometry transformMultiPoint(final MultiPoint geom,
@@ -284,7 +279,7 @@ public abstract class GeometryTransformer {
       }
       transGeomList.add(transformGeom);
     }
-    return factory.buildGeometry(transGeomList);
+    return this.factory.buildGeometry(transGeomList);
   }
 
   protected Geometry transformMultiPolygon(final MultiPolygon geom,
@@ -301,7 +296,7 @@ public abstract class GeometryTransformer {
       }
       transGeomList.add(transformGeom);
     }
-    return factory.buildGeometry(transGeomList);
+    return this.factory.buildGeometry(transGeomList);
   }
 
   protected abstract Geometry transformPoint(final Point point,
@@ -331,14 +326,14 @@ public abstract class GeometryTransformer {
     }
 
     if (isAllValidLinearRings) {
-      return factory.polygon(rings);
+      return this.factory.polygon(rings);
     } else {
       final List components = new ArrayList();
       if (shell != null) {
         components.add(shell);
       }
       components.addAll(rings);
-      return factory.buildGeometry(components);
+      return this.factory.buildGeometry(components);
     }
   }
 

@@ -11,11 +11,11 @@ public class HttpDcpType extends DcpType {
   }
 
   public void addMethod(final HttpMethod method) {
-    methods.add(method);
+    this.methods.add(method);
   }
 
   public List<HttpMethod> getMethods() {
-    return methods;
+    return this.methods;
   }
 
   public void setMethods(final List<HttpMethod> methods) {

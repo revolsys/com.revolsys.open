@@ -36,10 +36,10 @@ public class TopologyPreservingSimplifierTest extends TestCase {
     new GeometryOperationValidator(
       TPSimplifierResult.getResult(
         "GEOMETRYCOLLECTION ("
-          + "MULTIPOINT (80 200, 240 200, 240 60, 80 60, 80 200, 140 199, 120 120),"
-          + "POLYGON ((80 200, 240 200, 240 60, 80 60, 80 200)),"
-          + "LINESTRING (80 200, 240 200, 240 60, 80 60, 80 200, 140 199, 120 120)"
-          + ")", 10.0)).test();
+            + "MULTIPOINT (80 200, 240 200, 240 60, 80 60, 80 200, 140 199, 120 120),"
+            + "POLYGON ((80 200, 240 200, 240 60, 80 60, 80 200)),"
+            + "LINESTRING (80 200, 240 200, 240 60, 80 60, 80 200, 140 199, 120 120)"
+            + ")", 10.0)).test();
   }
 
   public void testMultiLineString() throws Exception {
@@ -74,7 +74,7 @@ public class TopologyPreservingSimplifierTest extends TestCase {
    * Test is from http://postgis.refractions.net/pipermail/postgis-users/2008-April/019327.html
    * Exhibits the issue where simplified polygon shells can "jump" across
    * holes, causing invalid topology.
-   * 
+   *
    * @throws Exception
    */
   public void testMultiPolygonWithSmallComponents() throws Exception {
@@ -125,8 +125,8 @@ public class TopologyPreservingSimplifierTest extends TestCase {
       TPSimplifierResult.getResult(
         "POLYGON ((80 200, 240 200, 240 60, 80 60, 80 200), (120 120, 220 120, 180 199, 160 200, 140 199, 120 120))",
         10.0)).setExpectedResult(
-      "POLYGON ((80 200, 240 200, 240 60, 80 60, 80 200), (120 120, 220 120, 180 199, 160 200, 140 199, 120 120))")
-      .test();
+            "POLYGON ((80 200, 240 200, 240 60, 80 60, 80 200), (120 120, 220 120, 180 199, 160 200, 140 199, 120 120))")
+            .test();
   }
 
   public void testTinyClosedLineString() throws Exception {
@@ -148,14 +148,14 @@ public class TopologyPreservingSimplifierTest extends TestCase {
 }
 
 class TPSimplifierResult {
-  private static WKTReader rdr = new WKTReader();
-
   public static Geometry[] getResult(final String wkt, final double tolerance)
-    throws ParseException {
+      throws ParseException {
     final Geometry[] ioGeom = new Geometry[2];
     ioGeom[0] = rdr.read(wkt);
     ioGeom[1] = TopologyPreservingSimplifier.simplify(ioGeom[0], tolerance);
-  //  System.out.println(ioGeom[1]);
+    //  System.out.println(ioGeom[1]);
     return ioGeom;
   }
+
+  private static WKTReader rdr = new WKTReader();
 }

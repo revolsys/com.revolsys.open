@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import java.util.Set;
  * The NameFilenameFilter is a {@link FilenameFilter} that only returns files if
  * the have one of the specified file names. More than one file name can be
  * specified by using the {@link #addName(String)} method.
- * 
+ *
  * @author Paul Austin
  */
 public class NameFilenameFilter implements FilenameFilter {
@@ -44,7 +44,7 @@ public class NameFilenameFilter implements FilenameFilter {
 
   /**
    * Construct a new NameFilenameFilter with the file names.
-   * 
+   *
    * @param filenames The file names.
    */
   public NameFilenameFilter(final Collection filenames) {
@@ -53,7 +53,7 @@ public class NameFilenameFilter implements FilenameFilter {
 
   /**
    * Construct a new NameFilenameFilter with the single file name.
-   * 
+   *
    * @param filenames The file names.
    * @param readOnly Flag indicating if the filter can be modified.
    */
@@ -64,7 +64,7 @@ public class NameFilenameFilter implements FilenameFilter {
 
   /**
    * Construct a new NameFilenameFilter with the single file name.
-   * 
+   *
    * @param filename The file name.
    */
   public NameFilenameFilter(final String filename) {
@@ -73,7 +73,7 @@ public class NameFilenameFilter implements FilenameFilter {
 
   /**
    * Construct a new NameFilenameFilter with the single file name.
-   * 
+   *
    * @param filename The file name.
    * @param readOnly Flag indicating if the filter can be modified.
    */
@@ -84,35 +84,35 @@ public class NameFilenameFilter implements FilenameFilter {
 
   /**
    * Check to see if the file should be included in the list of matched files
-   * 
+   *
    * @param directory The directory in which the file was found.
    * @param filename The name of the file.
    * @return True if the file matched, false otherwise.
    */
   @Override
   public boolean accept(final File directory, final String filename) {
-    return names.contains(filename);
+    return this.names.contains(filename);
   }
 
   /**
    * Add the file name to the names to find.
-   * 
+   *
    * @param name The file name.
    */
   public void addName(final String name) {
-    if (readOnly) {
+    if (this.readOnly) {
       throw new IllegalArgumentException("This filname filter is readonly");
     }
-    names.add(name);
+    this.names.add(name);
   }
 
   /**
    * Add the file names to the names to find.
-   * 
+   *
    * @param names The file names.
    */
   public void addNames(final Collection names) {
-    if (readOnly) {
+    if (this.readOnly) {
       throw new IllegalArgumentException("This filname filter is readonly");
     }
     for (final Iterator nameIter = names.iterator(); nameIter.hasNext();) {
@@ -123,17 +123,17 @@ public class NameFilenameFilter implements FilenameFilter {
 
   /**
    * Get the flag indicating if the filter can be modified.
-   * 
+   *
    * @return The flag indicating if the filter can be modified.
    */
   protected final boolean isReadOnly() {
-    return readOnly;
+    return this.readOnly;
   }
 
   /**
    * Set the flag indicating if the filter can be modified. If the flag is read
    * only it cannot be changed to writable.
-   * 
+   *
    * @param readOnly The flag indicating if the filter can be modified.
    */
   protected final void setReadOnly(final boolean readOnly) {

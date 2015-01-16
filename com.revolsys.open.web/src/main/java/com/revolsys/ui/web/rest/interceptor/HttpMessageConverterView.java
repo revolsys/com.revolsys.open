@@ -60,7 +60,7 @@ public class HttpMessageConverterView extends AbstractView {
   @Override
   protected void renderMergedOutputModel(final Map<String, Object> model,
     final HttpServletRequest request, final HttpServletResponse response)
-    throws Exception {
+        throws Exception {
     final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 
     final String path = (String)requestAttributes.getAttribute(

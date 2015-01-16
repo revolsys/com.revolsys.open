@@ -60,6 +60,7 @@ public interface LinearRing extends LineString {
   @Override
   LinearRing move(double... deltas);
 
+  @Override
   LinearRing moveVertex(Point newPoint, int vertexIndex);
 
   @Override

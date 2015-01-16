@@ -23,7 +23,7 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.util.JavaBeanUtil;
 
 public class GeometryStylePanel extends BaseStylePanel implements
-  PropertyChangeListener {
+PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private final GeometryStyleRenderer geometryStyleRenderer;

@@ -96,7 +96,7 @@ class LocationIndexOfPoint {
     }
 
     // sanity check for minLocation at or past end of line
-    final LinearLocation endLoc = LinearLocation.getEndLocation(linearGeom);
+    final LinearLocation endLoc = LinearLocation.getEndLocation(this.linearGeom);
     if (endLoc.compareTo(minIndex) <= 0) {
       return endLoc;
     }
@@ -107,7 +107,7 @@ class LocationIndexOfPoint {
      * This will not be null, since it was initialized to minLocation
      */
     Assert.isTrue(closestAfter.compareTo(minIndex) >= 0,
-      "computed location is before specified minimum location");
+        "computed location is before specified minimum location");
     return closestAfter;
   }
 
@@ -118,7 +118,7 @@ class LocationIndexOfPoint {
     int minSegmentIndex = 0;
     double minFrac = -1.0;
 
-    for (final LinearIterator it = new LinearIterator(linearGeom); it.hasNext(); it.next()) {
+    for (final LinearIterator it = new LinearIterator(this.linearGeom); it.hasNext(); it.next()) {
       if (!it.isEndOfLine()) {
         final Point p0 = it.getSegmentStart();
         final Point p1 = it.getSegmentEnd();
@@ -130,8 +130,8 @@ class LocationIndexOfPoint {
         if (segDistance < minDistance) {
           // ensure after minLocation, if any
           if (minIndex == null
-            || minIndex.compareLocationValues(candidateComponentIndex,
-              candidateSegmentIndex, segFrac) < 0) {
+              || minIndex.compareLocationValues(candidateComponentIndex,
+                candidateSegmentIndex, segFrac) < 0) {
             // otherwise, save this as new minimum
             minComponentIndex = candidateComponentIndex;
             minSegmentIndex = candidateSegmentIndex;
@@ -152,11 +152,11 @@ class LocationIndexOfPoint {
   }
 
   /**
-   * Computes the fraction of distance (in <tt>[0.0, 1.0]</tt>) 
+   * Computes the fraction of distance (in <tt>[0.0, 1.0]</tt>)
    * that a point occurs along a line segment.
    * If the point is beyond either ends of the line segment,
    * the closest fractional value (<tt>0.0</tt> or <tt>1.0</tt>) is returned.
-   *  
+   *
    * @param seg the line segment to use
    * @param inputPt the point
    * @return the fraction along the line segment the point occurs

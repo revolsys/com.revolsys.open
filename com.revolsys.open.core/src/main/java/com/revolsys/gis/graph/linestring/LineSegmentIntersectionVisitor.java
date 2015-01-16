@@ -9,7 +9,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.segment.LineSegment;
 
 public class LineSegmentIntersectionVisitor extends
-  AbstractEdgeListenerVisitor<LineSegment> {
+AbstractEdgeListenerVisitor<LineSegment> {
 
   private final Set<Geometry> intersections = new LinkedHashSet<>();
 
@@ -20,16 +20,16 @@ public class LineSegmentIntersectionVisitor extends
   }
 
   public Set<Geometry> getIntersections() {
-    return intersections;
+    return this.intersections;
   }
 
   @Override
   public boolean visit(final Edge<LineSegment> edge) {
     final LineSegment lineSegment = edge.getObject();
-    if (lineSegment.getBoundingBox().intersects(querySeg.getBoundingBox())) {
-      final Geometry intersection = querySeg.getIntersection(lineSegment);
+    if (lineSegment.getBoundingBox().intersects(this.querySeg.getBoundingBox())) {
+      final Geometry intersection = this.querySeg.getIntersection(lineSegment);
       if (intersection != null && !intersection.isEmpty()) {
-        intersections.add(intersection);
+        this.intersections.add(intersection);
       }
     }
     return true;

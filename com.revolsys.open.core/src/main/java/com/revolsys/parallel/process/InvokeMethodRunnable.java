@@ -13,7 +13,7 @@ import com.revolsys.util.Property;
 /**
  * A runnable class which will invoke a method on an object with the specified
  * parameters.
- * 
+ *
  * @author Paul Austin
  */
 public class InvokeMethodRunnable extends AbstractRunnable implements Process {
@@ -39,7 +39,7 @@ public class InvokeMethodRunnable extends AbstractRunnable implements Process {
 
   /**
    * Construct a new InvokeMethodRunnable.
-   * 
+   *
    * @param object The object to invoke the method on.
    * @param methodName The name of the method to invoke.
    * @param parameters The parameters to pass to the method.
@@ -53,7 +53,7 @@ public class InvokeMethodRunnable extends AbstractRunnable implements Process {
 
   /**
    * Construct a new InvokeMethodRunnable.
-   * 
+   *
    * @param object The object to invoke the method on.
    * @param methodName The name of the method to invoke.
    * @param parameters The parameters to pass to the method.
@@ -72,24 +72,24 @@ public class InvokeMethodRunnable extends AbstractRunnable implements Process {
     final Object object = getObject();
     if (object == null) {
       LoggerFactory.getLogger(getClass())
-        .debug("Object cannot be null " + this);
+      .debug("Object cannot be null " + this);
     } else {
-      Property.invoke(object, methodName, parameters);
+      Property.invoke(object, this.methodName, this.parameters);
     }
   }
 
   @Override
   public String getBeanName() {
-    return beanName;
+    return this.beanName;
   }
 
   public Object getObject() {
-    return object.get();
+    return this.object.get();
   }
 
   @Override
   public ProcessNetwork getProcessNetwork() {
-    return processNetwork;
+    return this.processNetwork;
   }
 
   @Override
@@ -118,13 +118,13 @@ public class InvokeMethodRunnable extends AbstractRunnable implements Process {
       string.append(object.getClass());
       string.append('.');
     }
-    string.append(methodName);
+    string.append(this.methodName);
     string.append('(');
-    for (int i = 0; i < parameters.length; i++) {
+    for (int i = 0; i < this.parameters.length; i++) {
       if (i > 0) {
         string.append(',');
       }
-      final Object parameter = parameters[i];
+      final Object parameter = this.parameters[i];
       if (parameter == null) {
         string.append("null");
       } else {
@@ -133,7 +133,7 @@ public class InvokeMethodRunnable extends AbstractRunnable implements Process {
     }
     string.append(')');
     string.append('\n');
-    string.append(Arrays.toString(parameters));
+    string.append(Arrays.toString(this.parameters));
 
     return string.toString();
   }

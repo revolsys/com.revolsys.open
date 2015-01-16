@@ -35,7 +35,7 @@ public class EqualsFilter<T> implements Filter<T> {
 
   @Override
   public boolean accept(final T object) {
-    if (equals.equals(this.object, object, excludeAttributes)) {
+    if (this.equals.equals(this.object, object, this.excludeAttributes)) {
       return true;
     } else {
       return false;

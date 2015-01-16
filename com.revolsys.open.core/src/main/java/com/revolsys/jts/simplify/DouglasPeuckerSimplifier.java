@@ -46,7 +46,7 @@ import com.revolsys.jts.geom.util.GeometryTransformer;
  * Simplifies a {@link Geometry} using the Douglas-Peucker algorithm.
  * Ensures that any polygonal geometries returned are valid.
  * Simple lines are not guaranteed to remain simple after simplification.
- * All geometry types are handled. 
+ * All geometry types are handled.
  * Empty and point geometries are returned unchanged.
  * Empty geometry components are deleted.
  * <p>
@@ -83,7 +83,7 @@ public class DouglasPeuckerSimplifier {
      * @return a valid area geometry
      */
     private Geometry createValidArea(final Geometry rawAreaGeom) {
-      if (isEnsureValidTopology) {
+      if (this.isEnsureValidTopology) {
         return rawAreaGeom.buffer(0.0);
       }
       return rawAreaGeom;
@@ -96,15 +96,15 @@ public class DouglasPeuckerSimplifier {
         return coords;
       } else {
         final Point[] newPts = DouglasPeuckerLineSimplifier.simplify(coords,
-          distanceTolerance);
+          DouglasPeuckerSimplifier.this.distanceTolerance);
         return new LineStringDouble(newPts);
       }
     }
 
     /**
-     * Simplifies a LinearRing.  If the simplification results 
+     * Simplifies a LinearRing.  If the simplification results
      * in a degenerate ring, remove the component.
-     * 
+     *
      * @return null if the simplification results in a degenerate ring
      */
     @Override
@@ -154,7 +154,7 @@ public class DouglasPeuckerSimplifier {
 
   /**
    * Simplifies a geometry using a given tolerance.
-   * 
+   *
    * @param geom geometry to simplify
    * @param distanceTolerance the tolerance to use
    * @return a simplified version of the geometry
@@ -174,7 +174,7 @@ public class DouglasPeuckerSimplifier {
 
   /**
    * Creates a simplifier for a given geometry.
-   * 
+   *
    * @param inputGeom the geometry to simplify
    */
   public DouglasPeuckerSimplifier(final Geometry inputGeom) {
@@ -183,23 +183,23 @@ public class DouglasPeuckerSimplifier {
 
   /**
    * Gets the simplified geometry.
-   * 
+   *
    * @return the simplified geometry
    */
   public Geometry getResultGeometry() {
     // empty input produces an empty result
-    if (inputGeom.isEmpty()) {
-      return inputGeom.clone();
+    if (this.inputGeom.isEmpty()) {
+      return this.inputGeom.clone();
     }
 
-    return (new DPTransformer(isEnsureValidTopology)).transform(inputGeom);
+    return new DPTransformer(this.isEnsureValidTopology).transform(this.inputGeom);
   }
 
   /**
    * Sets the distance tolerance for the simplification.
    * All vertices in the simplified geometry will be within this
    * distance of the original geometry.
-   * The tolerance value must be non-negative. 
+   * The tolerance value must be non-negative.
    *
    * @param distanceTolerance the approximation tolerance to use
    */
@@ -219,9 +219,9 @@ public class DouglasPeuckerSimplifier {
    * <li>fixing topology is a relative expensive operation
    * <li>in some pathological cases the topology fixing operation may either fail or run for too long
    * </ul>
-   * 
+   *
    * The default is to fix polygon topology.
-   * 
+   *
    * @param isEnsureValidTopology
    */
   public void setEnsureValid(final boolean isEnsureValidTopology) {

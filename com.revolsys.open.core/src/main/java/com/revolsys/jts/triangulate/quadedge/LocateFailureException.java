@@ -35,36 +35,42 @@ package com.revolsys.jts.triangulate.quadedge;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;
 
-public class LocateFailureException 
-	extends RuntimeException 
+public class LocateFailureException
+extends RuntimeException
 {
-	private static String msgWithSpatial(String msg, LineSegment seg) {
-		if (seg != null)
-			return msg + " [ " + seg + " ]";
-		return msg;
-	}
+  private static String msgWithSpatial(final String msg, final LineSegment seg) {
+    if (seg != null) {
+      return msg + " [ " + seg + " ]";
+    }
+    return msg;
+  }
 
-	private LineSegment seg = null;
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
-	public LocateFailureException(String msg) {
-		super(msg);
-	}
+  private LineSegment seg = null;
 
-	public LocateFailureException(String msg, LineSegment seg) {
-		super(msgWithSpatial(msg, seg));
-		this.seg = new LineSegmentDouble(seg);
-	}
+  public LocateFailureException(final LineSegment seg) {
+    super(
+      "Locate failed to converge (at edge: "
+          + seg
+          + ").  Possible causes include invalid Subdivision topology or very close sites");
+    this.seg = new LineSegmentDouble(seg);
+  }
 
-	public LocateFailureException(LineSegment seg) {
-		super(
-				"Locate failed to converge (at edge: "
-						+ seg
-						+ ").  Possible causes include invalid Subdivision topology or very close sites");
-		this.seg = new LineSegmentDouble(seg);
-	}
+  public LocateFailureException(final String msg) {
+    super(msg);
+  }
 
-	public LineSegment getSegment() {
-		return seg;
-	}
+  public LocateFailureException(final String msg, final LineSegment seg) {
+    super(msgWithSpatial(msg, seg));
+    this.seg = new LineSegmentDouble(seg);
+  }
+
+  public LineSegment getSegment() {
+    return this.seg;
+  }
 
 }

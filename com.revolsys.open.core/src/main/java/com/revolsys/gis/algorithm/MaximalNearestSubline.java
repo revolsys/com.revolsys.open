@@ -47,7 +47,7 @@ public class MaximalNearestSubline {
     if (!end.isVertex()) {
       newCoordinates.add(end.getCoordinate(), false);
     }
-    if (Double.isNaN(((Point)newCoordinates.get(0)).getX())) {
+    if (Double.isNaN(newCoordinates.get(0).getX())) {
       newCoordinates.remove(0);
     }
     Point[] newCoordinateArray = newCoordinates.toCoordinateArray();
@@ -75,34 +75,34 @@ public class MaximalNearestSubline {
   /**
    * Create a new Maximal Nearest Subline of {@link LineString} <code>a</code>
    * relative to {@link LineString} <code>b</code>
-   * 
+   *
    * @param a the LineString on which to compute the subline
    * @param b the LineString to compute the subline relative to
    */
   public MaximalNearestSubline(final LineString a, final LineString b) {
     this.a = a;
     this.b = b;
-    aPtLocator = new LocationOfPoint(a);
+    this.aPtLocator = new LocationOfPoint(a);
   }
 
   private void expandInterval(final LineStringLocation loc) {
     // expand maximal interval if this point is outside it
-    if (maxInterval[0] == null || loc.compareTo(maxInterval[0]) < 0) {
-      maxInterval[0] = loc;
+    if (this.maxInterval[0] == null || loc.compareTo(this.maxInterval[0]) < 0) {
+      this.maxInterval[0] = loc;
     }
-    if (maxInterval[1] == null || loc.compareTo(maxInterval[1]) > 0) {
-      maxInterval[1] = loc;
+    if (this.maxInterval[1] == null || loc.compareTo(this.maxInterval[1]) > 0) {
+      this.maxInterval[1] = loc;
     }
   }
 
   private void findNearestOnA(final Point bPt) {
-    final LineStringLocation nearestLocationOnA = aPtLocator.locate(bPt);
+    final LineStringLocation nearestLocationOnA = this.aPtLocator.locate(bPt);
     expandInterval(nearestLocationOnA);
   }
 
   /**
    * Computes the interval (range) containing the Maximal Nearest Subline.
-   * 
+   *
    * @return an array containing the minimum and maximum locations of the
    *         Maximal Nearest Subline of <code>A</code>
    */
@@ -115,7 +115,7 @@ public class MaximalNearestSubline {
      */
 
     // Heuristic #1: use every vertex of B as a test point
-    final LineString bCoords = b;
+    final LineString bCoords = this.b;
     for (int ib = 0; ib < bCoords.getVertexCount(); ib++) {
       findNearestOnA(bCoords.getPoint(ib));
     }
@@ -125,8 +125,8 @@ public class MaximalNearestSubline {
      * those points of B as test points. For efficiency use only vertices of A
      * outside current max interval.
      */
-    final LocationOfPoint bPtLocator = new LocationOfPoint(b);
-    final LineString aCoords = a;
+    final LocationOfPoint bPtLocator = new LocationOfPoint(this.b);
+    final LineString aCoords = this.a;
     for (int ia = 0; ia < aCoords.getVertexCount(); ia++) {
       if (isOutsideInterval(ia)) {
         final LineStringLocation bLoc = bPtLocator.locate(aCoords.getPoint(ia));
@@ -135,14 +135,14 @@ public class MaximalNearestSubline {
       }
     }
 
-    return maxInterval;
+    return this.maxInterval;
   }
 
   private boolean isOutsideInterval(final int ia) {
-    if (ia <= maxInterval[0].getSegmentIndex()) {
+    if (ia <= this.maxInterval[0].getSegmentIndex()) {
       return true;
     }
-    if (ia > maxInterval[1].getSegmentIndex()) {
+    if (ia > this.maxInterval[1].getSegmentIndex()) {
       return true;
     }
     return false;

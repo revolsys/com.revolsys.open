@@ -7,8 +7,6 @@ import com.revolsys.io.Path;
 
 public final class PathCache {
 
-  private static final Map<String, String> NAME_MAP = new HashMap<String, String>();
-
   public static synchronized String getName(final String name) {
     if (name == null) {
       return null;
@@ -28,6 +26,8 @@ public final class PathCache {
       return path;
     }
   }
+
+  private static final Map<String, String> NAME_MAP = new HashMap<String, String>();
 
   private PathCache() {
   }

@@ -77,7 +77,7 @@ public class Edge extends GraphComponent {
   private final Depth depth = new Depth();
 
   private int depthDelta = 0; // the change in area depth from the R to L side
-                              // of this edge
+  // of this edge
 
   public Edge(final LineString points) {
     this(points, null);
@@ -110,9 +110,9 @@ public class Edge extends GraphComponent {
       }
     }
     /**
-    * Add the intersection point to edge intersection list.
-    */
-    eiList.add(intPt, normalizedSegmentIndex, dist);
+     * Add the intersection point to edge intersection list.
+     */
+    this.eiList.add(intPt, normalizedSegmentIndex, dist);
   }
 
   /**
@@ -132,7 +132,7 @@ public class Edge extends GraphComponent {
    */
   @Override
   public void computeIM(final IntersectionMatrix im) {
-    updateIM(label, im);
+    updateIM(this.label, im);
   }
 
   /**
@@ -173,7 +173,7 @@ public class Edge extends GraphComponent {
   public Edge getCollapsedEdge() {
     final LineString points = new LineStringDouble(getCoordinate(0),
       getCoordinate(1));
-    final Edge edge = new Edge(points, Label.toLineLabel(label));
+    final Edge edge = new Edge(points, Label.toLineLabel(this.label));
     return edge;
   }
 
@@ -186,11 +186,11 @@ public class Edge extends GraphComponent {
   }
 
   public Point getCoordinate(final int i) {
-    return points.getPoint(i);
+    return this.points.getPoint(i);
   }
 
   public Depth getDepth() {
-    return depth;
+    return this.depth;
   }
 
   /**
@@ -198,18 +198,18 @@ public class Edge extends GraphComponent {
    * @return the change in depth as the edge is crossed from R to L
    */
   public int getDepthDelta() {
-    return depthDelta;
+    return this.depthDelta;
   }
 
   public EdgeIntersectionList getEdgeIntersectionList() {
-    return eiList;
+    return this.eiList;
   }
 
   public BoundingBox getEnvelope() {
-    if (env == null) {
-      env = new BoundingBoxDoubleGf(points);
+    if (this.env == null) {
+      this.env = new BoundingBoxDoubleGf(this.points);
     }
-    return env;
+    return this.env;
   }
 
   public int getMaximumSegmentIndex() {
@@ -217,18 +217,18 @@ public class Edge extends GraphComponent {
   }
 
   public MonotoneChainEdge getMonotoneChainEdge() {
-    if (mce == null) {
-      mce = new MonotoneChainEdge(this);
+    if (this.mce == null) {
+      this.mce = new MonotoneChainEdge(this);
     }
-    return mce;
+    return this.mce;
   }
 
   public int getNumPoints() {
-    return points.getVertexCount();
+    return this.points.getVertexCount();
   }
 
   public LineString getPoints() {
-    return points;
+    return this.points;
   }
 
   public boolean isClosed() {
@@ -240,7 +240,7 @@ public class Edge extends GraphComponent {
    * two segments which are equal and opposite (eg a zero-width V).
    */
   public boolean isCollapsed() {
-    if (!label.isArea()) {
+    if (!this.label.isArea()) {
       return false;
     }
     if (getNumPoints() != 3) {
@@ -254,7 +254,7 @@ public class Edge extends GraphComponent {
 
   @Override
   public boolean isIsolated() {
-    return isIsolated;
+    return this.isIsolated;
   }
 
   /**
@@ -288,7 +288,7 @@ public class Edge extends GraphComponent {
   @Override
   public String toString() {
     final StringBuilder buf = new StringBuilder();
-    buf.append("edge " + name + ": ");
+    buf.append("edge " + this.name + ": ");
     buf.append("LINESTRING (");
     for (int i = 0; i < getNumPoints(); i++) {
       if (i > 0) {
@@ -296,7 +296,7 @@ public class Edge extends GraphComponent {
       }
       buf.append(getCoordinate(i).getX() + " " + getCoordinate(i).getY());
     }
-    buf.append(")  " + label + " " + depthDelta);
+    buf.append(")  " + this.label + " " + this.depthDelta);
     return buf.toString();
   }
 

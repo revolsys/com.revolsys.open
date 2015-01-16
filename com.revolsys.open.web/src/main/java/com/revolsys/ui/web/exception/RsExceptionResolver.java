@@ -14,21 +14,21 @@ import org.springframework.web.servlet.ModelAndView;
 public class RsExceptionResolver implements HandlerExceptionResolver {
 
   @Override
-  public ModelAndView resolveException(HttpServletRequest request,
-    HttpServletResponse response, Object handler, Exception exception) {
+  public ModelAndView resolveException(final HttpServletRequest request,
+    final HttpServletResponse response, final Object handler, final Exception exception) {
     try {
       if (exception instanceof PageNotFoundException) {
-        PageNotFoundException pageNotFound = (PageNotFoundException)exception;
+        final PageNotFoundException pageNotFound = (PageNotFoundException)exception;
         response.sendError(HttpServletResponse.SC_NOT_FOUND,
           pageNotFound.getMessage());
         return new ModelAndView();
       } else if (exception instanceof IllegalArgumentException) {
-        IllegalArgumentException illegalArgument = (IllegalArgumentException)exception;
+        final IllegalArgumentException illegalArgument = (IllegalArgumentException)exception;
         response.sendError(HttpServletResponse.SC_BAD_REQUEST,
           illegalArgument.getMessage());
         return new ModelAndView();
       } else if (exception instanceof RedirectException) {
-        RedirectException redirect = (RedirectException)exception;
+        final RedirectException redirect = (RedirectException)exception;
         response.sendRedirect(redirect.getUrl());
         return new ModelAndView();
       } else if (exception instanceof MultipartException) {

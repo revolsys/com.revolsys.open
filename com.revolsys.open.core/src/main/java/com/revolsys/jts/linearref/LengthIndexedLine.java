@@ -101,7 +101,7 @@ public class LengthIndexedLine {
     // LinearLocation endLoc = locationOf(endIndex2, true);
     // LinearLocation startLoc = locationOf(startIndex2);
     final LinearLocation endLoc = locationOf(endIndex2);
-    return ExtractLineByLocation.extract(linearGeom, startLoc, endLoc);
+    return ExtractLineByLocation.extract(this.linearGeom, startLoc, endLoc);
   }
 
   /**
@@ -116,8 +116,8 @@ public class LengthIndexedLine {
    * @return the Point at the given index
    */
   public Point extractPoint(final double index) {
-    final LinearLocation loc = LengthLocationMap.getLocation(linearGeom, index);
-    return loc.getCoordinate(linearGeom);
+    final LinearLocation loc = LengthLocationMap.getLocation(this.linearGeom, index);
+    return loc.getCoordinate(this.linearGeom);
   }
 
   /**
@@ -127,7 +127,7 @@ public class LengthIndexedLine {
    * line will be returned.
    * The computed point is offset to the left of the line if the offset distance is
    * positive, to the right if negative.
-   * 
+   *
    * The Z-ordinate of the computed point will be interpolated from
    * the Z-ordinates of the line segment containing it, if they exist.
    *
@@ -138,9 +138,9 @@ public class LengthIndexedLine {
    */
   public Point extractPoint(final double index,
     final double offsetDistance) {
-    final LinearLocation loc = LengthLocationMap.getLocation(linearGeom, index);
-    final LinearLocation locLow = loc.toLowest(linearGeom);
-    return locLow.getSegment(linearGeom).pointAlongOffset(
+    final LinearLocation loc = LengthLocationMap.getLocation(this.linearGeom, index);
+    final LinearLocation locLow = loc.toLowest(this.linearGeom);
+    return locLow.getSegment(this.linearGeom).pointAlongOffset(
       locLow.getSegmentFraction(), offsetDistance);
   }
 
@@ -149,7 +149,7 @@ public class LengthIndexedLine {
    * @return the end index
    */
   public double getEndIndex() {
-    return linearGeom.getLength();
+    return this.linearGeom.getLength();
   }
 
   /**
@@ -178,7 +178,7 @@ public class LengthIndexedLine {
    * @see #project(Point)
    */
   public double indexOf(final Point pt) {
-    return LengthIndexOfPoint.indexOf(linearGeom, pt);
+    return LengthIndexOfPoint.indexOf(this.linearGeom, pt);
   }
 
   /**
@@ -204,7 +204,7 @@ public class LengthIndexedLine {
    * @see #project(Point)
    */
   public double indexOfAfter(final Point pt, final double minIndex) {
-    return LengthIndexOfPoint.indexOfAfter(linearGeom, pt, minIndex);
+    return LengthIndexOfPoint.indexOfAfter(this.linearGeom, pt, minIndex);
   }
 
   /**
@@ -217,11 +217,11 @@ public class LengthIndexedLine {
    * @return a pair of indices for the start and end of the subline.
    */
   public double[] indicesOf(final Geometry subLine) {
-    final LinearLocation[] locIndex = LocationIndexOfLine.indicesOf(linearGeom,
+    final LinearLocation[] locIndex = LocationIndexOfLine.indicesOf(this.linearGeom,
       subLine);
     final double[] index = new double[] {
-      LengthLocationMap.getLength(linearGeom, locIndex[0]),
-      LengthLocationMap.getLength(linearGeom, locIndex[1])
+      LengthLocationMap.getLength(this.linearGeom, locIndex[0]),
+      LengthLocationMap.getLength(this.linearGeom, locIndex[1])
     };
     return index;
   }
@@ -233,23 +233,23 @@ public class LengthIndexedLine {
    * @return <code>true</code> if the index is in the valid range
    */
   public boolean isValidIndex(final double index) {
-    return (index >= getStartIndex() && index <= getEndIndex());
+    return index >= getStartIndex() && index <= getEndIndex();
   }
 
   private LinearLocation locationOf(final double index) {
-    return LengthLocationMap.getLocation(linearGeom, index);
+    return LengthLocationMap.getLocation(this.linearGeom, index);
   }
 
   private LinearLocation locationOf(final double index,
     final boolean resolveLower) {
-    return LengthLocationMap.getLocation(linearGeom, index, resolveLower);
+    return LengthLocationMap.getLocation(this.linearGeom, index, resolveLower);
   }
 
   private double positiveIndex(final double index) {
     if (index >= 0.0) {
       return index;
     }
-    return linearGeom.getLength() + index;
+    return this.linearGeom.getLength() + index;
   }
 
   /**
@@ -262,6 +262,6 @@ public class LengthIndexedLine {
    * @return the index of the point
    */
   public double project(final Point pt) {
-    return LengthIndexOfPoint.indexOf(linearGeom, pt);
+    return LengthIndexOfPoint.indexOf(this.linearGeom, pt);
   }
 }

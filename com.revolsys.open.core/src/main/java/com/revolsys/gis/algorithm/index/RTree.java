@@ -11,9 +11,7 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
 
   private int maxEntries;
 
-  private int minEntries;
-
-  private RTreeNode<T> root = new RTreeLeaf<T>(maxEntries);
+  private RTreeNode<T> root = new RTreeLeaf<T>(this.maxEntries);
 
   private int size;
 
@@ -22,9 +20,8 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   }
 
   public RTree(final int minEntries, final int maxEntries) {
-    this.minEntries = minEntries;
     this.maxEntries = maxEntries;
-    root = new RTreeLeaf<T>(maxEntries);
+    this.root = new RTreeLeaf<T>(maxEntries);
   }
 
   private RTreeLeaf<T> chooseLeaf(final List<RTreeBranch<T>> path,
@@ -88,28 +85,28 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   }
 
   public int getSize() {
-    return size;
+    return this.size;
   }
 
   @Override
   public void put(final BoundingBox envelope, final T object) {
     final LinkedList<RTreeBranch<T>> path = new LinkedList<RTreeBranch<T>>();
-    final RTreeLeaf<T> leaf = chooseLeaf(path, root, envelope);
-    if (leaf.getSize() == maxEntries) {
+    final RTreeLeaf<T> leaf = chooseLeaf(path, this.root, envelope);
+    if (leaf.getSize() == this.maxEntries) {
       final List<RTreeNode<T>> newNodes = leaf.split(envelope, object);
       replace(path, leaf, newNodes);
     } else {
       leaf.add(envelope, object);
     }
-    size++;
+    this.size++;
   }
 
   @Override
   public boolean remove(final BoundingBox envelope, final T object) {
     // TODO rebalance after remove
     final LinkedList<RTreeNode<T>> path = new LinkedList<RTreeNode<T>>();
-    if (root.remove(path, envelope, object)) {
-      size--;
+    if (this.root.remove(path, envelope, object)) {
+      this.size--;
       return true;
     } else {
       return false;
@@ -119,10 +116,10 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   private void replace(final LinkedList<RTreeBranch<T>> path,
     final RTreeNode<T> oldNode, final List<RTreeNode<T>> newNodes) {
     if (path.isEmpty()) {
-      root = new RTreeBranch<T>(maxEntries, newNodes);
+      this.root = new RTreeBranch<T>(this.maxEntries, newNodes);
     } else {
       final RTreeBranch<T> parentNode = path.removeLast();
-      if (parentNode.getSize() + newNodes.size() - 1 >= maxEntries) {
+      if (parentNode.getSize() + newNodes.size() - 1 >= this.maxEntries) {
         final List<RTreeNode<T>> newParentNodes = parentNode.split(oldNode,
           newNodes);
         replace(path, parentNode, newParentNodes);
@@ -136,17 +133,17 @@ public class RTree<T> extends AbstractSpatialIndex<T> {
   @Override
   public void visit(final BoundingBox envelope, final Filter<T> filter,
     final Visitor<T> visitor) {
-    root.visit(envelope, filter, visitor);
+    this.root.visit(envelope, filter, visitor);
   }
 
   @Override
   public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
-    root.visit(envelope, visitor);
+    this.root.visit(envelope, visitor);
   }
 
   @Override
   public void visit(final Visitor<T> visitor) {
-    root.visit(visitor);
+    this.root.visit(visitor);
   }
 
 }

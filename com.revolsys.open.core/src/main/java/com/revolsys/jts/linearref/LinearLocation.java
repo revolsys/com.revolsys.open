@@ -50,18 +50,18 @@ import com.revolsys.jts.geom.segment.LineSegmentDouble;
  */
 public class LinearLocation implements Comparable {
   /**
-  *  Compares two sets of location values for order.
-  *
-  * @param componentIndex0 a component index
-  * @param segmentIndex0 a segment index
-  * @param segmentFraction0 a segment fraction
-  * @param componentIndex1 another component index
-  * @param segmentIndex1 another segment index
-  * @param segmentFraction1 another segment fraction
-  *@return    a negative integer, zero, or a positive integer
-  *      as the first set of location values
-  *      is less than, equal to, or greater than the second set of locationValues
-  */
+   *  Compares two sets of location values for order.
+   *
+   * @param componentIndex0 a component index
+   * @param segmentIndex0 a segment index
+   * @param segmentFraction0 a segment fraction
+   * @param componentIndex1 another component index
+   * @param segmentIndex1 another segment index
+   * @param segmentFraction1 another segment fraction
+   *@return    a negative integer, zero, or a positive integer
+   *      as the first set of location values
+   *      is less than, equal to, or greater than the second set of locationValues
+   */
   public static int compareLocationValues(final int componentIndex0,
     final int segmentIndex0, final double segmentFraction0,
     final int componentIndex1, final int segmentIndex1,
@@ -92,10 +92,10 @@ public class LinearLocation implements Comparable {
   }
 
   /**
-    * Gets a location which refers to the end of a linear {@link Geometry}.
-    * @param linear the linear geometry
-    * @return a new <tt>LinearLocation</tt>
-    */
+   * Gets a location which refers to the end of a linear {@link Geometry}.
+   * @param linear the linear geometry
+   * @return a new <tt>LinearLocation</tt>
+   */
   public static LinearLocation getEndLocation(final Geometry linear) {
     // assert: linear is LineString or MultiLineString
     final LinearLocation loc = new LinearLocation();
@@ -171,7 +171,7 @@ public class LinearLocation implements Comparable {
 
   /**
    * Creates a new location equal to a given one.
-   * 
+   *
    * @param loc a LinearLocation
    */
   public LinearLocation(final LinearLocation loc) {
@@ -186,14 +186,14 @@ public class LinearLocation implements Comparable {
    * @param linear a linear geometry
    */
   public void clamp(final Geometry linear) {
-    if (componentIndex >= linear.getGeometryCount()) {
+    if (this.componentIndex >= linear.getGeometryCount()) {
       setToEnd(linear);
       return;
     }
-    if (segmentIndex >= linear.getVertexCount()) {
-      final LineString line = (LineString)linear.getGeometry(componentIndex);
-      segmentIndex = line.getVertexCount() - 1;
-      segmentFraction = 1.0;
+    if (this.segmentIndex >= linear.getVertexCount()) {
+      final LineString line = (LineString)linear.getGeometry(this.componentIndex);
+      this.segmentIndex = line.getVertexCount() - 1;
+      this.segmentFraction = 1.0;
     }
   }
 
@@ -204,7 +204,7 @@ public class LinearLocation implements Comparable {
    */
   @Override
   public Object clone() {
-    return new LinearLocation(componentIndex, segmentIndex, segmentFraction);
+    return new LinearLocation(this.componentIndex, this.segmentIndex, this.segmentFraction);
   }
 
   /**
@@ -219,24 +219,24 @@ public class LinearLocation implements Comparable {
   public int compareLocationValues(final int componentIndex1,
     final int segmentIndex1, final double segmentFraction1) {
     // compare component indices
-    if (componentIndex < componentIndex1) {
+    if (this.componentIndex < componentIndex1) {
       return -1;
     }
-    if (componentIndex > componentIndex1) {
+    if (this.componentIndex > componentIndex1) {
       return 1;
     }
     // compare segments
-    if (segmentIndex < segmentIndex1) {
+    if (this.segmentIndex < segmentIndex1) {
       return -1;
     }
-    if (segmentIndex > segmentIndex1) {
+    if (this.segmentIndex > segmentIndex1) {
       return 1;
     }
     // same segment, so compare segment fraction
-    if (segmentFraction < segmentFraction1) {
+    if (this.segmentFraction < segmentFraction1) {
       return -1;
     }
-    if (segmentFraction > segmentFraction1) {
+    if (this.segmentFraction > segmentFraction1) {
       return 1;
     }
     // same location
@@ -255,24 +255,24 @@ public class LinearLocation implements Comparable {
   public int compareTo(final Object o) {
     final LinearLocation other = (LinearLocation)o;
     // compare component indices
-    if (componentIndex < other.componentIndex) {
+    if (this.componentIndex < other.componentIndex) {
       return -1;
     }
-    if (componentIndex > other.componentIndex) {
+    if (this.componentIndex > other.componentIndex) {
       return 1;
     }
     // compare segments
-    if (segmentIndex < other.segmentIndex) {
+    if (this.segmentIndex < other.segmentIndex) {
       return -1;
     }
-    if (segmentIndex > other.segmentIndex) {
+    if (this.segmentIndex > other.segmentIndex) {
       return 1;
     }
     // same segment, so compare segment fraction
-    if (segmentFraction < other.segmentFraction) {
+    if (this.segmentFraction < other.segmentFraction) {
       return -1;
     }
-    if (segmentFraction > other.segmentFraction) {
+    if (this.segmentFraction > other.segmentFraction) {
       return 1;
     }
     // same location
@@ -285,7 +285,7 @@ public class LinearLocation implements Comparable {
    * @return the component index
    */
   public int getComponentIndex() {
-    return componentIndex;
+    return this.componentIndex;
   }
 
   /**
@@ -297,31 +297,31 @@ public class LinearLocation implements Comparable {
    * @return the <tt>Coordinate</tt> at the location
    */
   public Point getCoordinate(final Geometry linearGeom) {
-    final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
-    final Point p0 = lineComp.getPoint(segmentIndex);
-    if (segmentIndex >= lineComp.getVertexCount() - 1) {
+    final LineString lineComp = (LineString)linearGeom.getGeometry(this.componentIndex);
+    final Point p0 = lineComp.getPoint(this.segmentIndex);
+    if (this.segmentIndex >= lineComp.getVertexCount() - 1) {
       return p0;
     }
-    final Point p1 = lineComp.getPoint(segmentIndex + 1);
-    return pointAlongSegmentByFraction(p0, p1, segmentFraction);
+    final Point p1 = lineComp.getPoint(this.segmentIndex + 1);
+    return pointAlongSegmentByFraction(p0, p1, this.segmentFraction);
   }
 
   /**
-   * Gets a {@link LineSegmentDouble} representing the segment of the 
+   * Gets a {@link LineSegmentDouble} representing the segment of the
    * given linear {@link Geometry} which contains this location.
    *
    * @param linearGeom a linear geometry
    * @return the <tt>LineSegmentDouble</tt> containing the location
    */
   public LineSegment getSegment(final Geometry linearGeom) {
-    final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
-    final Point p0 = lineComp.getPoint(segmentIndex);
+    final LineString lineComp = (LineString)linearGeom.getGeometry(this.componentIndex);
+    final Point p0 = lineComp.getPoint(this.segmentIndex);
     // check for endpoint - return last segment of the line if so
-    if (segmentIndex >= lineComp.getVertexCount() - 1) {
+    if (this.segmentIndex >= lineComp.getVertexCount() - 1) {
       final Point prev = lineComp.getPoint(lineComp.getVertexCount() - 2);
       return new LineSegmentDouble(prev, p0);
     }
-    final Point p1 = lineComp.getPoint(segmentIndex + 1);
+    final Point p1 = lineComp.getPoint(this.segmentIndex + 1);
     return new LineSegmentDouble(p0, p1);
   }
 
@@ -331,7 +331,7 @@ public class LinearLocation implements Comparable {
    * @return the segment fraction
    */
   public double getSegmentFraction() {
-    return segmentFraction;
+    return this.segmentFraction;
   }
 
   /**
@@ -340,7 +340,7 @@ public class LinearLocation implements Comparable {
    * @return the segment index
    */
   public int getSegmentIndex() {
-    return segmentIndex;
+    return this.segmentIndex;
   }
 
   /**
@@ -351,11 +351,11 @@ public class LinearLocation implements Comparable {
    * @return the length of the segment
    */
   public double getSegmentLength(final Geometry linearGeom) {
-    final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
+    final LineString lineComp = (LineString)linearGeom.getGeometry(this.componentIndex);
 
     // ensure segment index is valid
-    int segIndex = segmentIndex;
-    if (segmentIndex >= lineComp.getVertexCount() - 1) {
+    int segIndex = this.segmentIndex;
+    if (this.segmentIndex >= lineComp.getVertexCount() - 1) {
       segIndex = lineComp.getVertexCount() - 2;
     }
 
@@ -367,36 +367,36 @@ public class LinearLocation implements Comparable {
   /**
    * Tests whether this location is an endpoint of
    * the linear component it refers to.
-   * 
+   *
    * @param linearGeom the linear geometry referenced by this location
    * @return true if the location is a component endpoint
    */
   public boolean isEndpoint(final Geometry linearGeom) {
-    final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
+    final LineString lineComp = (LineString)linearGeom.getGeometry(this.componentIndex);
     // check for endpoint
     final int nseg = lineComp.getVertexCount() - 1;
-    return segmentIndex >= nseg
-      || (segmentIndex == nseg && segmentFraction >= 1.0);
+    return this.segmentIndex >= nseg
+        || this.segmentIndex == nseg && this.segmentFraction >= 1.0;
   }
 
   /**
    * Tests whether two locations
    * are on the same segment in the parent {@link Geometry}.
-   * 
+   *
    * @param loc a location on the same geometry
    * @return true if the locations are on the same segment of the parent geometry
    */
   public boolean isOnSameSegment(final LinearLocation loc) {
-    if (componentIndex != loc.componentIndex) {
+    if (this.componentIndex != loc.componentIndex) {
       return false;
     }
-    if (segmentIndex == loc.segmentIndex) {
+    if (this.segmentIndex == loc.segmentIndex) {
       return true;
     }
-    if (loc.segmentIndex - segmentIndex == 1 && loc.segmentFraction == 0.0) {
+    if (loc.segmentIndex - this.segmentIndex == 1 && loc.segmentFraction == 0.0) {
       return true;
     }
-    if (segmentIndex - loc.segmentIndex == 1 && segmentFraction == 0.0) {
+    if (this.segmentIndex - loc.segmentIndex == 1 && this.segmentFraction == 0.0) {
       return true;
     }
     return false;
@@ -410,19 +410,19 @@ public class LinearLocation implements Comparable {
    * @return true if this location is valid
    */
   public boolean isValid(final Geometry linearGeom) {
-    if (componentIndex < 0 || componentIndex >= linearGeom.getGeometryCount()) {
+    if (this.componentIndex < 0 || this.componentIndex >= linearGeom.getGeometryCount()) {
       return false;
     }
 
-    final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
-    if (segmentIndex < 0 || segmentIndex > lineComp.getVertexCount()) {
+    final LineString lineComp = (LineString)linearGeom.getGeometry(this.componentIndex);
+    if (this.segmentIndex < 0 || this.segmentIndex > lineComp.getVertexCount()) {
       return false;
     }
-    if (segmentIndex == lineComp.getVertexCount() && segmentFraction != 0.0) {
+    if (this.segmentIndex == lineComp.getVertexCount() && this.segmentFraction != 0.0) {
       return false;
     }
 
-    if (segmentFraction < 0.0 || segmentFraction > 1.0) {
+    if (this.segmentFraction < 0.0 || this.segmentFraction > 1.0) {
       return false;
     }
     return true;
@@ -434,7 +434,7 @@ public class LinearLocation implements Comparable {
    * @return true if the location is a vertex
    */
   public boolean isVertex() {
-    return segmentFraction <= 0.0 || segmentFraction >= 1.0;
+    return this.segmentFraction <= 0.0 || this.segmentFraction >= 1.0;
   }
 
   /**
@@ -445,25 +445,25 @@ public class LinearLocation implements Comparable {
    * @see clamp
    */
   private void normalize() {
-    if (segmentFraction < 0.0) {
-      segmentFraction = 0.0;
+    if (this.segmentFraction < 0.0) {
+      this.segmentFraction = 0.0;
     }
-    if (segmentFraction > 1.0) {
-      segmentFraction = 1.0;
+    if (this.segmentFraction > 1.0) {
+      this.segmentFraction = 1.0;
     }
 
-    if (componentIndex < 0) {
-      componentIndex = 0;
-      segmentIndex = 0;
-      segmentFraction = 0.0;
+    if (this.componentIndex < 0) {
+      this.componentIndex = 0;
+      this.segmentIndex = 0;
+      this.segmentFraction = 0.0;
     }
-    if (segmentIndex < 0) {
-      segmentIndex = 0;
-      segmentFraction = 0.0;
+    if (this.segmentIndex < 0) {
+      this.segmentIndex = 0;
+      this.segmentFraction = 0.0;
     }
-    if (segmentFraction == 1.0) {
-      segmentFraction = 0.0;
-      segmentIndex += 1;
+    if (this.segmentFraction == 1.0) {
+      this.segmentFraction = 0.0;
+      this.segmentIndex += 1;
     }
   }
 
@@ -474,10 +474,10 @@ public class LinearLocation implements Comparable {
    * @param linear the linear geometry to use to set the end
    */
   public void setToEnd(final Geometry linear) {
-    componentIndex = linear.getGeometryCount() - 1;
-    final LineString lastLine = (LineString)linear.getGeometry(componentIndex);
-    segmentIndex = lastLine.getVertexCount() - 1;
-    segmentFraction = 1.0;
+    this.componentIndex = linear.getGeometryCount() - 1;
+    final LineString lastLine = (LineString)linear.getGeometry(this.componentIndex);
+    this.segmentIndex = lastLine.getVertexCount() - 1;
+    this.segmentFraction = 1.0;
   }
 
   /**
@@ -489,16 +489,16 @@ public class LinearLocation implements Comparable {
    * @param minDistance the minimum allowable distance to a vertex
    */
   public void snapToVertex(final Geometry linearGeom, final double minDistance) {
-    if (segmentFraction <= 0.0 || segmentFraction >= 1.0) {
+    if (this.segmentFraction <= 0.0 || this.segmentFraction >= 1.0) {
       return;
     }
     final double segLen = getSegmentLength(linearGeom);
-    final double lenToStart = segmentFraction * segLen;
+    final double lenToStart = this.segmentFraction * segLen;
     final double lenToEnd = segLen - lenToStart;
     if (lenToStart <= lenToEnd && lenToStart < minDistance) {
-      segmentFraction = 0.0;
+      this.segmentFraction = 0.0;
     } else if (lenToEnd <= lenToStart && lenToEnd < minDistance) {
-      segmentFraction = 1.0;
+      this.segmentFraction = 1.0;
     }
   }
 
@@ -512,24 +512,24 @@ public class LinearLocation implements Comparable {
    * <li>if the location point is ambiguous (i.e. an endpoint and a startpoint), the lowest endpoint location is returned
    * </ul>
    * If the location index is already the lowest possible value, the original location is returned.
-   * 
+   *
    * @param linearGeom the linear geometry referenced by this location
    * @return the lowest equivalent location
    */
   public LinearLocation toLowest(final Geometry linearGeom) {
     // TODO: compute lowest component index
-    final LineString lineComp = (LineString)linearGeom.getGeometry(componentIndex);
+    final LineString lineComp = (LineString)linearGeom.getGeometry(this.componentIndex);
     final int nseg = lineComp.getVertexCount() - 1;
     // if not an endpoint can be returned directly
-    if (segmentIndex < nseg) {
+    if (this.segmentIndex < nseg) {
       return this;
     }
-    return new LinearLocation(componentIndex, nseg, 1.0, false);
+    return new LinearLocation(this.componentIndex, nseg, 1.0, false);
   }
 
   @Override
   public String toString() {
-    return "LinearLoc[" + componentIndex + ", " + segmentIndex + ", "
-      + segmentFraction + "]";
+    return "LinearLoc[" + this.componentIndex + ", " + this.segmentIndex + ", "
+        + this.segmentFraction + "]";
   }
 }

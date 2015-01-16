@@ -49,6 +49,10 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class TriangleTest extends TestCase {
 
+  public static void main(final String args[]) {
+    TestRunner.run(TriangleTest.class);
+  }
+
   private final GeometryFactory geometryFactory = GeometryFactory.floating(0,
     2);
 
@@ -56,16 +60,12 @@ public class TriangleTest extends TestCase {
 
   private static final double TOLERANCE = 1E-5;
 
-  public static void main(final String args[]) {
-    TestRunner.run(TriangleTest.class);
-  }
-
   public TriangleTest(final String name) {
     super(name);
   }
 
   public void checkAcute(final String wkt, final boolean expectedValue)
-    throws Exception {
+      throws Exception {
     final Polygon g = (Polygon)this.reader.read(wkt);
     final Triangle t = createTriangle(g);
     final boolean isAcute = t.isAcute();
@@ -74,7 +74,7 @@ public class TriangleTest extends TestCase {
   }
 
   public void checkArea(final String wkt, final double expectedValue)
-    throws Exception {
+      throws Exception {
     final Geometry g = this.reader.read(wkt);
 
     final Triangle t = createTriangle(g);
@@ -88,7 +88,7 @@ public class TriangleTest extends TestCase {
   }
 
   public void checkArea3D(final String wkt, final double expectedValue)
-    throws Exception {
+      throws Exception {
     final Geometry g = this.reader.read(wkt);
     final Triangle t = createTriangle(g);
     final double area3D = t.area3D();
@@ -97,7 +97,7 @@ public class TriangleTest extends TestCase {
   }
 
   public void checkCentroid(final String wkt, final Point expectedValue)
-    throws Exception {
+      throws Exception {
     final Geometry g = this.reader.read(wkt);
 
     final Triangle t = createTriangle(g);
@@ -170,7 +170,7 @@ public class TriangleTest extends TestCase {
   public Triangle createTriangle(final LineString line) {
     final Triangle t = new Triangle(line.getVertex(0).clonePoint(),
       line.getVertex(1).clonePoint(), line.getVertex(2)
-        .clonePoint());
+      .clonePoint());
     return t;
   }
 

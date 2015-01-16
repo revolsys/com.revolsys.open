@@ -66,7 +66,7 @@ public class PolygonizeTest extends TestCase {
     for (final Iterator i = expectedGeometries.iterator(); i.hasNext();) {
       final Geometry expectedGeometry = (Geometry)i.next();
       assertTrue("Expected to find: " + expectedGeometry + " in Actual result:"
-        + actualGeometries, contains(actualGeometries, expectedGeometry));
+          + actualGeometries, contains(actualGeometries, expectedGeometry));
     }
   }
 

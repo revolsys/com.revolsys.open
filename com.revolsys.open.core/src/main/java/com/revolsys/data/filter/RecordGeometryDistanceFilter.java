@@ -27,7 +27,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.Geometry;
 
 public class RecordGeometryDistanceFilter implements Filter<Record>,
-  Comparator<Record> {
+Comparator<Record> {
   /** The geometry to compare the data objects to to. */
   private final Geometry geometry;
 

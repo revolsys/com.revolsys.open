@@ -16,18 +16,18 @@ public class MapKeySetEntryIterator<K, V> implements Iterator<Entry<K, V>> {
 
   @Override
   public boolean hasNext() {
-    return keyInterator.hasNext();
+    return this.keyInterator.hasNext();
   }
 
   @Override
   public Entry<K, V> next() {
-    final K key = keyInterator.next();
-    return new MapKeyEntry<K, V>(map, key);
+    final K key = this.keyInterator.next();
+    return new MapKeyEntry<K, V>(this.map, key);
   }
 
   @Override
   public void remove() {
-    keyInterator.remove();
+    this.keyInterator.remove();
   }
 
 }

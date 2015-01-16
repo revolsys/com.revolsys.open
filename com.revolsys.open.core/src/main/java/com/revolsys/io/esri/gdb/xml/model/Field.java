@@ -34,59 +34,59 @@ public class Field {
   // TODO RasterDef rasterDef
 
   public String getAliasName() {
-    return aliasName;
+    return this.aliasName;
   }
 
   public Object getDefaultValue() {
-    return defaultValue;
+    return this.defaultValue;
   }
 
   public Domain getDomain() {
-    return domain;
+    return this.domain;
   }
 
   public Boolean getDomainFixed() {
-    return domainFixed;
+    return this.domainFixed;
   }
 
   public Boolean getEditable() {
-    return editable;
+    return this.editable;
   }
 
   public GeometryDef getGeometryDef() {
-    return geometryDef;
+    return this.geometryDef;
   }
 
   public int getLength() {
-    return length;
+    return this.length;
   }
 
   public String getModelName() {
-    return modelName;
+    return this.modelName;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public int getPrecision() {
-    return precision;
+    return this.precision;
   }
 
   public Boolean getRequired() {
-    return required;
+    return this.required;
   }
 
   public int getScale() {
-    return scale;
+    return this.scale;
   }
 
   public FieldType getType() {
-    return type;
+    return this.type;
   }
 
   public boolean isIsNullable() {
-    return isNullable;
+    return this.isNullable;
   }
 
   public void setAliasName(final String aliasName) {
@@ -127,10 +127,10 @@ public class Field {
 
   public void setName(final String name) {
     this.name = name;
-    if (aliasName == null) {
+    if (this.aliasName == null) {
       this.aliasName = name;
     }
-    if (modelName == null) {
+    if (this.modelName == null) {
       this.modelName = name;
     }
   }
@@ -153,6 +153,6 @@ public class Field {
 
   @Override
   public String toString() {
-    return name + ":" + type;
+    return this.name + ":" + this.type;
   }
 }

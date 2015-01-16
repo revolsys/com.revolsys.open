@@ -38,9 +38,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.geom.segment.LineSegment;
 
 /**
- * Models a constraint segment which can be split in two in various ways, 
+ * Models a constraint segment which can be split in two in various ways,
  * according to certain geometric constraints.
- * 
+ *
  * @author Martin Davis
  */
 public class SplitSegment {
@@ -48,7 +48,7 @@ public class SplitSegment {
    * Computes the {@link Coordinates} that lies a given fraction along the line defined by the
    * reverse of the given segment. A fraction of <code>0.0</code> returns the end point of the
    * segment; a fraction of <code>1.0</code> returns the start point of the segment.
-   * 
+   *
    * @param seg the LineSegmentDouble
    * @param segmentLengthFraction the fraction of the segment length along the line
    * @return the point at that distance
@@ -56,9 +56,9 @@ public class SplitSegment {
   private static Point pointAlongReverse(final LineSegment seg,
     final double segmentLengthFraction) {
     final double x = seg.getP1().getX() - segmentLengthFraction
-      * (seg.getP1().getX() - seg.getP0().getX());
+        * (seg.getP1().getX() - seg.getP0().getX());
     final double y = seg.getP1().getY() - segmentLengthFraction
-      * (seg.getP1().getY() - seg.getP0().getY());
+        * (seg.getP1().getY() - seg.getP0().getY());
     final Point coord = new PointDouble(x, y, Point.NULL_ORDINATE);
     return coord;
   }
@@ -73,47 +73,47 @@ public class SplitSegment {
 
   public SplitSegment(final LineSegment seg) {
     this.seg = seg;
-    segLen = seg.getLength();
+    this.segLen = seg.getLength();
   }
 
   private double getConstrainedLength(final double len) {
-    if (len < minimumLen) {
-      return minimumLen;
+    if (len < this.minimumLen) {
+      return this.minimumLen;
     }
     return len;
   }
 
   public Point getSplitPoint() {
-    return splitPt;
+    return this.splitPt;
   }
 
   public void setMinimumLength(final double minLen) {
-    minimumLen = minLen;
-  }
-
-  public void splitAt(final Point pt) {
-    // check that given pt doesn't violate min length
-    final double minFrac = minimumLen / segLen;
-    if (pt.distance(seg.getP0()) < minimumLen) {
-      splitPt = seg.pointAlong(minFrac);
-      return;
-    }
-    if (pt.distance(seg.getP1()) < minimumLen) {
-      splitPt = pointAlongReverse(seg, minFrac);
-      return;
-    }
-    // passes minimum distance check - use provided point as split pt
-    splitPt = pt;
+    this.minimumLen = minLen;
   }
 
   public void splitAt(final double length, final Point endPt) {
     final double actualLen = getConstrainedLength(length);
-    final double frac = actualLen / segLen;
-    if (endPt.equals(2,seg.getP0())) {
-      splitPt = seg.pointAlong(frac);
+    final double frac = actualLen / this.segLen;
+    if (endPt.equals(2,this.seg.getP0())) {
+      this.splitPt = this.seg.pointAlong(frac);
     } else {
-      splitPt = pointAlongReverse(seg, frac);
+      this.splitPt = pointAlongReverse(this.seg, frac);
     }
+  }
+
+  public void splitAt(final Point pt) {
+    // check that given pt doesn't violate min length
+    final double minFrac = this.minimumLen / this.segLen;
+    if (pt.distance(this.seg.getP0()) < this.minimumLen) {
+      this.splitPt = this.seg.pointAlong(minFrac);
+      return;
+    }
+    if (pt.distance(this.seg.getP1()) < this.minimumLen) {
+      this.splitPt = pointAlongReverse(this.seg, minFrac);
+      return;
+    }
+    // passes minimum distance check - use provided point as split pt
+    this.splitPt = pt;
   }
 
 }

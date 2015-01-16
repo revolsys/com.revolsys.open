@@ -33,9 +33,10 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Maps;
 
 public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
-  implements RecordDefinition {
+implements RecordDefinition {
   public static RecordDefinitionImpl create(final Map<String, Object> properties) {
     return new RecordDefinitionImpl(properties);
   }
@@ -99,7 +100,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @SuppressWarnings("unchecked")
   public RecordDefinitionImpl(final Map<String, Object> properties) {
-    this(CollectionUtil.getString(properties, "path"));
+    this(Maps.getString(properties, "path"));
     final List<Object> fields = (List<Object>)properties.get("fields");
     for (final Object object : fields) {
       if (object instanceof FieldDefinition) {
@@ -612,7 +613,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   private void readObject(final ObjectInputStream ois)
-    throws ClassNotFoundException, IOException {
+      throws ClassNotFoundException, IOException {
     ois.defaultReadObject();
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }

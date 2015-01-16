@@ -20,15 +20,15 @@ public class TileLoadTask implements Runnable {
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public MapTile getMapTile() {
-    return mapTile;
+    return this.mapTile;
   }
 
   public TiledImageLayerRenderer getRenderer() {
-    return renderer;
+    return this.renderer;
   }
 
   @Override

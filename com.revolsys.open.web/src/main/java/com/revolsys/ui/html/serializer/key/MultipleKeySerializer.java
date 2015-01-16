@@ -9,7 +9,7 @@ import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
 
 public class MultipleKeySerializer extends AbstractKeySerializer implements
-  HtmlUiBuilderAware<HtmlUiBuilder<?>> {
+HtmlUiBuilderAware<HtmlUiBuilder<?>> {
   private List<KeySerializer> serializers = new ArrayList<KeySerializer>();
 
   private HtmlUiBuilder<?> uiBuilder;
@@ -29,17 +29,30 @@ public class MultipleKeySerializer extends AbstractKeySerializer implements
   }
 
   public List<KeySerializer> getSerializers() {
-    return serializers;
+    return this.serializers;
   }
 
+  @Override
   public void serialize(final XmlWriter out, final Object object) {
-    for (final KeySerializer serializer : serializers) {
+    for (final KeySerializer serializer : this.serializers) {
       serializer.serialize(out, object);
     }
   }
 
   @Override
-  public void setProperties(Map<String, ? extends Object> properties) {
+  @SuppressWarnings("unchecked")
+  public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
+    this.uiBuilder = uiBuilder;
+    for (final KeySerializer serializer : this.serializers) {
+      if (serializer instanceof HtmlUiBuilderAware) {
+        final HtmlUiBuilderAware<HtmlUiBuilder<?>> builderAware = (HtmlUiBuilderAware<HtmlUiBuilder<?>>)serializer;
+        builderAware.setHtmlUiBuilder(uiBuilder);
+      }
+    }
+  }
+
+  @Override
+  public void setProperties(final Map<String, ? extends Object> properties) {
     getProperties().clear();
     if (properties != null) {
       getProperties().putAll(properties);
@@ -48,19 +61,8 @@ public class MultipleKeySerializer extends AbstractKeySerializer implements
     setProperty("searchable", false);
   }
 
-  @SuppressWarnings("unchecked")
-  public void setHtmlUiBuilder(final HtmlUiBuilder<?> uiBuilder) {
-    this.uiBuilder = uiBuilder;
-    for (final KeySerializer serializer : serializers) {
-      if (serializer instanceof HtmlUiBuilderAware) {
-        final HtmlUiBuilderAware<HtmlUiBuilder<?>> builderAware = (HtmlUiBuilderAware<HtmlUiBuilder<?>>)serializer;
-        builderAware.setHtmlUiBuilder(uiBuilder);
-      }
-    }
-  }
-
   public void setSerializers(final List<KeySerializer> serializers) {
     this.serializers = serializers;
-    setHtmlUiBuilder(uiBuilder);
+    setHtmlUiBuilder(this.uiBuilder);
   }
 }

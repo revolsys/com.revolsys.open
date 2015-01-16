@@ -39,10 +39,10 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
 /**
- * 
+ *
  * Cascades the effort of creating a set of topologically valid geometries.
  *
- * @author David Zwiers, Vivid Solutions. 
+ * @author David Zwiers, Vivid Solutions.
  */
 public class MultiGenerator extends GeometryGenerator {
 
@@ -76,14 +76,14 @@ public class MultiGenerator extends GeometryGenerator {
 
   /**
    * Creates a geometry collection representing the set of child geometries created.
-   * 
+   *
    * @see #setNumberGeometries(int)
    * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
-   * 
+   *
    * @see #BOX
    * @see #VERT
    * @see #HORZ
-   * 
+   *
    * @throws NullPointerException when the generator is missing
    * @throws IllegalStateException when the number of child geoms is too small
    * @throws IllegalStateException when the selected alg. is invalid
@@ -112,19 +112,19 @@ public class MultiGenerator extends GeometryGenerator {
         grid.setNumberRows(nrow);
         grid.setNumberColumns(ncol);
 
-      break;
+        break;
       case VERT:
 
         grid.setNumberRows(1);
         grid.setNumberColumns(this.numberGeometries);
 
-      break;
+        break;
       case HORZ:
 
         grid.setNumberRows(this.numberGeometries);
         grid.setNumberColumns(1);
 
-      break;
+        break;
       default:
         throw new IllegalStateException("Invalid Alg. Specified");
     }

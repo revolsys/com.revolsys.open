@@ -6,7 +6,7 @@ import com.revolsys.jts.geom.Point;
 
 public class CoordinateEvent extends EventObject {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -1809350055079477785L;
 
@@ -45,7 +45,7 @@ public class CoordinateEvent extends EventObject {
   }
 
   public String getAction() {
-    return action;
+    return this.action;
   }
 
   public Point getCoordinate() {
@@ -53,15 +53,15 @@ public class CoordinateEvent extends EventObject {
   }
 
   public String getNotes() {
-    return notes;
+    return this.notes;
   }
 
   public String getRuleName() {
-    return ruleName;
+    return this.ruleName;
   }
 
   public String getTypeName() {
-    return typePath;
+    return this.typePath;
   }
 
 }

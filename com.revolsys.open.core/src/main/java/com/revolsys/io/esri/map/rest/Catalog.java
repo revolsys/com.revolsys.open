@@ -23,7 +23,7 @@ public class Catalog extends ArcGisResponse {
     serviceUrl = serviceUrl.replaceAll("/+$", "");
     if (serviceUrl.endsWith("services")) {
       setServiceUrl(serviceUrl);
-      name = "";
+      this.name = "";
     } else {
       final String parentUrl = UrlUtil.getParent(serviceUrl);
       final Catalog parent = new Catalog(parentUrl);
@@ -33,21 +33,21 @@ public class Catalog extends ArcGisResponse {
   }
 
   public synchronized List<Catalog> getFolders() {
-    if (folders == null) {
-      folders = new ArrayList<Catalog>();
+    if (this.folders == null) {
+      this.folders = new ArrayList<Catalog>();
       final List<String> folderNames = getValue("folders");
       if (folderNames != null) {
         for (final String name : folderNames) {
           final Catalog folder = new Catalog(this, name);
-          folders.add(folder);
+          this.folders.add(folder);
         }
       }
     }
-    return folders;
+    return this.folders;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public Service getService(final String serviceName) {
@@ -69,7 +69,7 @@ public class Catalog extends ArcGisResponse {
           return (T)service;
         } else {
           throw new IllegalArgumentException("ArcGIS REST service is not a "
-            + serviceClass.getName() + ": " + name);
+              + serviceClass.getName() + ": " + name);
         }
       }
     }
@@ -80,7 +80,7 @@ public class Catalog extends ArcGisResponse {
           return (T)service;
         } else {
           throw new IllegalArgumentException("ArcGIS REST service is not a "
-            + serviceClass.getName() + ": " + name);
+              + serviceClass.getName() + ": " + name);
         }
       }
     }
@@ -88,8 +88,8 @@ public class Catalog extends ArcGisResponse {
   }
 
   public synchronized List<Service> getServices() {
-    if (services == null) {
-      services = new ArrayList<Service>();
+    if (this.services == null) {
+      this.services = new ArrayList<Service>();
       final List<Map<String, Object>> serviceDescriptions = getValue("services");
       if (serviceDescriptions != null) {
         for (final Map<String, Object> serviceDescription : serviceDescriptions) {
@@ -99,18 +99,18 @@ public class Catalog extends ArcGisResponse {
           try {
             getClass();
             final Class<Service> serviceClass = (Class<Service>)Class.forName("com.revolsys.io.esri.map.rest."
-              + type);
+                + type);
             service = serviceClass.newInstance();
             service.setCatalog(this);
             service.setServiceName(name);
           } catch (final Throwable t) {
             service = new Service(this, name, type);
           }
-          services.add(service);
+          this.services.add(service);
         }
       }
     }
-    return services;
+    return this.services;
   }
 
 }

@@ -13,7 +13,7 @@ import com.revolsys.data.io.RecordStoreFactory;
 import com.revolsys.data.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 
 public class OgrRecordStoreFactory implements RecordStoreFactory {
 
@@ -24,7 +24,7 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
       synchronized (COUNTS) {
         final String fileName = FileUtil.getCanonicalPath(file);
         file = new File(fileName);
-        final AtomicInteger count = CollectionUtil.get(COUNTS, fileName,
+        final AtomicInteger count = Maps.get(COUNTS, fileName,
           new AtomicInteger());
         count.incrementAndGet();
         OgrRecordStore recordStore = DATA_STORES.get(fileName);
@@ -44,7 +44,7 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
     } else {
       synchronized (COUNTS) {
         final String fileName = FileUtil.getCanonicalPath(file);
-        final AtomicInteger countHolder = CollectionUtil.get(COUNTS, fileName,
+        final AtomicInteger countHolder = Maps.get(COUNTS, fileName,
           new AtomicInteger());
         final int count = countHolder.decrementAndGet();
         if (count <= 0) {

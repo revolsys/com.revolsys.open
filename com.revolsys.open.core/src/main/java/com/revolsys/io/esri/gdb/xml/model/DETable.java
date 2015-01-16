@@ -27,8 +27,6 @@ public class DETable extends DEDataset {
 
   private String modelName = "";
 
-  private boolean hasGlobalID;
-
   private String globalIDFieldName = "";
 
   private String rasterFieldName = "";
@@ -54,7 +52,6 @@ public class DETable extends DEDataset {
   public void addField(final Field field) {
     this.fields.add(field);
     if (field.getType() == FieldType.esriFieldTypeGlobalID) {
-      this.hasGlobalID = true;
       this.globalIDFieldName = field.getName();
     }
   }
@@ -104,7 +101,6 @@ public class DETable extends DEDataset {
     if (!Property.hasValue(this.globalIDFieldName)) {
       for (final Field field : getFields()) {
         if (field.getType() == FieldType.esriFieldTypeGlobalID) {
-          this.hasGlobalID = true;
           this.globalIDFieldName = field.getName();
         }
       }
@@ -178,7 +174,6 @@ public class DETable extends DEDataset {
     this.fields = fields;
     for (final Field field : fields) {
       if (field.getType() == FieldType.esriFieldTypeGlobalID) {
-        this.hasGlobalID = true;
         this.globalIDFieldName = field.getName();
       }
     }
@@ -189,7 +184,6 @@ public class DETable extends DEDataset {
   }
 
   public void setHasGlobalID(final boolean hasGlobalID) {
-    this.hasGlobalID = hasGlobalID;
   }
 
   public void setHasOID(final boolean hasOID) {

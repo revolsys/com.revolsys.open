@@ -43,17 +43,17 @@ import com.revolsys.jts.planargraph.Edge;
  * @version 1.7
  */
 public class LineMergeEdge extends Edge {
-  private LineString line;
+  private final LineString line;
   /**
    * Constructs a LineMergeEdge with vertices given by the specified LineString.
    */
-  public LineMergeEdge(LineString line) {
+  public LineMergeEdge(final LineString line) {
     this.line = line;
   }
   /**
    * Returns the LineString specifying the vertices of this edge.
    */
   public LineString getLine() {
-    return line;
+    return this.line;
   }
 }

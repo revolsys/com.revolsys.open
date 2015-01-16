@@ -13,7 +13,7 @@ public class SplitEdgesOnNodeVisitor<T> implements Visitor<Node<T>> {
    * Split edges which the node is on the line of the edge. The edge will only
    * be split if the original node has at least one edge which shares the the
    * first two coordinates as one of the split lines.
-   * 
+   *
    * @param node The node.
    * @return True if an edge was split, false otherwise.
    */

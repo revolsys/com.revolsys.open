@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ public interface TableModel {
 
   /**
    * Get the contents for a body cell.
-   * 
+   *
    * @param row The row index.
    * @param col The column index.
    * @return The contents.
@@ -36,7 +36,7 @@ public interface TableModel {
 
   /**
    * Get the contents for a header cell.
-   * 
+   *
    * @param col The column index.
    * @return The contents.
    */

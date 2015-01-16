@@ -30,41 +30,41 @@ public class NamedThreadFactory implements ThreadFactory {
     final SecurityManager securityManager = System.getSecurityManager();
     if (securityManager == null) {
       final Thread currentThread = Thread.currentThread();
-      parentGroup = currentThread.getThreadGroup();
+      this.parentGroup = currentThread.getThreadGroup();
     } else {
-      parentGroup = securityManager.getThreadGroup();
+      this.parentGroup = securityManager.getThreadGroup();
     }
     this.namePrefix = "pool-" + poolNumber.getAndIncrement();
   }
 
   public String getNamePrefix() {
-    return namePrefix;
+    return this.namePrefix;
   }
 
   public ThreadGroup getParentGroup() {
-    return parentGroup;
+    return this.parentGroup;
   }
 
   public int getPriority() {
-    return priority;
+    return this.priority;
   }
 
   @Override
   public Thread newThread(final Runnable runnable) {
-    synchronized (threadNumber) {
-      if (group == null) {
+    synchronized (this.threadNumber) {
+      if (this.group == null) {
         this.threadNamePrefix = this.namePrefix + "-thread-";
-        this.group = new ThreadGroup(parentGroup, namePrefix);
+        this.group = new ThreadGroup(this.parentGroup, this.namePrefix);
       }
     }
 
-    final String threadName = threadNamePrefix + threadNumber.getAndIncrement();
+    final String threadName = this.threadNamePrefix + this.threadNumber.getAndIncrement();
     final LoggingRunnable loggingRunnable = new LoggingRunnable(runnable);
-    final Thread thread = new Thread(group, loggingRunnable, threadName, 0);
+    final Thread thread = new Thread(this.group, loggingRunnable, threadName, 0);
     if (thread.isDaemon()) {
       thread.setDaemon(false);
     }
-    thread.setPriority(priority);
+    thread.setPriority(this.priority);
     return thread;
   }
 

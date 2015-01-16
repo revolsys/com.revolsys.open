@@ -48,7 +48,7 @@ ImageObserver {
 
     if (value instanceof BaseTreeNode) {
       final BaseTreeNode node = (BaseTreeNode)value;
-      this.loading.removeNode(node);
+      BaseTreeNodeLoadingIcon.removeNode(node);
       if (node.isVisible()) {
         if (node.isUserObjectInitialized()) {
 
@@ -62,7 +62,7 @@ ImageObserver {
         } else {
           setIcon(this.loadingIcon);
           setForeground(WebColors.Gray);
-          this.loading.addNode(node);
+          BaseTreeNodeLoadingIcon.addNode(node);
         }
       } else {
         return this.hiddenRenderer;

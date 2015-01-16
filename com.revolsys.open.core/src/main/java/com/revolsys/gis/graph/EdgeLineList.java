@@ -23,13 +23,13 @@ public class EdgeLineList extends AbstractList<LineString> {
 
   @Override
   public LineString get(final int index) {
-    final Integer edgeId = edgeIds.get(index);
-    return graph.getEdgeLine(edgeId);
+    final Integer edgeId = this.edgeIds.get(index);
+    return this.graph.getEdgeLine(edgeId);
   }
 
   @Override
   public int size() {
-    return edgeIds.size();
+    return this.edgeIds.size();
   }
 
 }

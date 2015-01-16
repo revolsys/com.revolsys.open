@@ -43,36 +43,37 @@ import com.revolsys.jts.util.Assert;
  */
 public class Interval {
 
-  public Interval(Interval other) {
-    this(other.min, other.max);
-  }
+  private double min;
 
-  public Interval(double min, double max) {
+  private double max;
+
+  public Interval(final double min, final double max) {
     Assert.isTrue(min <= max);
     this.min = min;
     this.max = max;
   }
+  public Interval(final Interval other) {
+    this(other.min, other.max);
+  }
 
-  private double min;
-  private double max;
-
-  public double getCentre() { return (min+max)/2; }
+  @Override
+  public boolean equals(final Object o) {
+    if (! (o instanceof Interval)) { return false; }
+    final Interval other = (Interval) o;
+    return this.min == other.min && this.max == other.max;
+  }
 
   /**
    * @return this
    */
-  public Interval expandToInclude(Interval other) {
-    max = Math.max(max, other.max);
-    min = Math.min(min, other.min);
+  public Interval expandToInclude(final Interval other) {
+    this.max = Math.max(this.max, other.max);
+    this.min = Math.min(this.min, other.min);
     return this;
   }
 
-  public boolean intersects(Interval other) {
-    return !(other.min > max || other.max < min);
-  }
-  public boolean equals(Object o) {
-    if (! (o instanceof Interval)) { return false; }
-    Interval other = (Interval) o;
-    return min == other.min && max == other.max;
+  public double getCentre() { return (this.min+this.max)/2; }
+  public boolean intersects(final Interval other) {
+    return !(other.min > this.max || other.max < this.min);
   }
 }

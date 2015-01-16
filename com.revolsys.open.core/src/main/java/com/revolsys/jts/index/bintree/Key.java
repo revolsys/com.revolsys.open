@@ -65,8 +65,8 @@ public class Key {
   private void computeInterval(final int level, final Interval itemInterval) {
     final double size = DoubleBits.powerOf2(level);
     // double size = pow2.power(level);
-    pt = Math.floor(itemInterval.getMin() / size) * size;
-    interval.init(pt, pt + size);
+    this.pt = Math.floor(itemInterval.getMin() / size) * size;
+    this.interval.init(this.pt, this.pt + size);
   }
 
   /**
@@ -74,25 +74,25 @@ public class Key {
    * whose extent is a power of two and which is based at a power of 2
    */
   public void computeKey(final Interval itemInterval) {
-    level = computeLevel(itemInterval);
-    interval = new Interval();
-    computeInterval(level, itemInterval);
+    this.level = computeLevel(itemInterval);
+    this.interval = new Interval();
+    computeInterval(this.level, itemInterval);
     // MD - would be nice to have a non-iterative form of this algorithm
-    while (!interval.contains(itemInterval)) {
-      level += 1;
-      computeInterval(level, itemInterval);
+    while (!this.interval.contains(itemInterval)) {
+      this.level += 1;
+      computeInterval(this.level, itemInterval);
     }
   }
 
   public Interval getInterval() {
-    return interval;
+    return this.interval;
   }
 
   public int getLevel() {
-    return level;
+    return this.level;
   }
 
   public double getPoint() {
-    return pt;
+    return this.pt;
   }
 }

@@ -23,7 +23,16 @@ import javax.swing.plaf.basic.BasicButtonUI;
  * a JButton to close the tab it belongs to
  */
 public class ButtonTabComponent extends JPanel {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private class TabButton extends JButton implements ActionListener {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     private final JTabbedPane tabs;
 
     public TabButton(final JTabbedPane tabs) {
@@ -82,6 +91,11 @@ public class ButtonTabComponent extends JPanel {
 
     // make JLabel read titles from JTabbedPane
     final JLabel label = new JLabel() {
+      /**
+       *
+       */
+      private static final long serialVersionUID = 1L;
+
       @Override
       public String getText() {
         final int i = tabs.indexOfTabComponent(ButtonTabComponent.this);

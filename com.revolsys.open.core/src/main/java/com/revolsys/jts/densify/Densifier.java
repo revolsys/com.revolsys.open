@@ -49,7 +49,7 @@ import com.revolsys.jts.geom.segment.Segment;
 
 /**
  * Densifies a {@link Geometry} by inserting extra vertices along the line segments
- * contained in the geometry. 
+ * contained in the geometry.
  * All segments in the created densified geometry will be no longer than
  * than the given distance tolerance.
  * Densified polygonal geometries are guaranteed to be topologically correct.
@@ -58,7 +58,7 @@ import com.revolsys.jts.geom.segment.Segment;
  * <p>
  * <b>Note:</b> At some future point this class will
  * offer a variety of densification strategies.
- * 
+ *
  * @author Martin Davis
  */
 public class Densifier {
@@ -71,7 +71,7 @@ public class Densifier {
       geometries.add(newGeometry);
     }
     final GeometryCollection newGeometry = geometryCollection.getGeometryFactory()
-      .geometryCollection(geometries);
+        .geometryCollection(geometries);
     return newGeometry;
   }
 
@@ -128,7 +128,7 @@ public class Densifier {
   /**
    * Densifies a geometry using a given distance tolerance,
    * and respecting the input geometry's scale.
-   * 
+   *
    * @param geometry the geometry to densify
    * @param distanceTolerance the distance tolerance to densify
    * @return the densified geometry
@@ -159,14 +159,14 @@ public class Densifier {
         return (V)densify((GeometryCollection)geometry, distanceTolerance);
       } else {
         throw new UnsupportedOperationException("Unknown geometry type "
-          + geometry.getClass());
+            + geometry.getClass());
       }
     }
   }
 
   /**
    * Densifies a coordinate sequence.
-   * 
+   *
    * @param pts
    * @param distanceTolerance
    * @return the densified coordinate sequence
@@ -185,7 +185,7 @@ public class Densifier {
         if (densifiedSegCount > 1) {
           final double densifiedSegLen = length / densifiedSegCount;
           for (int j = 1; j < densifiedSegCount; j++) {
-            final double segFract = (j * densifiedSegLen) / length;
+            final double segFract = j * densifiedSegLen / length;
             final Point point = segment.pointAlong(segFract);
             if (!segment.isEndPoint(point)) {
               points.add(point.clonePoint());

@@ -47,18 +47,18 @@ import com.revolsys.jts.geom.util.GeometryTransformer;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 /**
- * Snaps the vertices and segments of a {@link Geometry} 
+ * Snaps the vertices and segments of a {@link Geometry}
  * to another Geometry's vertices.
  * A snap distance tolerance is used to control where snapping is performed.
- * Snapping one geometry to another can improve 
+ * Snapping one geometry to another can improve
  * robustness for overlay operations by eliminating
- * nearly-coincident edges 
+ * nearly-coincident edges
  * (which cause problems during noding and intersection calculation).
  * It can also be used to eliminate artifacts such as narrow slivers, spikes and gores.
  * <p>
- * Too much snapping can result in invalid topology 
+ * Too much snapping can result in invalid topology
  * being created, so the number and location of snapped vertices
- * is decided using heuristics to determine when it 
+ * is decided using heuristics to determine when it
  * is safe to snap.
  * This can result in some potential snaps being omitted, however.
  *
@@ -66,11 +66,9 @@ import com.revolsys.jts.geom.vertex.Vertex;
  * @version 1.7
  */
 public class GeometrySnapper {
-  private static final double SNAP_PRECISION_FACTOR = 1e-9;
-
   /**
    * Estimates the snap tolerance for a Geometry, taking into account its precision model.
-   * 
+   *
    * @param g a Geometry
    * @return the estimated snap tolerance
    */
@@ -78,17 +76,17 @@ public class GeometrySnapper {
     double snapTolerance = computeSizeBasedSnapTolerance(g);
 
     /**
-     * Overlay is carried out in the precision model 
-     * of the two inputs.  
+     * Overlay is carried out in the precision model
+     * of the two inputs.
      * If this precision model is of type FIXED, then the snap tolerance
-     * must reflect the precision grid size.  
-     * Specifically, the snap tolerance should be at least 
+     * must reflect the precision grid size.
+     * Specifically, the snap tolerance should be at least
      * the distance from a corner of a precision grid cell
-     * to the centre point of the cell.  
+     * to the centre point of the cell.
      */
     final GeometryFactory geometryFactory = g.getGeometryFactory();
     if (!geometryFactory.isFloating()) {
-      final double fixedSnapTol = (1 / geometryFactory.getScale(0)) * 2 / 1.415;
+      final double fixedSnapTol = 1 / geometryFactory.getScale(0) * 2 / 1.415;
       if (fixedSnapTol > snapTolerance) {
         snapTolerance = fixedSnapTol;
       }
@@ -111,7 +109,7 @@ public class GeometrySnapper {
 
   /**
    * Snaps two geometries together with a given tolerance.
-   * 
+   *
    * @param g0 a geometry to snap
    * @param g1 a geometry to snap
    * @param snapTolerance the tolerance to use
@@ -137,7 +135,7 @@ public class GeometrySnapper {
 
   /**
    * Snaps a geometry to itself.
-   * Allows optionally cleaning the result to ensure it is 
+   * Allows optionally cleaning the result to ensure it is
    * topologically valid
    * (which fixes issues such as topology collapses in polygonal inputs).
    * <p>
@@ -154,11 +152,13 @@ public class GeometrySnapper {
     return snapper0.snapToSelf(snapTolerance, cleanResult);
   }
 
+  private static final double SNAP_PRECISION_FACTOR = 1e-9;
+
   private final Geometry srcGeom;
 
   /**
    * Creates a new snapper acting on the given geometry
-   * 
+   *
    * @param srcGeom the geometry to snap
    */
   public GeometrySnapper(final Geometry srcGeom) {
@@ -174,19 +174,6 @@ public class GeometrySnapper {
       }
     }
     return minSegLen;
-  }
-
-  /**
-   * Computes the snap tolerance based on the input geometries.
-   *
-   * @param ringPts
-   * @return
-   */
-  private double computeSnapTolerance(final Point[] ringPts) {
-    final double minSegLen = computeMinimumSegmentLength(ringPts);
-    // use a small percentage of this to be safe
-    final double snapTol = minSegLen / 10;
-    return snapTol;
   }
 
   private Point[] extractTargetCoordinates(final Geometry geometry) {
@@ -212,14 +199,14 @@ public class GeometrySnapper {
 
     final SnapTransformer snapTrans = new SnapTransformer(snapTolerance,
       snapPts);
-    return snapTrans.transform(srcGeom);
+    return snapTrans.transform(this.srcGeom);
   }
 
   /**
    * Snaps the vertices in the component {@link LineString}s
    * of the source geometry
    * to the vertices of the same geometry.
-   * Allows optionally cleaning the result to ensure it is 
+   * Allows optionally cleaning the result to ensure it is
    * topologically valid
    * (which fixes issues such as topology collapses in polygonal inputs).
    *
@@ -229,11 +216,11 @@ public class GeometrySnapper {
    */
   public Geometry snapToSelf(final double snapTolerance,
     final boolean cleanResult) {
-    final Point[] snapPts = extractTargetCoordinates(srcGeom);
+    final Point[] snapPts = extractTargetCoordinates(this.srcGeom);
 
     final SnapTransformer snapTrans = new SnapTransformer(snapTolerance,
       snapPts, true);
-    final Geometry snappedGeom = snapTrans.transform(srcGeom);
+    final Geometry snappedGeom = snapTrans.transform(this.srcGeom);
     Geometry result = snappedGeom;
     if (cleanResult && result instanceof Polygonal) {
       // TODO: use better cleaning approach
@@ -265,22 +252,22 @@ class SnapTransformer extends GeometryTransformer {
 
   private Point[] snapLine(final LineString srcPts, final Point[] snapPts) {
     final LineStringSnapper snapper = new LineStringSnapper(srcPts,
-      snapTolerance);
-    snapper.setAllowSnappingToSourceVertices(isSelfSnap);
+      this.snapTolerance);
+    snapper.setAllowSnappingToSourceVertices(this.isSelfSnap);
     return snapper.snapTo(snapPts);
   }
 
   @Override
   protected LineString transformCoordinates(final LineString coords,
     final Geometry parent) {
-    final Point[] newPts = snapLine(coords, snapPts);
+    final Point[] newPts = snapLine(coords, this.snapPts);
     return new LineStringDouble(newPts);
   }
 
   @Override
   protected Geometry transformPoint(final Point point, final Geometry parent) {
-    final Point snapVert = LineStringSnapper.findSnapForVertex(point, snapPts,
-      snapTolerance);
+    final Point snapVert = LineStringSnapper.findSnapForVertex(point, this.snapPts,
+      this.snapTolerance);
     if (snapVert == null) {
       return point;
     } else {

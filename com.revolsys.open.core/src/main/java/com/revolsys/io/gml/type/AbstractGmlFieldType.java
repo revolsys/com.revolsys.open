@@ -6,7 +6,7 @@ import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
 
 public abstract class AbstractGmlFieldType implements GmlFieldType,
-  GmlConstants {
+GmlConstants {
 
   private final String xmlSchemaTypeName;
 
@@ -20,16 +20,16 @@ public abstract class AbstractGmlFieldType implements GmlFieldType,
 
   @Override
   public DataType getDataType() {
-    return dataType;
+    return this.dataType;
   }
 
   protected String getType(final Object value) {
-    return xmlSchemaTypeName;
+    return this.xmlSchemaTypeName;
   }
 
   @Override
   public String getXmlSchemaTypeName() {
-    return xmlSchemaTypeName;
+    return this.xmlSchemaTypeName;
   }
 
   @Override

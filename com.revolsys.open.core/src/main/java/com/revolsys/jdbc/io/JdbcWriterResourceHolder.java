@@ -10,18 +10,18 @@ public class JdbcWriterResourceHolder extends ResourceHolderSupport {
   }
 
   protected void close() {
-    if (writer != null) {
-      writer.close();
-      writer = null;
+    if (this.writer != null) {
+      this.writer.close();
+      this.writer = null;
     }
   }
 
   public JdbcWriterImpl getWriter() {
-    return writer;
+    return this.writer;
   }
 
   public boolean hasWriter() {
-    return writer != null;
+    return this.writer != null;
   }
 
   @Override

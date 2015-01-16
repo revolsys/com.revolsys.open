@@ -21,7 +21,7 @@ public class ZipUtil {
    * Add the all the sub directories and files below the directory to the zip
    * output stream. The names of the files in the ZIP file will be relative to
    * the directory.
-   * 
+   *
    * @param zipOut The zip output stream to add the files to.
    * @param directory The directory containing the files.
    * @throws IOException
@@ -36,7 +36,7 @@ public class ZipUtil {
    * Add the all the sub directories and files below the directory to the zip
    * output stream. The names of the files in the ZIP file will be relative to
    * the baseDirectory.
-   * 
+   *
    * @param zipOut The zip output stream to add the files to.
    * @param baseDirectory The base directory files are relative to.
    * @param directory The directory containing the files.
@@ -46,8 +46,7 @@ public class ZipUtil {
     final File baseDirectory, final File directory) throws IOException {
     final File[] files = directory.listFiles();
     if (files != null) {
-      for (int i = 0; i < files.length; i++) {
-        final File file = files[i];
+      for (final File file : files) {
         if (file.isDirectory()) {
           addDirectoryToZipFile(zipOut, baseDirectory, file);
         } else {
@@ -65,7 +64,7 @@ public class ZipUtil {
   /**
    * Add the list of file names to the zip output stream. The names of the files
    * in the ZIP file will be relative to the baseDirectory.
-   * 
+   *
    * @param zipOut The zip output stream to add the files to.
    * @param baseDirectory The base directory files are relative to.
    * @param fileNames The list of file names to add.
@@ -73,8 +72,7 @@ public class ZipUtil {
    */
   public static void addFilesToZipFile(final ZipOutputStream zipOut,
     final File baseDirectory, final String[] fileNames) throws IOException {
-    for (int i = 0; i < fileNames.length; i++) {
-      final String fileName = fileNames[i];
+    for (final String fileName : fileNames) {
       final File file = new File(baseDirectory, fileName);
       if (file.isDirectory()) {
         addDirectoryToZipFile(zipOut, baseDirectory, file);

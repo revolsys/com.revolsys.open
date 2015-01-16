@@ -42,7 +42,7 @@ public class LineDissolvePerfTest extends PerformanceTestCase {
     merger.add(dissolved);
     final Collection mergedColl = merger.getMergedLineStrings();
     final Geometry merged = lines.getGeometryFactory()
-      .buildGeometry(mergedColl);
+        .buildGeometry(mergedColl);
     return merged;
   }
 

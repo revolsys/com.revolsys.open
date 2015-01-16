@@ -40,11 +40,11 @@ public class ArcGisResponse extends AbstractMapWrapper {
   }
 
   public String getPath() {
-    return path;
+    return this.path;
   }
 
   public String getServiceUrl() {
-    return serviceUrl;
+    return this.serviceUrl;
   }
 
   @Override
@@ -52,7 +52,7 @@ public class ArcGisResponse extends AbstractMapWrapper {
     Map<String, Object> values = super.getValues();
     if (values == null) {
       final Resource resource = SpringUtil.getResource(UrlUtil.getUrl(
-        serviceUrl + path, FORMAT_PARAMETER));
+        this.serviceUrl + this.path, FORMAT_PARAMETER));
       values = JsonMapIoFactory.toMap(resource);
       setValues(values);
     }
@@ -69,7 +69,7 @@ public class ArcGisResponse extends AbstractMapWrapper {
   }
 
   protected void setName(final String name) {
-    this.serviceUrl = catalog.getServiceUrl();
+    this.serviceUrl = this.catalog.getServiceUrl();
     this.path = "/" + name;
   }
 

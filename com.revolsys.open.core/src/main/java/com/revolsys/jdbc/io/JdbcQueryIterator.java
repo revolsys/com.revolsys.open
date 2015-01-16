@@ -28,7 +28,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 
 public class JdbcQueryIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
 
   public static Record getNextObject(final JdbcRecordStore recordStore,
     final RecordDefinition recordDefinition,
@@ -196,7 +196,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements
           resultSetMetaData);
       }
       final List<String> fieldNames = new ArrayList<String>(
-        this.query.getFieldNames());
+          this.query.getFieldNames());
       if (fieldNames.isEmpty()) {
         this.attributes.addAll(this.recordDefinition.getFields());
       } else {

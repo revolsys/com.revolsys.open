@@ -40,7 +40,11 @@ public class PageInfo extends AbstractDocumentedObject {
     this.mediaTypes.addAll(pageInfo.getMediaTypes());
     this.inputContentTypes.addAll(pageInfo.getInputContentTypes());
     this.attributes = new LinkedHashMap<String, Object>(
-      pageInfo.getFields());
+        pageInfo.getFields());
+  }
+
+  public PageInfo(final String title) {
+    setTitle(title);
   }
 
   public PageInfo(final String title, final String description) {
@@ -54,12 +58,8 @@ public class PageInfo extends AbstractDocumentedObject {
     this.methods.addAll(Arrays.asList(methods));
   }
 
-  public PageInfo(String title) {
-    setTitle(title);
-  }
-
   public void addInputContentType(final MediaType mediaType) {
-    inputContentTypes.add(mediaType);
+    this.inputContentTypes.add(mediaType);
   }
 
   public void addPage(final Object path, final PageInfo page) {
@@ -67,17 +67,24 @@ public class PageInfo extends AbstractDocumentedObject {
   }
 
   public void addPage(final String path, final PageInfo page) {
-    pages.put(path, page);
+    this.pages.put(path, page);
   }
 
   public PageInfo addPage(final String path, final String title) {
-    PageInfo page = new PageInfo(title);
+    final PageInfo page = new PageInfo(title);
     addPage(path, page);
     return page;
   }
 
+  public PageInfo addPage(final String url, final String title, final String... methods) {
+    final PageInfo page = new PageInfo(title, null, methods);
+    addPage(url, page);
+    return page;
+
+  }
+
   public void addParameter(final ParameterInfo parameter) {
-    parameters.put(parameter.getName(), parameter);
+    this.parameters.put(parameter.getName(), parameter);
   }
 
   @Override
@@ -86,43 +93,43 @@ public class PageInfo extends AbstractDocumentedObject {
   }
 
   public Map<String, Object> getFields() {
-    return attributes;
+    return this.attributes;
   }
 
   public List<MediaType> getInputContentTypes() {
-    return inputContentTypes;
+    return this.inputContentTypes;
   }
 
   public List<MediaType> getMediaTypes() {
-    return mediaTypes;
+    return this.mediaTypes;
   }
 
   public List<String> getMethods() {
-    return methods;
+    return this.methods;
   }
 
   public Map<String, PageInfo> getPages() {
-    return pages;
+    return this.pages;
   }
 
   public Element getPagesElement() {
-    return pagesElement;
+    return this.pagesElement;
   }
 
   public Collection<ParameterInfo> getParameters() {
-    return parameters.values();
+    return this.parameters.values();
   }
 
   public Map<String, ParameterInfo> getParametersMap() {
-    return parameters;
+    return this.parameters;
   }
 
   public String getUrl() {
-    return url;
+    return this.url;
   }
 
   public void setAttribute(final String name, final Object value) {
-    attributes.put(name, value);
+    this.attributes.put(name, value);
   }
 
   public void setAttributes(final Map<String, Object> attributes) {
@@ -168,12 +175,5 @@ public class PageInfo extends AbstractDocumentedObject {
     } else {
       this.url = url.replaceAll("/+", "/");
     }
-  }
-
-  public PageInfo addPage(String url, String title, String... methods) {
-    PageInfo page = new PageInfo(title, null, methods);
-    addPage(url, page);
-    return page;
-
   }
 }

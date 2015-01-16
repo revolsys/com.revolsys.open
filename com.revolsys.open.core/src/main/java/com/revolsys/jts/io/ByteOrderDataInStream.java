@@ -44,33 +44,18 @@ public class ByteOrderDataInStream
   private int byteOrder = ByteOrderValues.BIG_ENDIAN;
   private InStream stream;
   // buffers to hold primitive datatypes
-  private byte[] buf1 = new byte[1];
-  private byte[] buf4 = new byte[4];
-  private byte[] buf8 = new byte[8];
+  private final byte[] buf1 = new byte[1];
+  private final byte[] buf4 = new byte[4];
+  private final byte[] buf8 = new byte[8];
 
   public ByteOrderDataInStream()
   {
     this.stream = null;
   }
 
-  public ByteOrderDataInStream(InStream stream)
+  public ByteOrderDataInStream(final InStream stream)
   {
     this.stream = stream;
-  }
-
-  /**
-   * Allows a single ByteOrderDataInStream to be reused
-   * on multiple InStreams.
-   *
-   * @param stream
-   */
-  public void setInStream(InStream stream)
-  {
-    this.stream = stream;
-  }
-  public void setOrder(int byteOrder)
-  {
-    this.byteOrder = byteOrder;
   }
 
   /**
@@ -79,30 +64,45 @@ public class ByteOrderDataInStream
    * @return the byte read
    */
   public byte readByte()
-  	throws IOException
+      throws IOException
   {
-    stream.read(buf1);
-    return buf1[0];
+    this.stream.read(this.buf1);
+    return this.buf1[0];
+  }
+  public double readDouble()
+      throws IOException
+  {
+    this.stream.read(this.buf8);
+    return ByteOrderValues.getDouble(this.buf8, this.byteOrder);
   }
 
   public int readInt()
-	throws IOException
+      throws IOException
   {
-    stream.read(buf4);
-    return ByteOrderValues.getInt(buf4, byteOrder);
-  }
-  public long readLong()
-	throws IOException
-  {
-    stream.read(buf8);
-    return ByteOrderValues.getLong(buf8, byteOrder);
+    this.stream.read(this.buf4);
+    return ByteOrderValues.getInt(this.buf4, this.byteOrder);
   }
 
-  public double readDouble()
-	throws IOException
+  public long readLong()
+      throws IOException
   {
-    stream.read(buf8);
-    return ByteOrderValues.getDouble(buf8, byteOrder);
+    this.stream.read(this.buf8);
+    return ByteOrderValues.getLong(this.buf8, this.byteOrder);
+  }
+  /**
+   * Allows a single ByteOrderDataInStream to be reused
+   * on multiple InStreams.
+   *
+   * @param stream
+   */
+  public void setInStream(final InStream stream)
+  {
+    this.stream = stream;
+  }
+
+  public void setOrder(final int byteOrder)
+  {
+    this.byteOrder = byteOrder;
   }
 
 }

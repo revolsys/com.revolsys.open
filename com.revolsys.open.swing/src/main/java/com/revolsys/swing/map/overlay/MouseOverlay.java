@@ -28,7 +28,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 
 public class MouseOverlay extends JComponent implements MouseListener,
-  MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
+MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
 
   public static int getEventX() {
     return x;
@@ -64,7 +64,7 @@ public class MouseOverlay extends JComponent implements MouseListener,
   @Override
   public void focusGained(final FocusEvent e) {
     if (e.getComponent() == this
-      && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
+        && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
     } else {
       for (final Component overlay : getOverlays()) {
         if (overlay instanceof FocusListener) {
@@ -78,7 +78,7 @@ public class MouseOverlay extends JComponent implements MouseListener,
   @Override
   public void focusLost(final FocusEvent e) {
     if (e.getComponent() == this
-      && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
+        && e.getOppositeComponent() == SwingUtilities.getWindowAncestor(this)) {
     } else {
       for (final Component overlay : getOverlays()) {
         if (overlay instanceof FocusListener) {

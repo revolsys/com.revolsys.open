@@ -102,7 +102,7 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
           final String idFieldName = idField.getName();
           if (fieldName.equals(idFieldName)) {
             if (this.record != null
-              && this.record.getState() == RecordState.New) {
+                && this.record.getState() == RecordState.New) {
               if (!Number.class.isAssignableFrom(idField.getTypeClass())) {
                 return true;
               }

@@ -25,6 +25,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -136,7 +137,7 @@ ListSelectionListener, PropertyChangeListener {
     layerPathsScrollPane.setPreferredSize(new Dimension(350, 400));
     this.fieldsPanel.add(layerPathsScrollPane);
 
-    final ToolBar fieldsToolBar = new ToolBar(ToolBar.VERTICAL);
+    final ToolBar fieldsToolBar = new ToolBar(SwingConstants.VERTICAL);
     fieldsToolBar.setOpaque(false);
     fieldsToolBar.setMinimumSize(new Dimension(25, 25));
     this.fieldsPanel.add(fieldsToolBar);
@@ -392,7 +393,7 @@ ListSelectionListener, PropertyChangeListener {
     this.addButton.setEnabled(this.allFieldNames.getSelectedIndex() > -1);
     final int selectedFieldIndex = this.selectedFieldNames.getSelectedIndex();
     final int lastSelectedFieldIndex = this.selectedFieldNames.getSelectionModel()
-      .getMaxSelectionIndex();
+        .getMaxSelectionIndex();
     this.removeButton.setEnabled(selectedFieldIndex > -1);
     this.moveUpButton.setEnabled(selectedFieldIndex > 0);
     this.moveDownButton.setEnabled(selectedFieldIndex > -1

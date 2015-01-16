@@ -95,11 +95,11 @@ public class TriangleFunctions {
     final Point cc = Triangle.circumcentre(pts[0], pts[1], pts[2]);
     final GeometryFactory geomFact = FunctionsUtil.getFactoryOrDefault(g);
     final LineString[] line = new LineString[3];
-    final Point p0 = (new LineSegmentDouble(pts[1], pts[2])).closestPoint(cc);
+    final Point p0 = new LineSegmentDouble(pts[1], pts[2]).closestPoint(cc);
     line[0] = geomFact.lineString(p0, cc);
-    final Point p1 = (new LineSegmentDouble(pts[0], pts[2])).closestPoint(cc);
+    final Point p1 = new LineSegmentDouble(pts[0], pts[2]).closestPoint(cc);
     line[1] = geomFact.lineString(p1, cc);
-    final Point p2 = (new LineSegmentDouble(pts[0], pts[1])).closestPoint(cc);
+    final Point p2 = new LineSegmentDouble(pts[0], pts[1]).closestPoint(cc);
     line[2] = geomFact.lineString(p2, cc);
     return geomFact.multiLineString(line);
   }
@@ -108,7 +108,7 @@ public class TriangleFunctions {
     final Point[] pts = CoordinatesListUtil.getCoordinates(g, 3);
     if (pts.length < 3) {
       throw new IllegalArgumentException(
-        "Input geometry must have at least 3 points");
+          "Input geometry must have at least 3 points");
     }
     return pts;
   }

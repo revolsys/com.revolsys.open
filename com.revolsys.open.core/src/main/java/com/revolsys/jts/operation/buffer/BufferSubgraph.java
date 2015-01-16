@@ -82,7 +82,7 @@ class BufferSubgraph implements Comparable {
   private BoundingBox env = null;
 
   public BufferSubgraph() {
-    finder = new RightmostEdgeFinder();
+    this.finder = new RightmostEdgeFinder();
   }
 
   /**
@@ -92,10 +92,10 @@ class BufferSubgraph implements Comparable {
    */
   private void add(final Node node, final Stack<Node> nodeStack) {
     node.setVisited(true);
-    nodes.add(node);
+    this.nodes.add(node);
     for (final Iterator i = ((DirectedEdgeStar)node.getEdges()).iterator(); i.hasNext();) {
       final DirectedEdge de = (DirectedEdge)i.next();
-      dirEdgeList.add(de);
+      this.dirEdgeList.add(de);
       final DirectedEdge sym = de.getSym();
       final Node symNode = sym.getNode();
       /**
@@ -125,7 +125,7 @@ class BufferSubgraph implements Comparable {
   }
 
   private void clearVisitedEdges() {
-    for (final DirectedEdge de : dirEdgeList) {
+    for (final DirectedEdge de : this.dirEdgeList) {
       de.setVisited(false);
     }
   }
@@ -156,7 +156,7 @@ class BufferSubgraph implements Comparable {
   public void computeDepth(final int outsideDepth) {
     clearVisitedEdges();
     // find an outside edge to assign depth to
-    final DirectedEdge de = finder.getEdge();
+    final DirectedEdge de = this.finder.getEdge();
     // right side of line returned by finder is on the outside
     de.setEdgeDepths(Position.RIGHT, outsideDepth);
     copySymDepths(de);
@@ -197,7 +197,7 @@ class BufferSubgraph implements Comparable {
           continue;
         }
         final Node adjNode = sym.getNode();
-        if (!(nodesVisited.contains(adjNode))) {
+        if (!nodesVisited.contains(adjNode)) {
           nodeQueue.addLast(adjNode);
           nodesVisited.add(adjNode);
         }
@@ -221,7 +221,7 @@ class BufferSubgraph implements Comparable {
     // only compute string append if assertion would fail
     if (startEdge == null) {
       throw new TopologyException("unable to find edge to compute depths at "
-        + n.getCoordinate());
+          + n.getCoordinate());
     }
 
     ((DirectedEdgeStar)n.getEdges()).computeDepths(startEdge);
@@ -248,8 +248,8 @@ class BufferSubgraph implements Comparable {
    */
   public void create(final Node node) {
     addReachable(node);
-    finder.findEdge(dirEdgeList);
-    rightMostCoord = finder.getCoordinate();
+    this.finder.findEdge(this.dirEdgeList);
+    this.rightMostCoord = this.finder.getCoordinate();
   }
 
   /**
@@ -261,7 +261,7 @@ class BufferSubgraph implements Comparable {
    * They do not form part of the result area boundary.
    */
   public void findResultEdges() {
-    for (final DirectedEdge de : dirEdgeList) {
+    for (final DirectedEdge de : this.dirEdgeList) {
       /**
        * Select edges which have an interior depth on the RHS
        * and an exterior depth on the LHS.
@@ -284,7 +284,7 @@ class BufferSubgraph implements Comparable {
   }
 
   public List<DirectedEdge> getDirectedEdges() {
-    return dirEdgeList;
+    return this.dirEdgeList;
   }
 
   /**
@@ -294,9 +294,9 @@ class BufferSubgraph implements Comparable {
    * @return the envelope of the graph.
    */
   public BoundingBox getEnvelope() {
-    if (env == null) {
+    if (this.env == null) {
       double[] bounds = null;
-      for (final DirectedEdge dirEdge : dirEdgeList) {
+      for (final DirectedEdge dirEdge : this.dirEdgeList) {
         final Edge edge = dirEdge.getEdge();
         final LineString points = edge.getPoints();
         for (int i = 0; i < points.getVertexCount(); i++) {
@@ -308,19 +308,19 @@ class BufferSubgraph implements Comparable {
           }
         }
       }
-      env = new BoundingBoxDoubleGf(2, bounds);
+      this.env = new BoundingBoxDoubleGf(2, bounds);
     }
-    return env;
+    return this.env;
   }
 
   public List<Node> getNodes() {
-    return nodes;
+    return this.nodes;
   }
 
   /**
    * Gets the rightmost coordinate in the edges of the subgraph
    */
   public Point getRightmostCoordinate() {
-    return rightMostCoord;
+    return this.rightMostCoord;
   }
 }

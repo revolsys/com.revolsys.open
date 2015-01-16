@@ -111,7 +111,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
  * <i>CoordinateSingletonList:</i>
  *         <b>(</b> <i>CoordinateSingleton {</i> <b>,</b> <i>CoordinateSingleton }</i> <b>)</b>
  *         | <b>EMPTY</b>
- *         
+ *
  * <i>CoordinateSingleton:</i>
  *         <b>(</b> <i>Coordinate <b>)</b>
  *         | <b>EMPTY</b>
@@ -197,7 +197,7 @@ public class WKTReader {
   }
 
   private Point[] getCoordinatesNoLeftParen() throws IOException,
-    ParseException {
+  ParseException {
     String nextToken = null;
     final ArrayList coordinates = new ArrayList();
     coordinates.add(getPreciseCoordinate());
@@ -269,7 +269,7 @@ public class WKTReader {
    * Parses the next number in the stream.
    * Numbers with exponents are handled.
    * <tt>NaN</tt> values are handled correctly, and
-   * the case of the "NaN" symbol is not significant. 
+   * the case of the "NaN" symbol is not significant.
    *
    *@param  tokenizer        tokenizer over a stream of text in Well-known Text
    *      format. The next token must be a number.
@@ -278,16 +278,16 @@ public class WKTReader {
    *@throws  IOException     if an I/O error occurs
    */
   private double getNextNumber() throws IOException, ParseException {
-    final int type = tokenizer.nextToken();
+    final int type = this.tokenizer.nextToken();
     switch (type) {
       case StreamTokenizer.TT_WORD: {
-        if (tokenizer.sval.equalsIgnoreCase(NAN_SYMBOL)) {
+        if (this.tokenizer.sval.equalsIgnoreCase(NAN_SYMBOL)) {
           return Double.NaN;
         } else {
           try {
-            return Double.parseDouble(tokenizer.sval);
+            return Double.parseDouble(this.tokenizer.sval);
           } catch (final NumberFormatException ex) {
-            parseErrorWithLine("Invalid number: " + tokenizer.sval);
+            parseErrorWithLine("Invalid number: " + this.tokenizer.sval);
           }
         }
       }
@@ -306,11 +306,11 @@ public class WKTReader {
    *@throws  IOException     if an I/O error occurs
    */
   private String getNextWord() throws IOException, ParseException {
-    final int type = tokenizer.nextToken();
+    final int type = this.tokenizer.nextToken();
     switch (type) {
       case StreamTokenizer.TT_WORD:
 
-        final String word = tokenizer.sval;
+        final String word = this.tokenizer.sval;
         if (word.equalsIgnoreCase(EMPTY)) {
           return EMPTY;
         }
@@ -328,8 +328,8 @@ public class WKTReader {
   }
 
   private Point getPreciseCoordinate() throws IOException, ParseException {
-    final double x = geometryFactory.makePrecise(0, getNextNumber());
-    final double y = geometryFactory.makePrecise(1, getNextNumber());
+    final double x = this.geometryFactory.makePrecise(0, getNextNumber());
+    final double y = this.geometryFactory.makePrecise(1, getNextNumber());
     final Point coord;
     if (isNumberNext()) {
       final double z = getNextNumber();
@@ -341,8 +341,8 @@ public class WKTReader {
   }
 
   private boolean isNumberNext() throws IOException {
-    final int type = tokenizer.nextToken();
-    tokenizer.pushBack();
+    final int type = this.tokenizer.nextToken();
+    this.tokenizer.pushBack();
     return type == StreamTokenizer.TT_WORD;
   }
 
@@ -357,7 +357,7 @@ public class WKTReader {
    */
   private String lookaheadWord() throws IOException, ParseException {
     final String nextWord = getNextWord();
-    tokenizer.pushBack();
+    this.tokenizer.pushBack();
     return nextWord;
   }
 
@@ -367,13 +367,13 @@ public class WKTReader {
    *
    * @param expected a description of what was expected
    * @throws ParseException
-    */
+   */
   private void parseErrorExpected(final String expected) throws ParseException {
     // throws Asserts for tokens that should never be seen
-    if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) {
+    if (this.tokenizer.ttype == StreamTokenizer.TT_NUMBER) {
       throw new IllegalStateException("Unexpected NUMBER token");
     }
-    if (tokenizer.ttype == StreamTokenizer.TT_EOL) {
+    if (this.tokenizer.ttype == StreamTokenizer.TT_EOL) {
       throw new IllegalStateException("Unexpected EOL token");
     }
 
@@ -382,7 +382,7 @@ public class WKTReader {
   }
 
   private void parseErrorWithLine(final String msg) throws ParseException {
-    throw new ParseException(msg + " (line " + tokenizer.lineno() + ")");
+    throw new ParseException(msg + " (line " + this.tokenizer.lineno() + ")");
   }
 
   /**
@@ -395,18 +395,18 @@ public class WKTReader {
    *@throws  ParseException  if a parsing problem occurs
    */
   public Geometry read(final Reader reader) throws ParseException {
-    tokenizer = new StreamTokenizer(reader);
+    this.tokenizer = new StreamTokenizer(reader);
     // set tokenizer to NOT parse numbers
-    tokenizer.resetSyntax();
-    tokenizer.wordChars('a', 'z');
-    tokenizer.wordChars('A', 'Z');
-    tokenizer.wordChars(128 + 32, 255);
-    tokenizer.wordChars('0', '9');
-    tokenizer.wordChars('-', '-');
-    tokenizer.wordChars('+', '+');
-    tokenizer.wordChars('.', '.');
-    tokenizer.whitespaceChars(0, ' ');
-    tokenizer.commentChar('#');
+    this.tokenizer.resetSyntax();
+    this.tokenizer.wordChars('a', 'z');
+    this.tokenizer.wordChars('A', 'Z');
+    this.tokenizer.wordChars(128 + 32, 255);
+    this.tokenizer.wordChars('0', '9');
+    this.tokenizer.wordChars('-', '-');
+    this.tokenizer.wordChars('+', '+');
+    this.tokenizer.wordChars('.', '.');
+    this.tokenizer.whitespaceChars(0, ' ');
+    this.tokenizer.commentChar('#');
 
     try {
       return readGeometryTaggedText();
@@ -449,10 +449,10 @@ public class WKTReader {
    *@throws  IOException     if an I/O error occurs
    */
   private GeometryCollection readGeometryCollectionText() throws IOException,
-    ParseException {
+  ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.geometryCollection();
+      return this.geometryFactory.geometryCollection();
     } else {
       final List<Geometry> geometries = new ArrayList<Geometry>();
       Geometry geometry = readGeometryTaggedText();
@@ -463,7 +463,7 @@ public class WKTReader {
         geometries.add(geometry);
         nextToken = getNextCloserOrComma();
       }
-      return geometryFactory.geometryCollection(geometries);
+      return this.geometryFactory.geometryCollection(geometries);
     }
   }
 
@@ -525,7 +525,7 @@ public class WKTReader {
    *      encountered
    */
   private LinearRing readLinearRingText() throws IOException, ParseException {
-    return geometryFactory.linearRing(getCoordinates());
+    return this.geometryFactory.linearRing(getCoordinates());
   }
 
   /**
@@ -539,7 +539,7 @@ public class WKTReader {
    *@throws  ParseException  if an unexpected token was encountered
    */
   private LineString readLineStringText() throws IOException, ParseException {
-    return geometryFactory.lineString(getCoordinates());
+    return this.geometryFactory.lineString(getCoordinates());
   }
 
   /*
@@ -559,10 +559,10 @@ public class WKTReader {
    *@throws  ParseException  if an unexpected token was encountered
    */
   private com.revolsys.jts.geom.MultiLineString readMultiLineStringText()
-    throws IOException, ParseException {
+      throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.multiLineString(new LineString[] {});
+      return this.geometryFactory.multiLineString(new LineString[] {});
     }
     final ArrayList lineStrings = new ArrayList();
     LineString lineString = readLineStringText();
@@ -574,7 +574,7 @@ public class WKTReader {
       nextToken = getNextCloserOrComma();
     }
     final LineString[] array = new LineString[lineStrings.size()];
-    return geometryFactory.multiLineString((LineString[])lineStrings.toArray(array));
+    return this.geometryFactory.multiLineString((LineString[])lineStrings.toArray(array));
   }
 
   /**
@@ -590,7 +590,7 @@ public class WKTReader {
   private MultiPoint readMultiPointText() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.multiPoint(new Point[0]);
+      return this.geometryFactory.multiPoint(new Point[0]);
     }
 
     // check for old-style JTS syntax and parse it if present
@@ -599,7 +599,7 @@ public class WKTReader {
     if (ALLOW_OLD_JTS_MULTIPOINT_SYNTAX) {
       final String nextWord = lookaheadWord();
       if (nextWord != L_PAREN) {
-        return geometryFactory.multiPoint(toPoints(getCoordinatesNoLeftParen()));
+        return this.geometryFactory.multiPoint(toPoints(getCoordinatesNoLeftParen()));
       }
     }
 
@@ -612,7 +612,7 @@ public class WKTReader {
       points.add(point);
       nextToken = getNextCloserOrComma();
     }
-    return geometryFactory.multiPoint(points);
+    return this.geometryFactory.multiPoint(points);
   }
 
   /**
@@ -627,10 +627,10 @@ public class WKTReader {
    *@throws  ParseException  if an unexpected token was encountered
    */
   private MultiPolygon readMultiPolygonText() throws IOException,
-    ParseException {
+  ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.multiPolygon(new Polygon[] {});
+      return this.geometryFactory.multiPolygon(new Polygon[] {});
     }
     final ArrayList polygons = new ArrayList();
     Polygon polygon = readPolygonText();
@@ -642,7 +642,7 @@ public class WKTReader {
       nextToken = getNextCloserOrComma();
     }
     final Polygon[] array = new Polygon[polygons.size()];
-    return geometryFactory.multiPolygon((Polygon[])polygons.toArray(array));
+    return this.geometryFactory.multiPolygon((Polygon[])polygons.toArray(array));
   }
 
   /**
@@ -658,9 +658,9 @@ public class WKTReader {
   private Point readPointText() throws IOException, ParseException {
     final String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.point((Point)null);
+      return this.geometryFactory.point((Point)null);
     }
-    final Point point = geometryFactory.point(getPreciseCoordinate());
+    final Point point = this.geometryFactory.point(getPreciseCoordinate());
     getNextCloser();
     return point;
   }
@@ -680,7 +680,7 @@ public class WKTReader {
   private Polygon readPolygonText() throws IOException, ParseException {
     String nextToken = getNextEmptyOrOpener();
     if (nextToken.equals(EMPTY)) {
-      return geometryFactory.polygon();
+      return this.geometryFactory.polygon();
     }
     final List<LinearRing> rings = new ArrayList<LinearRing>();
     final LinearRing shell = readLinearRingText();
@@ -691,7 +691,7 @@ public class WKTReader {
       rings.add(hole);
       nextToken = getNextCloserOrComma();
     }
-    return geometryFactory.polygon(rings);
+    return this.geometryFactory.polygon(rings);
   }
 
   /**
@@ -700,7 +700,7 @@ public class WKTReader {
    * @return a description of the current token
    */
   private String tokenString() {
-    switch (tokenizer.ttype) {
+    switch (this.tokenizer.ttype) {
       case StreamTokenizer.TT_NUMBER:
         return "<NUMBER>";
       case StreamTokenizer.TT_EOL:
@@ -708,9 +708,9 @@ public class WKTReader {
       case StreamTokenizer.TT_EOF:
         return "End-of-Stream";
       case StreamTokenizer.TT_WORD:
-        return "'" + tokenizer.sval + "'";
+        return "'" + this.tokenizer.sval + "'";
     }
-    return "'" + (char)tokenizer.ttype + "'";
+    return "'" + (char)this.tokenizer.ttype + "'";
   }
 
   /**
@@ -724,8 +724,8 @@ public class WKTReader {
    */
   private Point[] toPoints(final Point[] coordinates) {
     final ArrayList points = new ArrayList();
-    for (int i = 0; i < coordinates.length; i++) {
-      points.add(geometryFactory.point(coordinates[i]));
+    for (final Point coordinate : coordinates) {
+      points.add(this.geometryFactory.point(coordinate));
     }
     return (Point[])points.toArray(new Point[] {});
   }

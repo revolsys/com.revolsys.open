@@ -12,7 +12,7 @@ import java.util.NoSuchElementException;
 import com.revolsys.io.FileUtil;
 
 public class CsvIterator implements Iterator<List<String>>,
-  Iterable<List<String>> {
+Iterable<List<String>> {
 
   /** The current record. */
   private List<String> currentRecord;
@@ -25,7 +25,7 @@ public class CsvIterator implements Iterator<List<String>>,
 
   /**
    * Constructs CSVReader with supplied separator and quote char.
-   * 
+   *
    * @param reader The reader to the CSV file.
    * @throws IOException
    */
@@ -37,29 +37,29 @@ public class CsvIterator implements Iterator<List<String>>,
 
   /**
    * Closes the underlying reader.
-   * 
+   *
    * @throws IOException if the close fails
    */
   public void close() {
-    FileUtil.closeSilent(in);
+    FileUtil.closeSilent(this.in);
   }
 
   /**
    * Reads the next line from the file.
-   * 
+   *
    * @return the next line from the file without trailing newline
    * @throws IOException if bad things happen during the read
    */
   private String getNextLine() {
     try {
-      final String nextLine = in.readLine();
+      final String nextLine = this.in.readLine();
       if (nextLine == null) {
-        hasNext = false;
+        this.hasNext = false;
         close();
       }
       return nextLine;
     } catch (final IOException e) {
-      hasNext = false;
+      this.hasNext = false;
       close();
       return null;
     }
@@ -67,12 +67,12 @@ public class CsvIterator implements Iterator<List<String>>,
 
   /**
    * Returns <tt>true</tt> if the iteration has more elements.
-   * 
+   *
    * @return <tt>true</tt> if the iterator has more elements.
    */
   @Override
   public boolean hasNext() {
-    return hasNext;
+    return this.hasNext;
   }
 
   @Override
@@ -82,15 +82,15 @@ public class CsvIterator implements Iterator<List<String>>,
 
   /**
    * Return the next record from the iterator.
-   * 
+   *
    * @return The record
    */
   @Override
   public List<String> next() {
-    if (!hasNext) {
+    if (!this.hasNext) {
       throw new NoSuchElementException("No more elements");
     } else {
-      final List<String> object = currentRecord;
+      final List<String> object = this.currentRecord;
       readNextRecord();
       return object;
     }
@@ -98,7 +98,7 @@ public class CsvIterator implements Iterator<List<String>>,
 
   /**
    * Parses an incoming String and returns an array of elements.
-   * 
+   *
    * @param nextLine the string to parse
    * @return the comma-tokenized list of elements, or null if nextLine is null
    * @throws IOException if bad things happen during the read
@@ -124,14 +124,14 @@ public class CsvIterator implements Iterator<List<String>>,
           final char c = nextLine.charAt(i);
           if (c == '"') {
             hadQuotes = true;
-            if (inQuotes && nextLine.length() > (i + 1)
-              && nextLine.charAt(i + 1) == '"') {
+            if (inQuotes && nextLine.length() > i + 1
+                && nextLine.charAt(i + 1) == '"') {
               sb.append(nextLine.charAt(i + 1));
               i++;
             } else {
               inQuotes = !inQuotes;
               if (i > 2 && nextLine.charAt(i - 1) != ','
-                && nextLine.length() > (i + 1) && nextLine.charAt(i + 1) != ',') {
+                  && nextLine.length() > i + 1 && nextLine.charAt(i + 1) != ',') {
                 sb.append(c);
               }
             }
@@ -157,16 +157,16 @@ public class CsvIterator implements Iterator<List<String>>,
 
   /**
    * Reads the next line from the buffer and converts to a string array.
-   * 
+   *
    * @return a string array with each comma-separated element as a separate
    *         entry.
    * @throws IOException if bad things happen during the read
    */
   private List<String> readNextRecord() {
     final String nextLine = getNextLine();
-    if (hasNext) {
-      currentRecord = parseLine(nextLine);
-      return currentRecord;
+    if (this.hasNext) {
+      this.currentRecord = parseLine(nextLine);
+      return this.currentRecord;
     } else {
       return null;
     }

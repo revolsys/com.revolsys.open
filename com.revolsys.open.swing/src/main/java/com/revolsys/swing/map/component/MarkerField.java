@@ -26,27 +26,27 @@ public class MarkerField extends ValueField implements PropertyChangeListener {
   private final ComboBox comboBox = new ComboBox("marker",
     new DefaultComboBoxModel(new Vector<Marker>(ShapeMarker.getMarkers())),
     null, new DefaultListCellRenderer() {
-      private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-      @Override
-      public Component getListCellRendererComponent(final JList list,
-        final Object value, final int index, final boolean isSelected,
-        final boolean cellHasFocus) {
-        final Component component = super.getListCellRendererComponent(list,
-          value, index, isSelected, cellHasFocus);
-        setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
-        final ShapeMarker marker = (ShapeMarker)value;
-        setIcon(new ShapeIcon(marker.getShape(), 16, 16));
-        return component;
-      }
-    });
+    @Override
+    public Component getListCellRendererComponent(final JList list,
+      final Object value, final int index, final boolean isSelected,
+      final boolean cellHasFocus) {
+      final Component component = super.getListCellRendererComponent(list,
+        value, index, isSelected, cellHasFocus);
+      setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
+      final ShapeMarker marker = (ShapeMarker)value;
+      setIcon(new ShapeIcon(marker.getShape(), 16, 16));
+      return component;
+    }
+  });
 
   public MarkerField(final String fieldName, final Object fieldValue) {
     super(fieldName, fieldValue);
     setLayout(new VerticalLayout());
-    add(comboBox);
-    Property.addListener(comboBox, "marker", this);
-    comboBox.setSelectedItem(fieldValue);
+    add(this.comboBox);
+    Property.addListener(this.comboBox, "marker", this);
+    this.comboBox.setSelectedItem(fieldValue);
   }
 
   public Marker getMarker() {
@@ -55,8 +55,8 @@ public class MarkerField extends ValueField implements PropertyChangeListener {
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (event.getSource() == comboBox) {
-      final Object selectedItem = comboBox.getSelectedItem();
+    if (event.getSource() == this.comboBox) {
+      final Object selectedItem = this.comboBox.getSelectedItem();
       setFieldValue(selectedItem);
     }
   }

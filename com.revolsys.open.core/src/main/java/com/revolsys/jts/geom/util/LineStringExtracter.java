@@ -47,7 +47,7 @@ public class LineStringExtracter {
   /**
    * Extracts the {@link LineString} elements from a single {@link Geometry}
    * and returns them in a {@link List}.
-   * 
+   *
    * @param geometry the geometry from which to extract
    */
   public static List<LineString> getLines(final Geometry geometry) {
@@ -57,7 +57,7 @@ public class LineStringExtracter {
   /**
    * Extracts the {@link LineString} elements from a single {@link Geometry}
    * and adds them to the provided {@link List}.
-   * 
+   *
    * @param geom the geometry from which to extract
    * @param lines the list to add the extracted LineStrings to
    */

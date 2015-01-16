@@ -46,8 +46,8 @@ import com.revolsys.jts.geom.Point;
  * This implementation supports detecting and snapping points which are closer than a given
  * tolerance value. If the same point (up to tolerance) is inserted more than once a new node is
  * not created but the count of the existing node is incremented.
- * 
- * 
+ *
+ *
  * @author David Skea
  * @author Martin Davis
  */
@@ -61,7 +61,7 @@ public class KdTree {
   private final double tolerance;
 
   /**
-   * Creates a new instance of a KdTree 
+   * Creates a new instance of a KdTree
    * with a snapping tolerance of 0.0.
    * (I.e. distinct points will <i>not</i> be snapped)
    */
@@ -71,9 +71,9 @@ public class KdTree {
 
   /**
    * Creates a new instance of a KdTree, specifying a snapping distance tolerance.
-   * Point which lie closer than the tolerance to a point already 
+   * Point which lie closer than the tolerance to a point already
    * in the tree will be treated as identical to the existing point.
-   * 
+   *
    * @param tolerance
    *          the tolerance distance for considering two points equal
    */
@@ -83,7 +83,7 @@ public class KdTree {
 
   /**
    * Inserts a new point in the kd-tree, with no data.
-   * 
+   *
    * @param p
    *          the point to insert
    * @return the kdnode containing the point
@@ -94,7 +94,7 @@ public class KdTree {
 
   /**
    * Inserts a new point into the kd-tree.
-   * 
+   *
    * @param p
    *          the point to insert
    * @param data
@@ -104,13 +104,13 @@ public class KdTree {
    *         by testing returnedNode.getCount() > 1.
    */
   public KdNode insert(final Point p, final Object data) {
-    if (root == null) {
-      root = new KdNode(p, data);
-      return root;
+    if (this.root == null) {
+      this.root = new KdNode(p, data);
+      return this.root;
     }
 
-    KdNode currentNode = root;
-    KdNode leafNode = root;
+    KdNode currentNode = this.root;
+    KdNode leafNode = this.root;
     boolean isOddLevel = true;
     boolean isLessThan = true;
 
@@ -119,10 +119,10 @@ public class KdTree {
      * first cutting the plane left-right (by X ordinate)
      * then top-bottom (by Y ordinate)
      */
-    while (currentNode != last) {
+    while (currentNode != this.last) {
       // test if point is already a node
       if (currentNode != null) {
-        final boolean isInTolerance = p.distance(currentNode.getCoordinate()) <= tolerance;
+        final boolean isInTolerance = p.distance(currentNode.getCoordinate()) <= this.tolerance;
 
         // check if point is already in tree (up to tolerance) and if so simply
         // return existing node
@@ -148,10 +148,10 @@ public class KdTree {
     }
 
     // no node found, add new leaf node to tree
-    numberOfNodes = numberOfNodes + 1;
+    this.numberOfNodes = this.numberOfNodes + 1;
     final KdNode node = new KdNode(p, data);
-    node.setLeft(last);
-    node.setRight(last);
+    node.setLeft(this.last);
+    node.setRight(this.last);
     if (isLessThan) {
       leafNode.setLeft(node);
     } else {
@@ -162,11 +162,11 @@ public class KdTree {
 
   /**
    * Tests whether the index contains any items.
-   * 
+   *
    * @return true if the index does not contain any items
    */
   public boolean isEmpty() {
-    if (root == null) {
+    if (this.root == null) {
       return true;
     }
     return false;
@@ -174,27 +174,27 @@ public class KdTree {
 
   /**
    * Performs a range search of the points in the index.
-   * 
+   *
    * @param queryEnv
    *          the range rectangle to query
    * @return a list of the KdNodes found
    */
   public List query(final BoundingBox queryEnv) {
     final List result = new ArrayList();
-    queryNode(root, last, queryEnv, true, result);
+    queryNode(this.root, this.last, queryEnv, true, result);
     return result;
   }
 
   /**
    * Performs a range search of the points in the index.
-   * 
+   *
    * @param queryEnv
    *          the range rectangle to query
    * @param result
    *          a list to accumulate the result nodes into
    */
   public void query(final BoundingBox queryEnv, final List result) {
-    queryNode(root, last, queryEnv, true, result);
+    queryNode(this.root, this.last, queryEnv, true, result);
   }
 
   private void queryNode(final KdNode currentNode, final KdNode bottomNode,

@@ -49,11 +49,16 @@ import com.revolsys.jts.noding.SegmentStringUtil;
  * A prepared version for {@link Lineal} geometries.
  * <p>
  * Instances of this class are thread-safe.
- * 
+ *
  * @author mbdavis
  *
  */
 public class PreparedLineString extends AbstractLineString {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private FastSegmentSetIntersectionFinder segIntFinder = null;
 
   private final LineString line;
@@ -64,7 +69,7 @@ public class PreparedLineString extends AbstractLineString {
 
   @Override
   public BoundingBox getBoundingBox() {
-    return line.getBoundingBox();
+    return this.line.getBoundingBox();
   }
 
   @Override
@@ -87,20 +92,20 @@ public class PreparedLineString extends AbstractLineString {
 
   public synchronized FastSegmentSetIntersectionFinder getIntersectionFinder() {
     /**
-     * MD - Another option would be to use a simple scan for 
-     * segment testing for small geometries.  
-     * However, testing indicates that there is no particular advantage 
+     * MD - Another option would be to use a simple scan for
+     * segment testing for small geometries.
+     * However, testing indicates that there is no particular advantage
      * to this approach.
      */
-    if (segIntFinder == null) {
-      segIntFinder = new FastSegmentSetIntersectionFinder(
+    if (this.segIntFinder == null) {
+      this.segIntFinder = new FastSegmentSetIntersectionFinder(
         SegmentStringUtil.extractSegmentStrings(getLine()));
     }
-    return segIntFinder;
+    return this.segIntFinder;
   }
 
   public LineString getLine() {
-    return line;
+    return this.line;
   }
 
   @Override
@@ -140,7 +145,7 @@ public class PreparedLineString extends AbstractLineString {
          */
         return true;
       } else if (dimension == 0) {
-        /** 
+        /**
          * For L/P case, need to check if any points lie on line(s)
          */
         return isAnyTestPointInTarget(geometry);
@@ -156,7 +161,7 @@ public class PreparedLineString extends AbstractLineString {
    * Tests whether any representative point of the test Geometry intersects
    * the target geometry.
    * Only handles test geometries which are Puntal (dimension 0)
-   * 
+   *
    * @param geom a Puntal geometry to test
    * @return true if any point of the argument intersects the prepared geometry
    */

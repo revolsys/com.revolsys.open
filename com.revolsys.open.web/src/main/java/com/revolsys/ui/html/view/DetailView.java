@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,15 +57,15 @@ public class DetailView extends Element {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    final int size = serializer.getSize();
+    final int size = this.serializer.getSize();
     if (size > 0) {
       out.startTag(HtmlUtil.DIV);
-      out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+      out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
 
-      if (title != null && title.length() > 0) {
+      if (this.title != null && this.title.length() > 0) {
         out.startTag(HtmlUtil.DIV);
         out.attribute(HtmlUtil.ATTR_CLASS, "title");
-        out.text(title);
+        out.text(this.title);
         out.endTag(HtmlUtil.DIV);
       }
 
@@ -74,8 +74,8 @@ public class DetailView extends Element {
       out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
       out.attribute(HtmlUtil.ATTR_CLASS, "data");
       for (int i = 0; i < size; i++) {
-        final boolean firstCol = i % numColumns == 0;
-        final boolean lastCol = (i + 1) % numColumns == 0 || i == size - 1;
+        final boolean firstCol = i % this.numColumns == 0;
+        final boolean lastCol = (i + 1) % this.numColumns == 0 || i == size - 1;
         String labelCss = "";
         String valueCss = "";
         if (firstCol) {
@@ -85,7 +85,7 @@ public class DetailView extends Element {
           if (i == 0) {
             rowCss += " firstRow";
           }
-          if (i / numColumns == (size - 1) / numColumns) {
+          if (i / this.numColumns == (size - 1) / this.numColumns) {
             rowCss += " lastRow";
           }
           if (i % 2 == 1) {
@@ -99,24 +99,24 @@ public class DetailView extends Element {
           valueCss = " lastCol";
         }
         out.startTag(HtmlUtil.TH);
-        final String newLabelCss = serializer.getLabelCss(i);
+        final String newLabelCss = this.serializer.getLabelCss(i);
         if (newLabelCss != null) {
           labelCss = newLabelCss + labelCss;
         }
         if (labelCss.length() > 0) {
           out.attribute(HtmlUtil.ATTR_CLASS, labelCss);
         }
-        serializer.serializeLabel(out, i);
+        this.serializer.serializeLabel(out, i);
         out.endTag(HtmlUtil.TH);
         out.startTag(HtmlUtil.TD);
-        final String newValueCss = serializer.getValueCss(i);
+        final String newValueCss = this.serializer.getValueCss(i);
         if (newValueCss != null) {
           valueCss = newValueCss + valueCss;
         }
         if (labelCss.length() > 0) {
           out.attribute(HtmlUtil.ATTR_CLASS, valueCss);
         }
-        serializer.serializeValue(out, i);
+        this.serializer.serializeValue(out, i);
         out.endTag(HtmlUtil.TD);
         if (lastCol) {
           out.endTag(HtmlUtil.TR);

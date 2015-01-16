@@ -41,7 +41,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 
 /**
- * Simplifies a buffer input line to 
+ * Simplifies a buffer input line to
  * remove concavities with shallow depth.
  * <p>
  * The most important benefit of doing this
@@ -49,11 +49,11 @@ import com.revolsys.jts.geom.impl.LineStringDouble;
  * shape which will be buffered.
  * It also reduces the risk of gores created by
  * the quantized fillet arcs (although this issue
- * should be eliminated in any case by the 
+ * should be eliminated in any case by the
  * offset curve generation logic).
  * <p>
  * A key aspect of the simplification is that it
- * affects inside (concave or inward) corners only.  
+ * affects inside (concave or inward) corners only.
  * Convex (outward) corners are preserved, since they
  * are required to ensure that the generated buffer curve
  * lies at the correct distance from the input geometry.
@@ -65,25 +65,21 @@ import com.revolsys.jts.geom.impl.LineStringDouble;
  * No attempt is made to avoid self-intersections in the output.
  * This is acceptable for use for generating a buffer offset curve,
  * since the buffer algorithm is insensitive to invalid polygonal
- * geometry.  However, 
+ * geometry.  However,
  * this means that this algorithm
  * cannot be used as a general-purpose polygon simplification technique.
- * 
+ *
  * @author Martin Davis
  *
  */
 public class BufferInputLineSimplifier {
-  private static final int DELETE = 1;
-
-  private static final int NUM_PTS_TO_CHECK = 10;
-
   /**
    * Simplify the input coordinate list.
-   * If the distance tolerance is positive, 
+   * If the distance tolerance is positive,
    * concavities on the LEFT side of the line are simplified.
    * If the supplied distance tolerance is negative,
    * concavities on the RIGHT side of the line are simplified.
-   * 
+   *
    * @param inputLine the coordinate list to simplify
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
@@ -94,6 +90,10 @@ public class BufferInputLineSimplifier {
       inputLine);
     return simp.simplify(distanceTol);
   }
+
+  private static final int DELETE = 1;
+
+  private static final int NUM_PTS_TO_CHECK = 10;
 
   private final LineString inputLine;
 
@@ -110,14 +110,14 @@ public class BufferInputLineSimplifier {
   }
 
   private LineString collapseLine() {
-    final int axisCount = inputLine.getAxisCount();
-    final int vertexCount = inputLine.getVertexCount();
-    final double[] coordinates = new double[(vertexCount - deleteCount)
-      * axisCount];
+    final int axisCount = this.inputLine.getAxisCount();
+    final int vertexCount = this.inputLine.getVertexCount();
+    final double[] coordinates = new double[(vertexCount - this.deleteCount)
+                                            * axisCount];
     int j = 0;
     for (int i = 0; i < vertexCount; i++) {
-      if (isDeleted[i] != DELETE) {
-        final Point point = inputLine.getPoint(i);
+      if (this.isDeleted[i] != DELETE) {
+        final Point point = this.inputLine.getPoint(i);
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, point);
       }
     }
@@ -141,11 +141,11 @@ public class BufferInputLineSimplifier {
     int lastIndex = findNextNonDeletedIndex(midIndex);
 
     boolean isChanged = false;
-    while (lastIndex < inputLine.getVertexCount()) {
+    while (lastIndex < this.inputLine.getVertexCount()) {
       // test triple for shallow concavity
       boolean isMiddleVertexDeleted = false;
-      if (isDeletable(index, midIndex, lastIndex, distanceTol)) {
-        isDeleted[midIndex] = DELETE;
+      if (isDeletable(index, midIndex, lastIndex, this.distanceTol)) {
+        this.isDeleted[midIndex] = DELETE;
         isMiddleVertexDeleted = true;
         isChanged = true;
       }
@@ -170,7 +170,7 @@ public class BufferInputLineSimplifier {
    */
   private int findNextNonDeletedIndex(final int index) {
     int next = index + 1;
-    while (next < inputLine.getVertexCount() && isDeleted[next] == DELETE) {
+    while (next < this.inputLine.getVertexCount() && this.isDeleted[next] == DELETE) {
       next++;
     }
     return next;
@@ -179,15 +179,15 @@ public class BufferInputLineSimplifier {
   private boolean isConcave(final Point p0, final Point p1,
     final Point p2) {
     final int orientation = CGAlgorithmsDD.orientationIndex(p0, p1, p2);
-    final boolean isConcave = (orientation == angleOrientation);
+    final boolean isConcave = orientation == this.angleOrientation;
     return isConcave;
   }
 
   private boolean isDeletable(final int i0, final int i1, final int i2,
     final double distanceTol) {
-    final Point p0 = inputLine.getPoint(i0);
-    final Point p1 = inputLine.getPoint(i1);
-    final Point p2 = inputLine.getPoint(i2);
+    final Point p0 = this.inputLine.getPoint(i0);
+    final Point p1 = this.inputLine.getPoint(i1);
+    final Point p2 = this.inputLine.getPoint(i2);
 
     if (!isConcave(p0, p1, p2)) {
       return false;
@@ -210,9 +210,9 @@ public class BufferInputLineSimplifier {
 
   /**
    * Checks for shallowness over a sample of points in the given section.
-   * This helps prevents the siplification from incrementally  
+   * This helps prevents the siplification from incrementally
    * "skipping" over points which are in fact non-shallow.
-   * 
+   *
    * @param p0 start coordinate of section
    * @param p2 end coordinate of section
    * @param i0 start index of section
@@ -229,7 +229,7 @@ public class BufferInputLineSimplifier {
     }
 
     for (int i = i0; i < i2; i += inc) {
-      if (!isShallow(p0, p2, inputLine.getPoint(i), distanceTol)) {
+      if (!isShallow(p0, p2, this.inputLine.getPoint(i), distanceTol)) {
         return false;
       }
     }
@@ -238,22 +238,22 @@ public class BufferInputLineSimplifier {
 
   /**
    * Simplify the input coordinate list.
-   * If the distance tolerance is positive, 
+   * If the distance tolerance is positive,
    * concavities on the LEFT side of the line are simplified.
    * If the supplied distance tolerance is negative,
    * concavities on the RIGHT side of the line are simplified.
-   * 
+   *
    * @param distanceTol simplification distance tolerance to use
    * @return the simplified coordinate list
    */
   public LineString simplify(final double distanceTol) {
     this.distanceTol = Math.abs(distanceTol);
     if (distanceTol < 0) {
-      angleOrientation = CGAlgorithms.CLOCKWISE;
+      this.angleOrientation = CGAlgorithms.CLOCKWISE;
     }
 
     // rely on fact that boolean array is filled with false value
-    isDeleted = new byte[inputLine.getVertexCount()];
+    this.isDeleted = new byte[this.inputLine.getVertexCount()];
 
     boolean isChanged = false;
     do {

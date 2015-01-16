@@ -46,10 +46,10 @@ import com.revolsys.jts.geom.Puntal;
 import com.revolsys.jts.geom.util.GeometryCombiner;
 
 /**
- * Computes the union of a {@link Puntal} geometry with 
+ * Computes the union of a {@link Puntal} geometry with
  * another arbitrary {@link Geometry}.
  * Does not copy any component geometries.
- * 
+ *
  * @author mbdavis
  *
  */
@@ -67,9 +67,9 @@ public class PointGeometryUnion {
   private final GeometryFactory geomFact;
 
   public PointGeometryUnion(final Puntal pointGeom, final Geometry otherGeom) {
-    this.pointGeom = (Geometry)pointGeom;
+    this.pointGeom = pointGeom;
     this.otherGeom = otherGeom;
-    geomFact = otherGeom.getGeometryFactory();
+    this.geomFact = otherGeom.getGeometryFactory();
   }
 
   public Geometry union() {
@@ -77,10 +77,10 @@ public class PointGeometryUnion {
     // use a set to eliminate duplicates, as required for union
     final Set exteriorCoords = new TreeSet();
 
-    for (int i = 0; i < pointGeom.getGeometryCount(); i++) {
-      final Point point = (Point)pointGeom.getGeometry(i);
+    for (int i = 0; i < this.pointGeom.getGeometryCount(); i++) {
+      final Point point = (Point)this.pointGeom.getGeometry(i);
       final Point coord = point.getPoint();
-      final Location loc = locater.locate(coord, otherGeom);
+      final Location loc = locater.locate(coord, this.otherGeom);
       if (loc == Location.EXTERIOR) {
         exteriorCoords.add(coord);
       }
@@ -88,19 +88,19 @@ public class PointGeometryUnion {
 
     // if no points are in exterior, return the other geom
     if (exteriorCoords.size() == 0) {
-      return otherGeom;
+      return this.otherGeom;
     }
 
     // make a puntal geometry of appropriate size
     Geometry ptComp = null;
     final Point[] coords = CoordinateArrays.toCoordinateArray(exteriorCoords);
     if (coords.length == 1) {
-      ptComp = geomFact.point(coords[0]);
+      ptComp = this.geomFact.point(coords[0]);
     } else {
-      ptComp = geomFact.multiPoint(coords);
+      ptComp = this.geomFact.multiPoint(coords);
     }
 
     // add point component to the other geometry
-    return GeometryCombiner.combine(ptComp, otherGeom);
+    return GeometryCombiner.combine(ptComp, this.otherGeom);
   }
 }

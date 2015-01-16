@@ -53,36 +53,36 @@ import com.revolsys.jts.geom.impl.PointDouble;
  * structure.
  * <p>
  * QuadEdgeTriangles support having an external data attribute attached to them.
- * Alternatively, this class can be subclassed and attributes can 
- * be defined in the subclass.  Subclasses will need to define 
+ * Alternatively, this class can be subclassed and attributes can
+ * be defined in the subclass.  Subclasses will need to define
  * their own <tt>BuilderVisitor</tt> class
  * and <tt>createOn</tt> method.
- * 
+ *
  * @author Martin Davis
  * @version 1.0
  */
 public class QuadEdgeTriangle {
   private static class QuadEdgeTriangleBuilderVisitor implements
-    TriangleVisitor {
+  TriangleVisitor {
     private final List triangles = new ArrayList();
 
     public QuadEdgeTriangleBuilderVisitor() {
     }
 
     public List getTriangles() {
-      return triangles;
+      return this.triangles;
     }
 
     @Override
     public void visit(final QuadEdge[] edges) {
-      triangles.add(new QuadEdgeTriangle(edges));
+      this.triangles.add(new QuadEdgeTriangle(edges));
     }
   }
 
   /**
    * Tests whether the point pt is contained in the triangle defined by 3
    * {@link QuadEdge}es.
-   * 
+   *
    * @param tri
    *          an array containing at least 3 QuadEdges
    * @param pt
@@ -99,7 +99,7 @@ public class QuadEdgeTriangle {
   /**
    * Tests whether the point pt is contained in the triangle defined by 3
    * {@link Vertex}es.
-   * 
+   *
    * @param tri
    *          an array containing at least 3 Vertexes
    * @param pt
@@ -114,12 +114,12 @@ public class QuadEdgeTriangle {
   }
 
   /**
-   * Creates {@link QuadEdgeTriangle}s for all facets of a 
+   * Creates {@link QuadEdgeTriangle}s for all facets of a
    * {@link QuadEdgeSubdivision} representing a triangulation.
    * The <tt>data</tt> attributes of the {@link QuadEdge}s in the subdivision
    * will be set to point to the triangle which contains that edge.
    * This allows tracing the neighbour triangles of any given triangle.
-   * 
+   *
    * @param subdiv
    * 				the QuadEdgeSubdivision to create the triangles on.
    * @return a List of the created QuadEdgeTriangles
@@ -133,7 +133,7 @@ public class QuadEdgeTriangle {
   /**
    * Finds the next index around the triangle. Index may be an edge or vertex
    * index.
-   * 
+   *
    * @param index
    * @return the next index
    */
@@ -169,7 +169,7 @@ public class QuadEdgeTriangle {
 
   /**
    * Creates a new triangle from the given edges.
-   * 
+   *
    * @param edge an array of the edges of the triangle in CCW order
    */
   public QuadEdgeTriangle(final QuadEdge[] edge) {
@@ -193,13 +193,13 @@ public class QuadEdgeTriangle {
   }
 
   public Point getCoordinate(final int i) {
-    return edge[i].orig().getCoordinate();
+    return this.edge[i].orig().getCoordinate();
   }
 
   public Point[] getCoordinates() {
     final Point[] pts = new Point[4];
     for (int i = 0; i < 3; i++) {
-      pts[i] = edge[i].orig().getCoordinate();
+      pts[i] = this.edge[i].orig().getCoordinate();
     }
     pts[3] = new PointDouble(pts[0]);
     return pts;
@@ -207,20 +207,20 @@ public class QuadEdgeTriangle {
 
   /**
    * Gets the external data value for this triangle.
-   * 
+   *
    * @return the data object
    */
   public Object getData() {
-    return data;
+    return this.data;
   }
 
   public QuadEdge getEdge(final int i) {
-    return edge[i];
+    return this.edge[i];
   }
 
   /**
    * Gets the index for the given edge of this triangle
-   * 
+   *
    * @param e
    *          a QuadEdge
    * @return the index of the edge in this triangle
@@ -228,7 +228,7 @@ public class QuadEdgeTriangle {
    */
   public int getEdgeIndex(final QuadEdge e) {
     for (int i = 0; i < 3; i++) {
-      if (edge[i] == e) {
+      if (this.edge[i] == e) {
         return i;
       }
     }
@@ -237,7 +237,7 @@ public class QuadEdgeTriangle {
 
   /**
    * Gets the index for the edge that starts at vertex v.
-   * 
+   *
    * @param v
    *          the vertex to find the edge for
    * @return the index of the edge starting at the vertex
@@ -245,7 +245,7 @@ public class QuadEdgeTriangle {
    */
   public int getEdgeIndex(final Vertex v) {
     for (int i = 0; i < 3; i++) {
-      if (edge[i].orig() == v) {
+      if (this.edge[i].orig() == v) {
         return i;
       }
     }
@@ -253,7 +253,7 @@ public class QuadEdgeTriangle {
   }
 
   public QuadEdge[] getEdges() {
-    return edge;
+    return this.edge;
   }
 
   public Polygon getGeometry(final GeometryFactory fact) {
@@ -269,7 +269,7 @@ public class QuadEdgeTriangle {
   /**
    * Gets the neighbours of this triangle. If there is no neighbour triangle,
    * the array element is <code>null</code>
-   * 
+   *
    * @return an array containing the 3 neighbours of this triangle
    */
   public QuadEdgeTriangle[] getNeighbours() {
@@ -281,9 +281,9 @@ public class QuadEdgeTriangle {
   }
 
   /**
-   * Gets the triangles which are adjacent (include) to a 
+   * Gets the triangles which are adjacent (include) to a
    * given vertex of this triangle.
-   * 
+   *
    * @param vertexIndex the vertex to query
    * @return a list of the vertex-adjacent triangles
    */
@@ -306,12 +306,12 @@ public class QuadEdgeTriangle {
   }
 
   public Vertex getVertex(final int i) {
-    return edge[i].orig();
+    return this.edge[i].orig();
   }
 
   /**
    * Gets the vertices for this triangle.
-   * 
+   *
    * @return a new array containing the triangle vertices
    */
   public Vertex[] getVertices() {
@@ -324,7 +324,7 @@ public class QuadEdgeTriangle {
 
   /**
    * Tests whether this triangle is adjacent to the outside of the subdivision.
-   * 
+   *
    * @return true if the triangle is adjacent to the subdivision exterior
    */
   public boolean isBorder() {
@@ -341,16 +341,16 @@ public class QuadEdgeTriangle {
   }
 
   public boolean isLive() {
-    return edge != null;
+    return this.edge != null;
   }
 
   public void kill() {
-    edge = null;
+    this.edge = null;
   }
 
   /**
    * Sets the external data value for this triangle.
-   * 
+   *
    * @param data an object containing external data
    */
   public void setData(final Object data) {

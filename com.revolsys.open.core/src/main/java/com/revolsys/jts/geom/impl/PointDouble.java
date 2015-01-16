@@ -87,18 +87,18 @@ public class PointDouble extends AbstractPoint implements Serializable {
   @Override
   public PointDouble clone() {
     final PointDouble point = (PointDouble)super.clone();
-    if (coordinates != null) {
-      point.coordinates = coordinates.clone();
+    if (this.coordinates != null) {
+      point.coordinates = this.coordinates.clone();
     }
     return point;
   }
 
   @Override
   public int getAxisCount() {
-    if (coordinates == null) {
+    if (this.coordinates == null) {
       return 0;
     } else {
-      return (byte)coordinates.length;
+      return (byte)this.coordinates.length;
     }
   }
 
@@ -109,7 +109,7 @@ public class PointDouble extends AbstractPoint implements Serializable {
     } else {
       final int axisCount = getAxisCount();
       if (axisIndex >= 0 && axisIndex < axisCount) {
-        return coordinates[axisIndex];
+        return this.coordinates[axisIndex];
       } else {
         return Double.NaN;
       }
@@ -118,8 +118,8 @@ public class PointDouble extends AbstractPoint implements Serializable {
 
   @Override
   public double[] getCoordinates() {
-    if (coordinates == null) {
-      return coordinates;
+    if (this.coordinates == null) {
+      return this.coordinates;
     } else {
       return this.coordinates.clone();
     }
@@ -127,7 +127,7 @@ public class PointDouble extends AbstractPoint implements Serializable {
 
   @Override
   public boolean isEmpty() {
-    return coordinates == null;
+    return this.coordinates == null;
   }
 
   @Override

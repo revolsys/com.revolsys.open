@@ -39,16 +39,16 @@ import java.io.Serializable;
  *
  * A <code>Point</code> is topologically valid if and only if:
  * <ul>
- * <li>the coordinate which defines it (if any) is a valid coordinate 
+ * <li>the coordinate which defines it (if any) is a valid coordinate
  * (i.e does not have an <code>NaN</code> X or Y ordinate)
  * </ul>
- * 
+ *
  *@version 1.7
  */
 public interface Point extends Geometry, Puntal, Serializable {
   /**
    * The value used to indicate a null or missing ordinate value.
-   * In particular, used for the value of ordinates for dimensions 
+   * In particular, used for the value of ordinates for dimensions
    * greater than the defined dimension of a coordinate.
    */
   double NULL_ORDINATE = Double.NaN;
@@ -67,7 +67,7 @@ public interface Point extends Geometry, Puntal, Serializable {
    * point to another point. The angle is relative to the positive x-axis
    * relative to the positive X-axis. The angle will be in the range -PI -> PI
    * where negative values have a clockwise orientation.
-   * 
+   *
    * @return The angle in radians.
    */
   double angle2d(Point other);
@@ -112,7 +112,7 @@ public interface Point extends Geometry, Puntal, Serializable {
   /**
    * Computes the 2-dimensional Euclidean distance to another location.
    * The Z-ordinate is ignored.
-   * 
+   *
    * @param c a point
    * @return the 2-dimensional Euclidean distance between the locations
    */
@@ -120,7 +120,7 @@ public interface Point extends Geometry, Puntal, Serializable {
 
   /**
    * Computes the 3-dimensional Euclidean distance to another location.
-   * 
+   *
    * @param c a coordinate
    * @return the 3-dimensional Euclidean distance between the locations
    */
@@ -142,9 +142,9 @@ public interface Point extends Geometry, Puntal, Serializable {
 
   /**
    * Gets the ordinate value for the given index.
-   * The supported values for the index are 
+   * The supported values for the index are
    * {@link #X}, {@link #Y}, and {@link #Z}.
-   * 
+   *
    * @param axisIndex the ordinate index
    * @return the value of the ordinate
    * @throws IllegalArgumentException if the index is not valid

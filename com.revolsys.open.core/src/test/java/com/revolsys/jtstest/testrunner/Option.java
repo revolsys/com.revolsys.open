@@ -43,24 +43,24 @@ public class Option {
   String[] args; // the actual option args found
 
   public Option(final OptionSpec spec, final String[] _args) {
-    optSpec = spec;
-    args = _args;
+    this.optSpec = spec;
+    this.args = _args;
   }
 
   public String getArg(final int i) {
-    return args[i];
+    return this.args[i];
   }
 
   public int getArgAsInt(final int i) {
-    return Integer.parseInt(args[i]);
+    return Integer.parseInt(this.args[i]);
   }
 
   public String getName() {
-    return optSpec.getName();
+    return this.optSpec.getName();
   }
 
   public int getNumArgs() {
-    return args.length;
+    return this.args.length;
   }
 
 }

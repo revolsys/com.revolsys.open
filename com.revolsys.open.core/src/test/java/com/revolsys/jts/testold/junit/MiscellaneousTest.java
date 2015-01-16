@@ -321,14 +321,14 @@ public class MiscellaneousTest extends TestCase {
 
   public void testMultiLineStringGetBoundary1() throws Exception {
     final Geometry g = this.reader.read("MULTILINESTRING("
-      + "(0 0,  100 0, 50 50)," + "(50 50, 50 -50))");
+        + "(0 0,  100 0, 50 50)," + "(50 50, 50 -50))");
     final Geometry m = this.reader.read("MULTIPOINT(0 0, 50 -50)");
     assertTrue(m.equals(2, g.getBoundary()));
   }
 
   public void testMultiLineStringGetBoundary2() throws Exception {
     final Geometry g = this.reader.read("MULTILINESTRING("
-      + "(0 0,  100 0, 50 50)," + "(50 50, 50 0))");
+        + "(0 0,  100 0, 50 50)," + "(50 50, 50 0))");
     final Geometry m = this.reader.read("MULTIPOINT(0 0, 50 0)");
     assertTrue(m.equals(2, g.getBoundary()));
   }
@@ -356,13 +356,13 @@ public class MiscellaneousTest extends TestCase {
 
   public void testMultiPolygonGetBoundary1() throws Exception {
     final Geometry g = this.reader.read("MULTIPOLYGON("
-      + "(  (0 0, 40 0, 40 40, 0 40, 0 0),"
-      + "   (10 10, 30 10, 30 30, 10 30, 10 10)  ),"
-      + "(  (200 200, 210 200, 210 210, 200 200) )  )");
+        + "(  (0 0, 40 0, 40 40, 0 40, 0 0),"
+        + "   (10 10, 30 10, 30 30, 10 30, 10 10)  ),"
+        + "(  (200 200, 210 200, 210 210, 200 200) )  )");
     final Geometry b = this.reader.read("MULTILINESTRING("
-      + "(0 0, 40 0, 40 40, 0 40, 0 0),"
-      + "(10 10, 30 10, 30 30, 10 30, 10 10),"
-      + "(200 200, 210 200, 210 210, 200 200))");
+        + "(0 0, 40 0, 40 40, 0 40, 0 0),"
+        + "(10 10, 30 10, 30 30, 10 30, 10 10),"
+        + "(200 200, 210 200, 210 210, 200 200))");
     assertTrue(b.equals(2, g.getBoundary()));
   }
 
@@ -373,8 +373,8 @@ public class MiscellaneousTest extends TestCase {
 
   public void testMultiPolygonIsSimple2() throws Exception {
     final Geometry g = this.reader.read("MULTIPOLYGON("
-      + "((10 10, 10 20, 20 20, 20 15, 10 10)), "
-      + "((60 60, 70 70, 80 60, 60 60))  )");
+        + "((10 10, 10 20, 20 20, 20 15, 10 10)), "
+        + "((60 60, 70 70, 80 60, 60 60))  )");
     assertTrue(g.isSimple());
   }
 
@@ -390,11 +390,11 @@ public class MiscellaneousTest extends TestCase {
 
   public void testPolygonGetBoundary() throws Exception {
     final Geometry g = this.reader.read("POLYGON("
-      + "(0 0, 40 0, 40 40, 0 40, 0 0),"
-      + "(10 10, 30 10, 30 30, 10 30, 10 10))");
+        + "(0 0, 40 0, 40 40, 0 40, 0 0),"
+        + "(10 10, 30 10, 30 30, 10 30, 10 10))");
     final Geometry b = this.reader.read("MULTILINESTRING("
-      + "(0 0, 40 0, 40 40, 0 40, 0 0),"
-      + "(10 10, 30 10, 30 30, 10 30, 10 10))");
+        + "(0 0, 40 0, 40 40, 0 40, 0 0),"
+        + "(10 10, 30 10, 30 30, 10 30, 10 10))");
     assertTrue(b.equals(2, g.getBoundary()));
   }
 
@@ -424,7 +424,7 @@ public class MiscellaneousTest extends TestCase {
 
   public void testPolygonGetCoordinates() throws Exception {
     final Polygon p = (Polygon)this.reader.read("POLYGON ( (0 0, 100 0, 100 100, 0 100, 0 0), "
-      + "          (20 20, 20 80, 80 80, 80 20, 20 20)) ");
+        + "          (20 20, 20 80, 80 80, 80 20, 20 20)) ");
     assertEquals(10, p.getVertexCount());
   }
 

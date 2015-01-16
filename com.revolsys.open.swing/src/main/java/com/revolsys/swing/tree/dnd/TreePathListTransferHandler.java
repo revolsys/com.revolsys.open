@@ -15,7 +15,7 @@ import com.revolsys.swing.dnd.transferable.ObjectTransferable;
 @SuppressWarnings("serial")
 public class TreePathListTransferHandler extends TransferHandler {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 

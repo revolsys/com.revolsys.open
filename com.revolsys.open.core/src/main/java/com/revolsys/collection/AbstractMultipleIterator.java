@@ -12,25 +12,25 @@ public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
   @Override
   @PreDestroy
   public void doClose() {
-    if (iterator != null) {
-      FileUtil.closeSilent(iterator);
-      iterator = null;
+    if (this.iterator != null) {
+      FileUtil.closeSilent(this.iterator);
+      this.iterator = null;
     }
   }
 
   @Override
   protected T getNext() throws NoSuchElementException {
     try {
-      if (iterator == null) {
-        iterator = getNextIterator();
+      if (this.iterator == null) {
+        this.iterator = getNextIterator();
       }
-      while (!iterator.hasNext()) {
-        iterator.close();
-        iterator = getNextIterator();
+      while (!this.iterator.hasNext()) {
+        this.iterator.close();
+        this.iterator = getNextIterator();
       }
-      return iterator.next();
+      return this.iterator.next();
     } catch (final NoSuchElementException e) {
-      iterator = null;
+      this.iterator = null;
       throw e;
     }
   }
@@ -38,11 +38,11 @@ public abstract class AbstractMultipleIterator<T> extends AbstractIterator<T> {
   /**
    * Get the next iterator, if no iterators are available throw
    * {@link NoSuchElementException}. Don't not return null.
-   * 
+   *
    * @return
    * @throws NoSuchElementException
    */
   public abstract AbstractIterator<T> getNextIterator()
-    throws NoSuchElementException;
+      throws NoSuchElementException;
 
 }

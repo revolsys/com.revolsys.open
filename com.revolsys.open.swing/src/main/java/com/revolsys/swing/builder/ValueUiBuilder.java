@@ -9,7 +9,7 @@ public interface ValueUiBuilder {
 
   /**
    * Get the component to edit the specified value
-   * 
+   *
    * @param value
    * @return
    * @see CellEditor

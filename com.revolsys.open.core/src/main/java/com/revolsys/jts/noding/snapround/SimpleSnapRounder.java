@@ -43,14 +43,13 @@ import com.revolsys.jts.noding.InteriorIntersectionFinderAdder;
 import com.revolsys.jts.noding.MCIndexNoder;
 import com.revolsys.jts.noding.NodedSegmentString;
 import com.revolsys.jts.noding.Noder;
-import com.revolsys.jts.noding.NodingValidator;
 import com.revolsys.jts.noding.SegmentString;
 import com.revolsys.jts.noding.SinglePassNoder;
 
 /**
  * Uses Snap Rounding to compute a rounded,
  * fully noded arrangement from a set of {@link SegmentString}s.
- * Implements the Snap Rounding technique described in 
+ * Implements the Snap Rounding technique described in
  * the papers by Hobby, Guibas & Marimont, and Goodrich et al.
  * Snap Rounding assumes that all vertices lie on a uniform grid;
  * hence the precision model of the input must be fixed precision,
@@ -74,18 +73,8 @@ public class SimpleSnapRounder implements Noder {
   private Collection nodedSegStrings;
 
   public SimpleSnapRounder(final double scale) {
-    scaleFactor = scale;
-    li = new RobustLineIntersector(scaleFactor);
-  }
-
-  private void checkCorrectness(final Collection inputSegmentStrings) {
-    final Collection resultSegStrings = NodedSegmentString.getNodedSubstrings(inputSegmentStrings);
-    final NodingValidator nv = new NodingValidator(resultSegStrings);
-    try {
-      nv.checkValid();
-    } catch (final Exception ex) {
-      ex.printStackTrace();
-    }
+    this.scaleFactor = scale;
+    this.li = new RobustLineIntersector(this.scaleFactor);
   }
 
   /**
@@ -95,7 +84,7 @@ public class SimpleSnapRounder implements Noder {
   public void computeNodes(
     final Collection<NodedSegmentString> inputSegmentStrings) {
     this.nodedSegStrings = inputSegmentStrings;
-    snapRound(inputSegmentStrings, li);
+    snapRound(inputSegmentStrings, this.li);
 
     // testing purposes only - remove in final version
     // checkCorrectness(inputSegmentStrings);
@@ -116,7 +105,7 @@ public class SimpleSnapRounder implements Noder {
   private void computeSnaps(final NodedSegmentString ss,
     final Collection<Point> snapPts) {
     for (final Point snapPt : snapPts) {
-      final HotPixel hotPixel = new HotPixel(snapPt, scaleFactor, li);
+      final HotPixel hotPixel = new HotPixel(snapPt, this.scaleFactor, this.li);
       for (int i = 0; i < ss.size() - 1; i++) {
         hotPixel.addSnappedNode(ss, i);
       }
@@ -147,7 +136,7 @@ public class SimpleSnapRounder implements Noder {
     final NodedSegmentString segment2) {
     for (int i0 = 0; i0 < segment1.size() - 1; i0++) {
       final Point point1 = segment1.getCoordinate(i0);
-      final HotPixel hotPixel = new HotPixel(point1, scaleFactor, li);
+      final HotPixel hotPixel = new HotPixel(point1, this.scaleFactor, this.li);
       for (int i1 = 0; i1 < segment2.size() - 1; i1++) {
         // don't snap a vertex to itself
         if (segment1 == segment2) {
@@ -186,11 +175,11 @@ public class SimpleSnapRounder implements Noder {
 
   /**
    * @return a Collection of NodedSegmentStrings representing the substrings
-   * 
+   *
    */
   @Override
   public Collection<NodedSegmentString> getNodedSubstrings() {
-    return NodedSegmentString.getNodedSubstrings(nodedSegStrings);
+    return NodedSegmentString.getNodedSubstrings(this.nodedSegStrings);
   }
 
   private void snapRound(final Collection segStrings, final LineIntersector li) {

@@ -18,8 +18,8 @@ public class PathRedirect extends IafAction {
   @Override
   public void init(final ActionConfig config) throws ActionInitException {
     super.init(config);
-    path = (String)config.getParameter("path");
-    basePath = getConfig().getConfig().getBasePath();
+    this.path = (String)config.getParameter("path");
+    this.basePath = getConfig().getConfig().getBasePath();
 
   }
 
@@ -27,7 +27,7 @@ public class PathRedirect extends IafAction {
   public void process(
     final HttpServletRequest request,
     final HttpServletResponse response) throws ActionException, IOException {
-    response.sendRedirect(basePath + path);
+    response.sendRedirect(this.basePath + this.path);
   }
 
 }

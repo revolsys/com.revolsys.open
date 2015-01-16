@@ -9,18 +9,23 @@ import com.revolsys.jts.util.Stopwatch;
 /**
  * Stress-tests buffering by repeatedly buffering a geometry
  * using alternate positive and negative distances.
- * 
+ *
  * In older versions of JTS this used to quickly cause failure due to robustness
  * issues (bad noding causing topology failures).
  * However by ver 1.13 (at least) this test should pass perfectly.
  * This is due to the many heuristics introduced to improve buffer
  * robustnesss.
- * 
- * 
+ *
+ *
  * @author Martin Davis
  *
  */
 public class PolygonBufferStressTest {
+
+  public static void main(final String[] args) {
+    final PolygonBufferStressTest test = new PolygonBufferStressTest();
+    test.test();
+  }
 
   static final int MAX_ITER = 50;
 
@@ -28,11 +33,6 @@ public class PolygonBufferStressTest {
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
-
-  public static void main(final String[] args) {
-    final PolygonBufferStressTest test = new PolygonBufferStressTest();
-    test.test();
-  }
 
   Stopwatch sw = new Stopwatch();
 

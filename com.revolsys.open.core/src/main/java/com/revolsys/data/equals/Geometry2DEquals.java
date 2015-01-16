@@ -30,7 +30,7 @@ public class Geometry2DEquals implements Equals<Geometry> {
       if (!geometryPart1.equals(geometryPart2)) {
         return false;
       }
-      if (!equalsRegistry.equals(geometryPart1.getUserData(),
+      if (!this.equalsRegistry.equals(geometryPart1.getUserData(),
         geometryPart2.getUserData(), exclude)) {
         return false;
       }
@@ -38,7 +38,7 @@ public class Geometry2DEquals implements Equals<Geometry> {
     if (geometry1 instanceof GeometryCollection) {
       final Object userData1 = geometry1.getUserData();
       final Object userData2 = geometry2.getUserData();
-      return equalsRegistry.equals(userData1, userData2, exclude);
+      return this.equalsRegistry.equals(userData1, userData2, exclude);
     } else {
       return true;
     }

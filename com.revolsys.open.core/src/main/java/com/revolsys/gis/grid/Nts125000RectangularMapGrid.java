@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class Nts125000RectangularMapGrid extends Nts250000RectangularMapGrid {
   private static final Pattern NAME_PATTERN = Pattern.compile("^"
-    + NtsConstants.REGEX_125000 + ".*");
+      + NtsConstants.REGEX_125000 + ".*");
 
   public Nts125000RectangularMapGrid() {
     super(NtsConstants.WIDTH_125000, NtsConstants.HEIGHT_125000);

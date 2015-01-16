@@ -29,11 +29,17 @@ public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
 
   @Override
   public String getName() {
-    if (name == null) {
+    if (this.name == null) {
       return getClass().getName();
     } else {
-      return name;
+      return this.name;
     }
+  }
+
+  @Override
+  public Polygon getPolygon(final String mapTileName,
+    final CoordinateSystem coordinateSystem) {
+    return getPolygon(mapTileName, coordinateSystem.getGeometryFactory());
   }
 
   @Override
@@ -53,12 +59,6 @@ public abstract class AbstractRectangularMapGrid implements RectangularMapGrid {
     final BoundingBox boundingBox = mapTile.getBoundingBox();
     final Polygon polygon = boundingBox.toPolygon(geometryFactory, numX, numY);
     return polygon;
-  }
-
-  @Override
-  public Polygon getPolygon(final String mapTileName,
-    final CoordinateSystem coordinateSystem) {
-    return getPolygon(mapTileName, coordinateSystem.getGeometryFactory());
   }
 
   public void setName(final String name) {

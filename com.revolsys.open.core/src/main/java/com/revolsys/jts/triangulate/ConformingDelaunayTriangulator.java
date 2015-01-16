@@ -66,29 +66,27 @@ import com.revolsys.jts.triangulate.quadedge.Vertex;
  * edges (up to tolerance).
  * <p>
  * A Conforming Delaunay triangulation is distinct from a Constrained Delaunay triangulation.
- * A Constrained Delaunay triangulation is not necessarily fully Delaunay, 
+ * A Constrained Delaunay triangulation is not necessarily fully Delaunay,
  * and it contains the constraint segments exactly as edges of the triangulation.
  * <p>
  * A typical usage pattern for the triangulator is:
  * <pre>
  * 	 ConformingDelaunayTriangulator cdt = new ConformingDelaunayTriangulator(sites, tolerance);
- * 
- *   // optional	
+ *
+ *   // optional
  *   cdt.setSplitPointFinder(splitPointFinder);
  *   cdt.setVertexFactory(vertexFactory);
- *   
+ *
  *	 cdt.setConstraints(segments, new ArrayList(vertexMap.values()));
  *	 cdt.formInitialDelaunay();
  *	 cdt.enforceConstraints();
  *	 subdiv = cdt.getSubdivision();
  * </pre>
- * 
+ *
  * @author David Skea
  * @author Martin Davis
  */
 public class ConformingDelaunayTriangulator {
-  private final static int MAX_SPLIT_ITER = 99;
-
   private static BoundingBox computeVertexEnvelope(final Collection vertices) {
     BoundingBox env = new BoundingBoxDoubleGf();
     for (final Iterator i = vertices.iterator(); i.hasNext();) {
@@ -97,6 +95,8 @@ public class ConformingDelaunayTriangulator {
     }
     return env;
   }
+
+  private final static int MAX_SPLIT_ITER = 99;
 
   private final List initialVertices; // List<Vertex>
 
@@ -130,7 +130,7 @@ public class ConformingDelaunayTriangulator {
    * Creates a Conforming Delaunay Triangulation based on the given
    * unconstrained initial vertices. The initial vertex set should not contain
    * any vertices which appear in the constraint set.
-   * 
+   *
    * @param initialVertices
    *          a collection of {@link ConstraintVertex}
    * @param tolerance
@@ -140,18 +140,18 @@ public class ConformingDelaunayTriangulator {
     final double tolerance) {
     this.initialVertices = new ArrayList(initialVertices);
     this.tolerance = tolerance;
-    kdt = new KdTree(tolerance);
+    this.kdt = new KdTree(tolerance);
   }
 
   private void addConstraintVertices() {
     computeConvexHull();
     // insert constraint vertices as sites
-    insertSites(segVertices);
+    insertSites(this.segVertices);
   }
 
   private void computeBoundingBox() {
-    final BoundingBox vertexEnv = computeVertexEnvelope(initialVertices);
-    final BoundingBox segEnv = computeVertexEnvelope(segVertices);
+    final BoundingBox vertexEnv = computeVertexEnvelope(this.initialVertices);
+    final BoundingBox segEnv = computeVertexEnvelope(this.segVertices);
 
     final BoundingBox allPointsEnv = vertexEnv.expandToInclude(segEnv);
 
@@ -160,20 +160,20 @@ public class ConformingDelaunayTriangulator {
 
     final double delta = Math.max(deltaX, deltaY);
 
-    computeAreaEnv = allPointsEnv.expand(delta);
+    this.computeAreaEnv = allPointsEnv.expand(delta);
   }
 
   private void computeConvexHull() {
     final GeometryFactory fact = GeometryFactory.floating3();
     final Point[] coords = getPointArray();
     final ConvexHull hull = new ConvexHull(coords, fact);
-    convexHull = hull.getConvexHull();
+    this.convexHull = hull.getConvexHull();
   }
 
   private ConstraintVertex createVertex(final Point p) {
     ConstraintVertex v = null;
-    if (vertexFactory != null) {
-      v = vertexFactory.createVertex(p, null);
+    if (this.vertexFactory != null) {
+      v = this.vertexFactory.createVertex(p, null);
     } else {
       v = new ConstraintVertex(p);
     }
@@ -182,15 +182,15 @@ public class ConformingDelaunayTriangulator {
 
   /**
    * Creates a vertex on a constraint segment
-   * 
+   *
    * @param p the location of the vertex to create
    * @param seg the constraint segment it lies on
    * @return the new constraint vertex
    */
   private ConstraintVertex createVertex(final Point p, final Segment seg) {
     ConstraintVertex v = null;
-    if (vertexFactory != null) {
-      v = vertexFactory.createVertex(p, seg);
+    if (this.vertexFactory != null) {
+      v = this.vertexFactory.createVertex(p, seg);
     } else {
       v = new ConstraintVertex(p);
     }
@@ -200,7 +200,7 @@ public class ConformingDelaunayTriangulator {
 
   /**
    * Enforces the supplied constraints into the triangulation.
-   * 
+   *
    * @throws ConstraintEnforcementException
    *           if the constraints cannot be enforced
    */
@@ -211,14 +211,14 @@ public class ConformingDelaunayTriangulator {
     int count = 0;
     int splits = 0;
     do {
-      splits = enforceGabriel(segments);
+      splits = enforceGabriel(this.segments);
 
       count++;
     } while (splits > 0 && count < MAX_SPLIT_ITER);
     if (count == MAX_SPLIT_ITER) {
       throw new ConstraintEnforcementException(
         "Too many splitting iterations while enforcing constraints.  Last split point was at: ",
-        splitPt);
+        this.splitPt);
     }
   }
 
@@ -244,8 +244,8 @@ public class ConformingDelaunayTriangulator {
       }
 
       // compute split point
-      splitPt = splitFinder.findSplitPoint(seg, encroachPt);
-      final ConstraintVertex splitVertex = createVertex(splitPt, seg);
+      this.splitPt = this.splitFinder.findSplitPoint(seg, encroachPt);
+      final ConstraintVertex splitVertex = createVertex(this.splitPt, seg);
 
       // DebugFeature.addLineSegment(DEBUG_SEG_SPLIT, encroachPt, splitPt, "");
       // Debug.println(WKTWriter.toLineString(encroachPt, splitPt));
@@ -266,7 +266,7 @@ public class ConformingDelaunayTriangulator {
        * </ul>
        */
       final ConstraintVertex insertedVertex = insertSite(splitVertex);
-      if (!insertedVertex.getCoordinate().equals(2,splitPt)) {
+      if (!insertedVertex.getCoordinate().equals(2,this.splitPt)) {
         // throw new ConstraintEnforcementException("Split point snapped to
         // existing point
         // (tolerance too large or constraint interior narrow angle?)",
@@ -299,7 +299,7 @@ public class ConformingDelaunayTriangulator {
    * exists then the segment is said to have the Gabriel condition. Uses the
    * heuristic of finding the non-Gabriel point closest to the midpoint of the
    * segment.
-   * 
+   *
    * @param p
    *          start of the line segment
    * @param q
@@ -318,7 +318,7 @@ public class ConformingDelaunayTriangulator {
     // compute envelope of circumcircle
     final BoundingBox env = new BoundingBoxDoubleGf(midPt).expand(segRadius);
     // Find all points in envelope
-    final List result = kdt.query(env);
+    final List result = this.kdt.query(env);
 
     // For each point found, test if it falls strictly in the circle
     // find closest point
@@ -350,32 +350,32 @@ public class ConformingDelaunayTriangulator {
    */
   public void formInitialDelaunay() {
     computeBoundingBox();
-    subdiv = new QuadEdgeSubdivision(computeAreaEnv, tolerance);
-    subdiv.setLocator(new LastFoundQuadEdgeLocator(subdiv));
-    incDel = new IncrementalDelaunayTriangulator(subdiv);
-    insertSites(initialVertices);
+    this.subdiv = new QuadEdgeSubdivision(this.computeAreaEnv, this.tolerance);
+    this.subdiv.setLocator(new LastFoundQuadEdgeLocator(this.subdiv));
+    this.incDel = new IncrementalDelaunayTriangulator(this.subdiv);
+    insertSites(this.initialVertices);
   }
 
   // ==================================================================
 
   /**
    * Gets the {@link Segment}s which represent the constraints.
-   * 
+   *
    * @return a collection of Segments
    */
   public Collection getConstraintSegments() {
-    return segments;
+    return this.segments;
   }
 
   /**
    * Gets the convex hull of all the sites in the triangulation,
    * including constraint vertices.
    * Only valid after the constraints have been enforced.
-   * 
+   *
    * @return the convex hull of the sites
    */
   public Geometry getConvexHull() {
-    return convexHull;
+    return this.convexHull;
   }
 
   // /**
@@ -412,33 +412,33 @@ public class ConformingDelaunayTriangulator {
   // }
   // }
 
-  /** 
+  /**
    * Gets the sites (vertices) used to initialize the triangulation.
-   *  
+   *
    * @return a List of Vertex
    */
   public List getInitialVertices() {
-    return initialVertices;
+    return this.initialVertices;
   }
 
   /**
    * Gets the {@link KdTree} which contains the vertices of the triangulation.
-   * 
+   *
    * @return a KdTree
    */
   public KdTree getKDT() {
-    return kdt;
+    return this.kdt;
   }
 
   private Point[] getPointArray() {
-    final Point[] pts = new Point[initialVertices.size()
-      + segVertices.size()];
+    final Point[] pts = new Point[this.initialVertices.size()
+                                  + this.segVertices.size()];
     int index = 0;
-    for (final Iterator i = initialVertices.iterator(); i.hasNext();) {
+    for (final Iterator i = this.initialVertices.iterator(); i.hasNext();) {
       final Vertex v = (Vertex)i.next();
       pts[index++] = v.getCoordinate();
     }
-    for (final Iterator i2 = segVertices.iterator(); i2.hasNext();) {
+    for (final Iterator i2 = this.segVertices.iterator(); i2.hasNext();) {
       final Vertex v = (Vertex)i2.next();
       pts[index++] = v.getCoordinate();
     }
@@ -447,37 +447,37 @@ public class ConformingDelaunayTriangulator {
 
   /**
    * Gets the {@link QuadEdgeSubdivision} which represents the triangulation.
-   * 
+   *
    * @return a subdivision
    */
   public QuadEdgeSubdivision getSubdivision() {
-    return subdiv;
+    return this.subdiv;
   }
 
   /**
    * Gets the tolerance value used to construct the triangulation.
-   * 
+   *
    * @return a tolerance value
    */
   public double getTolerance() {
-    return tolerance;
+    return this.tolerance;
   }
 
   /**
    * Gets the <tt>ConstraintVertexFactory</tt> used to create new constraint vertices at split points.
-   * 
+   *
    * @return a new constraint vertex
    */
   public ConstraintVertexFactory getVertexFactory() {
-    return vertexFactory;
+    return this.vertexFactory;
   }
 
   // ==================================================================
 
   private ConstraintVertex insertSite(final ConstraintVertex v) {
-    final KdNode kdnode = kdt.insert(v.getCoordinate(), v);
+    final KdNode kdnode = this.kdt.insert(v.getCoordinate(), v);
     if (!kdnode.isRepeated()) {
-      incDel.insertSite(v);
+      this.incDel.insertSite(v);
     } else {
       final ConstraintVertex snappedV = (ConstraintVertex)kdnode.getData();
       snappedV.merge(v);
@@ -497,7 +497,7 @@ public class ConformingDelaunayTriangulator {
    * This can be used to further refine the triangulation if required
    * (e.g. to approximate the medial axis of the constraints,
    * or to improve the grading of the triangulation).
-   * 
+   *
    * @param p the location of the site to insert
    */
   public void insertSite(final Point p) {
@@ -506,7 +506,7 @@ public class ConformingDelaunayTriangulator {
 
   /**
    * Inserts all sites in a collection
-   * 
+   *
    * @param vertices a collection of ConstraintVertex
    */
   private void insertSites(final Collection vertices) {
@@ -519,12 +519,12 @@ public class ConformingDelaunayTriangulator {
   /**
    * Sets the constraints to be conformed to by the computed triangulation.
    * The constraints must not contain duplicate segments (up to orientation).
-   * The unique set of vertices (as {@link ConstraintVertex}es) 
+   * The unique set of vertices (as {@link ConstraintVertex}es)
    * forming the constraints must also be supplied.
    * Supplying it explicitly allows the ConstraintVertexes to be initialized
    * appropriately(e.g. with external data), and avoids re-computing the unique set
    * if it is already available.
-   * 
+   *
    * @param segments a list of the constraint {@link Segment}s
    * @param segVertices the set of unique {@link ConstraintVertex}es referenced by the segments
    */
@@ -544,8 +544,8 @@ public class ConformingDelaunayTriangulator {
    * Sets the {@link ConstraintSplitPointFinder} to be
    * used during constraint enforcement.
    * Different splitting strategies may be appropriate
-   * for special situations. 
-   * 
+   * for special situations.
+   *
    * @param splitFinder the ConstraintSplitPointFinder to be used
    */
   public void setSplitPointFinder(final ConstraintSplitPointFinder splitFinder) {
@@ -558,7 +558,7 @@ public class ConformingDelaunayTriangulator {
   /**
    * Sets a custom {@link ConstraintVertexFactory} to be used
    * to allow vertices carrying extra information to be created.
-   * 
+   *
    * @param vertexFactory the ConstraintVertexFactory to be used
    */
   public void setVertexFactory(final ConstraintVertexFactory vertexFactory) {

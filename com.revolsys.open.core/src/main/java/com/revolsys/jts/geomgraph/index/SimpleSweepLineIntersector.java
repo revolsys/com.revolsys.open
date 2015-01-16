@@ -65,8 +65,8 @@ public class SimpleSweepLineIntersector extends EdgeSetIntersector {
       final SweepLineSegment ss = new SweepLineSegment(edge, i);
       final SweepLineEvent insertEvent = new SweepLineEvent(edgeSet,
         ss.getMinX(), null);
-      events.add(insertEvent);
-      events.add(new SweepLineEvent(ss.getMaxX(), insertEvent));
+      this.events.add(insertEvent);
+      this.events.add(new SweepLineEvent(ss.getMaxX(), insertEvent));
     }
   }
 
@@ -105,11 +105,11 @@ public class SimpleSweepLineIntersector extends EdgeSetIntersector {
   }
 
   private void computeIntersections(final SegmentIntersector si) {
-    nOverlaps = 0;
+    this.nOverlaps = 0;
     prepareEvents();
 
-    for (int i = 0; i < events.size(); i++) {
-      final SweepLineEvent ev = (SweepLineEvent)events.get(i);
+    for (int i = 0; i < this.events.size(); i++) {
+      final SweepLineEvent ev = (SweepLineEvent)this.events.get(i);
       if (ev.isInsert()) {
         processOverlaps(i, ev.getDeleteEventIndex(), ev, si);
       }
@@ -122,10 +122,10 @@ public class SimpleSweepLineIntersector extends EdgeSetIntersector {
    * compared to a given INSERT event object.
    */
   private void prepareEvents() {
-    Collections.sort(events);
+    Collections.sort(this.events);
     // set DELETE event indexes
-    for (int i = 0; i < events.size(); i++) {
-      final SweepLineEvent ev = (SweepLineEvent)events.get(i);
+    for (int i = 0; i < this.events.size(); i++) {
+      final SweepLineEvent ev = (SweepLineEvent)this.events.get(i);
       if (ev.isDelete()) {
         ev.getInsertEvent().setDeleteEventIndex(i);
       }
@@ -141,13 +141,13 @@ public class SimpleSweepLineIntersector extends EdgeSetIntersector {
      * Last index can be skipped, because it must be a Delete event.
      */
     for (int i = start; i < end; i++) {
-      final SweepLineEvent ev1 = (SweepLineEvent)events.get(i);
+      final SweepLineEvent ev1 = (SweepLineEvent)this.events.get(i);
       if (ev1.isInsert()) {
         final SweepLineSegment ss1 = (SweepLineSegment)ev1.getObject();
         // don't compare edges in same group, if labels are present
         if (!ev0.isSameLabel(ev1)) {
           ss0.computeIntersections(ss1, si);
-          nOverlaps++;
+          this.nOverlaps++;
         }
       }
     }

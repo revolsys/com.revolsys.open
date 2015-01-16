@@ -7,7 +7,7 @@ public class DEDataset extends DataElement {
 
   private String datasetType;
 
-  private int dsid = DSID.incrementAndGet();
+  private int dsid = this.DSID.incrementAndGet();
 
   private boolean versioned;
 
@@ -16,23 +16,23 @@ public class DEDataset extends DataElement {
   private String configurationKeyword = "";
 
   public String getConfigurationKeyword() {
-    return configurationKeyword;
+    return this.configurationKeyword;
   }
 
   public String getDatasetType() {
-    return datasetType;
+    return this.datasetType;
   }
 
   public int getDSID() {
-    return dsid;
+    return this.dsid;
   }
 
   public boolean isCanVersion() {
-    return canVersion;
+    return this.canVersion;
   }
 
   public boolean isVersioned() {
-    return versioned;
+    return this.versioned;
   }
 
   public void setCanVersion(final boolean canVersion) {

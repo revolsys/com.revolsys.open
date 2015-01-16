@@ -30,29 +30,29 @@ public class DaoMethodSelectField extends SelectField {
     field.setRequired(isRequired());
     field.setReadOnly(isReadOnly());
     field.setNullValueLabel(getNullValueLabel());
-    field.setDataAccessObject(dataAccessObject);
-    field.setMethodName(methodName);
-    field.setMethodArguments(methodArguments);
+    field.setDataAccessObject(this.dataAccessObject);
+    field.setMethodName(this.methodName);
+    field.setMethodArguments(this.methodArguments);
     return field;
   }
 
   public DataAccessObject<?> getDataAccessObject() {
-    return dataAccessObject;
+    return this.dataAccessObject;
   }
 
   public List<Object> getMethodArguments() {
-    return methodArguments;
+    return this.methodArguments;
   }
 
   public String getMethodName() {
-    return methodName;
+    return this.methodName;
   }
 
   @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     try {
       final List<Object> options = (List<Object>)MethodUtils.invokeMethod(
-        dataAccessObject, methodName, methodArguments.toArray());
+        this.dataAccessObject, this.methodName, this.methodArguments.toArray());
       for (final Object option : options) {
         addOption(option, option.toString());
       }

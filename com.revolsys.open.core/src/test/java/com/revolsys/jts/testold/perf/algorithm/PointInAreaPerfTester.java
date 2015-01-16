@@ -12,7 +12,7 @@ import com.revolsys.jts.util.Stopwatch;
 /**
  * Creates a perturbed, buffered grid and tests a set
  * of points against using two PointInArea classes.
- * 
+ *
  * @author mbdavis
  *
  */
@@ -41,7 +41,7 @@ public class PointInAreaPerfTester {
   }
 
   /**
-   * 
+   *
    * @return true if all point locations were computed correctly
    */
   public boolean run() {

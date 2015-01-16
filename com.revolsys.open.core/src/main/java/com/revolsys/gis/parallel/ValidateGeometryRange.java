@@ -12,7 +12,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class ValidateGeometryRange extends
-  BaseInOutProcess<Record, Record> {
+BaseInOutProcess<Record, Record> {
   private static final Logger LOG = Logger.getLogger(ValidateGeometryRange.class);
 
   private double maxX = Double.MAX_VALUE;
@@ -31,46 +31,46 @@ public class ValidateGeometryRange extends
    * @return the maxX
    */
   public double getMaxX() {
-    return maxX;
+    return this.maxX;
   }
 
   /**
    * @return the maxY
    */
   public double getMaxY() {
-    return maxY;
+    return this.maxY;
   }
 
   /**
    * @return the maxZ
    */
   public double getMaxZ() {
-    return maxZ;
+    return this.maxZ;
   }
 
   /**
    * @return the minX
    */
   public double getMinX() {
-    return minX;
+    return this.minX;
   }
 
   /**
    * @return the minY
    */
   public double getMinY() {
-    return minY;
+    return this.minY;
   }
 
   /**
    * @return the minZ
    */
   public double getMinZ() {
-    return minZ;
+    return this.minZ;
   }
 
   private boolean isValid(final double min, final double max, final double value) {
-    return (value >= min && value <= max);
+    return value >= min && value <= max;
   }
 
   private boolean isValid(final String type, final Geometry geometry) {
@@ -115,9 +115,9 @@ public class ValidateGeometryRange extends
   }
 
   private boolean isValid(final String type, final Point coordinate) {
-    if (!isValid(minX, maxY, coordinate.getX())
-      || !isValid(minY, maxY, coordinate.getY())
-      || !isValid(minZ, maxZ, coordinate.getZ())) {
+    if (!isValid(this.minX, this.maxY, coordinate.getX())
+        || !isValid(this.minY, this.maxY, coordinate.getY())
+        || !isValid(this.minZ, this.maxZ, coordinate.getZ())) {
       LOG.warn(type + " has invalid coordinate at " + coordinate);
       return false;
     } else {

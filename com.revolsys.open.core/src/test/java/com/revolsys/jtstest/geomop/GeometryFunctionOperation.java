@@ -43,7 +43,7 @@ import com.revolsys.jtstest.testrunner.JTSTestReflectionException;
 import com.revolsys.jtstest.testrunner.Result;
 
 /**
- * Invokes a function from registry 
+ * Invokes a function from registry
  * or a Geometry method determined by a named operation with a list of arguments,
  * the first of which is a {@link Geometry}.
  * This class allows overriding Geometry methods
@@ -70,16 +70,16 @@ public class GeometryFunctionOperation implements GeometryOperation {
 
   @Override
   public Class getReturnType(final String opName) {
-    final GeometryFunction func = registry.find(opName);
+    final GeometryFunction func = this.registry.find(opName);
     if (func == null) {
-      return defaultOp.getReturnType(opName);
+      return this.defaultOp.getReturnType(opName);
     }
     return func.getReturnType();
   }
 
   private Result invoke(final GeometryFunction func, final Geometry geometry,
     final Object[] args) throws Exception {
-    final Object[] actualArgs = argConverter.convert(func.getParameterTypes(),
+    final Object[] actualArgs = this.argConverter.convert(func.getParameterTypes(),
       args);
 
     if (func.getReturnType() == boolean.class) {
@@ -95,15 +95,15 @@ public class GeometryFunctionOperation implements GeometryOperation {
       return new IntegerResult((Integer)func.invoke(geometry, actualArgs));
     }
     throw new JTSTestReflectionException("Unsupported result type: "
-      + func.getReturnType());
+        + func.getReturnType());
   }
 
   @Override
   public Result invoke(final String opName, final Geometry geometry,
     final Object[] args) throws Exception {
-    final GeometryFunction func = registry.find(opName, args.length);
+    final GeometryFunction func = this.registry.find(opName, args.length);
     if (func == null) {
-      return defaultOp.invoke(opName, geometry, args);
+      return this.defaultOp.invoke(opName, geometry, args);
     }
 
     return invoke(func, geometry, args);

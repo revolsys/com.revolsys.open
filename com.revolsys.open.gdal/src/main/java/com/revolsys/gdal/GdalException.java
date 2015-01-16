@@ -3,6 +3,11 @@ package com.revolsys.gdal;
 import org.gdal.gdal.gdal;
 
 public class GdalException extends RuntimeException {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final int errorType = gdal.GetLastErrorType();
 
   private final int errorNumber = gdal.GetLastErrorNo();
@@ -13,10 +18,10 @@ public class GdalException extends RuntimeException {
   }
 
   public int getErrorNumber() {
-    return errorNumber;
+    return this.errorNumber;
   }
 
   public int getErrorType() {
-    return errorType;
+    return this.errorType;
   }
 }

@@ -20,15 +20,15 @@ public class IsPointOnLineEdgeFilter<T> implements Filter<Node<T>> {
     this.edge = edge;
     this.maxDistance = maxDistance;
     this.envelope = edge.getBoundingBox();
-    envelope = envelope.expand(maxDistance);
+    this.envelope = this.envelope.expand(maxDistance);
   }
 
   @Override
   public boolean accept(final Node<T> node) {
-    final LineString line = edge.getLine();
-    if (!edge.hasNode(node)) {
-      if (envelope.intersects(new BoundingBoxDoubleGf(node))) {
-        if (LineStringUtil.isPointOnLine(line, node, maxDistance)) {
+    final LineString line = this.edge.getLine();
+    if (!this.edge.hasNode(node)) {
+      if (this.envelope.intersects(new BoundingBoxDoubleGf(node))) {
+        if (LineStringUtil.isPointOnLine(line, node, this.maxDistance)) {
           return true;
         }
       }
@@ -37,7 +37,7 @@ public class IsPointOnLineEdgeFilter<T> implements Filter<Node<T>> {
   }
 
   public com.revolsys.jts.geom.BoundingBox getEnvelope() {
-    return envelope;
+    return this.envelope;
   }
 
 }

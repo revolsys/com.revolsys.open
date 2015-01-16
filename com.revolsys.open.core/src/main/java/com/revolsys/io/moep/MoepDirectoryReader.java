@@ -17,7 +17,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.util.DateUtil;
 
 public class MoepDirectoryReader extends RecordDirectoryReader implements
-  RecordDefinitionFactory {
+RecordDefinitionFactory {
 
   private Date integrationDate;
 
@@ -38,7 +38,7 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements
 
   /**
    * Create a new {@link MoepBinaryReader} to read the file.
-   * 
+   *
    * @param file The file to read.
    * @return The reader for the file.
    * @throws IOException If an I/O error occurs.
@@ -49,7 +49,7 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements
   }
 
   public Date getIntegrationDate() {
-    return integrationDate;
+    return this.integrationDate;
   }
 
   @Override
@@ -62,15 +62,15 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements
   }
 
   public String getRevisionKey() {
-    return revisionKey;
+    return this.revisionKey;
   }
 
   public String getSpecificationsRelease() {
-    return specificationsRelease;
+    return this.specificationsRelease;
   }
 
   public Date getSubmissionDate() {
-    return submissionDate;
+    return this.submissionDate;
   }
 
   @Override
@@ -87,12 +87,12 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements
         final String[] versionFields = text.split(" ");
 
         final String dateString = versionFields[2];
-        submissionDate = new Date(DateUtil.getDate("yyyyMMdd", dateString)
+        this.submissionDate = new Date(DateUtil.getDate("yyyyMMdd", dateString)
           .getTime());
-        revisionKey = versionFields[3];
-        integrationDate = new Date(DateUtil.getDate("yyyyMMdd", versionFields[4])
+        this.revisionKey = versionFields[3];
+        this.integrationDate = new Date(DateUtil.getDate("yyyyMMdd", versionFields[4])
           .getTime());
-        specificationsRelease = versionFields[5];
+        this.specificationsRelease = versionFields[5];
       }
     }
 

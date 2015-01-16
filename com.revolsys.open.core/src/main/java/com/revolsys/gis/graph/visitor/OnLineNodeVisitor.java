@@ -24,7 +24,7 @@ public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
       env = env.expand(maxDistance);
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
       final OnLineNodeVisitor<T> visitor = new OnLineNodeVisitor<T>(line,
-        results);
+          results);
       index.visit(env, visitor);
       return results.getList();
     }
@@ -43,8 +43,8 @@ public class OnLineNodeVisitor<T> implements Visitor<Node<T>> {
   @Override
   public boolean visit(final Node<T> node) {
     final Point point = node;
-    if (LineStringUtil.isPointOnLine(line, point)) {
-      matchVisitor.visit(node);
+    if (LineStringUtil.isPointOnLine(this.line, point)) {
+      this.matchVisitor.visit(node);
     }
     return true;
   }

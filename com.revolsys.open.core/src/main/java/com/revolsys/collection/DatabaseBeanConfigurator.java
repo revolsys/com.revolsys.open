@@ -65,7 +65,7 @@ public class DatabaseBeanConfigurator extends BeanConfigurrer {
     try {
       final boolean hasTypeColumnName = Property.hasValue(this.typeColumnName);
       String sql = "SELECT " + this.propertyColumnName + ", "
-        + this.valueColumnName;
+          + this.valueColumnName;
       if (hasTypeColumnName) {
         sql += ", " + this.typeColumnName;
       }

@@ -8,7 +8,7 @@ import com.revolsys.gis.graph.Graph;
 import com.revolsys.gis.graph.Node;
 
 public class SplitEdgesCloseToNodeVisitor<T> extends
-  AbstractNodeListenerVisitor<T> {
+AbstractNodeListenerVisitor<T> {
   public static final String EDGE_CLOSE_TO_NODE = "Edge close to node";
 
   private final Graph<T> graph;
@@ -35,15 +35,15 @@ public class SplitEdgesCloseToNodeVisitor<T> extends
   }
 
   public double getMaxDistance() {
-    return maxDistance;
+    return this.maxDistance;
   }
 
   public Collection<Edge<T>> getNewEdges() {
-    return newEdges;
+    return this.newEdges;
   }
 
   public Collection<T> getSplitObjects() {
-    return splitObjects;
+    return this.splitObjects;
   }
 
   public void setNewEdges(final Collection<Edge<T>> newEdges) {
@@ -57,19 +57,19 @@ public class SplitEdgesCloseToNodeVisitor<T> extends
   @Override
   public boolean visit(final Node<T> node) {
     final List<Edge<T>> closeEdges = EdgeLessThanDistanceToNodeVisitor.edgesWithinDistance(
-      graph, node, maxDistance);
+      this.graph, node, this.maxDistance);
     for (final Edge<T> edge : closeEdges) {
       final T object = edge.getObject();
-      final String typePath = graph.getTypeName(edge);
-      final List<Edge<T>> splitEdges = graph.splitEdge(edge, node);
+      final String typePath = this.graph.getTypeName(edge);
+      final List<Edge<T>> splitEdges = this.graph.splitEdge(edge, node);
       if (splitEdges.size() > 1) {
-        nodeEvent(node, typePath, ruleName, "Fixed", null);
-        if (splitObjects != null) {
-          splitObjects.add(object);
+        nodeEvent(node, typePath, this.ruleName, "Fixed", null);
+        if (this.splitObjects != null) {
+          this.splitObjects.add(object);
         }
-        if (newEdges != null) {
-          newEdges.remove(edge);
-          newEdges.addAll(splitEdges);
+        if (this.newEdges != null) {
+          this.newEdges.remove(edge);
+          this.newEdges.addAll(splitEdges);
         }
       }
     }

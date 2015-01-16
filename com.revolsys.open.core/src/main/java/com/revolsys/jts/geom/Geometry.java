@@ -166,7 +166,7 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *@version 1.7
  */
 public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
-  DataTypeProxy {
+DataTypeProxy {
   List<String> sortedGeometryTypes = Collections.unmodifiableList(Arrays.asList(
     "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
     "Polygon", "MultiPolygon", "GeometryCollection"));

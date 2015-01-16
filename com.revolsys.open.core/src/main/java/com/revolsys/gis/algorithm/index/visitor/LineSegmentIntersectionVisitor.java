@@ -18,15 +18,15 @@ public class LineSegmentIntersectionVisitor implements Visitor<LineSegment> {
   }
 
   public Set<Geometry> getIntersections() {
-    return intersections;
+    return this.intersections;
   }
 
   @Override
   public boolean visit(final LineSegment segment) {
-    if (segment.getBoundingBox().intersects(querySeg.getBoundingBox())) {
-      final Geometry intersection = querySeg.getIntersection(segment);
+    if (segment.getBoundingBox().intersects(this.querySeg.getBoundingBox())) {
+      final Geometry intersection = this.querySeg.getIntersection(segment);
       if (intersection != null && intersection.isEmpty()) {
-        intersections.add(intersection);
+        this.intersections.add(intersection);
       }
     }
     return true;

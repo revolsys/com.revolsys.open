@@ -7,7 +7,7 @@ import com.revolsys.gis.cs.ProjectionParameterNames;
 import com.revolsys.gis.cs.Spheroid;
 
 public class TransverseMercatorSouthOriented extends
-  AbstractCoordinatesProjection {
+AbstractCoordinatesProjection {
 
   private final double a;
 
@@ -51,34 +51,34 @@ public class TransverseMercatorSouthOriented extends
     this.x0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_EASTING);
     this.y0 = cs.getDoubleParameter(ProjectionParameterNames.FALSE_NORTHING);
     this.lambda0 = Math.toRadians(centralMeridian);
-    this.a = spheroid.getSemiMajorAxis();
+    this.a = this.spheroid.getSemiMajorAxis();
     this.k0 = scaleFactor;
-    this.ep2 = (a * a - spheroid.getSemiMinorAxis()
-      * spheroid.getSemiMinorAxis())
-      / (spheroid.getSemiMinorAxis() * spheroid.getSemiMinorAxis());
-    eSq = spheroid.getEccentricitySquared();
-    e4 = eSq * eSq;
-    e6 = e4 * eSq;
-    e8 = e4 * e4;
-    a0 = 1.0 - eSq / 4.0 - 3.0 * e4 / 64.0 - 5.0 * e6 / 256.0 - 175.0 * e8
-      / 16384.0;
-    a2 = 3.0 / 8.0 * (eSq + e4 / 4.0 + 15.0 * e6 / 128.0 - 455.0 * e8 / 4096.0);
-    a4 = 15.0 / 256.0 * (e4 + 3.0 * e6 / 4.0 - 77.0 * e8 / 128.0);
-    a6 = 35.0 / 3072.0 * (e6 - 41.0 * e8 / 32.0);
-    a8 = -315.0 * e8 / 131072.0;
+    this.ep2 = (this.a * this.a - this.spheroid.getSemiMinorAxis()
+        * this.spheroid.getSemiMinorAxis())
+        / (this.spheroid.getSemiMinorAxis() * this.spheroid.getSemiMinorAxis());
+    this.eSq = this.spheroid.getEccentricitySquared();
+    this.e4 = this.eSq * this.eSq;
+    this.e6 = this.e4 * this.eSq;
+    this.e8 = this.e4 * this.e4;
+    this.a0 = 1.0 - this.eSq / 4.0 - 3.0 * this.e4 / 64.0 - 5.0 * this.e6 / 256.0 - 175.0 * this.e8
+        / 16384.0;
+    this.a2 = 3.0 / 8.0 * (this.eSq + this.e4 / 4.0 + 15.0 * this.e6 / 128.0 - 455.0 * this.e8 / 4096.0);
+    this.a4 = 15.0 / 256.0 * (this.e4 + 3.0 * this.e6 / 4.0 - 77.0 * this.e8 / 128.0);
+    this.a6 = 35.0 / 3072.0 * (this.e6 - 41.0 * this.e8 / 32.0);
+    this.a8 = -315.0 * this.e8 / 131072.0;
   }
 
   protected double footPointLatitude(final double y) {
     double lat1;
-    double newlat = y / a;
+    double newlat = y / this.a;
     int i = 0;
     do {
       lat1 = newlat;
       final double flat = s0(lat1) - y;
-      final double dflat = a
-        * (a0 - 2.0 * a2 * Math.cos(2.0 * lat1) + 4.0 * a4
-          * Math.cos(4.0 * lat1) - 6.0 * a6 * Math.cos(6.0 * lat1) + 8.0 * a8
-          * Math.cos(8.0 * lat1));
+      final double dflat = this.a
+          * (this.a0 - 2.0 * this.a2 * Math.cos(2.0 * lat1) + 4.0 * this.a4
+              * Math.cos(4.0 * lat1) - 6.0 * this.a6 * Math.cos(6.0 * lat1) + 8.0 * this.a8
+              * Math.cos(8.0 * lat1));
       newlat = lat1 - flat / dflat;
       // Increased tolerance from 1E-16 to 1E-15. 1E-16 was causing an infinite
       // loop.
@@ -93,16 +93,16 @@ public class TransverseMercatorSouthOriented extends
     final double[] targetCoordinates, final int targetOffset,
     final int targetAxisCount) {
 
-    final double phi1 = footPointLatitude(y - y0);
+    final double phi1 = footPointLatitude(y - this.y0);
     final double cosPhi1 = Math.cos(phi1);
     final double sinPhi = Math.sin(phi1);
     final double sinPhi1Sq = sinPhi * sinPhi;
     final double tanPhi1 = Math.tan(phi1);
 
-    final double nu1 = a / Math.sqrt(1 - eSq * sinPhi1Sq);
-    final double rho1 = a * (1 - eSq) / Math.pow(1 - eSq * sinPhi1Sq, 1.5);
-    final double c1 = eSq * cosPhi1 * cosPhi1;
-    final double d = (x - x0) / (nu1 * k0);
+    final double nu1 = this.a / Math.sqrt(1 - this.eSq * sinPhi1Sq);
+    final double rho1 = this.a * (1 - this.eSq) / Math.pow(1 - this.eSq * sinPhi1Sq, 1.5);
+    final double c1 = this.eSq * cosPhi1 * cosPhi1;
+    final double d = (x - this.x0) / (nu1 * this.k0);
     final double d2 = d * d;
     final double d3 = d2 * d;
     final double d4 = d2 * d2;
@@ -113,15 +113,15 @@ public class TransverseMercatorSouthOriented extends
     final double c1Sq = c1 * c1;
     final double t1Sq = t1 * t1;
     final double phi = phi1
-      - (nu1 * Math.tan(phi1 / rho1) * (d2 / 2
-        - (5 + 3 * t1 + 10 * c1 - 4 * c1Sq - 9 * eSq) * d4 / 24 + (61 + 90 * t1
-        + 298 * c1 + 45 * t1Sq - 252 * eSq - 3 * c1Sq)
-        * d6 / 720));
+        - nu1 * Math.tan(phi1 / rho1) * (d2 / 2
+            - (5 + 3 * t1 + 10 * c1 - 4 * c1Sq - 9 * this.eSq) * d4 / 24 + (61 + 90 * t1
+                + 298 * c1 + 45 * t1Sq - 252 * this.eSq - 3 * c1Sq)
+                * d6 / 720);
 
-    final double lambda = lambda0
-      + (d - (1 + 2 * t1 + c1) * d3 / 6 + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + 8
-        * eSq + 24 * t1Sq)
-        * d5 / 120) / cosPhi1;
+    final double lambda = this.lambda0
+        + (d - (1 + 2 * t1 + c1) * d3 / 6 + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + 8
+            * this.eSq + 24 * t1Sq)
+            * d5 / 120) / cosPhi1;
 
     final double lon = Math.toDegrees(lambda);
     final double lat = Math.toDegrees(phi);
@@ -135,8 +135,8 @@ public class TransverseMercatorSouthOriented extends
     final int targetAxisCount) {
     // ep2 = the second eccentricity squared.
     // N = the radius of curvature of the spheroid in the prime vertical plane
-    final double n = spheroid.primeVerticalRadiusOfCurvature(lat);
-    final double n2 = ep2 * Math.pow(Math.cos(lat), 2.0);
+    final double n = this.spheroid.primeVerticalRadiusOfCurvature(lat);
+    final double n2 = this.ep2 * Math.pow(Math.cos(lat), 2.0);
     final double n4 = n2 * n2;
     final double n6 = n4 * n2;
     final double n8 = n4 * n4;
@@ -146,7 +146,7 @@ public class TransverseMercatorSouthOriented extends
     final double t6 = t4 * t2;
     final double cosLat = Math.cos(lat);
     final double sinLat = Math.sin(lat);
-    final double l = lon - lambda0;
+    final double l = lon - this.lambda0;
     final double l2 = l * l;
     final double l3 = l2 * l;
     final double l4 = l2 * l2;
@@ -160,7 +160,7 @@ public class TransverseMercatorSouthOriented extends
     double u3 = l7 * Math.pow(cosLat, 7.0) / 5040.0;
     double v1 = 1.0 - t2 + n2;
     double v2 = 5.0 - 18.0 * t2 + t4 + 14.0 * n2 - 58.0 * t2 * n2 + 13.0 * n4
-      + 4.0 * n6 - 64.0 * n4 * t2 - 24.0 * n6 * t2;
+        + 4.0 * n6 - 64.0 * n4 * t2 - 24.0 * n6 * t2;
     double v3 = 61.0 - 479.0 * t2 + 179.0 * t4 - t6;
     final double x = u0 + u1 * v1 + u2 * v2 + u3 * v3;
 
@@ -170,18 +170,18 @@ public class TransverseMercatorSouthOriented extends
     u3 = l8 / 40320.0 * sinLat * Math.pow(cosLat, 7.0);
     v1 = 5.0 - t2 + 9.0 * n2 + 4.0 * n4;
     v2 = 61.0 - 58.0 * t2 + t4 + 270.0 * n2 - 330.0 * t2 * n2 + 445.0 * n4
-      + 324.0 * n6 - 680.0 * n4 * t2 + 88.0 * n8 - 600.0 * n6 * t2 - 192.0 * n8
-      * t2;
+        + 324.0 * n6 - 680.0 * n4 * t2 + 88.0 * n8 - 600.0 * n6 * t2 - 192.0 * n8
+        * t2;
     v3 = 1385.0 - 311.0 * t2 + 543.0 * t4 - t6;
     final double y = s0(lat) / n + u0 + u1 * v1 + u2 * v2 + u3 * v3;
 
-    targetCoordinates[targetOffset * targetAxisCount] = x0 - n * x * k0;
-    targetCoordinates[targetOffset * targetAxisCount + 1] = y0 - n * y * k0;
+    targetCoordinates[targetOffset * targetAxisCount] = this.x0 - n * x * this.k0;
+    targetCoordinates[targetOffset * targetAxisCount + 1] = this.y0 - n * y * this.k0;
   }
 
   private double s0(final double lat) {
-    return a
-      * (a0 * lat - a2 * Math.sin(2.0 * lat) + a4 * Math.sin(4.0 * lat) - a6
-        * Math.sin(6.0 * lat) + a8 * Math.sin(8.0 * lat));
+    return this.a
+        * (this.a0 * lat - this.a2 * Math.sin(2.0 * lat) + this.a4 * Math.sin(4.0 * lat) - this.a6
+            * Math.sin(6.0 * lat) + this.a8 * Math.sin(8.0 * lat));
   }
 }

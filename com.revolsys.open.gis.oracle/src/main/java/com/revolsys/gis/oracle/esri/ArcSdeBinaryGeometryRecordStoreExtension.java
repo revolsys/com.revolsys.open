@@ -15,7 +15,7 @@ import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 
 public class ArcSdeBinaryGeometryRecordStoreExtension implements
-  RecordStoreExtension {
+RecordStoreExtension {
 
   private Object sdeUtil;
 
@@ -26,7 +26,7 @@ public class ArcSdeBinaryGeometryRecordStoreExtension implements
   public void initialize(final RecordStore recordStore,
     final Map<String, Object> connectionProperties) {
     try {
-      sdeUtil = new ArcSdeBinaryGeometryRecordStoreUtil(recordStore,
+      this.sdeUtil = new ArcSdeBinaryGeometryRecordStoreUtil(recordStore,
         connectionProperties);
     } catch (final NoClassDefFoundError e) {
 
@@ -35,7 +35,7 @@ public class ArcSdeBinaryGeometryRecordStoreExtension implements
 
   @Override
   public boolean isEnabled(final RecordStore recordStore) {
-    return ArcSdeConstants.isSdeAvailable(recordStore) && sdeUtil != null;
+    return ArcSdeConstants.isSdeAvailable(recordStore) && this.sdeUtil != null;
   }
 
   @Override
@@ -51,12 +51,12 @@ public class ArcSdeBinaryGeometryRecordStoreExtension implements
         if (ArcSdeConstants.SDEBINARY.equals(columnProperties.get(ArcSdeConstants.GEOMETRY_COLUMN_TYPE))) {
           final FieldDefinition attribute = recordDefinition.getField(columnName);
           if (!(attribute instanceof OracleSdoGeometryJdbcFieldDefinition)) {
-            if (sdeUtil == null) {
+            if (this.sdeUtil == null) {
               LoggerFactory.getLogger(getClass())
-                .error(
-                  "SDE Binary columns not supported without the ArcSDE Java API jars");
+              .error(
+                "SDE Binary columns not supported without the ArcSDE Java API jars");
             } else {
-              ((ArcSdeBinaryGeometryRecordStoreUtil)sdeUtil).createGeometryColumn(
+              ((ArcSdeBinaryGeometryRecordStoreUtil)this.sdeUtil).createGeometryColumn(
                 recordStore, schema, recordDefinition, typePath, columnName,
                 columnProperties);
             }

@@ -12,18 +12,6 @@ import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.util.GeometricShapeFactory;
 
 public class JTSFunctions {
-  private static final double HEIGHT = 70;
-
-  private static final double WIDTH = 150; // 125;
-
-  private static final double J_WIDTH = 30;
-
-  private static final double J_RADIUS = J_WIDTH - 5;
-
-  private static final double S_RADIUS = HEIGHT / 4;
-
-  private static final double T_WIDTH = WIDTH - 2 * S_RADIUS - J_WIDTH;
-
   private static Geometry create_J(final Geometry g) {
     final GeometryFactory gf = FunctionsUtil.getFactoryOrDefault(g);
 
@@ -75,7 +63,7 @@ public class JTSFunctions {
     gsf2.setSize(2 * S_RADIUS);
     gsf2.setNumPoints(10);
     final LineString arcBottom = gsf2.createArc(1.5 * Math.PI, Math.PI)
-      .reverse();
+        .reverse();
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(top, false);
@@ -120,5 +108,17 @@ public class JTSFunctions {
   public static Geometry logoLines(final Geometry g) {
     return create_J(g).union(create_T(g)).union(create_S(g));
   }
+
+  private static final double HEIGHT = 70;
+
+  private static final double WIDTH = 150; // 125;
+
+  private static final double J_WIDTH = 30;
+
+  private static final double J_RADIUS = J_WIDTH - 5;
+
+  private static final double S_RADIUS = HEIGHT / 4;
+
+  private static final double T_WIDTH = WIDTH - 2 * S_RADIUS - J_WIDTH;
 
 }

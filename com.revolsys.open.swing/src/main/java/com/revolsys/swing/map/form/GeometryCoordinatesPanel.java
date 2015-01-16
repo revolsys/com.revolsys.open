@@ -23,7 +23,7 @@ import com.revolsys.swing.table.renderer.BaseTableCellRenderer;
 import com.revolsys.util.Property;
 
 public class GeometryCoordinatesPanel extends ValueField implements
-  TableModelListener {
+TableModelListener {
   private static final long serialVersionUID = 1L;
 
   private final GeometryCoordinatesTableModel model = new GeometryCoordinatesTableModel(

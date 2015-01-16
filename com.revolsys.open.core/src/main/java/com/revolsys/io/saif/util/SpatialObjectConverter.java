@@ -14,7 +14,7 @@ public class SpatialObjectConverter implements OsnConverter {
       iterator.throwParseError("No geometry attribute");
     }
     final String objectName = iterator.nextObjectName();
-    final OsnConverter osnConverter = converters.getConverter(objectName);
+    final OsnConverter osnConverter = this.converters.getConverter(objectName);
     if (osnConverter == null) {
       iterator.throwParseError("No Geometry Converter for " + objectName);
     }

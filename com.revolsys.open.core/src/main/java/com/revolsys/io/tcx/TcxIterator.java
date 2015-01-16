@@ -21,7 +21,6 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.gpx.GpxConstants;
 import com.revolsys.io.xml.StaxUtils;
-import com.revolsys.jts.geom.GeometryFactory;
 
 public class TcxIterator implements RecordIterator {
 
@@ -29,11 +28,7 @@ public class TcxIterator implements RecordIterator {
 
   private Record currentRecord;
 
-  private RecordFactory recordFactory;
-
   private File file;
-
-  private final GeometryFactory geometryFactory = TcxConstants.GEOMETRY_FACTORY;
 
   private boolean hasNext = true;
 
@@ -46,8 +41,6 @@ public class TcxIterator implements RecordIterator {
   private String typePath;
 
   private String baseName;
-
-  private final int index = 0;
 
   private final Queue<Record> records = new LinkedList<Record>();
 
@@ -62,14 +55,12 @@ public class TcxIterator implements RecordIterator {
   public TcxIterator(final Reader in, final RecordFactory recordFactory,
     final String path) {
     this(StaxUtils.createXmlReader(in));
-    this.recordFactory = recordFactory;
     this.typePath = path;
   }
 
   public TcxIterator(final Resource resource,
     final RecordFactory recordFactory, final String path) throws IOException {
     this(StaxUtils.createXmlReader(resource));
-    this.recordFactory = recordFactory;
     this.typePath = path;
     this.baseName = FileUtil.getBaseName(resource.getFilename());
   }

@@ -18,7 +18,7 @@ import com.revolsys.jts.geom.Point;
 import com.revolsys.util.Property;
 
 public class KmlRecordWriter extends AbstractRecordWriter implements
-  Kml22Constants {
+Kml22Constants {
   private static final Map<Class<?>, String> TYPE_MAP = new HashMap<Class<?>, String>();
 
   static {

@@ -15,22 +15,6 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.LineStringDouble;
 
 public class GeometryFactoryTest {
-  private static GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3857,
-    1.0);
-
-  // public static void assertCoordinatesListEqual(final Geometry geometry,
-  // final LineString... pointsList) {
-  // System.out.println(geometry);
-  // final List<LineString> geometryPointsList = getAll(geometry);
-  // Assert.assertEquals("Number of coordinates Lists", pointsList.length,
-  // geometryPointsList.size());
-  // for (int i = 0; i < pointsList.length; i++) {
-  // final LineString points = pointsList[i];
-  // final LineString geometryPoints = geometryPointsList.get(i);
-  // Assert.assertEquals("Coordinates not equal", points, geometryPoints);
-  // }
-  // }
-
   public static void assertCopyGeometry(final Geometry geometry,
     final LineString... pointsList) {
     // assertCoordinatesListEqual(geometry, pointsList);
@@ -46,6 +30,19 @@ public class GeometryFactoryTest {
     // assertCoordinatesListEqual(copy2, pointsList);
     assertCreateGeometryCollection(geometry, pointsList);
   }
+
+  // public static void assertCoordinatesListEqual(final Geometry geometry,
+  // final LineString... pointsList) {
+  // System.out.println(geometry);
+  // final List<LineString> geometryPointsList = getAll(geometry);
+  // Assert.assertEquals("Number of coordinates Lists", pointsList.length,
+  // geometryPointsList.size());
+  // for (int i = 0; i < pointsList.length; i++) {
+  // final LineString points = pointsList[i];
+  // final LineString geometryPoints = geometryPointsList.get(i);
+  // Assert.assertEquals("Coordinates not equal", points, geometryPoints);
+  // }
+  // }
 
   public static void assertCreateGeometryCollection(final Geometry geometry,
     final LineString... pointsList) {
@@ -127,4 +124,7 @@ public class GeometryFactoryTest {
     assertCopyGeometry(multiPolygon2, ringPoints, ring3Points);
 
   }
+
+  private static GeometryFactory GEOMETRY_FACTORY = GeometryFactory.fixed(3857,
+    1.0);
 }

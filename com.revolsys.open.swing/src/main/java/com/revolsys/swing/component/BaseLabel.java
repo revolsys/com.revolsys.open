@@ -1,6 +1,6 @@
 package com.revolsys.swing.component;
 
-import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.JXLabel;
 
@@ -9,12 +9,17 @@ import com.revolsys.util.Property;
 
 public class BaseLabel extends JXLabel {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public BaseLabel() {
     setOpaque(false);
     setFont(SwingUtil.FONT);
     setLineWrap(true);
-    setVerticalTextPosition(JLabel.TOP);
-    setVerticalAlignment(JLabel.NORTH);
+    setVerticalTextPosition(SwingConstants.TOP);
+    setVerticalAlignment(SwingConstants.NORTH);
 
   }
 

@@ -41,10 +41,6 @@ import com.revolsys.ui.web.exception.PageNotFoundException;
 public class IafConfigXmlProcessor extends XmlProcessor {
   private static final Logger log = Logger.getLogger(IafConfigXmlProcessor.class);
 
-  private static final Class[] PROCESS_METHOD_ARGS = new Class[] {
-    XMLStreamReader.class
-  };
-
   private final ServletContext servletContext;
 
   private static final Map standardTypes = new HashMap();
@@ -241,7 +237,7 @@ public class IafConfigXmlProcessor extends XmlProcessor {
     final String name = parser.getAttributeValue(null, "name");
     final String area = parser.getAttributeValue(null, "area");
     final Component component = (Component)this.config.getComponent(name)
-      .clone();
+        .clone();
     final ComponentInclude componentInclude = new ComponentInclude(area,
       component);
     StaxUtils.skipSubTree(parser);

@@ -141,8 +141,7 @@ public final class ShapefileGeometryUtil {
   public List<double[]> createCoordinatesLists(final int[] partIndex,
     final int axisCount) {
     final List<double[]> parts = new ArrayList<>(partIndex.length);
-    for (int i = 0; i < partIndex.length; i++) {
-      final int partNumPoints = partIndex[i];
+    for (final int partNumPoints : partIndex) {
       final double[] points = new double[partNumPoints * axisCount];
       parts.add(points);
     }

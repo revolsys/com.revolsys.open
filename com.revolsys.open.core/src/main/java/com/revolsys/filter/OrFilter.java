@@ -21,7 +21,7 @@ public class OrFilter<T> implements Filter<T> {
 
   @Override
   public boolean accept(final T object) {
-    for (final Filter<T> filter : filters) {
+    for (final Filter<T> filter : this.filters) {
       if (filter.accept(object)) {
         return true;
       }
@@ -30,7 +30,7 @@ public class OrFilter<T> implements Filter<T> {
   }
 
   public List<Filter<T>> getFilters() {
-    return filters;
+    return this.filters;
   }
 
   public void setFilters(final List<Filter<T>> filters) {
@@ -39,6 +39,6 @@ public class OrFilter<T> implements Filter<T> {
 
   @Override
   public String toString() {
-    return "OR" + filters;
+    return "OR" + this.filters;
   }
 }

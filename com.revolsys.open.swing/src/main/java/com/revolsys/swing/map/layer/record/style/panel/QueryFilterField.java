@@ -18,7 +18,12 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class QueryFilterField extends ValueField implements
-  PropertyChangeListener {
+PropertyChangeListener {
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
   private final TextArea queryField;
 
@@ -30,19 +35,19 @@ public class QueryFilterField extends ValueField implements
     final String fieldName, final String query) {
     super(new VerticalLayout());
     this.layer = layer;
-    queryField = new TextArea(fieldName, query, 5, 30);
-    Property.addListener(queryField, fieldName, this);
+    this.queryField = new TextArea(fieldName, query, 5, 30);
+    Property.addListener(this.queryField, fieldName, this);
     final ToolBar toolBar = new ToolBar();
 
     toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
       this, "showAdvancedFilter");
 
-    clearButton = toolBar.addButtonTitleIcon("search", "Clear Filter",
-      "filter_delete", queryField, "setFieldValue", "");
-    clearButton.setEnabled(Property.hasValue(queryField.getText()));
+    this.clearButton = toolBar.addButtonTitleIcon("search", "Clear Filter",
+      "filter_delete", this.queryField, "setFieldValue", "");
+    this.clearButton.setEnabled(Property.hasValue(this.queryField.getText()));
 
     add(toolBar);
-    add(new JScrollPane(queryField));
+    add(new JScrollPane(this.queryField));
 
   }
 
@@ -50,22 +55,22 @@ public class QueryFilterField extends ValueField implements
   public void addPropertyChangeListener(final String propertyName,
     final PropertyChangeListener listener) {
     super.addPropertyChangeListener(propertyName, listener);
-    Property.addListener(queryField, propertyName, listener);
+    Property.addListener(this.queryField, propertyName, listener);
   }
 
   @Override
   public String getFieldValidationMessage() {
-    return queryField.getFieldValidationMessage();
+    return this.queryField.getFieldValidationMessage();
   }
 
   @Override
   public <T> T getFieldValue() {
-    return queryField.getFieldValue();
+    return this.queryField.getFieldValue();
   }
 
   @Override
   public boolean isFieldValid() {
-    return queryField.isFieldValid();
+    return this.queryField.isFieldValid();
   }
 
   @Override
@@ -73,59 +78,59 @@ public class QueryFilterField extends ValueField implements
     if (event.getPropertyName().equals("filter")) {
       final Condition filter = (Condition)event.getNewValue();
       if (filter == null) {
-        queryField.setFieldValue(null);
+        this.queryField.setFieldValue(null);
       } else {
-        queryField.setFieldValue(filter.toFormattedString());
+        this.queryField.setFieldValue(filter.toFormattedString());
       }
     }
-    clearButton.setEnabled(Property.hasValue(queryField.getText()));
+    this.clearButton.setEnabled(Property.hasValue(this.queryField.getText()));
   }
 
   @Override
   public void setFieldBackgroundColor(final Color color) {
-    queryField.setFieldBackgroundColor(color);
+    this.queryField.setFieldBackgroundColor(color);
   }
 
   @Override
   public void setFieldForegroundColor(final Color color) {
-    queryField.setFieldForegroundColor(color);
+    this.queryField.setFieldForegroundColor(color);
   }
 
   @Override
   public void setFieldInvalid(final String message,
     final Color foregroundColor, final Color backgroundColor) {
-    queryField.setFieldInvalid(message, foregroundColor, backgroundColor);
+    this.queryField.setFieldInvalid(message, foregroundColor, backgroundColor);
   }
 
   @Override
   public void setFieldToolTip(final String toolTip) {
-    queryField.setFieldToolTip(toolTip);
+    this.queryField.setFieldToolTip(toolTip);
   }
 
   @Override
   public void setFieldValid() {
-    queryField.setFieldValid();
+    this.queryField.setFieldValid();
   }
 
   @Override
   public void setFieldValue(final Object value) {
-    queryField.setFieldValue(value);
+    this.queryField.setFieldValue(value);
   }
 
   @Override
   public void setToolTipText(final String text) {
-    queryField.setToolTipText(text);
+    this.queryField.setToolTipText(text);
   }
 
   public void showAdvancedFilter() {
     final QueryWhereConditionField advancedFilter = new QueryWhereConditionField(
-      layer, this, queryField.getText());
+      this.layer, this, this.queryField.getText());
     advancedFilter.showDialog(this);
   }
 
   @Override
   public void updateFieldValue() {
-    queryField.updateFieldValue();
+    this.queryField.updateFieldValue();
   }
 
 }

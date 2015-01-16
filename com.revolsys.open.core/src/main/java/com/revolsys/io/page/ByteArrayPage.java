@@ -8,35 +8,35 @@ public class ByteArrayPage extends AbstractPage {
   public ByteArrayPage(final PageManager pageManager, final int index,
     final int size) {
     super(pageManager, index);
-    content = new byte[size];
+    this.content = new byte[size];
   }
 
   @Override
   public byte[] getContent() {
-    return content;
+    return this.content;
   }
 
   @Override
   public int getOffset() {
-    return offset;
+    return this.offset;
   }
 
   @Override
   public int getSize() {
-    return content.length;
+    return this.content.length;
   }
 
   @Override
   protected int readNextByte() {
-    final byte b = content[offset];
-    offset++;
+    final byte b = this.content[this.offset];
+    this.offset++;
     return b & 0xff;
   }
 
   @Override
   public void setContent(final Page page) {
     final byte[] copyContent = page.getContent();
-    System.arraycopy(copyContent, 0, content, 0, copyContent.length);
+    System.arraycopy(copyContent, 0, this.content, 0, copyContent.length);
   }
 
   @Override
@@ -50,6 +50,6 @@ public class ByteArrayPage extends AbstractPage {
 
   @Override
   protected void writeByte(final int b) {
-    content[offset++] = (byte)b;
+    this.content[this.offset++] = (byte)b;
   }
 }

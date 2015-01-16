@@ -14,8 +14,6 @@ package com.revolsys.jts.index;
  */
 public class DoubleBits {
 
-  public static final int EXPONENT_BIAS = 1023;
-
   public static int exponent(final double d) {
     final DoubleBits db = new DoubleBits(d);
     return db.getExponent();
@@ -58,31 +56,33 @@ public class DoubleBits {
     return db.getDouble();
   }
 
+  public static final int EXPONENT_BIAS = 1023;
+
   private final double x;
 
   private long xBits;
 
   public DoubleBits(final double x) {
     this.x = x;
-    xBits = Double.doubleToLongBits(x);
+    this.xBits = Double.doubleToLongBits(x);
   }
 
   /**
    * Determines the exponent for the number
    */
   public int biasedExponent() {
-    final int signExp = (int)(xBits >> 52);
+    final int signExp = (int)(this.xBits >> 52);
     final int exp = signExp & 0x07ff;
     return exp;
   }
 
   public int getBit(final int i) {
-    final long mask = (1L << i);
-    return (xBits & mask) != 0 ? 1 : 0;
+    final long mask = 1L << i;
+    return (this.xBits & mask) != 0 ? 1 : 0;
   }
 
   public double getDouble() {
-    return Double.longBitsToDouble(xBits);
+    return Double.longBitsToDouble(this.xBits);
   }
 
   /**
@@ -115,19 +115,19 @@ public class DoubleBits {
    */
   @Override
   public String toString() {
-    final String numStr = Long.toBinaryString(xBits);
+    final String numStr = Long.toBinaryString(this.xBits);
     // 64 zeroes!
     final String zero64 = "0000000000000000000000000000000000000000000000000000000000000000";
     final String padStr = zero64 + numStr;
     final String bitStr = padStr.substring(padStr.length() - 64);
     final String str = bitStr.substring(0, 1) + "  " + bitStr.substring(1, 12)
-      + "(" + getExponent() + ") " + bitStr.substring(12) + " [ " + x + " ]";
+        + "(" + getExponent() + ") " + bitStr.substring(12) + " [ " + this.x + " ]";
     return str;
   }
 
   public void zeroLowerBits(final int nBits) {
     final long invMask = (1L << nBits) - 1L;
     final long mask = ~invMask;
-    xBits &= mask;
+    this.xBits &= mask;
   }
 }

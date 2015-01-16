@@ -51,34 +51,34 @@ import com.revolsys.jts.util.Assert;
 public abstract class EdgeRing {
 
   protected DirectedEdge startDe; // the directed edge which starts the list of
-                                  // edges for this EdgeRing
+  // edges for this EdgeRing
 
   private int maxNodeDegree = -1;
 
   private final List<DirectedEdge> edges = new ArrayList<>(); // the
-                                                              // DirectedEdges
-                                                              // making up
+  // DirectedEdges
+  // making up
 
   // this EdgeRing
 
   private final List<Point> pts = new ArrayList<>();
 
   private final Label label = new Label(Location.NONE); // label stores the
-                                                        // locations of each
-                                                        // geometry on the face
-                                                        // surrounded by this
-                                                        // ring
+  // locations of each
+  // geometry on the face
+  // surrounded by this
+  // ring
 
   private LinearRing ring; // the ring created for this EdgeRing
 
   private boolean isHole;
 
   private EdgeRing shell; // if non-null, the ring is a hole and this EdgeRing
-                          // is its containing shell
+  // is its containing shell
 
   private final List<EdgeRing> holes = new ArrayList<EdgeRing>(); // a list of
-                                                                  // EdgeRings
-                                                                  // which
+  // EdgeRings
+  // which
 
   // are holes in this EdgeRing
 
@@ -92,7 +92,7 @@ public abstract class EdgeRing {
   }
 
   public void addHole(final EdgeRing ring) {
-    holes.add(ring);
+    this.holes.add(ring);
   }
 
   protected void addPoints(final Edge edge, final boolean isForward,
@@ -104,7 +104,7 @@ public abstract class EdgeRing {
         startIndex = 0;
       }
       for (int i = startIndex; i < numPoints; i++) {
-        pts.add(edge.getCoordinate(i));
+        this.pts.add(edge.getCoordinate(i));
       }
     } else { // is backward
       int startIndex = numPoints - 2;
@@ -112,30 +112,30 @@ public abstract class EdgeRing {
         startIndex = numPoints - 1;
       }
       for (int i = startIndex; i >= 0; i--) {
-        pts.add(edge.getCoordinate(i));
+        this.pts.add(edge.getCoordinate(i));
       }
     }
   }
 
   private void computeMaxNodeDegree() {
-    maxNodeDegree = 0;
-    DirectedEdge de = startDe;
+    this.maxNodeDegree = 0;
+    DirectedEdge de = this.startDe;
     do {
       final Node node = de.getNode();
       final int degree = ((DirectedEdgeStar)node.getEdges()).getOutgoingDegree(this);
-      if (degree > maxNodeDegree) {
-        maxNodeDegree = degree;
+      if (degree > this.maxNodeDegree) {
+        this.maxNodeDegree = degree;
       }
       de = getNext(de);
-    } while (de != startDe);
-    maxNodeDegree *= 2;
+    } while (de != this.startDe);
+    this.maxNodeDegree *= 2;
   }
 
   /**
    * Collect all the points from the DirectedEdges of this ring into a contiguous list
    */
   protected void computePoints(final DirectedEdge start) {
-    startDe = start;
+    this.startDe = start;
     DirectedEdge de = start;
     boolean isFirstEdge = true;
     do {
@@ -146,10 +146,10 @@ public abstract class EdgeRing {
       if (de.getEdgeRing() == this) {
         throw new TopologyException(
           "Directed Edge visited twice during ring-building at "
-            + de.getCoordinate());
+              + de.getCoordinate());
       }
 
-      edges.add(de);
+      this.edges.add(de);
       final Label label = de.getLabel();
       Assert.isTrue(label.isArea());
       mergeLabel(label);
@@ -157,7 +157,7 @@ public abstract class EdgeRing {
       isFirstEdge = false;
       setEdgeRing(de, this);
       de = getNext(de);
-    } while (de != startDe);
+    } while (de != this.startDe);
   }
 
   /**
@@ -166,9 +166,9 @@ public abstract class EdgeRing {
    * accordingly.
    */
   public void computeRing() {
-    if (ring == null) {
-      ring = geometryFactory.linearRing(pts);
-      isHole = ring.isCounterClockwise();
+    if (this.ring == null) {
+      this.ring = this.geometryFactory.linearRing(this.pts);
+      this.isHole = this.ring.isCounterClockwise();
     }
   }
 
@@ -186,7 +186,7 @@ public abstract class EdgeRing {
       return false;
     }
 
-    for (final EdgeRing hole : holes) {
+    for (final EdgeRing hole : this.holes) {
       if (hole.containsPoint(p)) {
         return false;
       }
@@ -195,48 +195,48 @@ public abstract class EdgeRing {
   }
 
   public Point getCoordinate(final int i) {
-    return pts.get(i);
+    return this.pts.get(i);
   }
 
   /**
    * Returns the list of DirectedEdges that make up this EdgeRing
    */
   public List<DirectedEdge> getEdges() {
-    return edges;
+    return this.edges;
   }
 
   public Label getLabel() {
-    return label;
+    return this.label;
   }
 
   public LinearRing getLinearRing() {
-    return ring;
+    return this.ring;
   }
 
   public int getMaxNodeDegree() {
-    if (maxNodeDegree < 0) {
+    if (this.maxNodeDegree < 0) {
       computeMaxNodeDegree();
     }
-    return maxNodeDegree;
+    return this.maxNodeDegree;
   }
 
   abstract public DirectedEdge getNext(DirectedEdge de);
 
   public EdgeRing getShell() {
-    return shell;
+    return this.shell;
   }
 
   public boolean isHole() {
     // computePoints();
-    return isHole;
+    return this.isHole;
   }
 
   public boolean isIsolated() {
-    return (label.getGeometryCount() == 1);
+    return this.label.getGeometryCount() == 1;
   }
 
   public boolean isShell() {
-    return shell == null;
+    return this.shell == null;
   }
 
   protected void mergeLabel(final Label deLabel) {
@@ -258,8 +258,8 @@ public abstract class EdgeRing {
       return;
     }
     // if there is no current RHS value, set it
-    if (label.getLocation(geomIndex) == Location.NONE) {
-      label.setLocation(geomIndex, loc);
+    if (this.label.getLocation(geomIndex) == Location.NONE) {
+      this.label.setLocation(geomIndex, loc);
       return;
     }
   }
@@ -267,11 +267,11 @@ public abstract class EdgeRing {
   abstract public void setEdgeRing(DirectedEdge de, EdgeRing er);
 
   public void setInResult() {
-    DirectedEdge de = startDe;
+    DirectedEdge de = this.startDe;
     do {
       de.getEdge().setInResult(true);
       de = de.getNext();
-    } while (de != startDe);
+    } while (de != this.startDe);
   }
 
   public void setShell(final EdgeRing shell) {
@@ -284,8 +284,8 @@ public abstract class EdgeRing {
   public Polygon toPolygon(final GeometryFactory geometryFactory) {
     final List<LinearRing> rings = new ArrayList<>();
     rings.add(getLinearRing());
-    for (int i = 0; i < holes.size(); i++) {
-      final LinearRing ring = holes.get(i).getLinearRing();
+    for (int i = 0; i < this.holes.size(); i++) {
+      final LinearRing ring = this.holes.get(i).getLinearRing();
       rings.add(ring);
     }
     final Polygon poly = geometryFactory.polygon(rings);
@@ -294,10 +294,10 @@ public abstract class EdgeRing {
 
   @Override
   public String toString() {
-    if (ring == null) {
-      return pts.toString();
+    if (this.ring == null) {
+      return this.pts.toString();
     } else {
-      return ring.toString();
+      return this.ring.toString();
     }
   }
 

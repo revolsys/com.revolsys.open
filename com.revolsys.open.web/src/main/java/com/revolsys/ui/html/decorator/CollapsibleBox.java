@@ -32,24 +32,25 @@ public class CollapsibleBox implements Decorator {
   }
 
   public String getTitle() {
-    return title;
+    return this.title;
   }
 
   public boolean isOpen() {
-    return open;
+    return this.open;
   }
 
+  @Override
   public void serialize(final XmlWriter out, final Element element) {
     out.startTag(HtmlUtil.DIV);
     String cssClass = "collapsibleBox";
-    if (!open) {
+    if (!this.open) {
       cssClass += " closed";
     }
     out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
-    out.attribute(HtmlUtil.ATTR_STYLE, style);
+    out.attribute(HtmlUtil.ATTR_STYLE, this.style);
 
     out.startTag(HtmlUtil.H3);
-    HtmlUtil.serializeA(out, null, "#", title);
+    HtmlUtil.serializeA(out, null, "#", this.title);
     out.endTag(HtmlUtil.H3);
 
     out.startTag(HtmlUtil.DIV);

@@ -5,13 +5,13 @@
  * $Revision$
 
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,12 +47,12 @@ public class ObjectSetOutputStream extends OutputStream {
 
   public ObjectSetOutputStream(final File file) throws IOException {
     this.file = file;
-    prefix = ObjectSetUtil.getObjectSubsetPrefix(file);
+    this.prefix = ObjectSetUtil.getObjectSubsetPrefix(file);
     openFile();
   }
 
   public ObjectSetOutputStream(final File file, final int maxSize)
-    throws IOException {
+      throws IOException {
     this(file);
     this.maxSize = maxSize;
   }
@@ -60,32 +60,32 @@ public class ObjectSetOutputStream extends OutputStream {
   @Override
   public void close() throws IOException {
     if (log.isDebugEnabled()) {
-      log.debug("Closing object subset '" + FileUtil.getFileName(file)
+      log.debug("Closing object subset '" + FileUtil.getFileName(this.file)
         + "' from writing");
     }
-    out.close();
+    this.out.close();
   }
 
   @Override
   public void flush() throws IOException {
-    out.flush();
+    this.out.flush();
   }
 
   private void openFile() throws IOException {
     if (log.isDebugEnabled()) {
-      log.debug("Creating object subset '" + FileUtil.getFileName(file) + "'");
+      log.debug("Creating object subset '" + FileUtil.getFileName(this.file) + "'");
     }
-    out = new BufferedOutputStream(new FileOutputStream(file), 4096);
+    this.out = new BufferedOutputStream(new FileOutputStream(this.file), 4096);
   }
 
   private void openNextFile() throws IOException {
-    out.write('\n');
-    out.flush();
+    this.out.write('\n');
+    this.out.flush();
     close();
-    index++;
-    final String fileName = ObjectSetUtil.getObjectSubsetName(prefix, index);
-    file = new File(file.getParentFile(), fileName);
-    size = 0;
+    this.index++;
+    final String fileName = ObjectSetUtil.getObjectSubsetName(this.prefix, this.index);
+    this.file = new File(this.file.getParentFile(), fileName);
+    this.size = 0;
     openFile();
   }
 
@@ -96,22 +96,22 @@ public class ObjectSetOutputStream extends OutputStream {
 
   @Override
   public void write(final byte[] b, final int off, final int len)
-    throws IOException {
-    if (size >= maxSize) {
+      throws IOException {
+    if (this.size >= this.maxSize) {
       openNextFile();
-      size = 0;
+      this.size = 0;
     }
-    out.write(b, off, len);
-    size += len;
+    this.out.write(b, off, len);
+    this.size += len;
   }
 
   @Override
   public void write(final int b) throws IOException {
-    if (size >= maxSize) {
+    if (this.size >= this.maxSize) {
       openNextFile();
-      size = 0;
+      this.size = 0;
     }
-    out.write(b);
-    size += 1;
+    this.out.write(b);
+    this.size += 1;
   }
 }

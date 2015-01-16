@@ -21,6 +21,11 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class RecordQuadTree extends QuadTree<Record> {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public RecordQuadTree() {
   }
 

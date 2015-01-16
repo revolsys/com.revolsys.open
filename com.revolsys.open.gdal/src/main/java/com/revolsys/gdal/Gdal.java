@@ -1,5 +1,6 @@
 package com.revolsys.gdal;
 
+import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.BandedSampleModel;
 import java.awt.image.BufferedImage;
@@ -22,7 +23,6 @@ import org.gdal.gdal.ColorTable;
 import org.gdal.gdal.Dataset;
 import org.gdal.gdal.Driver;
 import org.gdal.gdal.gdal;
-import org.gdal.gdalconst.gdalconst;
 import org.gdal.gdalconst.gdalconstConstants;
 import org.gdal.ogr.ogr;
 import org.gdal.osr.SpatialReference;
@@ -305,7 +305,7 @@ public class Gdal {
         if (bandCount > 2) {
           colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
           colorModel = new ComponentColorModel(colorSpace, false, false,
-            ColorModel.OPAQUE, dataBufferType);
+            Transparency.OPAQUE, dataBufferType);
           image = new BufferedImage(colorModel, raster, true, null);
         } else {
           image = new BufferedImage(targetWidth, targetHeight, dataType);
@@ -338,7 +338,7 @@ public class Gdal {
   }
 
   public static Dataset getDataset(final File file) {
-    final int mode = gdalconst.GA_ReadOnly;
+    final int mode = gdalconstConstants.GA_ReadOnly;
     return getDataset(file, mode);
   }
 

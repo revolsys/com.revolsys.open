@@ -12,13 +12,6 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 
 public class PolygonUnionPerfTest {
 
-  static final int MAX_ITER = 1;
-
-  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
-    0, 2);
-
-  static WKTReader wktRdr = new WKTReader(geometryFactory);
-
   public static void main(final String[] args) {
     final PolygonUnionPerfTest test = new PolygonUnionPerfTest();
 
@@ -26,6 +19,13 @@ public class PolygonUnionPerfTest {
     test.testRampItems();
 
   }
+
+  static final int MAX_ITER = 1;
+
+  private static final GeometryFactory geometryFactory = GeometryFactory.floating(
+    0, 2);
+
+  static WKTReader wktRdr = new WKTReader(geometryFactory);
 
   GeometryFactory factory = GeometryFactory.floating3();
 
@@ -50,13 +50,13 @@ public class PolygonUnionPerfTest {
   /**
    * Creates a grid of circles with a small percentage of overlap
    * in both directions.
-   * This approximated likely real-world cases well, 
+   * This approximated likely real-world cases well,
    * and seems to produce
    * close to worst-case performance for the Iterated algorithm.
-   * 
-   * Sample times: 
+   *
+   * Sample times:
    * 1000 items/100 pts - Cascaded: 2718 ms, Iterated 150 s
-   * 
+   *
    * @param nItems
    * @param size
    * @param nPts
@@ -99,8 +99,8 @@ public class PolygonUnionPerfTest {
   }
 
   public void test(final int nItems, final int nPts, final double size) {
-  //  System.out.println("---------------------------------------------------------");
-  //  System.out.println("# pts/item: " + nPts);
+    //  System.out.println("---------------------------------------------------------");
+    //  System.out.println("# pts/item: " + nPts);
 
     final List polys = createPolys(nItems, size, nPts);
 

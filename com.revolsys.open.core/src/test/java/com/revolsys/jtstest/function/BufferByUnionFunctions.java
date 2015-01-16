@@ -46,7 +46,7 @@ public class BufferByUnionFunctions {
     final double distance, final int maxChainSize) {
     if (maxChainSize <= 0) {
       throw new IllegalArgumentException(
-        "Maximum Chain Size must be specified as an input parameter");
+          "Maximum Chain Size must be specified as an input parameter");
     }
     final Geometry segs = LineHandlingFunctions.extractChains(g, maxChainSize);
     final double posDist = Math.abs(distance);
@@ -65,7 +65,7 @@ public class BufferByUnionFunctions {
   /**
    * Buffer polygons by buffering the individual boundary segments and
    * either unioning or differencing them.
-   * 
+   *
    * @param g
    * @param distance
    * @return the buffer geometry

@@ -21,30 +21,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 
 public final class ProjectionFactory {
-  /** The map from projection names to projection classes. */
-  private static final Map<String, Class<? extends CoordinatesProjection>> projectionClasses = new HashMap<String, Class<? extends CoordinatesProjection>>();
-
-  static {
-    registerCoordinatesProjection(Projection.ALBERS_EQUAL_AREA,
-      AlbersConicEqualArea.class);
-    registerCoordinatesProjection(Projection.TRANSVERSE_MERCATOR,
-      TransverseMercator.class);
-    registerCoordinatesProjection(Projection.MERCATOR, Mercator1SP.class);
-    registerCoordinatesProjection(
-      Projection.POPULAR_VISUALISATION_PSEUDO_MERCATOR, WebMercator.class);
-    registerCoordinatesProjection(Projection.MERCATOR_1SP, Mercator1SP.class);
-    registerCoordinatesProjection(Projection.MERCATOR_2SP, Mercator2SP.class);
-    registerCoordinatesProjection(Projection.MERCATOR_1SP_SPHERICAL,
-      Mercator1SPSpherical.class);
-    registerCoordinatesProjection(Projection.LAMBERT_CONIC_CONFORMAL_1SP,
-      LambertConicConformal1SP.class);
-    registerCoordinatesProjection(Projection.LAMBERT_CONIC_CONFORMAL_2SP,
-      LambertConicConformal.class);
-    registerCoordinatesProjection(
-      Projection.LAMBERT_CONIC_CONFORMAL_2SP_BELGIUM,
-      LambertConicConformal.class);
-  }
-
   public static Point convert(final Point point,
     final GeometryFactory sourceGeometryFactory,
     final GeometryFactory targetGeometryFactory) {
@@ -189,7 +165,7 @@ public final class ProjectionFactory {
 
   /**
    * Get the operation to convert coordinates to geographics coordinates.
-   * 
+   *
    * @param coordinateSystem The coordinate system.
    * @return The coordinates operation.
    */
@@ -206,7 +182,7 @@ public final class ProjectionFactory {
   /**
    * Get the operation to convert geographics coordinates to projected
    * coordinates.
-   * 
+   *
    * @param coordinateSystem The coordinate system.
    * @return The coordinates operation.
    */
@@ -222,13 +198,37 @@ public final class ProjectionFactory {
 
   /**
    * Register a projection for the named projection.
-   * 
+   *
    * @param name The name.
    * @param projectionClass The projection class.
    */
   public static void registerCoordinatesProjection(final String name,
     final Class<? extends CoordinatesProjection> projectionClass) {
     projectionClasses.put(name, projectionClass);
+  }
+
+  /** The map from projection names to projection classes. */
+  private static final Map<String, Class<? extends CoordinatesProjection>> projectionClasses = new HashMap<String, Class<? extends CoordinatesProjection>>();
+
+  static {
+    registerCoordinatesProjection(Projection.ALBERS_EQUAL_AREA,
+      AlbersConicEqualArea.class);
+    registerCoordinatesProjection(Projection.TRANSVERSE_MERCATOR,
+      TransverseMercator.class);
+    registerCoordinatesProjection(Projection.MERCATOR, Mercator1SP.class);
+    registerCoordinatesProjection(
+      Projection.POPULAR_VISUALISATION_PSEUDO_MERCATOR, WebMercator.class);
+    registerCoordinatesProjection(Projection.MERCATOR_1SP, Mercator1SP.class);
+    registerCoordinatesProjection(Projection.MERCATOR_2SP, Mercator2SP.class);
+    registerCoordinatesProjection(Projection.MERCATOR_1SP_SPHERICAL,
+      Mercator1SPSpherical.class);
+    registerCoordinatesProjection(Projection.LAMBERT_CONIC_CONFORMAL_1SP,
+      LambertConicConformal1SP.class);
+    registerCoordinatesProjection(Projection.LAMBERT_CONIC_CONFORMAL_2SP,
+      LambertConicConformal.class);
+    registerCoordinatesProjection(
+      Projection.LAMBERT_CONIC_CONFORMAL_2SP_BELGIUM,
+      LambertConicConformal.class);
   }
 
   private ProjectionFactory() {

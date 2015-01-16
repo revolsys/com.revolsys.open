@@ -17,8 +17,8 @@ import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 
 public class JsonResourceRecordDefinitionFactory extends
-  AbstractObjectWithProperties implements ApplicationContextAware,
-  RecordDefinitionFactory {
+AbstractObjectWithProperties implements ApplicationContextAware,
+RecordDefinitionFactory {
 
   private final Map<String, RecordDefinition> recordDefinitionMap = new HashMap<String, RecordDefinition>();
 
@@ -27,31 +27,31 @@ public class JsonResourceRecordDefinitionFactory extends
   private ApplicationContext applicationContext;
 
   public String getLocationPattern() {
-    return locationPattern;
+    return this.locationPattern;
   }
 
   @Override
   public RecordDefinition getRecordDefinition(final String typePath) {
-    return recordDefinitionMap.get(typePath);
+    return this.recordDefinitionMap.get(typePath);
   }
 
   @PostConstruct
   public void init() {
     try {
-      for (final Resource resource : applicationContext.getResources(locationPattern)) {
+      for (final Resource resource : this.applicationContext.getResources(this.locationPattern)) {
         final RecordDefinition recordDefinition = MapObjectFactoryRegistry.toObject(resource);
         final String name = recordDefinition.getPath();
-        recordDefinitionMap.put(name, recordDefinition);
+        this.recordDefinitionMap.put(name, recordDefinition);
       }
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to get resources for "
-        + locationPattern);
+          + this.locationPattern);
     }
   }
 
   @Override
   public void setApplicationContext(final ApplicationContext applicationContext)
-    throws BeansException {
+      throws BeansException {
     this.applicationContext = applicationContext;
   }
 

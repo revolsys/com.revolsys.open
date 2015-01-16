@@ -17,19 +17,19 @@ public class JdbcUpdateStatementRunnable extends AbstractRunnable {
 
   @Override
   public void doRun() {
-    JdbcUtils.executeUpdate(dataSource, sql, parameters.toArray());
+    JdbcUtils.executeUpdate(this.dataSource, this.sql, this.parameters.toArray());
   }
 
   public DataSource getDataSource() {
-    return dataSource;
+    return this.dataSource;
   }
 
   public List<Object> getParameters() {
-    return parameters;
+    return this.parameters;
   }
 
   public String getSql() {
-    return sql;
+    return this.sql;
   }
 
   public void setDataSource(final DataSource dataSource) {

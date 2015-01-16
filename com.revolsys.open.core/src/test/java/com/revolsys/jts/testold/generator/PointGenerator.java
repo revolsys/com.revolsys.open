@@ -36,12 +36,12 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 
 /**
- * 
- * Creates a point based on the bounding box. 
- * 
+ *
+ * Creates a point based on the bounding box.
+ *
  * This implementation returns the centroid.
  *
- * @author David Zwiers, Vivid Solutions. 
+ * @author David Zwiers, Vivid Solutions.
  */
 public class PointGenerator extends GeometryGenerator {
 

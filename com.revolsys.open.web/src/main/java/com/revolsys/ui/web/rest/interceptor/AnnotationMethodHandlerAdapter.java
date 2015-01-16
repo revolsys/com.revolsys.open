@@ -182,14 +182,14 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
       return Arrays.equals(this.paths, other.paths)
           && Arrays.equals(this.methods, other.methods)
           && Arrays.equals(this.params, other.params)
-        && Arrays.equals(this.headers, other.headers);
+          && Arrays.equals(this.headers, other.headers);
     }
 
     @Override
     public int hashCode() {
       return Arrays.hashCode(this.paths) * 23 + Arrays.hashCode(this.methods)
           * 29 + Arrays.hashCode(this.params) * 31
-        + Arrays.hashCode(this.headers);
+          + Arrays.hashCode(this.headers);
     }
 
     public boolean matches(final HttpServletRequest request) {
@@ -680,8 +680,8 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
       Map<String, String> variables = null;
       final boolean hasSuffix = mappedPath.indexOf('.') != -1;
       if (!hasSuffix
-        && AnnotationMethodHandlerAdapter.this.pathMatcher.match(mappedPath
-          + ".*", lookupPath)) {
+          && AnnotationMethodHandlerAdapter.this.pathMatcher.match(mappedPath
+            + ".*", lookupPath)) {
         final String realPath = mappedPath + ".*";
         if (AnnotationMethodHandlerAdapter.this.pathMatcher.match(realPath,
           lookupPath)) {
@@ -762,20 +762,20 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
     private boolean isPathMatchInternal(final String pattern,
       final String lookupPath) {
       if (pattern.equals(lookupPath)
-        || AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern,
-          lookupPath)) {
+          || AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern,
+            lookupPath)) {
         return true;
       }
       final boolean hasSuffix = pattern.indexOf('.') != -1;
       if (!hasSuffix
-        && AnnotationMethodHandlerAdapter.this.pathMatcher.match(
-          pattern + ".*", lookupPath)) {
+          && AnnotationMethodHandlerAdapter.this.pathMatcher.match(
+            pattern + ".*", lookupPath)) {
         return true;
       }
       final boolean endsWithSlash = pattern.endsWith("/");
       if (!endsWithSlash
-        && AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern + "/",
-          lookupPath)) {
+          && AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern + "/",
+            lookupPath)) {
         return true;
       }
       return false;
@@ -844,7 +844,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
             handlerMethod);
           if (oldMappedMethod != null && oldMappedMethod != handlerMethod) {
             if (AnnotationMethodHandlerAdapter.this.methodNameResolver != null
-              && mappingInfo.paths.length == 0) {
+                && mappingInfo.paths.length == 0) {
               if (!oldMappedMethod.getName().equals(handlerMethod.getName())) {
                 if (resolvedMethodName == null) {
                   resolvedMethodName = AnnotationMethodHandlerAdapter.this.methodNameResolver.getHandlerMethodName(request);

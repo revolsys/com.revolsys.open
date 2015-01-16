@@ -15,16 +15,16 @@ public class SimpleProperty extends AbstractRecordDefinitionProperty {
 
   @Override
   public SimpleProperty clone() {
-    return new SimpleProperty(propertyName, value);
+    return new SimpleProperty(this.propertyName, this.value);
   }
 
   @Override
   public String getPropertyName() {
-    return propertyName;
+    return this.propertyName;
   }
 
   public <T> T getValue() {
-    return (T)value;
+    return (T)this.value;
   }
 
   public void setPropertyName(final String propertyName) {

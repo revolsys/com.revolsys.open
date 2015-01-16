@@ -64,7 +64,7 @@ public class DistanceTest extends TestCase {
 
   private void doNearestPointsTest(final String wkt0, final String wkt1,
     final double distance, final Point p0, final Point p1)
-    throws ParseException {
+        throws ParseException {
     final Geometry geometry1 = new WKTReader().read(wkt0);
     final Geometry geometry2 = new WKTReader().read(wkt1);
     final DistanceOp op = new DistanceOp(geometry1, geometry2);
@@ -94,7 +94,7 @@ public class DistanceTest extends TestCase {
       "MULTIPOINT ((140 280), (140 320))", 57.05597791103589,
       new PointDouble(111.6923076923077, 230.46153846153845,
         Point.NULL_ORDINATE), new PointDouble((double)140, 280,
-        Point.NULL_ORDINATE));
+          Point.NULL_ORDINATE));
   }
 
   public void testClosestPoints3() throws Exception {
@@ -102,7 +102,7 @@ public class DistanceTest extends TestCase {
       "LINESTRING (100 100, 200 100, 200 200, 100 200, 100 100)",
       "POINT (10 10)", 127.27922061357856, new PointDouble((double)100,
         100, Point.NULL_ORDINATE), new PointDouble((double)10, 10,
-        Point.NULL_ORDINATE));
+          Point.NULL_ORDINATE));
   }
 
   public void testClosestPoints4() throws Exception {
@@ -115,7 +115,7 @@ public class DistanceTest extends TestCase {
     doNearestPointsTest("LINESTRING (100 100, 200 200)",
       "LINESTRING (150 121, 200 0)", 20.506096654409877, new PointDouble(
         135.5, 135.5, Point.NULL_ORDINATE), new PointDouble((double)150,
-        121, Point.NULL_ORDINATE));
+          121, Point.NULL_ORDINATE));
   }
 
   public void testClosestPoints6() throws Exception {

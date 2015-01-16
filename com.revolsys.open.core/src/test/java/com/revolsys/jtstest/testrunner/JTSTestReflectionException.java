@@ -7,26 +7,31 @@ package com.revolsys.jtstest.testrunner;
  * @version 1.7
  */
 public class JTSTestReflectionException
-    extends Exception
+extends Exception
 {
-  public JTSTestReflectionException(String message) {
+  private static String createMessage(final String opName, final Object[] args) {
+    String msg = "Could not find Geometry method: " + opName + "(";
+    for (int j = 0; j < args.length; j++) {
+      if (j > 0) {
+        msg += ", ";
+      }
+      msg += args[j].getClass().getName();
+    }
+    msg += ")";
+    return msg;
+  }
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  public JTSTestReflectionException(final String message) {
     super(message);
   }
-  
-  public JTSTestReflectionException(String opName, Object[] args) {
+
+  public JTSTestReflectionException(final String opName, final Object[] args) {
     super(createMessage(opName, args));
   }
-  
-  private static String createMessage(String opName, Object[] args) {
-		String msg = "Could not find Geometry method: " + opName + "(";
-		for (int j = 0; j < args.length; j++) {
-			if (j > 0) {
-				msg += ", ";
-			}
-			msg += args[j].getClass().getName();
-		}
-		msg += ")";
-		return msg;
-	}
 
 }

@@ -16,7 +16,7 @@ public class BulletListKeySerializer extends AbstractKeySerializer {
 
   /**
    * Serialize the value to the XML writer.
-   * 
+   *
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
    */

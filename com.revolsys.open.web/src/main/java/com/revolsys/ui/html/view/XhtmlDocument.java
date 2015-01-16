@@ -9,13 +9,13 @@ public class XhtmlDocument {
   private Element body;
 
   public Element getBody() {
-    return body;
+    return this.body;
   }
 
   public void serialize(final XmlWriter out) throws IOException {
     out.startDocument("UTF-8", "1.0");
     out.docType("html", "-//W3C//DTD XHTML 1.1//EN",
-      "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd");
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd");
     out.startTag(HtmlUtil.HTML);
     out.attribute(HtmlUtil.ATTR_LANG, "en");
 

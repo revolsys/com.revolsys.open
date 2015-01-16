@@ -92,8 +92,8 @@ public class PlanarGraph {
   }
 
   public void add(final DirectedEdge e) {
-    nodes.add(e);
-    edgeEndList.add(e);
+    this.nodes.add(e);
+    this.edgeEndList.add(e);
   }
 
   /**
@@ -104,7 +104,7 @@ public class PlanarGraph {
     // create all the nodes for the edges
     for (final Iterator it = edgesToAdd.iterator(); it.hasNext();) {
       final Edge e = (Edge)it.next();
-      edges.add(e);
+      this.edges.add(e);
 
       final DirectedEdge de1 = new DirectedEdge(e, true);
       final DirectedEdge de2 = new DirectedEdge(e, false);
@@ -116,12 +116,12 @@ public class PlanarGraph {
     }
   }
 
-  public Node addNode(final Point coord) {
-    return nodes.addNode(coord);
+  public Node addNode(final Node node) {
+    return this.nodes.addNode(node);
   }
 
-  public Node addNode(final Node node) {
-    return nodes.addNode(node);
+  public Node addNode(final Point coord) {
+    return this.nodes.addNode(coord);
   }
 
   void debugPrint(final Object o) {
@@ -133,14 +133,14 @@ public class PlanarGraph {
   }
 
   public Iterable<Edge> edges() {
-    return edges;
+    return this.edges;
   }
 
   /**
    * @return the node if found; null otherwise
    */
   public Node find(final Point coord) {
-    return nodes.find(coord);
+    return this.nodes.find(coord);
   }
 
   /**
@@ -150,8 +150,8 @@ public class PlanarGraph {
    *    <code>null</code> if the edge was not found
    */
   public Edge findEdge(final Point p0, final Point p1) {
-    for (int i = 0; i < edges.size(); i++) {
-      final Edge e = edges.get(i);
+    for (int i = 0; i < this.edges.size(); i++) {
+      final Edge e = this.edges.get(i);
       if (p0.equals(e.getCoordinate(0)) && p1.equals(e.getCoordinate(1))) {
         return e;
       }
@@ -167,8 +167,8 @@ public class PlanarGraph {
    *    <code>null</code> if the edge was not found
    */
   public EdgeEnd findEdgeEnd(final Edge e) {
-    for (final Iterator i = getEdgeEnds().iterator(); i.hasNext();) {
-      final EdgeEnd ee = (EdgeEnd)i.next();
+    for (final Object element : getEdgeEnds()) {
+      final EdgeEnd ee = (EdgeEnd)element;
       if (ee.getEdge() == e) {
         return ee;
       }
@@ -184,8 +184,8 @@ public class PlanarGraph {
    *    <code>null</code> if the edge was not found
    */
   public Edge findEdgeInSameDirection(final Point p0, final Point p1) {
-    for (int i = 0; i < edges.size(); i++) {
-      final Edge e = edges.get(i);
+    for (int i = 0; i < this.edges.size(); i++) {
+      final Edge e = this.edges.get(i);
 
       if (matchInSameDirection(p0, p1, e.getCoordinate(0), e.getCoordinate(1))) {
         return e;
@@ -200,31 +200,31 @@ public class PlanarGraph {
   }
 
   public Collection<DirectedEdge> getEdgeEnds() {
-    return edgeEndList;
+    return this.edgeEndList;
   }
 
   public Iterator getEdgeIterator() {
-    return edges.iterator();
+    return this.edges.iterator();
   }
 
   public Iterator<Node> getNodeIterator() {
-    return nodes.iterator();
+    return this.nodes.iterator();
   }
 
   protected NodeMap getNodeMap() {
-    return nodes;
+    return this.nodes;
   }
 
   public Collection<Node> getNodes() {
-    return nodes.values();
+    return this.nodes.values();
   }
 
   protected void insertEdge(final Edge e) {
-    edges.add(e);
+    this.edges.add(e);
   }
 
   public boolean isBoundaryNode(final int geomIndex, final Point coord) {
-    final Node node = nodes.find(coord);
+    final Node node = this.nodes.find(coord);
     if (node == null) {
       return false;
     }
@@ -241,8 +241,8 @@ public class PlanarGraph {
    * efficiency (because they know that only a subset is of interest).
    */
   public void linkAllDirectedEdges() {
-    for (final Iterator nodeit = nodes.iterator(); nodeit.hasNext();) {
-      final Node node = (Node)nodeit.next();
+    for (final Object element : this.nodes) {
+      final Node node = (Node)element;
       ((DirectedEdgeStar)node.getEdges()).linkAllDirectedEdges();
     }
   }
@@ -253,8 +253,8 @@ public class PlanarGraph {
    * efficiency (because they know that only a subset is of interest).
    */
   public void linkResultDirectedEdges() {
-    for (final Iterator nodeit = nodes.iterator(); nodeit.hasNext();) {
-      final Node node = (Node)nodeit.next();
+    for (final Object element : this.nodes) {
+      final Node node = (Node)element;
       ((DirectedEdgeStar)node.getEdges()).linkResultDirectedEdges();
     }
   }
@@ -271,7 +271,7 @@ public class PlanarGraph {
     }
 
     if (CGAlgorithmsDD.orientationIndex(p0, p1, ep1) == CGAlgorithms.COLLINEAR
-      && Quadrant.quadrant(p0, p1) == Quadrant.quadrant(ep0, ep1)) {
+        && Quadrant.quadrant(p0, p1) == Quadrant.quadrant(ep0, ep1)) {
       return true;
     }
     return false;

@@ -37,7 +37,7 @@ public class StringConverterRegistry {
       return null;
     } else {
       final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-        .getConverter(valueClass);
+          .getConverter(valueClass);
       if (converter == null) {
         return (V)value;
       } else {

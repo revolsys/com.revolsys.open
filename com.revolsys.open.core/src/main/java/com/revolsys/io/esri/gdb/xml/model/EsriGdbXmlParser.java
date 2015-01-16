@@ -27,7 +27,20 @@ import com.revolsys.io.esri.gdb.xml.model.enums.WorkspaceType;
 import com.revolsys.io.xml.XmlProcessor;
 
 public class EsriGdbXmlParser extends XmlProcessor implements
-  EsriGeodatabaseXmlConstants {
+EsriGeodatabaseXmlConstants {
+
+  @SuppressWarnings("unchecked")
+  public static <T> T parse(final Resource resource) {
+    final EsriGdbXmlParser parser = new EsriGdbXmlParser();
+    return (T)parser.process(resource);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T parse(final String text) {
+    final byte[] bytes = text.getBytes();
+    final ByteArrayResource resource = new ByteArrayResource(bytes);
+    return (T)parse(resource);
+  }
 
   private static final Map<String, Class<?>> TAG_NAME_CLASS_MAP = new HashMap<String, Class<?>>();
 
@@ -94,19 +107,6 @@ public class EsriGdbXmlParser extends XmlProcessor implements
     TAG_NAME_CLASS_MAP.put(WORKSPACE_DEFINITION.getLocalPart(),
       WorkspaceDefinition.class);
     TAG_NAME_CLASS_MAP.put(WORKSPACE.getLocalPart(), Workspace.class);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T> T parse(final Resource resource) {
-    final EsriGdbXmlParser parser = new EsriGdbXmlParser();
-    return (T)parser.process(resource);
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <T> T parse(final String text) {
-    final byte[] bytes = text.getBytes();
-    final ByteArrayResource resource = new ByteArrayResource(bytes);
-    return (T)parse(resource);
   }
 
   public EsriGdbXmlParser() {

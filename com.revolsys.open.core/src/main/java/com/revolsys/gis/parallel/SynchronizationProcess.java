@@ -5,12 +5,12 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
 public class SynchronizationProcess extends
-  AbstractInOutProcess<Record, Record> {
+AbstractInOutProcess<Record, Record> {
   private int count = 0;
 
   @Override
   public synchronized Channel<Record> getIn() {
-    count++;
+    this.count++;
     return super.getIn();
   }
 
@@ -20,7 +20,7 @@ public class SynchronizationProcess extends
       for (Record object = in.read(); object != null; object = in.read()) {
         out.write(object);
       }
-      count--;
-    } while (count > 0);
+      this.count--;
+    } while (this.count > 0);
   }
 }

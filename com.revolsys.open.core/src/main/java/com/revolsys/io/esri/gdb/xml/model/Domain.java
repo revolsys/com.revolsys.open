@@ -29,27 +29,27 @@ public class Domain implements Cloneable {
   }
 
   public String getDescription() {
-    return description;
+    return this.description;
   }
 
   public String getDomainName() {
-    return domainName;
+    return this.domainName;
   }
 
   public FieldType getFieldType() {
-    return fieldType;
+    return this.fieldType;
   }
 
   public MergePolicyType getMergePolicy() {
-    return mergePolicy;
+    return this.mergePolicy;
   }
 
   public String getOwner() {
-    return owner;
+    return this.owner;
   }
 
   public SplitPolicyType getSplitPolicy() {
-    return splitPolicy;
+    return this.splitPolicy;
   }
 
   public void setDescription(final String description) {
@@ -78,7 +78,7 @@ public class Domain implements Cloneable {
 
   @Override
   public String toString() {
-    return domainName;
+    return this.domainName;
   }
 
 }

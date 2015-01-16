@@ -52,10 +52,10 @@ public final class WireFormat {
   public enum FieldType {
     DOUBLE(JavaType.DOUBLE, WIRETYPE_FIXED64), FLOAT(JavaType.FLOAT,
       WIRETYPE_FIXED32), INT64(JavaType.LONG, WIRETYPE_VARINT), UINT64(
-      JavaType.LONG, WIRETYPE_VARINT), INT32(JavaType.INT, WIRETYPE_VARINT), FIXED64(
-      JavaType.LONG, WIRETYPE_FIXED64), FIXED32(JavaType.INT, WIRETYPE_FIXED32), BOOL(
-      JavaType.BOOLEAN, WIRETYPE_VARINT), STRING(JavaType.STRING,
-      WIRETYPE_LENGTH_DELIMITED) {
+        JavaType.LONG, WIRETYPE_VARINT), INT32(JavaType.INT, WIRETYPE_VARINT), FIXED64(
+          JavaType.LONG, WIRETYPE_FIXED64), FIXED32(JavaType.INT, WIRETYPE_FIXED32), BOOL(
+            JavaType.BOOLEAN, WIRETYPE_VARINT), STRING(JavaType.STRING,
+              WIRETYPE_LENGTH_DELIMITED) {
       @Override
       public boolean isPackable() {
         return false;
@@ -81,7 +81,7 @@ public final class WireFormat {
     },
     UINT32(JavaType.INT, WIRETYPE_VARINT), ENUM(JavaType.ENUM, WIRETYPE_VARINT), SFIXED32(
       JavaType.INT, WIRETYPE_FIXED32), SFIXED64(JavaType.LONG, WIRETYPE_FIXED64), SINT32(
-      JavaType.INT, WIRETYPE_VARINT), SINT64(JavaType.LONG, WIRETYPE_VARINT);
+        JavaType.INT, WIRETYPE_VARINT), SINT64(JavaType.LONG, WIRETYPE_VARINT);
 
     private final JavaType javaType;
 

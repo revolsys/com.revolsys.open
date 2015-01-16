@@ -44,6 +44,12 @@ import com.revolsys.jts.util.Stopwatch;
  */
 public class QuadtreeCorrectTest {
 
+  public static void main(final String[] args) throws Exception {
+    // testBinaryPower();
+    final QuadtreeCorrectTest test = new QuadtreeCorrectTest();
+    test.run();
+  }
+
   /*
    * public static void testBinaryPower() { printBinaryPower(1004573397.0);
    * printBinaryPower(100.0); printBinaryPower(0.234);
@@ -58,12 +64,6 @@ public class QuadtreeCorrectTest {
   static final double MIN_EXTENT = -1000.0;
 
   static final double MAX_EXTENT = 1000.0;
-
-  public static void main(final String[] args) throws Exception {
-    // testBinaryPower();
-    final QuadtreeCorrectTest test = new QuadtreeCorrectTest();
-    test.run();
-  }
 
   private final EnvelopeList envList = new EnvelopeList();
 

@@ -40,12 +40,12 @@ import com.revolsys.jts.precision.CommonBitsRemover;
 /**
  * Performs an overlay operation using snapping and enhanced precision
  * to improve the robustness of the result.
- * This class <i>always</i> uses snapping.  
- * This is less performant than the standard JTS overlay code, 
+ * This class <i>always</i> uses snapping.
+ * This is less performant than the standard JTS overlay code,
  * and may even introduce errors which were not present in the original data.
- * For this reason, this class should only be used 
- * if the standard overlay code fails to produce a correct result. 
- *  
+ * For this reason, this class should only be used
+ * if the standard overlay code fails to produce a correct result.
+ *
  * @author Martin Davis
  * @version 1.7
  */
@@ -79,14 +79,14 @@ public class SnapOverlayOp {
   private CommonBitsRemover cbr;
 
   public SnapOverlayOp(final Geometry g1, final Geometry g2) {
-    geom[0] = g1;
-    geom[1] = g2;
+    this.geom[0] = g1;
+    this.geom[1] = g2;
     computeSnapTolerance();
   }
 
   private void computeSnapTolerance() {
-    snapTolerance = GeometrySnapper.computeOverlaySnapTolerance(geom[0],
-      geom[1]);
+    this.snapTolerance = GeometrySnapper.computeOverlaySnapTolerance(this.geom[0],
+      this.geom[1]);
 
     // System.out.println("Snap tol = " + snapTolerance);
   }
@@ -94,31 +94,31 @@ public class SnapOverlayOp {
   public Geometry getResultGeometry(final int opCode) {
     // Geometry[] selfSnapGeom = new Geometry[] { selfSnap(geom[0]),
     // selfSnap(geom[1])};
-    final Geometry[] prepGeom = snap(geom);
+    final Geometry[] prepGeom = snap(this.geom);
     final Geometry result = OverlayOp.overlayOp(prepGeom[0], prepGeom[1],
       opCode);
     return prepareResult(result);
   }
 
   private Geometry prepareResult(final Geometry geom) {
-    cbr.addCommonBits(geom);
+    this.cbr.addCommonBits(geom);
     return geom;
   }
 
   private Geometry[] removeCommonBits(final Geometry[] geom) {
-    cbr = new CommonBitsRemover();
-    cbr.add(geom[0]);
-    cbr.add(geom[1]);
+    this.cbr = new CommonBitsRemover();
+    this.cbr.add(geom[0]);
+    this.cbr.add(geom[1]);
     final Geometry remGeom[] = new Geometry[2];
-    remGeom[0] = cbr.removeCommonBits(geom[0].clone());
-    remGeom[1] = cbr.removeCommonBits(geom[1].clone());
+    remGeom[0] = this.cbr.removeCommonBits(geom[0].clone());
+    remGeom[1] = this.cbr.removeCommonBits(geom[1].clone());
     return remGeom;
   }
 
   private Geometry[] snap(final Geometry[] geom) {
     final Geometry[] remGeom = removeCommonBits(geom);
     final Geometry[] snapGeom = GeometrySnapper.snap(remGeom[0], remGeom[1],
-      snapTolerance);
+      this.snapTolerance);
     return snapGeom;
   }
 

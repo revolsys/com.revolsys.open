@@ -45,7 +45,7 @@ import com.revolsys.util.MathUtil;
  * Represents a sequence of facets (points or line segments)
  * of a {@link Geometry}
  * specified by a subsequence of a {@link LineString}.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -58,7 +58,7 @@ public class LineFacetSequence implements FacetSequence {
 
   /**
    * Creates a new sequence for a single point from a LineString.
-   * 
+   *
    * @param line the sequence holding the points in the facet sequence
    * @param start the index of the point
    */
@@ -70,7 +70,7 @@ public class LineFacetSequence implements FacetSequence {
 
   /**
    * Creates a new section based on a LineString.
-   * 
+   *
    * @param line the sequence holding the points in the section
    * @param start the index of the start point
    * @param end the index of the end point + 1
@@ -136,28 +136,28 @@ public class LineFacetSequence implements FacetSequence {
 
   @Override
   public Point getCoordinate(final int index) {
-    return line.getPoint(start + index);
+    return this.line.getPoint(this.start + index);
   }
 
   @Override
   public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    return line.getCoordinate(start + vertexIndex, axisIndex);
+    return this.line.getCoordinate(this.start + vertexIndex, axisIndex);
   }
 
   @Override
   public BoundingBox getEnvelope() {
-    final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(line);
+    final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(this.line);
     return env;
   }
 
   @Override
   public int getVertexCount() {
-    return end - start;
+    return this.end - this.start;
   }
 
   @Override
   public boolean isPoint() {
-    return end - start == 1;
+    return this.end - this.start == 1;
   }
 
   @Override

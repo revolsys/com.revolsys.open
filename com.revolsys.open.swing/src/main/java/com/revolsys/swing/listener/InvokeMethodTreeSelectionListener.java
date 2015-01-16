@@ -9,7 +9,7 @@ import com.revolsys.swing.parallel.Invoke;
 /**
  * An ActionListener that invokes the method on the object when the action is
  * performed.
- * 
+ *
  * @author Paul Austin
  */
 public class InvokeMethodTreeSelectionListener implements TreeSelectionListener {

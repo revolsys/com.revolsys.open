@@ -8,7 +8,7 @@ import com.revolsys.io.xml.XmlWriter;
 
 /**
  * Serialize a date with just the date fields.
- * 
+ *
  * @author Paul Austin
  */
 public class DateSerializer implements TypeSerializer {
@@ -17,28 +17,29 @@ public class DateSerializer implements TypeSerializer {
 
   /**
    * Get the dete style.
-   * 
+   *
    * @return The date style.
    */
   public int getDateStyle() {
-    return dateStyle;
+    return this.dateStyle;
   }
 
   /**
    * Serialize the value to the XML writer.
-   * 
+   *
    * @param out The XML writer to serialize to.
    * @param value The object to get the value from.
    * @throws IOException If there was an I/O error serializing the value.
    */
+  @Override
   public void serialize(final XmlWriter out, final Object value) {
-    final DateFormat dateFormat = DateFormat.getDateInstance(dateStyle);
+    final DateFormat dateFormat = DateFormat.getDateInstance(this.dateStyle);
     out.text(dateFormat.format(value));
   }
 
   /**
    * Set the dete style.
-   * 
+   *
    * @param dateStyle The date style.
    */
   public void setDateStyle(final int dateStyle) {
@@ -48,7 +49,7 @@ public class DateSerializer implements TypeSerializer {
   /**
    * Set the name of the style for use by
    * {@link DateFormat#getDateInstance(int)}.
-   * 
+   *
    * @param styleName The name of the date format style;
    */
   public void setDateStyle(final String styleName) {

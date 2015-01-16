@@ -13,7 +13,7 @@ public class EnumerationDataType extends SimpleDataType {
   }
 
   public Set<String> getAllowedValues() {
-    return allowedValues;
+    return this.allowedValues;
   }
 
 }

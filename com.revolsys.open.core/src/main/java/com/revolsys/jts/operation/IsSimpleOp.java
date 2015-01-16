@@ -213,7 +213,7 @@ public class IsSimpleOp {
           final int partIndex2 = segment2.getPartIndex();
           final int segmentIndex2 = segment2.getSegmentIndex();
           if (partIndex2 > partIndex || partIndex == partIndex2
-            && segmentIndex2 > segmentIndex) {
+              && segmentIndex2 > segmentIndex) {
             if (segment.equals(lineSegment)) {
               final SelfOverlapSegmentError error = new SelfOverlapSegmentError(
                 segment);

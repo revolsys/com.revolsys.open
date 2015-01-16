@@ -8,24 +8,24 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class MultipartFileResource extends AbstractResource {
 
-  private MultipartFile file;
+  private final MultipartFile file;
 
-  public MultipartFileResource(MultipartFile file) {
+  public MultipartFileResource(final MultipartFile file) {
     this.file = file;
   }
 
   @Override
+  public long contentLength() throws IOException {
+    return this.file.getSize();
+  }
+
+  @Override
   public String getDescription() {
-    return file.getName();
+    return this.file.getName();
   }
 
   @Override
   public InputStream getInputStream() throws IOException {
-    return file.getInputStream();
-  }
-
-  @Override
-  public long contentLength() throws IOException {
-    return file.getSize();
+    return this.file.getInputStream();
   }
 }

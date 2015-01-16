@@ -16,11 +16,11 @@ public class EdgeObjectFilter<T> implements Filter<Edge<T>> {
   @Override
   public boolean accept(final Edge<T> edge) {
     final T object = edge.getObject();
-    return filter.accept(object);
+    return this.filter.accept(object);
   }
 
   public Filter<T> getFilter() {
-    return filter;
+    return this.filter;
   }
 
   public void setFilter(final Filter<T> filter) {

@@ -3,7 +3,7 @@ package com.revolsys.data.record.property;
 import com.revolsys.data.record.schema.RecordDefinition;
 
 public abstract class AbstractRecordDefinitionProperty implements
-  RecordDefinitionProperty {
+RecordDefinitionProperty {
   private RecordDefinition recordDefinition;
 
   @Override
@@ -19,7 +19,11 @@ public abstract class AbstractRecordDefinitionProperty implements
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    return recordDefinition;
+    return this.recordDefinition;
+  }
+
+  public String getTypePath() {
+    return getRecordDefinition().getPath();
   }
 
   @Override
@@ -31,10 +35,6 @@ public abstract class AbstractRecordDefinitionProperty implements
     if (recordDefinition != null) {
       recordDefinition.setProperty(getPropertyName(), this);
     }
-  }
-
-  public String getTypePath() {
-    return getRecordDefinition().getPath();
   }
 
 }

@@ -65,53 +65,53 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
    */
   public InteriorIntersectionFinder(final LineIntersector li) {
     this.li = li;
-    interiorIntersection = null;
+    this.interiorIntersection = null;
   }
 
   /**
    * Gets the computed location of the intersection.
    * Due to round-off, the location may not be exact.
-   * 
+   *
    * @return the coordinate for the intersection location
    */
   public Point getInteriorIntersection() {
-    return interiorIntersection;
+    return this.interiorIntersection;
   }
 
   public List getIntersections() {
-    return intersections;
+    return this.intersections;
   }
 
   /**
    * Gets the endpoints of the intersecting segments.
-   * 
+   *
    * @return an array of the segment endpoints (p00, p01, p10, p11)
    */
   public Point[] getIntersectionSegments() {
-    return intSegments;
+    return this.intSegments;
   }
 
   /**
    * Tests whether an intersection was found.
-   * 
+   *
    * @return true if an intersection was found
    */
   public boolean hasIntersection() {
-    return interiorIntersection != null;
+    return this.interiorIntersection != null;
   }
 
   @Override
   public boolean isDone() {
-    if (findAllIntersections) {
+    if (this.findAllIntersections) {
       return false;
     }
-    return interiorIntersection != null;
+    return this.interiorIntersection != null;
   }
 
   /**
    * Tests whether a segment in a {@link SegmentString} is an end segment.
    * (either the first or last).
-   * 
+   *
    * @param segStr a segment string
    * @param index the index of a segment in the segment string
    * @return true if the segment is an end segment
@@ -149,11 +149,11 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
 
     /**
      * If enabled, only test end segments (on either segString).
-     * 
+     *
      */
-    if (isCheckEndSegmentsOnly) {
+    if (this.isCheckEndSegmentsOnly) {
       final boolean isEndSegPresent = isEndSegment(e0, segIndex0)
-        || isEndSegment(e1, segIndex1);
+          || isEndSegment(e1, segIndex1);
       if (!isEndSegPresent) {
         return;
       }
@@ -164,18 +164,18 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
     final Point p10 = e1.getCoordinate(segIndex1);
     final Point p11 = e1.getCoordinate(segIndex1 + 1);
 
-    li.computeIntersection(p00, p01, p10, p11);
+    this.li.computeIntersection(p00, p01, p10, p11);
 
-    if (li.hasIntersection()) {
-      if (li.isInteriorIntersection()) {
-        intSegments = new Point[4];
-        intSegments[0] = p00;
-        intSegments[1] = p01;
-        intSegments[2] = p10;
-        intSegments[3] = p11;
+    if (this.li.hasIntersection()) {
+      if (this.li.isInteriorIntersection()) {
+        this.intSegments = new Point[4];
+        this.intSegments[0] = p00;
+        this.intSegments[1] = p01;
+        this.intSegments[2] = p10;
+        this.intSegments[3] = p11;
 
-        interiorIntersection = li.getIntersection(0);
-        intersections.add(interiorIntersection);
+        this.interiorIntersection = this.li.getIntersection(0);
+        this.intersections.add(this.interiorIntersection);
       }
     }
   }
@@ -186,7 +186,7 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
    * the segments have been previously noded by an appropriate algorithm.
    * It may be known that any potential noding failures will occur only in
    * end segments.
-   * 
+   *
    * @param isCheckEndSegmentsOnly whether to test only end segments
    */
   public void setCheckEndSegmentsOnly(final boolean isCheckEndSegmentsOnly) {

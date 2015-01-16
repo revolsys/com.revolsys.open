@@ -9,15 +9,13 @@ import com.revolsys.jts.util.Stopwatch;
 
 /**
  * Runs {@link PerformanceTestCase} classes which contain performance tests.
- * 
- * 
- * 
+ *
+ *
+ *
  * @author Martin Davis
  *
  */
 public class PerformanceTestRunner {
-  private static final String RUN_PREFIX = "run";
-
   private static Method[] findMethods(final Class clz, final String methodPrefix) {
     final List runMeths = new ArrayList();
     final Method meth[] = clz.getDeclaredMethods();
@@ -33,6 +31,8 @@ public class PerformanceTestRunner {
     final PerformanceTestRunner runner = new PerformanceTestRunner();
     runner.runInternal(clz);
   }
+
+  private static final String RUN_PREFIX = "run";
 
   private PerformanceTestRunner() {
 
@@ -56,7 +56,7 @@ public class PerformanceTestRunner {
           for (int iter = 0; iter < runIter; iter++) {
             element.invoke(test);
           }
-        //  System.out.println(element.getName() + " : " + sw.getTimeString());
+          //  System.out.println(element.getName() + " : " + sw.getTimeString());
         }
         test.endRun();
       }

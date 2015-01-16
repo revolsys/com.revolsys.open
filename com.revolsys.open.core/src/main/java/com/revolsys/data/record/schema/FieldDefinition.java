@@ -20,6 +20,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -32,7 +33,7 @@ import com.revolsys.util.Property;
  * @see RecordDefinition
  */
 public class FieldDefinition extends AbstractObjectWithProperties implements
-  Cloneable, MapSerializer {
+Cloneable, MapSerializer {
 
   public static FieldDefinition create(final Map<String, Object> properties) {
     return new FieldDefinition(properties);
@@ -94,17 +95,17 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
   }
 
   public FieldDefinition(final Map<String, Object> properties) {
-    this.name = CollectionUtil.getString(properties, "name");
-    this.title = CollectionUtil.getString(properties, "title");
+    this.name = Maps.getString(properties, "name");
+    this.title = Maps.getString(properties, "title");
     if (!Property.hasValue(this.title)) {
       this.title = CaseConverter.toCapitalizedWords(this.name);
     }
-    this.description = CollectionUtil.getString(properties, "description");
-    this.type = DataTypes.getType(CollectionUtil.getString(properties,
-      "dataType"));
-    this.required = CollectionUtil.getBool(properties, "required");
-    this.length = CollectionUtil.getInteger(properties, "length", 0);
-    this.scale = CollectionUtil.getInteger(properties, "scale", 0);
+    this.description = Maps.getString(properties, "description");
+    this.type = DataTypes.getType(Maps.getString(properties,
+        "dataType"));
+    this.required = Maps.getBool(properties, "required");
+    this.length = Maps.getInteger(properties, "length", 0);
+    this.scale = Maps.getInteger(properties, "scale", 0);
     this.minValue = properties.get("minValue");
     if (this.minValue == null) {
       this.minValue = MathUtil.getMinValue(getTypeClass());
@@ -520,7 +521,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
 
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = new WeakReference<RecordDefinition>(
-      recordDefinition);
+        recordDefinition);
   }
 
   public void setRequired(final boolean required) {
@@ -585,7 +586,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements
 
     if (isRequired()) {
       if (value == null || value instanceof String
-        && !Property.hasValue((String)value)) {
+          && !Property.hasValue((String)value)) {
         throw new IllegalArgumentException(fieldName + " is required");
       }
     }

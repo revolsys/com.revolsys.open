@@ -44,6 +44,10 @@ import com.revolsys.jts.io.WKTReader;
  */
 public class AreaLengthTest extends TestCase {
 
+  public static void main(final String args[]) {
+    TestRunner.run(AreaLengthTest.class);
+  }
+
   private final GeometryFactory geometryFactory = GeometryFactory.floating(0,
     2);
 
@@ -51,22 +55,18 @@ public class AreaLengthTest extends TestCase {
 
   private static final double TOLERANCE = 1E-5;
 
-  public static void main(final String args[]) {
-    TestRunner.run(AreaLengthTest.class);
-  }
-
   public AreaLengthTest(final String name) {
     super(name);
   }
 
   public void checkArea(final String wkt, final double expectedValue)
-    throws Exception {
+      throws Exception {
     final Geometry g = this.reader.read(wkt);
     assertEquals(expectedValue, g.getArea(), TOLERANCE);
   }
 
   public void checkLength(final String wkt, final double expectedValue)
-    throws Exception {
+      throws Exception {
     final Geometry g = this.reader.read(wkt);
     final double len = g.getLength();
     // System.out.println(len);

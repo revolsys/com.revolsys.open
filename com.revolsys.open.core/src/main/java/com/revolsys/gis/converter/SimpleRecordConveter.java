@@ -16,7 +16,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.CollectionUtil;
 
 public class SimpleRecordConveter implements
-  Converter<Record, Record> {
+Converter<Record, Record> {
   private RecordDefinition recordDefinition;
 
   private RecordFactory factory;
@@ -43,34 +43,29 @@ public class SimpleRecordConveter implements
 
   public void addProcessor(
     final SourceToTargetProcess<Record, Record> processor) {
-    processors.add(processor);
+    this.processors.add(processor);
   }
 
   @Override
   public Record convert(final Record sourceObject) {
-    final Record targetObject = factory.createRecord(recordDefinition);
+    final Record targetObject = this.factory.createRecord(this.recordDefinition);
     final Geometry sourceGeometry = sourceObject.getGeometryValue();
     final GeometryFactory geometryFactory = sourceGeometry.getGeometryFactory();
     final Geometry targetGeometry = geometryFactory.geometry(sourceGeometry);
     GeometryProperties.copyUserData(sourceGeometry, targetGeometry);
     targetObject.setGeometryValue(targetGeometry);
-    for (final SourceToTargetProcess<Record, Record> processor : processors) {
+    for (final SourceToTargetProcess<Record, Record> processor : this.processors) {
       processor.process(sourceObject, targetObject);
     }
     return targetObject;
   }
 
-  public RecordDefinition getRecordDefinition() {
-    return recordDefinition;
-  }
-
   public List<SourceToTargetProcess<Record, Record>> getProcessors() {
-    return processors;
+    return this.processors;
   }
 
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.recordDefinition = recordDefinition;
-    this.factory = recordDefinition.getRecordFactory();
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   public void setProcessors(
@@ -78,9 +73,14 @@ public class SimpleRecordConveter implements
     this.processors = processors;
   }
 
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
+    this.factory = recordDefinition.getRecordFactory();
+  }
+
   @Override
   public String toString() {
-    return recordDefinition.getPath() + "\n  "
-      + CollectionUtil.toString("\n  ", processors);
+    return this.recordDefinition.getPath() + "\n  "
+        + CollectionUtil.toString("\n  ", this.processors);
   }
 }

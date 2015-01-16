@@ -98,12 +98,12 @@ public class DirectedEdge extends GraphComponent implements Comparable {
     this.from = from;
     this.to = to;
     this.edgeDirection = edgeDirection;
-    p0 = from.getCoordinate();
-    p1 = directionPt;
-    final double dx = p1.getX() - p0.getX();
-    final double dy = p1.getY() - p0.getY();
-    quadrant = Quadrant.quadrant(dx, dy);
-    angle = Math.atan2(dy, dx);
+    this.p0 = from.getCoordinate();
+    this.p1 = directionPt;
+    final double dx = this.p1.getX() - this.p0.getX();
+    final double dy = this.p1.getY() - this.p0.getY();
+    this.quadrant = Quadrant.quadrant(dx, dy);
+    this.angle = Math.atan2(dy, dx);
     // Assert.isTrue(! (dx == 0 && dy == 0),
     // "EdgeEnd with identical endpoints found");
   }
@@ -126,10 +126,10 @@ public class DirectedEdge extends GraphComponent implements Comparable {
   public int compareDirection(final DirectedEdge e) {
     // if the rays are in different quadrants, determining the ordering is
     // trivial
-    if (quadrant > e.quadrant) {
+    if (this.quadrant > e.quadrant) {
       return 1;
     }
-    if (quadrant < e.quadrant) {
+    if (this.quadrant < e.quadrant) {
       return -1;
     }
     // vectors are in the same quadrant - check relative orientation of
@@ -140,24 +140,24 @@ public class DirectedEdge extends GraphComponent implements Comparable {
      * dependent, when computing the orientation of a point very close to a
      * line. This is possibly due to the arithmetic in the translation to the
      * origin.
-     * 
+     *
      * For instance, the following situation produces identical results in spite
      * of the inverse orientation of the line segment:
-     * 
+     *
      * Point p0 = new PointDouble((double)219.3649559090992, 140.84159161824724);
      * Point p1 = new PointDouble((double)168.9018919682399, -5.713787599646864);
-     * 
+     *
      * Point p = new PointDouble((double)186.80814046338352, 46.28973405831556); int
      * orient = orientationIndex(p0, p1, p); int orientInv =
      * orientationIndex(p1, p0, p);
-     * 
+     *
      * A way to force consistent results is to normalize the orientation of the
      * vector using the following code. However, this may make the results of
      * orientationIndex inconsistent through the triangle of points, so it's not
      * clear this is an appropriate patch.
-     * 
+     *
      */
-    return CGAlgorithmsDD.orientationIndex(e.p0, e.p1, p1);
+    return CGAlgorithmsDD.orientationIndex(e.p0, e.p1, this.p1);
     // testing only
     // return ShewchuksDeterminant.orientationIndex(p1, p2, q);
     // previous implementation - not quite fully robust
@@ -190,14 +190,14 @@ public class DirectedEdge extends GraphComponent implements Comparable {
    * positive x-axis, in radians.
    */
   public double getAngle() {
-    return angle;
+    return this.angle;
   }
 
   /**
    * Returns the coordinate of the from-node.
    */
   public Point getCoordinate() {
-    return from.getCoordinate();
+    return this.from.getCoordinate();
   }
 
   /**
@@ -205,14 +205,14 @@ public class DirectedEdge extends GraphComponent implements Comparable {
    * specify this DirectedEdge's orientation.
    */
   public Point getDirectionPt() {
-    return p1;
+    return this.p1;
   }
 
   /**
    * Returns this DirectedEdge's parent Edge, or null if it has none.
    */
   public Edge getEdge() {
-    return parentEdge;
+    return this.parentEdge;
   }
 
   /**
@@ -220,14 +220,14 @@ public class DirectedEdge extends GraphComponent implements Comparable {
    * of this Directed Edge.
    */
   public boolean getEdgeDirection() {
-    return edgeDirection;
+    return this.edgeDirection;
   }
 
   /**
    * Returns the node from which this DirectedEdge leaves.
    */
   public Node getFromNode() {
-    return from;
+    return this.from;
   }
 
   /**
@@ -235,7 +235,7 @@ public class DirectedEdge extends GraphComponent implements Comparable {
    * orientation lies.
    */
   public int getQuadrant() {
-    return quadrant;
+    return this.quadrant;
   }
 
   /**
@@ -243,14 +243,14 @@ public class DirectedEdge extends GraphComponent implements Comparable {
    * this DirectedEdge's parent Edge.
    */
   public DirectedEdge getSym() {
-    return sym;
+    return this.sym;
   }
 
   /**
    * Returns the node to which this DirectedEdge goes.
    */
   public Node getToNode() {
-    return to;
+    return this.to;
   }
 
   /**
@@ -260,7 +260,7 @@ public class DirectedEdge extends GraphComponent implements Comparable {
    */
   @Override
   public boolean isRemoved() {
-    return parentEdge == null;
+    return this.parentEdge == null;
   }
 
   /**
@@ -270,8 +270,8 @@ public class DirectedEdge extends GraphComponent implements Comparable {
     final String className = getClass().getName();
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
-    out.print("  " + name + ": " + p0 + " - " + p1 + " " + quadrant + ":"
-      + angle);
+    out.print("  " + name + ": " + this.p0 + " - " + this.p1 + " " + this.quadrant + ":"
+        + this.angle);
   }
 
   /**

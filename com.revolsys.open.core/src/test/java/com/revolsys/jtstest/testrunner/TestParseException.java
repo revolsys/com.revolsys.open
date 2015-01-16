@@ -38,7 +38,12 @@ package com.revolsys.jtstest.testrunner;
  */
 public class TestParseException extends Exception {
 
-    public TestParseException(String s) {
-        super(s);
-    }
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  public TestParseException(final String s) {
+    super(s);
+  }
 }

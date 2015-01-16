@@ -38,57 +38,59 @@ import java.util.LinkedList;
 
 /**
  * A framework to visit sets of edge-connected {@link QuadEdgeTriangle}s in breadth-first order
- * 
+ *
  * @author Martin Davis
  * @version 1.0
  */
 public class EdgeConnectedTriangleTraversal {
-    private LinkedList triQueue = new LinkedList();
+  private final LinkedList triQueue = new LinkedList();
 
-    public EdgeConnectedTriangleTraversal() {}
+  public EdgeConnectedTriangleTraversal() {}
 
-    public void init(QuadEdgeTriangle tri) {
-        triQueue.addLast(tri);
+  /**
+   * Called to initialize the traversal queue with a given set of {@link QuadEdgeTriangle}s
+   *
+   * @param tris a collection of QuadEdgeTriangle
+   */
+  public void init(final Collection tris) {
+    this.triQueue.addAll(tris);
+  }
+
+  public void init(final QuadEdgeTriangle tri) {
+    this.triQueue.addLast(tri);
+  }
+
+  /**
+   * Subclasses can call this method to add a triangle to the end of the queue. This is useful for
+   * initializing the queue to a chosen set of triangles.
+   *
+   * @param tri a triangle
+   */
+  /*
+   * protected void addLast(QuadEdgeTriangle tri) { triQueue.addLast(tri); }
+   */
+
+  private void process(final QuadEdgeTriangle currTri, final TraversalVisitor visitor) {
+    currTri.getNeighbours();
+    for (int i = 0; i < 3; i++) {
+      final QuadEdgeTriangle neighTri = (QuadEdgeTriangle) currTri.getEdge(i).sym().getData();
+      if (neighTri == null) {
+        continue;
+      }
+      if (visitor.visit(currTri, i, neighTri)) {
+        this.triQueue.addLast(neighTri);
+      }
     }
+  }
 
-    /**
-     * Called to initialize the traversal queue with a given set of {@link QuadEdgeTriangle}s
-     * 
-     * @param tris a collection of QuadEdgeTriangle
-     */
-    public void init(Collection tris) {
-        triQueue.addAll(tris);
+  /**
+   * Subclasses call this method to perform the visiting process.
+   */
+  public void visitAll(final TraversalVisitor visitor) {
+    while (!this.triQueue.isEmpty()) {
+      final QuadEdgeTriangle tri = (QuadEdgeTriangle) this.triQueue.removeFirst();
+      process(tri, visitor);
     }
-
-    /**
-     * Subclasses can call this method to add a triangle to the end of the queue. This is useful for
-     * initializing the queue to a chosen set of triangles.
-     * 
-     * @param tri a triangle
-     */
-    /*
-     * protected void addLast(QuadEdgeTriangle tri) { triQueue.addLast(tri); }
-     */
-
-    /**
-     * Subclasses call this method to perform the visiting process.
-     */
-    public void visitAll(TraversalVisitor visitor) {
-        while (!triQueue.isEmpty()) {
-            QuadEdgeTriangle tri = (QuadEdgeTriangle) triQueue.removeFirst();
-            process(tri, visitor);
-        }
-    }
-
-    private void process(QuadEdgeTriangle currTri, TraversalVisitor visitor) {
-        currTri.getNeighbours();
-        for (int i = 0; i < 3; i++) {
-            QuadEdgeTriangle neighTri = (QuadEdgeTriangle) currTri.getEdge(i).sym().getData();
-            if (neighTri == null)
-                continue;
-            if (visitor.visit(currTri, i, neighTri))
-                triQueue.addLast(neighTri);
-        }
-    }
+  }
 
 }

@@ -30,7 +30,6 @@ import java.sql.Date;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -338,8 +337,7 @@ public class OsnSerializer {
           if (i < attributeCount - 1) {
             endLine();
           } else if (type.getName().equals("/Coord3D")) {
-            for (final Iterator<Object> scopes = this.scope.iterator(); scopes.hasNext();) {
-              final Object parent = scopes.next();
+            for (Object parent : this.scope) {
               if (parent instanceof Record) {
                 final Record parentObject = (Record)parent;
                 if (parentObject.getRecordDefinition()

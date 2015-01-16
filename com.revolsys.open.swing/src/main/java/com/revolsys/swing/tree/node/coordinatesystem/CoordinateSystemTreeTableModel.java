@@ -12,7 +12,7 @@ import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Projection;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 
 public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
   private final List<GeographicCoordinateSystem> geographicCoordinateSystems;
@@ -25,14 +25,14 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
 
   public CoordinateSystemTreeTableModel() {
     super(ROOT);
-    geographicCoordinateSystems = EpsgCoordinateSystems.getGeographicCoordinateSystems();
+    this.geographicCoordinateSystems = EpsgCoordinateSystems.getGeographicCoordinateSystems();
 
     for (final ProjectedCoordinateSystem projectedCoordinateSystem : EpsgCoordinateSystems.getProjectedCoordinateSystems()) {
       final Projection projection = projectedCoordinateSystem.getProjection();
-      CollectionUtil.addToList(projectedCoordinateSystemsByProjection,
+      Maps.addToList(this.projectedCoordinateSystemsByProjection,
         projection, projectedCoordinateSystem);
     }
-    this.projections.addAll(projectedCoordinateSystemsByProjection.keySet());
+    this.projections.addAll(this.projectedCoordinateSystemsByProjection.keySet());
   }
 
   @Override
@@ -40,16 +40,16 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
     if (parent == ROOT) {
       switch (index) {
         case 0:
-          return geographicCoordinateSystems;
+          return this.geographicCoordinateSystems;
         case 1:
-          return projections;
+          return this.projections;
         default:
           return null;
       }
-    } else if (parent == geographicCoordinateSystems) {
-      return geographicCoordinateSystems.get(index);
-    } else if (parent == projections) {
-      return projections.get(index);
+    } else if (parent == this.geographicCoordinateSystems) {
+      return this.geographicCoordinateSystems.get(index);
+    } else if (parent == this.projections) {
+      return this.projections.get(index);
     } else if (parent instanceof Projection) {
       final Projection projection = (Projection)parent;
       final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection.get(projection);
@@ -67,10 +67,10 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
   public int getChildCount(final Object parent) {
     if (parent == ROOT) {
       return 2;
-    } else if (parent == geographicCoordinateSystems) {
-      return geographicCoordinateSystems.size();
-    } else if (parent == projections) {
-      return projections.size();
+    } else if (parent == this.geographicCoordinateSystems) {
+      return this.geographicCoordinateSystems.size();
+    } else if (parent == this.projections) {
+      return this.projections.size();
     } else if (parent instanceof Projection) {
       final Projection projection = (Projection)parent;
       final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection.get(projection);
@@ -116,17 +116,17 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
   @Override
   public int getIndexOfChild(final Object parent, final Object child) {
     if (parent == ROOT) {
-      if (child == geographicCoordinateSystems) {
+      if (child == this.geographicCoordinateSystems) {
         return 0;
-      } else if (child == projectedCoordinateSystemsByProjection) {
+      } else if (child == this.projectedCoordinateSystemsByProjection) {
         return 1;
       } else {
         return -1;
       }
-    } else if (parent == geographicCoordinateSystems) {
-      return geographicCoordinateSystems.indexOf(child);
-    } else if (parent == projections) {
-      return projections.indexOf(child);
+    } else if (parent == this.geographicCoordinateSystems) {
+      return this.geographicCoordinateSystems.indexOf(child);
+    } else if (parent == this.projections) {
+      return this.projections.indexOf(child);
     } else if (parent instanceof Projection) {
       final Projection projection = (Projection)parent;
       final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection.get(projection);
@@ -146,11 +146,11 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
       if (column == 0) {
         return "Coordinate Systems";
       }
-    } else if (node == geographicCoordinateSystems) {
+    } else if (node == this.geographicCoordinateSystems) {
       if (column == 0) {
         return "Geographic Point Systems";
       }
-    } else if (node == projections) {
+    } else if (node == this.projections) {
       if (column == 0) {
         return "Projected Point Systems";
       }

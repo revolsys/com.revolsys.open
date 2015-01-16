@@ -51,7 +51,7 @@ public class DirectedEdge extends EdgeEnd {
     if (currLocation == Location.EXTERIOR && nextLocation == Location.INTERIOR) {
       return 1;
     } else if (currLocation == Location.INTERIOR
-      && nextLocation == Location.EXTERIOR) {
+        && nextLocation == Location.EXTERIOR) {
       return -1;
     }
     return 0;
@@ -66,10 +66,10 @@ public class DirectedEdge extends EdgeEnd {
   private DirectedEdge sym; // the symmetric edge
 
   private DirectedEdge next; // the next edge in the edge ring for the polygon
-                             // containing this edge
+  // containing this edge
 
   private DirectedEdge nextMin; // the next edge in the MinimalEdgeRing that
-                                // contains this edge
+  // contains this edge
 
   private EdgeRing edgeRing; // the EdgeRing that this edge is part of
 
@@ -99,19 +99,19 @@ public class DirectedEdge extends EdgeEnd {
    * Compute the label in the appropriate orientation for this DirEdge
    */
   private void computeDirectedLabel() {
-    setLabel(new Label(edge.getLabel()));
-    if (!isForward) {
+    setLabel(new Label(this.edge.getLabel()));
+    if (!this.isForward) {
       getLabel().flip();
     }
   }
 
   public int getDepth(final int position) {
-    return depth[position];
+    return this.depth[position];
   }
 
   public int getDepthDelta() {
-    int depthDelta = edge.getDepthDelta();
-    if (!isForward) {
+    int depthDelta = this.edge.getDepthDelta();
+    if (!this.isForward) {
       depthDelta = -depthDelta;
     }
     return depthDelta;
@@ -119,23 +119,23 @@ public class DirectedEdge extends EdgeEnd {
 
   @Override
   public Edge getEdge() {
-    return edge;
+    return this.edge;
   }
 
   public EdgeRing getEdgeRing() {
-    return edgeRing;
+    return this.edgeRing;
   }
 
   public EdgeRing getMinEdgeRing() {
-    return minEdgeRing;
+    return this.minEdgeRing;
   }
 
   public DirectedEdge getNext() {
-    return next;
+    return this.next;
   }
 
   public DirectedEdge getNextMin() {
-    return nextMin;
+    return this.nextMin;
   }
 
   /**
@@ -144,15 +144,15 @@ public class DirectedEdge extends EdgeEnd {
    * @return the DirectedEdge for the same Edge but in the opposite direction
    */
   public DirectedEdge getSym() {
-    return sym;
+    return this.sym;
   }
 
   public boolean isForward() {
-    return isForward;
+    return this.isForward;
   }
 
   public boolean isInResult() {
-    return isInResult;
+    return this.isInResult;
   }
 
   /**
@@ -168,8 +168,8 @@ public class DirectedEdge extends EdgeEnd {
     boolean isInteriorAreaEdge = true;
     for (int i = 0; i < 2; i++) {
       if (!(getLabel().isArea(i)
-        && getLabel().getLocation(i, Position.LEFT) == Location.INTERIOR && getLabel().getLocation(
-        i, Position.RIGHT) == Location.INTERIOR)) {
+          && getLabel().getLocation(i, Position.LEFT) == Location.INTERIOR && getLabel().getLocation(
+            i, Position.RIGHT) == Location.INTERIOR)) {
         isInteriorAreaEdge = false;
       }
     }
@@ -186,37 +186,37 @@ public class DirectedEdge extends EdgeEnd {
   public boolean isLineEdge() {
     final boolean isLine = getLabel().isLine(0) || getLabel().isLine(1);
     final boolean isExteriorIfArea0 = !getLabel().isArea(0)
-      || getLabel().allPositionsEqual(0, Location.EXTERIOR);
+        || getLabel().allPositionsEqual(0, Location.EXTERIOR);
     final boolean isExteriorIfArea1 = !getLabel().isArea(1)
-      || getLabel().allPositionsEqual(1, Location.EXTERIOR);
+        || getLabel().allPositionsEqual(1, Location.EXTERIOR);
 
     return isLine && isExteriorIfArea0 && isExteriorIfArea1;
   }
 
   public boolean isVisited() {
-    return isVisited;
+    return this.isVisited;
   }
 
   @Override
   public void print(final PrintStream out) {
     super.print(out);
-    out.print(" " + depth[Position.LEFT] + "/" + depth[Position.RIGHT]);
+    out.print(" " + this.depth[Position.LEFT] + "/" + this.depth[Position.RIGHT]);
     out.print(" (" + getDepthDelta() + ")");
     // out.print(" " + this.hashCode());
     // if (next != null) out.print(" next:" + next.hashCode());
-    if (isInResult) {
+    if (this.isInResult) {
       out.print(" inResult");
     }
   }
 
   public void setDepth(final int position, final int depthVal) {
-    if (depth[position] != -999) {
-      if (depth[position] != depthVal) {
+    if (this.depth[position] != -999) {
+      if (this.depth[position] != depthVal) {
         throw new TopologyException("assigned depths do not match",
           getCoordinate());
       }
     }
-    depth[position] = depthVal;
+    this.depth[position] = depthVal;
   }
 
   /**
@@ -226,7 +226,7 @@ public class DirectedEdge extends EdgeEnd {
   public void setEdgeDepths(final int position, final int depth) {
     // get the depth transition delta from R to L for this directed Edge
     int depthDelta = getEdge().getDepthDelta();
-    if (!isForward) {
+    if (!this.isForward) {
       depthDelta = -depthDelta;
     }
 
@@ -266,7 +266,7 @@ public class DirectedEdge extends EdgeEnd {
   }
 
   public void setSym(final DirectedEdge de) {
-    sym = de;
+    this.sym = de;
   }
 
   public void setVisited(final boolean isVisited) {
@@ -280,7 +280,7 @@ public class DirectedEdge extends EdgeEnd {
    */
   public void setVisitedEdge(final boolean isVisited) {
     setVisited(isVisited);
-    sym.setVisited(isVisited);
+    this.sym.setVisited(isVisited);
   }
 
 }

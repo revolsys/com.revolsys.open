@@ -12,16 +12,16 @@ import com.revolsys.spring.SpringUtil;
 public class RawContent extends Element {
   private final String content;
 
-  public RawContent(final String content) {
-    this.content = content;
-  }
-
   public RawContent(final Resource resource) {
     this(SpringUtil.getContents(resource));
   }
 
+  public RawContent(final String content) {
+    this.content = content;
+  }
+
   @Override
   public void serializeElement(final XmlWriter out) {
-    out.write(content);
+    out.write(this.content);
   }
 }

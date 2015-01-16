@@ -10,14 +10,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.revolsys.parallel.process.ProcessNetwork;
 
 public class ProcessNetworkServletContextListener implements
-  ServletContextListener {
+ServletContextListener {
 
   private ProcessNetwork processNetwork;
 
   @Override
   public void contextDestroyed(final ServletContextEvent servletContextEvent) {
-    if (processNetwork != null) {
-      processNetwork.stop();
+    if (this.processNetwork != null) {
+      this.processNetwork.stop();
     }
   }
 
@@ -26,6 +26,6 @@ public class ProcessNetworkServletContextListener implements
     final ServletContext servletContext = servletContextEvent.getServletContext();
     final WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
     this.processNetwork = (ProcessNetwork)applicationContext.getBean("processNetwork");
-    processNetwork.start();
+    this.processNetwork.start();
   }
 }

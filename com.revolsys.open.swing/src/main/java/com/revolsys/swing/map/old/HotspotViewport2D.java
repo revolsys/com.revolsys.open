@@ -13,7 +13,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.swing.map.layer.Project;
 
 public class HotspotViewport2D extends
-  com.revolsys.swing.map.ComponentViewport2D {
+com.revolsys.swing.map.ComponentViewport2D {
 
   private ZoomMode zoomMode = FixedScaleZoomMode.METRIC;
 
@@ -33,7 +33,7 @@ public class HotspotViewport2D extends
     } else {
       coordinate = point.getPoint();
     }
-    toolTipIndex.insert(new BoundingBoxDoubleGf(coordinate), new ViewportHotspot(
+    this.toolTipIndex.insert(new BoundingBoxDoubleGf(coordinate), new ViewportHotspot(
       coordinate, text, url));
   }
 
@@ -48,7 +48,7 @@ public class HotspotViewport2D extends
 
     final BoundingBox envelope = new BoundingBoxDoubleGf(2, location1[0], location2[0],
       location1[1], location2[1]);
-    final List<ViewportHotspot> results = toolTipIndex.query(envelope);
+    final List<ViewportHotspot> results = this.toolTipIndex.query(envelope);
     for (final ViewportHotspot result : results) {
       final Point point = result.getCoordinate();
       final double distance = point.distance(coordinate);
@@ -72,17 +72,17 @@ public class HotspotViewport2D extends
   }
 
   public ZoomMode getZoomMode() {
-    return zoomMode;
+    return this.zoomMode;
   }
 
   @Override
   public BoundingBox setBoundingBox(final BoundingBox boundingBox) {
-    final BoundingBox newBoundingBox = zoomMode.getBoundingBox(this,
+    final BoundingBox newBoundingBox = this.zoomMode.getBoundingBox(this,
       boundingBox);
     if (newBoundingBox.equals(this.getBoundingBox())) {
       return this.getBoundingBox();
     } else {
-      toolTipIndex = new QuadTree<>();
+      this.toolTipIndex = new QuadTree<>();
       return super.setBoundingBox(newBoundingBox);
     }
   }

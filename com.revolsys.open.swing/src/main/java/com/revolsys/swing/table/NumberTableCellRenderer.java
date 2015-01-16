@@ -4,12 +4,16 @@ import java.awt.Component;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 public class NumberTableCellRenderer extends DefaultTableCellRenderer {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private final String format;
 
   public NumberTableCellRenderer() {
@@ -21,7 +25,7 @@ public class NumberTableCellRenderer extends DefaultTableCellRenderer {
   }
 
   private NumberFormat getFormat() {
-    return new DecimalFormat(format);
+    return new DecimalFormat(this.format);
   }
 
   @Override
@@ -34,7 +38,7 @@ public class NumberTableCellRenderer extends DefaultTableCellRenderer {
     }
     final Component label = super.getTableCellRendererComponent(table, value,
       isSelected, hasFocus, row, column);
-    setHorizontalAlignment(JLabel.RIGHT);
+    setHorizontalAlignment(SwingConstants.RIGHT);
     return label;
   }
 }

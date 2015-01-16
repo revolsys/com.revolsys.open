@@ -57,101 +57,101 @@ public class MapPageable implements Pageable {
     this.modelGridSizeMetres = gridSizeMetres;
     final Unit<Length> pixelSize = NonSI.INCH.divide(dpi);
 
-    mapBoundingBox = boundingBox;
+    this.mapBoundingBox = boundingBox;
 
-    rulerSizePixels = Measure.valueOf(0.5, SI.CENTIMETRE)
-      .doubleValue(pixelSize);
+    this.rulerSizePixels = Measure.valueOf(0.5, SI.CENTIMETRE)
+        .doubleValue(pixelSize);
 
-    final double modelWidthMetres = mapBoundingBox.getWidthLength()
-      .doubleValue(SI.METRE);
-    final double modelHeightMetres = mapBoundingBox.getWidthLength()
-      .doubleValue(SI.METRE);
+    final double modelWidthMetres = this.mapBoundingBox.getWidthLength()
+        .doubleValue(SI.METRE);
+    final double modelHeightMetres = this.mapBoundingBox.getWidthLength()
+        .doubleValue(SI.METRE);
 
     final double printWidthPixels = pageFormat.getImageableWidth() * dpi / 72;
     final double printHeightPixels = pageFormat.getImageableHeight() * dpi / 72;
 
-    final double widthPixels = printWidthPixels - 2 * rulerSizePixels;
-    final double heightPixels = printHeightPixels - 3 * rulerSizePixels;
+    final double widthPixels = printWidthPixels - 2 * this.rulerSizePixels;
+    final double heightPixels = printHeightPixels - 3 * this.rulerSizePixels;
 
     final double pageWidthMetres = Measure.valueOf(widthPixels, pixelSize)
-      .doubleValue(SI.METRE);
+        .doubleValue(SI.METRE);
     final double pageHeightMetres = Measure.valueOf(heightPixels, pixelSize)
-      .doubleValue(SI.METRE);
+        .doubleValue(SI.METRE);
 
-    modelPageWidth = pageWidthMetres * scale;
-    modelPageHeight = pageHeightMetres * scale;
+    this.modelPageWidth = pageWidthMetres * scale;
+    this.modelPageHeight = pageHeightMetres * scale;
     final double cellsPerWidth = Math.ceil(pageWidthMetres * scale
-      / modelGridSizeMetres);
+      / this.modelGridSizeMetres);
     final double cellsPerHeight = Math.ceil(pageHeightMetres * scale
-      / modelGridSizeMetres);
+      / this.modelGridSizeMetres);
 
-    final double numXCells = Math.ceil(modelWidthMetres / modelGridSizeMetres);
-    final double numYCells = Math.ceil(modelHeightMetres / modelGridSizeMetres);
+    final double numXCells = Math.ceil(modelWidthMetres / this.modelGridSizeMetres);
+    final double numYCells = Math.ceil(modelHeightMetres / this.modelGridSizeMetres);
 
     if (numXCells <= cellsPerWidth - 1) {
-      coreCellsPerWidth = cellsPerWidth - 1;
+      this.coreCellsPerWidth = cellsPerWidth - 1;
     } else {
-      coreCellsPerWidth = cellsPerWidth - 2;
+      this.coreCellsPerWidth = cellsPerWidth - 2;
     }
     if (numYCells <= cellsPerHeight - 1) {
-      coreCellsPerHeight = cellsPerHeight - 1;
+      this.coreCellsPerHeight = cellsPerHeight - 1;
     } else {
-      coreCellsPerHeight = cellsPerHeight - 2;
+      this.coreCellsPerHeight = cellsPerHeight - 2;
     }
-    this.numXPages = (int)Math.ceil(numXCells / coreCellsPerWidth);
-    this.numYPages = (int)Math.ceil(numYCells / coreCellsPerHeight);
+    this.numXPages = (int)Math.ceil(numXCells / this.coreCellsPerWidth);
+    this.numYPages = (int)Math.ceil(numYCells / this.coreCellsPerHeight);
 
-    final double totalModelWidth = numXPages * coreCellsPerWidth
-      * modelGridSizeMetres;
-    if (mapBoundingBox.getWidth() < totalModelWidth) {
-      final double expandDistance = (totalModelWidth - mapBoundingBox.getWidth()) / 2;
-      mapBoundingBox = mapBoundingBox.expand(expandDistance, 0);
+    final double totalModelWidth = this.numXPages * this.coreCellsPerWidth
+        * this.modelGridSizeMetres;
+    if (this.mapBoundingBox.getWidth() < totalModelWidth) {
+      final double expandDistance = (totalModelWidth - this.mapBoundingBox.getWidth()) / 2;
+      this.mapBoundingBox = this.mapBoundingBox.expand(expandDistance, 0);
     }
-    final double totalModelHeight = numYPages * coreCellsPerHeight
-      * modelGridSizeMetres;
-    if (mapBoundingBox.getHeight() < totalModelHeight) {
-      final double expandDistance = (totalModelHeight - mapBoundingBox.getHeight()) / 2;
-      mapBoundingBox = mapBoundingBox.expand(0, expandDistance);
+    final double totalModelHeight = this.numYPages * this.coreCellsPerHeight
+        * this.modelGridSizeMetres;
+    if (this.mapBoundingBox.getHeight() < totalModelHeight) {
+      final double expandDistance = (totalModelHeight - this.mapBoundingBox.getHeight()) / 2;
+      this.mapBoundingBox = this.mapBoundingBox.expand(0, expandDistance);
     }
 
-    numPages = numXPages * numYPages;
-    contentRect = new Rectangle2D.Double(rulerSizePixels, rulerSizePixels,
+    this.numPages = this.numXPages * this.numYPages;
+    this.contentRect = new Rectangle2D.Double(this.rulerSizePixels, this.rulerSizePixels,
       widthPixels, heightPixels);
   }
 
   @Override
   public int getNumberOfPages() {
-    return numPages;
+    return this.numPages;
   }
 
   @Override
   public PageFormat getPageFormat(final int pageIndex) {
-    return pageFormat;
+    return this.pageFormat;
   }
 
   @Override
   public Printable getPrintable(final int pageIndex) {
-    final double pageXOffset = (modelPageWidth - coreCellsPerWidth
-      * modelGridSizeMetres) / 2;
-    final double pageYOffset = (modelPageHeight - coreCellsPerHeight
-      * modelGridSizeMetres) / 2;
-    final double startX = Math.floor(mapBoundingBox.getMinX()
-      / modelGridSizeMetres)
-      * modelGridSizeMetres;
-    final double startY = Math.floor(mapBoundingBox.getMinY()
-      / modelGridSizeMetres)
-      * modelGridSizeMetres;
-    final int column = pageIndex % numXPages;
-    final int row = numYPages - 1
-      - (int)Math.floor((double)pageIndex / numXPages);
-    final double x = startX + column * modelGridSizeMetres * coreCellsPerWidth
-      - pageXOffset;
-    final double y = startY + row * modelGridSizeMetres * coreCellsPerHeight
-      - pageYOffset;
-    final BoundingBox pageBoundingBox = new BoundingBoxDoubleGf(map.getGeometryFactory(),
-      2, x, y, x + modelPageWidth, y + modelPageHeight);
-    return new MapPrintable(map, column, numYPages - row, pageBoundingBox,
-      contentRect, dpi, rulerSizePixels, modelGridSizeMetres, scale);
+    final double pageXOffset = (this.modelPageWidth - this.coreCellsPerWidth
+        * this.modelGridSizeMetres) / 2;
+    final double pageYOffset = (this.modelPageHeight - this.coreCellsPerHeight
+        * this.modelGridSizeMetres) / 2;
+    final double startX = Math.floor(this.mapBoundingBox.getMinX()
+      / this.modelGridSizeMetres)
+      * this.modelGridSizeMetres;
+    final double startY = Math.floor(this.mapBoundingBox.getMinY()
+      / this.modelGridSizeMetres)
+      * this.modelGridSizeMetres;
+    final int column = pageIndex % this.numXPages;
+    final int row = this.numYPages - 1
+        - (int)Math.floor((double)pageIndex / this.numXPages);
+    final double x = startX + column * this.modelGridSizeMetres * this.coreCellsPerWidth
+        - pageXOffset;
+    final double y = startY + row * this.modelGridSizeMetres * this.coreCellsPerHeight
+        - pageYOffset;
+    final BoundingBox pageBoundingBox = new BoundingBoxDoubleGf(this.map.getGeometryFactory(),
+      2, x, y, x + this.modelPageWidth, y + this.modelPageHeight);
+    return new MapPrintable(this.map, column, this.numYPages - row, pageBoundingBox,
+      this.contentRect, this.dpi, this.rulerSizePixels, this.modelGridSizeMetres, this.scale);
   }
 
 }

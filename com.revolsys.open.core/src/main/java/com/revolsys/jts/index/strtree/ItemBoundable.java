@@ -42,17 +42,22 @@ import java.io.Serializable;
  * @version 1.7
  */
 public class ItemBoundable implements Boundable, Serializable {
-  private Object bounds;
-  private Object item;
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+  private final Object bounds;
+  private final Object item;
 
-  public ItemBoundable(Object bounds, Object item) {
+  public ItemBoundable(final Object bounds, final Object item) {
     this.bounds = bounds;
     this.item = item;
   }
 
+  @Override
   public Object getBounds() {
-    return bounds;
+    return this.bounds;
   }
 
-  public Object getItem() { return item; }
+  public Object getItem() { return this.item; }
 }

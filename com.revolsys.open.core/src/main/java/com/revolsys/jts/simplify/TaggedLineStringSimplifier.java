@@ -92,12 +92,12 @@ public class TaggedLineStringSimplifier {
 
   private int findFurthestPoint(final int i, final int j,
     final double[] maxDistance) {
-    final Point p0 = line.getVertex(i);
-    final Point p1 = line.getVertex(j);
+    final Point p0 = this.line.getVertex(i);
+    final Point p1 = this.line.getVertex(j);
     double maxDist = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
-      final Point midPt = line.getVertex(k);
+      final Point midPt = this.line.getVertex(k);
       final double distance = LineSegmentUtil.distanceLinePoint(p0, p1, midPt);
       if (distance > maxDist) {
         maxDist = distance;
@@ -114,25 +114,25 @@ public class TaggedLineStringSimplifier {
    * replacing them with a taggedLine between the endpoints.
    * The input and output indexes are updated
    * to reflect this.
-   * 
+   *
    * @param start the start index of the flattened section
    * @param end the end index of the flattened section
    * @return the new segment created
    */
   private LineSegment flatten(final int start, final int end) {
     // make a new segment for the simplified geometry
-    final Point p0 = line.getVertex(start).clonePoint();
-    final Point p1 = line.getVertex(end).clonePoint();
+    final Point p0 = this.line.getVertex(start).clonePoint();
+    final Point p1 = this.line.getVertex(end).clonePoint();
     final LineSegment newSeg = new LineSegmentDouble(p0, p1);
     // update the indexes
-    remove(taggedLine, start, end);
-    outputIndex.add(newSeg);
+    remove(this.taggedLine, start, end);
+    this.outputIndex.add(newSeg);
     return newSeg;
   }
 
   private boolean hasBadInputIntersection(final TaggedLineString parentLine,
     final int[] sectionIndex, final LineSegment candidateSeg) {
-    final List<TaggedLineSegment> querySegs = inputIndex.query(candidateSeg);
+    final List<TaggedLineSegment> querySegs = this.inputIndex.query(candidateSeg);
     for (final TaggedLineSegment querySeg : querySegs) {
       if (hasInteriorIntersection(querySeg, candidateSeg)) {
         if (isInLineSection(parentLine, sectionIndex, querySeg)) {
@@ -156,7 +156,7 @@ public class TaggedLineStringSimplifier {
   }
 
   private boolean hasBadOutputIntersection(final LineSegment candidateSeg) {
-    final List<LineSegment> querySegs = outputIndex.query(candidateSeg);
+    final List<LineSegment> querySegs = this.outputIndex.query(candidateSeg);
     for (final LineSegment querySeg : querySegs) {
       if (hasInteriorIntersection(querySeg, candidateSeg)) {
         return true;
@@ -167,9 +167,9 @@ public class TaggedLineStringSimplifier {
 
   private boolean hasInteriorIntersection(final LineSegment seg0,
     final LineSegment seg1) {
-    li.computeIntersection(seg0.getP0(), seg0.getP1(), seg1.getP0(),
+    this.li.computeIntersection(seg0.getP0(), seg0.getP1(), seg1.getP0(),
       seg1.getP1());
-    return li.isInteriorIntersection();
+    return this.li.isInteriorIntersection();
   }
 
   /**
@@ -183,7 +183,7 @@ public class TaggedLineStringSimplifier {
     final int end) {
     for (int i = start; i < end; i++) {
       final TaggedLineSegment seg = line.getSegment(i);
-      inputIndex.remove(seg);
+      this.inputIndex.remove(seg);
     }
   }
 
@@ -201,21 +201,21 @@ public class TaggedLineStringSimplifier {
   /**
    * Simplifies the given {@link TaggedLineString}
    * using the distance tolerance specified.
-   * 
+   *
    * @param taggedLine the linestring to simplify
    */
   void simplify(final TaggedLineString taggedLine) {
     this.taggedLine = taggedLine;
     this.line = taggedLine.getParent();
-    simplifySection(0, line.getVertexCount() - 1, 0);
+    simplifySection(0, this.line.getVertexCount() - 1, 0);
   }
 
   private void simplifySection(final int i, final int j, int depth) {
     depth += 1;
     final int[] sectionIndex = new int[2];
-    if ((i + 1) == j) {
-      final LineSegment newSeg = taggedLine.getSegment(i);
-      taggedLine.addToResult(newSeg);
+    if (i + 1 == j) {
+      final LineSegment newSeg = this.taggedLine.getSegment(i);
+      this.taggedLine.addToResult(newSeg);
       // leave this segment in the input index, for efficiency
       return;
     }
@@ -228,9 +228,9 @@ public class TaggedLineStringSimplifier {
      * Otherwise, if in the worst case there wouldn't be enough points,
      * don't flatten this segment (which avoids the worst case scenario)
      */
-    if (taggedLine.getResultSize() < taggedLine.getMinimumSize()) {
+    if (this.taggedLine.getResultSize() < this.taggedLine.getMinimumSize()) {
       final int worstCaseSize = depth + 1;
-      if (worstCaseSize < taggedLine.getMinimumSize()) {
+      if (worstCaseSize < this.taggedLine.getMinimumSize()) {
         isValidToSimplify = false;
       }
     }
@@ -238,23 +238,23 @@ public class TaggedLineStringSimplifier {
     final double[] distance = new double[1];
     final int furthestPtIndex = findFurthestPoint(i, j, distance);
     // flattening must be less than distanceTolerance
-    if (distance[0] > distanceTolerance) {
+    if (distance[0] > this.distanceTolerance) {
       isValidToSimplify = false;
     }
     // test if flattened section would cause intersection
     // final LineSegment candidateSeg = new LineSegmentDouble();
-    final Point p0 = line.getVertex(i).clonePoint();
-    final Point p1 = line.getVertex(j).clonePoint();
+    final Point p0 = this.line.getVertex(i).clonePoint();
+    final Point p1 = this.line.getVertex(j).clonePoint();
     final LineSegment candidateSeg = new LineSegmentDouble(p0, p1);
     sectionIndex[0] = i;
     sectionIndex[1] = j;
-    if (hasBadIntersection(taggedLine, sectionIndex, candidateSeg)) {
+    if (hasBadIntersection(this.taggedLine, sectionIndex, candidateSeg)) {
       isValidToSimplify = false;
     }
 
     if (isValidToSimplify) {
       final LineSegment newSeg = flatten(i, j);
-      taggedLine.addToResult(newSeg);
+      this.taggedLine.addToResult(newSeg);
       return;
     }
     simplifySection(i, furthestPtIndex, depth);

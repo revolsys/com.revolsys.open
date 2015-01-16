@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,11 +62,12 @@ public class TableLayout implements ElementContainerLayout {
     }
   }
 
+  @Override
   public void serialize(final XmlWriter out, final ElementContainer container) {
     if (!container.getElements().isEmpty()) {
       out.startTag(HtmlUtil.DIV);
-      if (cssClass != null) {
-        out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+      if (this.cssClass != null) {
+        out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
       }
       out.startTag(HtmlUtil.TABLE);
       out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
@@ -88,13 +89,13 @@ public class TableLayout implements ElementContainerLayout {
     int i = 0;
     int rowNum = 0;
     final int numElements = elementList.size();
-    final int lastRow = (numElements - 1) / numColumns;
+    final int lastRow = (numElements - 1) / this.numColumns;
     for (final Iterator elements = elementList.iterator(); elements.hasNext();) {
       final Element element = (Element)elements.next();
-      final int col = i % numColumns;
-      String colCss = (String)cssClasses.get(col);
+      final int col = i % this.numColumns;
+      String colCss = (String)this.cssClasses.get(col);
       final boolean firstCol = col == 0;
-      final boolean lastCol = (i + 1) % numColumns == 0 || i == numElements - 1;
+      final boolean lastCol = (i + 1) % this.numColumns == 0 || i == numElements - 1;
       if (firstCol) {
         out.startTag(HtmlUtil.TR);
         String rowCss = "";
@@ -128,18 +129,18 @@ public class TableLayout implements ElementContainerLayout {
   }
 
   private void serializeThead(final XmlWriter out) {
-    if (titles != null && !titles.isEmpty()) {
+    if (this.titles != null && !this.titles.isEmpty()) {
       out.startTag(HtmlUtil.THEAD);
       out.startTag(HtmlUtil.TR);
       int col = 0;
-      for (final Iterator titleIter = titles.iterator(); titleIter.hasNext();) {
+      for (final Iterator titleIter = this.titles.iterator(); titleIter.hasNext();) {
         final String title = (String)titleIter.next();
         out.startTag(HtmlUtil.TH);
-        String colCssClass = (String)cssClasses.get(col);
+        String colCssClass = (String)this.cssClasses.get(col);
         if (col == 0) {
           colCssClass += " firstCol";
         }
-        if (col == numColumns) {
+        if (col == this.numColumns) {
           colCssClass += " lastCol";
         }
         if (colCssClass.length() > 0) {

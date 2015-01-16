@@ -73,11 +73,6 @@ public class CodedValueDomain extends Domain implements CodeTable {
     return clone;
   }
 
-  @Override
-  public List<String> getFieldAliases() {
-    return Collections.emptyList();
-  }
-
   public List<CodedValue> getCodedValues() {
     return this.codedValues;
   }
@@ -85,6 +80,11 @@ public class CodedValueDomain extends Domain implements CodeTable {
   @Override
   public Map<Identifier, List<Object>> getCodes() {
     return Collections.unmodifiableMap(this.idValueMap);
+  }
+
+  @Override
+  public List<String> getFieldAliases() {
+    return Collections.emptyList();
   }
 
   @Override
@@ -115,13 +115,13 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   @Override
-  public String getIdFieldName() {
-    return getDomainName() + "_ID";
+  public Identifier getIdExact(final Object... values) {
+    return getId(values);
   }
 
   @Override
-  public Identifier getIdExact(final Object... values) {
-    return getId(values);
+  public String getIdFieldName() {
+    return getDomainName() + "_ID";
   }
 
   @Override

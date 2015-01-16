@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,9 +36,9 @@ import com.revolsys.ui.web.config.WebUiContext;
  * <p>
  * <b>Example </b>
  * </p>
- * 
+ *
  * <pre>
- * 
+ *
  *      &lt;%@ taglib uri=&quot;http://dev.nhigh.com/taglibs/nice&quot; prefix=&quot;nice&quot; %&gt;
  *      &lt;html&gt;
  *      &lt;head&gt;
@@ -50,14 +50,14 @@ import com.revolsys.ui.web.config.WebUiContext;
  *        .
  *      &lt;/body&gt;
  *      &lt;/html&gt;
- * 
+ *
  * </pre>
  * <dl>
  * <dt><B>Input Attributes: </B>
  * <dd><code>nice</code>- A Layout bean containing the component for the current
  * template.</dd>
  * </dl>
- * 
+ *
  * @author P. D. Austin
  * @version 1.0
  * @see Component
@@ -74,7 +74,7 @@ public class IncludeTag extends TagSupport {
 
   /**
    * Process the end tag.
-   * 
+   *
    * @return EVAL_PAGE
    */
   @Override
@@ -84,7 +84,7 @@ public class IncludeTag extends TagSupport {
 
   /**
    * Process the start tag.
-   * 
+   *
    * @return SKIP_BODY
    */
   @Override
@@ -94,30 +94,30 @@ public class IncludeTag extends TagSupport {
       if (context != null) {
         final Layout layout = context.getCurrentLayout();
         if (layout != null) {
-          final Component component = layout.getComponent(name);
+          final Component component = layout.getComponent(this.name);
           if (component != null) {
-            component.includeComponent(pageContext);
+            component.includeComponent(this.pageContext);
           }
         }
       }
     } catch (final Throwable t) {
-      log.error("Error including component: " + name, t);
+      log.error("Error including component: " + this.name, t);
     }
     return SKIP_BODY;
   }
 
   /**
    * Get the name of the component to be included.
-   * 
+   *
    * @return name the name of the child component to be included
    */
   public String getName() {
-    return name;
+    return this.name;
   }
 
   /**
    * Set the name of the component to be included.
-   * 
+   *
    * @param name the name of the child component to be included
    */
   public void setName(final String name) {

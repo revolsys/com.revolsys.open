@@ -253,25 +253,6 @@ public class CoordinateArrays {
   }
 
   /**
-   * Determines whether two {@link Coordinates} arrays of equal length
-   * are equal in opposite directions.
-   *
-   * @param pts1
-   * @param pts2
-   * @return <code>true</code> if the two arrays are equal in opposite directions.
-   */
-  private static boolean isEqualReversed(final Point[] pts1, final Point[] pts2) {
-    for (int i = 0; i < pts1.length; i++) {
-      final Point p1 = pts1[i];
-      final Point p2 = pts2[pts1.length - i - 1];
-      if (p1.compareTo(p2) != 0) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
    * Tests whether an array of {@link Coordinates}s forms a ring,
    * by checking length and closure.
    * Self-intersection is not checked.
@@ -297,8 +278,7 @@ public class CoordinateArrays {
    * or <code>null</code>
    */
   public static Point ptNotInList(final Point[] testPts, final Point[] pts) {
-    for (int i = 0; i < testPts.length; i++) {
-      final Point testPt = testPts[i];
+    for (final Point testPt : testPts) {
       if (CoordinateArrays.indexOf(testPt, pts) < 0) {
         return testPt;
       }
@@ -314,8 +294,8 @@ public class CoordinateArrays {
    */
   public static Point[] removeNull(final Point[] coord) {
     int nonNull = 0;
-    for (int i = 0; i < coord.length; i++) {
-      if (coord[i] != null) {
+    for (final Point element : coord) {
+      if (element != null) {
         nonNull++;
       }
     }
@@ -326,9 +306,9 @@ public class CoordinateArrays {
     }
 
     int j = 0;
-    for (int i = 0; i < coord.length; i++) {
-      if (coord[i] != null) {
-        newCoord[j++] = coord[i];
+    for (final Point element : coord) {
+      if (element != null) {
+        newCoord[j++] = element;
       }
     }
     return newCoord;

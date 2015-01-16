@@ -42,8 +42,6 @@ import com.revolsys.jts.geom.Location;
  */
 public class Depth {
 
-  private final static int NULL_VALUE = -1;
-
   public static int depthAtLocation(final Location location) {
     if (location == Location.EXTERIOR) {
       return 0;
@@ -54,13 +52,15 @@ public class Depth {
     return NULL_VALUE;
   }
 
+  private final static int NULL_VALUE = -1;
+
   private final int[][] depth = new int[2][3];
 
   public Depth() {
     // initialize depth array to a sentinel value
     for (int i = 0; i < 2; i++) {
       for (int j = 0; j < 3; j++) {
-        depth[i][j] = NULL_VALUE;
+        this.depth[i][j] = NULL_VALUE;
       }
     }
   }
@@ -68,7 +68,7 @@ public class Depth {
   public void add(final int geomIndex, final int posIndex,
     final Location location) {
     if (location == Location.INTERIOR) {
-      depth[geomIndex][posIndex]++;
+      this.depth[geomIndex][posIndex]++;
     }
   }
 
@@ -79,9 +79,9 @@ public class Depth {
         if (loc == Location.EXTERIOR || loc == Location.INTERIOR) {
           // initialize depth if it is null, otherwise add this location value
           if (isNull(i, j)) {
-            depth[i][j] = depthAtLocation(loc);
+            this.depth[i][j] = depthAtLocation(loc);
           } else {
-            depth[i][j] += depthAtLocation(loc);
+            this.depth[i][j] += depthAtLocation(loc);
           }
         }
       }
@@ -89,15 +89,15 @@ public class Depth {
   }
 
   public int getDelta(final int geomIndex) {
-    return depth[geomIndex][Position.RIGHT] - depth[geomIndex][Position.LEFT];
+    return this.depth[geomIndex][Position.RIGHT] - this.depth[geomIndex][Position.LEFT];
   }
 
   public int getDepth(final int geomIndex, final int posIndex) {
-    return depth[geomIndex][posIndex];
+    return this.depth[geomIndex][posIndex];
   }
 
   public Location getLocation(final int geomIndex, final int posIndex) {
-    if (depth[geomIndex][posIndex] <= 0) {
+    if (this.depth[geomIndex][posIndex] <= 0) {
       return Location.EXTERIOR;
     }
     return Location.INTERIOR;
@@ -109,7 +109,7 @@ public class Depth {
   public boolean isNull() {
     for (int i = 0; i < 2; i++) {
       for (int j = 0; j < 3; j++) {
-        if (depth[i][j] != NULL_VALUE) {
+        if (this.depth[i][j] != NULL_VALUE) {
           return false;
         }
       }
@@ -118,11 +118,11 @@ public class Depth {
   }
 
   public boolean isNull(final int geomIndex) {
-    return depth[geomIndex][1] == NULL_VALUE;
+    return this.depth[geomIndex][1] == NULL_VALUE;
   }
 
   public boolean isNull(final int geomIndex, final int posIndex) {
-    return depth[geomIndex][posIndex] == NULL_VALUE;
+    return this.depth[geomIndex][posIndex] == NULL_VALUE;
   }
 
   /**
@@ -136,9 +136,9 @@ public class Depth {
   public void normalize() {
     for (int i = 0; i < 2; i++) {
       if (!isNull(i)) {
-        int minDepth = depth[i][1];
-        if (depth[i][2] < minDepth) {
-          minDepth = depth[i][2];
+        int minDepth = this.depth[i][1];
+        if (this.depth[i][2] < minDepth) {
+          minDepth = this.depth[i][2];
         }
 
         if (minDepth < 0) {
@@ -146,10 +146,10 @@ public class Depth {
         }
         for (int j = 1; j < 3; j++) {
           int newValue = 0;
-          if (depth[i][j] > minDepth) {
+          if (this.depth[i][j] > minDepth) {
             newValue = 1;
           }
-          depth[i][j] = newValue;
+          this.depth[i][j] = newValue;
         }
       }
     }
@@ -157,12 +157,12 @@ public class Depth {
 
   public void setDepth(final int geomIndex, final int posIndex,
     final int depthValue) {
-    depth[geomIndex][posIndex] = depthValue;
+    this.depth[geomIndex][posIndex] = depthValue;
   }
 
   @Override
   public String toString() {
-    return "A: " + depth[0][1] + "," + depth[0][2] + " B: " + depth[1][1] + ","
-      + depth[1][2];
+    return "A: " + this.depth[0][1] + "," + this.depth[0][2] + " B: " + this.depth[1][1] + ","
+        + this.depth[1][2];
   }
 }

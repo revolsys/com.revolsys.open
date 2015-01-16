@@ -5,10 +5,10 @@ import java.util.LinkedHashSet;
 import com.revolsys.jts.geom.Point;
 
 public class CoordinateEventListenerList extends
-  LinkedHashSet<CoordinateEventListener> implements CoordinateEventListener {
+LinkedHashSet<CoordinateEventListener> implements CoordinateEventListener {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 3504994646284361341L;
 

@@ -157,7 +157,7 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
   }
 
   protected double getScale(final Datum[] values, final int axisIndex)
-    throws SQLException {
+      throws SQLException {
     if (axisIndex >= values.length) {
       return 0;
     } else {
@@ -175,17 +175,17 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
   @Override
   public void initialize(final RecordStoreSchema schema) {
     try (
-      final JdbcConnection connection = this.recordStore.getJdbcConnection()) {
+        final JdbcConnection connection = this.recordStore.getJdbcConnection()) {
       final String schemaName = this.recordStore.getDatabaseSchemaName(schema);
       final String sridSql = "select M.TABLE_NAME, M.COLUMN_NAME, M.SRID, M.DIMINFO, C.GEOMETRY_TYPE "
-        + "from ALL_SDO_GEOM_METADATA M "
-        + "LEFT OUTER JOIN ALL_GEOMETRY_COLUMNS C ON (M.OWNER = C.F_TABLE_SCHEMA AND M.TABLE_NAME = C.F_TABLE_NAME AND M.COLUMN_NAME = C.F_GEOMETRY_COLUMN) "
-        + "where OWNER = ?";
+          + "from ALL_SDO_GEOM_METADATA M "
+          + "LEFT OUTER JOIN ALL_GEOMETRY_COLUMNS C ON (M.OWNER = C.F_TABLE_SCHEMA AND M.TABLE_NAME = C.F_TABLE_NAME AND M.COLUMN_NAME = C.F_GEOMETRY_COLUMN) "
+          + "where OWNER = ?";
       try (
-        final PreparedStatement statement = connection.prepareStatement(sridSql)) {
+          final PreparedStatement statement = connection.prepareStatement(sridSql)) {
         statement.setString(1, schemaName);
         try (
-          final ResultSet resultSet = statement.executeQuery()) {
+            final ResultSet resultSet = statement.executeQuery()) {
           while (resultSet.next()) {
             final String tableName = resultSet.getString(1);
             final String columnName = resultSet.getString(2);

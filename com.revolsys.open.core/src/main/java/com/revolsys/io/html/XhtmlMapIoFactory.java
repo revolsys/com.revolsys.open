@@ -14,7 +14,7 @@ import com.revolsys.io.MapWriterFactory;
 import com.revolsys.spring.SpringUtil;
 
 public class XhtmlMapIoFactory extends AbstractIoFactory implements
-  MapWriterFactory {
+MapWriterFactory {
   public XhtmlMapIoFactory() {
     super("XHMTL");
     addMediaTypeAndFileExtension("text/html", "html");

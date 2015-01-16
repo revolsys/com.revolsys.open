@@ -72,39 +72,39 @@ public class GeometricShapeFactory {
     public double height;
 
     public Point getBase() {
-      return base;
+      return this.base;
     }
 
     public Point getCentre() {
-      if (centre == null) {
-        centre = new PointDouble(base.getX() + width / 2, base.getY() + height
+      if (this.centre == null) {
+        this.centre = new PointDouble(this.base.getX() + this.width / 2, this.base.getY() + this.height
           / 2, Point.NULL_ORDINATE);
       }
-      return centre;
+      return this.centre;
     }
 
     public BoundingBox getEnvelope() {
-      if (base != null) {
-        return new BoundingBoxDoubleGf(2, base.getX(), base.getY(), base.getX() + width,
-          base.getY() + height);
+      if (this.base != null) {
+        return new BoundingBoxDoubleGf(2, this.base.getX(), this.base.getY(), this.base.getX() + this.width,
+          this.base.getY() + this.height);
       }
-      if (centre != null) {
-        return new BoundingBoxDoubleGf(2, centre.getX() - width / 2, centre.getY()
-          - height / 2, centre.getX() + width / 2, centre.getY() + height / 2);
+      if (this.centre != null) {
+        return new BoundingBoxDoubleGf(2, this.centre.getX() - this.width / 2, this.centre.getY()
+          - this.height / 2, this.centre.getX() + this.width / 2, this.centre.getY() + this.height / 2);
       }
-      return new BoundingBoxDoubleGf(2, 0, 0, width, height);
+      return new BoundingBoxDoubleGf(2, 0, 0, this.width, this.height);
     }
 
     public double getHeight() {
-      return height;
+      return this.height;
     }
 
     public double getMinSize() {
-      return Math.min(width, height);
+      return Math.min(this.width, this.height);
     }
 
     public double getWidth() {
-      return width;
+      return this.width;
     }
 
     public void setBase(final Point base) {
@@ -127,8 +127,8 @@ public class GeometricShapeFactory {
     }
 
     public void setSize(final double size) {
-      height = size;
-      width = size;
+      this.height = size;
+      this.width = size;
     }
 
     public void setWidth(final double width) {
@@ -167,8 +167,8 @@ public class GeometricShapeFactory {
   }
 
   protected Point coord(final double x, final double y) {
-    final Point point = new PointDouble(geomFact.makePrecise(0, x),
-      geomFact.makePrecise(1, y));
+    final Point point = new PointDouble(this.geomFact.makePrecise(0, x),
+      this.geomFact.makePrecise(1, y));
     return point;
   }
 
@@ -178,17 +178,17 @@ public class GeometricShapeFactory {
   }
 
   /**
-    * Creates an elliptical arc, as a {@link LineString}.
-    * The arc is always created in a counter-clockwise direction.
-    * This can easily be reversed if required by using 
-    * {#link LineString.reverse()}
-    *
-    * @param startAng start angle in radians
-    * @param angExtent size of angle in radians
-    * @return an elliptical arc
-    */
+   * Creates an elliptical arc, as a {@link LineString}.
+   * The arc is always created in a counter-clockwise direction.
+   * This can easily be reversed if required by using
+   * {#link LineString.reverse()}
+   *
+   * @param startAng start angle in radians
+   * @param angExtent size of angle in radians
+   * @return an elliptical arc
+   */
   public LineString createArc(final double startAng, final double angExtent) {
-    final BoundingBox env = dim.getEnvelope();
+    final BoundingBox env = this.dim.getEnvelope();
     final double xRadius = env.getWidth() / 2.0;
     final double yRadius = env.getHeight() / 2.0;
 
@@ -199,17 +199,17 @@ public class GeometricShapeFactory {
     if (angSize <= 0.0 || angSize > 2 * Math.PI) {
       angSize = 2 * Math.PI;
     }
-    final double angInc = angSize / (nPts - 1);
+    final double angInc = angSize / (this.nPts - 1);
 
-    final Point[] pts = new Point[nPts];
+    final Point[] pts = new Point[this.nPts];
     int iPt = 0;
-    for (int i = 0; i < nPts; i++) {
+    for (int i = 0; i < this.nPts; i++) {
       final double ang = startAng + i * angInc;
       final double x = xRadius * Math.cos(ang) + centreX;
       final double y = yRadius * Math.sin(ang) + centreY;
       pts[iPt++] = coord(x, y);
     }
-    final LineString line = geomFact.lineString(pts);
+    final LineString line = this.geomFact.lineString(pts);
     return (LineString)rotate(line);
   }
 
@@ -223,7 +223,7 @@ public class GeometricShapeFactory {
    * @return an elliptical arc polygon
    */
   public Polygon createArcPolygon(final double startAng, final double angExtent) {
-    final BoundingBox env = dim.getEnvelope();
+    final BoundingBox env = this.dim.getEnvelope();
     final double xRadius = env.getWidth() / 2.0;
     final double yRadius = env.getHeight() / 2.0;
 
@@ -234,15 +234,15 @@ public class GeometricShapeFactory {
     if (angSize <= 0.0 || angSize > 2 * Math.PI) {
       angSize = 2 * Math.PI;
     }
-    final double angInc = angSize / (nPts - 1);
+    final double angInc = angSize / (this.nPts - 1);
     // double check = angInc * nPts;
     // double checkEndAng = startAng + check;
 
-    final Point[] pts = new Point[nPts + 2];
+    final Point[] pts = new Point[this.nPts + 2];
 
     int iPt = 0;
     pts[iPt++] = coord(centreX, centreY);
-    for (int i = 0; i < nPts; i++) {
+    for (int i = 0; i < this.nPts; i++) {
       final double ang = startAng + angInc * i;
 
       final double x = xRadius * Math.cos(ang) + centreX;
@@ -250,8 +250,8 @@ public class GeometricShapeFactory {
       pts[iPt++] = coord(x, y);
     }
     pts[iPt++] = coord(centreX, centreY);
-    final LinearRing ring = geomFact.linearRing(pts);
-    final Polygon poly = geomFact.polygon(ring);
+    final LinearRing ring = this.geomFact.linearRing(pts);
+    final Polygon poly = this.geomFact.polygon(ring);
     return (Polygon)rotate(poly);
   }
 
@@ -267,32 +267,32 @@ public class GeometricShapeFactory {
 
   /**
    * Creates an elliptical {@link Polygon}.
-   * If the supplied envelope is square the 
-   * result will be a circle. 
+   * If the supplied envelope is square the
+   * result will be a circle.
    *
    * @return an ellipse or circle
    */
   public Polygon createEllipse() {
 
-    final BoundingBox env = dim.getEnvelope();
+    final BoundingBox env = this.dim.getEnvelope();
     final double xRadius = env.getWidth() / 2.0;
     final double yRadius = env.getHeight() / 2.0;
 
     final double centreX = env.getMinX() + xRadius;
     final double centreY = env.getMinY() + yRadius;
 
-    final Point[] pts = new Point[nPts + 1];
+    final Point[] pts = new Point[this.nPts + 1];
     int iPt = 0;
-    for (int i = 0; i < nPts; i++) {
-      final double ang = i * (2 * Math.PI / nPts);
+    for (int i = 0; i < this.nPts; i++) {
+      final double ang = i * (2 * Math.PI / this.nPts);
       final double x = xRadius * Math.cos(ang) + centreX;
       final double y = yRadius * Math.sin(ang) + centreY;
       pts[iPt++] = coord(x, y);
     }
     pts[iPt] = pts[0].clonePoint();
 
-    final LinearRing ring = geomFact.linearRing(pts);
-    final Polygon poly = geomFact.polygon(ring);
+    final LinearRing ring = this.geomFact.linearRing(pts);
+    final Polygon poly = this.geomFact.polygon(ring);
     return (Polygon)rotate(poly);
   }
 
@@ -305,15 +305,15 @@ public class GeometricShapeFactory {
   public Polygon createRectangle() {
     int i;
     int ipt = 0;
-    int nSide = nPts / 4;
+    int nSide = this.nPts / 4;
     if (nSide < 1) {
       nSide = 1;
     }
-    final double XsegLen = dim.getEnvelope().getWidth() / nSide;
-    final double YsegLen = dim.getEnvelope().getHeight() / nSide;
+    final double XsegLen = this.dim.getEnvelope().getWidth() / nSide;
+    final double YsegLen = this.dim.getEnvelope().getHeight() / nSide;
 
     final Point[] pts = new Point[4 * nSide + 1];
-    final BoundingBox env = dim.getEnvelope();
+    final BoundingBox env = this.dim.getEnvelope();
 
     // double maxx = env.getMinX() + nSide * XsegLen;
     // double maxy = env.getMinY() + nSide * XsegLen;
@@ -340,8 +340,8 @@ public class GeometricShapeFactory {
     }
     pts[ipt++] = pts[0].clonePoint();
 
-    final LinearRing ring = geomFact.linearRing(pts);
-    final Polygon poly = geomFact.polygon(ring);
+    final LinearRing ring = this.geomFact.linearRing(pts);
+    final Polygon poly = this.geomFact.polygon(ring);
     return (Polygon)rotate(poly);
   }
 
@@ -369,15 +369,15 @@ public class GeometricShapeFactory {
   public Polygon createSupercircle(final double power) {
     final double recipPow = 1.0 / power;
 
-    final double radius = dim.getMinSize() / 2;
-    final Point centre = dim.getCentre();
+    final double radius = this.dim.getMinSize() / 2;
+    final Point centre = this.dim.getCentre();
 
     final double r4 = Math.pow(radius, power);
     final double y0 = radius;
 
     final double xyInt = Math.pow(r4 / 2, recipPow);
 
-    final int nSegsInOct = nPts / 8;
+    final int nSegsInOct = this.nPts / 8;
     final int totPts = nSegsInOct * 8 + 1;
     final Point[] pts = new Point[totPts];
     final double xInc = xyInt / nSegsInOct;
@@ -404,15 +404,15 @@ public class GeometricShapeFactory {
     }
     pts[pts.length - 1] = pts[0].clonePoint();
 
-    final LinearRing ring = geomFact.linearRing(pts);
-    final Polygon poly = geomFact.polygon(ring);
+    final LinearRing ring = this.geomFact.linearRing(pts);
+    final Polygon poly = this.geomFact.polygon(ring);
     return (Polygon)rotate(poly);
   }
 
   protected Geometry rotate(final Geometry geom) {
-    if (rotationAngle != 0.0) {
+    if (this.rotationAngle != 0.0) {
       final AffineTransformation trans = AffineTransformation.rotationInstance(
-        rotationAngle, dim.getCentre().getX(), dim.getCentre().getY());
+        this.rotationAngle, this.dim.getCentre().getX(), this.dim.getCentre().getY());
       trans.transform(geom);
     }
     return geom;
@@ -426,7 +426,7 @@ public class GeometricShapeFactory {
    * @param base the base coordinate of the shape
    */
   public void setBase(final Point base) {
-    dim.setBase(base);
+    this.dim.setBase(base);
   }
 
   /**
@@ -436,20 +436,20 @@ public class GeometricShapeFactory {
    * @param centre the centre coordinate of the shape
    */
   public void setCentre(final Point centre) {
-    dim.setCentre(centre);
+    this.dim.setCentre(centre);
   }
 
   public void setEnvelope(final BoundingBox env) {
-    dim.setEnvelope(env);
+    this.dim.setEnvelope(env);
   }
 
   /**
-  * Sets the height of the shape.
-  *
-  * @param height the height of the shape
-  */
+   * Sets the height of the shape.
+   *
+   * @param height the height of the shape
+   */
   public void setHeight(final double height) {
-    dim.setHeight(height);
+    this.dim.setHeight(height);
   }
 
   /**
@@ -464,11 +464,11 @@ public class GeometricShapeFactory {
   /**
    * Sets the rotation angle to use for the shape.
    * The rotation is applied relative to the centre of the shape.
-   * 
+   *
    * @param radians the rotation angle in radians.
    */
   public void setRotation(final double radians) {
-    rotationAngle = radians;
+    this.rotationAngle = radians;
   }
 
   /**
@@ -477,7 +477,7 @@ public class GeometricShapeFactory {
    * @param size the size of the shape's extent
    */
   public void setSize(final double size) {
-    dim.setSize(size);
+    this.dim.setSize(size);
   }
 
   /**
@@ -486,6 +486,6 @@ public class GeometricShapeFactory {
    * @param width the width of the shape
    */
   public void setWidth(final double width) {
-    dim.setWidth(width);
+    this.dim.setWidth(width);
   }
 }

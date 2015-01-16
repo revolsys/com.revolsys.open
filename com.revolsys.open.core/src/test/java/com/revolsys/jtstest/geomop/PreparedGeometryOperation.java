@@ -95,7 +95,7 @@ public class PreparedGeometryOperation implements GeometryOperation {
   /**
    * Creates a new operation which chains to the given {@link GeometryMethodOperation}
    * for non-intercepted methods.
-   * 
+   *
    * @param chainOp the operation to chain to
    */
   public PreparedGeometryOperation(final GeometryMethodOperation chainOp) {
@@ -107,12 +107,12 @@ public class PreparedGeometryOperation implements GeometryOperation {
     if (isPreparedOp(opName)) {
       return boolean.class;
     }
-    return chainOp.getReturnType(opName);
+    return this.chainOp.getReturnType(opName);
   }
 
   /**
    * Invokes the named operation
-   * 
+   *
    * @param opName
    * @param geometry
    * @param args
@@ -124,7 +124,7 @@ public class PreparedGeometryOperation implements GeometryOperation {
   public Result invoke(final String opName, final Geometry geometry,
     final Object[] args) throws Exception {
     if (!isPreparedOp(opName)) {
-      return chainOp.invoke(opName, geometry, args);
+      return this.chainOp.invoke(opName, geometry, args);
     }
     return invokePreparedOp(opName, geometry, args);
   }

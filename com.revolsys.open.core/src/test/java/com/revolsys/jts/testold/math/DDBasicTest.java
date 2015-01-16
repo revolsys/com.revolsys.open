@@ -7,7 +7,7 @@ import com.revolsys.jts.math.DD;
 
 /**
  * Tests basic arithmetic operations for {@link DD}s.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -62,7 +62,7 @@ public class DDBasicTest extends TestCase {
   /**
    * Computes (a+b)^2 in two different ways and compares the result.
    * For correct results, a and b should be integers.
-   * 
+   *
    * @param a
    * @param b
    */

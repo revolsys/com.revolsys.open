@@ -5,11 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FileSystemConnectionManager {
-  private static FileSystemConnectionManager INSTANCE = new FileSystemConnectionManager();
-
   public static FileSystemConnectionManager get() {
     return INSTANCE;
   }
+
+  private static FileSystemConnectionManager INSTANCE = new FileSystemConnectionManager();
 
   public List<File> getFileSystems() {
     return Arrays.asList(File.listRoots());

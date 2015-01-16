@@ -27,10 +27,10 @@ public class GetRecordValue implements Converter<Record, Object> {
 
   @Override
   public Object convert(final Record source) {
-    Object value = RecordUtil.getFieldByPath(source, attributePath);
-    if (!valueMap.isEmpty()) {
-      if (valueMap.containsKey(value)) {
-        value = valueMap.get(value);
+    Object value = RecordUtil.getFieldByPath(source, this.attributePath);
+    if (!this.valueMap.isEmpty()) {
+      if (this.valueMap.containsKey(value)) {
+        value = this.valueMap.get(value);
       }
     }
     return value;
@@ -38,6 +38,6 @@ public class GetRecordValue implements Converter<Record, Object> {
 
   @Override
   public String toString() {
-    return attributePath;
+    return this.attributePath;
   }
 }

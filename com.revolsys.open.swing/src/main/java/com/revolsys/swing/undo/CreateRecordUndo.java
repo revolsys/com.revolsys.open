@@ -22,8 +22,8 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      if (record != null) {
-        if (layerRecord == null) {
+      if (this.record != null) {
+        if (this.layerRecord == null) {
           return true;
         }
       }
@@ -34,8 +34,8 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      if (record != null) {
-        if (layerRecord != null) {
+      if (this.record != null) {
+        if (this.layerRecord != null) {
           return true;
         }
       }
@@ -45,19 +45,19 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
 
   @Override
   protected void doRedo() {
-    if (record != null) {
-      layerRecord = layer.createRecord(record);
-      layer.saveChanges(layerRecord);
-      layer.addSelectedRecords(layerRecord);
+    if (this.record != null) {
+      this.layerRecord = this.layer.createRecord(this.record);
+      this.layer.saveChanges(this.layerRecord);
+      this.layer.addSelectedRecords(this.layerRecord);
     }
   }
 
   @Override
   protected void doUndo() {
-    if (record != null) {
-      layer.deleteRecord(layerRecord);
-      layer.saveChanges(layerRecord);
-      layerRecord = null;
+    if (this.record != null) {
+      this.layer.deleteRecord(this.layerRecord);
+      this.layer.saveChanges(this.layerRecord);
+      this.layerRecord = null;
     }
   }
 

@@ -12,7 +12,7 @@ import com.revolsys.jts.geom.Geometry;
 /**
  * The exact match item visitor finds the first match in the archive features
  * for the update feature, excluding the attributes {@value #equalExclude}.
- * 
+ *
  * @author Paul Austin
  */
 public class RecordEquals2DFilter implements Filter<Record> {
@@ -35,11 +35,11 @@ public class RecordEquals2DFilter implements Filter<Record> {
 
   @Override
   public boolean accept(final Record object) {
-    final Geometry serachGeometry = searchObject.getGeometryValue();
+    final Geometry serachGeometry = this.searchObject.getGeometryValue();
     final Geometry geometry = object.getGeometryValue();
 
-    if (Geometry2DEquals.INSTANCE.equals(serachGeometry, geometry, equalExclude)) {
-      if (EqualsInstance.INSTANCE.equals(searchObject, object, equalExclude)) {
+    if (Geometry2DEquals.INSTANCE.equals(serachGeometry, geometry, this.equalExclude)) {
+      if (EqualsInstance.INSTANCE.equals(this.searchObject, object, this.equalExclude)) {
         return true;
       }
     }

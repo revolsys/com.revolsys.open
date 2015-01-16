@@ -13,7 +13,7 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.Reader;
 
 public class RecordDirectoryReader extends AbstractDirectoryReader<Record>
-  implements RecordDefinitionFactory {
+implements RecordDefinitionFactory {
 
   private final Map<String, RecordDefinition> typePathRecordDefinitionMap = new HashMap<String, RecordDefinition>();
 

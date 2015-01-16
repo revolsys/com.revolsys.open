@@ -27,8 +27,6 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
-  private static final Logger LOG = LoggerFactory.getLogger(EsriGdbXmlSerializer.class);
-
   public static String toString(final Object object) {
     final StringWriter writer = new StringWriter();
     final EsriGdbXmlSerializer serializer = new EsriGdbXmlSerializer(null,
@@ -37,6 +35,8 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     writer.flush();
     return writer.toString();
   }
+
+  private static final Logger LOG = LoggerFactory.getLogger(EsriGdbXmlSerializer.class);
 
   private final Map<Class<?>, Set<QName>> classPropertyTagNamesMap = new HashMap<Class<?>, Set<QName>>();
 
@@ -168,14 +168,14 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     addClassProperties(Workspace.class, WORKSPACE, null, WORKSPACE_DEFINITION,
       WORKSPACE_DATA);
 
-    classTypeNameMap.put(Byte.class, XmlConstants.XS_BYTE);
-    classTypeNameMap.put(Short.class, XmlConstants.XS_SHORT);
-    classTypeNameMap.put(Integer.class, XmlConstants.XS_INT);
-    classTypeNameMap.put(Float.class, XmlConstants.XS_FLOAT);
-    classTypeNameMap.put(Double.class, XmlConstants.XS_DOUBLE);
-    classTypeNameMap.put(String.class, XmlConstants.XS_STRING);
+    this.classTypeNameMap.put(Byte.class, XmlConstants.XS_BYTE);
+    this.classTypeNameMap.put(Short.class, XmlConstants.XS_SHORT);
+    this.classTypeNameMap.put(Integer.class, XmlConstants.XS_INT);
+    this.classTypeNameMap.put(Float.class, XmlConstants.XS_FLOAT);
+    this.classTypeNameMap.put(Double.class, XmlConstants.XS_DOUBLE);
+    this.classTypeNameMap.put(String.class, XmlConstants.XS_STRING);
 
-    xsiTypeTypeNames.add(CODE);
+    this.xsiTypeTypeNames.add(CODE);
   }
 
   public EsriGdbXmlSerializer(final String esriNamespaceUri, final Writer out) {
@@ -192,19 +192,19 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     this.out.startDocument("UTF-8");
     this.out.setPrefix(XmlConstants.XML_SCHEMA);
     this.out.setPrefix(XsiConstants.TYPE);
-    writeNamespaces = false;
-    writeFirstNamespace = true;
+    this.writeNamespaces = false;
+    this.writeFirstNamespace = true;
   }
 
   private void addClassProperties(final Class<?> objectClass,
     final QName tagName, final QName xsiTagName,
     final Collection<QName> propertyNames) {
-    classTagNameMap.put(objectClass, tagName);
+    this.classTagNameMap.put(objectClass, tagName);
     addClassXsiTagName(objectClass, xsiTagName);
     final Set<QName> allPropertyNames = new LinkedHashSet<QName>();
     addSuperclassPropertyNames(allPropertyNames, objectClass.getSuperclass());
     allPropertyNames.addAll(propertyNames);
-    classPropertyTagNamesMap.put(objectClass, allPropertyNames);
+    this.classPropertyTagNamesMap.put(objectClass, allPropertyNames);
   }
 
   private void addClassProperties(final Class<?> objectClass,
@@ -215,10 +215,10 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
   protected void addClassPropertyMethod(final Class<?> objectClass,
     final QName propertyName, final String methodName) {
-    Map<QName, Method> classMethods = classPropertyMethodMap.get(objectClass);
+    Map<QName, Method> classMethods = this.classPropertyMethodMap.get(objectClass);
     if (classMethods == null) {
       classMethods = new HashMap<QName, Method>();
-      classPropertyMethodMap.put(objectClass, classMethods);
+      this.classPropertyMethodMap.put(objectClass, classMethods);
     }
     final Method method = JavaBeanUtil.getMethod(EsriGdbXmlSerializer.class,
       methodName, Object.class);
@@ -228,7 +228,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
   private void addClassXsiTagName(final Class<?> objectClass,
     final QName tagName) {
     if (tagName != null) {
-      classXsiTagNameMap.put(objectClass, tagName);
+      this.classXsiTagNameMap.put(objectClass, tagName);
     }
   }
 
@@ -236,7 +236,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     final Class<?> objectClass) {
     if (!objectClass.equals(Object.class)) {
       addSuperclassPropertyNames(allPropertyNames, objectClass.getSuperclass());
-      final Set<QName> propertyNames = classPropertyTagNamesMap.get(objectClass);
+      final Set<QName> propertyNames = this.classPropertyTagNamesMap.get(objectClass);
       if (propertyNames != null) {
         allPropertyNames.addAll(propertyNames);
       }
@@ -246,35 +246,35 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
   private void addTagNameChildTagName(final QName tagName,
     final QName xsiTagName) {
-    tagNameChildTagNameMap.put(tagName, xsiTagName);
+    this.tagNameChildTagNameMap.put(tagName, xsiTagName);
   }
 
   private void addTagNameListElementTagName(final QName tagName,
     final QName xsiTagName) {
-    tagNameListElementTagNameMap.put(tagName, xsiTagName);
+    this.tagNameListElementTagNameMap.put(tagName, xsiTagName);
   }
 
   private void addTagNameXsiTagName(final QName tagName, final QName xsiTagName) {
-    tagNameXsiTagNameMap.put(tagName, xsiTagName);
+    this.tagNameXsiTagNameMap.put(tagName, xsiTagName);
   }
 
   public void close() {
-    out.flush();
-    out.close();
+    this.out.flush();
+    this.out.close();
   }
 
   private void endTag(final QName tagName) {
-    final QName childTagName = tagNameChildTagNameMap.get(tagName);
+    final QName childTagName = this.tagNameChildTagNameMap.get(tagName);
     if (childTagName != null) {
       endTag(childTagName);
     }
 
-    out.endTag();
+    this.out.endTag();
   }
 
   private Method getClassPropertyMethod(final Class<?> objectClass,
     final QName propertyName) {
-    final Map<QName, Method> propertyMethodMap = classPropertyMethodMap.get(objectClass);
+    final Map<QName, Method> propertyMethodMap = this.classPropertyMethodMap.get(objectClass);
     if (propertyMethodMap == null) {
       return null;
     } else {
@@ -284,7 +284,7 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
   public void serialize(final Object object) {
     final Class<? extends Object> objectClass = object.getClass();
-    QName tagName = classTagNameMap.get(objectClass);
+    QName tagName = this.classTagNameMap.get(objectClass);
     if (tagName == null) {
 
       final Package classPackage = objectClass.getPackage();
@@ -304,15 +304,15 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
     final Object object) {
     if (object != null) {
       final Class<? extends Object> objectClass = object.getClass();
-      final Collection<QName> propertyTagNames = classPropertyTagNamesMap.get(objectClass);
+      final Collection<QName> propertyTagNames = this.classPropertyTagNamesMap.get(objectClass);
       if (propertyTagNames == null) {
         if (object instanceof List) {
           final Collection list = (Collection)object;
           if (list.isEmpty()) {
-            out.closeStartTag();
-            out.setElementHasContent();
+            this.out.closeStartTag();
+            this.out.setElementHasContent();
           } else {
-            final QName listElementTagName = tagNameListElementTagNameMap.get(tagName);
+            final QName listElementTagName = this.tagNameListElementTagNameMap.get(tagName);
             if (listElementTagName == null) {
               for (final Object value : list) {
                 serialize(value);
@@ -328,17 +328,17 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
             }
           }
         } else {
-          out.text(object);
+          this.out.text(object);
         }
       } else {
         for (final QName propertyTagName : propertyTagNames) {
           String propertyName = propertyTagName.getLocalPart();
           if (propertyName.length() > 1
-            && Character.isLowerCase(propertyName.charAt(1))) {
+              && Character.isLowerCase(propertyName.charAt(1))) {
             propertyName = CaseConverter.toLowerFirstChar(propertyName);
           }
           final Object value = JavaBeanUtil.getProperty(object, propertyName);
-          if (writeNull || value != null) {
+          if (this.writeNull || value != null) {
             final Method method = getClassPropertyMethod(objectClass,
               propertyTagName);
             if (method == null) {
@@ -357,19 +357,19 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
   }
 
   private boolean startTag(final QName tagName) {
-    if (writeNamespaces || writeFirstNamespace) {
-      out.startTag(tagName);
-      writeFirstNamespace = false;
+    if (this.writeNamespaces || this.writeFirstNamespace) {
+      this.out.startTag(tagName);
+      this.writeFirstNamespace = false;
     } else {
-      out.startTag(null, tagName.getLocalPart());
+      this.out.startTag(null, tagName.getLocalPart());
     }
-    final QName xsiTagName = tagNameXsiTagNameMap.get(tagName);
+    final QName xsiTagName = this.tagNameXsiTagNameMap.get(tagName);
     boolean hasXsi = false;
     if (xsiTagName != null) {
-      out.xsiTypeAttribute(xsiTagName);
+      this.out.xsiTypeAttribute(xsiTagName);
       hasXsi = true;
     }
-    final QName childTagName = tagNameChildTagNameMap.get(tagName);
+    final QName childTagName = this.tagNameChildTagNameMap.get(tagName);
     if (childTagName != null) {
       startTag(childTagName);
     }
@@ -378,17 +378,17 @@ public class EsriGdbXmlSerializer implements EsriGeodatabaseXmlConstants {
 
   private void writeXsiTypeAttribute(final QName tagName,
     final Class<? extends Object> objectClass) {
-    QName xsiTagName = classXsiTagNameMap.get(objectClass);
+    QName xsiTagName = this.classXsiTagNameMap.get(objectClass);
     if (xsiTagName == null) {
-      if (xsiTypeTypeNames.contains(tagName)) {
-        xsiTagName = classTypeNameMap.get(objectClass);
+      if (this.xsiTypeTypeNames.contains(tagName)) {
+        xsiTagName = this.classTypeNameMap.get(objectClass);
         if (xsiTagName == null) {
           LOG.error("No xsi:type configuration for class " + objectClass);
         }
       }
     }
     if (xsiTagName != null) {
-      out.xsiTypeAttribute(xsiTagName);
+      this.out.xsiTypeAttribute(xsiTagName);
     }
   }
 

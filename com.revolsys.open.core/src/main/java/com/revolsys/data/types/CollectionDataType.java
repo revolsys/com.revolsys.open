@@ -11,7 +11,7 @@ public class CollectionDataType extends SimpleDataType {
   }
 
   public DataType getContentType() {
-    return contentType;
+    return this.contentType;
   }
 
 }

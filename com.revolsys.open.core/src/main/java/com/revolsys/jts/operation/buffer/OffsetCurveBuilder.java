@@ -45,12 +45,23 @@ import com.revolsys.jts.geomgraph.Position;
  * it may contain self-intersections (and usually will).
  * The final buffer polygon is computed by forming a topological graph
  * of all the noded raw curves and tracing outside contours.
- * The points in the raw curve are rounded 
+ * The points in the raw curve are rounded
  * to a given scale.
  *
  * @version 1.7
  */
 public class OffsetCurveBuilder {
+  /**
+   * Computes the distance tolerance to use during input
+   * line simplification.
+   *
+   * @param distance the buffer distance
+   * @return the simplification tolerance
+   */
+  private static double simplifyTolerance(final double bufDistance) {
+    return bufDistance / SIMPLIFY_FACTOR;
+  }
+
   private double distance = 0.0;
 
   private final GeometryFactory precisionModel;
@@ -59,23 +70,12 @@ public class OffsetCurveBuilder {
 
   /**
    * Use a value which results in a potential distance error which is
-   * significantly less than the error due to 
+   * significantly less than the error due to
    * the quadrant segment discretization.
    * For QS = 8 a value of 100 is reasonable.
    * This should produce a maximum of 1% distance error.
    */
   private static final double SIMPLIFY_FACTOR = 100.0;
-
-  /**
-   * Computes the distance tolerance to use during input
-   * line simplification.
-   * 
-   * @param distance the buffer distance
-   * @return the simplification tolerance
-   */
-  private static double simplifyTolerance(final double bufDistance) {
-    return bufDistance / SIMPLIFY_FACTOR;
-  }
 
   public OffsetCurveBuilder(final GeometryFactory precisionModel,
     final BufferParameters bufParams) {
@@ -85,7 +85,7 @@ public class OffsetCurveBuilder {
 
   private void computeLineBufferCurve(final LineString points,
     final OffsetSegmentGenerator segGen) {
-    final double distTol = simplifyTolerance(distance);
+    final double distTol = simplifyTolerance(this.distance);
 
     // --------- compute points for left side of line
     // Simplify the appropriate side of the line before generating
@@ -128,7 +128,7 @@ public class OffsetCurveBuilder {
 
   private void computeOffsetCurve(final LineString points,
     final boolean isRightSide, final OffsetSegmentGenerator segGen) {
-    final double distTol = simplifyTolerance(distance);
+    final double distTol = simplifyTolerance(this.distance);
 
     if (isRightSide) {
       // ---------- compute points for right side of line
@@ -168,21 +168,21 @@ public class OffsetCurveBuilder {
 
   private void computePointCurve(final Point point,
     final OffsetSegmentGenerator segGen) {
-    switch (bufParams.getEndCapStyle()) {
+    switch (this.bufParams.getEndCapStyle()) {
       case BufferParameters.CAP_ROUND:
         segGen.createCircle(point);
-      break;
+        break;
       case BufferParameters.CAP_SQUARE:
         segGen.createSquare(point);
-      break;
-    // otherwise curve is empty (e.g. for a butt cap);
+        break;
+        // otherwise curve is empty (e.g. for a butt cap);
     }
   }
 
   private void computeRingBufferCurve(final LineString inputPts,
     final int side, final OffsetSegmentGenerator segGen) {
     // simplify input line to improve performance
-    double distTol = simplifyTolerance(distance);
+    double distTol = simplifyTolerance(this.distance);
     // ensure that correct side is simplified
     if (side == Position.RIGHT) {
       distTol = -distTol;
@@ -202,7 +202,7 @@ public class OffsetCurveBuilder {
 
   private void computeSingleSidedBufferCurve(final LineString inputPts,
     final boolean isRightSide, final OffsetSegmentGenerator segGen) {
-    final double distTol = simplifyTolerance(distance);
+    final double distTol = simplifyTolerance(this.distance);
 
     if (isRightSide) {
       // add original line
@@ -249,11 +249,11 @@ public class OffsetCurveBuilder {
 
   /**
    * Gets the buffer parameters being used to generate the curve.
-   * 
+   *
    * @return the buffer parameters being used
    */
   public BufferParameters getBufferParameters() {
-    return bufParams;
+    return this.bufParams;
   }
 
   /**
@@ -263,7 +263,7 @@ public class OffsetCurveBuilder {
    *
    * @param inputPts the vertices of the line to offset
    * @param distance the offset distance
-   * 
+   *
    * @return a Point array representing the curve
    * or null if the curve is empty
    */
@@ -272,7 +272,7 @@ public class OffsetCurveBuilder {
     this.distance = distance;
 
     // a zero or negative width buffer of a line/point is empty
-    if (distance < 0.0 && !bufParams.isSingleSided()) {
+    if (distance < 0.0 && !this.bufParams.isSingleSided()) {
       return null;
     }
     if (distance == 0.0) {
@@ -284,7 +284,7 @@ public class OffsetCurveBuilder {
     if (inputPts.getVertexCount() <= 1) {
       computePointCurve(inputPts.getPoint(0), segGen);
     } else {
-      if (bufParams.isSingleSided()) {
+      if (this.bufParams.isSingleSided()) {
         final boolean isRightSide = distance < 0.0;
         computeSingleSidedBufferCurve(inputPts, isRightSide, segGen);
       } else {
@@ -324,7 +324,7 @@ public class OffsetCurveBuilder {
   public LineString getPointCurve(final Point point, final double distance) {
     this.distance = distance;
     // a zero or negative width buffer of a line/point is empty
-    if (distance < 0.0 && !bufParams.isSingleSided()) {
+    if (distance < 0.0 && !this.bufParams.isSingleSided()) {
       return null;
     } else if (distance == 0.0) {
       return null;
@@ -361,7 +361,7 @@ public class OffsetCurveBuilder {
   }
 
   private OffsetSegmentGenerator getSegGen(final double distance) {
-    return new OffsetSegmentGenerator(precisionModel, bufParams, distance);
+    return new OffsetSegmentGenerator(this.precisionModel, this.bufParams, distance);
   }
 
 }

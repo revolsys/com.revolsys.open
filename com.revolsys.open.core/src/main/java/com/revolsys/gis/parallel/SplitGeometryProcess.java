@@ -15,7 +15,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class SplitGeometryProcess extends
-  BaseInOutProcess<Record, Record> {
+BaseInOutProcess<Record, Record> {
   /** The statistics to record the number new observations created. */
   private Statistics createdStatistics;
 
@@ -37,54 +37,54 @@ public class SplitGeometryProcess extends
 
   /**
    * Get the statistics to record the number new observations created.
-   * 
+   *
    * @return The statistics to record the number new observations created.
    */
   public Statistics getCreatedStatistics() {
-    if (createdStatistics == null) {
-      createdStatistics = new Statistics("Created");
+    if (this.createdStatistics == null) {
+      this.createdStatistics = new Statistics("Created");
     }
-    return createdStatistics;
+    return this.createdStatistics;
   }
 
   public Geometry getGeometry() {
-    return geometry;
+    return this.geometry;
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public Statistics getNotWrittenStatistics() {
-    if (notWrittenStatistics == null) {
-      notWrittenStatistics = new Statistics("Discarded");
+    if (this.notWrittenStatistics == null) {
+      this.notWrittenStatistics = new Statistics("Discarded");
     }
-    return notWrittenStatistics;
+    return this.notWrittenStatistics;
   }
 
   public double getTolerance() {
-    return tolerance;
+    return this.tolerance;
   }
 
   @Override
   protected void postRun(final Channel<Record> in,
     final Channel<Record> out) {
-    if (createdStatistics != null) {
-      createdStatistics.disconnect();
+    if (this.createdStatistics != null) {
+      this.createdStatistics.disconnect();
     }
-    if (notWrittenStatistics != null) {
-      notWrittenStatistics.disconnect();
+    if (this.notWrittenStatistics != null) {
+      this.notWrittenStatistics.disconnect();
     }
   }
 
   @Override
   protected void preRun(final Channel<Record> in,
     final Channel<Record> out) {
-    if (createdStatistics != null) {
-      createdStatistics.connect();
+    if (this.createdStatistics != null) {
+      this.createdStatistics.connect();
     }
-    if (notWrittenStatistics != null) {
-      notWrittenStatistics.connect();
+    if (this.notWrittenStatistics != null) {
+      this.notWrittenStatistics.connect();
     }
   }
 
@@ -100,11 +100,11 @@ public class SplitGeometryProcess extends
           out.write(newObject);
         }
         if (newObjects.size() > 1) {
-          if (notWrittenStatistics != null) {
-            notWrittenStatistics.add(object);
+          if (this.notWrittenStatistics != null) {
+            this.notWrittenStatistics.add(object);
           }
-          if (createdStatistics != null) {
-            createdStatistics.add(object, newObjects.size());
+          if (this.createdStatistics != null) {
+            this.createdStatistics.add(object, newObjects.size());
           }
         }
 
@@ -118,7 +118,7 @@ public class SplitGeometryProcess extends
 
   /**
    * Set the statistics to record the number new observations created.
-   * 
+   *
    * @param createdStatistics The statistics to record the number new
    *          observations created.
    */
@@ -128,8 +128,8 @@ public class SplitGeometryProcess extends
 
   public void setGeometry(final Geometry geometry) {
     this.geometry = geometry;
-    index = new LineSegmentIndex();
-    index.insert(geometry);
+    this.index = new LineSegmentIndex();
+    this.index.insert(geometry);
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
@@ -147,8 +147,8 @@ public class SplitGeometryProcess extends
   protected List<Record> split(final Record object,
     final LineString line) {
     final List<Record> newObjects = new ArrayList<Record>();
-    final List<LineString> newLines = LineStringUtil.split(geometryFactory,
-      line, index, tolerance);
+    final List<LineString> newLines = LineStringUtil.split(this.geometryFactory,
+      line, this.index, this.tolerance);
     if (newLines.size() == 1) {
       final LineString newLine = newLines.get(0);
       if (newLine == line) {

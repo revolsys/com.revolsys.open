@@ -18,7 +18,7 @@ public class MethodInvoker extends AbstractRunnable {
 
   /**
    * Construct a new MethodInvoker.
-   * 
+   *
    * @param object The object to invoke the method on.
    * @param method The method to invoke.
    * @param parameters The parameters to pass to the method.
@@ -37,15 +37,15 @@ public class MethodInvoker extends AbstractRunnable {
 
   @SuppressWarnings("unchecked")
   public <T> T invoke() {
-    return (T)JavaBeanUtil.method(method, object, parameters);
+    return (T)JavaBeanUtil.method(this.method, this.object, this.parameters);
   }
 
   @Override
   public String toString() {
-    if (object instanceof Class) {
-      return object + " " + method;
+    if (this.object instanceof Class) {
+      return this.object + " " + this.method;
     } else {
-      return object.getClass() + " " + method;
+      return this.object.getClass() + " " + this.method;
     }
   }
 }

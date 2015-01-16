@@ -45,7 +45,7 @@ import com.revolsys.jts.index.strtree.SIRtree;
 public class SIRtreeTest extends TestCase {
   private static class TestTree extends SIRtree {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 

@@ -28,16 +28,16 @@ public class RecordTransferable implements Transferable {
 
   @Override
   public Object getTransferData(final DataFlavor flavor)
-    throws UnsupportedFlavorException, IOException {
+      throws UnsupportedFlavorException, IOException {
     if (this.object == null) {
       return null;
     } else if (DATA_OBJECT_FLAVOR.equals(flavor)
-      || MapTransferable.MAP_FLAVOR.equals(flavor)) {
+        || MapTransferable.MAP_FLAVOR.equals(flavor)) {
       return this.object;
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       final StringWriter out = new StringWriter();
       final Collection<String> fieldNames = this.object.getRecordDefinition()
-        .getFieldNames();
+          .getFieldNames();
       CsvUtil.writeColumns(out, fieldNames, '\t', '\n');
       final Collection<Object> values = this.object.values();
       CsvUtil.writeColumns(out, values, '\t', '\n');

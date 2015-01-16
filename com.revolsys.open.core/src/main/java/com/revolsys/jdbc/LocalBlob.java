@@ -32,10 +32,10 @@ public class LocalBlob implements Blob {
 
   @Override
   public InputStream getBinaryStream() throws SQLException {
-    if (resource == null) {
+    if (this.resource == null) {
       return null;
     } else {
-      final InputStream in = SpringUtil.getInputStream(resource);
+      final InputStream in = SpringUtil.getInputStream(this.resource);
       if (in instanceof FileInputStream) {
         final FileInputStream fileIn = (FileInputStream)in;
         return new BufferedInputStream(fileIn);
@@ -47,7 +47,7 @@ public class LocalBlob implements Blob {
 
   @Override
   public InputStream getBinaryStream(final long pos, final long length)
-    throws SQLException {
+      throws SQLException {
     throw new UnsupportedOperationException();
   }
 
@@ -59,22 +59,22 @@ public class LocalBlob implements Blob {
   @Override
   public long length() throws SQLException {
     try {
-      return resource.contentLength();
+      return this.resource.contentLength();
     } catch (final IOException e) {
       throw new RuntimeException("Unable to get length for resource: "
-        + resource, e);
+          + this.resource, e);
     }
   }
 
   @Override
   public long position(final Blob pattern, final long start)
-    throws SQLException {
+      throws SQLException {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public long position(final byte pattern[], final long start)
-    throws SQLException {
+      throws SQLException {
     throw new UnsupportedOperationException();
   }
 

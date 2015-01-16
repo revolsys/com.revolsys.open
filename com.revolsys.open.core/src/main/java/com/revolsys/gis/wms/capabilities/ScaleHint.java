@@ -6,11 +6,11 @@ public class ScaleHint {
   private double max;
 
   public double getMax() {
-    return max;
+    return this.max;
   }
 
   public double getMin() {
-    return min;
+    return this.min;
   }
 
   public void setMax(final double max) {

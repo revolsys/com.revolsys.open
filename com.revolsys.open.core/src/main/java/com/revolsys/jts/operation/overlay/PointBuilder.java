@@ -33,7 +33,6 @@
 package com.revolsys.jts.operation.overlay;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.PointLocator;
@@ -73,7 +72,7 @@ public class PointBuilder {
      * result geometries, so must perform this filter.
      * (For instance, this can happen during topology collapse).
      */
-    return resultLineString;
+    return this.resultLineString;
   }
 
   /**
@@ -88,8 +87,8 @@ public class PointBuilder {
     // testing only
     // if (true) return resultNodeList;
 
-    for (final Iterator nodeit = op.getGraph().getNodes().iterator(); nodeit.hasNext();) {
-      final Node n = (Node)nodeit.next();
+    for (final Object element : this.op.getGraph().getNodes()) {
+      final Node n = (Node)element;
 
       // filter out nodes which are known to be in the result
       if (n.isInResult()) {
@@ -127,9 +126,9 @@ public class PointBuilder {
    */
   private void filterCoveredNodeToPoint(final Node n) {
     final Point coord = n.getCoordinate();
-    if (!op.isCoveredByLA(coord)) {
-      final Point pt = geometryFactory.point(coord);
-      resultLineString.add(pt);
+    if (!this.op.isCoveredByLA(coord)) {
+      final Point pt = this.geometryFactory.point(coord);
+      this.resultLineString.add(pt);
     }
   }
 }

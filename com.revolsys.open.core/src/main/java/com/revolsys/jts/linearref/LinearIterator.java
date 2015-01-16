@@ -102,7 +102,7 @@ public class LinearIterator {
       throw new IllegalArgumentException("Lineal geometry is required");
     }
     this.linearGeom = linearGeom;
-    numLines = linearGeom.getGeometryCount();
+    this.numLines = linearGeom.getGeometryCount();
     this.componentIndex = componentIndex;
     this.vertexIndex = vertexIndex;
     loadCurrentLine();
@@ -125,7 +125,7 @@ public class LinearIterator {
    * @return the current component index
    */
   public int getComponentIndex() {
-    return componentIndex;
+    return this.componentIndex;
   }
 
   /**
@@ -133,7 +133,7 @@ public class LinearIterator {
    * @return a linestring
    */
   public LineString getLine() {
-    return currentLine;
+    return this.currentLine;
   }
 
   /**
@@ -144,8 +144,8 @@ public class LinearIterator {
    * @return a {@link Coordinates} or <code>null</code>
    */
   public Point getSegmentEnd() {
-    if (vertexIndex < getLine().getVertexCount() - 1) {
-      return currentLine.getPoint(vertexIndex + 1);
+    if (this.vertexIndex < getLine().getVertexCount() - 1) {
+      return this.currentLine.getPoint(this.vertexIndex + 1);
     }
     return null;
   }
@@ -156,7 +156,7 @@ public class LinearIterator {
    * @return a {@link Coordinates}
    */
   public Point getSegmentStart() {
-    return currentLine.getPoint(vertexIndex);
+    return this.currentLine.getPoint(this.vertexIndex);
   }
 
   /**
@@ -164,23 +164,23 @@ public class LinearIterator {
    * @return the current vertex index
    */
   public int getVertexIndex() {
-    return vertexIndex;
+    return this.vertexIndex;
   }
 
   /**
    * Tests whether there are any vertices left to iterator over.
    * Specifically, hasNext() return <tt>true</tt> if the
    * current state of the iterator represents a valid location
-   * on the linear geometry. 
-   * 
+   * on the linear geometry.
+   *
    * @return <code>true</code> if there are more vertices to scan
    */
   public boolean hasNext() {
-    if (componentIndex >= numLines) {
+    if (this.componentIndex >= this.numLines) {
       return false;
     }
-    if (componentIndex == numLines - 1
-      && vertexIndex >= currentLine.getVertexCount()) {
+    if (this.componentIndex == this.numLines - 1
+        && this.vertexIndex >= this.currentLine.getVertexCount()) {
       return false;
     }
     return true;
@@ -193,23 +193,23 @@ public class LinearIterator {
    * @return <code>true</true> if the iterator is at an endpoint
    */
   public boolean isEndOfLine() {
-    if (componentIndex >= numLines) {
+    if (this.componentIndex >= this.numLines) {
       return false;
     }
     // LineString currentLine = (LineString)
     // linear.getGeometryN(componentIndex);
-    if (vertexIndex < currentLine.getVertexCount() - 1) {
+    if (this.vertexIndex < this.currentLine.getVertexCount() - 1) {
       return false;
     }
     return true;
   }
 
   private void loadCurrentLine() {
-    if (componentIndex >= numLines) {
-      currentLine = null;
+    if (this.componentIndex >= this.numLines) {
+      this.currentLine = null;
       return;
     }
-    currentLine = (LineString)linearGeom.getGeometry(componentIndex);
+    this.currentLine = (LineString)this.linearGeom.getGeometry(this.componentIndex);
   }
 
   /**
@@ -220,11 +220,11 @@ public class LinearIterator {
       return;
     }
 
-    vertexIndex++;
-    if (vertexIndex >= currentLine.getVertexCount()) {
-      componentIndex++;
+    this.vertexIndex++;
+    if (this.vertexIndex >= this.currentLine.getVertexCount()) {
+      this.componentIndex++;
       loadCurrentLine();
-      vertexIndex = 0;
+      this.vertexIndex = 0;
     }
   }
 }

@@ -17,8 +17,8 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Maps;
 
 /**
  * For each object render using the first renderer that matches the filter.
@@ -78,7 +78,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRenderer {
           final AbstractRecordLayerRenderer renderer = getRenderer(layer,
             renderers, record, scale);
           if (renderer != null) {
-            CollectionUtil.addToList(rendererToRecordMap, renderer, record);
+            Maps.addToList(rendererToRecordMap, renderer, record);
           }
         }
       }

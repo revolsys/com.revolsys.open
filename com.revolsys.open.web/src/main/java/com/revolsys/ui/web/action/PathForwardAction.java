@@ -19,18 +19,20 @@ public class PathForwardAction implements Action {
    * @return Returns the path.
    */
   public String getPath() {
-    return path;
+    return this.path;
   }
 
+  @Override
   public void init(final ServletContext context) throws ServletException {
   }
 
+  @Override
   public void process(
     final HttpServletRequest request,
     final HttpServletResponse response) throws IOException, ServletException {
-    final RequestDispatcher requestDispatcher = request.getRequestDispatcher(path);
+    final RequestDispatcher requestDispatcher = request.getRequestDispatcher(this.path);
     Logger.getLogger(PathForwardAction.class).debug(
-      path + '=' + requestDispatcher);
+      this.path + '=' + requestDispatcher);
     if (requestDispatcher != null) {
       requestDispatcher.forward(request, response);
     }

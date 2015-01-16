@@ -48,7 +48,7 @@ import com.revolsys.jts.geom.util.GeometryTransformer;
  * Simplifies a geometry and ensures that
  * the result is a valid geometry having the
  * same dimension and number of components as the input,
- * and with the components having the same topological 
+ * and with the components having the same topological
  * relationship.
  * <p>
  * If the input is a polygonal geometry
@@ -57,21 +57,21 @@ import com.revolsys.jts.geom.util.GeometryTransformer;
  * <li>The result has the same number of shells and holes as the input,
  * with the same topological structure
  * <li>The result rings touch at <b>no more</b> than the number of touching points in the input
- * (although they may touch at fewer points).  
- * The key implication of this statement is that if the 
- * input is topologically valid, so is the simplified output. 
+ * (although they may touch at fewer points).
+ * The key implication of this statement is that if the
+ * input is topologically valid, so is the simplified output.
  * </ul>
  * For linear geometries, if the input does not contain
  * any intersecting line segments, this property
  * will be preserved in the output.
  * <p>
- * For all geometry types, the result will contain 
+ * For all geometry types, the result will contain
  * enough vertices to ensure validity.  For polygons
  * and closed linear geometries, the result will have at
  * least 4 vertices; for open linestrings the result
  * will have at least 2 vertices.
  * <p>
- * All geometry types are handled. 
+ * All geometry types are handled.
  * Empty and point geometries are returned unchanged.
  * Empty geometry components are deleted.
  * <p>
@@ -87,7 +87,7 @@ import com.revolsys.jts.geom.util.GeometryTransformer;
  * A workaround is to test for this situation in post-processing and remove
  * any invalid holes or polygons.
  * </ul>
- * 
+ *
  * @author Martin Davis
  * @see DouglasPeuckerSimplifier
  *
@@ -103,7 +103,7 @@ public class TopologyPreservingSimplifier {
       }
       // for linear components (including rings), simplify the linestring
       if (parent instanceof LineString) {
-        final TaggedLineString taggedLine = linestringMap.get(parent);
+        final TaggedLineString taggedLine = TopologyPreservingSimplifier.this.linestringMap.get(parent);
         return new LineStringDouble(taggedLine.getResultCoordinates());
       }
       // for anything else (e.g. points) just copy the coordinates
@@ -136,24 +136,24 @@ public class TopologyPreservingSimplifier {
 
   public Geometry getResultGeometry() {
     // empty input produces an empty result
-    if (geometry.isEmpty()) {
-      return geometry.clone();
+    if (this.geometry.isEmpty()) {
+      return this.geometry.clone();
     } else {
 
-      linestringMap = new HashMap<>();
+      this.linestringMap = new HashMap<>();
 
-      for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
+      for (final LineString line : this.geometry.getGeometryComponents(LineString.class)) {
         // skip empty geometries
         if (!line.isEmpty()) {
           final int minSize = line.isClosed() ? 4 : 2;
           final TaggedLineString taggedLine = new TaggedLineString(line,
             minSize);
-          linestringMap.put(line, taggedLine);
+          this.linestringMap.put(line, taggedLine);
         }
       }
 
-      lineSimplifier.simplify(linestringMap.values());
-      final Geometry result = (new LineStringTransformer()).transform(geometry);
+      this.lineSimplifier.simplify(this.linestringMap.values());
+      final Geometry result = new LineStringTransformer().transform(this.geometry);
       return result;
     }
   }
@@ -171,7 +171,7 @@ public class TopologyPreservingSimplifier {
     if (distanceTolerance < 0.0) {
       throw new IllegalArgumentException("Tolerance must be non-negative");
     }
-    lineSimplifier.setDistanceTolerance(distanceTolerance);
+    this.lineSimplifier.setDistanceTolerance(distanceTolerance);
   }
 
 }

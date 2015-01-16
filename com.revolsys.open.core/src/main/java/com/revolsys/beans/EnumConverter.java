@@ -13,7 +13,7 @@ public final class EnumConverter extends AbstractConverter {
 
   @Override
   protected Object convertToType(final Class type, final Object value)
-    throws Throwable {
+      throws Throwable {
     if (type.isEnum()) {
       return Enum.valueOf(type, value.toString());
     } else {

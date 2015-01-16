@@ -116,7 +116,7 @@ PropertyChangeListener {
 
   public void redraw() {
     if (this.layer != null && getWidth() > 0 && getHeight() > 0
-      && this.layer.isExists() && this.layer.isVisible()) {
+        && this.layer.isExists() && this.layer.isVisible()) {
       synchronized (this.loadSync) {
         this.loadImage = true;
         if (this.imageWorker != null) {

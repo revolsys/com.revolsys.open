@@ -24,49 +24,49 @@ public class LazyHttpPostOutputStream extends OutputStream {
 
   @Override
   public void close() throws IOException {
-    out.flush();
-    out.close();
-    in = connection.getInputStream();
-    if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+    this.out.flush();
+    this.out.close();
+    this.in = this.connection.getInputStream();
+    if (this.connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
       throw new RuntimeException("Result data not accepted by server "
-        + connection.getResponseCode() + " " + connection.getResponseMessage());
+          + this.connection.getResponseCode() + " " + this.connection.getResponseMessage());
     }
-    in.close();
+    this.in.close();
   }
 
   private void init() throws IOException {
-    connection = (HttpURLConnection)new URL(url).openConnection();
-    connection.setRequestMethod("POST");
-    connection.setRequestProperty("Content-Type", contentType);
-    connection.setChunkedStreamingMode(4096);
-    connection.setDoOutput(true);
-    connection.setDoInput(true);
-    out = connection.getOutputStream();
+    this.connection = (HttpURLConnection)new URL(this.url).openConnection();
+    this.connection.setRequestMethod("POST");
+    this.connection.setRequestProperty("Content-Type", this.contentType);
+    this.connection.setChunkedStreamingMode(4096);
+    this.connection.setDoOutput(true);
+    this.connection.setDoInput(true);
+    this.out = this.connection.getOutputStream();
 
   }
 
   @Override
   public void write(final byte[] b) throws IOException {
-    if (out == null) {
+    if (this.out == null) {
       init();
     }
-    out.write(b);
+    this.out.write(b);
   }
 
   @Override
   public void write(final byte[] b, final int off, final int len)
-    throws IOException {
-    if (out == null) {
+      throws IOException {
+    if (this.out == null) {
       init();
     }
-    out.write(b, off, len);
+    this.out.write(b, off, len);
   }
 
   @Override
   public void write(final int b) throws IOException {
-    if (out == null) {
+    if (this.out == null) {
       init();
     }
-    out.write(b);
+    this.out.write(b);
   }
 }

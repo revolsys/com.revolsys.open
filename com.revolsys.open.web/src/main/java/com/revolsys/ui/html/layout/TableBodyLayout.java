@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,6 +50,7 @@ public class TableBodyLayout implements ElementContainerLayout {
     }
   }
 
+  @Override
   public void serialize(final XmlWriter out, final ElementContainer container) {
     if (!container.getElements().isEmpty()) {
       serializeTbody(out, container);
@@ -60,19 +61,19 @@ public class TableBodyLayout implements ElementContainerLayout {
     final XmlWriter out,
     final ElementContainer container) {
     out.startTag(HtmlUtil.TBODY);
-    if (cssClass != null) {
-      out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+    if (this.cssClass != null) {
+      out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
     }
     final List<Element> elementList = container.getElements();
     int i = 0;
     int rowNum = 0;
     final int numElements = elementList.size();
-    final int lastRow = (numElements - 1) / numColumns;
+    final int lastRow = (numElements - 1) / this.numColumns;
     for (final Element element : elementList) {
-      final int col = i % numColumns;
-      String colCss = cssClasses.get(col);
+      final int col = i % this.numColumns;
+      String colCss = this.cssClasses.get(col);
       final boolean firstCol = col == 0;
-      final boolean lastCol = (i + 1) % numColumns == 0 || i == numElements - 1;
+      final boolean lastCol = (i + 1) % this.numColumns == 0 || i == numElements - 1;
       if (firstCol) {
         out.startTag(HtmlUtil.TR);
         String rowCss = "";

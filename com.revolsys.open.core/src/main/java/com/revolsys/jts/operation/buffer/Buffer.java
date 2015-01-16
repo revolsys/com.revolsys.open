@@ -285,7 +285,7 @@ public class Buffer {
     for (final SegmentString segment : nodedSegments) {
       final int vertexCount = segment.size();
       if (vertexCount > 2 || vertexCount == 2
-        && !segment.getCoordinate(0).equals(2, segment.getCoordinate(1))) {
+          && !segment.getCoordinate(0).equals(2, segment.getCoordinate(1))) {
         final Label oldLabel = (Label)segment.getData();
         final Label label = new Label(oldLabel);
         final LineString points = segment.getPoints();

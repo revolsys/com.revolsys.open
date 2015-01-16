@@ -50,25 +50,26 @@ public class DoubleResult implements Result {
     final DoubleResult otherResult = (DoubleResult)other;
     final double otherValue = otherResult.value;
 
-    return Math.abs(value - otherValue) <= tolerance;
+    return Math.abs(this.value - otherValue) <= tolerance;
   }
 
+  @Override
   public Double getResult() {
-    return value;
+    return this.value;
   }
 
   @Override
   public String toFormattedString() {
-    return Double.toString(value);
+    return Double.toString(this.value);
   }
 
   @Override
   public String toLongString() {
-    return Double.toString(value);
+    return Double.toString(this.value);
   }
 
   @Override
   public String toShortString() {
-    return Double.toString(value);
+    return Double.toString(this.value);
   }
 }

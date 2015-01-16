@@ -88,7 +88,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
     final String referencedTypeName = referencedRecordDefinition.getPath();
     final String referencedFieldName = referencedRecordDefinition.getIdFieldName();
     final String constraintName = getTableAlias(recordDefinition) + "_"
-      + getTableAlias(referencedRecordDefinition) + "_FK";
+        + getTableAlias(referencedRecordDefinition) + "_FK";
     writeAddForeignKeyConstraint(typePath, constraintName, fieldName,
       referencedTypeName, referencedFieldName);
   }
@@ -101,8 +101,8 @@ public abstract class JdbcDdlWriter implements Cloneable {
     final String referencedTypeName = referencedRecordDefinition.getPath();
     final String referencedFieldName = referencedRecordDefinition.getIdFieldName();
     final String constraintName = getTableAlias(recordDefinition) + "_"
-      + referenceTablePrefix + "_" + getTableAlias(referencedRecordDefinition)
-      + "_FK";
+        + referenceTablePrefix + "_" + getTableAlias(referencedRecordDefinition)
+        + "_FK";
     writeAddForeignKeyConstraint(typePath, constraintName, fieldName,
       referencedTypeName, referencedFieldName);
   }

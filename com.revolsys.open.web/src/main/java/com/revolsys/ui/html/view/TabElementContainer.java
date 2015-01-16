@@ -23,29 +23,29 @@ public class TabElementContainer extends ElementContainer {
   }
 
   public void add(final String label, final Element element) {
-    final String tabId = id + "-" + getElements().size();
+    final String tabId = this.id + "-" + getElements().size();
     add(tabId, label, element);
   }
 
   public void add(final String tabId, final String label, final Element element) {
     add(element);
-    labels.add(label);
-    ids.add(tabId);
+    this.labels.add(label);
+    this.ids.add(tabId);
   }
 
   public Integer getSelectedIndex() {
-    return selectedIndex;
+    return this.selectedIndex;
   }
 
   @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "jqueryTabs");
-    out.attribute(HtmlUtil.ATTR_ID, id);
+    out.attribute(HtmlUtil.ATTR_ID, this.id);
     out.startTag(HtmlUtil.UL);
     int i = 0;
-    for (final String label : labels) {
-      final String id = ids.get(i++);
+    for (final String label : this.labels) {
+      final String id = this.ids.get(i++);
       out.startTag(HtmlUtil.LI);
       out.startTag(HtmlUtil.A);
       out.attribute(HtmlUtil.ATTR_HREF, "#" + id);
@@ -57,7 +57,7 @@ public class TabElementContainer extends ElementContainer {
 
     i = 0;
     for (final Element element : getElements()) {
-      final String id = ids.get(i++);
+      final String id = this.ids.get(i++);
       out.startTag(HtmlUtil.DIV);
       out.attribute(HtmlUtil.ATTR_ID, id);
       element.serialize(out);
@@ -65,11 +65,11 @@ public class TabElementContainer extends ElementContainer {
     }
 
     out.endTag(HtmlUtil.DIV);
-    if (selectedIndex != null) {
+    if (this.selectedIndex != null) {
       out.startTag(HtmlUtil.SCRIPT);
       out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
-      out.text("$(document).ready(function() {$('#" + id
-        + "').tabs('option', 'active', " + selectedIndex + ");});");
+      out.text("$(document).ready(function() {$('#" + this.id
+        + "').tabs('option', 'active', " + this.selectedIndex + ");});");
       out.endTag(HtmlUtil.SCRIPT);
     }
   }

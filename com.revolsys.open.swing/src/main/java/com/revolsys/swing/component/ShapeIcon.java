@@ -28,12 +28,12 @@ public class ShapeIcon implements Icon {
 
   @Override
   public int getIconHeight() {
-    return iconHeight;
+    return this.iconHeight;
   }
 
   @Override
   public int getIconWidth() {
-    return iconWidth;
+    return this.iconWidth;
   }
 
   @Override
@@ -43,10 +43,10 @@ public class ShapeIcon implements Icon {
     final AffineTransform savedTransform = graphics.getTransform();
     try {
       graphics.translate(x, y);
-      final Rectangle bounds = shape.getBounds();
+      final Rectangle bounds = this.shape.getBounds();
       final AffineTransform shapeTransform = AffineTransform.getScaleInstance(
-        iconWidth / bounds.width, iconHeight / bounds.height);
-      final Shape newShape = new GeneralPath(shape).createTransformedShape(shapeTransform);
+        this.iconWidth / bounds.width, this.iconHeight / bounds.height);
+      final Shape newShape = new GeneralPath(this.shape).createTransformedShape(shapeTransform);
       graphics.setPaint(WebColors.Gray);
       graphics.fill(newShape);
       graphics.setColor(WebColors.Black);

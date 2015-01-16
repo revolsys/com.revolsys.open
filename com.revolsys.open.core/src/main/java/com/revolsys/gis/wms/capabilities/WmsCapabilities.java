@@ -13,11 +13,11 @@ public class WmsCapabilities {
   private Capability capability;
 
   public Capability getCapability() {
-    return capability;
+    return this.capability;
   }
 
   public WmsLayer getLayer(final String name) {
-    return getLayer(capability.getLayer(), name);
+    return getLayer(this.capability.getLayer(), name);
   }
 
   private WmsLayer getLayer(final WmsLayer layer, final String name) {
@@ -36,7 +36,7 @@ public class WmsCapabilities {
   }
 
   public Request getRequest(final String requestName) {
-    for (final Request request : capability.getRequests()) {
+    for (final Request request : this.capability.getRequests()) {
       if (request.getName().equalsIgnoreCase(requestName)) {
         return request;
       }
@@ -62,15 +62,15 @@ public class WmsCapabilities {
   }
 
   public Service getService() {
-    return service;
+    return this.service;
   }
 
   public String getUpdateSequence() {
-    return updateSequence;
+    return this.updateSequence;
   }
 
   public String getVersion() {
-    return version;
+    return this.version;
   }
 
   public boolean hasLayer(final String name) {
@@ -79,7 +79,7 @@ public class WmsCapabilities {
 
   public boolean isSrsSupported(final String srsId,
     final List<String> layerNames) {
-    final WmsLayer layer = capability.getLayer();
+    final WmsLayer layer = this.capability.getLayer();
     return isSrsSupported(srsId, layer, layerNames, false);
   }
 

@@ -35,7 +35,7 @@ package com.revolsys.jts.geom;
 /**
  * Models a collection of {@link Geometry}s of
  * arbitrary type and dimension.
- * 
+ *
  *
  *@version 1.7
  */

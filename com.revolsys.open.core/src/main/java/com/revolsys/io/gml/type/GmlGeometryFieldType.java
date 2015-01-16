@@ -21,19 +21,6 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     super(dataType, "xs:" + dataType.getName());
   }
 
-  private void coordinates(final XmlWriter out, final Point point) {
-    out.startTag(GmlConstants.COORDINATES);
-    final int axisCount = point.getAxisCount();
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      if (axisIndex > 0) {
-        out.text(",");
-      }
-      final double value = point.getCoordinate(axisIndex);
-      number(out, value);
-    }
-    out.endTag(GmlConstants.COORDINATES);
-  }
-
   private void coordinates(final XmlWriter out, final LineString points) {
     out.startTag(GmlConstants.COORDINATES);
     final int axisCount = points.getAxisCount();
@@ -51,6 +38,19 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
         final double value = points.getCoordinate(i, axisIndex);
         number(out, value);
       }
+    }
+    out.endTag(GmlConstants.COORDINATES);
+  }
+
+  private void coordinates(final XmlWriter out, final Point point) {
+    out.startTag(GmlConstants.COORDINATES);
+    final int axisCount = point.getAxisCount();
+    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+      if (axisIndex > 0) {
+        out.text(",");
+      }
+      final double value = point.getCoordinate(axisIndex);
+      number(out, value);
     }
     out.endTag(GmlConstants.COORDINATES);
   }
@@ -179,56 +179,6 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
       }
     }
     out.endTag(POLYGON);
-  }
-
-  private void pos(final XmlWriter out, final Point coordinates) {
-    out.startTag(GmlConstants.POS);
-    final int axisCount = coordinates.getAxisCount();
-    out.attribute(GmlConstants.DIMENSION, axisCount);
-    final double x = coordinates.getX();
-    out.text(x);
-    final double y = coordinates.getY();
-    out.text(" ");
-    out.text(y);
-    if (axisCount > 2) {
-      final double z = coordinates.getZ();
-      out.text(" ");
-      if (Double.isNaN(z)) {
-        out.text(0);
-      } else {
-        out.text(z);
-      }
-    }
-    out.endTag(GmlConstants.POS);
-  }
-
-  private void posList(final XmlWriter out, final LineString points) {
-    out.startTag(GmlConstants.POS_LIST);
-    final int axisCount = points.getAxisCount();
-    out.attribute(GmlConstants.DIMENSION, axisCount);
-    boolean first = true;
-    for (int i = 0; i < points.getVertexCount(); i++) {
-      if (first) {
-        first = false;
-      } else {
-        out.text(" ");
-      }
-      final double x = points.getX(i);
-      out.text(x);
-      final double y = points.getY(i);
-      out.text(" ");
-      out.text(y);
-      if (axisCount > 2) {
-        final double z = points.getZ(i);
-        out.text(" ");
-        if (Double.isNaN(z)) {
-          out.text(0);
-        } else {
-          out.text(z);
-        }
-      }
-    }
-    out.endTag(GmlConstants.POS_LIST);
   }
 
   private void srsName(final XmlWriter out, final Geometry geometry,

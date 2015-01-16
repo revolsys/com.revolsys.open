@@ -192,9 +192,9 @@ Comparable {
   public String getSignature() {
     final StringBuilder paramTypes = new StringBuilder();
     paramTypes.append("Geometry");
-    for (int i = 0; i < this.parameterTypes.length; i++) {
+    for (final Class parameterType : this.parameterTypes) {
       paramTypes.append(",");
-      paramTypes.append(Classes.className(this.parameterTypes[i]));
+      paramTypes.append(Classes.className(parameterType));
     }
     final Class clz = this.returnType;
     return this.name + "(" + paramTypes + ")" + " -> " + Classes.className(clz);

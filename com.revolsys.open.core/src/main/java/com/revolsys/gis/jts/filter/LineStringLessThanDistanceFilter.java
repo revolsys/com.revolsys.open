@@ -5,13 +5,13 @@
  * $Revision:$
 
  * Copyright 2004-2007 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +50,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 
   /**
    * Construct a new LineStringLessThanDistanceFilter.
-   * 
+   *
    * @param geometry The geometry to compare the data objects to to.
    * @param distance
    */
@@ -62,7 +62,7 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 
   @Override
   public boolean accept(final LineString line) {
-    if (line.getBoundingBox().intersects(envelope)) {
+    if (line.getBoundingBox().intersects(this.envelope)) {
       final double distance = LineStringUtil.distance(line, this.geometry,
         this.distance);
       if (distance < this.distance) {
@@ -78,24 +78,24 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
 
   /**
    * Get the maximum distance the object can be from the source geometry.
-   * 
+   *
    * @return The maximum distance the object can be from the source geometry.
    */
   public double getDistance() {
-    return distance;
+    return this.distance;
   }
 
   public com.revolsys.jts.geom.BoundingBox getEnvelope() {
-    return envelope;
+    return this.envelope;
   }
 
   /**
    * Get the geometry to compare the data objects to to.
-   * 
+   *
    * @return The geometry to compare the data objects to to.
    */
   public LineString getGeometry() {
-    return geometry;
+    return this.geometry;
   }
 
   public void setDistance(final double distance) {
@@ -105,6 +105,6 @@ public class LineStringLessThanDistanceFilter implements Filter<LineString> {
   public void setGeometry(final LineString geometry) {
     this.geometry = geometry;
     this.envelope = geometry.getBoundingBox();
-    this.envelope = this.envelope.expand(distance);
+    this.envelope = this.envelope.expand(this.distance);
   }
 }

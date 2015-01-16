@@ -19,9 +19,9 @@ public class RunnableSwingWorkerManager {
   public void addTask(final Runnable task) {
     synchronized (this.tasks) {
       this.tasks.add(task);
-      if (process == null) {
-        process = new RunnableSwingWorkerProcess(this);
-        process.execute();
+      if (this.process == null) {
+        this.process = new RunnableSwingWorkerProcess(this);
+        this.process.execute();
       }
     }
   }
@@ -29,26 +29,26 @@ public class RunnableSwingWorkerManager {
   public void addTasks(final Collection<Runnable> tasks) {
     synchronized (this.tasks) {
       this.tasks.addAll(tasks);
-      if (process == null) {
-        process = new RunnableSwingWorkerProcess(this);
-        process.execute();
+      if (this.process == null) {
+        this.process = new RunnableSwingWorkerProcess(this);
+        this.process.execute();
       }
     }
   }
 
   public Runnable getNextTask() {
-    synchronized (tasks) {
-      final Runnable task = tasks.poll();
+    synchronized (this.tasks) {
+      final Runnable task = this.tasks.poll();
       if (task == null) {
-        process = null;
+        this.process = null;
       }
       return task;
     }
   }
 
   public void removeTask(final Runnable task) {
-    synchronized (tasks) {
-      tasks.remove(task);
+    synchronized (this.tasks) {
+      this.tasks.remove(task);
     }
   }
 
@@ -60,6 +60,6 @@ public class RunnableSwingWorkerManager {
 
   @Override
   public String toString() {
-    return description;
+    return this.description;
   }
 }

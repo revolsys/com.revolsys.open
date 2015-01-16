@@ -5,7 +5,7 @@ import com.revolsys.gis.graph.AbstractItemVisitor;
 import com.revolsys.jts.geom.BoundingBox;
 
 public final class IdObjectIndexItemVisitor<T> extends
-  AbstractItemVisitor<Integer> {
+AbstractItemVisitor<Integer> {
   private final IdObjectIndex<T> index;
 
   private final BoundingBox envelope;
@@ -21,10 +21,10 @@ public final class IdObjectIndexItemVisitor<T> extends
 
   @Override
   public boolean visit(final Integer id) {
-    final T object = index.getObject(id);
-    final BoundingBox e = index.getEnvelope(object);
-    if (e.intersects(envelope)) {
-      visitor.visit(object);
+    final T object = this.index.getObject(id);
+    final BoundingBox e = this.index.getEnvelope(object);
+    if (e.intersects(this.envelope)) {
+      this.visitor.visit(object);
     }
     return true;
   }

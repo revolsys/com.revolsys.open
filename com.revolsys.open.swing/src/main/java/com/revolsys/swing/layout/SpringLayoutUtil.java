@@ -119,7 +119,7 @@ public class SpringLayoutUtil {
    * maximum preferred width of the components in that column; height is
    * similarly determined for each row. The parent is made just big enough to
    * fit them all.
-   * 
+   *
    * @param rows number of rows
    * @param cols number of columns
    * @param initialX x location to start the grid at
@@ -183,7 +183,7 @@ public class SpringLayoutUtil {
    * <code>parent</code> in a grid. Each component is as big as the maximum
    * preferred width and height of the components. The parent is made just big
    * enough to fit them all.
-   * 
+   *
    * @param rows number of rows
    * @param cols number of columns
    * @param initialX x location to start the grid at
@@ -210,9 +210,9 @@ public class SpringLayoutUtil {
     // Calculate Springs that are the max of the width/height so that all
     // cells have the same size.
     Spring maxWidthSpring = springLayout.getConstraints(parent.getComponent(0))
-      .getWidth();
+        .getWidth();
     Spring maxHeightSpring = springLayout.getConstraints(parent.getComponent(0))
-      .getWidth();
+        .getWidth();
     for (int i = 1; i < max; i++) {
       final SpringLayout.Constraints cons = springLayout.getConstraints(parent.getComponent(i));
 

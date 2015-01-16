@@ -11,6 +11,11 @@ import com.revolsys.jts.geom.vertex.Vertex;
 
 public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static GeometryVertexQuadTree getGeometryVertexIndex(
     final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {

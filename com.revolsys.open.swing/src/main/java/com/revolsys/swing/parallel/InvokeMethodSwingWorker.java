@@ -41,7 +41,7 @@ public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
     this.doneObject = object;
     if (Property.hasValue(backgroundMethodName)) {
       this.backgroundTask = new InvokeMethodCallable<T>(object,
-        backgroundMethodName, backgroundMethodParameters.toArray());
+          backgroundMethodName, backgroundMethodParameters.toArray());
     }
     if (Property.hasValue(doneMethodName)) {
       this.doneMethodName = doneMethodName;
@@ -99,7 +99,7 @@ public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
     }
     if (this.doneMethodName != null) {
       final List<Object> parameters = new ArrayList<Object>(
-        this.doneMethodParameters);
+          this.doneMethodParameters);
       if (result != null) {
         parameters.add(result);
       }
@@ -109,10 +109,10 @@ public class InvokeMethodSwingWorker<T, V> extends AbstractSwingWorker<T, V> {
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error(
           "Error running "
-            + this.description
-            + " using "
-            + Property.toString(this.doneObject, this.doneMethodName,
-              parameters), e);
+              + this.description
+              + " using "
+              + Property.toString(this.doneObject, this.doneMethodName,
+                parameters), e);
       }
     }
   }

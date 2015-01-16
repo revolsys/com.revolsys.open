@@ -28,7 +28,7 @@ public class FieldNoLabelDecorator implements Decorator {
   }
 
   public String getInstructions() {
-    return instructions;
+    return this.instructions;
   }
 
   @Override
@@ -41,14 +41,21 @@ public class FieldNoLabelDecorator implements Decorator {
     out.endTag(HtmlUtil.DIV);
   }
 
+  protected void serializeElement(final XmlWriter out, final Element element) {
+    out.startTag(HtmlUtil.DIV);
+    out.attribute(HtmlUtil.ATTR_CLASS, "contents");
+    element.serializeElement(out);
+    out.endTag(HtmlUtil.DIV);
+  }
+
   protected void serializeErrors(final XmlWriter out, final Element element) {
     if (element instanceof Field) {
-      Field field = (Field)element;
+      final Field field = (Field)element;
       if (field.hasValidationErrors()) {
         out.startTag(HtmlUtil.DIV);
         out.attribute(HtmlUtil.ATTR_CLASS, "errors");
         for (final Iterator<String> validationErrors = field.getValidationErrors()
-          .iterator(); validationErrors.hasNext();) {
+            .iterator(); validationErrors.hasNext();) {
           final String error = validationErrors.next();
           out.text(error);
           if (validationErrors.hasNext()) {
@@ -58,13 +65,6 @@ public class FieldNoLabelDecorator implements Decorator {
         out.endTag(HtmlUtil.DIV);
       }
     }
-  }
-
-  protected void serializeElement(final XmlWriter out, final Element element) {
-    out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, "contents");
-    element.serializeElement(out);
-    out.endTag(HtmlUtil.DIV);
   }
 
   protected void serializeInstructions(final XmlWriter out) {

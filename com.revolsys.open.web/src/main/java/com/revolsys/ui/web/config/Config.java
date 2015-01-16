@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,6 @@ package com.revolsys.ui.web.config;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -66,17 +65,17 @@ public class Config implements Serializable {
    * Add the Component to the list of components, the name property will be
    * assoiciated with the Component and can be used to look up the Component.
    * </p>
-   * 
+   *
    * @param component The Component to add @ If another Component with the same
    *          name has already been defined
    */
   public void addComponent(final Component component) {
     final String name = component.getName();
-    if (components.containsKey(name)) {
+    if (this.components.containsKey(name)) {
       throw new IllegalArgumentException(new StringBuilder(
-        "Duplicate Component definition with name ").append(name).toString());
+          "Duplicate Component definition with name ").append(name).toString());
     }
-    components.put(name, component);
+    this.components.put(name, component);
   }
 
   /**
@@ -85,20 +84,20 @@ public class Config implements Serializable {
   public void addLayout(final Layout layout) {
     addComponent(layout);
     final String name = layout.getName();
-    if (layouts.containsKey(name)) {
+    if (this.layouts.containsKey(name)) {
       throw new IllegalArgumentException(new StringBuilder(
-        "Duplicate Layout definition with name ").append(name).toString());
+          "Duplicate Layout definition with name ").append(name).toString());
     }
-    layouts.put(name, layout);
+    this.layouts.put(name, layout);
   }
 
   public void addMenu(final Menu menu) {
     final String name = menu.getName();
-    if (menus.containsKey(name)) {
+    if (this.menus.containsKey(name)) {
       throw new IllegalArgumentException(new StringBuilder(
-        "Duplicate Menu definition with name ").append(name).toString());
+          "Duplicate Menu definition with name ").append(name).toString());
     }
-    menus.put(name, menu);
+    this.menus.put(name, menu);
   }
 
   /**
@@ -115,25 +114,25 @@ public class Config implements Serializable {
     // throw new IllegalArgumentException("Duplicate Page definition with name "
     // + name);
     // }
-    pages.put(path, page);
-    pageByName.put(name, page);
-    pagePathMap.put(page, path);
+    this.pages.put(path, page);
+    this.pageByName.put(name, page);
+    this.pagePathMap.put(page, path);
     if (path.indexOf("*") != -1) {
       final Pattern pathPattern = Pattern.compile(path);
-      pagePatterns.add(pathPattern);
-      pageByPattern.put(pathPattern, page);
+      this.pagePatterns.add(pathPattern);
+      this.pageByPattern.put(pathPattern, page);
 
     }
-    for (final Iterator entries = page.getPathMap().entrySet().iterator(); entries.hasNext();) {
-      final Map.Entry entry = (Map.Entry)entries.next();
+    for (final Object element : page.getPathMap().entrySet()) {
+      final Map.Entry entry = (Map.Entry)element;
       final String fullPath = page.getPath() + entry.getKey();
       final Page childPage = (Page)entry.getValue();
       // if (pages.containsKey(fullPath)) {
       // throw new IllegalArgumentException(
       // "Duplicate Page definition with path=" + fullPath);
       // }
-      pages.put(fullPath, childPage);
-      pagePathMap.put(childPage, fullPath);
+      this.pages.put(fullPath, childPage);
+      this.pagePathMap.put(childPage, fullPath);
     }
   }
 
@@ -142,7 +141,7 @@ public class Config implements Serializable {
    * Check to see if two objects are equal. Both objects must have the same
    * components, layouts, pages and menu tree to be equal.
    * </p>
-   * 
+   *
    * @param o The object to compare this object with
    * @return true if both objects are equal
    */
@@ -150,8 +149,8 @@ public class Config implements Serializable {
   public boolean equals(final Object o) {
     if (o instanceof Config) {
       final Config c = (Config)o;
-      if (c.components.equals(components) && c.layouts.equals(layouts)
-        && c.pages.equals(pages) && (c.menus.equals(menus))) {
+      if (c.components.equals(this.components) && c.layouts.equals(this.layouts)
+          && c.pages.equals(this.pages) && c.menus.equals(this.menus)) {
         return true;
       }
     }
@@ -159,7 +158,7 @@ public class Config implements Serializable {
   }
 
   public String getBasePath() {
-    return basePath;
+    return this.basePath;
   }
 
   /**
@@ -167,12 +166,12 @@ public class Config implements Serializable {
    * @return
    */
   public Component getComponent(final String name) {
-    final Component component = (Component)components.get(name);
+    final Component component = (Component)this.components.get(name);
     if (component == null) {
       throw new IllegalArgumentException(new StringBuilder(
-        "There does not exist a Component definition with name '").append(name)
-        .append("'")
-        .toString());
+          "There does not exist a Component definition with name '").append(name)
+          .append("'")
+          .toString());
     }
     return component;
   }
@@ -182,27 +181,27 @@ public class Config implements Serializable {
    * @return
    */
   public Layout getLayout(final String name) {
-    final Layout layout = (Layout)layouts.get(name);
+    final Layout layout = (Layout)this.layouts.get(name);
     if (layout == null) {
       throw new IllegalArgumentException(new StringBuilder(
-        "There does not exist a Component definition with name '").append(name)
-        .append("'")
-        .toString());
+          "There does not exist a Component definition with name '").append(name)
+          .append("'")
+          .toString());
     }
     return layout;
   }
 
   public Menu getMenu(final String name) {
-    final Menu menu = (Menu)menus.get(name);
+    final Menu menu = (Menu)this.menus.get(name);
     return menu;
   }
 
   public Map getMenus() {
-    return menus;
+    return this.menus;
   }
 
   public Page getPage(final String path) throws PageNotFoundException {
-    Page page = pages.get(path);
+    Page page = this.pages.get(path);
     if (page != null) {
       return page;
     } else {
@@ -210,16 +209,16 @@ public class Config implements Serializable {
       String parentPath = path;
       for (int pathIndex = parentPath.lastIndexOf('/'); pathIndex != -1; pathIndex = parentPath.lastIndexOf('/')) {
         parentPath = parentPath.substring(0, pathIndex);
-        page = pages.get(parentPath);
+        page = this.pages.get(parentPath);
         if (page != null) {
           return page;
         }
       }
       // Check to see if there is a page match using a regular expression
-      for (final Pattern pattern : pagePatterns) {
+      for (final Pattern pattern : this.pagePatterns) {
         final Matcher matcher = pattern.matcher(path);
         if (matcher.matches()) {
-          return pageByPattern.get(pattern);
+          return this.pageByPattern.get(pattern);
         }
       }
       throw new PageNotFoundException();
@@ -227,7 +226,7 @@ public class Config implements Serializable {
   }
 
   public Page getPageByName(final String pageName) throws PageNotFoundException {
-    final Page page = pageByName.get(pageName);
+    final Page page = this.pageByName.get(pageName);
     if (page == null) {
       throw new PageNotFoundException("Page " + pageName + " does not exist");
     }
@@ -235,22 +234,22 @@ public class Config implements Serializable {
   }
 
   public String getPath(final Page page) {
-    return (String)pagePathMap.get(page);
+    return (String)this.pagePathMap.get(page);
   }
 
   public ServletContext getServletContext() {
-    return servletContext;
+    return this.servletContext;
   }
 
   /**
    * Generate the hash code for the object.
-   * 
+   *
    * @return The hashCode.
    */
   @Override
   public int hashCode() {
-    return components.hashCode() + (layouts.hashCode() << 2)
-      + (pages.hashCode() << 4) + (menus.hashCode() << 6);
+    return this.components.hashCode() + (this.layouts.hashCode() << 2)
+        + (this.pages.hashCode() << 4) + (this.menus.hashCode() << 6);
   }
 
   public void setBasePath(final String basePath) {

@@ -44,7 +44,7 @@ import com.revolsys.jts.geom.Polygon;
  * A ConnectedElementPointFilter extracts a single point
  * from each connected element in a Geometry
  * (e.g. a polygon, linestring or point)
- * and returns them in a list. The elements of the list are 
+ * and returns them in a list. The elements of the list are
  * {@link com.revolsys.jts.operation.distance.GeometryLocation}s.
  *
  * @version 1.7
@@ -54,14 +54,14 @@ public class ConnectedElementLocationFilter {
   /**
    * Returns a list containing a point from each Polygon, LineString, and Point
    * found inside the specified geometry. Thus, if the specified geometry is
-   * not a GeometryCollection, an empty list will be returned. The elements of the list 
+   * not a GeometryCollection, an empty list will be returned. The elements of the list
    * are {@link com.revolsys.jts.operation.distance.GeometryLocation}s.
    */
   public static List<GeometryLocation> getLocations(final Geometry geometry) {
     final List<GeometryLocation> locations = new ArrayList<GeometryLocation>();
     for (final Geometry part : geometry.geometries()) {
       if (part instanceof Point || part instanceof LineString
-        || part instanceof Polygon) {
+          || part instanceof Polygon) {
         locations.add(new GeometryLocation(part, 0, part.getPoint()));
       }
     }

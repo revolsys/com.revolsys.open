@@ -5,13 +5,13 @@
  * $Revision: 2602 $
 
  * Copyright 2004-2007 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,19 +35,19 @@ import com.revolsys.collection.Visitor;
  * The simplest and most effecient way to loop through all objects in the reader
  * is to use the following loop.
  * </p>
- * 
+ *
  * <pre>
  * Reader&lt;T&gt; reader = ...
  * for (T object : reader) {
  *   // Do something with the object.
  * }
  * </pre>
- * 
+ *
  * @author Paul Austin
  * @param <T> The type of the item to read.
  */
 public interface Reader<T> extends Iterable<T>, ObjectWithProperties,
-  AutoCloseable {
+AutoCloseable {
   /**
    * Close the reader and all resources associated with it.
    */
@@ -59,7 +59,7 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties,
    * calls to this method must return a new iterator. Implementors of this are
    * responsible for cleaning up the iterator when the hasNext or next method on
    * iterator reaches the end of the items to read.
-   * 
+   *
    * @return The iterator.
    */
   @Override
@@ -72,7 +72,7 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties,
 
   /**
    * Read all items and return a List containing the items.
-   * 
+   *
    * @return The list of items.
    */
   List<T> read();
@@ -80,7 +80,7 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties,
   /**
    * Visit each item returned from the reader until all items have been visited
    * or the visit method returns false.
-   * 
+   *
    * @param visitor The visitor.
    */
   void visit(Visitor<T> visitor);

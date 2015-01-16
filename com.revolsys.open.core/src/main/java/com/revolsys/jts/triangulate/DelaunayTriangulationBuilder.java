@@ -54,16 +54,16 @@ import com.revolsys.jts.triangulate.quadedge.Vertex;
 
 /**
  * A utility class which creates Delaunay Trianglulations
- * from collections of points and extract the resulting 
- * triangulation edges or triangles as geometries. 
- * 
+ * from collections of points and extract the resulting
+ * triangulation edges or triangles as geometries.
+ *
  * @author Martin Davis
  *
  */
 public class DelaunayTriangulationBuilder {
   /**
    * Computes the {@link BoundingBoxDoubleGf} of a collection of {@link Coordinates}s.
-   * 
+   *
    * @param coords a List of Coordinates
    * @return the envelope of the set of coordinates
    */
@@ -120,78 +120,78 @@ public class DelaunayTriangulationBuilder {
   }
 
   private void create() {
-    if (subdiv != null) {
+    if (this.subdiv != null) {
       return;
     }
 
-    final BoundingBox siteEnv = envelope(siteCoords);
-    final List vertices = toVertices(siteCoords);
-    subdiv = new QuadEdgeSubdivision(siteEnv, tolerance);
+    final BoundingBox siteEnv = envelope(this.siteCoords);
+    final List vertices = toVertices(this.siteCoords);
+    this.subdiv = new QuadEdgeSubdivision(siteEnv, this.tolerance);
     final IncrementalDelaunayTriangulator triangulator = new IncrementalDelaunayTriangulator(
-      subdiv);
+      this.subdiv);
     triangulator.insertSites(vertices);
   }
 
   /**
    * Gets the edges of the computed triangulation as a {@link MultiLineString}.
-   * 
+   *
    * @param geomFact the geometry factory to use to create the output
    * @return the edges of the triangulation
    */
   public Geometry getEdges(final GeometryFactory geomFact) {
     create();
-    return subdiv.getEdges(geomFact);
+    return this.subdiv.getEdges(geomFact);
   }
 
   /**
    * Gets the {@link QuadEdgeSubdivision} which models the computed triangulation.
-   * 
+   *
    * @return the subdivision containing the triangulation
    */
   public QuadEdgeSubdivision getSubdivision() {
     create();
-    return subdiv;
+    return this.subdiv;
   }
 
   /**
-   * Gets the faces of the computed triangulation as a {@link GeometryCollection} 
+   * Gets the faces of the computed triangulation as a {@link GeometryCollection}
    * of {@link Polygon}.
-   * 
+   *
    * @param geomFact the geometry factory to use to create the output
    * @return the faces of the triangulation
    */
   public Geometry getTriangles(final GeometryFactory geomFact) {
     create();
-    return subdiv.getTriangles(geomFact);
+    return this.subdiv.getTriangles(geomFact);
   }
 
   /**
    * Sets the sites (vertices) which will be triangulated
    * from a collection of {@link Coordinates}s.
-   * 
+   *
    * @param coords a collection of Coordinates.
    */
   public void setSites(final Collection coords) {
     // remove any duplicate points (they will cause the triangulation to fail)
-    siteCoords = unique(CoordinateArrays.toCoordinateArray(coords));
+    this.siteCoords = unique(CoordinateArrays.toCoordinateArray(coords));
   }
 
   /**
    * Sets the sites (vertices) which will be triangulated.
    * All vertices of the given geometry will be used as sites.
-   * 
+   *
    * @param geom the geometry from which the sites will be extracted.
    */
   public void setSites(final Geometry geom) {
     // remove any duplicate points (they will cause the triangulation to fail)
-    siteCoords = extractUniqueCoordinates(geom);
+    this.siteCoords = extractUniqueCoordinates(geom);
   }
 
   /**
    * Sets the snapping tolerance which will be used
    * to improved the robustness of the triangulation computation.
    * A tolerance of 0.0 specifies that no snapping will take place.
-   * 
+   *
    * @param tolerance the tolerance distance to use
    */
   public void setTolerance(final double tolerance) {

@@ -22,7 +22,7 @@ public class AbstractDocumentedObject {
 
   public void addDocumentation(final DocInfo documentation) {
     final Locale locale = documentation.getLocale();
-    documentationByLocale.put(locale, documentation);
+    this.documentationByLocale.put(locale, documentation);
     if (locale != null) {
       final String language = locale.getLanguage();
       final Map<String, DocInfo> documentationByCountry = getDocumentationByLanguage(language);
@@ -31,17 +31,8 @@ public class AbstractDocumentedObject {
     }
   }
 
-  public String getDescription() {
-    final DocInfo docInfo = documentationByLocale.get(null);
-    if (docInfo == null) {
-      return null;
-    } else {
-      return docInfo.getDescription();
-    }
-  }
-
   public DocInfo getDefaultDocumentation() {
-    final DocInfo docInfo = documentationByLocale.get(null);
+    final DocInfo docInfo = this.documentationByLocale.get(null);
     if (docInfo == null) {
       return new DocInfo();
     } else {
@@ -49,21 +40,30 @@ public class AbstractDocumentedObject {
     }
   }
 
+  public String getDescription() {
+    final DocInfo docInfo = this.documentationByLocale.get(null);
+    if (docInfo == null) {
+      return null;
+    } else {
+      return docInfo.getDescription();
+    }
+  }
+
   public Collection<DocInfo> getDocumentation() {
-    return documentationByLocale.values();
+    return this.documentationByLocale.values();
   }
 
   public Map<String, DocInfo> getDocumentationByLanguage(final String language) {
-    Map<String, DocInfo> documentationByCountry = documentationByLanguageAndCountry.get(language);
+    Map<String, DocInfo> documentationByCountry = this.documentationByLanguageAndCountry.get(language);
     if (documentationByCountry == null) {
       documentationByCountry = new LinkedHashMap<String, DocInfo>();
-      documentationByLanguageAndCountry.put(language, documentationByCountry);
+      this.documentationByLanguageAndCountry.put(language, documentationByCountry);
     }
     return documentationByCountry;
   }
 
   public String getTitle() {
-    final DocInfo docInfo = documentationByLocale.get(null);
+    final DocInfo docInfo = this.documentationByLocale.get(null);
     if (docInfo == null) {
       return null;
     } else {
@@ -72,7 +72,7 @@ public class AbstractDocumentedObject {
   }
 
   public void setDescription(final String description) {
-    DocInfo docInfo = documentationByLocale.get(null);
+    DocInfo docInfo = this.documentationByLocale.get(null);
     if (docInfo == null) {
       docInfo = new DocInfo(null, description);
       addDocumentation(docInfo);
@@ -82,7 +82,7 @@ public class AbstractDocumentedObject {
   }
 
   public void setHtmlDescription(final String description) {
-    DocInfo docInfo = documentationByLocale.get(null);
+    DocInfo docInfo = this.documentationByLocale.get(null);
     if (docInfo == null) {
       docInfo = new DocInfo();
       addDocumentation(docInfo);
@@ -92,7 +92,7 @@ public class AbstractDocumentedObject {
   }
 
   protected void setTitle(final String title) {
-    DocInfo docInfo = documentationByLocale.get(null);
+    DocInfo docInfo = this.documentationByLocale.get(null);
     if (docInfo == null) {
       docInfo = new DocInfo(title);
       addDocumentation(docInfo);

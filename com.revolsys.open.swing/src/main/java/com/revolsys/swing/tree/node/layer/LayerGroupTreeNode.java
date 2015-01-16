@@ -66,7 +66,7 @@ MouseListener {
   @SuppressWarnings("unchecked")
   @Override
   public boolean dndImportData(final TransferSupport support, final int index)
-    throws IOException, UnsupportedFlavorException {
+      throws IOException, UnsupportedFlavorException {
     final LayerGroup group = getGroup();
     if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
       final Transferable transferable = support.getTransferable();

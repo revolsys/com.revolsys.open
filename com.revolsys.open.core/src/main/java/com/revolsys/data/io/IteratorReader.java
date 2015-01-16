@@ -21,15 +21,15 @@ public class IteratorReader<T> extends AbstractReader<T> {
   public IteratorReader(final Iterator<T> iterator) {
     setIterator(iterator);
     if (iterator instanceof ObjectWithProperties) {
-      object = (ObjectWithProperties)iterator;
+      this.object = (ObjectWithProperties)iterator;
     }
   }
 
   @Override
   public void close() {
     try {
-      if (iterator instanceof AbstractIterator) {
-        final AbstractIterator<T> i = (AbstractIterator<T>)iterator;
+      if (this.iterator instanceof AbstractIterator) {
+        final AbstractIterator<T> i = (AbstractIterator<T>)this.iterator;
         i.close();
       }
     } finally {
@@ -39,31 +39,31 @@ public class IteratorReader<T> extends AbstractReader<T> {
 
   @Override
   public Map<String, Object> getProperties() {
-    if (object == null) {
+    if (this.object == null) {
       return super.getProperties();
     } else {
-      return object.getProperties();
+      return this.object.getProperties();
     }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <C> C getProperty(final String name) {
-    if (object == null) {
+    if (this.object == null) {
       return (C)super.getProperty(name);
     } else {
-      return (C)object.getProperty(name);
+      return (C)this.object.getProperty(name);
     }
   }
 
   @Override
   public Iterator<T> iterator() {
-    return iterator;
+    return this.iterator;
   }
 
   @Override
   public void open() {
-    iterator.hasNext();
+    this.iterator.hasNext();
   }
 
   protected void setIterator(final Iterator<T> iterator) {
@@ -76,10 +76,10 @@ public class IteratorReader<T> extends AbstractReader<T> {
 
   @Override
   public void setProperty(final String name, final Object value) {
-    if (object == null) {
+    if (this.object == null) {
       super.setProperty(name, value);
     } else {
-      object.setProperty(name, value);
+      this.object.setProperty(name, value);
     }
   }
 }

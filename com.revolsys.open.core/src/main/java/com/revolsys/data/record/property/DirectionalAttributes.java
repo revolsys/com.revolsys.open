@@ -442,7 +442,7 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
       } else {
         if (LOG.isDebugEnabled()) {
           LOG.debug("Different values (" + fieldName + "=" + value1 + ") != ("
-            + fieldName + " = " + value2 + ")");
+              + fieldName + " = " + value2 + ")");
           LOG.debug(object1.toString());
           LOG.debug(object2.toString());
         }

@@ -17,7 +17,7 @@ public class MultiComparator<T> implements Comparator<T> {
 
   @Override
   public int compare(final T object1, final T object2) {
-    for (final Comparator<T> comparator : comparators) {
+    for (final Comparator<T> comparator : this.comparators) {
       final int compare = comparator.compare(object1, object2);
       if (compare != 0) {
         return compare;

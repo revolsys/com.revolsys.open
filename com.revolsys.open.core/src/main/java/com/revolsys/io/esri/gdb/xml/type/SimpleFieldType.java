@@ -32,12 +32,12 @@ public class SimpleFieldType extends AbstractEsriGeodatabaseXmlFieldType {
 
   @Override
   public int getFixedLength() {
-    return fixedLength;
+    return this.fixedLength;
   }
 
   @Override
   public boolean isUsePrecision() {
-    return usePrecision;
+    return this.usePrecision;
   }
 
   @Override

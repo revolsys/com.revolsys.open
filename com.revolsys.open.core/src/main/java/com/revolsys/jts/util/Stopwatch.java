@@ -41,8 +41,15 @@ package com.revolsys.jts.util;
  */
 public class Stopwatch {
 
+  public static String getTimeString(final long timeMillis) {
+    final String totalTimeStr = timeMillis < 10000
+        ? timeMillis + " ms"
+          : timeMillis / 1000.0 + " s";
+    return totalTimeStr;
+  }
   private long startTimestamp;
   private long totalTime = 0;
+
   private boolean isRunning = false;
 
   public Stopwatch()
@@ -50,59 +57,55 @@ public class Stopwatch {
     start();
   }
 
-  public void start()
-  {
-    if (isRunning) return;
-    startTimestamp = System.currentTimeMillis();
-    isRunning = true;
-  }
-
-  public long stop()
-  {
-    if (isRunning) {
-      updateTotalTime();
-      isRunning = false;
-    }
-    return totalTime;
-  }
-
-  public void reset()
-  {
-    totalTime = 0;
-    startTimestamp = System.currentTimeMillis();
-  }
-
-  public long split()
-  {
-    if (isRunning)
-      updateTotalTime();
-    return totalTime;
-  }
-
-  private void updateTotalTime()
-  {
-    long endTimestamp = System.currentTimeMillis();
-    long elapsedTime = endTimestamp - startTimestamp;
-    startTimestamp = endTimestamp;
-    totalTime += elapsedTime;
-  }
-
   public long getTime()
   {
     updateTotalTime();
-    return totalTime;
+    return this.totalTime;
   }
 
   public String getTimeString()
   {
-    long totalTime = getTime();
+    final long totalTime = getTime();
     return getTimeString(totalTime);
   }
 
-  public static String getTimeString(long timeMillis) {
-    String totalTimeStr = timeMillis < 10000 
-        ? timeMillis + " ms" 
-        : (double) timeMillis / 1000.0 + " s";
-    return totalTimeStr;
+  public void reset()
+  {
+    this.totalTime = 0;
+    this.startTimestamp = System.currentTimeMillis();
+  }
+
+  public long split()
+  {
+    if (this.isRunning) {
+      updateTotalTime();
+    }
+    return this.totalTime;
+  }
+
+  public void start()
+  {
+    if (this.isRunning) {
+      return;
+    }
+    this.startTimestamp = System.currentTimeMillis();
+    this.isRunning = true;
+  }
+
+  public long stop()
+  {
+    if (this.isRunning) {
+      updateTotalTime();
+      this.isRunning = false;
+    }
+    return this.totalTime;
+  }
+
+  private void updateTotalTime()
+  {
+    final long endTimestamp = System.currentTimeMillis();
+    final long elapsedTime = endTimestamp - this.startTimestamp;
+    this.startTimestamp = endTimestamp;
+    this.totalTime += elapsedTime;
   }
 }

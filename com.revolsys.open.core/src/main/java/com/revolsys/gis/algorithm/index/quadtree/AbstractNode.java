@@ -9,6 +9,11 @@ import com.revolsys.jts.index.IntervalSize;
 import com.revolsys.jts.util.BoundingBoxUtil;
 
 public abstract class AbstractNode<T> implements Serializable {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private static int computeQuadLevel(final double... bounds) {
     final double dx = bounds[2] - bounds[0];
     final double dy = bounds[3] - bounds[1];
@@ -92,7 +97,7 @@ public abstract class AbstractNode<T> implements Serializable {
   }
 
   public void clear() {
-    nodes = null;
+    this.nodes = null;
   }
 
   public AbstractNode<T> createExpanded(final AbstractNode<T> node,
@@ -147,27 +152,27 @@ public abstract class AbstractNode<T> implements Serializable {
         maxX = centreX;
         minY = this.minY;
         maxY = centreY;
-      break;
+        break;
       case 1:
         minX = centreX;
         maxX = this.maxX;
         minY = this.minY;
         maxY = centreY;
-      break;
+        break;
       case 2:
         minX = this.minX;
         maxX = centreX;
         minY = centreY;
         maxY = this.maxY;
-      break;
+        break;
       case 3:
         minX = centreX;
         maxX = this.maxX;
         minY = centreY;
         maxY = this.maxY;
-      break;
+        break;
     }
-    final AbstractNode<T> node = createNode(level - 1, minX, minY, maxX, maxY);
+    final AbstractNode<T> node = createNode(this.level - 1, minX, minY, maxX, maxY);
     return node;
   }
 
@@ -207,7 +212,7 @@ public abstract class AbstractNode<T> implements Serializable {
     if (isRoot()) {
       return 0;
     } else {
-      return (minX + maxX) / 2;
+      return (this.minX + this.maxX) / 2;
     }
   }
 
@@ -215,7 +220,7 @@ public abstract class AbstractNode<T> implements Serializable {
     if (isRoot()) {
       return 0;
     } else {
-      return (minY + maxY) / 2;
+      return (this.minY + this.maxY) / 2;
     }
   }
 
@@ -234,10 +239,10 @@ public abstract class AbstractNode<T> implements Serializable {
   }
 
   protected AbstractNode<T> getNode(final int i) {
-    if (nodes == null) {
+    if (this.nodes == null) {
       return null;
     } else {
-      return nodes[i];
+      return this.nodes[i];
     }
   }
 
@@ -290,7 +295,7 @@ public abstract class AbstractNode<T> implements Serializable {
     final double centreY = getCentreY();
     final int index = getSubnodeIndex(centreX, centreY, node.minX, node.minY,
       node.maxX, node.maxY);
-    if (node.level == level - 1) {
+    if (node.level == this.level - 1) {
       setNode(index, node);
     } else {
       final AbstractNode<T> childNode = createSubnode(index);
@@ -311,8 +316,8 @@ public abstract class AbstractNode<T> implements Serializable {
       final double maxY2 = bounds[3];
       AbstractNode<T> node = getNode(index);
       if (node == null
-        || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY,
-          minX2, minY2, maxX2, maxY2)) {
+          || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY,
+            minX2, minY2, maxX2, maxY2)) {
         final AbstractNode<T> largerNode = createExpanded(node, bounds);
         setNode(index, largerNode);
         node = largerNode;
@@ -339,7 +344,7 @@ public abstract class AbstractNode<T> implements Serializable {
   }
 
   public boolean isRoot() {
-    return level == Integer.MIN_VALUE;
+    return this.level == Integer.MIN_VALUE;
   }
 
   protected boolean isSearchMatch(final double[] bounds) {
@@ -382,13 +387,13 @@ public abstract class AbstractNode<T> implements Serializable {
 
   @SuppressWarnings("unchecked")
   protected void setNode(final int i, final AbstractNode<T> node) {
-    if (nodes == null) {
+    if (this.nodes == null) {
       if (node == null) {
         return;
       }
-      nodes = new AbstractNode[4];
+      this.nodes = new AbstractNode[4];
     }
-    nodes[i] = node;
+    this.nodes[i] = node;
   }
 
   protected int size() {
@@ -404,10 +409,10 @@ public abstract class AbstractNode<T> implements Serializable {
 
   @Override
   public String toString() {
-    if (nodes == null) {
+    if (this.nodes == null) {
       return "[]=" + getItemCount();
     } else {
-      return Arrays.toString(nodes) + "=" + getItemCount();
+      return Arrays.toString(this.nodes) + "=" + getItemCount();
     }
   }
 

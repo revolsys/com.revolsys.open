@@ -48,7 +48,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
  * as midpoints of the curve segments.
  * Due to the way buffer curves are constructed, this
  * should be a very close approximation.
- * 
+ *
  * @author mbdavis
  *
  */
@@ -68,7 +68,7 @@ public class BufferCurveMaximumDistanceFinder {
     for (final Segment segment : curve.segments()) {
       final Point midPoint = segment.midPoint();
       minPtDist.initialize();
-      DistanceToPointFinder.computeDistance(inputGeom, midPoint, minPtDist);
+      DistanceToPointFinder.computeDistance(this.inputGeom, midPoint, minPtDist);
       maxPtDist.setMaximum(minPtDist);
     }
     this.maxPtDist.setMaximum(maxPtDist);
@@ -79,7 +79,7 @@ public class BufferCurveMaximumDistanceFinder {
     final PointPairDistance minPtDist = new PointPairDistance();
     for (final Vertex vertex : curve.vertices()) {
       minPtDist.initialize();
-      DistanceToPointFinder.computeDistance(inputGeom, vertex, minPtDist);
+      DistanceToPointFinder.computeDistance(this.inputGeom, vertex, minPtDist);
       maxPtDist.setMaximum(minPtDist);
     }
     this.maxPtDist.setMaximum(maxPtDist);
@@ -88,11 +88,11 @@ public class BufferCurveMaximumDistanceFinder {
   public double findDistance(final Geometry bufferCurve) {
     computeMaxVertexDistance(bufferCurve);
     computeMaxMidpointDistance(bufferCurve);
-    return maxPtDist.getDistance();
+    return this.maxPtDist.getDistance();
   }
 
   public PointPairDistance getDistancePoints() {
-    return maxPtDist;
+    return this.maxPtDist;
   }
 
 }

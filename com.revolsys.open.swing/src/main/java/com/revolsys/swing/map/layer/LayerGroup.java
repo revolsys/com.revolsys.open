@@ -39,7 +39,7 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class LayerGroup extends AbstractLayer implements Parent<Layer>,
-  Iterable<Layer> {
+Iterable<Layer> {
 
   public static LayerGroup create(final Map<String, Object> properties) {
     final LayerGroup layerGroup = new LayerGroup();
@@ -546,7 +546,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>,
           } else if (object != null) {
             LoggerFactory.getLogger(LayerGroup.class).error(
               "Unexpected object type " + object.getClass() + " in "
-                + childResource);
+                  + childResource);
           }
         } else {
           LoggerFactory.getLogger(LayerGroup.class).error(

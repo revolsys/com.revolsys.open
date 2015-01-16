@@ -7,7 +7,7 @@ import com.revolsys.util.MathUtil;
 
 public class Spheroid implements Serializable {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -8349864136575195872L;
 
@@ -44,7 +44,7 @@ public class Spheroid implements Serializable {
 
     if (Double.isNaN(inverseFlattening)) {
       this.inverseFlattening = semiMajorAxis
-        / (semiMajorAxis - this.semiMinorAxis);
+          / (semiMajorAxis - this.semiMinorAxis);
     }
     final double f = 1.0 / this.inverseFlattening;
 
@@ -56,8 +56,8 @@ public class Spheroid implements Serializable {
     // double b2 = this.semiMinorAxis * this.semiMinorAxis;
     // eccentricitySquared = 1.0 - b2 / a2;
 
-    eccentricitySquared = f + f - f * f;
-    eccentricity = Math.sqrt(eccentricitySquared);
+    this.eccentricitySquared = f + f - f * f;
+    this.eccentricity = Math.sqrt(this.eccentricitySquared);
   }
 
   @Override
@@ -65,10 +65,10 @@ public class Spheroid implements Serializable {
     if (object instanceof Spheroid) {
       final Spheroid spheroid = (Spheroid)object;
       if (Double.doubleToLongBits(MathUtil.makePrecise(1000000.0,
-        inverseFlattening)) != Double.doubleToLongBits(MathUtil.makePrecise(
-        1000000.0, spheroid.inverseFlattening))) {
+        this.inverseFlattening)) != Double.doubleToLongBits(MathUtil.makePrecise(
+          1000000.0, spheroid.inverseFlattening))) {
         return false;
-      } else if (Double.doubleToLongBits(semiMajorAxis) != Double.doubleToLongBits(spheroid.semiMajorAxis)) {
+      } else if (Double.doubleToLongBits(this.semiMajorAxis) != Double.doubleToLongBits(spheroid.semiMajorAxis)) {
         return false;
       }
       return true;
@@ -79,17 +79,17 @@ public class Spheroid implements Serializable {
   }
 
   public boolean equalsExact(final Spheroid spheroid) {
-    if (!EqualsRegistry.equal(authority, spheroid.authority)) {
+    if (!EqualsRegistry.equal(this.authority, spheroid.authority)) {
       return false;
       // } else if (deprecated != spheroid.deprecated) {
       // return false;
-    } else if (inverseFlattening != spheroid.inverseFlattening) {
+    } else if (this.inverseFlattening != spheroid.inverseFlattening) {
       return false;
       // } else if (!EqualsRegistry.equal(name, spheroid.name)) {
       // return false;
-    } else if (semiMajorAxis != spheroid.semiMajorAxis) {
+    } else if (this.semiMajorAxis != spheroid.semiMajorAxis) {
       return false;
-    } else if (semiMinorAxis != spheroid.semiMinorAxis) {
+    } else if (this.semiMinorAxis != spheroid.semiMinorAxis) {
       return false;
     } else {
       return true;
@@ -97,31 +97,31 @@ public class Spheroid implements Serializable {
   }
 
   public Authority getAuthority() {
-    return authority;
+    return this.authority;
   }
 
   public double getEccentricity() {
-    return eccentricity;
+    return this.eccentricity;
   }
 
   public double getEccentricitySquared() {
-    return eccentricitySquared;
+    return this.eccentricitySquared;
   }
 
   public double getInverseFlattening() {
-    return inverseFlattening;
+    return this.inverseFlattening;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public double getSemiMajorAxis() {
-    return semiMajorAxis;
+    return this.semiMajorAxis;
   }
 
   public double getSemiMinorAxis() {
-    return semiMinorAxis;
+    return this.semiMinorAxis;
   }
 
   @Override
@@ -130,36 +130,36 @@ public class Spheroid implements Serializable {
     int result = 1;
     long temp;
     temp = Double.doubleToLongBits(MathUtil.makePrecise(1000000.0,
-      inverseFlattening));
-    result = prime * result + (int)(temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(semiMajorAxis);
-    result = prime * result + (int)(temp ^ (temp >>> 32));
+      this.inverseFlattening));
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    temp = Double.doubleToLongBits(this.semiMajorAxis);
+    result = prime * result + (int)(temp ^ temp >>> 32);
     return result;
   }
 
   public boolean isDeprecated() {
-    return deprecated;
+    return this.deprecated;
   }
 
   public double meridianRadiusOfCurvature(final double latitude) {
-    final double er = 1.0 - eccentricitySquared * Math.sin(latitude)
-      * Math.sin(latitude);
+    final double er = 1.0 - this.eccentricitySquared * Math.sin(latitude)
+        * Math.sin(latitude);
     final double el = Math.pow(er, 1.5);
-    final double m0 = (semiMajorAxis * (1.0 - eccentricitySquared)) / el;
+    final double m0 = this.semiMajorAxis * (1.0 - this.eccentricitySquared) / el;
     return m0;
   }
 
   public double primeVerticalRadiusOfCurvature(final double latitude) {
-    final double t1 = semiMajorAxis * semiMajorAxis;
+    final double t1 = this.semiMajorAxis * this.semiMajorAxis;
     final double t2 = t1 * Math.cos(latitude) * Math.cos(latitude);
-    final double t3 = semiMinorAxis * semiMinorAxis * Math.sin(latitude)
-      * Math.sin(latitude);
+    final double t3 = this.semiMinorAxis * this.semiMinorAxis * Math.sin(latitude)
+        * Math.sin(latitude);
     final double n0 = t1 / Math.sqrt(t2 + t3);
     return n0;
   }
 
   @Override
   public String toString() {
-    return name;
+    return this.name;
   }
 }

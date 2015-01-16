@@ -11,19 +11,19 @@ public class BoundingBox {
   private double resY;
 
   public com.revolsys.jts.geom.BoundingBox getEnvelope() {
-    return envelope;
+    return this.envelope;
   }
 
   public double getResX() {
-    return resX;
+    return this.resX;
   }
 
   public double getResY() {
-    return resY;
+    return this.resY;
   }
 
   public String getSrs() {
-    return srs;
+    return this.srs;
   }
 
   public void setEnvelope(final com.revolsys.jts.geom.BoundingBox envelope) {

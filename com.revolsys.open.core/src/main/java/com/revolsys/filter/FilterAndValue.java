@@ -12,15 +12,15 @@ public class FilterAndValue<F, V> implements Filter<F> {
 
   @Override
   public boolean accept(final F object) {
-    return filter.accept(object);
+    return this.filter.accept(object);
   }
 
   public Filter<F> getFilter() {
-    return filter;
+    return this.filter;
   }
 
   public V getValue() {
-    return value;
+    return this.value;
   }
 
   public void setFilter(final Filter<F> filter) {
@@ -33,6 +33,6 @@ public class FilterAndValue<F, V> implements Filter<F> {
 
   @Override
   public String toString() {
-    return "filter=" + filter + "\nvalue=" + value;
+    return "filter=" + this.filter + "\nvalue=" + this.value;
   }
 }

@@ -47,7 +47,7 @@ import com.revolsys.jts.testold.algorithm.PerturbedGridPolygonBuilder;
 public class SimpleRayCrossingStressTest extends TestCase {
 
   static class SimpleRayCrossingPointInAreaLocator implements
-    PointOnGeometryLocator {
+  PointOnGeometryLocator {
     private final Geometry geom;
 
     public SimpleRayCrossingPointInAreaLocator(final Geometry geom) {
@@ -57,7 +57,7 @@ public class SimpleRayCrossingStressTest extends TestCase {
     @Override
     public Location locate(final Point p) {
       final RayCrossingCounter rcc = new RayCrossingCounter(p);
-      for (final Segment segment : geom.segments()) {
+      for (final Segment segment : this.geom.segments()) {
         rcc.countSegment(segment);
       }
       return rcc.getLocation();

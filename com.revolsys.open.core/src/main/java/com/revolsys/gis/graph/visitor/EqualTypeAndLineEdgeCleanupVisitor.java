@@ -30,24 +30,24 @@ import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class EqualTypeAndLineEdgeCleanupVisitor extends
-  AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
+AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
 
   /** Flag indicating that the edge has been processed. */
   private static final String EDGE_PROCESSED = EqualTypeAndLineEdgeCleanupVisitor.class.getName()
-    + ".processed";
+      + ".processed";
 
   private Statistics duplicateStatistics;
 
   private Set<String> equalExcludeAttributes = new HashSet<String>(
-    Arrays.asList(RecordEquals.EXCLUDE_ID,
-      RecordEquals.EXCLUDE_GEOMETRY));
+      Arrays.asList(RecordEquals.EXCLUDE_ID,
+        RecordEquals.EXCLUDE_GEOMETRY));
 
   @PreDestroy
   public void destroy() {
-    if (duplicateStatistics != null) {
-      duplicateStatistics.disconnect();
+    if (this.duplicateStatistics != null) {
+      this.duplicateStatistics.disconnect();
     }
-    duplicateStatistics = null;
+    this.duplicateStatistics = null;
   }
 
   public boolean fixMissingZValues(final LineString line1,
@@ -100,13 +100,13 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
   }
 
   public Set<String> getEqualExcludeAttributes() {
-    return equalExcludeAttributes;
+    return this.equalExcludeAttributes;
   }
 
   @PostConstruct
   public void init() {
-    duplicateStatistics = new Statistics("Duplicate equal lines");
-    duplicateStatistics.connect();
+    this.duplicateStatistics = new Statistics("Duplicate equal lines");
+    this.duplicateStatistics.connect();
   }
 
   public boolean isReverse(final LineString points1, final LineString points2) {
@@ -140,7 +140,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     final Record object2 = edge2.getObject();
 
     final boolean equalAttributes = EqualsInstance.INSTANCE.equals(object1,
-      object2, equalExcludeAttributes);
+      object2, this.equalExcludeAttributes);
 
     final LineString line1 = edge1.getLine();
     int compare = 0;
@@ -151,7 +151,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
     if (compare == 0) {
       if (equalAttributes) {
         boolean equalExcludedAttributes = true;
-        for (final String name : equalExcludeAttributes) {
+        for (final String name : this.equalExcludeAttributes) {
           if (!RecordEquals.equals(object1, object2, name)) {
             equalExcludedAttributes = false;
           }
@@ -198,8 +198,8 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
   protected void removeDuplicate(final Edge<Record> removeEdge,
     final Edge<Record> keepEdge) {
     removeEdge.remove();
-    if (duplicateStatistics != null) {
-      duplicateStatistics.add(removeEdge.getObject());
+    if (this.duplicateStatistics != null) {
+      this.duplicateStatistics.add(removeEdge.getObject());
     }
   }
 
@@ -224,7 +224,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
       final AndFilter<Edge<Record>> attributeAndGeometryFilter = new AndFilter<Edge<Record>>();
 
       attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<Record>(
-        typePath));
+          typePath));
 
       final Filter<Edge<Record>> filter = getFilter();
       if (filter != null) {
@@ -232,9 +232,9 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends
       }
 
       final Filter<Record> equalLineFilter = new RecordGeometryFilter<LineString>(
-        new LineEqualIgnoreDirectionFilter(line, 2));
+          new LineEqualIgnoreDirectionFilter(line, 2));
       final EdgeObjectFilter<Record> edgeFilter = new EdgeObjectFilter<Record>(
-        equalLineFilter);
+          equalLineFilter);
       attributeAndGeometryFilter.addFilter(edgeFilter);
 
       final List<Edge<Record>> equalEdges;

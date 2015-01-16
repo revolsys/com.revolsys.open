@@ -41,6 +41,11 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.util.Stopwatch;
 
 public class PreparedLineIntersectsPerfTest {
+  public static void main(final String[] args) {
+    final PreparedLineIntersectsPerfTest test = new PreparedLineIntersectsPerfTest();
+    test.test();
+  }
+
   static final int MAX_ITER = 1;
 
   static final int NUM_AOI_PTS = 2000;
@@ -50,11 +55,6 @@ public class PreparedLineIntersectsPerfTest {
   static final int NUM_LINE_PTS = 10;
 
   static GeometryFactory geometryFactory = GeometryFactory.floating(0, 2);
-
-  public static void main(final String[] args) {
-    final PreparedLineIntersectsPerfTest test = new PreparedLineIntersectsPerfTest();
-    test.test();
-  }
 
   TestDataBuilder builder = new TestDataBuilder();
 
@@ -135,10 +135,10 @@ public class PreparedLineIntersectsPerfTest {
   /**
    * Tests using PreparedGeometry, but creating a new
    * Geometry object each time.
-   * This tests whether there is a penalty for using 
-   * the PG algorithm as a complete replacement for 
+   * This tests whether there is a penalty for using
+   * the PG algorithm as a complete replacement for
    * the original algorithm.
-   *  
+   *
    * @param g
    * @param lines
    * @return the count

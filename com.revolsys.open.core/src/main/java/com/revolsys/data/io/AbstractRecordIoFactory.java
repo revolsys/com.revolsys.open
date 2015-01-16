@@ -16,7 +16,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractRecordIoFactory extends
-  AbstractRecordReaderFactory implements RecordWriterFactory {
+AbstractRecordReaderFactory implements RecordWriterFactory {
 
   private final boolean geometrySupported;
 
@@ -71,7 +71,7 @@ public abstract class AbstractRecordIoFactory extends
   protected void setCoordinateSystems(
     final CoordinateSystem... coordinateSystems) {
     setCoordinateSystems(new LinkedHashSet<CoordinateSystem>(
-      Arrays.asList(coordinateSystems)));
+        Arrays.asList(coordinateSystems)));
   }
 
   protected void setCoordinateSystems(

@@ -18,7 +18,7 @@ public class Timer implements SelectableInput {
   }
 
   public long getWaitTime() {
-    final long waitTime = time - System.currentTimeMillis();
+    final long waitTime = this.time - System.currentTimeMillis();
     return waitTime;
   }
 
@@ -28,7 +28,7 @@ public class Timer implements SelectableInput {
   }
 
   public boolean isTimeout() {
-    final boolean timeout = System.currentTimeMillis() > time;
+    final boolean timeout = System.currentTimeMillis() > this.time;
     return timeout;
   }
 }

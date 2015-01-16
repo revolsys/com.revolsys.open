@@ -37,9 +37,9 @@ import com.revolsys.jts.operation.overlay.snap.GeometrySnapper;
 
 /**
  * Implementations for various geometry functions.
- * 
+ *
  * @author Martin Davis
- * 
+ *
  */
 public class SnappingFunctions {
   public static Geometry snapAtoB(final Geometry g, final Geometry g2,

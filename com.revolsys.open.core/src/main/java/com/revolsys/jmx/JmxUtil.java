@@ -3,7 +3,6 @@ package com.revolsys.jmx;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -78,8 +77,7 @@ public class JmxUtil {
       MBeanInfo mBeanInfo;
       mBeanInfo = connection.getMBeanInfo(objectName);
       final MBeanAttributeInfo[] attributes = mBeanInfo.getAttributes();
-      for (int i = 0; i < attributes.length; i++) {
-        final MBeanAttributeInfo thisAttribute = attributes[i];
+      for (final MBeanAttributeInfo thisAttribute : attributes) {
         if (thisAttribute.getName().equals(attributeName)) {
           attribute = thisAttribute;
           break;
@@ -110,8 +108,7 @@ public class JmxUtil {
       objectNames = mBeanServer.queryNames(new ObjectName(objectNameString),
         null);
       attributesMap = new TreeMap<String, MBeanAttributeInfo[]>();
-      for (final Iterator<ObjectName> iterator = objectNames.iterator(); iterator.hasNext();) {
-        final ObjectName objectName = iterator.next();
+      for (ObjectName objectName : objectNames) {
         MBeanInfo mBeanInfo;
         mBeanInfo = mBeanServer.getMBeanInfo(objectName);
         final MBeanAttributeInfo[] attributes = mBeanInfo.getAttributes();
@@ -140,8 +137,7 @@ public class JmxUtil {
       objectNames = connection.queryNames(new ObjectName(objectNameString),
         null);
       attributesMap = new TreeMap<String, MBeanAttributeInfo[]>();
-      for (final Iterator<ObjectName> iterator = objectNames.iterator(); iterator.hasNext();) {
-        final ObjectName objectName = iterator.next();
+      for (ObjectName objectName : objectNames) {
         MBeanInfo mBeanInfo;
         mBeanInfo = connection.getMBeanInfo(objectName);
         final MBeanAttributeInfo[] attributes = mBeanInfo.getAttributes();
@@ -229,8 +225,7 @@ public class JmxUtil {
       ObjectName objectName;
       try {
         objectName = new ObjectName(objectNameStr);
-        for (int i = 0; i < attributes.length; i++) {
-          final MBeanAttributeInfo attribute = attributes[i];
+        for (final MBeanAttributeInfo attribute : attributes) {
           final String attributeName = attribute.getName();
           System.out.print(" name=" + attributeName);
           final String attributeType = attribute.getType();
@@ -258,12 +253,12 @@ public class JmxUtil {
     final MBeanAttributeInfo attribute) {
     final String attributeName = attribute.getName();
     System.out.println("objectName="
-      + objectNameString
-      + " "
-      + attributeName
-      + "="
-      + JmxUtil.getMBeanAttributeValue(connection, objectNameString,
-        attributeName));
+        + objectNameString
+        + " "
+        + attributeName
+        + "="
+        + JmxUtil.getMBeanAttributeValue(connection, objectNameString,
+          attributeName));
 
   }
 }

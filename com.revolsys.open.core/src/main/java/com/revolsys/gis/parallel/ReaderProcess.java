@@ -34,18 +34,18 @@ public class ReaderProcess extends AbstractOutProcess<Record> {
    * @return the reader
    */
   public RecordIterator getReader() {
-    return reader;
+    return this.reader;
   }
 
   @Override
   protected void run(final Channel<Record> out) {
     final Logger log = Logger.getLogger(getClass());
     try {
-      reader.open();
+      this.reader.open();
 
       log.debug("Opened");
-      while (reader.hasNext()) {
-        final Record object = reader.next();
+      while (this.reader.hasNext()) {
+        final Record object = this.reader.next();
         out.write(object);
       }
 
@@ -55,7 +55,7 @@ public class ReaderProcess extends AbstractOutProcess<Record> {
     } catch (final Throwable t) {
       log.error("Error reading", t);
     } finally {
-      reader.close();
+      this.reader.close();
     }
   }
 

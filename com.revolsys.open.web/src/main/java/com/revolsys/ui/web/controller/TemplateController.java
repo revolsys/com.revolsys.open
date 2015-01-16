@@ -22,31 +22,31 @@ public class TemplateController extends AbstractController {
   private UrlPathHelper urlPathHelper = new UrlPathHelper();
 
   public TemplateController() {
-    urlPathHelper.setAlwaysUseFullPath(true);
+    this.urlPathHelper.setAlwaysUseFullPath(true);
   }
 
   @PreDestroy
   public void destroy() {
     setApplicationContext(null);
-    attributes = Collections.emptyMap();
-    viewName = null;
-    urlPathHelper = null;
+    this.attributes = Collections.emptyMap();
+    this.viewName = null;
+    this.urlPathHelper = null;
   }
 
   public Map<String, Object> getFields() {
-    return attributes;
+    return this.attributes;
   }
 
   public String getViewName() {
-    return viewName;
+    return this.viewName;
   }
 
   @Override
   public ModelAndView handleRequestInternal(final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
-    String path = urlPathHelper.getOriginatingRequestUri(request);
+    String path = this.urlPathHelper.getOriginatingRequestUri(request);
 
-    final String contextPath = urlPathHelper.getOriginatingContextPath(request);
+    final String contextPath = this.urlPathHelper.getOriginatingContextPath(request);
     path = path.substring(contextPath.length());
     final String pathNoExt = FileUtil.getBaseName(path);
 
@@ -55,7 +55,7 @@ public class TemplateController extends AbstractController {
     viewName = viewName.replaceAll("\\[PATH-NO-EXT\\]", pathNoExt);
 
     final ModelAndView view = new ModelAndView(viewName);
-    for (final Entry<String, Object> attribute : attributes.entrySet()) {
+    for (final Entry<String, Object> attribute : this.attributes.entrySet()) {
       final String attributeName = attribute.getKey();
       Object attributeValue = attribute.getValue();
       if (attributeValue instanceof String) {

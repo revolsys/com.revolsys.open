@@ -19,11 +19,11 @@ public class CodedValue implements Cloneable {
   }
 
   public Object getCode() {
-    return code;
+    return this.code;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public void setCode(final Object code) {
@@ -36,6 +36,6 @@ public class CodedValue implements Cloneable {
 
   @Override
   public String toString() {
-    return code + "=" + name;
+    return this.code + "=" + this.name;
   }
 }

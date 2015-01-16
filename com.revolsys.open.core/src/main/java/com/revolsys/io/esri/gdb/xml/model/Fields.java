@@ -8,7 +8,7 @@ public class Fields {
   private List<Field> fields = new ArrayList<Field>();
 
   public List<Field> getFields() {
-    return fields;
+    return this.fields;
   }
 
   public void setFields(final List<Field> fields) {
@@ -17,6 +17,6 @@ public class Fields {
 
   @Override
   public String toString() {
-    return fields.toString();
+    return this.fields.toString();
   }
 }

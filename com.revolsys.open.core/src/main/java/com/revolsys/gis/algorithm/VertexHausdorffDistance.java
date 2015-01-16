@@ -67,13 +67,13 @@ public class VertexHausdorffDistance {
   }
 
   private void compute(final Geometry g0, final Geometry g1) {
-    computeMaxPointDistance(g0, g1, ptDist);
-    computeMaxPointDistance(g1, g0, ptDist);
+    computeMaxPointDistance(g0, g1, this.ptDist);
+    computeMaxPointDistance(g1, g0, this.ptDist);
   }
 
   private void compute(final LineSegment seg0, final LineSegment seg1) {
-    computeMaxPointDistance(seg0, seg1, ptDist);
-    computeMaxPointDistance(seg1, seg0, ptDist);
+    computeMaxPointDistance(seg0, seg1, this.ptDist);
+    computeMaxPointDistance(seg1, seg0, this.ptDist);
   }
 
   private void computeMaxPointDistance(final Geometry pointGeom,
@@ -93,7 +93,7 @@ public class VertexHausdorffDistance {
   /**
    * Computes the maximum oriented distance between two line segments, as well
    * as the point pair separated by that distance.
-   * 
+   *
    * @param seg0 the line segment containing the furthest point
    * @param seg1 the line segment containing the closest point
    * @param ptDist the point pair and distance to be updated
@@ -107,11 +107,11 @@ public class VertexHausdorffDistance {
   }
 
   public double distance() {
-    return ptDist.getDistance();
+    return this.ptDist.getDistance();
   }
 
   public Point[] getCoordinates() {
-    return ptDist.getCoordinates();
+    return this.ptDist.getCoordinates();
   }
 
 }

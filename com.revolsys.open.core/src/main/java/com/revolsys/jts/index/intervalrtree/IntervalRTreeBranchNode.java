@@ -51,11 +51,11 @@ public class IntervalRTreeBranchNode<V> extends IntervalRTreeNode<V> {
   public void query(final double queryMin, final double queryMax,
     final Visitor<V> visitor) {
     if (intersects(queryMin, queryMax)) {
-      if (node1 != null) {
-        node1.query(queryMin, queryMax, visitor);
+      if (this.node1 != null) {
+        this.node1.query(queryMin, queryMax, visitor);
       }
-      if (node2 != null) {
-        node2.query(queryMin, queryMax, visitor);
+      if (this.node2 != null) {
+        this.node2.query(queryMin, queryMax, visitor);
       }
     }
   }

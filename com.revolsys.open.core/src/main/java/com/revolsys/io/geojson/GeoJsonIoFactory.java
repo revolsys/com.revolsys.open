@@ -16,21 +16,13 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.Writer;
 
 public class GeoJsonIoFactory extends
-  AbstractRecordAndGeometryWriterFactory implements GeometryReaderFactory {
+AbstractRecordAndGeometryWriterFactory implements GeometryReaderFactory {
 
   public GeoJsonIoFactory() {
     super(GeoJsonConstants.DESCRIPTION, true, true);
     addMediaTypeAndFileExtension(GeoJsonConstants.MEDIA_TYPE,
       GeoJsonConstants.FILE_EXTENSION);
     addMediaType(GeoJsonConstants.MEDIA_TYPE);
-  }
-
-  @Override
-  public Writer<Record> createRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
-    final Charset charset) {
-    final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
-    return new GeoJsonRecordWriter(writer);
   }
 
   @Override
@@ -42,6 +34,14 @@ public class GeoJsonIoFactory extends
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }
+  }
+
+  @Override
+  public Writer<Record> createRecordWriter(final String baseName,
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final Charset charset) {
+    final OutputStreamWriter writer = FileUtil.createUtf8Writer(outputStream);
+    return new GeoJsonRecordWriter(writer);
   }
 
   @Override

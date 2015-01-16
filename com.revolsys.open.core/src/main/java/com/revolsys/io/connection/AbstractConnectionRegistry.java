@@ -17,11 +17,11 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.spring.SpringUtil;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public abstract class AbstractConnectionRegistry<T extends MapSerializer>
-  implements ConnectionRegistry<T>, PropertyChangeListener {
+implements ConnectionRegistry<T>, PropertyChangeListener {
 
   private Map<String, T> connections;
 
@@ -44,7 +44,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
 
   public AbstractConnectionRegistry(
     final ConnectionRegistryManager<? extends ConnectionRegistry<T>> connectionManager,
-    final String name) {
+      final String name) {
     this.name = name;
     setConnectionManager(connectionManager);
   }
@@ -73,7 +73,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   @Override
   public void createConnection(
     final Map<String, ? extends Object> connectionParameters) {
-    final String name = CollectionUtil.getString(connectionParameters, "name");
+    final String name = Maps.getString(connectionParameters, "name");
     final File file = getConnectionFile(name);
     if (file != null && (!file.exists() || file.canRead())) {
       final FileSystemResource resource = new FileSystemResource(file);
@@ -114,7 +114,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
       }
     }
     final String fileName = FileUtil.toSafeName(name) + "."
-      + this.fileExtension;
+        + this.fileExtension;
     final File file = new File(this.directory, fileName);
     return file;
   }
@@ -133,7 +133,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   @Override
   public List<String> getConnectionNames() {
     final List<String> names = new ArrayList<String>(
-      this.connectionNames.values());
+        this.connectionNames.values());
     return names;
   }
 
@@ -216,7 +216,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   public void save() {
     for (final MapSerializer connection : this.connections.values()) {
       final Map<String, Object> connectionParameters = connection.toMap();
-      final String name = CollectionUtil.getString(connectionParameters, "name");
+      final String name = Maps.getString(connectionParameters, "name");
       final File file = getConnectionFile(name);
       if (file != null) {
         final FileSystemResource resource = new FileSystemResource(file);
@@ -275,7 +275,7 @@ public abstract class AbstractConnectionRegistry<T extends MapSerializer>
   public void setReadOnly(final boolean readOnly) {
     if (this.isReadOnly() && !readOnly) {
       throw new IllegalArgumentException(
-        "Cannot make a read only registry not read only");
+          "Cannot make a read only registry not read only");
     }
     this.readOnly = readOnly;
   }

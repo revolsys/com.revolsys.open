@@ -10,8 +10,6 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
-  private static final WeakHashMap<String, Guid> GUID_CACHE = new WeakHashMap<String, Guid>();
-
   public static void addGuid(final Guid guid) {
     synchronized (GUID_CACHE) {
       final String guidString = guid.toString();
@@ -33,10 +31,12 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
     }
   }
 
+  private static final WeakHashMap<String, Guid> GUID_CACHE = new WeakHashMap<String, Guid>();
+
   public GuidFieldDefinition(final Field field) {
     this(field.getName(), field.getLength(),
       BooleanStringConverter.getBoolean(field.getRequired())
-        || !field.isIsNullable());
+      || !field.isIsNullable());
   }
 
   public GuidFieldDefinition(final String name, final int length,

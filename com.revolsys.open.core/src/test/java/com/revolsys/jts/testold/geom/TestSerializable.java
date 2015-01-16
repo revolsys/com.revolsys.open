@@ -53,14 +53,14 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
  */
 public class TestSerializable {
 
-  public static final String FILENAME = "c:\\testSerial.txt";
-
-  public static final GeometryFactory fact = GeometryFactory.floating3();
-
   public static void main(final String[] args) {
     final TestSerializable test = new TestSerializable();
     test.run();
   }
+
+  public static final String FILENAME = "c:\\testSerial.txt";
+
+  public static final GeometryFactory fact = GeometryFactory.floating3();
 
   public TestSerializable() {
   }

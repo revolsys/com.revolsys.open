@@ -101,7 +101,7 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
   @Override
   public void itemStateChanged(final ItemEvent e) {
     if (e.getSource() == this.unitField
-      && e.getStateChange() == ItemEvent.SELECTED) {
+        && e.getStateChange() == ItemEvent.SELECTED) {
       final Object selectedItem = this.unitField.getSelectedItem();
       if (selectedItem instanceof Unit<?>) {
         setUnit((Unit<Length>)selectedItem);

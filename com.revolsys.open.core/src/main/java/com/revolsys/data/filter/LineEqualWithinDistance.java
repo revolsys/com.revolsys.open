@@ -26,8 +26,8 @@ public class LineEqualWithinDistance implements Filter<LineString> {
 
   @Override
   public boolean accept(final LineString line2) {
-    final LineStringRelate relate = new LineStringRelate(line, line2,
-      maxDistance);
+    final LineStringRelate relate = new LineStringRelate(this.line, line2,
+      this.maxDistance);
     return relate.isEqual();
   }
 }

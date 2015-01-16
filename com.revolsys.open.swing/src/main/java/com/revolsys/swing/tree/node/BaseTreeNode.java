@@ -39,7 +39,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
-  PropertyChangeListener {
+PropertyChangeListener {
 
   @SuppressWarnings("unchecked")
   public static <V> V getUserData(final TreePath path) {
@@ -54,7 +54,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
   private boolean visible = true;
 
   public static final EnableCheck NODE_EXISTS = new TreeNodePropertyEnableCheck(
-    "exists");
+      "exists");
 
   private boolean allowsChildren;
 
@@ -144,7 +144,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>,
   }
 
   public boolean dndImportData(final TransferSupport support, int index)
-    throws IOException, UnsupportedFlavorException {
+      throws IOException, UnsupportedFlavorException {
     if (!TreeTransferHandler.isDndNoneAction(support)) {
       final Transferable transferable = support.getTransferable();
       if (support.isDataFlavorSupported(TreePathListTransferable.FLAVOR)) {

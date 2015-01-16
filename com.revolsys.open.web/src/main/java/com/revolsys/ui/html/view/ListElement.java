@@ -8,37 +8,37 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.xml.XmlWriter;
 
 public class ListElement extends Element {
-  private Collection<? extends Object> objects;
+  private final Collection<? extends Object> objects;
 
-  private QName parentTag;
+  private final QName parentTag;
 
-  private QName elementTag;
+  private final QName elementTag;
 
-  public ListElement(QName parentTag, QName elementTag,
-    Collection<? extends Object> objects) {
+  public ListElement(final QName parentTag, final QName elementTag,
+    final Collection<? extends Object> objects) {
     this.parentTag = parentTag;
     this.elementTag = elementTag;
     this.objects = objects;
   }
 
   @Override
-  public void serializeElement(XmlWriter out) {
-    if (parentTag != null) {
-      out.startTag(parentTag);
+  public void serializeElement(final XmlWriter out) {
+    if (this.parentTag != null) {
+      out.startTag(this.parentTag);
 
     }
-    if (elementTag == null) {
-      for (Object value : objects) {
+    if (this.elementTag == null) {
+      for (final Object value : this.objects) {
         out.text(StringConverterRegistry.toString(value));
       }
     } else {
-      for (Object value : objects) {
-        out.element(elementTag, StringConverterRegistry.toString(value));
+      for (final Object value : this.objects) {
+        out.element(this.elementTag, StringConverterRegistry.toString(value));
       }
 
     }
-    if (parentTag != null) {
-      out.endTag(parentTag);
+    if (this.parentTag != null) {
+      out.endTag(this.parentTag);
     }
   }
 }

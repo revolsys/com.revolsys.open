@@ -23,13 +23,13 @@ public class FileCacheRequest extends CacheRequest {
 
   @Override
   public void abort() {
-    FileUtil.closeSilent(out);
-    file.delete();
+    FileUtil.closeSilent(this.out);
+    this.file.delete();
   }
 
   @Override
   public OutputStream getBody() throws IOException {
-    return out;
+    return this.out;
   }
 
 }

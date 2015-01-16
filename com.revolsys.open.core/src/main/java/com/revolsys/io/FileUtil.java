@@ -154,7 +154,7 @@ public final class FileUtil {
    * @throws IOException If an I/O error occurs.
    */
   public static long copy(final File file, final OutputStream out)
-    throws IOException {
+      throws IOException {
     final FileInputStream in = new FileInputStream(file);
     try {
       return copy(in, out);
@@ -211,7 +211,7 @@ public final class FileUtil {
    * @throws IOException if an i/o error
    */
   public static void copy(final InputStream zin, final File file, final long sz)
-    throws IOException {
+      throws IOException {
 
     ReadableByteChannel rc = null;
     FileOutputStream out = null;
@@ -388,8 +388,8 @@ public final class FileUtil {
     boolean deleted = true;
     final File[] files = directory.listFiles();
     if (files != null) {
-      for (int i = 0; i < files.length; i++) {
-        final File file = files[i];
+      for (final File file2 : files) {
+        final File file = file2;
         if (file.exists()) {
           if (file.isDirectory()) {
             if (!deleteDirectory(file, true)) {
@@ -417,8 +417,8 @@ public final class FileUtil {
     final FilenameFilter filter) {
     final File[] files = directory.listFiles();
     if (files != null) {
-      for (int i = 0; i < files.length; i++) {
-        final File file = files[i];
+      for (final File file2 : files) {
+        final File file = file2;
         if (file.exists() && filter.accept(directory, getFileName(file))) {
           if (file.isDirectory()) {
             deleteDirectory(file, true);
@@ -475,8 +475,7 @@ public final class FileUtil {
    */
   public static void deleteFiles(final File directory, final String pattern) {
     final File[] files = directory.listFiles(new PatternFilenameFilter(pattern));
-    for (int i = 0; i < files.length; i++) {
-      final File file = files[i];
+    for (final File file : files) {
       file.delete();
     }
   }
@@ -640,7 +639,7 @@ public final class FileUtil {
 
       File file = null;
       for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
-        .getConnectionRegistries()) {
+          .getConnectionRegistries()) {
         final FolderConnection connection = registry.getConnection(connectionName);
         if (connection != null) {
           final File directory = connection.getFile();

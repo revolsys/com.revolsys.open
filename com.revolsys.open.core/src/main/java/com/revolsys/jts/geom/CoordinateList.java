@@ -46,6 +46,10 @@ import com.revolsys.jts.geom.impl.PointDouble;
  * @version 1.7
  */
 public class CoordinateList extends ArrayList<Point> {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   // With contributions from Markus Schaber [schabios@logi-track.com]
   // [Jon Aquino 2004-03-25]
   private final static Point[] coordArrayType = new Point[0];
@@ -57,11 +61,16 @@ public class CoordinateList extends ArrayList<Point> {
     super();
   }
 
+  public CoordinateList(final LineString points) {
+    ensureCapacity(points.getVertexCount());
+    add(points, true, true);
+  }
+
   /**
    * Constructs a new list from an array of Coordinates, allowing repeated points.
    * (I.e. this constructor produces a {@link CoordinateList} with exactly the same set of points
    * as the input array.)
-   * 
+   *
    * @param coord the initial coordinates
    */
   public CoordinateList(final Point[] coord) {
@@ -81,14 +90,9 @@ public class CoordinateList extends ArrayList<Point> {
     add(coord, allowRepeated);
   }
 
-  public CoordinateList(final LineString points) {
-    ensureCapacity(points.getVertexCount());
-    add(points, true, true);
-  }
-
   /**
    * Inserts the specified coordinate at the specified position in this list.
-   * 
+   *
    * @param i the position at which to insert
    * @param coord the coordinate to insert
    * @param allowRepeated if set to false, repeated coordinates are collapsed
@@ -115,7 +119,21 @@ public class CoordinateList extends ArrayList<Point> {
     super.add(i, coord);
   }
 
-  /** 
+  public boolean add(final LineString coord, final boolean allowRepeated,
+    final boolean direction) {
+    if (direction) {
+      for (int i = 0; i < coord.getVertexCount(); i++) {
+        add(coord.getPoint(i), allowRepeated);
+      }
+    } else {
+      for (int i = coord.getVertexCount() - 1; i >= 0; i--) {
+        add(coord.getPoint(i), allowRepeated);
+      }
+    }
+    return true;
+  }
+
+  /**
    * Adds an array of coordinates to the list.
    * @param coord The coordinates
    * @param allowRepeated if set to false, repeated coordinates are collapsed
@@ -136,7 +154,7 @@ public class CoordinateList extends ArrayList<Point> {
     return true;
   }
 
-  /** 
+  /**
    * Adds a coordinate to the list.
    * @param obj The coordinate to add
    * @param allowRepeated if set to false, repeated coordinates are collapsed
@@ -149,7 +167,7 @@ public class CoordinateList extends ArrayList<Point> {
 
   /**
    * Adds a coordinate to the end of the list.
-   * 
+   *
    * @param coord The coordinates
    * @param allowRepeated if set to false, repeated coordinates are collapsed
    */
@@ -166,7 +184,7 @@ public class CoordinateList extends ArrayList<Point> {
     super.add(coord);
   }
 
-  /** 
+  /**
    * Adds an array of coordinates to the list.
    * @param coord The coordinates
    * @param allowRepeated if set to false, repeated coordinates are collapsed
@@ -177,7 +195,7 @@ public class CoordinateList extends ArrayList<Point> {
     return true;
   }
 
-  /** 
+  /**
    * Adds an array of coordinates to the list.
    * @param coord The coordinates
    * @param allowRepeated if set to false, repeated coordinates are collapsed
@@ -187,8 +205,8 @@ public class CoordinateList extends ArrayList<Point> {
   public boolean add(final Point[] coord, final boolean allowRepeated,
     final boolean direction) {
     if (direction) {
-      for (int i = 0; i < coord.length; i++) {
-        add(coord[i], allowRepeated);
+      for (final Point element : coord) {
+        add(element, allowRepeated);
       }
     } else {
       for (int i = coord.length - 1; i >= 0; i--) {
@@ -198,7 +216,7 @@ public class CoordinateList extends ArrayList<Point> {
     return true;
   }
 
-  /** 
+  /**
    * Adds a section of an array of coordinates to the list.
    * @param coord The coordinates
    * @param allowRepeated if set to false, repeated coordinates are collapsed
@@ -215,20 +233,6 @@ public class CoordinateList extends ArrayList<Point> {
 
     for (int i = start; i != end; i += inc) {
       add(coord[i], allowRepeated);
-    }
-    return true;
-  }
-
-  public boolean add(final LineString coord, final boolean allowRepeated,
-    final boolean direction) {
-    if (direction) {
-      for (int i = 0; i < coord.getVertexCount(); i++) {
-        add(coord.getPoint(i), allowRepeated);
-      }
-    } else {
-      for (int i = coord.getVertexCount() - 1; i >= 0; i--) {
-        add(coord.getPoint(i), allowRepeated);
-      }
     }
     return true;
   }

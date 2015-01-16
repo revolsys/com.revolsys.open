@@ -39,47 +39,54 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class DoubleKeyMap 
+public class DoubleKeyMap
 {
-	private Map topMap = new TreeMap();
-	
-	public void put(Object key1, Object key2, Object value)
-	{
-		Map keyMap = (Map) topMap.get(key1);
-		if (keyMap == null)
-			keyMap = createKeyMap(key1);
-		keyMap.put(key2, value);
-	}
-	
-	private Map createKeyMap(Object key1)
-	{
-		Map map = new TreeMap();
-		topMap.put(key1, map);
-		return map;
-	}
-	
-	public Object get(Object key1, Object key2)
-	{
-		Map keyMap = (Map) topMap.get(key1);
-		if (keyMap == null) return null;
-		return keyMap.get(key2);
-	}
-	
-	public Set keySet()
-	{
-		return topMap.keySet();
-	}
-	public Set keySet(Object key)
-	{
-		Map keyMap = (Map) topMap.get(key);
-		if (keyMap == null) return new TreeSet();
-		return keyMap.keySet();
-	}
-	
-	public Collection values(Object key1)
-	{
-		Map keyMap = (Map) topMap.get(key1);
-		if (keyMap == null) return new ArrayList();
-		return keyMap.values();
-	}
+  private final Map topMap = new TreeMap();
+
+  private Map createKeyMap(final Object key1)
+  {
+    final Map map = new TreeMap();
+    this.topMap.put(key1, map);
+    return map;
+  }
+
+  public Object get(final Object key1, final Object key2)
+  {
+    final Map keyMap = (Map) this.topMap.get(key1);
+    if (keyMap == null) {
+      return null;
+    }
+    return keyMap.get(key2);
+  }
+
+  public Set keySet()
+  {
+    return this.topMap.keySet();
+  }
+
+  public Set keySet(final Object key)
+  {
+    final Map keyMap = (Map) this.topMap.get(key);
+    if (keyMap == null) {
+      return new TreeSet();
+    }
+    return keyMap.keySet();
+  }
+  public void put(final Object key1, final Object key2, final Object value)
+  {
+    Map keyMap = (Map) this.topMap.get(key1);
+    if (keyMap == null) {
+      keyMap = createKeyMap(key1);
+    }
+    keyMap.put(key2, value);
+  }
+
+  public Collection values(final Object key1)
+  {
+    final Map keyMap = (Map) this.topMap.get(key1);
+    if (keyMap == null) {
+      return new ArrayList();
+    }
+    return keyMap.values();
+  }
 }

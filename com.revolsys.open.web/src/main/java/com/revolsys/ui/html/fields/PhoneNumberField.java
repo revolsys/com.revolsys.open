@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,18 +46,18 @@ public class PhoneNumberField extends Field {
   }
 
   public String getInputValue() {
-    return inputValue;
+    return this.inputValue;
   }
 
   @Override
   public boolean hasValue() {
-    return inputValue != null && !inputValue.equals("");
+    return this.inputValue != null && !this.inputValue.equals("");
   }
 
   @Override
   public void initialize(final Form form, final HttpServletRequest request) {
-    inputValue = request.getParameter(getName());
-    if (inputValue == null) {
+    this.inputValue = request.getParameter(getName());
+    if (this.inputValue == null) {
       setValue(getInitialValue(request));
     }
   }
@@ -68,7 +68,7 @@ public class PhoneNumberField extends Field {
     if (!super.isValid()) {
       valid = false;
     } else if (hasValue()) {
-      final String phoneValue = PhoneNumber.normalize(inputValue);
+      final String phoneValue = PhoneNumber.normalize(this.inputValue);
       final int length = phoneValue.length();
       if (length > VALUE_MAX_LENGTH) {
         addValidationError("Cannot exceed " + VALUE_MAX_LENGTH + " characters");
@@ -81,7 +81,7 @@ public class PhoneNumberField extends Field {
         addValidationError("Phone number must only contain characters [0-9()+- ]");
         valid = false;
       } else {
-        inputValue = phoneValue;
+        this.inputValue = phoneValue;
         setValue(phoneValue);
       }
     } else {
@@ -97,8 +97,8 @@ public class PhoneNumberField extends Field {
     out.attribute(HtmlUtil.ATTR_TYPE, "text");
     out.attribute(HtmlUtil.ATTR_SIZE, Integer.toString(FIELD_SIZE));
     out.attribute(HtmlUtil.ATTR_MAX_LENGTH, Integer.toString(FIELD_MAX_LENGTH));
-    if (inputValue != null) {
-      out.attribute(HtmlUtil.ATTR_VALUE, inputValue);
+    if (this.inputValue != null) {
+      out.attribute(HtmlUtil.ATTR_VALUE, this.inputValue);
     }
     out.endTag(HtmlUtil.INPUT);
   }
@@ -107,9 +107,9 @@ public class PhoneNumberField extends Field {
   public void setValue(final Object value) {
     super.setValue(value);
     if (value != null) {
-      inputValue = PhoneNumber.format(value.toString());
+      this.inputValue = PhoneNumber.format(value.toString());
     } else {
-      inputValue = null;
+      this.inputValue = null;
     }
   }
 }

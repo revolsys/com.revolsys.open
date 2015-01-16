@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,25 +43,25 @@ public class CheckBoxField extends Field {
     super(name, required);
   }
 
-  public CheckBoxField(String name, boolean required, Object defaultValue) {
+  public CheckBoxField(final String name, final boolean required, final Object defaultValue) {
     super(name, required);
     if (defaultValue != null) {
       if (defaultValue != null) {
-        selected = Boolean.valueOf(defaultValue.toString());
+        this.selected = Boolean.valueOf(defaultValue.toString());
       }
     }
   }
 
   public Object getFalseValue() {
-    return falseValue;
+    return this.falseValue;
   }
 
   public String getOnClick() {
-    return onClick;
+    return this.onClick;
   }
 
   public Object getTrueValue() {
-    return trueValue;
+    return this.trueValue;
   }
 
   @Override
@@ -73,20 +73,20 @@ public class CheckBoxField extends Field {
   public void initialize(final Form form, final HttpServletRequest request) {
     final String inputValue = request.getParameter(getName());
     if (inputValue != null) {
-      selected = inputValue.equals(selectedValue);
+      this.selected = inputValue.equals(this.selectedValue);
     } else if (request.getMethod() == "GET" || !getForm().isMainFormTask()) {
       setValue(getInitialValue(request));
       if (getValue() != null) {
-        selected = getValue().equals(trueValue);
+        this.selected = getValue().equals(this.trueValue);
       }
     } else {
-      setValue(falseValue);
-      selected = false;
+      setValue(this.falseValue);
+      this.selected = false;
     }
   }
 
   public boolean isSelected() {
-    return selected;
+    return this.selected;
   }
 
   @Override
@@ -99,9 +99,9 @@ public class CheckBoxField extends Field {
     }
     if (valid) {
       if (isSelected()) {
-        setValue(trueValue);
+        setValue(this.trueValue);
       } else {
-        setValue(falseValue);
+        setValue(this.falseValue);
       }
     }
     return valid;
@@ -109,8 +109,8 @@ public class CheckBoxField extends Field {
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    HtmlUtil.serializeCheckBox(out, getName(), selectedValue, isSelected(),
-      onClick);
+    HtmlUtil.serializeCheckBox(out, getName(), this.selectedValue, isSelected(),
+      this.onClick);
   }
 
   public void setFalseValue(final Object falseValue) {

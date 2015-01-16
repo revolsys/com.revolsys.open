@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,13 +41,13 @@ public class DetailViewTag extends TagSupport {
 
   @Override
   public int doStartTag() throws JspException {
-    if (name != null) {
+    if (this.name != null) {
       try {
-        final Object object = pageContext.findAttribute(name);
+        final Object object = this.pageContext.findAttribute(this.name);
         if (object != null) {
-          final Writer out = pageContext.getOut();
-          JavaBeanUtil.setProperty(model, "object", object);
-          final DetailView view = new DetailView(model);
+          final Writer out = this.pageContext.getOut();
+          JavaBeanUtil.setProperty(this.model, "object", object);
+          final DetailView view = new DetailView(this.model);
           view.serialize(out);
         }
       } catch (final Throwable t) {
@@ -58,18 +58,18 @@ public class DetailViewTag extends TagSupport {
   }
 
   public String getModelClass() {
-    return modelClass;
+    return this.modelClass;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public void setModelClass(final String modelClass) {
     this.modelClass = modelClass;
     try {
       final Class klass = Class.forName(modelClass);
-      model = (LabelValueListSerializer)klass.newInstance();
+      this.model = (LabelValueListSerializer)klass.newInstance();
     } catch (final Throwable t) {
       throw new IllegalArgumentException("Unable to create class " + modelClass);
     }

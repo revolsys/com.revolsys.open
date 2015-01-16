@@ -75,39 +75,39 @@ class DouglasPeuckerLineSimplifier {
   }
 
   public Point[] simplify() {
-    usePt = new boolean[pts.getVertexCount()];
-    for (int i = 0; i < pts.getVertexCount(); i++) {
-      usePt[i] = true;
+    this.usePt = new boolean[this.pts.getVertexCount()];
+    for (int i = 0; i < this.pts.getVertexCount(); i++) {
+      this.usePt[i] = true;
     }
-    simplifySection(0, pts.getVertexCount() - 1);
+    simplifySection(0, this.pts.getVertexCount() - 1);
     final CoordinateList coordList = new CoordinateList();
-    for (int i = 0; i < pts.getVertexCount(); i++) {
-      if (usePt[i]) {
-        coordList.add(pts.getPoint(i));
+    for (int i = 0; i < this.pts.getVertexCount(); i++) {
+      if (this.usePt[i]) {
+        coordList.add(this.pts.getPoint(i));
       }
     }
     return coordList.toCoordinateArray();
   }
 
   private void simplifySection(final int i, final int j) {
-    if ((i + 1) == j) {
+    if (i + 1 == j) {
       return;
     }
-    final Point p0 = pts.getPoint(i);
-    final Point p1 = pts.getPoint(j);
+    final Point p0 = this.pts.getPoint(i);
+    final Point p1 = this.pts.getPoint(j);
     double maxDistance = -1.0;
     int maxIndex = i;
     for (int k = i + 1; k < j; k++) {
       final double distance = LineSegmentUtil.distanceLinePoint(p0, p1,
-        pts.getPoint(k));
+        this.pts.getPoint(k));
       if (distance > maxDistance) {
         maxDistance = distance;
         maxIndex = k;
       }
     }
-    if (maxDistance <= distanceTolerance) {
+    if (maxDistance <= this.distanceTolerance) {
       for (int k = i + 1; k < j; k++) {
-        usePt[k] = false;
+        this.usePt[k] = false;
       }
     } else {
       simplifySection(i, maxIndex);

@@ -19,11 +19,11 @@ import javax.measure.unit.Unit;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
 
@@ -323,10 +323,10 @@ PropertyChangeListener {
     scales.addAll(MapPanel.SCALES);
     final InvokeMethodStringConverter converter = new InvokeMethodStringConverter(
       MapScale.class, "formatScale");
-    converter.setHorizontalAlignment(JLabel.RIGHT);
+    converter.setHorizontalAlignment(SwingConstants.RIGHT);
     final ComboBox field = new ComboBox(fieldName, new DefaultComboBoxModel(
       scales), converter, converter);
-    ((JTextField)field.getEditor().getEditorComponent()).setHorizontalAlignment(JTextField.RIGHT);
+    ((JTextField)field.getEditor().getEditorComponent()).setHorizontalAlignment(SwingConstants.RIGHT);
     field.setSelectedItem(value);
     field.setPreferredSize(new Dimension(150, 22));
     return field;

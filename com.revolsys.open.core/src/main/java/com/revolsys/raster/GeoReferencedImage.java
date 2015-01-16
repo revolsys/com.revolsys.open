@@ -15,7 +15,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public interface GeoReferencedImage extends MapSerializer,
-  PropertyChangeListener {
+PropertyChangeListener {
 
   void cancelChanges();
 

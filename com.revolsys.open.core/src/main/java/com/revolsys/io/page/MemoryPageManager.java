@@ -19,57 +19,57 @@ public class MemoryPageManager implements PageManager {
   @Override
   public synchronized Page createPage() {
     Page page;
-    if (freePages.isEmpty()) {
-      page = new ByteArrayPage(this, pages.size(), pageSize);
-      pages.add(page);
+    if (this.freePages.isEmpty()) {
+      page = new ByteArrayPage(this, this.pages.size(), this.pageSize);
+      this.pages.add(page);
     } else {
-      final Iterator<Page> iterator = freePages.iterator();
+      final Iterator<Page> iterator = this.freePages.iterator();
       page = iterator.next();
       iterator.remove();
     }
-    pagesInUse.add(page);
+    this.pagesInUse.add(page);
     return page;
   }
 
   @Override
   public Page createTempPage() {
-    return new ByteArrayPage(this, -1, pageSize);
+    return new ByteArrayPage(this, -1, this.pageSize);
   }
 
   @Override
   public synchronized int getNumPages() {
-    return pages.size() - freePages.size();
+    return this.pages.size() - this.freePages.size();
   }
 
   @Override
   public synchronized Page getPage(final int index) {
-    final Page page = pages.get(index);
-    if (freePages.contains(page)) {
+    final Page page = this.pages.get(index);
+    if (this.freePages.contains(page)) {
       throw new IllegalArgumentException("Page does not exist " + index);
-    } else if (pagesInUse.contains(page)) {
+    } else if (this.pagesInUse.contains(page)) {
       throw new IllegalArgumentException("Page is currently being used "
-        + index);
+          + index);
     } else {
       page.setOffset(0);
-      pagesInUse.add(page);
+      this.pagesInUse.add(page);
       return page;
     }
   }
 
   @Override
   public int getPageSize() {
-    return pageSize;
+    return this.pageSize;
   }
 
   @Override
   public synchronized void releasePage(final Page page) {
-    pagesInUse.remove(page);
+    this.pagesInUse.remove(page);
   }
 
   @Override
   public synchronized void removePage(final Page page) {
-    freePages.add(page);
-    pagesInUse.remove(page);
+    this.freePages.add(page);
+    this.pagesInUse.remove(page);
   }
 
   @Override

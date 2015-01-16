@@ -30,7 +30,7 @@ import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class GeometryHttpMessageConverter extends
-  AbstractHttpMessageConverter<Geometry> {
+AbstractHttpMessageConverter<Geometry> {
   private static final Logger LOG = LoggerFactory.getLogger(GeometryHttpMessageConverter.class);
 
   private GeometryFactory geometryFactory = GeometryFactory.floating3(4326);
@@ -60,12 +60,12 @@ public class GeometryHttpMessageConverter extends
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"
-        + mediaType.getSubtype();
+          + mediaType.getSubtype();
       final GeometryReaderFactory readerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
         GeometryReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format"
-          + mediaType);
+            + mediaType);
       } else {
         final Reader<Geometry> reader = readerFactory.createGeometryReader(new InputStreamResource(
           "geometryUpload", body));
@@ -86,7 +86,7 @@ public class GeometryHttpMessageConverter extends
     } catch (final Throwable e) {
       LOG.error("Error reading data using " + mediaType, e);
       throw new HttpMessageNotReadableException("Error reading data using"
-        + mediaType);
+          + mediaType);
     }
   }
 
@@ -110,7 +110,7 @@ public class GeometryHttpMessageConverter extends
           outputMessage, actualMediaType);
         final OutputStream body = outputMessage.getBody();
         final String mediaTypeString = actualMediaType.getType() + "/"
-          + actualMediaType.getSubtype();
+            + actualMediaType.getSubtype();
         final GeometryWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
           GeometryWriterFactory.class, mediaTypeString);
         if (writerFactory == null) {

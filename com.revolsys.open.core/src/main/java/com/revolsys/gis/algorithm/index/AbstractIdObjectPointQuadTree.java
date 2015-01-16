@@ -7,7 +7,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Point;
 
 public abstract class AbstractIdObjectPointQuadTree<T> extends
-  AbstractPointSpatialIndex<T> implements IdObjectIndex<T> {
+AbstractPointSpatialIndex<T> implements IdObjectIndex<T> {
 
   private final PointSpatialIndex<Integer> index = new PointQuadTree<Integer>();
 
@@ -30,13 +30,13 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends
   @Override
   public void put(final Point point, final T object) {
     final int id = getId(object);
-    index.put(point, id);
+    this.index.put(point, id);
   }
 
   @Override
   public boolean remove(final Point point, final T object) {
     final int id = getId(object);
-    return index.remove(point, id);
+    return this.index.remove(point, id);
   }
 
   @Override
@@ -54,15 +54,15 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends
   @Override
   public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
     final IdObjectIndexEnvelopeVisitor<T> itemVisitor = new IdObjectIndexEnvelopeVisitor<T>(
-      this, envelope, visitor);
-    index.visit(envelope, itemVisitor);
+        this, envelope, visitor);
+    this.index.visit(envelope, itemVisitor);
   }
 
   @Override
   public void visit(final Visitor<T> visitor) {
     final IdObjectIndexVisitor<T> itemVisitor = new IdObjectIndexVisitor<T>(
-      this, visitor);
-    index.visit(itemVisitor);
+        this, visitor);
+    this.index.visit(itemVisitor);
   }
 
 }

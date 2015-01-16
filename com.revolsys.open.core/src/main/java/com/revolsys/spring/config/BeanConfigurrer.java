@@ -113,12 +113,12 @@ ApplicationContextAware, BeanNameAware, PriorityOrdered {
     setAttributes(attributes);
   }
 
-  public Map<String, Object> getFields() {
-    return this.attributes;
-  }
-
   public String getBeanName() {
     return this.beanName;
+  }
+
+  public Map<String, Object> getFields() {
+    return this.attributes;
   }
 
   @Override

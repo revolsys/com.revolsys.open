@@ -21,7 +21,7 @@ public final class Delta<T> extends AbstractInProcess<T> {
 
   @SuppressWarnings("unchecked")
   private T clone(final T value) {
-    if (clone && (value instanceof Cloneable)) {
+    if (this.clone && value instanceof Cloneable) {
       try {
         final Class<? extends Object> valueClass = value.getClass();
         final Method method = valueClass.getMethod("clone", new Class[0]);
@@ -67,18 +67,18 @@ public final class Delta<T> extends AbstractInProcess<T> {
   }
 
   public List<ChannelOutput<T>> getOut() {
-    return out;
+    return this.out;
   }
 
   public boolean isClone() {
-    return clone;
+    return this.clone;
   }
 
   @Override
   protected void run(final Channel<T> in) {
-    running = true;
+    this.running = true;
     try {
-      while (running) {
+      while (this.running) {
         final T record = in.read();
         if (record != null) {
           for (final ChannelOutput<T> out : this.out) {
@@ -90,7 +90,7 @@ public final class Delta<T> extends AbstractInProcess<T> {
     } finally {
       try {
       } finally {
-        running = false;
+        this.running = false;
       }
     }
 

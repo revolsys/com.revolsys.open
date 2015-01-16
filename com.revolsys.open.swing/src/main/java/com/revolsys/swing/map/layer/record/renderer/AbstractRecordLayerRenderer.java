@@ -37,7 +37,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayerRenderer extends
-  AbstractLayerRenderer<AbstractRecordLayer> {
+AbstractLayerRenderer<AbstractRecordLayer> {
 
   public static void addRendererClass(final String name,
     final Class<? extends AbstractRecordLayerRenderer> clazz) {
@@ -69,12 +69,12 @@ public abstract class AbstractRecordLayerRenderer extends
           query = query.replaceAll("==", "=");
           query = query.replaceAll("!=", "<>");
           query = query.replaceAll("\\{(.*)\\}.contains\\((.*)\\)",
-            "$2 IN ($1)");
+              "$2 IN ($1)");
           query = query.replaceAll("\\[(.*)\\]", "$1");
           query = query.replaceAll("(.*).startsWith\\('(.*)'\\)",
-            "$1 LIKE '$2%'");
+              "$1 LIKE '$2%'");
           query = query.replaceAll("#systemProperties\\['user.name'\\]",
-            "'{gbaUsername}'");
+              "'{gbaUsername}'");
           return new SqlLayerFilter(layer, query);
         }
       } else if ("sqlFilter".equals(type)) {
@@ -133,7 +133,7 @@ public abstract class AbstractRecordLayerRenderer extends
         "editing", false), "showProperties"));
     menu.addMenuItem("layer", MenuSourceRunnable.createAction("Delete",
       "delete", new MenuSourcePropertyEnableCheck("parent", null, true),
-      "delete"));
+        "delete"));
 
     menu.addComponentFactory("scale", new TreeItemScaleMenu(true, null));
     menu.addComponentFactory("scale", new TreeItemScaleMenu(false, null));
@@ -230,7 +230,7 @@ public abstract class AbstractRecordLayerRenderer extends
             ExceptionUtil.log(
               getClass(),
               "Unabled to render " + layer.getName() + " #"
-                + record.getIdentifier(), e);
+                  + record.getIdentifier(), e);
           }
         }
       }

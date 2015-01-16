@@ -27,14 +27,6 @@ import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.math.Angle;
 
 public class CoordinatesListUtil {
-  public static final String COORDINATE_DISTANCE = "coordinateDistance";
-
-  public static final String COORDINATE_INDEX = "coordinateIndex";
-
-  public static final String SEGMENT_DISTANCE = "segmentDistance";
-
-  public static final String SEGMENT_INDEX = "segmentIndex";
-
   public static double angle(final LineString points, final int i1, final int i2) {
     final double x1 = points.getX(i1);
     final double y1 = points.getY(i1);
@@ -75,7 +67,7 @@ public class CoordinatesListUtil {
       return angle;
     } else {
       throw new IllegalArgumentException(
-        "Index must be > 0 to calculate previous angle");
+          "Index must be > 0 to calculate previous angle");
     }
   }
 
@@ -165,7 +157,7 @@ public class CoordinatesListUtil {
    * <li>Line is contained if all line segments from point2 have matching lines
    * in points1.</li>
    * </ol>
-   * 
+   *
    * @param points1
    * @param points2
    * @param tolerance
@@ -177,11 +169,11 @@ public class CoordinatesListUtil {
     final LineStringGraph graph1 = new LineStringGraph(points1);
     final LineStringGraph graph2 = new LineStringGraph(points2);
     graph1.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(
-      CoordinatesListUtil.class, "movePointsWithinTolerance", null, graph2,
-      tolerance));
+        CoordinatesListUtil.class, "movePointsWithinTolerance", null, graph2,
+        tolerance));
     graph2.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(
-      CoordinatesListUtil.class, "movePointsWithinTolerance", null, graph1,
-      tolerance));
+        CoordinatesListUtil.class, "movePointsWithinTolerance", null, graph1,
+        tolerance));
 
     final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = graph1.getPointsOnEdges(
       graph2, tolerance);
@@ -235,7 +227,7 @@ public class CoordinatesListUtil {
 
         while (segment != null) {
           final double currentCoordinateDistance = segment.getPoint(1)
-            .distance(point);
+              .distance(point);
           if (currentCoordinateDistance == 0) {
             result.put(SEGMENT_INDEX, i);
             result.put(COORDINATE_INDEX, i);
@@ -301,11 +293,11 @@ public class CoordinatesListUtil {
     graph2.setPrecisionModel(geometryFactory);
     final Map<Point, Point> movedNodes = new HashMap<Point, Point>();
     graph1.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(
-      CoordinatesListUtil.class, "movePointsWithinTolerance", movedNodes,
-      graph2, maxDistance));
+        CoordinatesListUtil.class, "movePointsWithinTolerance", movedNodes,
+        graph2, maxDistance));
     graph2.visitNodes(new InvokeMethodVisitor<Node<LineSegment>>(
-      CoordinatesListUtil.class, "movePointsWithinTolerance", movedNodes,
-      graph1, maxDistance));
+        CoordinatesListUtil.class, "movePointsWithinTolerance", movedNodes,
+        graph1, maxDistance));
 
     final Map<Edge<LineSegment>, List<Node<LineSegment>>> pointsOnEdge1 = graph1.getPointsOnEdges(
       graph2, maxDistance);
@@ -362,7 +354,7 @@ public class CoordinatesListUtil {
 
   /**
    * Only move the node if there is one of them
-   * 
+   *
    * @param graph2
    * @param maxDistance
    * @param node1
@@ -399,7 +391,7 @@ public class CoordinatesListUtil {
   /**
    * Returns the index of the direction of the point <code>q</code> relative to
    * a vector specified by <code>p1-p2</code>.
-   * 
+   *
    * @param p1 the origin point of the vector
    * @param p2 the final point of the vector
    * @param q the point to compute the direction to
@@ -512,5 +504,13 @@ public class CoordinatesListUtil {
     }
 
   }
+
+  public static final String COORDINATE_DISTANCE = "coordinateDistance";
+
+  public static final String COORDINATE_INDEX = "coordinateIndex";
+
+  public static final String SEGMENT_DISTANCE = "segmentDistance";
+
+  public static final String SEGMENT_INDEX = "segmentIndex";
 
 }

@@ -57,10 +57,10 @@ public interface SegmentString {
   boolean isClosed();
 
   /**
-  * Sets the user-defined data for this segment string.
-  *
-  * @param data an Object containing user-defined data
-  */
+   * Sets the user-defined data for this segment string.
+   *
+   * @param data an Object containing user-defined data
+   */
   void setData(Object data);
 
   int size();

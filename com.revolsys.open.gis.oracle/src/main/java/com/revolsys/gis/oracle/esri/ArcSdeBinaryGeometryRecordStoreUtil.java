@@ -245,7 +245,7 @@ public class ArcSdeBinaryGeometryRecordStoreUtil {
               LoggerFactory.getLogger(ArcSdeBinaryGeometryRecordStoreUtil.class)
               .error(
                 "Unsupported column type: " + object.getRecordDefinition()
-                    + "." + name);
+                + "." + name);
               break;
           }
           object.setValue(name, value);

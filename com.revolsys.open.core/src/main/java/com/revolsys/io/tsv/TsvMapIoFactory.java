@@ -15,7 +15,7 @@ import com.revolsys.io.csv.CsvMapWriter;
 import com.revolsys.spring.SpringUtil;
 
 public class TsvMapIoFactory extends AbstractIoFactory implements
-  MapWriterFactory {
+MapWriterFactory {
   public TsvMapIoFactory() {
     super(TsvConstants.DESCRIPTION);
     addMediaTypeAndFileExtension(TsvConstants.MEDIA_TYPE,

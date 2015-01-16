@@ -49,7 +49,7 @@ import com.revolsys.jts.geom.util.ShortCircuitedGeometryVisitor;
 /**
  * Tests whether it can be concluded that a rectangle intersects a geometry,
  * based on the relationship of the envelope(s) of the geometry.
- * 
+ *
  * @author Martin Davis
  * @version 1.7
  */
@@ -63,19 +63,19 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
   }
 
   /**
-   * Reports whether it can be concluded that an intersection occurs, 
+   * Reports whether it can be concluded that an intersection occurs,
    * or whether further testing is required.
-   * 
-   * @return true if an intersection must occur 
+   *
+   * @return true if an intersection must occur
    * or false if no conclusion about intersection can be made
    */
   public boolean intersects() {
-    return intersects;
+    return this.intersects;
   }
 
   @Override
   protected boolean isDone() {
-    return intersects == true;
+    return this.intersects == true;
   }
 
   @Override
@@ -83,12 +83,12 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
     final BoundingBox elementEnv = element.getBoundingBox();
 
     // disjoint => no intersection
-    if (!rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.intersects(elementEnv)) {
       return;
     }
     // rectangle contains target env => must intersect
-    if (rectEnv.covers(elementEnv)) {
-      intersects = true;
+    if (this.rectEnv.covers(elementEnv)) {
+      this.intersects = true;
       return;
     }
     /**
@@ -100,24 +100,24 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
      * completely bisected. In this case it is not possible to make a conclusion
      * about the presence of an intersection.
      */
-    if (elementEnv.getMinX() >= rectEnv.getMinX()
-      && elementEnv.getMaxX() <= rectEnv.getMaxX()) {
-      intersects = true;
+    if (elementEnv.getMinX() >= this.rectEnv.getMinX()
+        && elementEnv.getMaxX() <= this.rectEnv.getMaxX()) {
+      this.intersects = true;
       return;
     }
-    if (elementEnv.getMinY() >= rectEnv.getMinY()
-      && elementEnv.getMaxY() <= rectEnv.getMaxY()) {
-      intersects = true;
+    if (elementEnv.getMinY() >= this.rectEnv.getMinY()
+        && elementEnv.getMaxY() <= this.rectEnv.getMaxY()) {
+      this.intersects = true;
       return;
     }
   }
 }
 
 /**
- * A visitor which tests whether it can be 
+ * A visitor which tests whether it can be
  * concluded that a geometry contains a vertex of
  * a query geometry.
- * 
+ *
  * @author Martin Davis
  * @version 1.7
  */
@@ -130,23 +130,23 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
 
   public GeometryContainsPointVisitor(final Polygon rectangle) {
     this.rectSeq = rectangle.getExteriorRing();
-    rectEnv = rectangle.getBoundingBox();
+    this.rectEnv = rectangle.getBoundingBox();
   }
 
   /**
    * Reports whether it can be concluded that a corner point of the rectangle is
    * contained in the geometry, or whether further testing is required.
-   * 
-   * @return true if a corner point is contained 
+   *
+   * @return true if a corner point is contained
    * or false if no conclusion about intersection can be made
    */
   public boolean containsPoint() {
-    return containsPoint;
+    return this.containsPoint;
   }
 
   @Override
   protected boolean isDone() {
-    return containsPoint == true;
+    return this.containsPoint == true;
   }
 
   @Override
@@ -158,20 +158,20 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
 
     // skip if envelopes do not intersect
     final BoundingBox elementEnv = geom.getBoundingBox();
-    if (!rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.intersects(elementEnv)) {
       return;
     }
 
     // test each corner of rectangle for inclusion
     for (int i = 0; i < 4; i++) {
-      final Point rectPt = rectSeq.getPoint(i);
+      final Point rectPt = this.rectSeq.getPoint(i);
       if (!elementEnv.covers(rectPt)) {
         continue;
       }
       // check rect point in poly (rect is known not to touch polygon at this
       // point)
       if (SimplePointInAreaLocator.containsPointInPolygon(rectPt, (Polygon)geom)) {
-        containsPoint = true;
+        this.containsPoint = true;
         return;
       }
     }
@@ -180,21 +180,21 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
 
 /**
  * Implementation of the <tt>intersects</tt> spatial predicate
- * optimized for the case where one {@link Geometry} is a rectangle. 
+ * optimized for the case where one {@link Geometry} is a rectangle.
  * This class works for all
  * input geometries, including {@link GeometryCollection}s.
  * <p>
- * As a further optimization, 
+ * As a further optimization,
  * this class can be used in batch style
  * to test many geometries
  * against a single rectangle.
- * 
+ *
  * @version 1.7
  */
 public class RectangleIntersects {
   /**
    * Tests whether a rectangle intersects a given geometry.
-   * 
+   *
    * @param rectangle
    *          a rectangular Polygon
    * @param b
@@ -212,24 +212,24 @@ public class RectangleIntersects {
 
   /**
    * Create a new intersects computer for a rectangle.
-   * 
+   *
    * @param rectangle
    *          a rectangular Polygon
    */
   public RectangleIntersects(final Polygon rectangle) {
     this.rectangle = rectangle;
-    rectEnv = rectangle.getBoundingBox();
+    this.rectEnv = rectangle.getBoundingBox();
   }
 
   /**
    * Tests whether the given Geometry intersects
    * the query rectangle.
-   * 
+   *
    * @param geom the Geometry to test (may be of any type)
    * @return true if the geometry intersects the query rectangle
    */
   public boolean intersects(final Geometry geom) {
-    if (!rectEnv.intersects(geom.getBoundingBox())) {
+    if (!this.rectEnv.intersects(geom.getBoundingBox())) {
       return false;
     }
 
@@ -238,7 +238,7 @@ public class RectangleIntersects {
      * This handles Point components as well
      */
     final EnvelopeIntersectsVisitor visitor = new EnvelopeIntersectsVisitor(
-      rectEnv);
+      this.rectEnv);
     visitor.applyTo(geom);
     if (visitor.intersects()) {
       return true;
@@ -248,7 +248,7 @@ public class RectangleIntersects {
      * Test if any rectangle vertex is contained in the target geometry
      */
     final GeometryContainsPointVisitor ecpVisitor = new GeometryContainsPointVisitor(
-      rectangle);
+      this.rectangle);
     ecpVisitor.applyTo(geom);
     if (ecpVisitor.containsPoint()) {
       return true;
@@ -258,7 +258,7 @@ public class RectangleIntersects {
      * Test if any target geometry line segment intersects the rectangle
      */
     final RectangleIntersectsSegmentVisitor riVisitor = new RectangleIntersectsSegmentVisitor(
-      rectangle);
+      this.rectangle);
     riVisitor.applyTo(geom);
     if (riVisitor.intersects()) {
       return true;
@@ -271,7 +271,7 @@ public class RectangleIntersects {
 /**
  * A visitor to test for intersection between the query
  * rectangle and the line segments of the geometry.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -285,19 +285,19 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
   /**
    * Creates a visitor for checking rectangle intersection
    * with segments
-   * 
-   * @param rectangle the query rectangle 
+   *
+   * @param rectangle the query rectangle
    */
   public RectangleIntersectsSegmentVisitor(final Polygon rectangle) {
-    rectEnv = rectangle.getBoundingBox();
-    rectIntersector = new RectangleLineIntersector(rectEnv);
+    this.rectEnv = rectangle.getBoundingBox();
+    this.rectIntersector = new RectangleLineIntersector(this.rectEnv);
   }
 
   private void checkIntersectionWithLineStrings(final List lines) {
     for (final Iterator i = lines.iterator(); i.hasNext();) {
       final LineString testLine = (LineString)i.next();
       checkIntersectionWithSegments(testLine);
-      if (hasIntersection) {
+      if (this.hasIntersection) {
         return;
       }
     }
@@ -309,8 +309,8 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
       final Point p0 = seq1.getPoint(j - 1);
       final Point p1 = seq1.getPoint(j);
 
-      if (rectIntersector.intersects(p0, p1)) {
-        hasIntersection = true;
+      if (this.rectIntersector.intersects(p0, p1)) {
+        this.hasIntersection = true;
         return;
       }
     }
@@ -318,28 +318,28 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
 
   /**
    * Reports whether any segment intersection exists.
-   * 
+   *
    * @return true if a segment intersection exists
    * or false if no segment intersection exists
    */
   public boolean intersects() {
-    return hasIntersection;
+    return this.hasIntersection;
   }
 
   @Override
   protected boolean isDone() {
-    return hasIntersection == true;
+    return this.hasIntersection == true;
   }
 
   @Override
   protected void visit(final Geometry geom) {
     /**
-     * It may be the case that the rectangle and the 
+     * It may be the case that the rectangle and the
      * envelope of the geometry component are disjoint,
      * so it is worth checking this simple condition.
      */
     final BoundingBox elementEnv = geom.getBoundingBox();
-    if (!rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.intersects(elementEnv)) {
       return;
     }
 

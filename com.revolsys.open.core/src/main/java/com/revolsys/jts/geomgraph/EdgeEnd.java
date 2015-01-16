@@ -59,7 +59,7 @@ public class EdgeEnd implements Comparable {
   private Point p0, p1; // points of initial line segment
 
   private double dx, dy; // the direction vector for this edge from its starting
-                         // point
+  // point
 
   private int quadrant;
 
@@ -99,10 +99,10 @@ public class EdgeEnd implements Comparable {
     }
     // if the rays are in different quadrants, determining the ordering is
     // trivial
-    if (quadrant > e.quadrant) {
+    if (this.quadrant > e.quadrant) {
       return 1;
     }
-    if (quadrant < e.quadrant) {
+    if (this.quadrant < e.quadrant) {
       return -1;
     }
     // vectors are in the same quadrant - check relative orientation of
@@ -113,24 +113,24 @@ public class EdgeEnd implements Comparable {
      * dependent, when computing the orientation of a point very close to a
      * line. This is possibly due to the arithmetic in the translation to the
      * origin.
-     * 
+     *
      * For instance, the following situation produces identical results in spite
      * of the inverse orientation of the line segment:
-     * 
+     *
      * Point p0 = new PointDouble((double)219.3649559090992, 140.84159161824724);
      * Point p1 = new PointDouble((double)168.9018919682399, -5.713787599646864);
-     * 
+     *
      * Point p = new PointDouble((double)186.80814046338352, 46.28973405831556); int
      * orient = orientationIndex(p0, p1, p); int orientInv =
      * orientationIndex(p1, p0, p);
-     * 
+     *
      * A way to force consistent results is to normalize the orientation of the
      * vector using the following code. However, this may make the results of
      * orientationIndex inconsistent through the triangle of points, so it's not
      * clear this is an appropriate patch.
-     * 
+     *
      */
-    return CGAlgorithmsDD.orientationIndex(e.p0, e.p1, p1);
+    return CGAlgorithmsDD.orientationIndex(e.p0, e.p1, this.p1);
     // testing only
     // return ShewchuksDeterminant.orientationIndex(p1, p2, q);
     // previous implementation - not quite fully robust
@@ -148,45 +148,45 @@ public class EdgeEnd implements Comparable {
   }
 
   public Point getCoordinate() {
-    return p0;
+    return this.p0;
   }
 
   public Point getDirectedCoordinate() {
-    return p1;
+    return this.p1;
   }
 
   public double getDx() {
-    return dx;
+    return this.dx;
   }
 
   public double getDy() {
-    return dy;
+    return this.dy;
   }
 
   public Edge getEdge() {
-    return edge;
+    return this.edge;
   }
 
   public Label getLabel() {
-    return label;
+    return this.label;
   }
 
   public Node getNode() {
-    return node;
+    return this.node;
   }
 
   public int getQuadrant() {
-    return quadrant;
+    return this.quadrant;
   }
 
   protected void init(final Point p0, final Point p1) {
     this.p0 = p0;
     this.p1 = p1;
-    dx = p1.getX() - p0.getX();
-    dy = p1.getY() - p0.getY();
-    quadrant = Quadrant.quadrant(dx, dy);
-    Assert.isTrue(!(dx == 0 && dy == 0),
-      "EdgeEnd with identical endpoints found");
+    this.dx = p1.getX() - p0.getX();
+    this.dy = p1.getY() - p0.getY();
+    this.quadrant = Quadrant.quadrant(this.dx, this.dy);
+    Assert.isTrue(!(this.dx == 0 && this.dy == 0),
+        "EdgeEnd with identical endpoints found");
   }
 
   public void print(final PrintStream out) {
@@ -194,8 +194,8 @@ public class EdgeEnd implements Comparable {
     final String className = getClass().getName();
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
-    out.print("  " + name + ": " + p0 + " - " + p1 + " " + quadrant + ":"
-      + angle + "   " + getLabel());
+    out.print("  " + name + ": " + this.p0 + " - " + this.p1 + " " + this.quadrant + ":"
+        + angle + "   " + getLabel());
   }
 
   protected void setLabel(final Label label) {
@@ -212,7 +212,7 @@ public class EdgeEnd implements Comparable {
     final String className = getClass().getName();
     final int lastDotPos = className.lastIndexOf('.');
     final String name = className.substring(lastDotPos + 1);
-    return "  " + name + ": " + p0 + " - " + p1 + " " + quadrant + ":" + angle
-      + "   " + getLabel();
+    return "  " + name + ": " + this.p0 + " - " + this.p1 + " " + this.quadrant + ":" + angle
+        + "   " + getLabel();
   }
 }

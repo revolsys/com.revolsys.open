@@ -40,15 +40,15 @@ public class EdgeIntersectsLinearlyEdgeVisitor<T> implements Visitor<Edge<T>> {
 
   @Override
   public boolean visit(final Edge<T> edge2) {
-    if (edge2 != edge) {
-      final LineString line1 = edge.getLine();
+    if (edge2 != this.edge) {
+      final LineString line1 = this.edge.getLine();
       final LineString line2 = edge2.getLine();
       final BoundingBox envelope1 = line1.getBoundingBox();
       final BoundingBox envelope2 = line2.getBoundingBox();
       if (envelope1.intersects(envelope2)) {
         final IntersectionMatrix relate = line1.relate(line2);
         if (relate.get(0, 0) == Dimension.L) {
-          matchVisitor.visit(edge2);
+          this.matchVisitor.visit(edge2);
         }
       }
     }

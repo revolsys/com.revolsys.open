@@ -46,17 +46,17 @@ import com.revolsys.jts.geom.prep.PreparedMultiPolygon;
 /**
  * Models a collection of {@link Polygon}s.
  * <p>
- * As per the OGC SFS specification, 
- * the Polygons in a MultiPolygon may not overlap, 
+ * As per the OGC SFS specification,
+ * the Polygons in a MultiPolygon may not overlap,
  * and may only touch at single points.
  * This allows the topological point-set semantics
  * to be well-defined.
- *  
+ *
  *
  *@version 1.7
  */
 public class MultiPolygonImpl extends AbstractMultiPolygon implements
-  MultiPolygon {
+MultiPolygon {
 
   private static final long serialVersionUID = 8166665132445433741L;
 
@@ -86,7 +86,7 @@ public class MultiPolygonImpl extends AbstractMultiPolygon implements
       this.polygons = null;
     } else if (hasNullElements(polygons)) {
       throw new IllegalArgumentException(
-        "geometries must not contain null elements");
+          "geometries must not contain null elements");
     } else {
       this.polygons = polygons;
     }
@@ -94,48 +94,48 @@ public class MultiPolygonImpl extends AbstractMultiPolygon implements
 
   @Override
   public BoundingBox getBoundingBox() {
-    if (boundingBox == null) {
+    if (this.boundingBox == null) {
       if (isEmpty()) {
-        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
+        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
-        boundingBox = computeBoundingBox();
+        this.boundingBox = computeBoundingBox();
       }
     }
-    return boundingBox;
+    return this.boundingBox;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (polygons == null) {
+    if (this.polygons == null) {
       return new ArrayList<V>();
     } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(polygons));
+      return (List<V>)new ArrayList<>(Arrays.asList(this.polygons));
     }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (polygons == null) {
+    if (this.polygons == null) {
       return null;
     } else {
-      return (V)polygons[n];
+      return (V)this.polygons[n];
     }
   }
 
   @Override
   public int getGeometryCount() {
-    if (polygons == null) {
+    if (this.polygons == null) {
       return 0;
     } else {
-      return polygons.length;
+      return this.polygons.length;
     }
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   /**
@@ -145,12 +145,12 @@ public class MultiPolygonImpl extends AbstractMultiPolygon implements
    */
   @Override
   public Object getUserData() {
-    return userData;
+    return this.userData;
   }
 
   @Override
   public boolean isEmpty() {
-    return polygons == null;
+    return this.polygons == null;
   }
 
   @Override

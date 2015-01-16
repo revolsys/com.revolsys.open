@@ -13,7 +13,7 @@ import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 
 public class AttributeTitleStringConveter extends ObjectToStringConverter
-  implements ListCellRenderer {
+implements ListCellRenderer {
   private final AbstractRecordLayer layer;
 
   private final DefaultListCellRenderer renderer = new DefaultListCellRenderer();

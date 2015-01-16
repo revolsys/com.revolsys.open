@@ -22,8 +22,8 @@ public class DelegatingReader<T> extends AbstractReader<T> {
   @Override
   public final void close() {
     try {
-      if (reader != null) {
-        reader.close();
+      if (this.reader != null) {
+        this.reader.close();
       }
     } finally {
       doClose();
@@ -31,43 +31,43 @@ public class DelegatingReader<T> extends AbstractReader<T> {
   }
 
   protected void doClose() {
-    if (iterator instanceof AbstractIterator) {
-      final AbstractIterator<T> iter = (AbstractIterator<T>)iterator;
+    if (this.iterator instanceof AbstractIterator) {
+      final AbstractIterator<T> iter = (AbstractIterator<T>)this.iterator;
       iter.close();
     }
   }
 
   @Override
   public Map<String, Object> getProperties() {
-    return reader.getProperties();
+    return this.reader.getProperties();
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <C> C getProperty(final String name) {
-    return (C)reader.getProperty(name);
+    return (C)this.reader.getProperty(name);
   }
 
   public Reader<T> getReader() {
-    return reader;
+    return this.reader;
   }
 
   @Override
   public Iterator<T> iterator() {
-    if (iterator == null) {
-      iterator = reader.iterator();
+    if (this.iterator == null) {
+      this.iterator = this.reader.iterator();
     }
-    return iterator;
+    return this.iterator;
   }
 
   @Override
   public void open() {
-    reader.open();
+    this.reader.open();
   }
 
   @Override
   public void setProperty(final String name, final Object value) {
-    reader.setProperty(name, value);
+    this.reader.setProperty(name, value);
   }
 
   public void setReader(final Reader<T> reader) {

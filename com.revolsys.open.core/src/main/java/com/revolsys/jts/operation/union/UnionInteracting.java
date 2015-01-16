@@ -43,9 +43,9 @@ import com.revolsys.jts.geom.util.GeometryCombiner;
 /**
  * Experimental code to union MultiPolygons
  * with processing limited to the elements which actually interact.
- * 
+ *
  * Not currently used, since it doesn't seem to offer much of a performance advantage.
- * 
+ *
  * @author mbdavis
  *
  */
@@ -68,33 +68,26 @@ public class UnionInteracting {
   public UnionInteracting(final Geometry g0, final Geometry g1) {
     this.g0 = g0;
     this.g1 = g1;
-    geomFactory = g0.getGeometryFactory();
-    interacts0 = new boolean[g0.getGeometryCount()];
-    interacts1 = new boolean[g1.getGeometryCount()];
-  }
-
-  private Geometry bufferUnion(final Geometry g0, final Geometry g1) {
-    final GeometryFactory factory = g0.getGeometryFactory();
-    final Geometry gColl = factory.geometryCollection(g0, g1);
-    final Geometry unionAll = gColl.buffer(0.0);
-    return unionAll;
+    this.geomFactory = g0.getGeometryFactory();
+    this.interacts0 = new boolean[g0.getGeometryCount()];
+    this.interacts1 = new boolean[g1.getGeometryCount()];
   }
 
   private void computeInteracting() {
-    for (int i = 0; i < g0.getGeometryCount(); i++) {
-      final Geometry elem = g0.getGeometry(i);
-      interacts0[i] = computeInteracting(elem);
+    for (int i = 0; i < this.g0.getGeometryCount(); i++) {
+      final Geometry elem = this.g0.getGeometry(i);
+      this.interacts0[i] = computeInteracting(elem);
     }
   }
 
   private boolean computeInteracting(final Geometry elem0) {
     boolean interactsWithAny = false;
-    for (int i = 0; i < g1.getGeometryCount(); i++) {
-      final Geometry elem1 = g1.getGeometry(i);
+    for (int i = 0; i < this.g1.getGeometryCount(); i++) {
+      final Geometry elem1 = this.g1.getGeometry(i);
       final boolean interacts = elem1.getBoundingBox().intersects(
         elem0.getBoundingBox());
       if (interacts) {
-        interacts1[i] = true;
+        this.interacts1[i] = true;
       }
       if (interacts) {
         interactsWithAny = true;
@@ -112,7 +105,7 @@ public class UnionInteracting {
         extractedGeoms.add(elem);
       }
     }
-    return geomFactory.buildGeometry(extractedGeoms);
+    return this.geomFactory.buildGeometry(extractedGeoms);
   }
 
   public Geometry union() {
@@ -120,8 +113,8 @@ public class UnionInteracting {
 
     // check for all interacting or none interacting!
 
-    final Geometry int0 = extractElements(g0, interacts0, true);
-    final Geometry int1 = extractElements(g1, interacts1, true);
+    final Geometry int0 = extractElements(this.g0, this.interacts0, true);
+    final Geometry int1 = extractElements(this.g1, this.interacts1, true);
 
     // System.out.println(int0);
     // System.out.println(int1);
@@ -138,8 +131,8 @@ public class UnionInteracting {
     final Geometry union = int0.union(int1);
     // Geometry union = bufferUnion(int0, int1);
 
-    final Geometry disjoint0 = extractElements(g0, interacts0, false);
-    final Geometry disjoint1 = extractElements(g1, interacts1, false);
+    final Geometry disjoint0 = extractElements(this.g0, this.interacts0, false);
+    final Geometry disjoint1 = extractElements(this.g1, this.interacts1, false);
 
     final Geometry overallUnion = GeometryCombiner.combine(union, disjoint0,
       disjoint1);

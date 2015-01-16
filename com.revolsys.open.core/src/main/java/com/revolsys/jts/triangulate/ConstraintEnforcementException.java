@@ -39,13 +39,11 @@ import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
  * Indicates a failure during constraint enforcement.
- * 
+ *
  * @author Martin Davis
  * @version 1.0
  */
 public class ConstraintEnforcementException extends RuntimeException {
-
-  private static final long serialVersionUID = 386496846550080140L;
 
   private static String msgWithCoord(final String msg, final Point pt) {
     if (pt != null) {
@@ -54,11 +52,13 @@ public class ConstraintEnforcementException extends RuntimeException {
     return msg;
   }
 
+  private static final long serialVersionUID = 386496846550080140L;
+
   private Point pt = null;
 
   /**
    * Creates a new instance with a given message.
-   * 
+   *
    * @param msg a string
    */
   public ConstraintEnforcementException(final String msg) {
@@ -67,7 +67,7 @@ public class ConstraintEnforcementException extends RuntimeException {
 
   /**
    * Creates a new instance with a given message and approximate location.
-   * 
+   *
    * @param msg a string
    * @param pt the location of the error
    */
@@ -78,10 +78,10 @@ public class ConstraintEnforcementException extends RuntimeException {
 
   /**
    * Gets the approximate location of this error.
-   * 
+   *
    * @return a location
    */
   public Point getCoordinate() {
-    return pt;
+    return this.pt;
   }
 }

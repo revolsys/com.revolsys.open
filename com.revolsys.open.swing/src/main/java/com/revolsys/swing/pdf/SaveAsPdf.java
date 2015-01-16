@@ -41,8 +41,8 @@ public class SaveAsPdf {
       final PDRectangle pageSize = new PDRectangle(width, height);
       final PDPage page = new PDPage(pageSize);
       try (
-        PdfViewport pdfViewport = new PdfViewport(document, page, project,
-          width, height, boundingBox)) {
+          PdfViewport pdfViewport = new PdfViewport(document, page, project,
+            width, height, boundingBox)) {
         final LayerRenderer<? extends Layer> renderer = project.getRenderer();
         renderer.render(pdfViewport);
       }

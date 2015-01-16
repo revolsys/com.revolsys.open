@@ -71,7 +71,7 @@ public final class JavaProcess {
     final List<String> programArguments) {
     final String javaHome = System.getProperty("java.home");
     final String javaBin = javaHome + File.separator + "bin" + File.separator
-      + "java";
+        + "java";
 
     final List<String> params = new ArrayList<String>();
     params.add(javaBin);
@@ -84,7 +84,7 @@ public final class JavaProcess {
     params.add("-Djava.library.path=" + libraryPath);
 
     final List<String> inputArguments = ManagementFactory.getRuntimeMXBean()
-      .getInputArguments();
+        .getInputArguments();
     for (final String argument : inputArguments) {
       if (argument.startsWith("-D")) {
         params.add(argument);

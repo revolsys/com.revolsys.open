@@ -136,7 +136,7 @@ public class SaifSchemaReader {
   }
 
   public void attributes(final RecordDefinition type, final CsnIterator iterator)
-    throws IOException {
+      throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_NAME
         || iterator.getNextEventType() == CsnIterator.OPTIONAL_ATTRIBUTE) {
       boolean required = true;
@@ -362,7 +362,7 @@ public class SaifSchemaReader {
   }
 
   public void restricted(final RecordDefinition type, final CsnIterator iterator)
-    throws IOException {
+      throws IOException {
     while (iterator.getNextEventType() == CsnIterator.ATTRIBUTE_PATH) {
       iterator.next();
       String fieldName = iterator.getStringValue();

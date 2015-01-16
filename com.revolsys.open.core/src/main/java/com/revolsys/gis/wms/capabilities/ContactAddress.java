@@ -14,27 +14,27 @@ public class ContactAddress {
   private String country;
 
   public String getAddress() {
-    return address;
+    return this.address;
   }
 
   public String getAddressType() {
-    return addressType;
+    return this.addressType;
   }
 
   public String getCity() {
-    return city;
+    return this.city;
   }
 
   public String getCountry() {
-    return country;
+    return this.country;
   }
 
   public String getPostCode() {
-    return postCode;
+    return this.postCode;
   }
 
   public String getStateOrProvince() {
-    return stateOrProvince;
+    return this.stateOrProvince;
   }
 
   public void setAddress(final String address) {

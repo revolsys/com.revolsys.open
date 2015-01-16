@@ -16,11 +16,11 @@ import com.revolsys.jts.operation.linemerge.LineSequencer;
  * @version 1.7
  */
 public class LineSequencerTest extends TestCase {
-  private static WKTReader rdr = new WKTReader();
-
   public static void main(final String[] args) {
     junit.textui.TestRunner.run(LineSequencerTest.class);
   }
+
+  private static WKTReader rdr = new WKTReader();
 
   public LineSequencerTest(final String name) {
     super(name);
@@ -39,7 +39,7 @@ public class LineSequencerTest extends TestCase {
   }
 
   private void runIsSequenced(final String inputWKT, final boolean expected)
-    throws ParseException {
+      throws ParseException {
     final Geometry g = rdr.read(inputWKT);
     final boolean isSequenced = LineSequencer.isSequenced(g);
     assertTrue(isSequenced == expected);
@@ -59,8 +59,8 @@ public class LineSequencerTest extends TestCase {
       final Geometry result = sequencer.getSequencedLineStrings();
       final boolean isOK = expected.equalsNorm(result);
       if (!isOK) {
-      //  System.out.println("ERROR - Expected: " + expected);
-      //  System.out.println("          Actual: " + result);
+        //  System.out.println("ERROR - Expected: " + expected);
+        //  System.out.println("          Actual: " + result);
       }
       assertTrue(isOK);
 

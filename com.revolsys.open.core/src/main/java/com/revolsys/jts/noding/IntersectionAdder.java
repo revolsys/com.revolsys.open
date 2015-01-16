@@ -37,7 +37,7 @@ import com.revolsys.jts.geom.Point;
 
 /**
  * Computes the possible intersections between two line segments in {@link NodedSegmentString}s
- * and adds them to each string 
+ * and adds them to each string
  * using {@link NodedSegmentString#addIntersection(LineIntersector, int, int, int)}.
  *
  * @version 1.7
@@ -64,8 +64,6 @@ public class IntersectionAdder implements SegmentIntersector {
 
   private final LineIntersector li;
 
-  private boolean isSelfIntersection;
-
   // private boolean intersectionFound;
   public int numIntersections = 0;
 
@@ -81,14 +79,14 @@ public class IntersectionAdder implements SegmentIntersector {
   }
 
   public LineIntersector getLineIntersector() {
-    return li;
+    return this.li;
   }
 
   /**
    * @return the proper intersection point, or <code>null</code> if none was found
    */
   public Point getProperIntersectionPoint() {
-    return properIntersectionPoint;
+    return this.properIntersectionPoint;
   }
 
   /**
@@ -96,11 +94,11 @@ public class IntersectionAdder implements SegmentIntersector {
    * in the interior of some segment.
    */
   public boolean hasInteriorIntersection() {
-    return hasInterior;
+    return this.hasInterior;
   }
 
   public boolean hasIntersection() {
-    return hasIntersection;
+    return this.hasIntersection;
   }
 
   /**
@@ -108,7 +106,7 @@ public class IntersectionAdder implements SegmentIntersector {
    * contained in the set of boundary nodes set for this SegmentIntersector.
    */
   public boolean hasProperInteriorIntersection() {
-    return hasProperInterior;
+    return this.hasProperInterior;
   }
 
   /**
@@ -119,12 +117,12 @@ public class IntersectionAdder implements SegmentIntersector {
    * can result in the point being on the Boundary of the Geometry.
    */
   public boolean hasProperIntersection() {
-    return hasProper;
+    return this.hasProper;
   }
 
   /**
    * Always process all intersections
-   * 
+   *
    * @return false always
    */
   @Override
@@ -141,14 +139,14 @@ public class IntersectionAdder implements SegmentIntersector {
   private boolean isTrivialIntersection(final SegmentString e0,
     final int segIndex0, final SegmentString e1, final int segIndex1) {
     if (e0 == e1) {
-      if (li.getIntersectionNum() == 1) {
+      if (this.li.getIntersectionNum() == 1) {
         if (isAdjacentSegments(segIndex0, segIndex1)) {
           return true;
         }
         if (e0.isClosed()) {
           final int maxSegIndex = e0.size() - 1;
-          if ((segIndex0 == 0 && segIndex1 == maxSegIndex)
-            || (segIndex1 == 0 && segIndex0 == maxSegIndex)) {
+          if (segIndex0 == 0 && segIndex1 == maxSegIndex
+              || segIndex1 == 0 && segIndex0 == maxSegIndex) {
             return true;
           }
         }
@@ -171,20 +169,20 @@ public class IntersectionAdder implements SegmentIntersector {
     if (e0 == e1 && segIndex0 == segIndex1) {
       return;
     }
-    numTests++;
+    this.numTests++;
     final Point p00 = e0.getCoordinate(segIndex0);
     final Point p01 = e0.getCoordinate(segIndex0 + 1);
     final Point p10 = e1.getCoordinate(segIndex1);
     final Point p11 = e1.getCoordinate(segIndex1 + 1);
 
-    li.computeIntersection(p00, p01, p10, p11);
+    this.li.computeIntersection(p00, p01, p10, p11);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);
-    if (li.hasIntersection()) {
+    if (this.li.hasIntersection()) {
       // intersectionFound = true;
-      numIntersections++;
-      if (li.isInteriorIntersection()) {
-        numInteriorIntersections++;
-        hasInterior = true;
+      this.numIntersections++;
+      if (this.li.isInteriorIntersection()) {
+        this.numInteriorIntersections++;
+        this.hasInterior = true;
         // System.out.println(li);
       }
       // if the segments are adjacent they have at least one trivial
@@ -192,13 +190,13 @@ public class IntersectionAdder implements SegmentIntersector {
       // the shared endpoint. Don't bother adding it if it is the
       // only intersection.
       if (!isTrivialIntersection(e0, segIndex0, e1, segIndex1)) {
-        hasIntersection = true;
-        ((NodedSegmentString)e0).addIntersections(li, segIndex0, 0);
-        ((NodedSegmentString)e1).addIntersections(li, segIndex1, 1);
-        if (li.isProper()) {
-          numProperIntersections++;
-          hasProper = true;
-          hasProperInterior = true;
+        this.hasIntersection = true;
+        ((NodedSegmentString)e0).addIntersections(this.li, segIndex0, 0);
+        ((NodedSegmentString)e1).addIntersections(this.li, segIndex1, 1);
+        if (this.li.isProper()) {
+          this.numProperIntersections++;
+          this.hasProper = true;
+          this.hasProperInterior = true;
         }
       }
     }

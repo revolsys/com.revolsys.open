@@ -17,7 +17,7 @@ import com.revolsys.swing.layout.SpringLayoutUtil;
 
 public class TogglePanel extends ValueField implements ItemListener {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -1157521301167776836L;
 
@@ -54,7 +54,7 @@ public class TogglePanel extends ValueField implements ItemListener {
       final Object actionCommand = action.getValue(Action.ACTION_COMMAND_KEY);
 
       if (value != null && actionCommand != null
-        && value.equalsIgnoreCase(actionCommand.toString())) {
+          && value.equalsIgnoreCase(actionCommand.toString())) {
         button.setSelected(true);
       }
       button.addItemListener(this);
@@ -63,7 +63,7 @@ public class TogglePanel extends ValueField implements ItemListener {
   }
 
   public String getActionCommand() {
-    if (group != null) {
+    if (this.group != null) {
       final ButtonModel selection = this.group.getSelection();
       if (selection != null) {
         return selection.getActionCommand();

@@ -41,37 +41,14 @@ import com.revolsys.util.MathUtil;
 
 /**
  * A 2-dimensional mathematical vector represented by double-precision X and Y components.
- * 
+ *
  * @author mbdavis
- * 
+ *
  */
 public class Vector2D {
   /**
-   * Creates a vector from a {@link Coordinates}. 
-   * 
-   * @param coord the Point to copy
-   * @return a new vector
-   */
-  public static Vector2D create(final Point coord) {
-    return new Vector2D(coord);
-  }
-
-  /**
-   * Creates a vector with the direction and magnitude
-   * of the difference between the 
-   * <tt>to</tt> and <tt>from</tt> {@link Coordinates}s.
-   * 
-   * @param from the origin Coordinate
-   * @param to the destination Coordinate
-   * @return a new vector
-   */
-  public static Vector2D create(final Point from, final Point to) {
-    return new Vector2D(from, to);
-  }
-
-  /**
    * Creates a new vector with given X and Y components.
-   * 
+   *
    * @param x the x component
    * @param y the y component
    * @return a new vector
@@ -81,8 +58,31 @@ public class Vector2D {
   }
 
   /**
+   * Creates a vector from a {@link Coordinates}.
+   *
+   * @param coord the Point to copy
+   * @return a new vector
+   */
+  public static Vector2D create(final Point coord) {
+    return new Vector2D(coord);
+  }
+
+  /**
+   * Creates a vector with the direction and magnitude
+   * of the difference between the
+   * <tt>to</tt> and <tt>from</tt> {@link Coordinates}s.
+   *
+   * @param from the origin Coordinate
+   * @param to the destination Coordinate
+   * @return a new vector
+   */
+  public static Vector2D create(final Point from, final Point to) {
+    return new Vector2D(from, to);
+  }
+
+  /**
    * Creates a new vector from an existing one.
-   * 
+   *
    * @param v the vector to copy
    * @return a new vector
    */
@@ -104,32 +104,32 @@ public class Vector2D {
     this(0.0, 0.0);
   }
 
-  public Vector2D(final Point v) {
-    x = v.getX();
-    y = v.getY();
-  }
-
-  public Vector2D(final Point from, final Point to) {
-    x = to.getX() - from.getX();
-    y = to.getY() - from.getY();
-  }
-
   public Vector2D(final double x, final double y) {
     this.x = x;
     this.y = y;
   }
 
+  public Vector2D(final Point v) {
+    this.x = v.getX();
+    this.y = v.getY();
+  }
+
+  public Vector2D(final Point from, final Point to) {
+    this.x = to.getX() - from.getX();
+    this.y = to.getY() - from.getY();
+  }
+
   public Vector2D(final Vector2D v) {
-    x = v.x;
-    y = v.y;
+    this.x = v.x;
+    this.y = v.y;
   }
 
   public Vector2D add(final Vector2D v) {
-    return create(x + v.x, y + v.y);
+    return create(this.x + v.x, this.y + v.y);
   }
 
   public double angle() {
-    return Math.atan2(y, x);
+    return Math.atan2(this.y, this.x);
   }
 
   public double angle(final Vector2D v) {
@@ -157,7 +157,7 @@ public class Vector2D {
 
   /**
    * Creates a copy of this vector
-   * 
+   *
    * @return a copy of this vector
    */
   @Override
@@ -171,35 +171,35 @@ public class Vector2D {
    * @return the distance between the vectors
    */
   public double distance(final Vector2D v) {
-    final double delx = v.x - x;
-    final double dely = v.y - y;
+    final double delx = v.x - this.x;
+    final double dely = v.y - this.y;
     return Math.sqrt(delx * delx + dely * dely);
   }
 
   /**
    * Divides the vector by a scalar value.
-   * 
+   *
    * @param d the value to divide by
    * @return a new vector with the value v / d
    */
   public Vector2D divide(final double d) {
-    return create(x / d, y / d);
+    return create(this.x / d, this.y / d);
   }
 
   /**
    * Computes the dot-product of two vectors
-   * 
+   *
    * @param v a vector
    * @return the dot product of the vectors
    */
   public double dot(final Vector2D v) {
-    return x * v.x + y * v.y;
+    return this.x * v.x + this.y * v.y;
   }
 
   /**
    * Tests if a vector <tt>o</tt> has the same values for the x and y
    * components.
-   * 
+   *
    * @param o
    *          a <tt>Vector2D</tt> with which to do the comparison.
    * @return true if <tt>other</tt> is a <tt>Vector2D</tt> with the same
@@ -211,62 +211,62 @@ public class Vector2D {
       return false;
     }
     final Vector2D v = (Vector2D)o;
-    return x == v.x && y == v.y;
+    return this.x == v.x && this.y == v.y;
   }
 
   public double getComponent(final int index) {
     if (index == 0) {
-      return x;
+      return this.x;
     }
-    return y;
+    return this.y;
   }
 
   public double getX() {
-    return x;
+    return this.x;
   }
 
   public double getY() {
-    return y;
+    return this.y;
   }
 
   /**
    * Gets a hashcode for this vector.
-   * 
+   *
    * @return a hashcode for this vector
    */
   @Override
   public int hashCode() {
     // Algorithm from Effective Java by Joshua Bloch
     int result = 17;
-    result = 37 * result + MathUtil.hashCode(x);
-    result = 37 * result + MathUtil.hashCode(y);
+    result = 37 * result + MathUtil.hashCode(this.x);
+    result = 37 * result + MathUtil.hashCode(this.y);
     return result;
   }
 
   public boolean isParallel(final Vector2D v) {
-    return 0.0 == RobustDeterminant.signOfDet2x2(x, y, v.x, v.y);
+    return 0.0 == RobustDeterminant.signOfDet2x2(this.x, this.y, v.x, v.y);
   }
 
   public double length() {
-    return Math.sqrt(x * x + y * y);
+    return Math.sqrt(this.x * this.x + this.y * this.y);
   }
 
   public double lengthSquared() {
-    return x * x + y * y;
+    return this.x * this.x + this.y * this.y;
   }
 
   /**
    * Multiplies the vector by a scalar value.
-   * 
+   *
    * @param d the value to multiply by
    * @return a new vector with the value v * d
    */
   public Vector2D multiply(final double d) {
-    return create(x * d, y * d);
+    return create(this.x * d, this.y * d);
   }
 
   public Vector2D negate() {
-    return create(-x, -y);
+    return create(-this.x, -this.y);
   }
 
   public Vector2D normalize() {
@@ -280,7 +280,7 @@ public class Vector2D {
   public Vector2D rotate(final double angle) {
     final double cos = Math.cos(angle);
     final double sin = Math.sin(angle);
-    return create(x * cos - y * sin, x * sin + y * cos);
+    return create(this.x * cos - this.y * sin, this.x * sin + this.y * cos);
   }
 
   /**
@@ -289,7 +289,7 @@ public class Vector2D {
    * negative number rotates clockwise. Under this operation the magnitude of
    * the vector and the absolute values of the ordinates do not change, only
    * their sign and ordinate index.
-   * 
+   *
    * @param numQuarters
    *          the number of quarter-circles to rotate by
    * @return the rotated vector.
@@ -301,38 +301,38 @@ public class Vector2D {
     }
     switch (nQuad) {
       case 0:
-        return create(x, y);
+        return create(this.x, this.y);
       case 1:
-        return create(-y, x);
+        return create(-this.y, this.x);
       case 2:
-        return create(-x, -y);
+        return create(-this.x, -this.y);
       case 3:
-        return create(y, -x);
+        return create(this.y, -this.x);
     }
     Assert.shouldNeverReachHere();
     return null;
   }
 
   public Vector2D subtract(final Vector2D v) {
-    return create(x - v.x, y - v.y);
+    return create(this.x - v.x, this.y - v.y);
   }
 
   public Point toCoordinate() {
-    return new PointDouble((double)x, y, Point.NULL_ORDINATE);
+    return new PointDouble(this.x, this.y, Point.NULL_ORDINATE);
   }
 
   /**
    * Gets a string representation of this vector
-   * 
+   *
    * @return a string representing this vector
    */
   @Override
   public String toString() {
-    return "[" + x + ", " + y + "]";
+    return "[" + this.x + ", " + this.y + "]";
   }
 
   public Point translate(final Point coord) {
-    return new PointDouble((double)x + coord.getX(), y + coord.getY(),
+    return new PointDouble(this.x + coord.getX(), this.y + coord.getY(),
       Point.NULL_ORDINATE);
   }
 
@@ -342,17 +342,17 @@ public class Vector2D {
    * with this vector contributing a fraction
    * of <tt>frac</tt> to the total.
    * <p>
-   * In other words, 
+   * In other words,
    * <pre>
    * sum = frac * this + (1 - frac) * v
    * </pre>
-   * 
+   *
    * @param v the vector to sum
    * @param frac the fraction of the total contributed by this vector
    * @return the weighted sum of the two vectors
    */
   public Vector2D weightedSum(final Vector2D v, final double frac) {
-    return create(frac * x + (1.0 - frac) * v.x, frac * y + (1.0 - frac) * v.y);
+    return create(frac * this.x + (1.0 - frac) * v.x, frac * this.y + (1.0 - frac) * v.y);
   }
 
 }

@@ -1,13 +1,18 @@
 package com.revolsys.swing.table.renderer;
 
-import javax.swing.JLabel;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.renderer.CellContext;
 import org.jdesktop.swingx.renderer.ComponentProvider;
 import org.jdesktop.swingx.renderer.StringValue;
 
 public class JTextPaneProvider extends ComponentProvider<JTextPane> {
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
   public JTextPaneProvider() {
     this(null);
@@ -18,7 +23,7 @@ public class JTextPaneProvider extends ComponentProvider<JTextPane> {
   }
 
   public JTextPaneProvider(final StringValue converter) {
-    this(converter, JLabel.LEADING);
+    this(converter, SwingConstants.LEADING);
   }
 
   public JTextPaneProvider(final StringValue converter, final int alignment) {
@@ -38,7 +43,7 @@ public class JTextPaneProvider extends ComponentProvider<JTextPane> {
   @Override
   protected void format(final CellContext context) {
     // rendererComponent.setIcon(getValueAsIcon(context));
-    rendererComponent.setText(getValueAsString(context));
+    this.rendererComponent.setText(getValueAsString(context));
   }
 
 }

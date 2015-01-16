@@ -57,7 +57,7 @@ public class DashField extends ValueField implements ItemListener {
   @Override
   public void itemStateChanged(final ItemEvent event) {
     if (event.getSource() == this.dashField
-      && event.getStateChange() == ItemEvent.SELECTED) {
+        && event.getStateChange() == ItemEvent.SELECTED) {
       final List<Measure<Length>> dash = (List<Measure<Length>>)this.dashField.getSelectedItem();
       setFieldValue(dash);
     }

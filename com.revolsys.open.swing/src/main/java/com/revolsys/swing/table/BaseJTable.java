@@ -2,6 +2,7 @@ package com.revolsys.swing.table;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JLabel;
@@ -44,12 +45,12 @@ public class BaseJTable extends JXTable {
     setFont(SwingUtil.FONT);
 
     SwingUtil.addAction(this,
-      KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK),
+      KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK),
       "selectPreviousColumnCell", this, "editRelativeCell", 0, -1);
     SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0),
       "selectNextColumnCell", this, "editRelativeCell", 0, 1);
     SwingUtil.addAction(this,
-      KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK),
+      KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK),
       "selectPreviousRowCell", this, "editRelativeCell", -1, 0);
     SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
       "enterPressed", this, "editRelativeCell", 1, 0);

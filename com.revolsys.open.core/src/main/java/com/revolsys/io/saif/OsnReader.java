@@ -41,27 +41,27 @@ public class OsnReader implements RecordIterator {
 
   public OsnReader(final RecordDefinitionFactory recordDefinitionFactory,
     final File directory, final String fileName, final int srid)
-    throws IOException {
+        throws IOException {
     this.recordDefinitionFactory = recordDefinitionFactory;
     this.directory = directory;
     this.fileName = fileName;
-    converters = new OsnConverterRegistry(srid);
+    this.converters = new OsnConverterRegistry(srid);
     open();
   }
 
   public OsnReader(final RecordDefinitionFactory recordDefinitionFactory,
     final ZipFile zipFile, final String fileName, final int srid)
-    throws IOException {
+        throws IOException {
     this.recordDefinitionFactory = recordDefinitionFactory;
     this.fileName = fileName;
     this.zipFile = zipFile;
-    converters = new OsnConverterRegistry(srid);
+    this.converters = new OsnConverterRegistry(srid);
     open();
   }
 
   /**
    * Get an attribute definition from the iterator.
-   * 
+   *
    * @param record
    * @param typePath TODO
    * @param iterator The OsnIterator.
@@ -69,12 +69,12 @@ public class OsnReader implements RecordIterator {
    * @throws IOException If an I/O error occurs.
    */
   private void addField(final Record record) {
-    if (osnIterator.getEventType() != OsnIterator.START_ATTRIBUTE) {
-      if (osnIterator.next() != OsnIterator.START_ATTRIBUTE) {
-        osnIterator.throwParseError("Excepecting an attribute name");
+    if (this.osnIterator.getEventType() != OsnIterator.START_ATTRIBUTE) {
+      if (this.osnIterator.next() != OsnIterator.START_ATTRIBUTE) {
+        this.osnIterator.throwParseError("Excepecting an attribute name");
       }
     }
-    final String name = osnIterator.getStringValue();
+    final String name = this.osnIterator.getStringValue();
     final Object value = getExpression();
     record.setValue(name, value);
   }
@@ -82,35 +82,20 @@ public class OsnReader implements RecordIterator {
   @Override
   public void close() {
     try {
-      osnIterator.close();
+      this.osnIterator.close();
     } catch (final IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
 
-  private Object getRecord() {
-    final String typePath = osnIterator.getPathValue();
-    final OsnConverter converter = converters.getConverter(typePath);
-    if (converter != null) {
-      return converter.read(osnIterator);
-    } else {
-      final RecordDefinition type = recordDefinitionFactory.getRecordDefinition(typePath);
-      final Record record = factory.createRecord(type);
-      while (osnIterator.next() != OsnIterator.END_OBJECT) {
-        addField(record);
-      }
-      return record;
-    }
-  }
-
   /**
    * Get the value of an expression from the iterator.
-   * 
+   *
    * @return The value of the expression.
    * @throws IOException If an I/O error occurs.
    */
   private Object getExpression() {
-    final Object eventType = osnIterator.next();
+    final Object eventType = this.osnIterator.next();
     if (eventType == OsnIterator.START_DEFINITION) {
       return getRecord();
     } else if (eventType == OsnIterator.START_SET) {
@@ -122,15 +107,15 @@ public class OsnReader implements RecordIterator {
       processCollection(list, OsnIterator.END_LIST);
       return list;
     } else if (eventType == OsnIterator.TEXT_VALUE) {
-      return osnIterator.getValue();
+      return this.osnIterator.getValue();
     } else if (eventType == OsnIterator.NUMERIC_VALUE) {
-      return osnIterator.getValue();
+      return this.osnIterator.getValue();
     } else if (eventType == OsnIterator.BOOLEAN_VALUE) {
-      return osnIterator.getValue();
+      return this.osnIterator.getValue();
     } else if (eventType == OsnIterator.ENUM_TAG) {
-      return osnIterator.getValue();
+      return this.osnIterator.getValue();
     } else if (eventType == OsnIterator.UNKNOWN) {
-      osnIterator.throwParseError("Expected an expression");
+      this.osnIterator.throwParseError("Expected an expression");
     }
     return null;
   }
@@ -139,49 +124,64 @@ public class OsnReader implements RecordIterator {
    * @return the factory
    */
   public RecordFactory getFactory() {
-    return factory;
+    return this.factory;
   }
 
   /**
    * @return the fileName
    */
   public String getFileName() {
-    return fileName;
+    return this.fileName;
+  }
+
+  private Object getRecord() {
+    final String typePath = this.osnIterator.getPathValue();
+    final OsnConverter converter = this.converters.getConverter(typePath);
+    if (converter != null) {
+      return converter.read(this.osnIterator);
+    } else {
+      final RecordDefinition type = this.recordDefinitionFactory.getRecordDefinition(typePath);
+      final Record record = this.factory.createRecord(type);
+      while (this.osnIterator.next() != OsnIterator.END_OBJECT) {
+        addField(record);
+      }
+      return record;
+    }
   }
 
   public RecordDefinitionFactory getRecordDefinitionFactory() {
-    return recordDefinitionFactory;
+    return this.recordDefinitionFactory;
   }
 
   @Override
   public boolean hasNext() {
-    if (nextChecked) {
+    if (this.nextChecked) {
       return true;
-    } else if (endOfFile) {
+    } else if (this.endOfFile) {
       return false;
     } else {
-      if (osnIterator.hasNext()) {
-        Object eventType = osnIterator.getEventType();
+      if (this.osnIterator.hasNext()) {
+        Object eventType = this.osnIterator.getEventType();
         if (eventType != OsnIterator.START_DEFINITION) {
-          eventType = osnIterator.next();
+          eventType = this.osnIterator.next();
         }
         if (eventType == OsnIterator.START_DEFINITION) {
-          nextChecked = true;
+          this.nextChecked = true;
           return true;
         } else if (eventType != OsnIterator.END_DOCUMENT
-          && eventType != OsnIterator.END_SET) {
-          osnIterator.throwParseError("Excepecting start of an object");
+            && eventType != OsnIterator.END_SET) {
+          this.osnIterator.throwParseError("Excepecting start of an object");
         }
       }
     }
-    endOfFile = true;
+    this.endOfFile = true;
     return false;
   }
 
   @Override
   public Record next() {
     if (hasNext()) {
-      nextChecked = false;
+      this.nextChecked = false;
       return (Record)getRecord();
     } else {
       throw new NoSuchElementException();
@@ -191,10 +191,10 @@ public class OsnReader implements RecordIterator {
   @Override
   public void open() {
     try {
-      if (directory != null) {
-        osnIterator = new OsnIterator(directory, fileName);
+      if (this.directory != null) {
+        this.osnIterator = new OsnIterator(this.directory, this.fileName);
       } else {
-        osnIterator = new OsnIterator(zipFile, fileName);
+        this.osnIterator = new OsnIterator(this.zipFile, this.fileName);
       }
       skipToFirstRecord();
     } catch (final IOException e) {
@@ -204,16 +204,16 @@ public class OsnReader implements RecordIterator {
 
   /**
    * Process a collection, loading all the values into the collection.
-   * 
+   *
    * @param collection The collection to save the objects to.
    * @param endEventType The event type indicating the end of a collection.
    * @throws IOException If an I/O error occurs.
    */
   private void processCollection(final Collection<Object> collection,
     final Object endEventType) {
-    while (osnIterator.getEventType() != endEventType) {
+    while (this.osnIterator.getEventType() != endEventType) {
       final Object value = getExpression();
-      if (value != null || osnIterator.getEventType() == OsnIterator.NULL_VALUE) {
+      if (value != null || this.osnIterator.getEventType() == OsnIterator.NULL_VALUE) {
         collection.add(value);
       }
     }
@@ -222,7 +222,7 @@ public class OsnReader implements RecordIterator {
   @Override
   public void remove() {
     throw new UnsupportedOperationException(
-      "Removing SAIF objects is not supported");
+        "Removing SAIF objects is not supported");
   }
 
   /**
@@ -234,46 +234,46 @@ public class OsnReader implements RecordIterator {
 
   /**
    * Skip all objects and attributes until the first object in the collection.
-   * 
+   *
    * @return True if an object was found.
    * @throws IOException If an I/O error occurs.
    */
   private boolean skipToFirstRecord() throws IOException {
-    if (osnIterator.next() == OsnIterator.START_DEFINITION) {
-      final String typePath = osnIterator.getPathValue();
-      final RecordDefinitionImpl type = (RecordDefinitionImpl)recordDefinitionFactory.getRecordDefinition(typePath);
-      final RecordDefinition spatialDataSetType = recordDefinitionFactory.getRecordDefinition("/SpatialDataSet");
+    if (this.osnIterator.next() == OsnIterator.START_DEFINITION) {
+      final String typePath = this.osnIterator.getPathValue();
+      final RecordDefinitionImpl type = (RecordDefinitionImpl)this.recordDefinitionFactory.getRecordDefinition(typePath);
+      final RecordDefinition spatialDataSetType = this.recordDefinitionFactory.getRecordDefinition("/SpatialDataSet");
       if (type != null && type.isInstanceOf(spatialDataSetType)) {
-        final String oiName = osnIterator.nextFieldName();
+        final String oiName = this.osnIterator.nextFieldName();
 
         if (oiName != null && oiName.equals("objectIdentifier")) {
-          osnIterator.nextStringValue();
-          final String fieldName = osnIterator.nextFieldName();
+          this.osnIterator.nextStringValue();
+          final String fieldName = this.osnIterator.nextFieldName();
           if (fieldName != null
-            && (fieldName.equals("geoComponents") || fieldName.equals("annotationComponents"))) {
-            if (osnIterator.next() == OsnIterator.START_SET) {
+              && (fieldName.equals("geoComponents") || fieldName.equals("annotationComponents"))) {
+            if (this.osnIterator.next() == OsnIterator.START_SET) {
               return true;
             } else {
-              osnIterator.throwParseError("Expecting a set of objects");
+              this.osnIterator.throwParseError("Expecting a set of objects");
             }
           } else {
-            osnIterator.throwParseError("Excepecting the 'geoComponents' attribute");
+            this.osnIterator.throwParseError("Excepecting the 'geoComponents' attribute");
           }
 
         } else {
-          osnIterator.throwParseError("Expecting the 'objectIdentifier' attribute");
+          this.osnIterator.throwParseError("Expecting the 'objectIdentifier' attribute");
         }
       } else {
         return true;
       }
     } else {
-      osnIterator.throwParseError("Expecting a start of an object definition");
+      this.osnIterator.throwParseError("Expecting a start of an object definition");
     }
     return false;
   }
 
   @Override
   public String toString() {
-    return fileName;
+    return this.fileName;
   }
 }

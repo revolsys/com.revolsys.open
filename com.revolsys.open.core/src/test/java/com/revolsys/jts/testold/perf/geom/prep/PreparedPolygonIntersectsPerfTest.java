@@ -48,6 +48,11 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 import com.revolsys.jts.util.Stopwatch;
 
 public class PreparedPolygonIntersectsPerfTest {
+  public static void main(final String[] args) {
+    final PreparedPolygonIntersectsPerfTest test = new PreparedPolygonIntersectsPerfTest();
+    test.test();
+  }
+
   static final int MAX_ITER = 10;
 
   static final int NUM_AOI_PTS = 2000;
@@ -60,11 +65,6 @@ public class PreparedPolygonIntersectsPerfTest {
     0, 2);
 
   static WKTReader wktRdr = new WKTReader(geometryFactory);
-
-  public static void main(final String[] args) {
-    final PreparedPolygonIntersectsPerfTest test = new PreparedPolygonIntersectsPerfTest();
-    test.test();
-  }
 
   Stopwatch sw = new Stopwatch();
 
@@ -202,10 +202,10 @@ public class PreparedPolygonIntersectsPerfTest {
   /**
    * Tests using PreparedGeometry, but creating a new
    * Geometry object each time.
-   * This tests whether there is a penalty for using 
-   * the PG algorithm as a complete replacement for 
+   * This tests whether there is a penalty for using
+   * the PG algorithm as a complete replacement for
    * the original algorithm.
-   *  
+   *
    * @param g
    * @param lines
    * @return the count

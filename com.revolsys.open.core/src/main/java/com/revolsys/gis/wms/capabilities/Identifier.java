@@ -6,11 +6,11 @@ public class Identifier {
   private String authority;
 
   public String getAuthority() {
-    return authority;
+    return this.authority;
   }
 
   public String getValue() {
-    return value;
+    return this.value;
   }
 
   public void setAuthority(final String authority) {

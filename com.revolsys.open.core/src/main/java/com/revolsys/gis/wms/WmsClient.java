@@ -38,7 +38,7 @@ public class WmsClient {
   }
 
   public WmsClient(final String name, final String url)
-    throws MalformedURLException {
+      throws MalformedURLException {
     this(name, new URL(url));
   }
 
@@ -52,10 +52,10 @@ public class WmsClient {
   }
 
   public WmsCapabilities getCapabilities() {
-    if (capabilities == null) {
+    if (this.capabilities == null) {
       loadCapabilities();
     }
-    return capabilities;
+    return this.capabilities;
   }
 
   public Image getMapImage(final List<String> layers,
@@ -103,7 +103,7 @@ public class WmsClient {
       parameters.put(WmsParameters.SRS, srid);
     }
     final String bbox = envelope.getMinX() + "," + envelope.getMinY() + ","
-      + envelope.getMaxX() + "," + envelope.getMaxY();
+        + envelope.getMaxX() + "," + envelope.getMaxY();
     parameters.put(WmsParameters.BBOX, bbox);
     parameters.put(WmsParameters.WIDTH, width);
     parameters.put(WmsParameters.HEIGHT, height);
@@ -111,7 +111,7 @@ public class WmsClient {
     parameters.put(WmsParameters.TRANSPARENT, "TRUE");
     URL requestUrl = getCapabilities().getRequestUrl("GetMap", "GET");
     if (requestUrl == null) {
-      requestUrl = serviceUrl;
+      requestUrl = this.serviceUrl;
     }
     final String urlString = UrlUtil.getUrl(requestUrl, parameters);
     try {
@@ -122,22 +122,22 @@ public class WmsClient {
   }
 
   protected String getName() {
-    return name;
+    return this.name;
   }
 
   public URL getUrl() {
-    return serviceUrl;
+    return this.serviceUrl;
   }
 
   public boolean isConnected() {
-    return capabilities != null;
+    return this.capabilities != null;
   }
 
   public void loadCapabilities() {
     final Map<String, Object> parameters = new LinkedHashMap<String, Object>();
     parameters.put(WmsParameters.SERVICE, WmsParameterValues.WMS);
     parameters.put(WmsParameters.REQUEST, WmsParameterValues.GET_CAPABILITIES);
-    final String urlString = UrlUtil.getUrl(serviceUrl, parameters);
+    final String urlString = UrlUtil.getUrl(this.serviceUrl, parameters);
 
     final XmlProcessorContext context = new SimpleXmlProcessorContext();
     try {
@@ -150,7 +150,7 @@ public class WmsClient {
         try {
           StaxUtils.skipToStartElement(parser);
           if (parser.getEventType() == XMLStreamConstants.START_ELEMENT) {
-            capabilities = (WmsCapabilities)new Parser(context).process(parser);
+            this.capabilities = (WmsCapabilities)new Parser(context).process(parser);
           }
         } catch (final XMLStreamException e) {
           context.addError(e.getMessage(), e, parser.getLocation());
@@ -165,7 +165,7 @@ public class WmsClient {
     }
     if (!context.getErrors().isEmpty()) {
       throw new IllegalArgumentException("Capabilities file is invalid"
-        + context.getErrors());
+          + context.getErrors());
     }
   }
 
@@ -175,6 +175,6 @@ public class WmsClient {
 
   @Override
   public String toString() {
-    return name;
+    return this.name;
   }
 }

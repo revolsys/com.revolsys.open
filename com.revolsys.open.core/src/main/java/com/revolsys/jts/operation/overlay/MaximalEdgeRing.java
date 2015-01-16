@@ -68,14 +68,14 @@ public class MaximalEdgeRing extends EdgeRing {
 
   public List<MinimalEdgeRing> buildMinimalRings() {
     final List<MinimalEdgeRing> minEdgeRings = new ArrayList<>();
-    DirectedEdge de = startDe;
+    DirectedEdge de = this.startDe;
     do {
       if (de.getMinEdgeRing() == null) {
-        final MinimalEdgeRing minEr = new MinimalEdgeRing(de, geometryFactory);
+        final MinimalEdgeRing minEr = new MinimalEdgeRing(de, this.geometryFactory);
         minEdgeRings.add(minEr);
       }
       de = de.getNext();
-    } while (de != startDe);
+    } while (de != this.startDe);
     return minEdgeRings;
   }
 
@@ -89,12 +89,12 @@ public class MaximalEdgeRing extends EdgeRing {
    * link the DirectedEdges at the node to form minimalEdgeRings
    */
   public void linkDirectedEdgesForMinimalEdgeRings() {
-    DirectedEdge de = startDe;
+    DirectedEdge de = this.startDe;
     do {
       final Node node = de.getNode();
       ((DirectedEdgeStar)node.getEdges()).linkMinimalDirectedEdges(this);
       de = de.getNext();
-    } while (de != startDe);
+    } while (de != this.startDe);
   }
 
   @Override

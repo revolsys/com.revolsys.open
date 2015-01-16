@@ -11,7 +11,7 @@ public class UpperUnderscoreNameConverter implements NameConverter {
 
   @Override
   public String convert(final String name) {
-    String newName = names.get(name);
+    String newName = this.names.get(name);
     if (newName == null) {
       newName = CaseConverter.toUpperUnderscore(name);
     }
@@ -19,6 +19,6 @@ public class UpperUnderscoreNameConverter implements NameConverter {
   }
 
   public void setName(final String name, final String newName) {
-    names.put(name, newName);
+    this.names.put(name, newName);
   }
 }

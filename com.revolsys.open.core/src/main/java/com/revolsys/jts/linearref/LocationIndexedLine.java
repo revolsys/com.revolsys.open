@@ -58,7 +58,7 @@ public class LocationIndexedLine {
   }
 
   private void checkGeometryType() {
-    if (!(linearGeom instanceof LineString || linearGeom instanceof MultiLineString)) {
+    if (!(this.linearGeom instanceof LineString || this.linearGeom instanceof MultiLineString)) {
       throw new IllegalArgumentException("Input geometry must be linear");
     }
   }
@@ -71,7 +71,7 @@ public class LocationIndexedLine {
    */
   public LinearLocation clampIndex(final LinearLocation index) {
     final LinearLocation loc = (LinearLocation)index.clone();
-    loc.clamp(linearGeom);
+    loc.clamp(this.linearGeom);
     return loc;
   }
 
@@ -85,7 +85,7 @@ public class LocationIndexedLine {
    */
   public Geometry extractLine(final LinearLocation startIndex,
     final LinearLocation endIndex) {
-    return ExtractLineByLocation.extract(linearGeom, startIndex, endIndex);
+    return ExtractLineByLocation.extract(this.linearGeom, startIndex, endIndex);
   }
 
   /**
@@ -100,7 +100,7 @@ public class LocationIndexedLine {
    * @return the Point at the given index
    */
   public Point extractPoint(final LinearLocation index) {
-    return index.getCoordinate(linearGeom);
+    return index.getCoordinate(this.linearGeom);
   }
 
   /**
@@ -110,7 +110,7 @@ public class LocationIndexedLine {
    * line will be returned.
    * The computed point is offset to the left of the line if the offset distance is
    * positive, to the right if negative.
-   * 
+   *
    * The Z-ordinate of the computed point will be interpolated from
    * the Z-ordinates of the line segment containing it, if they exist.
    *
@@ -121,8 +121,8 @@ public class LocationIndexedLine {
    */
   public Point extractPoint(final LinearLocation index,
     final double offsetDistance) {
-    final LinearLocation indexLow = index.toLowest(linearGeom);
-    return indexLow.getSegment(linearGeom).pointAlongOffset(
+    final LinearLocation indexLow = index.toLowest(this.linearGeom);
+    return indexLow.getSegment(this.linearGeom).pointAlongOffset(
       indexLow.getSegmentFraction(), offsetDistance);
   }
 
@@ -131,7 +131,7 @@ public class LocationIndexedLine {
    * @return the location index
    */
   public LinearLocation getEndIndex() {
-    return LinearLocation.getEndLocation(linearGeom);
+    return LinearLocation.getEndLocation(this.linearGeom);
   }
 
   /**
@@ -156,7 +156,7 @@ public class LocationIndexedLine {
    * @see #project(Point)
    */
   public LinearLocation indexOf(final Point pt) {
-    return LocationIndexOfPoint.indexOf(linearGeom, pt);
+    return LocationIndexOfPoint.indexOf(this.linearGeom, pt);
   }
 
   /**
@@ -183,7 +183,7 @@ public class LocationIndexedLine {
    */
   public LinearLocation indexOfAfter(final Point pt,
     final LinearLocation minIndex) {
-    return LocationIndexOfPoint.indexOfAfter(linearGeom, pt, minIndex);
+    return LocationIndexOfPoint.indexOfAfter(this.linearGeom, pt, minIndex);
   }
 
   /**
@@ -196,7 +196,7 @@ public class LocationIndexedLine {
    * @return a pair of indices for the start and end of the subline.
    */
   public LinearLocation[] indicesOf(final Geometry subLine) {
-    return LocationIndexOfLine.indicesOf(linearGeom, subLine);
+    return LocationIndexOfLine.indicesOf(this.linearGeom, subLine);
   }
 
   /**
@@ -206,7 +206,7 @@ public class LocationIndexedLine {
    * @return <code>true</code> if the index is in the valid range
    */
   public boolean isValidIndex(final LinearLocation index) {
-    return index.isValid(linearGeom);
+    return index.isValid(this.linearGeom);
   }
 
   /**
@@ -219,6 +219,6 @@ public class LocationIndexedLine {
    * @return the index of the point
    */
   public LinearLocation project(final Point pt) {
-    return LocationIndexOfPoint.indexOf(linearGeom, pt);
+    return LocationIndexOfPoint.indexOf(this.linearGeom, pt);
   }
 }

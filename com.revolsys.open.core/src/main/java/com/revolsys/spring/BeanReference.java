@@ -10,16 +10,16 @@ public class BeanReference implements BeanFactoryAware {
   private String name;
 
   public Object getBean() {
-    return beanFactory.getBean(name);
+    return this.beanFactory.getBean(this.name);
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   @Override
   public void setBeanFactory(final BeanFactory beanFactory)
-    throws BeansException {
+      throws BeansException {
     this.beanFactory = beanFactory;
   }
 

@@ -14,18 +14,18 @@ public class BeanReference implements BeanFactoryAware {
    * @return Returns the bean.
    */
   public String getBean() {
-    return bean;
+    return this.bean;
   }
 
   /**
    * @return Returns the name.
    */
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public Object getReferencedBean() {
-    return factory.getBean(bean);
+    return this.factory.getBean(this.bean);
   }
 
   /**
@@ -35,6 +35,7 @@ public class BeanReference implements BeanFactoryAware {
     this.bean = bean;
   }
 
+  @Override
   public void setBeanFactory(final BeanFactory factory) {
     this.factory = factory;
 

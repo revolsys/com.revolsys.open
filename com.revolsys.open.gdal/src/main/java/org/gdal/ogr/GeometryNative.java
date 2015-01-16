@@ -8,13 +8,11 @@
 
 package org.gdal.ogr;
 
-import java.lang.ref.WeakReference;
 import java.lang.ref.ReferenceQueue;
-import java.util.Set;
-import java.util.HashSet;
+import java.lang.ref.WeakReference;
 import java.util.Collections;
-
-import org.gdal.ogr.Geometry;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /* This class enables to finalize native resources associated with the object */
@@ -32,70 +30,73 @@ class GeometryNative extends WeakReference {
   static
   {
     cleanupThread = new Thread() {
-        public void run()
+      @Override
+      public void run()
+      {
+        while(true)
         {
-            while(true)
-            {
-                try
-                {
-                    GeometryNative nativeObject =
-                        (GeometryNative) refQueue.remove();
-                    if (nativeObject != null)
-                        nativeObject.delete();
-                }
-                catch(InterruptedException ie) {}
+          try
+          {
+            final GeometryNative nativeObject =
+                (GeometryNative) refQueue.remove();
+            if (nativeObject != null) {
+              nativeObject.delete();
             }
+          }
+          catch(final InterruptedException ie) {}
         }
+      }
     };
     try
     {
-        cleanupThread.setName("Geometry" + "NativeObjectsCleaner");
-        cleanupThread.setDaemon(true);
-        cleanupThread.start();
+      cleanupThread.setName("Geometry" + "NativeObjectsCleaner");
+      cleanupThread.setDaemon(true);
+      cleanupThread.start();
     }
-    catch (SecurityException se)
+    catch (final SecurityException se)
     {
-        //System.err.println("could not start daemon thread");
-        cleanupThread = null;
+      //System.err.println("could not start daemon thread");
+      cleanupThread = null;
     }
   }
 
-  public GeometryNative(Geometry javaObject, long cPtr) {
+  public GeometryNative(final Geometry javaObject, final long cPtr) {
     super(javaObject, refQueue);
 
     if (cleanupThread == null)
     {
-        /* We didn't manage to have a daemon cleanup thread */
-        /* so let's clean manually */
-        while(true)
-        {
-            GeometryNative nativeObject =
-                (GeometryNative) refQueue.poll();
-            if (nativeObject != null)
-                nativeObject.delete();
-            else
-                break;
+      /* We didn't manage to have a daemon cleanup thread */
+      /* so let's clean manually */
+      while(true)
+      {
+        final GeometryNative nativeObject =
+            (GeometryNative) refQueue.poll();
+        if (nativeObject != null) {
+          nativeObject.delete();
+        } else {
+          break;
         }
+      }
     }
 
     refList.add(this);
 
-    swigCPtr = cPtr;
+    this.swigCPtr = cPtr;
+  }
+
+  public void delete()
+  {
+    refList.remove(this);
+    if(this.swigCPtr != 0) {
+      ogrJNI.delete_Geometry(this.swigCPtr);
+    }
+    this.swigCPtr = 0;
   }
 
   public void dontDisposeNativeResources()
   {
-      refList.remove(this);
-      swigCPtr = 0;
-  }
-
-  public void delete() 
-  {
     refList.remove(this);
-    if(swigCPtr != 0) {
-      ogrJNI.delete_Geometry(swigCPtr);
-    }
-    swigCPtr = 0;
+    this.swigCPtr = 0;
   }
 
 

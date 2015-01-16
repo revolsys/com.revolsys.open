@@ -41,7 +41,7 @@ public class PseudoNodeAttribute {
     final Record object1 = edge1.getObject();
     final Record object2 = edge2.getObject();
     if (DirectionalAttributes.canMergeObjects(node, object1, object2,
-      equalExcludeAttributes)) {
+      this.equalExcludeAttributes)) {
       return new EdgePair<Record>(edge1, edge2);
     } else {
       return null;
@@ -49,15 +49,15 @@ public class PseudoNodeAttribute {
   }
 
   public List<EdgePair<Record>> getEdgePairs() {
-    return edgePairs;
+    return this.edgePairs;
   }
 
   public List<EdgePair<Record>> getReversedEdgePairs() {
-    return reversedEdgePairs;
+    return this.reversedEdgePairs;
   }
 
   public String getTypeName() {
-    return typePath;
+    return this.typePath;
   }
 
   private void init(final Node<Record> node,
@@ -73,7 +73,7 @@ public class PseudoNodeAttribute {
     if (!LineStringUtil.hasLoop(lines)) {
       if (edgesByLine.size() == 2) {
         final Iterator<Set<Edge<Record>>> edgeIter = edgesByLine.values()
-          .iterator();
+            .iterator();
         final Set<Edge<Record>> edges1 = edgeIter.next();
         final Set<Edge<Record>> edges2 = edgeIter.next();
         final int size1 = edges1.size();
@@ -86,25 +86,25 @@ public class PseudoNodeAttribute {
               edge2);
             if (edgePair != null) {
               if (edge1.isForwards(node) == edge2.isForwards(node)) {
-                reversedEdgePairs.add(edgePair);
+                this.reversedEdgePairs.add(edgePair);
               } else {
-                edgePairs.add(edgePair);
+                this.edgePairs.add(edgePair);
               }
               return true;
             }
           } else {
             final List<Edge<Record>> unmatchedEdges1 = new ArrayList<Edge<Record>>(
-              edges1);
+                edges1);
             final List<Edge<Record>> unmatchedEdges2 = new ArrayList<Edge<Record>>(
-              edges2);
+                edges2);
             // Find non-reversed matches
-            matchEdges(node, unmatchedEdges1, unmatchedEdges2, edgePairs, false);
+            matchEdges(node, unmatchedEdges1, unmatchedEdges2, this.edgePairs, false);
             if (unmatchedEdges2.isEmpty()) {
               return true;
             } else {
               // Find reversed matches
               matchEdges(node, unmatchedEdges1, unmatchedEdges2,
-                reversedEdgePairs, true);
+                this.reversedEdgePairs, true);
               if (unmatchedEdges2.isEmpty()) {
                 return true;
               }

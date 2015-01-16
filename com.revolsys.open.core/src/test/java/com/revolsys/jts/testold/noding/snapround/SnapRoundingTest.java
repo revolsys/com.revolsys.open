@@ -20,11 +20,11 @@ import com.revolsys.jts.noding.snapround.GeometryNoder;
  */
 public class SnapRoundingTest extends TestCase {
 
-  static final double SNAP_TOLERANCE = 1.0;
-
   public static void main(final String args[]) {
     TestRunner.run(SnapRoundingTest.class);
   }
+
+  static final double SNAP_TOLERANCE = 1.0;
 
   WKTReader rdr = new WKTReader();
 
@@ -44,18 +44,16 @@ public class SnapRoundingTest extends TestCase {
     return geomList;
   }
 
-  private boolean isSnapped(final Point v, final Point p0,
-    final Point p1) {
-    if (v.equals(2,p0)) {
-      return true;
-    }
-    if (v.equals(2,p1)) {
-      return true;
-    }
-    final LineSegment seg = new LineSegmentDouble(p0, p1);
-    final double dist = seg.distance(v);
-    if (dist < SNAP_TOLERANCE / 2.05) {
-      return false;
+  boolean isSnapped(final List lines, final double tol) {
+    for (int i = 0; i < lines.size(); i++) {
+      final LineString line = (LineString)lines.get(i);
+      for (int j = 0; j < line.getVertexCount(); j++) {
+        final Point v = line.getPoint(j);
+        if (!isSnapped(v, lines)) {
+          return false;
+        }
+
+      }
     }
     return true;
   }
@@ -74,16 +72,18 @@ public class SnapRoundingTest extends TestCase {
     return true;
   }
 
-  boolean isSnapped(final List lines, final double tol) {
-    for (int i = 0; i < lines.size(); i++) {
-      final LineString line = (LineString)lines.get(i);
-      for (int j = 0; j < line.getVertexCount(); j++) {
-        final Point v = line.getPoint(j);
-        if (!isSnapped(v, lines)) {
-          return false;
-        }
-
-      }
+  private boolean isSnapped(final Point v, final Point p0,
+    final Point p1) {
+    if (v.equals(2,p0)) {
+      return true;
+    }
+    if (v.equals(2,p1)) {
+      return true;
+    }
+    final LineSegment seg = new LineSegmentDouble(p0, p1);
+    final double dist = seg.distance(v);
+    if (dist < SNAP_TOLERANCE / 2.05) {
+      return false;
     }
     return true;
   }

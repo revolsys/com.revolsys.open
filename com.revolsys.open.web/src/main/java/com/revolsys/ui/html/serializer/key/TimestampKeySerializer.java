@@ -4,7 +4,7 @@ import java.text.DateFormat;
 
 /**
  * Serialize a date with the date and timestamp fields.
- * 
+ *
  * @author Paul Austin
  */
 public class TimestampKeySerializer extends DateTimeKeySerializer {

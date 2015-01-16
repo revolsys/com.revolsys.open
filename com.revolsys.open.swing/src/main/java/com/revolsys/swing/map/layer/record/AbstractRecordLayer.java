@@ -122,10 +122,10 @@ import com.revolsys.swing.tree.MenuSourcePropertyEnableCheck;
 import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.swing.tree.node.record.RecordStoreTableTreeNode;
 import com.revolsys.swing.undo.SetObjectProperty;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Label;
+import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayer extends AbstractLayer implements
@@ -1725,6 +1725,7 @@ RecordFactory, AddGeometryCompleteAction {
     return getGeometryFieldName() != null;
   }
 
+  @Override
   public boolean isHasSelectedRecords() {
     return isHasCachedRecords(this.cacheIdSelected);
   }
@@ -2122,7 +2123,7 @@ RecordFactory, AddGeometryCompleteAction {
     final LayerRecord record) {
     if (isLayerRecord(record)) {
       synchronized (getSync()) {
-        return CollectionUtil.removeFromCollection(this.cacheIdToRecordMap,
+        return Maps.removeFromCollection(this.cacheIdToRecordMap,
           cacheId, record);
       }
     }

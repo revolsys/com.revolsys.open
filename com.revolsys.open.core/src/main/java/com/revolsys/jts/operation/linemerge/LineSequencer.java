@@ -60,11 +60,11 @@ import com.revolsys.jts.util.Assert;
  * components of the input.  Each linestring is oriented
  * so that identical endpoints are adjacent in the list.
  * <p>
- * A typical use case is to convert a set of 
- * unoriented geometric links 
+ * A typical use case is to convert a set of
+ * unoriented geometric links
  * from a linear network
  * (e.g. such as block faces on a bus route)
- * into a continuous oriented path through the network. 
+ * into a continuous oriented path through the network.
  * <p>
  * The input linestrings may form one or more connected sets.
  * The input linestrings should be correctly noded, or the results may
@@ -233,11 +233,11 @@ public class LineSequencer {
   }
 
   private void addLine(final LineString lineString) {
-    if (factory == null) {
+    if (this.factory == null) {
       this.factory = lineString.getGeometryFactory();
     }
-    graph.addEdge(lineString);
-    lineCount++;
+    this.graph.addEdge(lineString);
+    this.lineCount++;
   }
 
   private void addReverseSubpath(DirectedEdge de, final ListIterator lit,
@@ -291,29 +291,29 @@ public class LineSequencer {
       }
     }
     if (lines.size() == 0) {
-      return factory.multiLineString(new LineString[0]);
+      return this.factory.multiLineString(new LineString[0]);
     }
-    return factory.buildGeometry(lines);
+    return this.factory.buildGeometry(lines);
   }
 
   private void computeSequence() {
-    if (isRun) {
+    if (this.isRun) {
       return;
     }
-    isRun = true;
+    this.isRun = true;
 
     final List sequences = findSequences();
     if (sequences == null) {
       return;
     }
 
-    sequencedGeometry = buildSequencedGeometry(sequences);
-    isSequenceable = true;
+    this.sequencedGeometry = buildSequencedGeometry(sequences);
+    this.isSequenceable = true;
 
-    final int finalLineCount = sequencedGeometry.getGeometryCount();
-    Assert.isTrue(lineCount == finalLineCount, "Lines were missing from result");
-    Assert.isTrue(sequencedGeometry instanceof LineString
-      || sequencedGeometry instanceof MultiLineString, "Result is not lineal");
+    final int finalLineCount = this.sequencedGeometry.getGeometryCount();
+    Assert.isTrue(this.lineCount == finalLineCount, "Lines were missing from result");
+    Assert.isTrue(this.sequencedGeometry instanceof LineString
+      || this.sequencedGeometry instanceof MultiLineString, "Result is not lineal");
   }
 
   private List findSequence(final Subgraph graph) {
@@ -321,8 +321,8 @@ public class LineSequencer {
 
     final Node startNode = findLowestDegreeNode(graph);
     final DirectedEdge startDE = (DirectedEdge)startNode.getOutEdges()
-      .iterator()
-      .next();
+        .iterator()
+        .next();
     final DirectedEdge startDESym = startDE.getSym();
 
     final List seq = new LinkedList();
@@ -347,7 +347,7 @@ public class LineSequencer {
 
   private List findSequences() {
     final List sequences = new ArrayList();
-    final ConnectedSubgraphFinder csFinder = new ConnectedSubgraphFinder(graph);
+    final ConnectedSubgraphFinder csFinder = new ConnectedSubgraphFinder(this.graph);
     final List subgraphs = csFinder.getConnectedSubgraphs();
     for (final Iterator i = subgraphs.iterator(); i.hasNext();) {
       final Subgraph subgraph = (Subgraph)i.next();
@@ -371,7 +371,7 @@ public class LineSequencer {
    */
   public Geometry getSequencedLineStrings() {
     computeSequence();
-    return sequencedGeometry;
+    return this.sequencedGeometry;
   }
 
   /**
@@ -400,7 +400,7 @@ public class LineSequencer {
    */
   public boolean isSequenceable() {
     computeSequence();
-    return isSequenceable;
+    return this.isSequenceable;
   }
 
   /**
@@ -429,7 +429,7 @@ public class LineSequencer {
 
     boolean flipSeq = false;
     final boolean hasDegree1Node = startNode.getDegree() == 1
-      || endNode.getDegree() == 1;
+        || endNode.getDegree() == 1;
 
     if (hasDegree1Node) {
       boolean hasObviousStartNode = false;
@@ -437,12 +437,12 @@ public class LineSequencer {
       // test end edge before start edge, to make result stable
       // (ie. if both are good starts, pick the actual start
       if (endEdge.getToNode().getDegree() == 1
-        && endEdge.getEdgeDirection() == false) {
+          && endEdge.getEdgeDirection() == false) {
         hasObviousStartNode = true;
         flipSeq = true;
       }
       if (startEdge.getFromNode().getDegree() == 1
-        && startEdge.getEdgeDirection() == true) {
+          && startEdge.getEdgeDirection() == true) {
         hasObviousStartNode = true;
         flipSeq = false;
       }

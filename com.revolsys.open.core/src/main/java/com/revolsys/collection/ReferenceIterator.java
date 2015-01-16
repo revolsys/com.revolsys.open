@@ -15,13 +15,13 @@ public class ReferenceIterator<V> extends AbstractIterator<V> {
   @Override
   protected void doClose() {
     super.doClose();
-    iterator = null;
+    this.iterator = null;
   }
 
   @Override
   protected V getNext() throws NoSuchElementException {
-    while (iterator.hasNext()) {
-      final Reference<V> reference = iterator.next();
+    while (this.iterator.hasNext()) {
+      final Reference<V> reference = this.iterator.next();
       final V value = reference.get();
       if (value != null) {
         return value;

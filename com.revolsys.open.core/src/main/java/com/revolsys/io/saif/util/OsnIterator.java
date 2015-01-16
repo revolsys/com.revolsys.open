@@ -697,6 +697,6 @@ public class OsnIterator implements Iterator<Object> {
   @Override
   public String toString() {
     return this.fileName + "[" + this.lineNumber + "," + this.columnNumber
-      + "]";
+        + "]";
   }
 }

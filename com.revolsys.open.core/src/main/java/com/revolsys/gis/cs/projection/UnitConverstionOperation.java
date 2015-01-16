@@ -15,7 +15,7 @@ public class UnitConverstionOperation implements CoordinatesOperation {
   public UnitConverstionOperation(final Unit sourceUnit, final Unit targetUnit) {
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
-    converter = sourceUnit.getConverterTo(targetUnit);
+    this.converter = sourceUnit.getConverterTo(targetUnit);
   }
 
   public UnitConverstionOperation(final Unit sourceUnit, final Unit targetUnit,
@@ -23,7 +23,7 @@ public class UnitConverstionOperation implements CoordinatesOperation {
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
     this.axisCount = axisCount;
-    converter = sourceUnit.getConverterTo(targetUnit);
+    this.converter = sourceUnit.getConverterTo(targetUnit);
   }
 
   @Override
@@ -37,7 +37,7 @@ public class UnitConverstionOperation implements CoordinatesOperation {
         if (axisIndex < sourceAxisCount) {
           value = sourceCoordinates[vertexIndex * sourceAxisCount + axisIndex];
           if (axisIndex < this.axisCount) {
-            value = converter.convert(value);
+            value = this.converter.convert(value);
           }
         } else {
           value = Double.NaN;
@@ -49,6 +49,6 @@ public class UnitConverstionOperation implements CoordinatesOperation {
 
   @Override
   public String toString() {
-    return sourceUnit + "->" + targetUnit;
+    return this.sourceUnit + "->" + this.targetUnit;
   }
 }

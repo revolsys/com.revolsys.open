@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,20 +41,24 @@ public class LabelValueListModelSerializer implements LabelValueListSerializer {
     this.valueCss = valueCss;
   }
 
+  @Override
   public String getLabelCss(final int index) {
-    return labelCss;
+    return this.labelCss;
   }
 
+  @Override
   public int getSize() {
-    return model.getSize();
+    return this.model.getSize();
   }
 
+  @Override
   public String getValueCss(final int index) {
-    return valueCss;
+    return this.valueCss;
   }
 
+  @Override
   public void serializeLabel(final XmlWriter out, final int index) {
-    final String label = model.getLabel(index);
+    final String label = this.model.getLabel(index);
     if (label != null) {
       out.text(label);
     } else {
@@ -62,8 +66,9 @@ public class LabelValueListModelSerializer implements LabelValueListSerializer {
     }
   }
 
+  @Override
   public void serializeValue(final XmlWriter out, final int index) {
-    final String value = model.getValue(index);
+    final String value = this.model.getValue(index);
     if (value != null) {
       out.text(value);
     } else {

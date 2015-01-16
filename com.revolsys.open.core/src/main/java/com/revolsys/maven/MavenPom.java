@@ -13,9 +13,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public class MavenPom extends LinkedHashMap<String, Object> {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static String getGroupAndArtifactId(final String id) {
     final String[] parts = id.split(":");
     if (parts.length < 2) {
@@ -247,7 +253,7 @@ public class MavenPom extends LinkedHashMap<String, Object> {
 
   public String getMapValue(final Map<String, Object> map, final String key,
     final String defaultValue) {
-    String value = CollectionUtil.get(map, key, defaultValue);
+    String value = Maps.get(map, key, defaultValue);
     value = CollectionUtil.replaceProperties(value, getProperties());
     return value;
   }

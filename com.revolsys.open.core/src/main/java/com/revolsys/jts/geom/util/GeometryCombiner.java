@@ -50,14 +50,14 @@ import com.revolsys.jts.geom.Polygonal;
  * No validation of the result geometry is performed.
  * (The only case where invalidity is possible is where {@link Polygonal} geometries
  * are combined and result in a self-intersection).
- * 
+ *
  * @author mbdavis
  * @see GeometryFactory#buildGeometry
  */
 public class GeometryCombiner {
   /**
    * Combines a collection of geometries.
-   * 
+   *
    * @param geoms the geometries to combine
    * @return the combined geometry
    */
@@ -68,7 +68,7 @@ public class GeometryCombiner {
 
   /**
    * Combines two geometries.
-   * 
+   *
    * @param g0 a geometry to combine
    * @param g1 a geometry to combine
    * @return the combined geometry
@@ -80,7 +80,7 @@ public class GeometryCombiner {
 
   /**
    * Combines three geometries.
-   * 
+   *
    * @param g0 a geometry to combine
    * @param g1 a geometry to combine
    * @param g2 a geometry to combine
@@ -95,7 +95,7 @@ public class GeometryCombiner {
 
   /**
    * Creates a list from two items
-   * 
+   *
    * @param obj0
    * @param obj1
    * @return a List containing the two items
@@ -110,7 +110,7 @@ public class GeometryCombiner {
 
   /**
    * Creates a list from two items
-   * 
+   *
    * @param obj0
    * @param obj1
    * @return a List containing the two items
@@ -126,7 +126,7 @@ public class GeometryCombiner {
 
   /**
    * Extracts the GeometryFactory used by the geometries in a collection
-   * 
+   *
    * @param geoms
    * @return a GeometryFactory
    */
@@ -144,35 +144,35 @@ public class GeometryCombiner {
 
   /**
    * Creates a new combiner for a collection of geometries
-   * 
+   *
    * @param geoms the geometries to combine
    */
   public GeometryCombiner(final Collection<? extends Geometry> geoms) {
-    geomFactory = extractFactory(geoms);
+    this.geomFactory = extractFactory(geoms);
     this.inputGeoms = geoms;
   }
 
   /**
    * Computes the combination of the input geometries
    * to produce the most appropriate {@link Geometry} or {@link GeometryCollection}
-   * 
+   *
    * @return a Geometry which is the combination of the inputs
    */
   public Geometry combine() {
     final List<Geometry> elems = new ArrayList<>();
-    for (final Geometry g : inputGeoms) {
+    for (final Geometry g : this.inputGeoms) {
       extractElements(g, elems);
     }
 
     if (elems.size() == 0) {
-      if (geomFactory != null) {
+      if (this.geomFactory != null) {
         // return an empty GC
-        return geomFactory.geometryCollection();
+        return this.geomFactory.geometryCollection();
       }
       return null;
     }
     // return the "simplest possible" geometry
-    return geomFactory.buildGeometry(elems);
+    return this.geomFactory.buildGeometry(elems);
   }
 
   private void extractElements(final Geometry geom, final List<Geometry> elems) {

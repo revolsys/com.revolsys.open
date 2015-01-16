@@ -46,8 +46,6 @@ import com.revolsys.jts.geom.impl.PointDouble;
  */
 public class OctagonalEnvelope {
 
-  private static double SQRT2 = Math.sqrt(2.0);
-
   private static double computeA(final double x, final double y) {
     return x + y;
   }
@@ -55,6 +53,8 @@ public class OctagonalEnvelope {
   private static double computeB(final double x, final double y) {
     return x - y;
   }
+
+  private static double SQRT2 = Math.sqrt(2.0);
 
   // initialize in the null state
   private double minX = Double.NaN;
@@ -121,9 +121,9 @@ public class OctagonalEnvelope {
       return false;
     }
 
-    return other.minX >= minX && other.maxX <= maxX && other.minY >= minY
-      && other.maxY <= maxY && other.minA >= minA && other.maxA <= maxA
-      && other.minB >= minB && other.maxB <= maxB;
+    return other.minX >= this.minX && other.maxX <= this.maxX && other.minY >= this.minY
+        && other.maxY <= this.maxY && other.minA >= this.minA && other.maxA <= this.maxA
+        && other.minB >= this.minB && other.maxB <= this.maxB;
   }
 
   public void expandBy(final double distance) {
@@ -133,14 +133,14 @@ public class OctagonalEnvelope {
 
     final double diagonalDistance = SQRT2 * distance;
 
-    minX -= distance;
-    maxX += distance;
-    minY -= distance;
-    maxY += distance;
-    minA -= diagonalDistance;
-    maxA += diagonalDistance;
-    minB -= diagonalDistance;
-    maxB += diagonalDistance;
+    this.minX -= distance;
+    this.maxX += distance;
+    this.minY -= distance;
+    this.maxY += distance;
+    this.minA -= diagonalDistance;
+    this.maxA += diagonalDistance;
+    this.minB -= diagonalDistance;
+    this.maxB += diagonalDistance;
 
     if (!isValid()) {
       setToNull();
@@ -160,38 +160,38 @@ public class OctagonalEnvelope {
     final double B = computeB(x, y);
 
     if (isNull()) {
-      minX = x;
-      maxX = x;
-      minY = y;
-      maxY = y;
-      minA = A;
-      maxA = A;
-      minB = B;
-      maxB = B;
+      this.minX = x;
+      this.maxX = x;
+      this.minY = y;
+      this.maxY = y;
+      this.minA = A;
+      this.maxA = A;
+      this.minB = B;
+      this.maxB = B;
     } else {
-      if (x < minX) {
-        minX = x;
+      if (x < this.minX) {
+        this.minX = x;
       }
-      if (x > maxX) {
-        maxX = x;
+      if (x > this.maxX) {
+        this.maxX = x;
       }
-      if (y < minY) {
-        minY = y;
+      if (y < this.minY) {
+        this.minY = y;
       }
-      if (y > maxY) {
-        maxY = y;
+      if (y > this.maxY) {
+        this.maxY = y;
       }
-      if (A < minA) {
-        minA = A;
+      if (A < this.minA) {
+        this.minA = A;
       }
-      if (A > maxA) {
-        maxA = A;
+      if (A > this.maxA) {
+        this.maxA = A;
       }
-      if (B < minB) {
-        minB = B;
+      if (B < this.minB) {
+        this.minB = B;
       }
-      if (B > maxB) {
-        maxB = B;
+      if (B > this.maxB) {
+        this.maxB = B;
       }
     }
     return this;
@@ -202,56 +202,8 @@ public class OctagonalEnvelope {
       expandToInclude(point);
     }
     for (final LineString line : geometry.getGeometryComponents(LineString.class)) {
-      expandToInclude((LineString)line);
+      expandToInclude(line);
     }
-  }
-
-  public OctagonalEnvelope expandToInclude(final OctagonalEnvelope oct) {
-    if (oct.isNull()) {
-      return this;
-    }
-
-    if (isNull()) {
-      minX = oct.minX;
-      maxX = oct.maxX;
-      minY = oct.minY;
-      maxY = oct.maxY;
-      minA = oct.minA;
-      maxA = oct.maxA;
-      minB = oct.minB;
-      maxB = oct.maxB;
-      return this;
-    }
-    if (oct.minX < minX) {
-      minX = oct.minX;
-    }
-    if (oct.maxX > maxX) {
-      maxX = oct.maxX;
-    }
-    if (oct.minY < minY) {
-      minY = oct.minY;
-    }
-    if (oct.maxY > maxY) {
-      maxY = oct.maxY;
-    }
-    if (oct.minA < minA) {
-      minA = oct.minA;
-    }
-    if (oct.maxA > maxA) {
-      maxA = oct.maxA;
-    }
-    if (oct.minB < minB) {
-      minB = oct.minB;
-    }
-    if (oct.maxB > maxB) {
-      maxB = oct.maxB;
-    }
-    return this;
-  }
-
-  public OctagonalEnvelope expandToInclude(final Point p) {
-    expandToInclude(p.getX(), p.getY());
-    return this;
   }
 
   public OctagonalEnvelope expandToInclude(final LineString seq) {
@@ -263,36 +215,84 @@ public class OctagonalEnvelope {
     return this;
   }
 
+  public OctagonalEnvelope expandToInclude(final OctagonalEnvelope oct) {
+    if (oct.isNull()) {
+      return this;
+    }
+
+    if (isNull()) {
+      this.minX = oct.minX;
+      this.maxX = oct.maxX;
+      this.minY = oct.minY;
+      this.maxY = oct.maxY;
+      this.minA = oct.minA;
+      this.maxA = oct.maxA;
+      this.minB = oct.minB;
+      this.maxB = oct.maxB;
+      return this;
+    }
+    if (oct.minX < this.minX) {
+      this.minX = oct.minX;
+    }
+    if (oct.maxX > this.maxX) {
+      this.maxX = oct.maxX;
+    }
+    if (oct.minY < this.minY) {
+      this.minY = oct.minY;
+    }
+    if (oct.maxY > this.maxY) {
+      this.maxY = oct.maxY;
+    }
+    if (oct.minA < this.minA) {
+      this.minA = oct.minA;
+    }
+    if (oct.maxA > this.maxA) {
+      this.maxA = oct.maxA;
+    }
+    if (oct.minB < this.minB) {
+      this.minB = oct.minB;
+    }
+    if (oct.maxB > this.maxB) {
+      this.maxB = oct.maxB;
+    }
+    return this;
+  }
+
+  public OctagonalEnvelope expandToInclude(final Point p) {
+    expandToInclude(p.getX(), p.getY());
+    return this;
+  }
+
   public double getMaxA() {
-    return maxA;
+    return this.maxA;
   }
 
   public double getMaxB() {
-    return maxB;
+    return this.maxB;
   }
 
   public double getMaxX() {
-    return maxX;
+    return this.maxX;
   }
 
   public double getMaxY() {
-    return maxY;
+    return this.maxY;
   }
 
   public double getMinA() {
-    return minA;
+    return this.minA;
   }
 
   public double getMinB() {
-    return minB;
+    return this.minB;
   }
 
   public double getMinX() {
-    return minX;
+    return this.minX;
   }
 
   public double getMinY() {
-    return minY;
+    return this.minY;
   }
 
   public boolean intersects(final OctagonalEnvelope other) {
@@ -300,66 +300,66 @@ public class OctagonalEnvelope {
       return false;
     }
 
-    if (minX > other.maxX) {
+    if (this.minX > other.maxX) {
       return false;
     }
-    if (maxX < other.minX) {
+    if (this.maxX < other.minX) {
       return false;
     }
-    if (minY > other.maxY) {
+    if (this.minY > other.maxY) {
       return false;
     }
-    if (maxY < other.minY) {
+    if (this.maxY < other.minY) {
       return false;
     }
-    if (minA > other.maxA) {
+    if (this.minA > other.maxA) {
       return false;
     }
-    if (maxA < other.minA) {
+    if (this.maxA < other.minA) {
       return false;
     }
-    if (minB > other.maxB) {
+    if (this.minB > other.maxB) {
       return false;
     }
-    if (maxB < other.minB) {
+    if (this.maxB < other.minB) {
       return false;
     }
     return true;
   }
 
   public boolean intersects(final Point p) {
-    if (minX > p.getX()) {
+    if (this.minX > p.getX()) {
       return false;
     }
-    if (maxX < p.getX()) {
+    if (this.maxX < p.getX()) {
       return false;
     }
-    if (minY > p.getY()) {
+    if (this.minY > p.getY()) {
       return false;
     }
-    if (maxY < p.getY()) {
+    if (this.maxY < p.getY()) {
       return false;
     }
 
     final double A = computeA(p.getX(), p.getY());
     final double B = computeB(p.getX(), p.getY());
-    if (minA > A) {
+    if (this.minA > A) {
       return false;
     }
-    if (maxA < A) {
+    if (this.maxA < A) {
       return false;
     }
-    if (minB > B) {
+    if (this.minB > B) {
       return false;
     }
-    if (maxB < B) {
+    if (this.maxB < B) {
       return false;
     }
     return true;
   }
 
   public boolean isNull() {
-    return Double.isNaN(minX);
+    return Double.isNaN(this.minX);
   }
 
   /**
@@ -371,14 +371,14 @@ public class OctagonalEnvelope {
     if (isNull()) {
       return true;
     }
-    return minX <= maxX && minY <= maxY && minA <= maxA && minB <= maxB;
+    return this.minX <= this.maxX && this.minY <= this.maxY && this.minA <= this.maxA && this.minB <= this.maxB;
   }
 
   /**
    *  Sets the value of this object to the null value
    */
   public void setToNull() {
-    minX = Double.NaN;
+    this.minX = Double.NaN;
   }
 
   public Geometry toGeometry(final GeometryFactory geometryFactory) {
@@ -386,25 +386,25 @@ public class OctagonalEnvelope {
       return geometryFactory.point((LineString)null);
     }
 
-    final Point px00 = new PointDouble(geometryFactory.makePrecise(0, minX),
-      geometryFactory.makePrecise(1, minA - minX));
-    final Point px01 = new PointDouble(geometryFactory.makePrecise(0, minX),
-      geometryFactory.makePrecise(1, minX - minB));
+    final Point px00 = new PointDouble(geometryFactory.makePrecise(0, this.minX),
+      geometryFactory.makePrecise(1, this.minA - this.minX));
+    final Point px01 = new PointDouble(geometryFactory.makePrecise(0, this.minX),
+      geometryFactory.makePrecise(1, this.minX - this.minB));
 
-    final Point px10 = new PointDouble(geometryFactory.makePrecise(0, maxX),
-      geometryFactory.makePrecise(1, maxX - maxB));
-    final Point px11 = new PointDouble(geometryFactory.makePrecise(0, maxX),
-      geometryFactory.makePrecise(1, maxA - maxX));
+    final Point px10 = new PointDouble(geometryFactory.makePrecise(0, this.maxX),
+      geometryFactory.makePrecise(1, this.maxX - this.maxB));
+    final Point px11 = new PointDouble(geometryFactory.makePrecise(0, this.maxX),
+      geometryFactory.makePrecise(1, this.maxA - this.maxX));
 
-    final Point py00 = new PointDouble(geometryFactory.makePrecise(0, minA
-      - minY), geometryFactory.makePrecise(1, minY));
-    final Point py01 = new PointDouble(geometryFactory.makePrecise(0, minY
-      + maxB), geometryFactory.makePrecise(1, minY));
+    final Point py00 = new PointDouble(geometryFactory.makePrecise(0, this.minA
+      - this.minY), geometryFactory.makePrecise(1, this.minY));
+    final Point py01 = new PointDouble(geometryFactory.makePrecise(0, this.minY
+      + this.maxB), geometryFactory.makePrecise(1, this.minY));
 
-    final Point py10 = new PointDouble(geometryFactory.makePrecise(0, maxY
-      + minB), geometryFactory.makePrecise(1, maxY));
-    final Point py11 = new PointDouble(geometryFactory.makePrecise(0, maxA
-      - maxY), geometryFactory.makePrecise(1, maxY));
+    final Point py10 = new PointDouble(geometryFactory.makePrecise(0, this.maxY
+      + this.minB), geometryFactory.makePrecise(1, this.maxY));
+    final Point py11 = new PointDouble(geometryFactory.makePrecise(0, this.maxA
+      - this.maxY), geometryFactory.makePrecise(1, this.maxY));
 
     final CoordinateList coordList = new CoordinateList();
     coordList.add(px00, false);

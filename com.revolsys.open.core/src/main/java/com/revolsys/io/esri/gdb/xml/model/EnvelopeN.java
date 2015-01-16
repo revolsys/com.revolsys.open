@@ -29,50 +29,50 @@ public class EnvelopeN extends Envelope {
     final CoordinateSystem coordinateSystem = spatialReference.getCoordinateSystem();
     if (coordinateSystem != null) {
       final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
-      xMin = boundingBox.getMinX();
-      yMin = boundingBox.getMinY();
-      xMax = boundingBox.getMaxX();
-      yMax = boundingBox.getMaxY();
-      zMin = boundingBox.getMin(2);
-      zMax = boundingBox.getMax(2);
+      this.xMin = boundingBox.getMinX();
+      this.yMin = boundingBox.getMinY();
+      this.xMax = boundingBox.getMaxX();
+      this.yMax = boundingBox.getMaxY();
+      this.zMin = boundingBox.getMin(2);
+      this.zMax = boundingBox.getMax(2);
       this.spatialReference = spatialReference;
     }
   }
 
   public double getMMax() {
-    return mMax;
+    return this.mMax;
   }
 
   public double getMMin() {
-    return mMin;
+    return this.mMin;
   }
 
   public SpatialReference getSpatialReference() {
-    return spatialReference;
+    return this.spatialReference;
   }
 
   public double getXMax() {
-    return xMax;
+    return this.xMax;
   }
 
   public double getXMin() {
-    return xMin;
+    return this.xMin;
   }
 
   public double getYMax() {
-    return yMax;
+    return this.yMax;
   }
 
   public double getYMin() {
-    return yMin;
+    return this.yMin;
   }
 
   public double getZMax() {
-    return zMax;
+    return this.zMax;
   }
 
   public double getZMin() {
-    return zMin;
+    return this.zMin;
   }
 
   public void setMMax(final double mMax) {

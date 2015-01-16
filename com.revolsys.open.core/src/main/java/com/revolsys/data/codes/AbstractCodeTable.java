@@ -21,7 +21,7 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
 
 public abstract class AbstractCodeTable implements Closeable,
-  PropertyChangeSupportProxy, CodeTable, Cloneable {
+PropertyChangeSupportProxy, CodeTable, Cloneable {
 
   private boolean capitalizeWords = false;
 
@@ -275,11 +275,6 @@ public abstract class AbstractCodeTable implements Closeable,
     return getValue(SingleIdentifier.create(id));
   }
 
-  @Override
-  public List<String> getValueFieldNames() {
-    return Arrays.asList("VALUE");
-  }
-
   protected List<Object> getValueById(Object id) {
     if (this.valueIdCache.containsKey(Collections.singletonList(id))) {
       if (id instanceof SingleIdentifier) {
@@ -302,6 +297,11 @@ public abstract class AbstractCodeTable implements Closeable,
       }
       return values;
     }
+  }
+
+  @Override
+  public List<String> getValueFieldNames() {
+    return Arrays.asList("VALUE");
   }
 
   @Override

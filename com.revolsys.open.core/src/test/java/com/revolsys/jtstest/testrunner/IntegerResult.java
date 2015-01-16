@@ -50,25 +50,26 @@ public class IntegerResult implements Result {
     final IntegerResult otherResult = (IntegerResult)other;
     final int otherValue = otherResult.value;
 
-    return Math.abs(value - otherValue) <= tolerance;
+    return Math.abs(this.value - otherValue) <= tolerance;
   }
 
+  @Override
   public Integer getResult() {
-    return value;
+    return this.value;
   }
 
   @Override
   public String toFormattedString() {
-    return Integer.toString(value);
+    return Integer.toString(this.value);
   }
 
   @Override
   public String toLongString() {
-    return Integer.toString(value);
+    return Integer.toString(this.value);
   }
 
   @Override
   public String toShortString() {
-    return Integer.toString(value);
+    return Integer.toString(this.value);
   }
 }

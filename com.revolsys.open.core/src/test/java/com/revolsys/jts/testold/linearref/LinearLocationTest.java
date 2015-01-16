@@ -14,7 +14,7 @@ import com.revolsys.jts.linearref.LocationIndexedLine;
 
 /**
  * Tests methods involving only {@link LinearLocation}s
- * 
+ *
  * @author Martin Davis
  *
  */

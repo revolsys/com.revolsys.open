@@ -140,7 +140,7 @@ public class PackedCoordinateUtil {
           yOffset, xyScale, zOffset, zScale, mOffset, mScale);
       default:
         throw new IllegalArgumentException("Unknown ST_GEOMETRY entity type: "
-          + geometryType);
+            + geometryType);
     }
   }
 
@@ -151,8 +151,8 @@ public class PackedCoordinateUtil {
     final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale) {
     try (
-      final PackedIntegerInputStream in = new PackedIntegerInputStream(
-        inputStream)) {
+        final PackedIntegerInputStream in = new PackedIntegerInputStream(
+          inputStream)) {
       final long packedByteLength = in.readLong5();
       final long dimensionFlag = in.readLong();
       final int annotationDimension = in.read();
@@ -271,7 +271,7 @@ public class PackedCoordinateUtil {
         if (x == -1 && y == 0) {
           if (j > 2) {
             final double[] subCoordinates = new double[j * axisCount
-              + axisCount];
+                                                       + axisCount];
             System.arraycopy(coordinates, 0, subCoordinates, 0,
               subCoordinates.length);
             pointsList.add(subCoordinates);
@@ -283,10 +283,10 @@ public class PackedCoordinateUtil {
           pointsList = new ArrayList<>();
         } else if (j > 0 && i < vertexCount - 1) {
           if (coordinates[0] == coordinates[j * axisCount]
-            && coordinates[1] == coordinates[j * axisCount + 1]) {
+              && coordinates[1] == coordinates[j * axisCount + 1]) {
             if (j > 2) {
               final double[] subCoordinates = new double[j * axisCount
-                + axisCount];
+                                                         + axisCount];
               System.arraycopy(coordinates, 0, subCoordinates, 0,
                 subCoordinates.length);
               pointsList.add(subCoordinates);
@@ -410,8 +410,8 @@ public class PackedCoordinateUtil {
     final Double zOffset, final Double zScale, final Double mOffset,
     final Double mScale) {
     try (
-      final PackedIntegerInputStream in = new PackedIntegerInputStream(
-        inputStream)) {
+        final PackedIntegerInputStream in = new PackedIntegerInputStream(
+          inputStream)) {
       final long packedByteLength = in.readLong5();
       final long dimensionFlag = in.readLong();
       final int annotationDimension = in.read();
@@ -468,8 +468,8 @@ public class PackedCoordinateUtil {
     final Double mScale, final InputStream inputStream) {
 
     try (
-      final PackedIntegerInputStream in = new PackedIntegerInputStream(
-        inputStream)) {
+        final PackedIntegerInputStream in = new PackedIntegerInputStream(
+          inputStream)) {
       final List<double[]> pointsList = new ArrayList<>();
 
       final long packedByteLength = in.readLong5();
@@ -499,10 +499,10 @@ public class PackedCoordinateUtil {
         if (j > 0 && i < vertexCount - 1) {
           final int numCoordinates = j * axisCount;
           if (coordinates[0] == coordinates[numCoordinates]
-            && coordinates[1] == coordinates[numCoordinates + 1]) {
+              && coordinates[1] == coordinates[numCoordinates + 1]) {
             if (j > 2) {
               final double[] subCoordinates = new double[numCoordinates
-                + axisCount];
+                                                         + axisCount];
               System.arraycopy(coordinates, 0, subCoordinates, 0,
                 subCoordinates.length);
               pointsList.add(subCoordinates);
@@ -550,14 +550,14 @@ public class PackedCoordinateUtil {
     final long deltaValueLong = in.readLong();
     final double deltaValue = deltaValueLong / scale;
     final double value = Math.round((previousValue + deltaValue) * scale)
-      / scale;
+        / scale;
     return value;
   }
 
   private static double readCoordinate(final PackedIntegerInputStream in,
     final double[] coordinates, final int vertexIndex, final int axisCount,
     final int axisIndex, final double previousValue, final double scale)
-    throws IOException {
+        throws IOException {
     final double value = readCoordinate(in, previousValue, scale);
     coordinates[vertexIndex * axisCount + axisIndex] = value;
     return value;
@@ -566,7 +566,7 @@ public class PackedCoordinateUtil {
   private static void readCoordinates(final PackedIntegerInputStream in,
     final double[] coordinates, final int vertexCount, final int axisCount,
     final int axisIndex, final double offset, final double scale)
-    throws IOException {
+        throws IOException {
 
     double previousValue = offset;
     for (int i = 0; i < vertexCount; i++) {
@@ -648,7 +648,7 @@ public class PackedCoordinateUtil {
    * coordinateIndex and ordinateIndex. The value written is the difference
    * between the current value and the previous value which are both multiplied
    * by the scale and rounded to longs before conversion.
-   * 
+   *
    * @param out The stream to write the bytes to.
    * @param coordinates The coordinates.
    * @param previousValue The value of the previous coordinate, returned from

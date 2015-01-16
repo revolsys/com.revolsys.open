@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
 import com.revolsys.io.json.JsonParser.EventType;
 
 public class JsonMapIterator implements Iterator<Map<String, Object>>,
-  AutoCloseable {
+AutoCloseable {
 
   /** The current record. */
   private Map<String, Object> currentRecord;
@@ -24,68 +24,68 @@ public class JsonMapIterator implements Iterator<Map<String, Object>>,
   }
 
   public JsonMapIterator(final Reader in, final boolean single)
-    throws IOException {
+      throws IOException {
     this.parser = new JsonParser(in);
     if (single) {
-      hasNext = true;
+      this.hasNext = true;
       readNextRecord();
-    } else if (parser.hasNext()) {
-      EventType event = parser.next();
+    } else if (this.parser.hasNext()) {
+      EventType event = this.parser.next();
       if (event == EventType.startDocument) {
-        if (parser.hasNext()) {
-          event = parser.next();
+        if (this.parser.hasNext()) {
+          event = this.parser.next();
           if (event == EventType.startObject) {
-            JsonParser.getString(parser);
-            if (parser.hasNext()) {
-              event = parser.next();
+            JsonParser.getString(this.parser);
+            if (this.parser.hasNext()) {
+              event = this.parser.next();
               if (event == EventType.colon) {
-                if (parser.hasNext()) {
-                  event = parser.next();
+                if (this.parser.hasNext()) {
+                  event = this.parser.next();
                   if (event == EventType.startArray) {
-                    hasNext = true;
+                    this.hasNext = true;
                     readNextRecord();
                   }
                 }
               }
             }
           } else if (event == EventType.startArray) {
-            hasNext = true;
+            this.hasNext = true;
             readNextRecord();
           }
         }
       }
     }
-    if (!hasNext) {
+    if (!this.hasNext) {
       close();
     }
   }
 
   @Override
   public void close() {
-    parser.close();
+    this.parser.close();
   }
 
   /**
    * Returns <tt>true</tt> if the iteration has more elements.
-   * 
+   *
    * @return <tt>true</tt> if the iterator has more elements.
    */
   @Override
   public boolean hasNext() {
-    return hasNext;
+    return this.hasNext;
   }
 
   /**
    * Return the next record from the iterator.
-   * 
+   *
    * @return The record
    */
   @Override
   public Map<String, Object> next() {
-    if (!hasNext) {
+    if (!this.hasNext) {
       throw new NoSuchElementException("No more elements");
     } else {
-      final Map<String, Object> object = currentRecord;
+      final Map<String, Object> object = this.currentRecord;
       readNextRecord();
       return object;
     }
@@ -93,25 +93,25 @@ public class JsonMapIterator implements Iterator<Map<String, Object>>,
 
   /**
    * Reads the next line from the buffer and converts to a string array.
-   * 
+   *
    * @return a string array with each comma-separated element as a separate
    *         entry.
    * @throws IOException if bad things happen during the read
    */
   private Map<String, Object> readNextRecord() {
 
-    if (hasNext && parser.hasNext()) {
-      final EventType event = parser.next();
+    if (this.hasNext && this.parser.hasNext()) {
+      final EventType event = this.parser.next();
       if (event == EventType.endArray || event == EventType.endDocument) {
-        hasNext = false;
+        this.hasNext = false;
         close();
         return null;
       } else {
-        currentRecord = JsonParser.getMap(parser);
-        return currentRecord;
+        this.currentRecord = JsonParser.getMap(this.parser);
+        return this.currentRecord;
       }
     } else {
-      hasNext = false;
+      this.hasNext = false;
       close();
       return null;
     }

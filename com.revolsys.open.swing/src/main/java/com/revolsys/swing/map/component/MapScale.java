@@ -14,15 +14,13 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 
 public class MapScale extends JLabel implements PropertyChangeListener {
-  private static final long serialVersionUID = 1L;
-
   public static String formatScale(final Object scale) {
     double scaleDouble;
     if (scale instanceof Number) {
       final Number number = (Number)scale;
       scaleDouble = number.doubleValue();
       if (scaleDouble <= 0 || number.longValue() == Long.MAX_VALUE
-        || scaleDouble == Double.MAX_VALUE) {
+          || scaleDouble == Double.MAX_VALUE) {
         return "Unlimited";
       } else if (Double.isNaN(scaleDouble) || Double.isInfinite(scaleDouble)) {
         return "Unknown";
@@ -49,6 +47,8 @@ public class MapScale extends JLabel implements PropertyChangeListener {
     format.setDecimalFormatSymbols(formatSymbols);
     return format;
   }
+
+  private static final long serialVersionUID = 1L;
 
   private final Viewport2D viewport;
 

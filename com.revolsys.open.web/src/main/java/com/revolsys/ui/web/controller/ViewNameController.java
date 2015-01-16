@@ -11,13 +11,14 @@ public class ViewNameController implements Controller {
   private String viewName;
 
   public String getViewName() {
-    return viewName;
+    return this.viewName;
   }
 
+  @Override
   public ModelAndView handleRequest(
     final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
-    return new ModelAndView(viewName);
+    return new ModelAndView(this.viewName);
   }
 
   public void setViewName(final String viewName) {

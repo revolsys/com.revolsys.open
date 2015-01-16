@@ -38,23 +38,23 @@ public class PointQuadTreeNode<T> {
     }
     final boolean xLess = isLessThanX(point.getX());
     final boolean yLess = isLessThanY(point.getY());
-    if (southWest != null && xLess && yLess) {
-      if (southWest.contains(point)) {
+    if (this.southWest != null && xLess && yLess) {
+      if (this.southWest.contains(point)) {
         return true;
       }
     }
-    if (northWest != null && xLess && !yLess) {
-      if (northWest.contains(point)) {
+    if (this.northWest != null && xLess && !yLess) {
+      if (this.northWest.contains(point)) {
         return true;
       }
     }
-    if (southEast != null && !xLess && yLess) {
-      if (southEast.contains(point)) {
+    if (this.southEast != null && !xLess && yLess) {
+      if (this.southEast.contains(point)) {
         return true;
       }
     }
-    if (northEast != null && !xLess && !yLess) {
-      if (northEast.contains(point)) {
+    if (this.northEast != null && !xLess && !yLess) {
+      if (this.northEast.contains(point)) {
         return true;
       }
     }
@@ -67,25 +67,51 @@ public class PointQuadTreeNode<T> {
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
-    if (envelope.covers(x, y)) {
-      final PointDouble coordinates = new PointDouble(x, y);
-      results.add(new SimpleImmutableEntry<Point, T>(coordinates, value));
+    if (envelope.covers(this.x, this.y)) {
+      final PointDouble coordinates = new PointDouble(this.x, this.y);
+      results.add(new SimpleImmutableEntry<Point, T>(coordinates, this.value));
     }
     final boolean minXLess = isLessThanX(minX);
     final boolean maxXLess = isLessThanX(maxX);
     final boolean minYLess = isLessThanY(minY);
     final boolean maxYLess = isLessThanY(maxY);
-    if (southWest != null && minXLess && minYLess) {
-      southWest.findEntriesWithin(results, envelope);
+    if (this.southWest != null && minXLess && minYLess) {
+      this.southWest.findEntriesWithin(results, envelope);
     }
-    if (northWest != null && minXLess && !maxYLess) {
-      northWest.findEntriesWithin(results, envelope);
+    if (this.northWest != null && minXLess && !maxYLess) {
+      this.northWest.findEntriesWithin(results, envelope);
     }
-    if (southEast != null && !maxXLess && minYLess) {
-      southEast.findEntriesWithin(results, envelope);
+    if (this.southEast != null && !maxXLess && minYLess) {
+      this.southEast.findEntriesWithin(results, envelope);
     }
-    if (northEast != null && !maxXLess && !maxYLess) {
-      northEast.findEntriesWithin(results, envelope);
+    if (this.northEast != null && !maxXLess && !maxYLess) {
+      this.northEast.findEntriesWithin(results, envelope);
+    }
+  }
+
+  public void findWithin(final List<T> results, final BoundingBox envelope) {
+    final double minX = envelope.getMinX();
+    final double maxX = envelope.getMaxX();
+    final double minY = envelope.getMinY();
+    final double maxY = envelope.getMaxY();
+    if (envelope.covers(this.x, this.y)) {
+      results.add(this.value);
+    }
+    final boolean minXLess = isLessThanX(minX);
+    final boolean maxXLess = isLessThanX(maxX);
+    final boolean minYLess = isLessThanY(minY);
+    final boolean maxYLess = isLessThanY(maxY);
+    if (this.southWest != null && minXLess && minYLess) {
+      this.southWest.findWithin(results, envelope);
+    }
+    if (this.northWest != null && minXLess && !maxYLess) {
+      this.northWest.findWithin(results, envelope);
+    }
+    if (this.southEast != null && !maxXLess && minYLess) {
+      this.southEast.findWithin(results, envelope);
+    }
+    if (this.northEast != null && !maxXLess && !maxYLess) {
+      this.northEast.findWithin(results, envelope);
     }
   }
 
@@ -97,49 +123,23 @@ public class PointQuadTreeNode<T> {
     final double maxY = envelope.getMaxY();
     final double distance = MathUtil.distance(x, y, this.x, this.y);
     if (distance < maxDistance) {
-      results.add(value);
+      results.add(this.value);
     }
     final boolean minXLess = isLessThanX(minX);
     final boolean maxXLess = isLessThanX(maxX);
     final boolean minYLess = isLessThanY(minY);
     final boolean maxYLess = isLessThanY(maxY);
-    if (southWest != null && minXLess && minYLess) {
-      southWest.findWithin(results, x, y, maxDistance, envelope);
+    if (this.southWest != null && minXLess && minYLess) {
+      this.southWest.findWithin(results, x, y, maxDistance, envelope);
     }
-    if (northWest != null && minXLess && !maxYLess) {
-      northWest.findWithin(results, x, y, maxDistance, envelope);
+    if (this.northWest != null && minXLess && !maxYLess) {
+      this.northWest.findWithin(results, x, y, maxDistance, envelope);
     }
-    if (southEast != null && !maxXLess && minYLess) {
-      southEast.findWithin(results, x, y, maxDistance, envelope);
+    if (this.southEast != null && !maxXLess && minYLess) {
+      this.southEast.findWithin(results, x, y, maxDistance, envelope);
     }
-    if (northEast != null && !maxXLess && !maxYLess) {
-      northEast.findWithin(results, x, y, maxDistance, envelope);
-    }
-  }
-
-  public void findWithin(final List<T> results, final BoundingBox envelope) {
-    final double minX = envelope.getMinX();
-    final double maxX = envelope.getMaxX();
-    final double minY = envelope.getMinY();
-    final double maxY = envelope.getMaxY();
-    if (envelope.covers(x, y)) {
-      results.add(value);
-    }
-    final boolean minXLess = isLessThanX(minX);
-    final boolean maxXLess = isLessThanX(maxX);
-    final boolean minYLess = isLessThanY(minY);
-    final boolean maxYLess = isLessThanY(maxY);
-    if (southWest != null && minXLess && minYLess) {
-      southWest.findWithin(results, envelope);
-    }
-    if (northWest != null && minXLess && !maxYLess) {
-      northWest.findWithin(results, envelope);
-    }
-    if (southEast != null && !maxXLess && minYLess) {
-      southEast.findWithin(results, envelope);
-    }
-    if (northEast != null && !maxXLess && !maxYLess) {
-      northEast.findWithin(results, envelope);
+    if (this.northEast != null && !maxXLess && !maxYLess) {
+      this.northEast.findWithin(results, x, y, maxDistance, envelope);
     }
   }
 
@@ -156,28 +156,28 @@ public class PointQuadTreeNode<T> {
     final boolean xLess = isLessThanX(x);
     final boolean yLess = isLessThanY(y);
     if (xLess && yLess) {
-      if (southWest == null) {
-        southWest = node;
+      if (this.southWest == null) {
+        this.southWest = node;
       } else {
-        southWest.put(x, y, node);
+        this.southWest.put(x, y, node);
       }
     } else if (xLess && !yLess) {
-      if (northWest == null) {
-        northWest = node;
+      if (this.northWest == null) {
+        this.northWest = node;
       } else {
-        northWest.put(x, y, node);
+        this.northWest.put(x, y, node);
       }
     } else if (!xLess && yLess) {
-      if (southEast == null) {
-        southEast = node;
+      if (this.southEast == null) {
+        this.southEast = node;
       } else {
-        southEast.put(x, y, node);
+        this.southEast.put(x, y, node);
       }
     } else if (!xLess && !yLess) {
-      if (northEast == null) {
-        northEast = node;
+      if (this.northEast == null) {
+        this.northEast = node;
       } else {
-        northEast.put(x, y, node);
+        this.northEast.put(x, y, node);
       }
     }
   }
@@ -188,17 +188,17 @@ public class PointQuadTreeNode<T> {
     final boolean yLess = isLessThanY(y);
     if (this.x == x && this.y == y && this.value == value) {
       final List<PointQuadTreeNode<T>> nodes = new ArrayList<PointQuadTreeNode<T>>();
-      if (northWest != null) {
-        nodes.add(northWest);
+      if (this.northWest != null) {
+        nodes.add(this.northWest);
       }
-      if (northEast != null) {
-        nodes.add(northEast);
+      if (this.northEast != null) {
+        nodes.add(this.northEast);
       }
-      if (southWest != null) {
-        nodes.add(southWest);
+      if (this.southWest != null) {
+        nodes.add(this.southWest);
       }
-      if (southEast != null) {
-        nodes.add(southEast);
+      if (this.southEast != null) {
+        nodes.add(this.southEast);
       }
       if (nodes.isEmpty()) {
         return null;
@@ -210,20 +210,20 @@ public class PointQuadTreeNode<T> {
         return node;
       }
     } else if (xLess && yLess) {
-      if (southWest != null) {
-        southWest = southWest.remove(x, y, value);
+      if (this.southWest != null) {
+        this.southWest = this.southWest.remove(x, y, value);
       }
     } else if (xLess && !yLess) {
-      if (northWest != null) {
-        northWest = northWest.remove(x, y, value);
+      if (this.northWest != null) {
+        this.northWest = this.northWest.remove(x, y, value);
       }
     } else if (!xLess && yLess) {
-      if (southEast != null) {
-        southEast = southEast.remove(x, y, value);
+      if (this.southEast != null) {
+        this.southEast = this.southEast.remove(x, y, value);
       }
     } else if (!xLess && !yLess) {
-      if (northEast != null) {
-        northEast = northEast.remove(x, y, value);
+      if (this.northEast != null) {
+        this.northEast = this.northEast.remove(x, y, value);
       }
     }
     return this;
@@ -231,7 +231,7 @@ public class PointQuadTreeNode<T> {
 
   public void setValue(final int index, final double value) {
     throw new UnsupportedOperationException(
-      "Cannot change the coordinates on a quad tree");
+        "Cannot change the coordinates on a quad tree");
   }
 
   public boolean visit(final BoundingBox envelope, final Visitor<T> visitor) {
@@ -239,8 +239,8 @@ public class PointQuadTreeNode<T> {
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
-    if (envelope.covers(x, y)) {
-      if (!visitor.visit(value)) {
+    if (envelope.covers(this.x, this.y)) {
+      if (!visitor.visit(this.value)) {
         return false;
       }
     }
@@ -248,23 +248,23 @@ public class PointQuadTreeNode<T> {
     final boolean maxXLess = isLessThanX(maxX);
     final boolean minYLess = isLessThanY(minY);
     final boolean maxYLess = isLessThanY(maxY);
-    if (southWest != null && minXLess && minYLess) {
-      if (!southWest.visit(envelope, visitor)) {
+    if (this.southWest != null && minXLess && minYLess) {
+      if (!this.southWest.visit(envelope, visitor)) {
         return false;
       }
     }
-    if (northWest != null && minXLess && !maxYLess) {
-      if (!northWest.visit(envelope, visitor)) {
+    if (this.northWest != null && minXLess && !maxYLess) {
+      if (!this.northWest.visit(envelope, visitor)) {
         return false;
       }
     }
-    if (southEast != null && !maxXLess && minYLess) {
-      if (!southEast.visit(envelope, visitor)) {
+    if (this.southEast != null && !maxXLess && minYLess) {
+      if (!this.southEast.visit(envelope, visitor)) {
         return false;
       }
     }
-    if (northEast != null && !maxXLess && !maxYLess) {
-      if (!northEast.visit(envelope, visitor)) {
+    if (this.northEast != null && !maxXLess && !maxYLess) {
+      if (!this.northEast.visit(envelope, visitor)) {
         return false;
       }
     }
@@ -272,26 +272,26 @@ public class PointQuadTreeNode<T> {
   }
 
   public boolean visit(final Visitor<T> visitor) {
-    if (!visitor.visit(value)) {
+    if (!visitor.visit(this.value)) {
       return false;
     }
-    if (southWest != null) {
-      if (!southWest.visit(visitor)) {
+    if (this.southWest != null) {
+      if (!this.southWest.visit(visitor)) {
         return false;
       }
     }
-    if (northWest != null) {
-      if (!northWest.visit(visitor)) {
+    if (this.northWest != null) {
+      if (!this.northWest.visit(visitor)) {
         return false;
       }
     }
-    if (southEast != null) {
-      if (!southEast.visit(visitor)) {
+    if (this.southEast != null) {
+      if (!this.southEast.visit(visitor)) {
         return false;
       }
     }
-    if (northEast != null) {
-      if (!northEast.visit(visitor)) {
+    if (this.northEast != null) {
+      if (!this.northEast.visit(visitor)) {
         return false;
       }
     }

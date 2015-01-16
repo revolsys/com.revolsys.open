@@ -16,15 +16,6 @@ public class RecordEqualsFilter implements Filter<Record> {
 
   private final Record searchObject;
 
-  public RecordEqualsFilter(final Record searchObject) {
-    this(null, searchObject, null);
-  }
-
-  public RecordEqualsFilter(final Record searchObject,
-    final Collection<String> equalExclude) {
-    this(null, searchObject, equalExclude);
-  }
-
   public RecordEqualsFilter(final EqualsRegistry equalsRegistry,
     final Record searchObject) {
     this(null, searchObject, null);
@@ -41,13 +32,22 @@ public class RecordEqualsFilter implements Filter<Record> {
     }
   }
 
+  public RecordEqualsFilter(final Record searchObject) {
+    this(null, searchObject, null);
+  }
+
+  public RecordEqualsFilter(final Record searchObject,
+    final Collection<String> equalExclude) {
+    this(null, searchObject, equalExclude);
+  }
+
   @Override
   public boolean accept(final Record object) {
-    final Geometry serachGeometry = searchObject.getGeometryValue();
+    final Geometry serachGeometry = this.searchObject.getGeometryValue();
     final Geometry geometry = object.getGeometryValue();
 
-    if (equalsRegistry.equals(serachGeometry, geometry, equalExclude)) {
-      if (equalsRegistry.equals(searchObject, object, equalExclude)) {
+    if (this.equalsRegistry.equals(serachGeometry, geometry, this.equalExclude)) {
+      if (this.equalsRegistry.equals(this.searchObject, object, this.equalExclude)) {
         return true;
       }
     }

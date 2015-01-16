@@ -15,7 +15,7 @@ import com.revolsys.visitor.AbstractVisitor;
  * and matching edges. Can be used to dissolve lines between polygons.
  */
 public class RemoveBothDuplicateEdgeVisitor<T> extends AbstractVisitor<Edge<T>>
-  implements ObjectProcessor<Graph<T>> {
+implements ObjectProcessor<Graph<T>> {
   @Override
   public void process(final Graph<T> graph) {
     graph.visitEdges(this);

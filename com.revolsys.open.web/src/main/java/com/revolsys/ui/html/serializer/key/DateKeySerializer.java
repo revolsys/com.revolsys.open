@@ -9,7 +9,7 @@ import com.revolsys.util.JavaBeanUtil;
 
 /**
  * Serialize a date with just the date fields.
- * 
+ *
  * @author Paul Austin
  */
 public class DateKeySerializer extends AbstractKeySerializer {
@@ -24,24 +24,25 @@ public class DateKeySerializer extends AbstractKeySerializer {
   }
 
   protected DateFormat getDateFormat() {
-    return DateFormat.getDateInstance(dateStyle);
+    return DateFormat.getDateInstance(this.dateStyle);
   }
 
   /**
    * Get the dete style.
-   * 
+   *
    * @return The date style.
    */
   public int getDateStyle() {
-    return dateStyle;
+    return this.dateStyle;
   }
 
   /**
    * Serialize the value to the XML writer.
-   * 
+   *
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
    */
+  @Override
   public void serialize(final XmlWriter out, final Object object) {
     final Object value = JavaBeanUtil.getProperty(object, getName());
     final DateFormat dateFormat = getDateFormat();
@@ -56,7 +57,7 @@ public class DateKeySerializer extends AbstractKeySerializer {
 
   /**
    * Set the dete style.
-   * 
+   *
    * @param dateStyle The date style.
    */
   public void setDateStyle(final int dateStyle) {
@@ -66,7 +67,7 @@ public class DateKeySerializer extends AbstractKeySerializer {
   /**
    * Set the name of the style for use by
    * {@link DateFormat#getDateInstance(int)}.
-   * 
+   *
    * @param styleName The name of the date format style;
    */
   public void setDateStyle(final String styleName) {

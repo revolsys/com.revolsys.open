@@ -19,6 +19,11 @@ import com.revolsys.util.Property;
 public class Slider extends JSlider implements Field, FocusListener,
 ChangeListener {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static final Color DEFAULT_BACKGROUND = new JTextField().getBackground();
 
   public static final Color DEFAULT_FOREGROUND = new JTextField().getForeground();

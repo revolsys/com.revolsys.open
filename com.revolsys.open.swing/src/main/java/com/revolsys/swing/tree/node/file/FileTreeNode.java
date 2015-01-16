@@ -210,7 +210,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       SwingUtil.addLabel(panel, "Folder Connections");
       final List<FolderConnectionRegistry> registries = new ArrayList<>();
       for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
-        .getVisibleConnectionRegistries()) {
+          .getVisibleConnectionRegistries()) {
         if (!registry.isReadOnly()) {
           registries.add(registry);
         }
@@ -298,7 +298,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       final String extension = FileUtil.getFileNameExtension(file);
       if (Property.hasValue(extension)) {
         final IoFactory factory = IoFactoryRegistry.getInstance()
-          .getFactoryByFileExtension(IoFactory.class, extension);
+            .getFactoryByFileExtension(IoFactory.class, extension);
         if (factory != null) {
           return factory.getName();
         }

@@ -8,7 +8,7 @@ import com.revolsys.jts.geom.Geometry;
 public class ReverseRecordGeometryUndo extends AbstractUndoableEdit {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 

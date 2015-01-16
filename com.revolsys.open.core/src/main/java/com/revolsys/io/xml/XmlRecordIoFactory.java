@@ -10,7 +10,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Writer;
 
 public class XmlRecordIoFactory extends
-  AbstractRecordAndGeometryWriterFactory {
+AbstractRecordAndGeometryWriterFactory {
   public XmlRecordIoFactory() {
     super("XML", true, true);
     addMediaTypeAndFileExtension("text/xml", "xml");

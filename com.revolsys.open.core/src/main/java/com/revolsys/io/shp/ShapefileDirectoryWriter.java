@@ -86,7 +86,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
         if (!childDirectory.mkdirs()) {
           if (!childDirectory.isDirectory()) {
             throw new IllegalArgumentException("Unable to create directory "
-              + childDirectory);
+                + childDirectory);
           }
         }
         return childDirectory;
@@ -147,7 +147,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
     this.directory = baseDirectory;
     baseDirectory.mkdirs();
     this.statistics = new Statistics("Write Shape "
-      + baseDirectory.getAbsolutePath());
+        + baseDirectory.getAbsolutePath());
     this.statistics.connect();
   }
 

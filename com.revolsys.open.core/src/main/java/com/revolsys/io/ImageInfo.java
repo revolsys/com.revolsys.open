@@ -6,7 +6,7 @@
  * A Java class to determine image width, height and color depth for
  * a number of image file formats.
  *
- * Written by Marco Schmidt 
+ * Written by Marco Schmidt
  *
  * Contributed to the Public Domain.
  */
@@ -22,9 +22,9 @@ import java.util.Vector;
 import com.revolsys.util.Base64InputStream;
 
 /**
- * Get file format, image resolution, number of bits per pixel and optionally 
- * number of images, comments and physical resolution from 
- * JPEG, GIF, BMP, PCX, PNG, IFF, RAS, PBM, PGM, PPM and PSD files 
+ * Get file format, image resolution, number of bits per pixel and optionally
+ * number of images, comments and physical resolution from
+ * JPEG, GIF, BMP, PCX, PNG, IFF, RAS, PBM, PGM, PPM and PSD files
  * (or input streams).
  * <p>
  * Use the class like this:
@@ -37,8 +37,8 @@ import com.revolsys.util.Base64InputStream;
  *   System.err.println("Not a supported image file format.");
  *   return;
  * }
- * System.out.println(ii.getFormatName() + ", " + ii.getMimeType() + 
- *   ", " + ii.getWidth() + " x " + ii.getHeight() + " pixels, " + 
+ * System.out.println(ii.getFormatName() + ", " + ii.getMimeType() +
+ *   ", " + ii.getWidth() + " x " + ii.getHeight() + " pixels, " +
  *   ii.getBitsPerPixel() + " bits per pixel, " + ii.getNumberOfImages() +
  *   " image(s), " + ii.getNumberOfComments() + " comment(s).");
  *  // there are other properties, check out the API documentation
@@ -50,12 +50,12 @@ import com.revolsys.util.Base64InputStream;
  * </pre>
  * or call it without parameters and pipe data to it:
  * <pre>
- *   java ImageInfo &lt; image.jpg  
+ *   java ImageInfo &lt; image.jpg
  * </pre>
  * <p>
  * Known limitations:
  * <ul>
- * <li>When the determination of the number of images is turned off, GIF bits 
+ * <li>When the determination of the number of images is turned off, GIF bits
  *  per pixel are only read from the global header.
  *  For some GIFs, local palettes change this to a typically larger
  *  value. To be certain to get the correct color depth, call
@@ -89,12 +89,12 @@ import com.revolsys.util.Base64InputStream;
  *   Use {@link #setDetermineImageNumber} with <code>true</code> as argument to identify animated GIFs
  *   ({@link #getNumberOfImages()} will return a value larger than <code>1</code>).</li>
  * <li><strong>2002-04-10</strong> Fixed a bug in the feature 'determine number of images in animated GIF' introduced with version 1.1.
- *   Thanks to Marcelo P. Lima for sending in the bug report. 
+ *   Thanks to Marcelo P. Lima for sending in the bug report.
  *   Released as 1.1.1.</li>
- * <li><strong>2002-04-18</strong> Added {@link #setCollectComments(boolean)}. 
- *  That new method lets the user specify whether textual comments are to be  
+ * <li><strong>2002-04-18</strong> Added {@link #setCollectComments(boolean)}.
+ *  That new method lets the user specify whether textual comments are to be
  *  stored in an internal list when encountered in an input image file / stream.
- *  Added two methods to return the physical width and height of the image in dpi: 
+ *  Added two methods to return the physical width and height of the image in dpi:
  *   {@link #getPhysicalWidthDpi()} and {@link #getPhysicalHeightDpi()}.
  *  If the physical resolution could not be retrieved, these methods return <code>-1</code>.
  *  </li>
@@ -109,16 +109,16 @@ import com.revolsys.util.Base64InputStream;
  *  Released as 1.4.</li>
  * <li><strong>2004-02-29</strong> Added support for recognizing progressive JPEG and
  *  interlaced PNG and GIF. A new method {@link #isProgressive()} returns whether ImageInfo
- *  has found that the storage type is progressive (or interlaced). 
+ *  has found that the storage type is progressive (or interlaced).
  *  Thanks to Joe Germuska for suggesting the feature.
  *  Bug fix: BMP physical resolution is now correctly determined.
  *  Released as 1.5.</li>
- * <li><strong>2004-11-30</strong> Bug fix: recognizing progressive GIFs 
- * (interlaced in GIF terminology) did not work (thanks to Franz Jeitler for 
+ * <li><strong>2004-11-30</strong> Bug fix: recognizing progressive GIFs
+ * (interlaced in GIF terminology) did not work (thanks to Franz Jeitler for
  *   pointing this out). Now it should work, but only if the number of images is determined.
  *  This is because information on interlacing is stored in a local image header.
- *  In theory, different images could be stored interlaced and non-interlaced in one 
- *  file. However, I think  that's unlikely. Right now, the last image in the GIF file 
+ *  In theory, different images could be stored interlaced and non-interlaced in one
+ *  file. However, I think  that's unlikely. Right now, the last image in the GIF file
  *  that is examined by ImageInfo is used for the "progressive" status.</li>
  * <li><strong>2005-01-02</strong> Some code clean up (unused methods and variables
  *  commented out, missing javadoc comments, etc.). Thanks to George Sexton for a long list.
@@ -127,7 +127,7 @@ import com.revolsys.util.Base64InputStream;
  *  Changed delimiter character in compact output from semicolon to tabulator
  * (for better integration with cut(1) and other Unix tools).
  *  Added some points to the <a href="http://schmidt.devlib.org/image-info/index.html#knownissues">'Known
- *  issues' section of the website</a>. 
+ *  issues' section of the website</a>.
  *  Released as 1.6.</li>
  * <li><strong>2005-07-26</strong> Removed code to identify Flash (SWF) files.
  *  Has repeatedly led to problems and support requests, and I don't know the
@@ -145,107 +145,13 @@ import com.revolsys.util.Base64InputStream;
  *  </li>
  *  <li><strong>2006-11-13</strong> Removed check that made ImageInfo report JPEG APPx
  *   markers smaller than 14 bytes as files in unknown format. Such JPEGs seem to be
- *   generated by Google's Picasa application. First reported with fix by 
- *   Karl von Randow. Released as 1.9.</li>  
+ *   generated by Google's Picasa application. First reported with fix by
+ *   Karl von Randow. Released as 1.9.</li>
  * </ul>
  * @author Marco Schmidt
  */
 @SuppressWarnings("unchecked")
 public class ImageInfo {
-  /**
-   * Return value of {@link #getFormat()} for JPEG streams.
-   * ImageInfo can extract physical resolution and comments
-   * from JPEGs (only from APP0 headers).
-   * Only one image can be stored in a file.
-   * It is determined whether the JPEG stream is progressive 
-   * (see {@link #isProgressive()}).
-   */
-  public static final int FORMAT_JPEG = 0;
-
-  /**
-   * Return value of {@link #getFormat()} for GIF streams.
-   * ImageInfo can extract comments from GIFs and count the number
-   * of images (GIFs with more than one image are animations).
-   * It is determined whether the GIF stream is interlaced (see {@link #isProgressive()}).
-   */
-  public static final int FORMAT_GIF = 1;
-
-  /**
-   * Return value of {@link #getFormat()} for PNG streams.
-   * PNG only supports one image per file.
-   * Both physical resolution and comments can be stored with PNG,
-   * but ImageInfo is currently not able to extract those.
-   * It is determined whether the PNG stream is interlaced (see {@link #isProgressive()}).
-   */
-  public static final int FORMAT_PNG = 2;
-
-  /**
-   * Return value of {@link #getFormat()} for BMP streams.
-   * BMP only supports one image per file.
-   * BMP does not allow for comments.
-   * The physical resolution can be stored.
-   */
-  public static final int FORMAT_BMP = 3;
-
-  /**
-   * Return value of {@link #getFormat()} for PCX streams.
-   * PCX does not allow for comments or more than one image per file.
-   * However, the physical resolution can be stored.
-   */
-  public static final int FORMAT_PCX = 4;
-
-  /**
-   * Return value of {@link #getFormat()} for IFF streams.
-   */
-  public static final int FORMAT_IFF = 5;
-
-  /**
-   * Return value of {@link #getFormat()} for RAS streams.
-   * Sun Raster allows for one image per file only and is not able to
-   * store physical resolution or comments.
-   */
-  public static final int FORMAT_RAS = 6;
-
-  /** Return value of {@link #getFormat()} for PBM streams. */
-  public static final int FORMAT_PBM = 7;
-
-  /** Return value of {@link #getFormat()} for PGM streams. */
-  public static final int FORMAT_PGM = 8;
-
-  /** Return value of {@link #getFormat()} for PPM streams. */
-  public static final int FORMAT_PPM = 9;
-
-  /** Return value of {@link #getFormat()} for PSD streams. */
-  public static final int FORMAT_PSD = 10;
-
-  /*
-   * public static final int COLOR_TYPE_UNKNOWN = -1; public static final int
-   * COLOR_TYPE_TRUECOLOR_RGB = 0; public static final int COLOR_TYPE_PALETTED =
-   * 1; public static final int COLOR_TYPE_GRAYSCALE= 2; public static final int
-   * COLOR_TYPE_BLACK_AND_WHITE = 3;
-   */
-
-  /**
-   * The names of all supported file formats.
-   * The FORMAT_xyz int constants can be used as index values for
-   * this array.
-   */
-  private static final String[] FORMAT_NAMES = {
-    "JPEG", "GIF", "PNG", "BMP", "PCX", "IFF", "RAS", "PBM", "PGM", "PPM",
-    "PSD"
-  };
-
-  /**
-   * The names of the MIME types for all supported file formats.
-   * The FORMAT_xyz int constants can be used as index values for
-   * this array.
-   */
-  private static final String[] MIME_TYPE_STRINGS = {
-    "image/jpeg", "image/gif", "image/png", "image/bmp", "image/pcx",
-    "image/iff", "image/ras", "image/x-portable-bitmap",
-    "image/x-portable-graymap", "image/x-portable-pixmap", "image/psd"
-  };
-
   /**
    * Run over String list, return false iff at least one of the arguments
    * equals <code>-c</code>.
@@ -253,8 +159,8 @@ public class ImageInfo {
    */
   private static boolean determineVerbosity(final String[] args) {
     if (args != null && args.length > 0) {
-      for (int i = 0; i < args.length; i++) {
-        if ("-c".equals(args[i])) {
+      for (final String arg : args) {
+        if ("-c".equals(arg)) {
           return false;
         }
       }
@@ -274,24 +180,24 @@ public class ImageInfo {
 
   private static int getIntBigEndian(final byte[] a, final int offs) {
     return (a[offs] & 0xff) << 24 | (a[offs + 1] & 0xff) << 16
-      | (a[offs + 2] & 0xff) << 8 | a[offs + 3] & 0xff;
+        | (a[offs + 2] & 0xff) << 8 | a[offs + 3] & 0xff;
   }
 
   private static int getIntLittleEndian(final byte[] a, final int offs) {
     return (a[offs + 3] & 0xff) << 24 | (a[offs + 2] & 0xff) << 16
-      | (a[offs + 1] & 0xff) << 8 | a[offs] & 0xff;
+        | (a[offs + 1] & 0xff) << 8 | a[offs] & 0xff;
   }
 
   private static int getShortBigEndian(final byte[] a, final int offs) {
-    return (a[offs] & 0xff) << 8 | (a[offs + 1] & 0xff);
+    return (a[offs] & 0xff) << 8 | a[offs + 1] & 0xff;
   }
 
   private static int getShortLittleEndian(final byte[] a, final int offs) {
-    return (a[offs] & 0xff) | (a[offs + 1] & 0xff) << 8;
+    return a[offs] & 0xff | (a[offs + 1] & 0xff) << 8;
   }
 
   /**
-   * To use this class as a command line application, give it either 
+   * To use this class as a command line application, give it either
    * some file names as parameters (information on them will be
    * printed to standard output, one line per file) or call
    * it with no parameters. It will then check data given to it
@@ -367,6 +273,13 @@ public class ImageInfo {
     }
   }
 
+  /*
+   * public static final int COLOR_TYPE_UNKNOWN = -1; public static final int
+   * COLOR_TYPE_TRUECOLOR_RGB = 0; public static final int COLOR_TYPE_PALETTED =
+   * 1; public static final int COLOR_TYPE_GRAYSCALE= 2; public static final int
+   * COLOR_TYPE_BLACK_AND_WHITE = 3;
+   */
+
   private static void printLine(int indentLevels, final String text,
     final String value) {
     if (value == null || value.length() == 0) {
@@ -414,6 +327,93 @@ public class ImageInfo {
     }
   }
 
+  /**
+   * Return value of {@link #getFormat()} for JPEG streams.
+   * ImageInfo can extract physical resolution and comments
+   * from JPEGs (only from APP0 headers).
+   * Only one image can be stored in a file.
+   * It is determined whether the JPEG stream is progressive
+   * (see {@link #isProgressive()}).
+   */
+  public static final int FORMAT_JPEG = 0;
+
+  /**
+   * Return value of {@link #getFormat()} for GIF streams.
+   * ImageInfo can extract comments from GIFs and count the number
+   * of images (GIFs with more than one image are animations).
+   * It is determined whether the GIF stream is interlaced (see {@link #isProgressive()}).
+   */
+  public static final int FORMAT_GIF = 1;
+
+  /**
+   * Return value of {@link #getFormat()} for PNG streams.
+   * PNG only supports one image per file.
+   * Both physical resolution and comments can be stored with PNG,
+   * but ImageInfo is currently not able to extract those.
+   * It is determined whether the PNG stream is interlaced (see {@link #isProgressive()}).
+   */
+  public static final int FORMAT_PNG = 2;
+
+  /**
+   * Return value of {@link #getFormat()} for BMP streams.
+   * BMP only supports one image per file.
+   * BMP does not allow for comments.
+   * The physical resolution can be stored.
+   */
+  public static final int FORMAT_BMP = 3;
+
+  /**
+   * Return value of {@link #getFormat()} for PCX streams.
+   * PCX does not allow for comments or more than one image per file.
+   * However, the physical resolution can be stored.
+   */
+  public static final int FORMAT_PCX = 4;
+
+  /**
+   * Return value of {@link #getFormat()} for IFF streams.
+   */
+  public static final int FORMAT_IFF = 5;
+
+  /**
+   * Return value of {@link #getFormat()} for RAS streams.
+   * Sun Raster allows for one image per file only and is not able to
+   * store physical resolution or comments.
+   */
+  public static final int FORMAT_RAS = 6;
+
+  /** Return value of {@link #getFormat()} for PBM streams. */
+  public static final int FORMAT_PBM = 7;
+
+  /** Return value of {@link #getFormat()} for PGM streams. */
+  public static final int FORMAT_PGM = 8;
+
+  /** Return value of {@link #getFormat()} for PPM streams. */
+  public static final int FORMAT_PPM = 9;
+
+  /** Return value of {@link #getFormat()} for PSD streams. */
+  public static final int FORMAT_PSD = 10;
+
+  /**
+   * The names of all supported file formats.
+   * The FORMAT_xyz int constants can be used as index values for
+   * this array.
+   */
+  private static final String[] FORMAT_NAMES = {
+    "JPEG", "GIF", "PNG", "BMP", "PCX", "IFF", "RAS", "PBM", "PGM", "PPM",
+    "PSD"
+  };
+
+  /**
+   * The names of the MIME types for all supported file formats.
+   * The FORMAT_xyz int constants can be used as index values for
+   * this array.
+   */
+  private static final String[] MIME_TYPE_STRINGS = {
+    "image/jpeg", "image/gif", "image/png", "image/bmp", "image/pcx",
+    "image/iff", "image/ras", "image/x-portable-bitmap",
+    "image/x-portable-graymap", "image/x-portable-pixmap", "image/psd"
+  };
+
   private int width;
 
   private int height;
@@ -450,10 +450,10 @@ public class ImageInfo {
   }
 
   private void addComment(final String s) {
-    if (comments == null) {
-      comments = new Vector();
+    if (this.comments == null) {
+      this.comments = new Vector();
     }
-    comments.addElement(s);
+    this.comments.addElement(s);
   }
 
   /**
@@ -464,14 +464,14 @@ public class ImageInfo {
    * @return if information could be retrieved from input
    */
   public boolean check() {
-    format = -1;
-    width = -1;
-    height = -1;
-    bitsPerPixel = -1;
-    numberOfImages = 1;
-    physicalHeightDpi = -1;
-    physicalWidthDpi = -1;
-    comments = null;
+    this.format = -1;
+    this.width = -1;
+    this.height = -1;
+    this.bitsPerPixel = -1;
+    this.numberOfImages = 1;
+    this.physicalHeightDpi = -1;
+    this.physicalWidthDpi = -1;
+    this.comments = null;
     try {
       final int b1 = read() & 0xff;
       final int b2 = read() & 0xff;
@@ -506,14 +506,14 @@ public class ImageInfo {
     if (read(a) != a.length) {
       return false;
     }
-    width = getIntLittleEndian(a, 16);
-    height = getIntLittleEndian(a, 20);
-    if (width < 1 || height < 1) {
+    this.width = getIntLittleEndian(a, 16);
+    this.height = getIntLittleEndian(a, 20);
+    if (this.width < 1 || this.height < 1) {
       return false;
     }
-    bitsPerPixel = getShortLittleEndian(a, 26);
-    if (bitsPerPixel != 1 && bitsPerPixel != 4 && bitsPerPixel != 8
-      && bitsPerPixel != 16 && bitsPerPixel != 24 && bitsPerPixel != 32) {
+    this.bitsPerPixel = getShortLittleEndian(a, 26);
+    if (this.bitsPerPixel != 1 && this.bitsPerPixel != 4 && this.bitsPerPixel != 8
+        && this.bitsPerPixel != 16 && this.bitsPerPixel != 24 && this.bitsPerPixel != 32) {
       return false;
     }
     final int x = (int)(getIntLittleEndian(a, 36) * 0.0254);
@@ -524,7 +524,7 @@ public class ImageInfo {
     if (y > 0) {
       setPhysicalHeightDpi(y);
     }
-    format = FORMAT_BMP;
+    this.format = FORMAT_BMP;
     return true;
   }
 
@@ -536,48 +536,48 @@ public class ImageInfo {
       0x46, 0x38, 0x39, 0x61
     };
     final byte[] a = new byte[11]; // 4 from the GIF signature + 7 from the
-                                   // global header
+    // global header
     if (read(a) != 11) {
       return false;
     }
-    if ((!equals(a, 0, GIF_MAGIC_89A, 0, 4))
-      && (!equals(a, 0, GIF_MAGIC_87A, 0, 4))) {
+    if (!equals(a, 0, GIF_MAGIC_89A, 0, 4)
+        && !equals(a, 0, GIF_MAGIC_87A, 0, 4)) {
       return false;
     }
-    format = FORMAT_GIF;
-    width = getShortLittleEndian(a, 4);
-    height = getShortLittleEndian(a, 6);
+    this.format = FORMAT_GIF;
+    this.width = getShortLittleEndian(a, 4);
+    this.height = getShortLittleEndian(a, 6);
     int flags = a[8] & 0xff;
-    bitsPerPixel = ((flags >> 4) & 0x07) + 1;
+    this.bitsPerPixel = (flags >> 4 & 0x07) + 1;
     // progressive = (flags & 0x02) != 0;
-    if (!determineNumberOfImages) {
+    if (!this.determineNumberOfImages) {
       return true;
     }
     // skip global color palette
     if ((flags & 0x80) != 0) {
-      final int tableSize = (1 << ((flags & 7) + 1)) * 3;
+      final int tableSize = (1 << (flags & 7) + 1) * 3;
       skip(tableSize);
     }
-    numberOfImages = 0;
+    this.numberOfImages = 0;
     int blockType;
     do {
       blockType = read();
       switch (blockType) {
-        case (0x2c): // image separator
+        case 0x2c: // image separator
         {
           if (read(a, 0, 9) != 9) {
             return false;
           }
           flags = a[8] & 0xff;
-          progressive = (flags & 0x40) != 0;
+          this.progressive = (flags & 0x40) != 0;
           /*
            * int locWidth = getShortLittleEndian(a, 4); int locHeight =
            * getShortLittleEndian(a, 6); System.out.println("LOCAL: " + locWidth
            * + " x " + locHeight);
            */
           final int localBitsPerPixel = (flags & 0x07) + 1;
-          if (localBitsPerPixel > bitsPerPixel) {
-            bitsPerPixel = localBitsPerPixel;
+          if (localBitsPerPixel > this.bitsPerPixel) {
+            this.bitsPerPixel = localBitsPerPixel;
           }
           if ((flags & 0x80) != 0) {
             skip((1 << localBitsPerPixel) * 3);
@@ -592,13 +592,13 @@ public class ImageInfo {
               return false;
             }
           } while (n > 0);
-          numberOfImages++;
+          this.numberOfImages++;
           break;
         }
-        case (0x21): // extension
+        case 0x21: // extension
         {
           final int extensionType = read();
-          if (collectComments && extensionType == 0xfe) {
+          if (this.collectComments && extensionType == 0xfe) {
             final StringBuilder sb = new StringBuilder();
             int n;
             do {
@@ -629,7 +629,7 @@ public class ImageInfo {
           }
           break;
         }
-        case (0x3b): // end of file
+        case 0x3b: // end of file
         {
           break;
         }
@@ -656,7 +656,7 @@ public class ImageInfo {
     }
     final int type = getIntBigEndian(a, 6);
     if (type != 0x494c424d && // type must be ILBM...
-      type != 0x50424d20) { // ...or PBM
+        type != 0x50424d20) { // ...or PBM
       return false;
     }
     // loop chunks to find BMHD chunk
@@ -673,11 +673,11 @@ public class ImageInfo {
         if (read(a, 0, 9) != 9) {
           return false;
         }
-        format = FORMAT_IFF;
-        width = getShortBigEndian(a, 0);
-        height = getShortBigEndian(a, 2);
-        bitsPerPixel = a[8] & 0xff;
-        return (width > 0 && height > 0 && bitsPerPixel > 0 && bitsPerPixel < 33);
+        this.format = FORMAT_IFF;
+        this.width = getShortBigEndian(a, 0);
+        this.height = getShortBigEndian(a, 2);
+        this.bitsPerPixel = a[8] & 0xff;
+        return this.width > 0 && this.height > 0 && this.bitsPerPixel > 0 && this.bitsPerPixel < 33;
       } else {
         skip(size);
       }
@@ -720,7 +720,7 @@ public class ImageInfo {
           }
         }
         skip(size - 14);
-      } else if (collectComments && size > 2 && marker == 0xfffe) { // comment
+      } else if (this.collectComments && size > 2 && marker == 0xfffe) { // comment
         size -= 2;
         final byte[] chars = new byte[size];
         if (read(chars, 0, size) != size) {
@@ -730,16 +730,16 @@ public class ImageInfo {
         comment = comment.trim();
         addComment(comment);
       } else if (marker >= 0xffc0 && marker <= 0xffcf && marker != 0xffc4
-        && marker != 0xffc8) {
+          && marker != 0xffc8) {
         if (read(data, 0, 6) != 6) {
           return false;
         }
-        format = FORMAT_JPEG;
-        bitsPerPixel = (data[0] & 0xff) * (data[5] & 0xff);
-        progressive = marker == 0xffc2 || marker == 0xffc6 || marker == 0xffca
-          || marker == 0xffce;
-        width = getShortBigEndian(data, 3);
-        height = getShortBigEndian(data, 1);
+        this.format = FORMAT_JPEG;
+        this.bitsPerPixel = (data[0] & 0xff) * (data[5] & 0xff);
+        this.progressive = marker == 0xffc2 || marker == 0xffc6 || marker == 0xffca
+            || marker == 0xffce;
+        this.width = getShortBigEndian(data, 3);
+        this.height = getShortBigEndian(data, 1);
         return true;
       } else {
         skip(size - 2);
@@ -763,23 +763,23 @@ public class ImageInfo {
     if (x1 < 0 || x2 < x1 || y1 < 0 || y2 < y1) {
       return false;
     }
-    width = x2 - x1 + 1;
-    height = y2 - y1 + 1;
+    this.width = x2 - x1 + 1;
+    this.height = y2 - y1 + 1;
     // color depth
     final int bits = a[1];
     final int planes = a[63];
     if (planes == 1 && (bits == 1 || bits == 2 || bits == 4 || bits == 8)) {
       // paletted
-      bitsPerPixel = bits;
+      this.bitsPerPixel = bits;
     } else if (planes == 3 && bits == 8) {
       // RGB truecolor
-      bitsPerPixel = 24;
+      this.bitsPerPixel = 24;
     } else {
       return false;
     }
     setPhysicalWidthDpi(getShortLittleEndian(a, 10));
     setPhysicalHeightDpi(getShortLittleEndian(a, 10));
-    format = FORMAT_PCX;
+    this.format = FORMAT_PCX;
     return true;
   }
 
@@ -794,15 +794,15 @@ public class ImageInfo {
     if (!equals(a, 0, PNG_MAGIC, 0, 6)) {
       return false;
     }
-    format = FORMAT_PNG;
-    width = getIntBigEndian(a, 14);
-    height = getIntBigEndian(a, 18);
-    bitsPerPixel = a[22] & 0xff;
+    this.format = FORMAT_PNG;
+    this.width = getIntBigEndian(a, 14);
+    this.height = getIntBigEndian(a, 18);
+    this.bitsPerPixel = a[22] & 0xff;
     final int colorType = a[23] & 0xff;
     if (colorType == 2 || colorType == 6) {
-      bitsPerPixel *= 3;
+      this.bitsPerPixel *= 3;
     }
-    progressive = (a[26] & 0xff) != 0;
+    this.progressive = (a[26] & 0xff) != 0;
     return true;
   }
 
@@ -813,7 +813,7 @@ public class ImageInfo {
     final int[] PNM_FORMATS = {
       FORMAT_PBM, FORMAT_PGM, FORMAT_PPM
     };
-    format = PNM_FORMATS[(id - 1) % 3];
+    this.format = PNM_FORMATS[(id - 1) % 3];
     boolean hasPixelResolution = false;
     String s;
     while (true) {
@@ -825,7 +825,7 @@ public class ImageInfo {
         continue;
       }
       if (s.charAt(0) == '#') { // comment
-        if (collectComments && s.length() > 1) {
+        if (this.collectComments && s.length() > 1) {
           addComment(s.substring(1));
         }
         continue;
@@ -842,16 +842,16 @@ public class ImageInfo {
         }
         final String heightString = s.substring(spaceIndex + 1);
         try {
-          width = Integer.parseInt(widthString);
-          height = Integer.parseInt(heightString);
+          this.width = Integer.parseInt(widthString);
+          this.height = Integer.parseInt(heightString);
         } catch (final NumberFormatException nfe) {
           return false;
         }
-        if (width < 1 || height < 1) {
+        if (this.width < 1 || this.height < 1) {
           return false;
         }
-        if (format == FORMAT_PBM) {
-          bitsPerPixel = 1;
+        if (this.format == FORMAT_PBM) {
+          this.bitsPerPixel = 1;
           return true;
         }
         hasPixelResolution = true;
@@ -866,10 +866,10 @@ public class ImageInfo {
           return false;
         }
         for (int i = 0; i < 25; i++) {
-          if (maxSample < (1 << (i + 1))) {
-            bitsPerPixel = i + 1;
-            if (format == FORMAT_PPM) {
-              bitsPerPixel *= 3;
+          if (maxSample < 1 << i + 1) {
+            this.bitsPerPixel = i + 1;
+            if (this.format == FORMAT_PPM) {
+              this.bitsPerPixel *= 3;
             }
             return true;
           }
@@ -890,13 +890,13 @@ public class ImageInfo {
     if (!equals(a, 0, PSD_MAGIC, 0, 2)) {
       return false;
     }
-    format = FORMAT_PSD;
-    width = getIntBigEndian(a, 16);
-    height = getIntBigEndian(a, 12);
+    this.format = FORMAT_PSD;
+    this.width = getIntBigEndian(a, 16);
+    this.height = getIntBigEndian(a, 12);
     final int channels = getShortBigEndian(a, 10);
     final int depth = getShortBigEndian(a, 20);
-    bitsPerPixel = channels * depth;
-    return (width > 0 && height > 0 && bitsPerPixel > 0 && bitsPerPixel <= 64);
+    this.bitsPerPixel = channels * depth;
+    return this.width > 0 && this.height > 0 && this.bitsPerPixel > 0 && this.bitsPerPixel <= 64;
   }
 
   private boolean checkRas() throws IOException {
@@ -910,20 +910,20 @@ public class ImageInfo {
     if (!equals(a, 0, RAS_MAGIC, 0, 2)) {
       return false;
     }
-    format = FORMAT_RAS;
-    width = getIntBigEndian(a, 2);
-    height = getIntBigEndian(a, 6);
-    bitsPerPixel = getIntBigEndian(a, 10);
-    return (width > 0 && height > 0 && bitsPerPixel > 0 && bitsPerPixel <= 24);
+    this.format = FORMAT_RAS;
+    this.width = getIntBigEndian(a, 2);
+    this.height = getIntBigEndian(a, 6);
+    this.bitsPerPixel = getIntBigEndian(a, 10);
+    return this.width > 0 && this.height > 0 && this.bitsPerPixel > 0 && this.bitsPerPixel <= 24;
   }
 
-  /** 
+  /**
    * If {@link #check()} was successful, returns the image's number of bits per pixel.
    * Does not include transparency information like the alpha channel.
    * @return number of bits per image pixel
    */
   public int getBitsPerPixel() {
-    return bitsPerPixel;
+    return this.bitsPerPixel;
   }
 
   /**
@@ -934,10 +934,10 @@ public class ImageInfo {
    * @see #getNumberOfComments
    */
   public String getComment(final int index) {
-    if (comments == null || index < 0 || index >= comments.size()) {
+    if (this.comments == null || index < 0 || index >= this.comments.size()) {
       throw new IllegalArgumentException("Not a valid comment index: " + index);
     }
-    return (String)comments.elementAt(index);
+    return (String)this.comments.elementAt(index);
   }
 
   /**
@@ -947,7 +947,7 @@ public class ImageInfo {
    * @return file format as a FORMAT_xyz constant
    */
   public int getFormat() {
-    return format;
+    return this.format;
   }
 
   /**
@@ -956,33 +956,33 @@ public class ImageInfo {
    * @return file format name
    */
   public String getFormatName() {
-    if (format >= 0 && format < FORMAT_NAMES.length) {
-      return FORMAT_NAMES[format];
+    if (this.format >= 0 && this.format < FORMAT_NAMES.length) {
+      return FORMAT_NAMES[this.format];
     } else {
       return "?";
     }
   }
 
-  /** 
+  /**
    * If {@link #check()} was successful, returns one the image's vertical
    * resolution in pixels.
    * @return image height in pixels
    */
   public int getHeight() {
-    return height;
+    return this.height;
   }
 
-  /** 
+  /**
    * If {@link #check()} was successful, returns a String with the
    * MIME type of the format.
    * @return MIME type, e.g. <code>image/jpeg</code>
    */
   public String getMimeType() {
-    if (format >= 0 && format < MIME_TYPE_STRINGS.length) {
-      if (format == FORMAT_JPEG && progressive) {
+    if (this.format >= 0 && this.format < MIME_TYPE_STRINGS.length) {
+      if (this.format == FORMAT_JPEG && this.progressive) {
         return "image/pjpeg";
       }
-      return MIME_TYPE_STRINGS[format];
+      return MIME_TYPE_STRINGS[this.format];
     } else {
       return null;
     }
@@ -990,17 +990,17 @@ public class ImageInfo {
 
   /**
    * If {@link #check()} was successful and {@link #setCollectComments(boolean)} was called with
-   * <code>true</code> as argument, returns the number of comments retrieved 
+   * <code>true</code> as argument, returns the number of comments retrieved
    * from the input image stream / file.
    * Any number &gt;= 0 and smaller than this number of comments is then a
    * valid argument for the {@link #getComment(int)} method.
    * @return number of comments retrieved from input image
    */
   public int getNumberOfComments() {
-    if (comments == null) {
+    if (this.comments == null) {
       return 0;
     } else {
-      return comments.size();
+      return this.comments.size();
     }
   }
 
@@ -1012,7 +1012,7 @@ public class ImageInfo {
    * @return number of images in file
    */
   public int getNumberOfImages() {
-    return numberOfImages;
+    return this.numberOfImages;
   }
 
   /**
@@ -1024,7 +1024,7 @@ public class ImageInfo {
    * @see #getPhysicalHeightInch()
    */
   public int getPhysicalHeightDpi() {
-    return physicalHeightDpi;
+    return this.physicalHeightDpi;
   }
 
   /**
@@ -1039,7 +1039,7 @@ public class ImageInfo {
     final int h = getHeight();
     final int ph = getPhysicalHeightDpi();
     if (h > 0 && ph > 0) {
-      return ((float)h) / ((float)ph);
+      return (float)h / (float)ph;
     } else {
       return -1.0f;
     }
@@ -1054,7 +1054,7 @@ public class ImageInfo {
    * @see #getPhysicalHeightInch()
    */
   public int getPhysicalWidthDpi() {
-    return physicalWidthDpi;
+    return this.physicalWidthDpi;
   }
 
   /**
@@ -1069,19 +1069,19 @@ public class ImageInfo {
     final int w = getWidth();
     final int pw = getPhysicalWidthDpi();
     if (w > 0 && pw > 0) {
-      return ((float)w) / ((float)pw);
+      return (float)w / (float)pw;
     } else {
       return -1.0f;
     }
   }
 
-  /** 
+  /**
    * If {@link #check()} was successful, returns one the image's horizontal
    * resolution in pixels.
    * @return image width in pixels
    */
   public int getWidth() {
-    return width;
+    return this.width;
   }
 
   /**
@@ -1089,32 +1089,32 @@ public class ImageInfo {
    * @return true for progressive/interlaced, false otherwise
    */
   public boolean isProgressive() {
-    return progressive;
+    return this.progressive;
   }
 
   private int read() throws IOException {
-    if (in != null) {
-      return in.read();
+    if (this.in != null) {
+      return this.in.read();
     } else {
-      return din.readByte();
+      return this.din.readByte();
     }
   }
 
   private int read(final byte[] a) throws IOException {
-    if (in != null) {
-      return in.read(a);
+    if (this.in != null) {
+      return this.in.read(a);
     } else {
-      din.readFully(a);
+      this.din.readFully(a);
       return a.length;
     }
   }
 
   private int read(final byte[] a, final int offset, final int num)
-    throws IOException {
-    if (in != null) {
-      return in.read(a, offset, num);
+      throws IOException {
+    if (this.in != null) {
+      return this.in.read(a, offset, num);
     } else {
-      din.readFully(a, offset, num);
+      this.din.readFully(a, offset, num);
       return num;
     }
   }
@@ -1127,7 +1127,7 @@ public class ImageInfo {
     boolean finished;
     do {
       final int value = read();
-      finished = (value == -1 || value == 10);
+      finished = value == -1 || value == 10;
       if (!finished) {
         sb.append((char)value);
       }
@@ -1144,7 +1144,7 @@ public class ImageInfo {
    * @see #getComment
    */
   public void setCollectComments(final boolean newValue) {
-    collectComments = newValue;
+    this.collectComments = newValue;
   }
 
   /**
@@ -1155,25 +1155,25 @@ public class ImageInfo {
    * task.
    * Not all file formats support more than one image.
    * If this method is called with <code>true</code> as argument,
-   * the actual number of images can be queried via 
+   * the actual number of images can be queried via
    * {@link #getNumberOfImages()} after a successful call to
    * {@link #check()}.
    * @param newValue will the number of images be determined?
    * @see #getNumberOfImages
    */
   public void setDetermineImageNumber(final boolean newValue) {
-    determineNumberOfImages = newValue;
+    this.determineNumberOfImages = newValue;
   }
 
   /**
-   * Set the input stream to the argument stream (or file). 
+   * Set the input stream to the argument stream (or file).
    * Note that {@link java.io.RandomAccessFile} implements
    * {@link java.io.DataInput}.
    * @param dataInput the input stream to read from
    */
   public void setInput(final DataInput dataInput) {
-    din = dataInput;
-    in = null;
+    this.din = dataInput;
+    this.in = null;
   }
 
   /**
@@ -1181,33 +1181,33 @@ public class ImageInfo {
    * @param inputStream the input stream to read from
    */
   public void setInput(final InputStream inputStream) {
-    in = inputStream;
-    din = null;
+    this.in = inputStream;
+    this.din = null;
   }
 
   private void setPhysicalHeightDpi(final int newValue) {
-    physicalWidthDpi = newValue;
+    this.physicalWidthDpi = newValue;
   }
 
   private void setPhysicalWidthDpi(final int newValue) {
-    physicalHeightDpi = newValue;
+    this.physicalHeightDpi = newValue;
   }
 
   private void skip(int num) throws IOException {
     while (num > 0) {
       long result;
-      if (in != null) {
-        result = in.skip(num);
+      if (this.in != null) {
+        result = this.in.skip(num);
       } else {
-        result = din.skipBytes(num);
+        result = this.din.skipBytes(num);
       }
       if (result > 0) {
         num -= result;
       } else {
-        if (in != null) {
-          result = in.read();
+        if (this.in != null) {
+          result = this.in.read();
         } else {
-          result = din.readByte();
+          result = this.din.readByte();
         }
         if (result == -1) {
           throw new IOException("Premature end of input.");

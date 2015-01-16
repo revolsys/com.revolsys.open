@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,11 +47,13 @@ public class IafServletFilter implements Filter {
 
   private Config rsWebUiConfig;
 
+  @Override
   public void destroy() {
-    rsWebUiConfig = null;
+    this.rsWebUiConfig = null;
     WebUiContext.setServletContext(null);
   }
 
+  @Override
   public void doFilter(
     final ServletRequest request,
     final ServletResponse response,
@@ -60,15 +62,16 @@ public class IafServletFilter implements Filter {
       final HttpServletRequest httpRequest = (HttpServletRequest)request;
       final HttpServletResponse httpResponse = (HttpServletResponse)response;
       final String contextPath = httpRequest.getContextPath();
-      WebUiContext.set(new WebUiContext(rsWebUiConfig, contextPath, null,
+      WebUiContext.set(new WebUiContext(this.rsWebUiConfig, contextPath, null,
         httpRequest, httpResponse));
-      request.setAttribute("niceConfig", rsWebUiConfig);
+      request.setAttribute("niceConfig", this.rsWebUiConfig);
       chain.doFilter(request, response);
     } finally {
       WebUiContext.set(null);
     }
   }
 
+  @Override
   public void init(final FilterConfig filterConfig) throws ServletException {
     String config = filterConfig.getInitParameter("config");
     if (config == null) {
@@ -82,18 +85,18 @@ public class IafServletFilter implements Filter {
       final URL configResource = servletContext.getResource(config);
       final XmlConfigLoader configLoader = new XmlConfigLoader(configResource,
         servletContext);
-      rsWebUiConfig = configLoader.loadConfig();
-      servletContext.setAttribute("rsWebUiConfig", rsWebUiConfig);
+      this.rsWebUiConfig = configLoader.loadConfig();
+      servletContext.setAttribute("rsWebUiConfig", this.rsWebUiConfig);
     } catch (final InvalidConfigException e) {
       log.error(e.getErrors(), e);
       throw new UnavailableException(
         "Cannot load a rsWebUiConfig resource from '" + config + "' due to "
-          + e.getErrors());
+            + e.getErrors());
     } catch (final Exception e) {
       log.error(e.getMessage(), e);
       throw new UnavailableException(
         "Cannot load a rsWebUiConfig resource from '" + config + "' due to "
-          + e.getMessage());
+            + e.getMessage());
     }
   }
 }

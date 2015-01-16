@@ -28,21 +28,14 @@ public class OracleRecordStoreConnectionPanel extends ValueField implements
 PropertyChangeListener {
   private static final long serialVersionUID = 2750736040832727823L;
 
-  private final ConnectionRegistry<RecordStoreConnection> registry;
-
   private String name;
 
   private final Map<String, Field> fieldsByName = new HashMap<>();
-
-  private final RecordStoreConnection connection;
 
   @SuppressWarnings("unchecked")
   public OracleRecordStoreConnectionPanel(
     final ConnectionRegistry<RecordStoreConnection> registry,
     final RecordStoreConnection connection) {
-    this.registry = registry;
-    this.connection = connection;
-
     addField(new TextField("name", 50));
 
     addField(new TextField("url", 255));

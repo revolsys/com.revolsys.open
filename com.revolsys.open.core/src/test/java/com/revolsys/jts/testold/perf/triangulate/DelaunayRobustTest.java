@@ -12,25 +12,25 @@ import com.revolsys.jts.util.Stopwatch;
 /**
  * Test robustness of Delaunay computation.
  * Test dataset is constructed to have many points
- * with a large base offset.  This reduces 
+ * with a large base offset.  This reduces
  * the precision available for the arithmetic in the inCircle test.
  * This causes incorrect values to be computed by using
  * the simple double-precision approach.
- * 
+ *
  * @author Martin Davis
  *
  */
 public class DelaunayRobustTest {
+  public static void main(final String args[]) {
+    final DelaunayRobustTest test = new DelaunayRobustTest();
+    test.run();
+  }
+
   final static GeometryFactory geomFact = GeometryFactory.floating3();
 
   final static double SIDE_LEN = 1.0;
 
   final static double BASE_OFFSET = 1.0e7;
-
-  public static void main(final String args[]) {
-    final DelaunayRobustTest test = new DelaunayRobustTest();
-    test.run();
-  }
 
   List randomPoints(final int nPts) {
     final List pts = new ArrayList();

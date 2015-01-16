@@ -5,13 +5,13 @@
  * $Revision: 188 $
  *
  * Copyright 2004- Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import com.revolsys.ui.html.builder.HtmlUiBuilder;
 /**
  * The HtmlUiBuilderKeyView is an {@Element} for serializing the
  * specified key on the object using a {@link HtmlUiBuilder}.
- * 
+ *
  * @author Paul Austin
  */
 public class HtmlUiBuilderKeyView extends Element implements SetObject {
@@ -41,7 +41,7 @@ public class HtmlUiBuilderKeyView extends Element implements SetObject {
 
   /**
    * Constuct a new HtmlUiBuilderKeyView.
-   * 
+   *
    * @param builder The HTML UI builder.
    * @param object The object to serialize.
    * @param key The key to serialize on the builder.
@@ -55,7 +55,7 @@ public class HtmlUiBuilderKeyView extends Element implements SetObject {
 
   /**
    * Constuct a new HtmlUiBuilderKeyView.
-   * 
+   *
    * @param builder The HTML UI builder.
    * @param key The key to serialize on the builder.
    */
@@ -65,46 +65,46 @@ public class HtmlUiBuilderKeyView extends Element implements SetObject {
 
   /**
    * Get the HTML UI builder.
-   * 
+   *
    * @return The HTML UI builder.
    */
   public HtmlUiBuilder getBuilder() {
-    return builder;
+    return this.builder;
   }
 
   /**
    * Get the key to serialize on the builder.
-   * 
+   *
    * @return T
    */
   public String getKey() {
-    return key;
+    return this.key;
   }
 
   /**
    * Get the object to serialize.
-   * 
+   *
    * @return The object to serialize.
    */
   public Object getObject() {
-    return object;
+    return this.object;
   }
 
   /**
    * Serialize the key on the object using the builder.
-   * 
+   *
    * @param out The XML writer to serialize to.
    */
   @Override
   public void serializeElement(final XmlWriter out) {
-    if (object != null) {
-      builder.serialize(out, object, key);
+    if (this.object != null) {
+      this.builder.serialize(out, this.object, this.key);
     }
   }
 
   /**
    * Set the HTML UI builder.
-   * 
+   *
    * @param builder The HTML UI builder.
    */
   public void setBuilder(final HtmlUiBuilder builder) {
@@ -113,7 +113,7 @@ public class HtmlUiBuilderKeyView extends Element implements SetObject {
 
   /**
    * Set the key to serialize on the builder.
-   * 
+   *
    * @param key The key to serialize on the builder.
    */
   public void setKey(final String key) {
@@ -122,9 +122,10 @@ public class HtmlUiBuilderKeyView extends Element implements SetObject {
 
   /**
    * Set the object to serialize.
-   * 
+   *
    * @param object The object to serialize.
    */
+  @Override
   public void setObject(final Object object) {
     this.object = object;
   }

@@ -67,7 +67,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
       } else {
         final double lookAtScale = 1.2;
         final double lookAtRange = maxMetres / 2 / Math.tan(Math.toRadians(25))
-          * lookAtScale;
+            * lookAtScale;
         return (long)Math.ceil(lookAtRange);
       }
     }
@@ -426,7 +426,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     startTag(ICON);
     final Map<String, String> parameters = Collections.singletonMap("BBOX",
       envelope.getMinX() + "," + envelope.getMinY() + "," + envelope.getMaxX()
-        + "," + envelope.getMaxY());
+      + "," + envelope.getMaxY());
     element(HREF, UrlUtil.getUrl(baseUrl, parameters));
 
     endTag();

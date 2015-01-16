@@ -18,7 +18,7 @@ import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.geometry.GeometryCoordinatesTableModel;
 
 public class GeometryCoordinateErrorPredicate extends BorderHighlighter
-  implements HighlightPredicate {
+implements HighlightPredicate {
 
   public static void add(final BaseJTable table) {
     final GeometryCoordinatesTableModel model = (GeometryCoordinatesTableModel)table.getModel();

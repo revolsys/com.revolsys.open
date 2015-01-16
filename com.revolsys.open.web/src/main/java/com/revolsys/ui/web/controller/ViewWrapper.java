@@ -16,21 +16,22 @@ public class ViewWrapper implements Controller {
   private String suffix = ".jsp";
 
   public String getFieldName() {
-    return attributeName;
+    return this.attributeName;
   }
 
   public String getPrefix() {
-    return prefix;
+    return this.prefix;
   }
 
   public String getSuffix() {
-    return suffix;
+    return this.suffix;
   }
 
   public String getViewName() {
-    return viewName;
+    return this.viewName;
   }
 
+  @Override
   public ModelAndView handleRequest(
     final HttpServletRequest request,
     final HttpServletResponse response) throws Exception {
@@ -38,9 +39,9 @@ public class ViewWrapper implements Controller {
     if ("/".equals(path)) {
       path = "/index";
     }
-    final ModelAndView view = new ModelAndView(viewName);
+    final ModelAndView view = new ModelAndView(this.viewName);
 
-    view.addObject(attributeName, prefix + path + suffix);
+    view.addObject(this.attributeName, this.prefix + path + this.suffix);
     return view;
   }
 

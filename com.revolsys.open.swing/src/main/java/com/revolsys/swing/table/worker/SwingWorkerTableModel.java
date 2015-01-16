@@ -18,8 +18,6 @@ import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 
 public class SwingWorkerTableModel extends AbstractTableModel {
-  private static final long serialVersionUID = 1L;
-
   public static JPanel createPanel() {
     final JPanel taskPanel = new JPanel(new BorderLayout());
     final BaseJTable table = SwingWorkerTableModel.createTable();
@@ -48,8 +46,10 @@ public class SwingWorkerTableModel extends AbstractTableModel {
     return table;
   }
 
+  private static final long serialVersionUID = 1L;
+
   private final List<String> columnTitles = Arrays.asList("Description",
-    "Status");
+      "Status");
 
   private final InvokeMethodListener listener;
 

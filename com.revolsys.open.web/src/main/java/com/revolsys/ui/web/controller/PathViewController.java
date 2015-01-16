@@ -36,7 +36,7 @@ public class PathViewController implements Controller {
 
   public static boolean include(final HttpServletRequest request,
     final HttpServletResponse response, final Object object)
-    throws IOException, ServletException {
+        throws IOException, ServletException {
     if (object == null) {
       return false;
     } else {

@@ -113,7 +113,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
   public List<Record> getList() {
     if (this.results == null) {
       throw new IllegalStateException(
-        "The page number must be set using setPageNumber");
+          "The page number must be set using setPageNumber");
     }
     return this.results;
   }

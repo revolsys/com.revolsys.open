@@ -48,8 +48,6 @@ import com.revolsys.jts.util.Assert;
  * @version 1.7
  */
 public class LineMergerTest extends TestCase {
-  private static WKTReader reader = new WKTReader();
-
   public static void compare(final Collection expectedGeometries,
     final Collection actualGeometries, final boolean compareDirections) {
     assertEquals("Geometry count, " + actualGeometries,
@@ -100,6 +98,8 @@ public class LineMergerTest extends TestCase {
 
     return geometries;
   }
+
+  private static WKTReader reader = new WKTReader();
 
   public LineMergerTest(final String name) {
     super(name);

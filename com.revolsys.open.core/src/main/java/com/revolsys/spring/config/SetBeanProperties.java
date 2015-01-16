@@ -14,7 +14,7 @@ import org.springframework.beans.factory.config.RuntimeBeanNameReference;
 import org.springframework.beans.factory.config.TypedStringValue;
 
 public class SetBeanProperties implements BeanFactoryPostProcessor,
-  InitializingBean {
+InitializingBean {
   private Map<String, String> beanPropertyNames = new LinkedHashMap<String, String>();
 
   private String targetTypeName;
@@ -27,51 +27,51 @@ public class SetBeanProperties implements BeanFactoryPostProcessor,
 
   public void addBeanPropertyName(final String beanName,
     final String propertyName) {
-    beanPropertyNames.put(beanName, propertyName);
+    this.beanPropertyNames.put(beanName, propertyName);
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    assert (value != null & ref != null) : "Cannot have a value and a ref";
-    if (ref != null) {
-      propertyValue = new RuntimeBeanNameReference(ref);
-    } else if (value != null) {
-      if (value instanceof String) {
-        if (targetTypeName == null) {
-          propertyValue = new TypedStringValue((String)value);
+    assert this.value != null & this.ref != null : "Cannot have a value and a ref";
+    if (this.ref != null) {
+      this.propertyValue = new RuntimeBeanNameReference(this.ref);
+    } else if (this.value != null) {
+      if (this.value instanceof String) {
+        if (this.targetTypeName == null) {
+          this.propertyValue = new TypedStringValue((String)this.value);
         } else {
-          propertyValue = new TypedStringValue((String)value, targetTypeName);
+          this.propertyValue = new TypedStringValue((String)this.value, this.targetTypeName);
         }
       } else {
-        propertyValue = value;
+        this.propertyValue = this.value;
       }
     }
   }
 
   public Map<String, String> getBeanPropertyNames() {
-    return beanPropertyNames;
+    return this.beanPropertyNames;
   }
 
   protected Object getPropertyValue() {
-    return propertyValue;
+    return this.propertyValue;
   }
 
   public String getRef() {
-    return ref;
+    return this.ref;
   }
 
   public String getTargetTypeName() {
-    return targetTypeName;
+    return this.targetTypeName;
   }
 
   public Object getValue() {
-    return value;
+    return this.value;
   }
 
   @Override
   public void postProcessBeanFactory(
     final ConfigurableListableBeanFactory beanFactory) throws BeansException {
-    for (final Entry<String, String> beanPropertyName : beanPropertyNames.entrySet()) {
+    for (final Entry<String, String> beanPropertyName : this.beanPropertyNames.entrySet()) {
       String beanName = beanPropertyName.getKey();
       final String[] aliases = beanFactory.getAliases(beanName);
       if (aliases.length > 0) {
@@ -81,7 +81,7 @@ public class SetBeanProperties implements BeanFactoryPostProcessor,
       final BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
       beanDefinition.setLazyInit(false);
       final MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();
-      propertyValues.add(propertyName, propertyValue);
+      propertyValues.add(propertyName, this.propertyValue);
     }
   }
 

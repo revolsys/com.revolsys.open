@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ComboBoxEditor;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
@@ -18,7 +19,7 @@ public class SelectMapScaleEditor implements ComboBoxEditor {
   public SelectMapScaleEditor(final ComboBoxEditor editor,
     final ObjectToStringConverter stringConverter) {
     this.wrapped = editor;
-    ((JTextField)editor.getEditorComponent()).setHorizontalAlignment(JTextField.RIGHT);
+    ((JTextField)editor.getEditorComponent()).setHorizontalAlignment(SwingConstants.RIGHT);
     this.stringConverter = stringConverter;
   }
 

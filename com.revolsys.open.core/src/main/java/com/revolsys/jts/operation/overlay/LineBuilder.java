@@ -33,7 +33,6 @@
 package com.revolsys.jts.operation.overlay;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.PointLocator;
@@ -79,13 +78,13 @@ public class LineBuilder {
     collectLines(opCode);
     // labelIsolatedLines(lineEdgesList);
     buildLines(opCode);
-    return resultLineList;
+    return this.resultLineList;
   }
 
   private void buildLines(final int opCode) {
-    for (final Edge e : lineEdgesList) {
-      final LineString line = geometryFactory.lineString(e.getPoints());
-      resultLineList.add(line);
+    for (final Edge e : this.lineEdgesList) {
+      final LineString line = this.geometryFactory.lineString(e.getPoints());
+      this.resultLineList.add(line);
       e.setInResult(true);
     }
   }
@@ -114,7 +113,7 @@ public class LineBuilder {
     }
     if (de.getEdge().isInResult()) {
       return; // if the edge linework is already included, don't include it
-              // again
+      // again
     }
 
     // sanity check for labelling of result edgerings
@@ -123,7 +122,7 @@ public class LineBuilder {
 
     // include the linework if it's in the result of the operation
     if (OverlayOp.isResultOfOp(label, opCode)
-      && opCode == OverlayOp.INTERSECTION) {
+        && opCode == OverlayOp.INTERSECTION) {
       edges.add(de.getEdge());
       de.setVisitedEdge(true);
     }
@@ -146,7 +145,7 @@ public class LineBuilder {
     // include L edges which are in the result
     if (de.isLineEdge()) {
       if (!de.isVisited() && OverlayOp.isResultOfOp(label, opCode)
-        && !e.isCovered()) {
+          && !e.isCovered()) {
         // Debug.println("de: " + de.getLabel());
         // Debug.println("edge: " + e.getLabel());
 
@@ -157,10 +156,10 @@ public class LineBuilder {
   }
 
   private void collectLines(final int opCode) {
-    for (final Iterator it = op.getGraph().getEdgeEnds().iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
-      collectLineEdge(de, opCode, lineEdgesList);
-      collectBoundaryTouchEdge(de, opCode, lineEdgesList);
+    for (final Object element : this.op.getGraph().getEdgeEnds()) {
+      final DirectedEdge de = (DirectedEdge)element;
+      collectLineEdge(de, opCode, this.lineEdgesList);
+      collectBoundaryTouchEdge(de, opCode, this.lineEdgesList);
     }
   }
 
@@ -173,8 +172,8 @@ public class LineBuilder {
    */
   private void findCoveredLineEdges() {
     // first set covered for all L edges at nodes which have A edges too
-    for (final Iterator nodeit = op.getGraph().getNodes().iterator(); nodeit.hasNext();) {
-      final Node node = (Node)nodeit.next();
+    for (final Object element : this.op.getGraph().getNodes()) {
+      final Node node = (Node)element;
       // node.print(System.out);
       ((DirectedEdgeStar)node.getEdges()).findCoveredLineEdges();
     }
@@ -183,11 +182,11 @@ public class LineBuilder {
      * For all L edges which weren't handled by the above,
      * use a point-in-poly test to determine whether they are covered
      */
-    for (final Iterator it = op.getGraph().getEdgeEnds().iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final Object element : this.op.getGraph().getEdgeEnds()) {
+      final DirectedEdge de = (DirectedEdge)element;
       final Edge e = de.getEdge();
       if (de.isLineEdge() && !e.isCoveredSet()) {
-        final boolean isCovered = op.isCoveredByA(de.getCoordinate());
+        final boolean isCovered = this.op.isCoveredByA(de.getCoordinate());
         e.setCovered(isCovered);
       }
     }
@@ -197,24 +196,9 @@ public class LineBuilder {
    * Label an isolated node with its relationship to the target geometry.
    */
   private void labelIsolatedLine(final Edge e, final int targetIndex) {
-    final Location loc = ptLocator.locate(e.getCoordinate(),
-      op.getArgGeometry(targetIndex));
+    final Location loc = this.ptLocator.locate(e.getCoordinate(),
+      this.op.getArgGeometry(targetIndex));
     e.getLabel().setLocation(targetIndex, loc);
-  }
-
-  private void labelIsolatedLines(final List edgesList) {
-    for (final Iterator it = edgesList.iterator(); it.hasNext();) {
-      final Edge e = (Edge)it.next();
-      final Label label = e.getLabel();
-      // n.print(System.out);
-      if (e.isIsolated()) {
-        if (label.isNull(0)) {
-          labelIsolatedLine(e, 0);
-        } else {
-          labelIsolatedLine(e, 1);
-        }
-      }
-    }
   }
 
 }

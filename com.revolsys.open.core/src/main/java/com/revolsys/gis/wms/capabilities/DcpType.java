@@ -9,7 +9,7 @@ public class DcpType {
 
   @Override
   public String toString() {
-    return type;
+    return this.type;
   }
 
 }

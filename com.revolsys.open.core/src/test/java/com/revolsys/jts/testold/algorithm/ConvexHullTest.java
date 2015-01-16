@@ -120,7 +120,7 @@ public class ConvexHullTest extends TestCase {
   public void test6() throws Exception {
     final WKTReader reader = new WKTReader(GeometryFactory.fixed(0, 1.0));
     final Geometry actualGeometry = reader.read("MULTIPOINT (0 0, 5 1, 10 0)")
-      .convexHull();
+        .convexHull();
     final Geometry expectedGeometry = reader.read("POLYGON ((0 0, 5 1, 10 0, 0 0))");
     assertEquals(expectedGeometry.toString(), actualGeometry.toString());
   }

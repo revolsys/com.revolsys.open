@@ -20,7 +20,6 @@ import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.ui.html.view.XmlTagElement;
 import com.revolsys.ui.model.Menu;
 import com.revolsys.ui.web.config.Action;
-import com.revolsys.ui.web.config.Config;
 import com.revolsys.ui.web.config.PageController;
 import com.revolsys.ui.web.config.Site;
 import com.revolsys.ui.web.config.SiteNode;
@@ -95,14 +94,6 @@ public class DisplayConfigAction implements Action {
         }
       }
     }
-  }
-
-  private void addSites(final Config config, final ElementContainer view) {
-    view.add(new XmlTagElement(HtmlUtil.H2, "Sites"));
-    // for (Iterator sites = config.getSites().iterator(); sites.hasNext();) {
-    // Site site = (Site)sites.next();
-    // addSite(view, site);
-    // }
   }
 
   @Override

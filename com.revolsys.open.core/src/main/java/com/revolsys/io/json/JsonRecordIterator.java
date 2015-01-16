@@ -18,7 +18,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.io.FileUtil;
 
 public class JsonRecordIterator extends AbstractIterator<Record>
-  implements RecordIterator {
+implements RecordIterator {
 
   private RecordDefinition recordDefinition;
 
@@ -46,22 +46,17 @@ public class JsonRecordIterator extends AbstractIterator<Record>
 
   @Override
   protected void doClose() {
-    FileUtil.closeSilent(iterator);
-    iterator = null;
-    recordDefinition = null;
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    return recordDefinition;
+    FileUtil.closeSilent(this.iterator);
+    this.iterator = null;
+    this.recordDefinition = null;
   }
 
   @Override
   protected Record getNext() throws NoSuchElementException {
-    if (iterator.hasNext()) {
-      final Map<String, Object> map = iterator.next();
-      final Record object = new ArrayRecord(recordDefinition);
-      for (final FieldDefinition attribute : recordDefinition.getFields()) {
+    if (this.iterator.hasNext()) {
+      final Map<String, Object> map = this.iterator.next();
+      final Record object = new ArrayRecord(this.recordDefinition);
+      for (final FieldDefinition attribute : this.recordDefinition.getFields()) {
         final String name = attribute.getName();
         final Object value = map.get(name);
         if (value != null) {
@@ -72,7 +67,7 @@ public class JsonRecordIterator extends AbstractIterator<Record>
             object.setValue(name, value);
           } else {
             final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-              .getConverter(dataTypeClass);
+                .getConverter(dataTypeClass);
             if (converter == null) {
               object.setValue(name, value);
             } else {
@@ -86,5 +81,10 @@ public class JsonRecordIterator extends AbstractIterator<Record>
     } else {
       throw new NoSuchElementException();
     }
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 }

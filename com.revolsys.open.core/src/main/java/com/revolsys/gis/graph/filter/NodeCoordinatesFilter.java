@@ -16,11 +16,11 @@ public class NodeCoordinatesFilter<T> implements Filter<Node<T>> {
 
   @Override
   public boolean accept(final Node<T> node) {
-    return filter.accept(node);
+    return this.filter.accept(node);
   }
 
   public Filter<Point> getFilter() {
-    return filter;
+    return this.filter;
   }
 
   public void setFilter(final Filter<Point> filter) {

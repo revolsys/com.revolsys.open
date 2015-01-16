@@ -47,14 +47,6 @@ import junit.framework.Assert;
  * @version 1.7
  */
 public class Parameters {
-  private static List arguments = null;
-
-  private static List requiredKeys = new Vector();
-
-  private static List allowedKeys = new Vector();
-
-  private static Parameters instance = null;
-
   /**
    * Returns the singleton. Be sure to call #setParameters first.
    */
@@ -84,6 +76,14 @@ public class Parameters {
     }
   }
 
+  private static List arguments = null;
+
+  private static List requiredKeys = new Vector();
+
+  private static List allowedKeys = new Vector();
+
+  private static Parameters instance = null;
+
   // //////////////////////////////////////////////////////////////////////////////
   private final Hashtable hashtable = new Hashtable();
 
@@ -111,14 +111,14 @@ public class Parameters {
       if (!allowedKeys.contains(key)) {
         throw new IllegalArgumentException(
           "Unrecognized command-line argument: " + arg.substring(1)
-            + ". Valid arguments are: "
-            + StringUtil.toCommaDelimitedString(allowedKeys));
+          + ". Valid arguments are: "
+          + StringUtil.toCommaDelimitedString(allowedKeys));
       }
-      hashtable.put(key, value);
+      this.hashtable.put(key, value);
     }
     for (final Iterator i = requiredKeys.iterator(); i.hasNext();) {
       final String requiredKey = (String)i.next();
-      if (!hashtable.containsKey(requiredKey)) {
+      if (!this.hashtable.containsKey(requiredKey)) {
         throw new IllegalArgumentException(
           "Required command-line argument is missing: " + requiredKey);
       }
@@ -130,7 +130,7 @@ public class Parameters {
    */
   public boolean contains(final String key) {
     Assert.assertTrue(allowedKeys.contains(key.toLowerCase()));
-    return hashtable.containsKey(key.toLowerCase());
+    return this.hashtable.containsKey(key.toLowerCase());
   }
 
   /**
@@ -138,6 +138,6 @@ public class Parameters {
    */
   public String get(final String key) {
     Assert.assertTrue(allowedKeys.contains(key.toLowerCase()));
-    return (String)hashtable.get(key.toLowerCase());
+    return (String)this.hashtable.get(key.toLowerCase());
   }
 }

@@ -19,7 +19,7 @@ public class ElementContainer extends Element {
 
   private final List<Element> elements = new ArrayList<Element>();
 
-  private final List<Element> elementsExternal = Collections.unmodifiableList(elements);
+  private final List<Element> elementsExternal = Collections.unmodifiableList(this.elements);
 
   private final Map<String, Field> fields = new HashMap<String, Field>();
 
@@ -29,33 +29,33 @@ public class ElementContainer extends Element {
     this(new RawLayout());
   }
 
-  public ElementContainer(final Element... elements) {
+  public ElementContainer(final Decorator decorator) {
+    setDecorator(decorator);
+  }
+
+  public ElementContainer(final Decorator decorator, final Element... elements) {
+    setDecorator(decorator);
     add(elements);
   }
 
-  public ElementContainer(Decorator decorator) {
-    setDecorator(decorator);
+  public ElementContainer(final Element... elements) {
+    add(elements);
   }
 
   public ElementContainer(final ElementContainerLayout layout) {
     this.layout = layout;
   }
 
-  public ElementContainer(Decorator decorator, Element... elements) {
-    setDecorator(decorator);
-    add(elements);
-  }
-
   public ElementContainer add(final Element element) {
     if (element != null) {
-      elements.add(element);
+      this.elements.add(element);
       element.setContainer(this);
       if (element instanceof Field) {
         final Field field = (Field)element;
-        fields.put(field.getName(), field);
+        this.fields.put(field.getName(), field);
       } else if (element instanceof ElementContainer) {
         final ElementContainer container = (ElementContainer)element;
-        containers.add(container);
+        this.containers.add(container);
       }
     }
     return this;
@@ -76,7 +76,7 @@ public class ElementContainer extends Element {
   }
 
   public void add(final int index, final Element element) {
-    elements.add(index, element);
+    this.elements.add(index, element);
 
   }
 
@@ -85,15 +85,15 @@ public class ElementContainer extends Element {
   }
 
   public List<Element> getElements() {
-    return elementsExternal;
+    return this.elementsExternal;
   }
 
   public Field getField(final String name) {
-    Field field = fields.get(name);
+    Field field = this.fields.get(name);
     if (field != null) {
       return field;
     }
-    for (final ElementContainer container : containers) {
+    for (final ElementContainer container : this.containers) {
       field = container.getField(name);
       if (field != null) {
         return field;
@@ -104,8 +104,8 @@ public class ElementContainer extends Element {
 
   public List<String> getFieldNames() {
     final List<String> allFields = new ArrayList<String>();
-    allFields.addAll(fields.keySet());
-    for (final ElementContainer container : containers) {
+    allFields.addAll(this.fields.keySet());
+    for (final ElementContainer container : this.containers) {
       allFields.addAll(container.getFieldNames());
     }
     return allFields;
@@ -113,8 +113,8 @@ public class ElementContainer extends Element {
 
   public Map<String, Field> getFields() {
     final Map<String, Field> allFields = new HashMap<String, Field>();
-    allFields.putAll(fields);
-    for (final ElementContainer container : containers) {
+    allFields.putAll(this.fields);
+    for (final ElementContainer container : this.containers) {
       allFields.putAll(container.getFields());
     }
     return allFields;
@@ -129,19 +129,19 @@ public class ElementContainer extends Element {
    * @return Returns the layout.
    */
   public ElementContainerLayout getLayout() {
-    return layout;
+    return this.layout;
   }
 
   @Override
   public void initialize(final HttpServletRequest request) {
-    for (final Element element : elements) {
+    for (final Element element : this.elements) {
       element.initialize(request);
     }
   }
 
   @Override
   public void serializeElement(final XmlWriter out) {
-    layout.serialize(out, this);
+    this.layout.serialize(out, this);
   }
 
   /**
@@ -153,7 +153,7 @@ public class ElementContainer extends Element {
 
   public boolean validate() {
     boolean valid = true;
-    for (final ElementContainer container : containers) {
+    for (final ElementContainer container : this.containers) {
       valid &= container.validate();
     }
     return valid;

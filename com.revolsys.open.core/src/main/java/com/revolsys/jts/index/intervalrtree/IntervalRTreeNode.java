@@ -49,11 +49,11 @@ public abstract class IntervalRTreeNode<V> {
   }
 
   public double getMax() {
-    return max;
+    return this.max;
   }
 
   public double getMin() {
-    return min;
+    return this.min;
   }
 
   protected boolean intersects(final double queryMin, final double queryMax) {

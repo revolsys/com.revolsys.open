@@ -28,12 +28,12 @@ public class IterableProcess<T> extends AbstractOutProcess<T> {
    * @return the iterable
    */
   public Iterable<T> getIterable() {
-    return iterable;
+    return this.iterable;
   }
 
   @Override
   protected void run(final Channel<T> out) {
-    for (final T object : iterable) {
+    for (final T object : this.iterable) {
       write(out, object);
     }
   }
@@ -47,7 +47,7 @@ public class IterableProcess<T> extends AbstractOutProcess<T> {
 
   @Override
   public String toString() {
-    return iterable.toString();
+    return this.iterable.toString();
   }
 
   protected void write(final Channel<T> out, final T object) {

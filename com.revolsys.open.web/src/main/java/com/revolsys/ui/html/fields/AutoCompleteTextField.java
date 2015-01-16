@@ -18,11 +18,11 @@ public class AutoCompleteTextField extends TextField {
   }
 
   public String getDataUrl() {
-    return dataUrl;
+    return this.dataUrl;
   }
 
   public int getMaxResults() {
-    return maxResults;
+    return this.maxResults;
   }
 
   @Override
@@ -40,12 +40,12 @@ public class AutoCompleteTextField extends TextField {
     out.text("    source: function(request, response) {\n");
     out.text("      $.ajax({\n");
     out.text("        url: '");
-    out.text(dataUrl);
+    out.text(this.dataUrl);
     out.text("',");
     out.text("        dataType: 'json',");
     out.text("        data: {");
     out.text("          maxRows: ");
-    out.text(maxResults);
+    out.text(this.maxResults);
     out.text(",\n");
     out.text("          term: request.term\n");
     out.text("        },\n");

@@ -20,6 +20,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.JXPanel;
@@ -121,8 +122,8 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
     panel.setScrollableWidthHint(ScrollableSizeHint.FIT);
     panel.setScrollableHeightHint(ScrollableSizeHint.PREFERRED_STRETCH);
     panel.setOpaque(false);
-    add(new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-      JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+    add(new JScrollPane(panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+      ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
     this.mergedObjectsPanel = new JPanel(new VerticalLayout());
     this.mergedObjectsPanel.setOpaque(false);

@@ -39,11 +39,11 @@ public class EdgeQuadTree<T> extends AbstractIdObjectQuadTree<Edge<T>> {
 
   @Override
   public Edge<T> getObject(final Integer id) {
-    return graph.getEdge(id);
+    return this.graph.getEdge(id);
   }
 
   @Override
   public List<Edge<T>> getObjects(final List<Integer> ids) {
-    return graph.getEdges(ids);
+    return this.graph.getEdges(ids);
   }
 }

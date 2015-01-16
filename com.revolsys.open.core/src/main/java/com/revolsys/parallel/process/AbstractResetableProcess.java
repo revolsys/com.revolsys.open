@@ -35,24 +35,24 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
   protected abstract boolean execute();
 
   protected void finishExecution(final UUID id) {
-    synchronized (executions) {
-      executions.remove(id);
-      executions.notifyAll();
+    synchronized (this.executions) {
+      this.executions.remove(id);
+      this.executions.notifyAll();
     }
   }
 
   @ManagedAttribute
   public int getExecutionCount() {
-    return executions.size();
+    return this.executions.size();
   }
 
   @ManagedAttribute
   public String getStatus() {
-    return status;
+    return this.status;
   }
 
   public long getWaitTime() {
-    return waitTime;
+    return this.waitTime;
   }
 
   /**
@@ -62,9 +62,9 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
    */
   @ManagedOperation
   public void hardReset() {
-    waitForExecutionToFinish = false;
-    pause = false;
-    reset = true;
+    this.waitForExecutionToFinish = false;
+    this.pause = false;
+    this.reset = true;
   }
 
   /**
@@ -73,7 +73,7 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
    */
   @ManagedOperation
   public void pause() {
-    pause = true;
+    this.pause = true;
   }
 
   protected void postRun() {
@@ -88,27 +88,27 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
   @Override
   public void run() {
     preRun();
-    running = true;
+    this.running = true;
     try {
-      while (running) {
-        status = "resetting";
-        executions.clear();
+      while (this.running) {
+        this.status = "resetting";
+        this.executions.clear();
         reset();
-        reset = false;
-        while (running && !reset) {
-          status = "starting execution";
-          if (pause || !execute()) {
-            if (pause) {
-              status = "paused";
+        this.reset = false;
+        while (this.running && !this.reset) {
+          this.status = "starting execution";
+          if (this.pause || !execute()) {
+            if (this.pause) {
+              this.status = "paused";
             } else {
-              status = "waiting";
+              this.status = "waiting";
             }
-            ThreadUtil.pause(this, waitTime);
+            ThreadUtil.pause(this, this.waitTime);
           }
         }
 
-        synchronized (executions) {
-          while (waitForExecutionToFinish && !executions.isEmpty()) {
+        synchronized (this.executions) {
+          while (this.waitForExecutionToFinish && !this.executions.isEmpty()) {
             waitOnExecutions();
           }
         }
@@ -118,8 +118,8 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
       try {
         postRun();
       } finally {
-        running = false;
-        status = "terminated";
+        this.running = false;
+        this.status = "terminated";
       }
     }
   }
@@ -139,23 +139,23 @@ public abstract class AbstractResetableProcess extends AbstractProcess {
    */
   @ManagedOperation
   public void softReset() {
-    waitForExecutionToFinish = true;
-    pause = false;
-    reset = true;
+    this.waitForExecutionToFinish = true;
+    this.pause = false;
+    this.reset = true;
   }
 
   protected UUID startExecution() {
-    synchronized (executions) {
+    synchronized (this.executions) {
       final UUID id = UUID.randomUUID();
-      executions.add(id);
-      executions.notifyAll();
+      this.executions.add(id);
+      this.executions.notifyAll();
       return id;
     }
   }
 
   protected void waitOnExecutions() {
-    status = "waiting on executions";
-    ThreadUtil.pause(executions, waitTime);
+    this.status = "waiting on executions";
+    ThreadUtil.pause(this.executions, this.waitTime);
   }
 
 }

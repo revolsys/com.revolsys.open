@@ -21,19 +21,19 @@ public class WorkspaceDefinition implements Cloneable {
   }
 
   public void addDomain(final Domain domain) {
-    domains.add(domain);
+    this.domains.add(domain);
   }
 
   @Override
   public WorkspaceDefinition clone() {
     try {
       final WorkspaceDefinition clone = (WorkspaceDefinition)super.clone();
-      clone.domains = new ArrayList<Domain>(domains.size());
-      for (final Domain domain : domains) {
+      clone.domains = new ArrayList<Domain>(this.domains.size());
+      for (final Domain domain : this.domains) {
         clone.domains.add(domain.clone());
       }
       clone.datasetDefinitions = new ArrayList<DataElement>();
-      for (final DataElement dataElement : datasetDefinitions) {
+      for (final DataElement dataElement : this.datasetDefinitions) {
         clone.datasetDefinitions.add(dataElement.clone());
       }
       return clone;
@@ -43,23 +43,23 @@ public class WorkspaceDefinition implements Cloneable {
   }
 
   public List<DataElement> getDatasetDefinitions() {
-    return datasetDefinitions;
+    return this.datasetDefinitions;
   }
 
   public List<Domain> getDomains() {
-    return domains;
+    return this.domains;
   }
 
   public String getMetadata() {
-    return metadata;
+    return this.metadata;
   }
 
   public String getVersion() {
-    return version;
+    return this.version;
   }
 
   public WorkspaceType getWorkspaceType() {
-    return workspaceType;
+    return this.workspaceType;
   }
 
   public void setDatasetDefinitions(final List<DataElement> datasetDefinitions) {

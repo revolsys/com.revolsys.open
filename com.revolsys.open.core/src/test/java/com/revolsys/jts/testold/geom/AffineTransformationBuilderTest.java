@@ -10,7 +10,7 @@ import com.revolsys.jts.geom.util.AffineTransformationFactory;
 
 /**
  * Tests {@link AffineTransformationBuilder}.
- * 
+ *
  * @author Martin Davis
  */
 public class AffineTransformationBuilderTest extends TestCase {

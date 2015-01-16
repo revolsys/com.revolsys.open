@@ -33,9 +33,6 @@
 
 package com.revolsys.jts.triangulate.quadedge;
 
-import java.util.Arrays;
-
-import com.revolsys.io.wkt.EWktWriter;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.math.DD;
@@ -49,62 +46,25 @@ import com.revolsys.jts.math.DD;
  * Also, some more robust formulations of
  * some algorithms are provided, which utilize
  * normalization to the origin.
- * 
+ *
  * @author Martin Davis
  *
  */
 public class TrianglePredicate {
   /**
-   * Checks if the computed value for isInCircle is correct, using
-   * double-double precision arithmetic.
-   * 
-   * @param a a vertex of the triangle
-   * @param b a vertex of the triangle
-   * @param c a vertex of the triangle
-   * @param p the point to test
-   */
-  private static void checkRobustInCircle(final Point a,
-    final Point b, final Point c, final Point p) {
-    final boolean nonRobustInCircle = isInCircleNonRobust(a, b, c, p);
-    final boolean isInCircleDD = TrianglePredicate.isInCircleDDSlow(a, b, c, p);
-    final boolean isInCircleCC = TrianglePredicate.isInCircleCC(a, b, c, p);
-
-    final Point circumCentre = Triangle.circumcentre(a, b, c);
-    System.out.println("p radius diff a = "
-      + Math.abs(p.distance(circumCentre) - a.distance(circumCentre))
-      / a.distance(circumCentre));
-
-    if (nonRobustInCircle != isInCircleDD || nonRobustInCircle != isInCircleCC) {
-      System.out.println("inCircle robustness failure (double result = "
-        + nonRobustInCircle + ", DD result = " + isInCircleDD
-        + ", CC result = " + isInCircleCC + ")");
-      System.out.println(Arrays.asList(a, b, c, p));
-      System.out.println("Circumcentre = " + EWktWriter.point(circumCentre)
-        + " radius = " + a.distance(circumCentre));
-      System.out.println("p radius diff a = "
-        + Math.abs(p.distance(circumCentre) / a.distance(circumCentre) - 1));
-      System.out.println("p radius diff b = "
-        + Math.abs(p.distance(circumCentre) / b.distance(circumCentre) - 1));
-      System.out.println("p radius diff c = "
-        + Math.abs(p.distance(circumCentre) / c.distance(circumCentre) - 1));
-      System.out.println();
-    }
-  }
-
-  /**
-   * Computes the inCircle test using distance from the circumcentre. 
+   * Computes the inCircle test using distance from the circumcentre.
    * Uses standard double-precision arithmetic.
    * <p>
    * In general this doesn't
    * appear to be any more robust than the standard calculation. However, there
    * is at least one case where the test point is far enough from the
-   * circumcircle that this test gives the correct answer. 
+   * circumcircle that this test gives the correct answer.
    * <pre>
    * LINESTRING
    * (1507029.9878 518325.7547, 1507022.1120341457 518332.8225183258,
    * 1507029.9833 518325.7458, 1507029.9896965567 518325.744909031)
    * </pre>
-   * 
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -121,13 +81,13 @@ public class TrianglePredicate {
 
   public static boolean isInCircleDDFast(final Point a,
     final Point b, final Point c, final Point p) {
-    final DD aTerm = (DD.sqr(a.getX()).selfAdd(DD.sqr(a.getY()))).selfMultiply(triAreaDDFast(
+    final DD aTerm = DD.sqr(a.getX()).selfAdd(DD.sqr(a.getY())).selfMultiply(triAreaDDFast(
       b, c, p));
-    final DD bTerm = (DD.sqr(b.getX()).selfAdd(DD.sqr(b.getY()))).selfMultiply(triAreaDDFast(
+    final DD bTerm = DD.sqr(b.getX()).selfAdd(DD.sqr(b.getY())).selfMultiply(triAreaDDFast(
       a, c, p));
-    final DD cTerm = (DD.sqr(c.getX()).selfAdd(DD.sqr(c.getY()))).selfMultiply(triAreaDDFast(
+    final DD cTerm = DD.sqr(c.getX()).selfAdd(DD.sqr(c.getY())).selfMultiply(triAreaDDFast(
       a, b, p));
-    final DD pTerm = (DD.sqr(p.getX()).selfAdd(DD.sqr(p.getY()))).selfMultiply(triAreaDDFast(
+    final DD pTerm = DD.sqr(p.getX()).selfAdd(DD.sqr(p.getY())).selfMultiply(triAreaDDFast(
       a, b, c));
 
     final DD sum = aTerm.selfSubtract(bTerm).selfAdd(cTerm).selfSubtract(pTerm);
@@ -153,8 +113,8 @@ public class TrianglePredicate {
     final DD clift = cdx.multiply(cdx).selfAdd(cdy.multiply(cdy));
 
     final DD sum = alift.selfMultiply(bcdet)
-      .selfAdd(blift.selfMultiply(cadet))
-      .selfAdd(clift.selfMultiply(abdet));
+        .selfAdd(blift.selfMultiply(cadet))
+        .selfAdd(clift.selfMultiply(abdet));
 
     final boolean isInCircle = sum.doubleValue() > 0;
 
@@ -162,10 +122,10 @@ public class TrianglePredicate {
   }
 
   /**
-   * Tests if a point is inside the circle defined by 
-   * the triangle with vertices a, b, c (oriented counter-clockwise). 
+   * Tests if a point is inside the circle defined by
+   * the triangle with vertices a, b, c (oriented counter-clockwise).
    * The computation uses {@link DD} arithmetic for robustness.
-   * 
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -183,13 +143,13 @@ public class TrianglePredicate {
     final DD cx = DD.valueOf(c.getX());
     final DD cy = DD.valueOf(c.getY());
 
-    final DD aTerm = (ax.multiply(ax).add(ay.multiply(ay))).multiply(triAreaDDSlow(
+    final DD aTerm = ax.multiply(ax).add(ay.multiply(ay)).multiply(triAreaDDSlow(
       bx, by, cx, cy, px, py));
-    final DD bTerm = (bx.multiply(bx).add(by.multiply(by))).multiply(triAreaDDSlow(
+    final DD bTerm = bx.multiply(bx).add(by.multiply(by)).multiply(triAreaDDSlow(
       ax, ay, cx, cy, px, py));
-    final DD cTerm = (cx.multiply(cx).add(cy.multiply(cy))).multiply(triAreaDDSlow(
+    final DD cTerm = cx.multiply(cx).add(cy.multiply(cy)).multiply(triAreaDDSlow(
       ax, ay, bx, by, px, py));
-    final DD pTerm = (px.multiply(px).add(py.multiply(py))).multiply(triAreaDDSlow(
+    final DD pTerm = px.multiply(px).add(py.multiply(py)).multiply(triAreaDDSlow(
       ax, ay, bx, by, cx, cy));
 
     final DD sum = aTerm.subtract(bTerm).add(cTerm).subtract(pTerm);
@@ -199,11 +159,11 @@ public class TrianglePredicate {
   }
 
   /**
-   * Tests if a point is inside the circle defined by 
-   * the triangle with vertices a, b, c (oriented counter-clockwise). 
+   * Tests if a point is inside the circle defined by
+   * the triangle with vertices a, b, c (oriented counter-clockwise).
    * This test uses simple
    * double-precision arithmetic, and thus may not be robust.
-   * 
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -213,22 +173,22 @@ public class TrianglePredicate {
   public static boolean isInCircleNonRobust(final Point a,
     final Point b, final Point c, final Point p) {
     final boolean isInCircle = (a.getX() * a.getX() + a.getY() * a.getY()) * triArea(b, c, p)
-      - (b.getX() * b.getX() + b.getY() * b.getY()) * triArea(a, c, p) + (c.getX() * c.getX() + c.getY() * c.getY())
-      * triArea(a, b, p) - (p.getX() * p.getX() + p.getY() * p.getY()) * triArea(a, b, c) > 0;
-    return isInCircle;
+        - (b.getX() * b.getX() + b.getY() * b.getY()) * triArea(a, c, p) + (c.getX() * c.getX() + c.getY() * c.getY())
+        * triArea(a, b, p) - (p.getX() * p.getX() + p.getY() * p.getY()) * triArea(a, b, c) > 0;
+        return isInCircle;
   }
 
   /**
-   * Tests if a point is inside the circle defined by 
-   * the triangle with vertices a, b, c (oriented counter-clockwise). 
+   * Tests if a point is inside the circle defined by
+   * the triangle with vertices a, b, c (oriented counter-clockwise).
    * This test uses simple
    * double-precision arithmetic, and thus is not 100% robust.
    * However, by using normalization to the origin
    * it provides improved robustness and increased performance.
    * <p>
    * Based on code by J.R.Shewchuk.
-   * 
-   * 
+   *
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -256,10 +216,10 @@ public class TrianglePredicate {
   }
 
   /**
-   * Tests if a point is inside the circle defined by 
-   * the triangle with vertices a, b, c (oriented counter-clockwise). 
+   * Tests if a point is inside the circle defined by
+   * the triangle with vertices a, b, c (oriented counter-clockwise).
    * This method uses more robust computation.
-   * 
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -276,7 +236,7 @@ public class TrianglePredicate {
   /**
    * Computes twice the area of the oriented triangle (a, b, c), i.e., the area is positive if the
    * triangle is oriented counterclockwise.
-   * 
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -290,12 +250,12 @@ public class TrianglePredicate {
     final Point c) {
 
     final DD t1 = DD.valueOf(b.getX())
-      .selfSubtract(a.getX())
-      .selfMultiply(DD.valueOf(c.getY()).selfSubtract(a.getY()));
+        .selfSubtract(a.getX())
+        .selfMultiply(DD.valueOf(c.getY()).selfSubtract(a.getY()));
 
     final DD t2 = DD.valueOf(b.getY())
-      .selfSubtract(a.getY())
-      .selfMultiply(DD.valueOf(c.getX()).selfSubtract(a.getX()));
+        .selfSubtract(a.getY())
+        .selfMultiply(DD.valueOf(c.getX()).selfSubtract(a.getX()));
 
     return t1.selfSubtract(t2);
   }
@@ -304,7 +264,7 @@ public class TrianglePredicate {
    * Computes twice the area of the oriented triangle (a, b, c), i.e., the area
    * is positive if the triangle is oriented counterclockwise.
    * The computation uses {@link DD} arithmetic for robustness.
-   * 
+   *
    * @param ax the x ordinate of a vertex of the triangle
    * @param ay the y ordinate of a vertex of the triangle
    * @param bx the x ordinate of a vertex of the triangle
@@ -314,8 +274,8 @@ public class TrianglePredicate {
    */
   public static DD triAreaDDSlow(final DD ax, final DD ay, final DD bx,
     final DD by, final DD cx, final DD cy) {
-    return (bx.subtract(ax).multiply(cy.subtract(ay)).subtract(by.subtract(ay)
-      .multiply(cx.subtract(ax))));
+    return bx.subtract(ax).multiply(cy.subtract(ay)).subtract(by.subtract(ay)
+      .multiply(cx.subtract(ax)));
   }
 
 }

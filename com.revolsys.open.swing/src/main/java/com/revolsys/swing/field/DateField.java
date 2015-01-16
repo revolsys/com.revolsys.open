@@ -16,7 +16,7 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
 public class DateField extends JXDatePicker implements Field,
-  PropertyChangeListener {
+PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   private String fieldName;

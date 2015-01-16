@@ -5,14 +5,14 @@ package com.revolsys.jts.testold.perf;
  * to be run by the {@link PerformanceTestRunner}.
  * <p>
  * In a subclass of this class,
- * all public methods which start with <code>run</code> are 
+ * all public methods which start with <code>run</code> are
  * executed as performance tests.
  * <p>
  * Multiple test runs with different run sizes may be made.
- * Within each run, each <code>run</code> method is executed 
+ * Within each run, each <code>run</code> method is executed
  * the specified number of iterations.
  * The time to run the method is printed for each one.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -31,7 +31,7 @@ public abstract class PerformanceTestCase {
 
   /**
    * Ends a test run.
-   * 
+   *
    * @throws Exception
    */
   public void endRun() throws Exception {
@@ -52,7 +52,7 @@ public abstract class PerformanceTestCase {
 
   /**
    * Sets the number of iterations to execute the test methods in each test run.
-   * 
+   *
    * @param runIter the number of iterations to execute.
    */
   protected void setRunIterations(final int runIter) {
@@ -61,7 +61,7 @@ public abstract class PerformanceTestCase {
 
   /**
    * Sets the size(s) for the runs of the test.
-   * 
+   *
    * @param runSize a list of the sizes for the test runs
    */
   protected void setRunSize(final int[] runSize) {
@@ -70,7 +70,7 @@ public abstract class PerformanceTestCase {
 
   /**
    * Sets up any fixtures needed for the test runs.
-   * 
+   *
    * @throws Exception
    */
   public void setUp() throws Exception {
@@ -79,7 +79,7 @@ public abstract class PerformanceTestCase {
 
   /**
    * Starts a test run with the given size.
-   * 
+   *
    * @param size
    * @throws Exception
    */
@@ -89,7 +89,7 @@ public abstract class PerformanceTestCase {
 
   /**
    * Tear down any fixtures made for the testing.
-   * 
+   *
    * @throws Exception
    */
   public void tearDown() throws Exception {

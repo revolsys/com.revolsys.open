@@ -53,7 +53,7 @@ public class NonRobustLineIntersector extends LineIntersector {
     if (a == 0 || b == 0) {
       return false;
     }
-    return (a < 0 && b < 0) || (a > 0 && b > 0);
+    return a < 0 && b < 0 || a > 0 && b > 0;
   }
 
   public NonRobustLineIntersector() {
@@ -99,22 +99,22 @@ public class NonRobustLineIntersector extends LineIntersector {
 
     // check for single point intersection
     if (q4 == p1) {
-      pa = p1.clonePoint();
+      this.pa = p1.clonePoint();
       return POINT_INTERSECTION;
     }
     if (q3 == p2) {
-      pa = p2.clonePoint();
+      this.pa = p2.clonePoint();
       return POINT_INTERSECTION;
     }
 
     // intersection MUST be a segment - compute endpoints
-    pa = p1.clonePoint();
+    this.pa = p1.clonePoint();
     if (t3 > r1) {
-      pa = q3.clonePoint();
+      this.pa = q3.clonePoint();
     }
-    pb = p2.clonePoint();
+    this.pb = p2.clonePoint();
     if (t4 < r2) {
-      pb = q4.clonePoint();
+      this.pb = q4.clonePoint();
     }
     return COLLINEAR_INTERSECTION;
   }
@@ -146,7 +146,7 @@ public class NonRobustLineIntersector extends LineIntersector {
      */
     // double denom, offset, num; /* Intermediate values */
 
-    isProper = false;
+    this.isProper = false;
 
     /*
      * Compute a1, b1, c1, where line joining points 1 and 2 is
@@ -206,16 +206,16 @@ public class NonRobustLineIntersector extends LineIntersector {
      * " - int: " + valInt + ", floor: " + pa.x);
      */
     final double numY = a2 * c1 - a1 * c2;
-    pa = new PointDouble(numX / denom, numY / denom);
+    this.pa = new PointDouble(numX / denom, numY / denom);
 
     // check if this is a proper intersection BEFORE truncating values,
     // to avoid spurious equality comparisons with endpoints
-    isProper = true;
-    if (pa.equals(p1) || pa.equals(p2) || pa.equals(p3) || pa.equals(p4)) {
-      isProper = false;
+    this.isProper = true;
+    if (this.pa.equals(p1) || this.pa.equals(p2) || this.pa.equals(p3) || this.pa.equals(p4)) {
+      this.isProper = false;
     }
 
-    pa = CoordinatesUtil.getPrecise(getScale(), pa);
+    this.pa = CoordinatesUtil.getPrecise(getScale(), this.pa);
     return POINT_INTERSECTION;
   }
 
@@ -232,7 +232,7 @@ public class NonRobustLineIntersector extends LineIntersector {
     /*
      * 'Sign' values
      */
-    isProper = false;
+    this.isProper = false;
 
     /*
      * Compute a1, b1, c1, where line joining points 1 and 2 is
@@ -249,7 +249,7 @@ public class NonRobustLineIntersector extends LineIntersector {
 
     // if r != 0 the point does not lie on the line
     if (r != 0) {
-      result = NO_INTERSECTION;
+      this.result = NO_INTERSECTION;
       return;
     }
 
@@ -257,15 +257,15 @@ public class NonRobustLineIntersector extends LineIntersector {
 
     final double dist = rParameter(p1, p2, p);
     if (dist < 0.0 || dist > 1.0) {
-      result = NO_INTERSECTION;
+      this.result = NO_INTERSECTION;
       return;
     }
 
-    isProper = true;
+    this.isProper = true;
     if (p.equals(p1) || p.equals(p2)) {
-      isProper = false;
+      this.isProper = false;
     }
-    result = POINT_INTERSECTION;
+    this.result = POINT_INTERSECTION;
   }
 
   /**

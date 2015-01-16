@@ -9,7 +9,7 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class RecordLayerHighlightedListSelectionModel extends
-  DefaultListSelectionModel {
+DefaultListSelectionModel {
   private static final long serialVersionUID = 1L;
 
   private final RecordLayerTableModel model;
@@ -29,7 +29,7 @@ public class RecordLayerHighlightedListSelectionModel extends
   }
 
   public int convertRowIndexToModel(final int i) {
-    return model.getTable().convertRowIndexToModel(i);
+    return this.model.getTable().convertRowIndexToModel(i);
   }
 
   protected List<LayerRecord> getObjects(final int index0, final int index1) {

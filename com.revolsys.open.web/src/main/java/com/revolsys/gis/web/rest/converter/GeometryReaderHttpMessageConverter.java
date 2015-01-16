@@ -21,7 +21,7 @@ import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 
 public class GeometryReaderHttpMessageConverter extends
-  AbstractHttpMessageConverter<GeometryReader> {
+AbstractHttpMessageConverter<GeometryReader> {
 
   private GeometryFactory geometryFactory;
 
@@ -33,7 +33,7 @@ public class GeometryReaderHttpMessageConverter extends
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   @Override
@@ -49,17 +49,17 @@ public class GeometryReaderHttpMessageConverter extends
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"
-        + mediaType.getSubtype();
-      final GeometryReaderFactory readerFactory = ioFactoryRegistry.getFactoryByMediaType(
+          + mediaType.getSubtype();
+      final GeometryReaderFactory readerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
         GeometryReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format"
-          + mediaType);
+            + mediaType);
       } else {
         final InputStreamResource resource = new InputStreamResource(
           "geometryInput", body);
         final GeometryReader reader = readerFactory.createGeometryReader(resource);
-        GeometryFactory factory = geometryFactory;
+        GeometryFactory factory = this.geometryFactory;
         final ServletWebRequest requestAttributes = (ServletWebRequest)RequestContextHolder.getRequestAttributes();
         final String srid = requestAttributes.getParameter("srid");
         if (srid != null && srid.trim().length() > 0) {

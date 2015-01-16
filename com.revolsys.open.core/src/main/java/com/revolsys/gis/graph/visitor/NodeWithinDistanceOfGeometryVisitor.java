@@ -24,7 +24,7 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> 
       env = env.expand(maxDistance);
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
       final NodeWithinDistanceOfGeometryVisitor<T> visitor = new NodeWithinDistanceOfGeometryVisitor<T>(
-        geometry, maxDistance, results);
+          geometry, maxDistance, results);
       index.visit(env, visitor);
       return results.getList();
     }
@@ -49,10 +49,10 @@ public class NodeWithinDistanceOfGeometryVisitor<T> implements Visitor<Node<T>> 
   @Override
   public boolean visit(final Node<T> node) {
     final Point coordinates = node;
-    final Point point = geometryFactory.point(coordinates);
-    final double distance = geometry.distance(point);
-    if (distance <= maxDistance) {
-      matchVisitor.visit(node);
+    final Point point = this.geometryFactory.point(coordinates);
+    final double distance = this.geometry.distance(point);
+    if (distance <= this.maxDistance) {
+      this.matchVisitor.visit(node);
     }
     return true;
   }

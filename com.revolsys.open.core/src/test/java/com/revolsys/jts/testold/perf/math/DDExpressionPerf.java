@@ -6,9 +6,9 @@ import com.revolsys.jts.math.DD;
 import com.revolsys.jts.util.Stopwatch;
 
 /**
- * Times evaluating floating-point expressions using 
+ * Times evaluating floating-point expressions using
  * various extended precision APIs.
- * 
+ *
  * @author Martin Davis
  *
  */

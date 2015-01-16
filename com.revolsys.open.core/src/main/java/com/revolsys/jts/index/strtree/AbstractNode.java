@@ -43,7 +43,7 @@ import com.revolsys.jts.util.Assert;
  * <ul>
  * <li>empty
  * <li>an <i>interior node</i> containing child {@link AbstractNode}s
- * <li>a <i>leaf node</i> containing data items ({@link ItemBoundable}s). 
+ * <li>a <i>leaf node</i> containing data items ({@link ItemBoundable}s).
  * </ul>
  * A node stores the bounds of its children, and its level within the index tree.
  *
@@ -51,11 +51,11 @@ import com.revolsys.jts.util.Assert;
  */
 public abstract class AbstractNode implements Boundable, Serializable {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 6493722185909573708L;
-  
-  private ArrayList childBoundables = new ArrayList();
+
+  private final ArrayList childBoundables = new ArrayList();
   private Object bounds = null;
   private int level;
 
@@ -70,16 +70,17 @@ public abstract class AbstractNode implements Boundable, Serializable {
    * @param level 0 if this node is a leaf, 1 if a parent of a leaf, and so on; the
    * root node will have the highest level
    */
-  public AbstractNode(int level) {
+  public AbstractNode(final int level) {
     this.level = level;
   }
 
   /**
-   * Returns either child {@link AbstractNode}s, or if this is a leaf node, real data (wrapped
-   * in {@link ItemBoundable}s).
+   * Adds either an AbstractNode, or if this is a leaf node, a data object
+   * (wrapped in an ItemBoundable)
    */
-  public List getChildBoundables() {
-    return childBoundables;
+  public void addChildBoundable(final Boundable childBoundable) {
+    Assert.isTrue(this.bounds == null);
+    this.childBoundables.add(childBoundable);
   }
 
   /**
@@ -96,14 +97,23 @@ public abstract class AbstractNode implements Boundable, Serializable {
 
   /**
    * Gets the bounds of this node
-   * 
+   *
    * @return the object representing bounds in this index
    */
+  @Override
   public Object getBounds() {
-    if (bounds == null) {
-      bounds = computeBounds();
+    if (this.bounds == null) {
+      this.bounds = computeBounds();
     }
-    return bounds;
+    return this.bounds;
+  }
+
+  /**
+   * Returns either child {@link AbstractNode}s, or if this is a leaf node, real data (wrapped
+   * in {@link ItemBoundable}s).
+   */
+  public List getChildBoundables() {
+    return this.childBoundables;
   }
 
   /**
@@ -111,35 +121,26 @@ public abstract class AbstractNode implements Boundable, Serializable {
    * root node will have the highest level
    */
   public int getLevel() {
-    return level;
+    return this.level;
   }
 
   /**
-   * Gets the count of the {@link Boundable}s at this node.
-   * 
-   * @return the count of boundables at this node
-   */
-  public int size()
-  {
-    return childBoundables.size();
-  }
-  
-  /**
    * Tests whether there are any {@link Boundable}s at this node.
-   * 
+   *
    * @return true if there are boundables at this node
    */
   public boolean isEmpty()
   {
-    return childBoundables.isEmpty();
+    return this.childBoundables.isEmpty();
   }
-  
+
   /**
-   * Adds either an AbstractNode, or if this is a leaf node, a data object
-   * (wrapped in an ItemBoundable)
+   * Gets the count of the {@link Boundable}s at this node.
+   *
+   * @return the count of boundables at this node
    */
-  public void addChildBoundable(Boundable childBoundable) {
-    Assert.isTrue(bounds == null);
-    childBoundables.add(childBoundable);
+  public int size()
+  {
+    return this.childBoundables.size();
   }
 }

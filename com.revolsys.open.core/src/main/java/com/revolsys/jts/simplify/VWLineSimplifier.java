@@ -7,17 +7,15 @@ import com.revolsys.jts.geom.Triangle;
 import com.revolsys.jts.geom.impl.PointDouble;
 
 /**
- * Simplifies a linestring (sequence of points) using the 
+ * Simplifies a linestring (sequence of points) using the
  * Visvalingam-Whyatt algorithm.
- * The Visvalingam-Whyatt algorithm simplifies geometry 
+ * The Visvalingam-Whyatt algorithm simplifies geometry
  * by removing vertices while trying to minimize the area changed.
- * 
+ *
  * @version 1.7
  */
 class VWLineSimplifier {
   static class VWVertex {
-    public static double MAX_AREA = Double.MAX_VALUE;
-
     public static VWLineSimplifier.VWVertex buildLine(final LineString pts) {
       VWLineSimplifier.VWVertex first = null;
       VWLineSimplifier.VWVertex prev = null;
@@ -36,6 +34,8 @@ class VWLineSimplifier {
       return first;
     }
 
+    public static double MAX_AREA = Double.MAX_VALUE;
+
     private final Point pt;
 
     private VWLineSimplifier.VWVertex prev;
@@ -51,7 +51,7 @@ class VWLineSimplifier {
     }
 
     public double getArea() {
-      return area;
+      return this.area;
     }
 
     public Point[] getCoordinates() {
@@ -65,26 +65,26 @@ class VWLineSimplifier {
     }
 
     public boolean isLive() {
-      return isLive;
+      return this.isLive;
     }
 
     public VWLineSimplifier.VWVertex remove() {
-      final VWLineSimplifier.VWVertex tmpPrev = prev;
-      final VWLineSimplifier.VWVertex tmpNext = next;
+      final VWLineSimplifier.VWVertex tmpPrev = this.prev;
+      final VWLineSimplifier.VWVertex tmpNext = this.next;
       VWLineSimplifier.VWVertex result = null;
-      if (prev != null) {
-        prev.setNext(tmpNext);
-        prev.updateArea();
-        result = prev;
+      if (this.prev != null) {
+        this.prev.setNext(tmpNext);
+        this.prev.updateArea();
+        result = this.prev;
       }
-      if (next != null) {
-        next.setPrev(tmpPrev);
-        next.updateArea();
+      if (this.next != null) {
+        this.next.setPrev(tmpPrev);
+        this.next.updateArea();
         if (result == null) {
-          result = next;
+          result = this.next;
         }
       }
-      isLive = false;
+      this.isLive = false;
       return result;
     }
 
@@ -97,11 +97,11 @@ class VWLineSimplifier {
     }
 
     public void updateArea() {
-      if (prev == null || next == null) {
-        area = MAX_AREA;
+      if (this.prev == null || this.next == null) {
+        this.area = MAX_AREA;
         return;
       }
-      area = Math.abs(Triangle.area(prev.pt, pt, next.pt));
+      this.area = Math.abs(Triangle.area(this.prev.pt, this.pt, this.next.pt));
     }
   }
 
@@ -122,11 +122,11 @@ class VWLineSimplifier {
   }
 
   public Point[] simplify() {
-    final VWLineSimplifier.VWVertex vwLine = VWVertex.buildLine(pts);
-    double minArea = tolerance;
+    final VWLineSimplifier.VWVertex vwLine = VWVertex.buildLine(this.pts);
+    double minArea = this.tolerance;
     do {
       minArea = simplifyVertex(vwLine);
-    } while (minArea < tolerance);
+    } while (minArea < this.tolerance);
     final Point[] simp = vwLine.getCoordinates();
     // ensure computed value is a valid line
     if (simp.length < 2) {
@@ -154,7 +154,7 @@ class VWLineSimplifier {
       }
       curr = curr.next;
     }
-    if (minVertex != null && minArea < tolerance) {
+    if (minVertex != null && minArea < this.tolerance) {
       minVertex.remove();
     }
     if (!vwLine.isLive()) {

@@ -11,18 +11,6 @@ import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.data.types.DataType;
 
 public class JdbcFieldAdder {
-  private DataType dataType;
-
-  public static String GEOMETRY_FACTORY = "geometryFactory";
-
-  public static String NUM_AXIS = "axisCount";
-
-  public static String GEOMETRY_TYPE = "geometryType";
-
-  public static final String COLUMN_PROPERTIES = "columnProperties";
-
-  public static final String TABLE_PROPERTIES = "tableProperties";
-
   public static Map<String, Map<String, Map<String, Object>>> getColumnProperties(
     final RecordStoreSchema schema) {
     synchronized (schema) {
@@ -144,6 +132,18 @@ public class JdbcFieldAdder {
     properties.put(propertyName, value);
   }
 
+  private DataType dataType;
+
+  public static String GEOMETRY_FACTORY = "geometryFactory";
+
+  public static String NUM_AXIS = "axisCount";
+
+  public static String GEOMETRY_TYPE = "geometryType";
+
+  public static final String COLUMN_PROPERTIES = "columnProperties";
+
+  public static final String TABLE_PROPERTIES = "tableProperties";
+
   public JdbcFieldAdder() {
   }
 
@@ -167,31 +167,31 @@ public class JdbcFieldAdder {
         case Types.VARCHAR:
           attribute = new JdbcStringFieldDefinition(dbName, name, sqlType, length,
             required, description, null);
-        break;
+          break;
         case Types.BIGINT:
           attribute = new JdbcLongFieldDefinition(dbName, name, sqlType, length,
             required, description, null);
-        break;
+          break;
         case Types.INTEGER:
           attribute = new JdbcIntegerFieldDefinition(dbName, name, sqlType, length,
             required, description, null);
-        break;
+          break;
         case Types.SMALLINT:
           attribute = new JdbcShortFieldDefinition(dbName, name, sqlType, length,
             required, description, null);
-        break;
+          break;
         case Types.TINYINT:
           attribute = new JdbcByteFieldDefinition(dbName, name, sqlType, length,
             required, description, null);
-        break;
+          break;
         case Types.DOUBLE:
           attribute = new JdbcDoubleFieldDefinition(dbName, name, sqlType, length,
             required, description, null);
-        break;
+          break;
         case Types.REAL:
           attribute = new JdbcFloatFieldDefinition(dbName, name, sqlType, length,
             required, description, null);
-        break;
+          break;
         case Types.DECIMAL:
         case Types.NUMERIC:
         case Types.FLOAT:
@@ -219,27 +219,27 @@ public class JdbcFieldAdder {
                 length, required, description, null);
             }
           }
-        break;
+          break;
         case Types.DATE:
           attribute = new JdbcDateFieldDefinition(dbName, name, sqlType, required,
             description, null);
-        break;
+          break;
         case Types.TIMESTAMP:
           attribute = new JdbcTimestampFieldDefinition(dbName, name, sqlType,
             required, description, null);
-        break;
+          break;
         case Types.BIT:
           attribute = new JdbcBooleanFieldDefinition(dbName, name, sqlType, length,
             required, description, null);
-        break;
+          break;
         case Types.BLOB:
           attribute = new JdbcBlobFieldDefinition(dbName, name, sqlType, length,
             required, description, null);
-        break;
+          break;
         default:
           attribute = new JdbcFieldDefinition(dbName, name, this.dataType, sqlType,
             length, scale, required, description, null);
-        break;
+          break;
       }
     }
     recordDefinition.addField(attribute);

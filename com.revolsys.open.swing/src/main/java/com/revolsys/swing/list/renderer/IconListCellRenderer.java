@@ -10,6 +10,10 @@ import javax.swing.JList;
 
 public class IconListCellRenderer extends DefaultListCellRenderer {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private Map<Object, Icon> icons = new HashMap<>();
 
   public IconListCellRenderer(final Map<Object, Icon> icons) {

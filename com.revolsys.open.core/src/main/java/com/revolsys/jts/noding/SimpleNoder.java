@@ -33,7 +33,6 @@
 package com.revolsys.jts.noding;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Nodes a set of {@link SegmentString}s by
@@ -53,7 +52,7 @@ public class SimpleNoder extends SinglePassNoder {
   private void computeIntersects(final SegmentString e0, final SegmentString e1) {
     for (int i0 = 0; i0 < e0.size() - 1; i0++) {
       for (int i1 = 0; i1 < e1.size() - 1; i1++) {
-        segInt.processIntersections(e0, i0, e1, i1);
+        this.segInt.processIntersections(e0, i0, e1, i1);
       }
     }
   }
@@ -61,10 +60,10 @@ public class SimpleNoder extends SinglePassNoder {
   @Override
   public void computeNodes(final Collection<NodedSegmentString> inputSegStrings) {
     this.nodedSegStrings = inputSegStrings;
-    for (final Iterator i0 = inputSegStrings.iterator(); i0.hasNext();) {
-      final SegmentString edge0 = (SegmentString)i0.next();
-      for (final Iterator i1 = inputSegStrings.iterator(); i1.hasNext();) {
-        final SegmentString edge1 = (SegmentString)i1.next();
+    for (final Object element : inputSegStrings) {
+      final SegmentString edge0 = (SegmentString)element;
+      for (final Object element2 : inputSegStrings) {
+        final SegmentString edge1 = (SegmentString)element2;
         computeIntersects(edge0, edge1);
       }
     }
@@ -72,7 +71,7 @@ public class SimpleNoder extends SinglePassNoder {
 
   @Override
   public Collection<NodedSegmentString> getNodedSubstrings() {
-    return NodedSegmentString.getNodedSubstrings((Collection)nodedSegStrings);
+    return NodedSegmentString.getNodedSubstrings((Collection)this.nodedSegStrings);
   }
 
 }

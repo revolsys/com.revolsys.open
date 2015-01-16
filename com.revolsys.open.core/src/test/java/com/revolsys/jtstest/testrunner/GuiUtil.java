@@ -55,124 +55,130 @@ import javax.swing.text.JTextComponent;
  */
 public class GuiUtil {
 
-    /**
-     * Centers the first component on the second
-     */
-    public static void center(Component componentToMove, Component componentToCenterOn) {
-        Dimension componentToCenterOnSize = componentToCenterOn.getSize();
-        componentToMove.setLocation(
-            componentToCenterOn.getX()
-                + ((componentToCenterOnSize.width - componentToMove.getWidth()) / 2),
-            componentToCenterOn.getY()
-                + ((componentToCenterOnSize.height - componentToMove.getHeight()) / 2));
-    }
+  /**
+   * Centers the first component on the second
+   */
+  public static void center(final Component componentToMove, final Component componentToCenterOn) {
+    final Dimension componentToCenterOnSize = componentToCenterOn.getSize();
+    componentToMove.setLocation(
+      componentToCenterOn.getX()
+      + (componentToCenterOnSize.width - componentToMove.getWidth()) / 2,
+      componentToCenterOn.getY()
+      + (componentToCenterOnSize.height - componentToMove.getHeight()) / 2);
+  }
 
-    /**
-     * Centers the component on the screen
-     */
-    public static void centerOnScreen(Component componentToMove) {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        componentToMove.setLocation(
-            (screenSize.width - componentToMove.getWidth()) / 2,
-            (screenSize.height - componentToMove.getHeight()) / 2);
-    }
+  /**
+   * Centers the component on the screen
+   */
+  public static void centerOnScreen(final Component componentToMove) {
+    final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    componentToMove.setLocation(
+      (screenSize.width - componentToMove.getWidth()) / 2,
+      (screenSize.height - componentToMove.getHeight()) / 2);
+  }
 
-    /**
-     * Centers the component on its window
-     */
-    public static void centerOnWindow(Component componentToMove) {
-        center(componentToMove, SwingUtilities.windowForComponent(componentToMove));
-    }
+  /**
+   * Centers the component on its window
+   */
+  public static void centerOnWindow(final Component componentToMove) {
+    center(componentToMove, SwingUtilities.windowForComponent(componentToMove));
+  }
 
-    //Save the contents of the cell that the user is in the middle of editing
-    //From Question of the Week No. 23
-    //http://developer.java.sun.com/developer/qow/archive/23/
-    public static void commitChanges(JTable table) {
-        if (table.isEditing()) {
-            String text = ((JTextComponent) table.getEditorComponent()).getText();
-            table.setValueAt(text, table.getEditingRow(), table.getEditingColumn());
-            table.getCellEditor().cancelCellEditing();
-        }
+  //Save the contents of the cell that the user is in the middle of editing
+  //From Question of the Week No. 23
+  //http://developer.java.sun.com/developer/qow/archive/23/
+  public static void commitChanges(final JTable table) {
+    if (table.isEditing()) {
+      final String text = ((JTextComponent) table.getEditorComponent()).getText();
+      table.setValueAt(text, table.getEditingRow(), table.getEditingColumn());
+      table.getCellEditor().cancelCellEditing();
     }
+  }
 
-    /**
-     * Workaround for bug: can't re-show internal frames. See bug parade 4138031.
-     */
-    public static void show(JInternalFrame internalFrame, JDesktopPane desktopPane)
-        throws PropertyVetoException {
-        if (!desktopPane.isAncestorOf(internalFrame))
-            desktopPane.add(internalFrame);
-        internalFrame.setClosed(false);
-        internalFrame.setVisible(true);
-        internalFrame.toFront();
+  /**
+   * Changes the tooltip text of the JComponent to be multiline HTML.
+   */
+  public static void formatTooltip(final JComponent jcomponent) {
+    String tip = jcomponent.getToolTipText();
+    if (tip == null || tip.length() == 0) {
+      return;
     }
+    if (tip.toLowerCase().indexOf("<html>") > -1) {
+      return;
+    }
+    tip = StringUtil.wrap(tip, 50);
+    tip = StringUtil.replaceAll(tip, "\n", "<p>");
+    tip = "<html>" + tip + "</html>";
+    jcomponent.setToolTipText(tip);
+  }
 
-    /**
-     * Workaround for Swing bug: JFileChooser does not support multi-file selection
-     * See Sun bug database 4218431.
-     * http://manning.spindoczine.com/sbe/files/uts2/Chapter14html/Chapter14.htm)
-     */
-    public static File[] getSelectedFiles(JFileChooser chooser) {
-        // Although JFileChooser won't give us this information,
-        // we need it...
-        Container c1 = (Container) chooser.getComponent(3);
-        JList list = null;
-        while (c1 != null) {
-            Container c = (Container) c1.getComponent(0);
-            if (c instanceof JList) {
-                list = (JList) c;
-                break;
-            }
-            c1 = c;
-        }
-        Object[] entries = list.getSelectedValues();
-        File[] files = new File[entries.length];
-        for (int k = 0; k < entries.length; k++) {
-            if (entries[k] instanceof File)
-                files[k] = (File) entries[k];
-        }
-        return files;
+  /**
+   * Changes the tooltip text of each component in the Container to be
+   * multiline HTML. Modifies all descendants (children, grandchildren, etc.).
+   */
+  public static void formatTooltips(final Container container) {
+    for (int i = 0; i < container.getComponentCount(); i++) {
+      final Component component = container.getComponent(i);
+      if (component instanceof JComponent) {
+        formatTooltip((JComponent) component);
+      }
+      if (component instanceof Container) {
+        formatTooltips((Container) component);
+      }
     }
+  }
 
-    /**
-     * Changes the tooltip text of each component in the Container to be
-     * multiline HTML. Modifies all descendants (children, grandchildren, etc.).
-     */
-    public static void formatTooltips(Container container) {
-        for (int i = 0; i < container.getComponentCount(); i++) {
-            Component component = container.getComponent(i);
-            if (component instanceof JComponent)
-                formatTooltip((JComponent) component);
-            if (component instanceof Container)
-                formatTooltips((Container) component);
-        }
+  /**
+   * Workaround for Swing bug: JFileChooser does not support multi-file selection
+   * See Sun bug database 4218431.
+   * http://manning.spindoczine.com/sbe/files/uts2/Chapter14html/Chapter14.htm)
+   */
+  public static File[] getSelectedFiles(final JFileChooser chooser) {
+    // Although JFileChooser won't give us this information,
+    // we need it...
+    Container c1 = (Container) chooser.getComponent(3);
+    JList list = null;
+    while (c1 != null) {
+      final Container c = (Container) c1.getComponent(0);
+      if (c instanceof JList) {
+        list = (JList) c;
+        break;
+      }
+      c1 = c;
     }
+    final Object[] entries = list.getSelectedValues();
+    final File[] files = new File[entries.length];
+    for (int k = 0; k < entries.length; k++) {
+      if (entries[k] instanceof File) {
+        files[k] = (File) entries[k];
+      }
+    }
+    return files;
+  }
 
-    /**
-     * Changes the tooltip text of the JComponent to be multiline HTML.
-     */
-    public static void formatTooltip(JComponent jcomponent) {
-        String tip = jcomponent.getToolTipText();
-        if (tip == null || tip.length() == 0)
-            return;
-        if (tip.toLowerCase().indexOf("<html>") > -1)
-            return;
-        tip = StringUtil.wrap(tip, 50);
-        tip = StringUtil.replaceAll(tip, "\n", "<p>");
-        tip = "<html>" + tip + "</html>";
-        jcomponent.setToolTipText(tip);
+  /**
+   * Runs r in the event dispatch thread, which may be the current thread.
+   * Waits for r to finish before returning.
+   */
+  public static void invokeAndWait(final Runnable r)
+      throws InterruptedException, java.lang.reflect.InvocationTargetException {
+    if (SwingUtilities.isEventDispatchThread()) {
+      r.run();
+    } else {
+      SwingUtilities.invokeAndWait(r);
     }
+  }
 
-    /**
-     * Runs r in the event dispatch thread, which may be the current thread.
-     * Waits for r to finish before returning.
-     */
-    public static void invokeAndWait(Runnable r)
-        throws InterruptedException, java.lang.reflect.InvocationTargetException {
-        if (SwingUtilities.isEventDispatchThread()) {
-            r.run();
-        } else {
-            SwingUtilities.invokeAndWait(r);
-        }
+  /**
+   * Workaround for bug: can't re-show internal frames. See bug parade 4138031.
+   */
+  public static void show(final JInternalFrame internalFrame, final JDesktopPane desktopPane)
+      throws PropertyVetoException {
+    if (!desktopPane.isAncestorOf(internalFrame)) {
+      desktopPane.add(internalFrame);
     }
+    internalFrame.setClosed(false);
+    internalFrame.setVisible(true);
+    internalFrame.toFront();
+  }
 }

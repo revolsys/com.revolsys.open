@@ -38,54 +38,55 @@ package com.revolsys.jts.io;
  * with different byte arrays.
  */
 public class ByteArrayInStream
-	implements InStream
+implements InStream
 {
-	/*
-	 * Implementation improvement suggested by Andrea Aime - Dec 15 2007
-	 */
-	
+  /*
+   * Implementation improvement suggested by Andrea Aime - Dec 15 2007
+   */
+
   private byte[] buffer;
-	private int position;
+  private int position;
 
-	/**
-	 * Creates a new stream based on the given buffer.
-	 * 
-	 * @param buffer the bytes to read
-	 */
-	public ByteArrayInStream(final byte[] buffer) {
-		setBytes(buffer);
-	}
+  /**
+   * Creates a new stream based on the given buffer.
+   *
+   * @param buffer the bytes to read
+   */
+  public ByteArrayInStream(final byte[] buffer) {
+    setBytes(buffer);
+  }
 
-	/**
-	 * Sets this stream to read from the given buffer
-	 * 
-	 * @param buffer the bytes to read
-	 */
-	public void setBytes(final byte[] buffer) {
-		this.buffer = buffer;
-		this.position = 0;
-	}
+  /**
+   * Reads up to <tt>buf.length</tt> bytes from the stream
+   * into the given byte buffer.
+   *
+   * @param buf the buffer to place the read bytes into
+   */
+  @Override
+  public void read(final byte[] buf) {
+    int numToRead = buf.length;
+    // don't try and copy past the end of the input
+    if (this.position + numToRead > this.buffer.length) {
+      numToRead = this.buffer.length - this.position;
+      System.arraycopy(this.buffer, this.position, buf, 0, numToRead);
+      // zero out the unread bytes
+      for (int i = numToRead; i < buf.length; i++) {
+        buf[i] = 0;
+      }
+    }
+    else {
+      System.arraycopy(this.buffer, this.position, buf, 0, numToRead);
+    }
+    this.position += numToRead;
+  }
 
-	/**
-	 * Reads up to <tt>buf.length</tt> bytes from the stream
-	 * into the given byte buffer.
-	 * 
-	 * @param buf the buffer to place the read bytes into
-	 */
-	public void read(final byte[] buf) {
-		int numToRead = buf.length;
-		// don't try and copy past the end of the input
-		if ((position + numToRead) > buffer.length) {
-			numToRead = buffer.length - position;
-			System.arraycopy(buffer, position, buf, 0, numToRead);
-			// zero out the unread bytes
-			for (int i = numToRead; i < buf.length; i++) {
-				buf[i] = 0;
-			}
-		}
-		else {
-			System.arraycopy(buffer, position, buf, 0, numToRead);			
-		}
-		position += numToRead;
-	}
+  /**
+   * Sets this stream to read from the given buffer
+   *
+   * @param buffer the bytes to read
+   */
+  public void setBytes(final byte[] buffer) {
+    this.buffer = buffer;
+    this.position = 0;
+  }
 }

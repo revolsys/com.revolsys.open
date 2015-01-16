@@ -16,7 +16,7 @@ public class GeometryFilter {
   public static <T extends Geometry> Filter<T> intersects(
     final BoundingBox envelope) {
     return new InvokeMethodFilter<T>(GeometryFilter.class,
-      "acceptEnvelopeIntersects", envelope);
+        "acceptEnvelopeIntersects", envelope);
   }
 
   public static Filter<LineString> lineContainedWithinTolerance(

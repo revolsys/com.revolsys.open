@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,7 @@ import com.revolsys.ui.web.config.WebUiContext;
  * the PageDefinition object in the "page" attribute. The following attribute
  * will appear in the output.
  * </p>
- * 
+ *
  * <pre>
  * onload = &quot;alert('hello');&quot;
  * </pre>
@@ -41,7 +41,7 @@ import com.revolsys.ui.web.config.WebUiContext;
  * <p>
  * <b>Example</b>
  * </p>
- * 
+ *
  * <pre>
  *     &lt;%@ taglib uri=&quot;http://dev.nhigh.com/taglibs/nhigh&quot; prefix=&quot;nhigh&quot; %&gt;
  *     &lt;html&gt;
@@ -57,7 +57,7 @@ import com.revolsys.ui.web.config.WebUiContext;
  * <dd><code>page</code> - A PageDefinition bean containing the defintion of
  * this page.</dd>
  * </dl>
- * 
+ *
  * @author P. D. Austin
  * @version 1.0
  * @see PageDefinition#getOnLoads()
@@ -68,7 +68,7 @@ public class OnLoadTag extends TagSupport {
 
   /**
    * Process the end tag.
-   * 
+   *
    * @return EVAL_PAGE
    */
   @Override
@@ -78,7 +78,7 @@ public class OnLoadTag extends TagSupport {
 
   /**
    * Process the start tag.
-   * 
+   *
    * @return SKIP_BODY
    */
   @Override
@@ -88,7 +88,7 @@ public class OnLoadTag extends TagSupport {
       if (context != null) {
         final Page page = context.getPage();
         if (page != null) {
-          final JspWriter out = pageContext.getOut();
+          final JspWriter out = this.pageContext.getOut();
           final Iterator onLoads = page.getOnLoads().iterator();
           out.print("onload=\"");
           while (onLoads.hasNext()) {

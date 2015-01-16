@@ -27,32 +27,32 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
   public abstract void execute(BoundingBox cellBoundingBox);
 
   public Geometry getBoundary() {
-    return boundary;
+    return this.boundary;
   }
 
   public BoundingBox getBoundingBox() {
-    return boundingBox;
+    return this.boundingBox;
   }
 
   public int getNumX() {
-    return numX;
+    return this.numX;
   }
 
   public int getNumY() {
-    return numY;
+    return this.numY;
   }
 
   public boolean isLogScriptInfo() {
-    return logScriptInfo;
+    return this.logScriptInfo;
   }
 
   protected void postRun() {
   }
 
   protected void preRun() {
-    if (boundingBox != null) {
-      if (boundary != null) {
-        preparedBoundary = boundary.prepare();
+    if (this.boundingBox != null) {
+      if (this.boundary != null) {
+        this.preparedBoundary = this.boundary.prepare();
       }
     }
   }
@@ -61,21 +61,21 @@ public abstract class BoundingBoxTaskSplitter extends AbstractProcess {
   public void run() {
     preRun();
     try {
-      if (boundingBox != null) {
-        final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
-        final double xInc = boundingBox.getWidth() / numX;
-        final double yInc = boundingBox.getHeight() / numY;
-        double y = boundingBox.getMinY();
-        for (int j = 0; j < numX; j++) {
-          double x = boundingBox.getMinX();
-          for (int i = 0; i < numX; i++) {
+      if (this.boundingBox != null) {
+        final GeometryFactory geometryFactory = this.boundingBox.getGeometryFactory();
+        final double xInc = this.boundingBox.getWidth() / this.numX;
+        final double yInc = this.boundingBox.getHeight() / this.numY;
+        double y = this.boundingBox.getMinY();
+        for (int j = 0; j < this.numX; j++) {
+          double x = this.boundingBox.getMinX();
+          for (int i = 0; i < this.numX; i++) {
             final BoundingBox cellBoundingBox = new BoundingBoxDoubleGf(geometryFactory,
               2, x, y, x + xInc, y + yInc);
-            if (preparedBoundary == null
-              || preparedBoundary.intersects(cellBoundingBox.toPolygon(50))) {
-              if (logScriptInfo) {
-                log.info("Processing bounding box "
-                  + cellBoundingBox.toPolygon(1));
+            if (this.preparedBoundary == null
+                || this.preparedBoundary.intersects(cellBoundingBox.toPolygon(50))) {
+              if (this.logScriptInfo) {
+                this.log.info("Processing bounding box "
+                    + cellBoundingBox.toPolygon(1));
               }
               execute(cellBoundingBox);
             }

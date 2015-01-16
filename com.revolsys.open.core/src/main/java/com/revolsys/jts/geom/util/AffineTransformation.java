@@ -39,7 +39,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Assert;
 
 /**
- * Represents an affine transformation on the 2D Cartesian plane. 
+ * Represents an affine transformation on the 2D Cartesian plane.
  * It can be used to transform a {@link Coordinates} or {@link Geometry}.
  * An affine transformation is a mapping of the 2D plane into itself
  * via a series of transformations of the following basic types:
@@ -48,12 +48,12 @@ import com.revolsys.jts.util.Assert;
  * <li>rotation (around the origin)
  * <li>scaling (relative to the origin)
  * <li>shearing (in both the X and Y directions)
- * <li>translation 
+ * <li>translation
  * </ul>
  * In general, affine transformations preserve straightness and parallel lines,
  * but do not preserve distance or shape.
  * <p>
- * An affine transformation can be represented by a 3x3 
+ * An affine transformation can be represented by a 3x3
  * matrix in the following form:
  * <blockquote><pre>
  * T = | m00 m01 m02 |
@@ -69,27 +69,27 @@ import com.revolsys.jts.util.Assert;
  * </pre></blockquote>
  * <h3>Transformation Composition</h3>
  * Affine transformations can be composed using the {@link #compose} method.
- * Composition is computed via multiplication of the 
+ * Composition is computed via multiplication of the
  * transformation matrices, and is defined as:
  * <blockquote><pre>
  * A.compose(B) = T<sub>B</sub> x T<sub>A</sub>
  * </pre></blockquote>
  * This produces a transformation whose effect is that of A followed by B.
- * The methods {@link #reflect}, {@link #rotate}, 
- * {@link #scale}, {@link #shear}, and {@link #translate} 
+ * The methods {@link #reflect}, {@link #rotate},
+ * {@link #scale}, {@link #shear}, and {@link #translate}
  * have the effect of composing a transformation of that type with
- * the transformation they are invoked on.  
+ * the transformation they are invoked on.
  * <p>
  * The composition of transformations is in general <i>not</i> commutative.
- * 
+ *
  * <h3>Transformation Inversion</h3>
- * Affine transformations may be invertible or non-invertible.  
- * If a transformation is invertible, then there exists 
- * an inverse transformation which when composed produces 
- * the identity transformation.  
+ * Affine transformations may be invertible or non-invertible.
+ * If a transformation is invertible, then there exists
+ * an inverse transformation which when composed produces
+ * the identity transformation.
  * The {@link #getInverse} method
  * computes the inverse of a transformation, if one exists.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -99,9 +99,9 @@ public class AffineTransformation implements Cloneable
 {
 
   /**
-   * Creates a transformation for a reflection about the 
+   * Creates a transformation for a reflection about the
    * line (0,0) - (x,y).
-   * 
+   *
    * @param x the x-ordinate of a point on the reflection line
    * @param y the y-ordinate of a point on the reflection line
    * @return a transformation for the reflection
@@ -114,9 +114,9 @@ public class AffineTransformation implements Cloneable
   }
 
   /**
-   * Creates a transformation for a reflection about the 
+   * Creates a transformation for a reflection about the
    * line (x0,y0) - (x1,y1).
-   * 
+   *
    * @param x0 the x-ordinate of a point on the reflection line
    * @param y0 the y-ordinate of a point on the reflection line
    * @param x1 the x-ordinate of a another point on the reflection line
@@ -132,11 +132,11 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Creates a transformation for a rotation
-   * about the origin 
+   * about the origin
    * by an angle <i>theta</i>.
-   * Positive angles correspond to a rotation 
+   * Positive angles correspond to a rotation
    * in the counter-clockwise direction.
-   * 
+   *
    * @param theta the rotation angle, in radians
    * @return a transformation for the rotation
    */
@@ -145,12 +145,12 @@ public class AffineTransformation implements Cloneable
   }
 
   /**
-   * Creates a transformation for a rotation 
+   * Creates a transformation for a rotation
    * by an angle <i>theta</i>,
    * specified by the sine and cosine of the angle.
    * This allows providing exact values for sin(theta) and cos(theta)
-   * for the common case of rotations of multiples of quarter-circles. 
-   * 
+   * for the common case of rotations of multiples of quarter-circles.
+   *
    * @param sinTheta the sine of the rotation angle
    * @param cosTheta the cosine of the rotation angle
    * @return a transformation for the rotation
@@ -165,9 +165,9 @@ public class AffineTransformation implements Cloneable
   /**
    * Creates a transformation for a rotation
    * about the point (x,y) by an angle <i>theta</i>.
-   * Positive angles correspond to a rotation 
+   * Positive angles correspond to a rotation
    * in the counter-clockwise direction.
-   * 
+   *
    * @param theta the rotation angle, in radians
    * @param x the x-ordinate of the rotation point
    * @param y the y-ordinate of the rotation point
@@ -179,12 +179,12 @@ public class AffineTransformation implements Cloneable
   }
 
   /**
-   * Creates a transformation for a rotation 
+   * Creates a transformation for a rotation
    * about the point (x,y) by an angle <i>theta</i>,
    * specified by the sine and cosine of the angle.
    * This allows providing exact values for sin(theta) and cos(theta)
-   * for the common case of rotations of multiples of quarter-circles. 
-   * 
+   * for the common case of rotations of multiples of quarter-circles.
+   *
    * @param sinTheta the sine of the rotation angle
    * @param cosTheta the cosine of the rotation angle
    * @param x the x-ordinate of the rotation point
@@ -200,7 +200,7 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Creates a transformation for a scaling relative to the origin.
-   * 
+   *
    * @param xScale the value to scale by in the x direction
    * @param yScale the value to scale by in the y direction
    * @return a transformation for the scaling
@@ -214,7 +214,7 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Creates a transformation for a scaling relative to the point (x,y).
-   * 
+   *
    * @param xScale the value to scale by in the x direction
    * @param yScale the value to scale by in the y direction
    * @param x the x-ordinate of the point to scale around
@@ -232,7 +232,7 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Creates a transformation for a shear.
-   * 
+   *
    * @param xShear the value to shear by in the x direction
    * @param yShear the value to shear by in the y direction
    * @return a tranformation for the shear
@@ -246,7 +246,7 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Creates a transformation for a translation.
-   * 
+   *
    * @param x the value to translate by in the x direction
    * @param y the value to translate by in the y direction
    * @return a tranformation for the translation
@@ -282,7 +282,7 @@ public class AffineTransformation implements Cloneable
   /**
    * Constructs a transformation which is
    * a copy of the given one.
-   * 
+   *
    * @param trans the transformation to copy
    */
   public AffineTransformation(final AffineTransformation trans) {
@@ -290,28 +290,10 @@ public class AffineTransformation implements Cloneable
   }
 
   /**
-   * Constructs a transformation
-   * which maps the given source
-   * points into the given destination points.
-   * 
-   * @param src0 source point 0
-   * @param src1 source point 1
-   * @param src2 source point 2
-   * @param dest0 the mapped point for source point 0
-   * @param dest1 the mapped point for source point 1
-   * @param dest2 the mapped point for source point 2
-   * 
-   */
-  public AffineTransformation(final Point src0, final Point src1,
-    final Point src2, final Point dest0, final Point dest1,
-    final Point dest2) {
-  }
-
-  /**
-   * Constructs a new transformation whose 
+   * Constructs a new transformation whose
    * matrix has the specified values.
-   * 
-   * @param m00 the entry for the [0, 0] element in the transformation matrix 
+   *
+   * @param m00 the entry for the [0, 0] element in the transformation matrix
    * @param m01 the entry for the [0, 1] element in the transformation matrix
    * @param m02 the entry for the [0, 2] element in the transformation matrix
    * @param m10 the entry for the [1, 0] element in the transformation matrix
@@ -324,25 +306,43 @@ public class AffineTransformation implements Cloneable
   }
 
   /**
-   * Constructs a new transformation whose 
+   * Constructs a new transformation whose
    * matrix has the specified values.
-   * 
+   *
    * @param matrix an array containing the 6 values { m00, m01, m02, m10, m11, m12 }
    * @throws NullPointerException if matrix is null
-   * @throws ArrayIndexOutOfBoundsException if matrix is too small 
+   * @throws ArrayIndexOutOfBoundsException if matrix is too small
    */
   public AffineTransformation(final double[] matrix) {
-    m00 = matrix[0];
-    m01 = matrix[1];
-    m02 = matrix[2];
-    m10 = matrix[3];
-    m11 = matrix[4];
-    m12 = matrix[5];
+    this.m00 = matrix[0];
+    this.m01 = matrix[1];
+    this.m02 = matrix[2];
+    this.m10 = matrix[3];
+    this.m11 = matrix[4];
+    this.m12 = matrix[5];
+  }
+
+  /**
+   * Constructs a transformation
+   * which maps the given source
+   * points into the given destination points.
+   *
+   * @param src0 source point 0
+   * @param src1 source point 1
+   * @param src2 source point 2
+   * @param dest0 the mapped point for source point 0
+   * @param dest1 the mapped point for source point 1
+   * @param dest2 the mapped point for source point 2
+   *
+   */
+  public AffineTransformation(final Point src0, final Point src1,
+    final Point src2, final Point dest0, final Point dest1,
+    final Point dest2) {
   }
 
   /**
    * Clones this transformation
-   * 
+   *
    * @return a copy of this transformation
    */
   @Override
@@ -357,70 +357,70 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Updates this transformation to be
-   * the composition of this transformation with the given {@link AffineTransformation}. 
-   * This produces a transformation whose effect 
-   * is equal to applying this transformation 
+   * the composition of this transformation with the given {@link AffineTransformation}.
+   * This produces a transformation whose effect
+   * is equal to applying this transformation
    * followed by the argument transformation.
    * Mathematically,
    * <blockquote><pre>
    * A.compose(B) = T<sub>B</sub> x T<sub>A</sub>
    * </pre></blockquote>
-   * 
+   *
    * @param trans an affine transformation
    * @return this transformation, with an updated matrix
    */
   public AffineTransformation compose(final AffineTransformation trans) {
-    final double mp00 = trans.m00 * m00 + trans.m01 * m10;
-    final double mp01 = trans.m00 * m01 + trans.m01 * m11;
-    final double mp02 = trans.m00 * m02 + trans.m01 * m12 + trans.m02;
-    final double mp10 = trans.m10 * m00 + trans.m11 * m10;
-    final double mp11 = trans.m10 * m01 + trans.m11 * m11;
-    final double mp12 = trans.m10 * m02 + trans.m11 * m12 + trans.m12;
-    m00 = mp00;
-    m01 = mp01;
-    m02 = mp02;
-    m10 = mp10;
-    m11 = mp11;
-    m12 = mp12;
+    final double mp00 = trans.m00 * this.m00 + trans.m01 * this.m10;
+    final double mp01 = trans.m00 * this.m01 + trans.m01 * this.m11;
+    final double mp02 = trans.m00 * this.m02 + trans.m01 * this.m12 + trans.m02;
+    final double mp10 = trans.m10 * this.m00 + trans.m11 * this.m10;
+    final double mp11 = trans.m10 * this.m01 + trans.m11 * this.m11;
+    final double mp12 = trans.m10 * this.m02 + trans.m11 * this.m12 + trans.m12;
+    this.m00 = mp00;
+    this.m01 = mp01;
+    this.m02 = mp02;
+    this.m10 = mp10;
+    this.m11 = mp11;
+    this.m12 = mp12;
     return this;
   }
 
   /**
-   * Updates this transformation to be the composition 
+   * Updates this transformation to be the composition
    * of a given {@link AffineTransformation} with this transformation.
-   * This produces a transformation whose effect 
-   * is equal to applying the argument transformation 
+   * This produces a transformation whose effect
+   * is equal to applying the argument transformation
    * followed by this transformation.
    * Mathematically,
    * <blockquote><pre>
    * A.composeBefore(B) = T<sub>A</sub> x T<sub>B</sub>
    * </pre></blockquote>
-   * 
+   *
    * @param trans an affine transformation
    * @return this transformation, with an updated matrix
    */
   public AffineTransformation composeBefore(final AffineTransformation trans) {
-    final double mp00 = m00 * trans.m00 + m01 * trans.m10;
-    final double mp01 = m00 * trans.m01 + m01 * trans.m11;
-    final double mp02 = m00 * trans.m02 + m01 * trans.m12 + m02;
-    final double mp10 = m10 * trans.m00 + m11 * trans.m10;
-    final double mp11 = m10 * trans.m01 + m11 * trans.m11;
-    final double mp12 = m10 * trans.m02 + m11 * trans.m12 + m12;
-    m00 = mp00;
-    m01 = mp01;
-    m02 = mp02;
-    m10 = mp10;
-    m11 = mp11;
-    m12 = mp12;
+    final double mp00 = this.m00 * trans.m00 + this.m01 * trans.m10;
+    final double mp01 = this.m00 * trans.m01 + this.m01 * trans.m11;
+    final double mp02 = this.m00 * trans.m02 + this.m01 * trans.m12 + this.m02;
+    final double mp10 = this.m10 * trans.m00 + this.m11 * trans.m10;
+    final double mp11 = this.m10 * trans.m01 + this.m11 * trans.m11;
+    final double mp12 = this.m10 * trans.m02 + this.m11 * trans.m12 + this.m12;
+    this.m00 = mp00;
+    this.m01 = mp01;
+    this.m02 = mp02;
+    this.m10 = mp10;
+    this.m11 = mp11;
+    this.m12 = mp12;
     return this;
   }
 
   /**
    * Tests if an object is an
    * <tt>AffineTransformation</tt>
-   * and has the same matrix as 
+   * and has the same matrix as
    * this transformation.
-   * 
+   *
    * @param obj an object to test
    * @return true if the given object is equal to this object
    */
@@ -434,13 +434,13 @@ public class AffineTransformation implements Cloneable
     }
 
     final AffineTransformation trans = (AffineTransformation)obj;
-    return m00 == trans.m00 && m01 == trans.m01 && m02 == trans.m02
-      && m10 == trans.m10 && m11 == trans.m11 && m12 == trans.m12;
+    return this.m00 == trans.m00 && this.m01 == trans.m01 && this.m02 == trans.m02
+        && this.m10 == trans.m10 && this.m11 == trans.m11 && this.m12 == trans.m12;
   }
 
   /**
    * Transforms the i'th coordinate in the input sequence
-   * 
+   *
    *@param seq  a <code>LineString</code>
    *@param i the index of the coordinate to transform
    */
@@ -450,30 +450,30 @@ public class AffineTransformation implements Cloneable
   // }
 
   /**
-  * Computes the determinant of the transformation matrix. 
-  * The determinant is computed as:
-  * <blockquote><pre>
-  * | m00 m01 m02 |
-  * | m10 m11 m12 | = m00 * m11 - m01 * m10
-  * |  0   0   1  |
-  * </pre></blockquote>
-  * If the determinant is zero, 
-  * the transform is singular (not invertible), 
-  * and operations which attempt to compute
-  * an inverse will throw a <tt>NoninvertibleTransformException</tt>. 
+   * Computes the determinant of the transformation matrix.
+   * The determinant is computed as:
+   * <blockquote><pre>
+   * | m00 m01 m02 |
+   * | m10 m11 m12 | = m00 * m11 - m01 * m10
+   * |  0   0   1  |
+   * </pre></blockquote>
+   * If the determinant is zero,
+   * the transform is singular (not invertible),
+   * and operations which attempt to compute
+   * an inverse will throw a <tt>NoninvertibleTransformException</tt>.
 
-  * @return the determinant of the transformation
-  * @see #getInverse()
-  */
+   * @return the determinant of the transformation
+   * @see #getInverse()
+   */
   public double getDeterminant() {
-    return m00 * m11 - m01 * m10;
+    return this.m00 * this.m11 - this.m01 * this.m10;
   }
 
   /**
    * Computes the inverse of this transformation, if one
    * exists.
-   * The inverse is the transformation which when 
-   * composed with this one produces the identity 
+   * The inverse is the transformation which when
+   * composed with this one produces the identity
    * transformation.
    * A transformation has an inverse if and only if it
    * is not singular (i.e. its
@@ -483,13 +483,13 @@ public class AffineTransformation implements Cloneable
    * If no inverse exists this method
    * will throw a <tt>NoninvertibleTransformationException</tt>.
    * <p>
-   * The matrix of the inverse is equal to the 
+   * The matrix of the inverse is equal to the
    * inverse of the matrix for the transformation.
    * It is computed as follows:
-   * <blockquote><pre>  
-   *                 1    
-   * inverse(A)  =  ---   x  adjoint(A) 
-   *                det 
+   * <blockquote><pre>
+   *                 1
+   * inverse(A)  =  ---   x  adjoint(A)
+   *                det
    *
    *
    *             =   1       |  m11  -m01   m01*m12-m02*m11  |
@@ -502,26 +502,26 @@ public class AffineTransformation implements Cloneable
    *               | -m10/det   m00/det  -m00*m12+m10*m02/det |
    *               |   0           0          1               |
    *
-   * </pre></blockquote>  
-   *  
+   * </pre></blockquote>
+   *
    * @return a new inverse transformation
    * @throws NoninvertibleTransformationException
    * @see #getDeterminant()
    */
   public AffineTransformation getInverse()
-    throws NoninvertibleTransformationException {
+      throws NoninvertibleTransformationException {
     final double det = getDeterminant();
     if (det == 0) {
       throw new NoninvertibleTransformationException(
-        "Transformation is non-invertible");
+          "Transformation is non-invertible");
     }
 
-    final double im00 = m11 / det;
-    final double im10 = -m10 / det;
-    final double im01 = -m01 / det;
-    final double im11 = m00 / det;
-    final double im02 = (m01 * m12 - m02 * m11) / det;
-    final double im12 = (-m00 * m12 + m10 * m02) / det;
+    final double im00 = this.m11 / det;
+    final double im10 = -this.m10 / det;
+    final double im01 = -this.m01 / det;
+    final double im11 = this.m00 / det;
+    final double im02 = (this.m01 * this.m12 - this.m02 * this.m11) / det;
+    final double im12 = (-this.m00 * this.m12 + this.m10 * this.m02) / det;
 
     return new AffineTransformation(im00, im01, im02, im10, im11, im12);
   }
@@ -534,19 +534,19 @@ public class AffineTransformation implements Cloneable
    * <pre>
    * m00, m01, m02, m10, m11, m12
    * </pre>
-   * 
+   *
    * @return an array of length 6
    */
   public double[] getMatrixEntries() {
     return new double[] {
-      m00, m01, m02, m10, m11, m12
+      this.m00, this.m01, this.m02, this.m10, this.m11, this.m12
     };
   }
 
   /**
-   * Reports that this filter should continue to be executed until 
+   * Reports that this filter should continue to be executed until
    * all coordinates have been transformed.
-   * 
+   *
    * @return false
    */
   // @Override
@@ -560,19 +560,19 @@ public class AffineTransformation implements Cloneable
   // }
 
   /**
-  * Tests if this transformation is the identity transformation.
-  *
-  * @return true if this is the identity transformation
-  */
+   * Tests if this transformation is the identity transformation.
+   *
+   * @return true if this is the identity transformation
+   */
   public boolean isIdentity() {
-    return (m00 == 1 && m01 == 0 && m02 == 0 && m10 == 0 && m11 == 1 && m12 == 0);
+    return this.m00 == 1 && this.m01 == 0 && this.m02 == 0 && this.m10 == 0 && this.m11 == 1 && this.m12 == 0;
   }
 
   /**
    * Updates the value of this transformation
-   * to that of a reflection transformation composed 
+   * to that of a reflection transformation composed
    * with the current value.
-   * 
+   *
    * @param x the x-ordinate of the line to reflect around
    * @param y the y-ordinate of the line to reflect around
    * @return this transformation, with an updated matrix
@@ -584,9 +584,9 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Updates the value of this transformation
-   * to that of a reflection transformation composed 
+   * to that of a reflection transformation composed
    * with the current value.
-   * 
+   *
    * @param x0 the x-ordinate of a point on the line to reflect around
    * @param y0 the y-ordinate of a point on the line to reflect around
    * @param x1 the x-ordinate of a point on the line to reflect around
@@ -601,11 +601,11 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Updates the value of this transformation
-   * to that of a rotation transformation composed 
+   * to that of a rotation transformation composed
    * with the current value.
-   * Positive angles correspond to a rotation 
+   * Positive angles correspond to a rotation
    * in the counter-clockwise direction.
-   * 
+   *
    * @param theta the angle to rotate by, in radians
    * @return this transformation, with an updated matrix
    */
@@ -616,10 +616,10 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Updates the value of this transformation
-   * to that of a rotation around the origin composed 
+   * to that of a rotation around the origin composed
    * with the current value,
    * with the sin and cos of the rotation angle specified directly.
-   * 
+   *
    * @param sinTheta the sine of the angle to rotate by
    * @param cosTheta the cosine of the angle to rotate by
    * @return this transformation, with an updated matrix
@@ -632,11 +632,11 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Updates the value of this transformation
-   * to that of a rotation around a given point composed 
+   * to that of a rotation around a given point composed
    * with the current value.
-   * Positive angles correspond to a rotation 
+   * Positive angles correspond to a rotation
    * in the counter-clockwise direction.
-   * 
+   *
    * @param theta the angle to rotate by, in radians
    * @param x the x-ordinate of the rotation point
    * @param y the y-ordinate of the rotation point
@@ -650,10 +650,10 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Updates the value of this transformation
-   * to that of a rotation around a given point composed 
+   * to that of a rotation around a given point composed
    * with the current value,
    * with the sin and cos of the rotation angle specified directly.
-   * 
+   *
    * @param sinTheta the sine of the angle to rotate by
    * @param cosTheta the cosine of the angle to rotate by
    * @param x the x-ordinate of the rotation point
@@ -668,9 +668,9 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Updates the value of this transformation
-   * to that of a scale transformation composed 
+   * to that of a scale transformation composed
    * with the current value.
-   * 
+   *
    * @param xScale the value to scale by in the x direction
    * @param yScale the value to scale by in the y direction
    * @return this transformation, with an updated matrix
@@ -691,28 +691,28 @@ public class AffineTransformation implements Cloneable
    * @return this transformation, with an updated matrix
    */
   public AffineTransformation setToIdentity() {
-    m00 = 1.0;
-    m01 = 0.0;
-    m02 = 0.0;
-    m10 = 0.0;
-    m11 = 1.0;
-    m12 = 0.0;
+    this.m00 = 1.0;
+    this.m01 = 0.0;
+    this.m02 = 0.0;
+    this.m10 = 0.0;
+    this.m11 = 1.0;
+    this.m12 = 0.0;
     return this;
   }
 
   /**
-   * Sets this transformation to be a reflection 
+   * Sets this transformation to be a reflection
    * about the line defined by vector (x,y).
    * The transformation for a reflection
    * is computed by:
    * <blockquote><pre>
-   * d = sqrt(x<sup>2</sup> + y<sup>2</sup>)  
+   * d = sqrt(x<sup>2</sup> + y<sup>2</sup>)
    * sin = y / d;
    * cos = x / d;
-   * 
-   * T<sub>ref</sub> = T<sub>rot(sin, cos)</sub> x T<sub>scale(1, -1)</sub> x T<sub>rot(-sin, cos)</sub  
-   * </pre></blockquote> 
-   * 
+   *
+   * T<sub>ref</sub> = T<sub>rot(sin, cos)</sub> x T<sub>scale(1, -1)</sub> x T<sub>rot(-sin, cos)</sub
+   * </pre></blockquote>
+   *
    * @param x the x-component of the reflection line vector
    * @param y the y-component of the reflection line vector
    * @return this transformation, with an updated matrix
@@ -727,12 +727,12 @@ public class AffineTransformation implements Cloneable
      * This case is specified explicitly to avoid roundoff error.
      */
     if (x == y) {
-      m00 = 0.0;
-      m01 = 1.0;
-      m02 = 0.0;
-      m10 = 1.0;
-      m11 = 0.0;
-      m12 = 0.0;
+      this.m00 = 0.0;
+      this.m01 = 1.0;
+      this.m02 = 0.0;
+      this.m10 = 1.0;
+      this.m11 = 0.0;
+      this.m12 = 0.0;
       return this;
     }
 
@@ -749,9 +749,9 @@ public class AffineTransformation implements Cloneable
   }
 
   /**
-   * Sets this transformation to be a reflection 
+   * Sets this transformation to be a reflection
    * about the line defined by a line <tt>(x0,y0) - (x1,y1)</tt>.
-   * 
+   *
    * @param x0 the X ordinate of one point on the reflection line
    * @param y0 the Y ordinate of one point on the reflection line
    * @param x1 the X ordinate of another point on the reflection line
@@ -762,7 +762,7 @@ public class AffineTransformation implements Cloneable
     final double x1, final double y1) {
     if (x0 == x1 && y0 == y1) {
       throw new IllegalArgumentException(
-        "Reflection line points must be distinct");
+          "Reflection line points must be distinct");
     }
     // translate line vector to origin
     setToTranslation(-x0, -y0);
@@ -795,7 +795,7 @@ public class AffineTransformation implements Cloneable
     final double y0, final double x1, final double y1) {
     if (x0 == x1 && y0 == y1) {
       throw new IllegalArgumentException(
-        "Reflection line points must be distinct");
+          "Reflection line points must be distinct");
     }
     final double dx = x1 - x0;
     final double dy = y1 - y0;
@@ -804,28 +804,28 @@ public class AffineTransformation implements Cloneable
     final double cos = dx / d;
     final double cs2 = 2 * sin * cos;
     final double c2s2 = cos * cos - sin * sin;
-    m00 = c2s2;
-    m01 = cs2;
-    m02 = 0.0;
-    m10 = cs2;
-    m11 = -c2s2;
-    m12 = 0.0;
+    this.m00 = c2s2;
+    this.m01 = cs2;
+    this.m02 = 0.0;
+    this.m10 = cs2;
+    this.m11 = -c2s2;
+    this.m12 = 0.0;
     return this;
   }
 
   /**
    * Sets this transformation to be a rotation around the origin.
-   * A positive rotation angle corresponds 
+   * A positive rotation angle corresponds
    * to a counter-clockwise rotation.
    * The transformation matrix for a rotation
    * by an angle <tt>theta</tt>
    * has the value:
-   * <blockquote><pre>  
+   * <blockquote><pre>
    * |  cos(theta)  -sin(theta)   0 |
    * |  sin(theta)   cos(theta)   0 |
    * |           0            0   1 |
-   * </pre></blockquote> 
-   * 
+   * </pre></blockquote>
+   *
    * @param theta the rotation angle, in radians
    * @return this transformation, with an updated matrix
    */
@@ -839,41 +839,41 @@ public class AffineTransformation implements Cloneable
    * by specifying the sin and cos of the rotation angle directly.
    * The transformation matrix for the rotation
    * has the value:
-   * <blockquote><pre>  
+   * <blockquote><pre>
    * |  cosTheta  -sinTheta   0 |
    * |  sinTheta   cosTheta   0 |
    * |         0          0   1 |
-   * </pre></blockquote> 
-   * 
+   * </pre></blockquote>
+   *
    * @param sinTheta the sine of the rotation angle
    * @param cosTheta the cosine of the rotation angle
    * @return this transformation, with an updated matrix
    */
   public AffineTransformation setToRotation(final double sinTheta,
     final double cosTheta) {
-    m00 = cosTheta;
-    m01 = -sinTheta;
-    m02 = 0.0;
-    m10 = sinTheta;
-    m11 = cosTheta;
-    m12 = 0.0;
+    this.m00 = cosTheta;
+    this.m01 = -sinTheta;
+    this.m02 = 0.0;
+    this.m10 = sinTheta;
+    this.m11 = cosTheta;
+    this.m12 = 0.0;
     return this;
   }
 
   /**
    * Sets this transformation to be a rotation
    * around a given point (x,y).
-   * A positive rotation angle corresponds 
+   * A positive rotation angle corresponds
    * to a counter-clockwise rotation.
    * The transformation matrix for a rotation
    * by an angle <tt>theta</tt>
    * has the value:
-   * <blockquote><pre>  
+   * <blockquote><pre>
    * |  cosTheta  -sinTheta   x-x*cos+y*sin |
    * |  sinTheta   cosTheta   y-x*sin-y*cos |
    * |           0            0   1 |
-   * </pre></blockquote> 
-   * 
+   * </pre></blockquote>
+   *
    * @param theta the rotation angle, in radians
    * @param x the x-ordinate of the rotation point
    * @param y the y-ordinate of the rotation point
@@ -891,12 +891,12 @@ public class AffineTransformation implements Cloneable
    * by specifying the sin and cos of the rotation angle directly.
    * The transformation matrix for the rotation
    * has the value:
-   * <blockquote><pre>  
+   * <blockquote><pre>
    * |  cosTheta  -sinTheta   x-x*cos+y*sin |
    * |  sinTheta   cosTheta   y-x*sin-y*cos |
    * |         0          0         1       |
-   * </pre></blockquote> 
-   * 
+   * </pre></blockquote>
+   *
    * @param sinTheta the sine of the rotation angle
    * @param cosTheta the cosine of the rotation angle
    * @param x the x-ordinate of the rotation point
@@ -905,12 +905,12 @@ public class AffineTransformation implements Cloneable
    */
   public AffineTransformation setToRotation(final double sinTheta,
     final double cosTheta, final double x, final double y) {
-    m00 = cosTheta;
-    m01 = -sinTheta;
-    m02 = x - x * cosTheta + y * sinTheta;
-    m10 = sinTheta;
-    m11 = cosTheta;
-    m12 = y - x * sinTheta - y * cosTheta;
+    this.m00 = cosTheta;
+    this.m01 = -sinTheta;
+    this.m02 = x - x * cosTheta + y * sinTheta;
+    this.m10 = sinTheta;
+    this.m11 = cosTheta;
+    this.m12 = y - x * sinTheta - y * cosTheta;
     return this;
   }
 
@@ -918,53 +918,53 @@ public class AffineTransformation implements Cloneable
    * Sets this transformation to be a scaling.
    * The transformation matrix for a scale
    * has the value:
-   * <blockquote><pre>  
+   * <blockquote><pre>
    * |  xScale      0  dx |
    * |  1      yScale  dy |
    * |  0           0   1 |
-   * </pre></blockquote> 
-   * 
+   * </pre></blockquote>
+   *
    * @param xScale the amount to scale x-ordinates by
    * @param yScale the amount to scale y-ordinates by
    * @return this transformation, with an updated matrix
    */
   public AffineTransformation setToScale(final double xScale,
     final double yScale) {
-    m00 = xScale;
-    m01 = 0.0;
-    m02 = 0.0;
-    m10 = 0.0;
-    m11 = yScale;
-    m12 = 0.0;
+    this.m00 = xScale;
+    this.m01 = 0.0;
+    this.m02 = 0.0;
+    this.m10 = 0.0;
+    this.m11 = yScale;
+    this.m12 = 0.0;
     return this;
   }
 
   /**
    * Sets this transformation to be a shear.
-   * The transformation matrix for a shear 
+   * The transformation matrix for a shear
    * has the value:
-   * <blockquote><pre>  
+   * <blockquote><pre>
    * |  1      xShear  0 |
    * |  yShear      1  0 |
    * |  0           0  1 |
-   * </pre></blockquote> 
-   * Note that a shear of (1, 1) is <i>not</i> 
+   * </pre></blockquote>
+   * Note that a shear of (1, 1) is <i>not</i>
    * equal to shear(1, 0) composed with shear(0, 1).
-   * Instead, shear(1, 1) corresponds to a mapping onto the 
+   * Instead, shear(1, 1) corresponds to a mapping onto the
    * line x = y.
-   * 
+   *
    * @param xShear the x component to shear by
    * @param yShear the y component to shear by
    * @return this transformation, with an updated matrix
    */
   public AffineTransformation setToShear(final double xShear,
     final double yShear) {
-    m00 = 1.0;
-    m01 = xShear;
-    m02 = 0.0;
-    m10 = yShear;
-    m11 = 1.0;
-    m12 = 0.0;
+    this.m00 = 1.0;
+    this.m01 = xShear;
+    this.m02 = 0.0;
+    this.m10 = yShear;
+    this.m11 = 1.0;
+    this.m12 = 0.0;
     return this;
   }
 
@@ -972,45 +972,45 @@ public class AffineTransformation implements Cloneable
    * Sets this transformation to be a translation.
    * For a translation by the vector (x, y)
    * the transformation matrix has the value:
-   * <blockquote><pre>  
+   * <blockquote><pre>
    * |  1  0  dx |
    * |  1  0  dy |
    * |  0  0   1 |
-   * </pre></blockquote> 
+   * </pre></blockquote>
    * @param dx the x component to translate by
    * @param dy the y component to translate by
    * @return this transformation, with an updated matrix
    */
   public AffineTransformation setToTranslation(final double dx, final double dy) {
-    m00 = 1.0;
-    m01 = 0.0;
-    m02 = dx;
-    m10 = 0.0;
-    m11 = 1.0;
-    m12 = dy;
+    this.m00 = 1.0;
+    this.m01 = 0.0;
+    this.m02 = dx;
+    this.m10 = 0.0;
+    this.m11 = 1.0;
+    this.m12 = dy;
     return this;
   }
 
   /**
    * Sets this transformation to be a copy of the given one
-   * 
+   *
    * @param trans a transformation to copy
    * @return this transformation, with an updated matrix
    */
   public AffineTransformation setTransformation(final AffineTransformation trans) {
-    m00 = trans.m00;
-    m01 = trans.m01;
-    m02 = trans.m02;
-    m10 = trans.m10;
-    m11 = trans.m11;
-    m12 = trans.m12;
+    this.m00 = trans.m00;
+    this.m01 = trans.m01;
+    this.m02 = trans.m02;
+    this.m10 = trans.m10;
+    this.m11 = trans.m11;
+    this.m12 = trans.m12;
     return this;
   }
 
   /**
    * Sets this transformation's matrix to have the given values.
-   * 
-   * @param m00 the entry for the [0, 0] element in the transformation matrix 
+   *
+   * @param m00 the entry for the [0, 0] element in the transformation matrix
    * @param m01 the entry for the [0, 1] element in the transformation matrix
    * @param m02 the entry for the [0, 2] element in the transformation matrix
    * @param m10 the entry for the [1, 0] element in the transformation matrix
@@ -1032,9 +1032,9 @@ public class AffineTransformation implements Cloneable
 
   /**
    * Updates the value of this transformation
-   * to that of a shear transformation composed 
+   * to that of a shear transformation composed
    * with the current value.
-   * 
+   *
    * @param xShear the value to shear by in the x direction
    * @param yShear the value to shear by in the y direction
    * @return this transformation, with an updated matrix
@@ -1050,35 +1050,35 @@ public class AffineTransformation implements Cloneable
    * <pre>
    * AffineTransformation[[m00, m01, m02], [m10, m11, m12]]
    * </pre>
-   * 
+   *
    * @return a string representing this transformation
-   * 
+   *
    */
   @Override
   public String toString() {
-    return "AffineTransformation[[" + m00 + ", " + m01 + ", " + m02 + "], ["
-      + m10 + ", " + m11 + ", " + m12 + "]]";
+    return "AffineTransformation[[" + this.m00 + ", " + this.m01 + ", " + this.m02 + "], ["
+        + this.m10 + ", " + this.m11 + ", " + this.m12 + "]]";
   }
 
   /**
-   * Applies this transformation to the <tt>src</tt> coordinate
-   * and places the results in the <tt>dest</tt> coordinate
-   * (which may be the same as the source).
-   * 
-   * @param src the coordinate to transform
-   * @param dest the coordinate to accept the results 
-   * @return the <tt>dest</tt> coordinate
+   * Cretaes a new @link Geometry which is the result
+   * of this transformation applied to the input Geometry.
+   *
+   *@param seq  a <code>Geometry</code>
+   *@return a transformed Geometry
    */
-  public Point transform(final Point src) {
-    final double xp = m00 * src.getX() + m01 * src.getY() + m02;
-    final double yp = m10 * src.getX() + m11 * src.getY() + m12;
-    return new PointDouble(xp, yp);
+  public Geometry transform(final Geometry g) {
+    // TODO
+    throw new UnsupportedOperationException("Need to implement");
+    // Geometry g2 = (Geometry) g.clone();
+    // g2.apply(this);
+    // return g2;
   }
 
   /**
    * Applies this transformation to the i'th coordinate
    * in the given LineString.
-   * 
+   *
    *@param seq  a <code>LineString</code>
    *@param i the index of the coordinate to transform
    */
@@ -1092,25 +1092,25 @@ public class AffineTransformation implements Cloneable
   // }
 
   /**
-   * Cretaes a new @link Geometry which is the result
-   * of this transformation applied to the input Geometry.
-   * 
-   *@param seq  a <code>Geometry</code>
-   *@return a transformed Geometry
+   * Applies this transformation to the <tt>src</tt> coordinate
+   * and places the results in the <tt>dest</tt> coordinate
+   * (which may be the same as the source).
+   *
+   * @param src the coordinate to transform
+   * @param dest the coordinate to accept the results
+   * @return the <tt>dest</tt> coordinate
    */
-  public Geometry transform(final Geometry g) {
-    // TODO
-    throw new UnsupportedOperationException("Need to implement");
-    // Geometry g2 = (Geometry) g.clone();
-    // g2.apply(this);
-    // return g2;
+  public Point transform(final Point src) {
+    final double xp = this.m00 * src.getX() + this.m01 * src.getY() + this.m02;
+    final double yp = this.m10 * src.getX() + this.m11 * src.getY() + this.m12;
+    return new PointDouble(xp, yp);
   }
 
   /**
    * Updates the value of this transformation
-   * to that of a translation transformation composed 
+   * to that of a translation transformation composed
    * with the current value.
-   * 
+   *
    * @param x the value to translate by in the x direction
    * @param y the value to translate by in the y direction
    * @return this transformation, with an updated matrix

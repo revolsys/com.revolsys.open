@@ -5,7 +5,7 @@ import java.util.Map;
 import org.springframework.core.io.Resource;
 
 public abstract class AbstractMapReaderFactory extends AbstractIoFactory
-  implements MapReaderFactory {
+implements MapReaderFactory {
   public static MapReaderFactory getMapReaderFactory(final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final MapReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
@@ -33,12 +33,12 @@ public abstract class AbstractMapReaderFactory extends AbstractIoFactory
 
   @Override
   public boolean isCustomAttributionSupported() {
-    return customAttributionSupported;
+    return this.customAttributionSupported;
   }
 
   @Override
   public boolean isSingleFile() {
-    return singleFile;
+    return this.singleFile;
   }
 
   protected void setCustomAttributionSupported(

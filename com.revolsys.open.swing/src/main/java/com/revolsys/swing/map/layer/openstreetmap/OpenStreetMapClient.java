@@ -116,9 +116,9 @@ public class OpenStreetMapClient {
           return 0;
         } else {
           final double range = levelMetresPerPixel
-            - previousLevelMetresPerPixel;
+              - previousLevelMetresPerPixel;
           final double ratio = (metresPerPixel - previousLevelMetresPerPixel)
-            / range;
+              / range;
           if (ratio < 0.8) {
             return i - 1;
           } else {

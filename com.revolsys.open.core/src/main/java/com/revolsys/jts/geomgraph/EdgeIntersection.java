@@ -53,10 +53,10 @@ public class EdgeIntersection implements Comparable {
   public Point coord; // the point of intersection
 
   public int segmentIndex; // the index of the containing line segment in the
-                           // parent edge
+  // parent edge
 
   public double dist; // the edge distance of this point along the containing
-                      // line segment
+  // line segment
 
   public EdgeIntersection(final Point coord, final int segmentIndex,
     final double dist) {
@@ -93,35 +93,35 @@ public class EdgeIntersection implements Comparable {
   }
 
   public Point getCoordinate() {
-    return coord;
+    return this.coord;
   }
 
   public double getDistance() {
-    return dist;
+    return this.dist;
   }
 
   public int getSegmentIndex() {
-    return segmentIndex;
+    return this.segmentIndex;
   }
 
   public boolean isEndPoint(final int maxSegmentIndex) {
-    if (segmentIndex == 0 && dist == 0.0) {
+    if (this.segmentIndex == 0 && this.dist == 0.0) {
       return true;
     }
-    if (segmentIndex == maxSegmentIndex) {
+    if (this.segmentIndex == maxSegmentIndex) {
       return true;
     }
     return false;
   }
 
   public void print(final PrintStream out) {
-    out.print(coord);
-    out.print(" seg # = " + segmentIndex);
-    out.println(" dist = " + dist);
+    out.print(this.coord);
+    out.print(" seg # = " + this.segmentIndex);
+    out.println(" dist = " + this.dist);
   }
 
   @Override
   public String toString() {
-    return coord + " seg # = " + segmentIndex + " dist = " + dist;
+    return this.coord + " seg # = " + this.segmentIndex + " dist = " + this.dist;
   }
 }

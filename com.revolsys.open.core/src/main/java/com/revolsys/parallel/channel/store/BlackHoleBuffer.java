@@ -9,7 +9,7 @@ import com.revolsys.parallel.channel.ChannelValueStore;
  * <P>
  * The getState method will return EMPTY if the Channel does not contain an
  * Object and FULL if it does.
- * 
+ *
  * @author P.D.Austin
  */
 public class BlackHoleBuffer<T> extends ChannelValueStore<T> {
@@ -20,7 +20,7 @@ public class BlackHoleBuffer<T> extends ChannelValueStore<T> {
    * constructing a new instance with the same parameters as the original.
    * <I>NOTE: Only the sizes of the data should be cloned not the stored
    * data.</I>
-   * 
+   *
    * @return The cloned instance of this Object.
    */
   @Override
@@ -36,7 +36,7 @@ public class BlackHoleBuffer<T> extends ChannelValueStore<T> {
    * undefined state.</I>
    * <P>
    * Pre-condition: The state must not be EMPTY
-   * 
+   *
    * @return The next available Object from the ChannelValueStore
    */
   @Override
@@ -47,7 +47,7 @@ public class BlackHoleBuffer<T> extends ChannelValueStore<T> {
   /**
    * Returns the current state of the ZeroBuffer, should be called to ensure the
    * Pre-conditions of the other methods are not broken.
-   * 
+   *
    * @return The current state of the ZeroBuffer (EMPTY or FULL)
    */
   @Override
@@ -63,7 +63,7 @@ public class BlackHoleBuffer<T> extends ChannelValueStore<T> {
    * undefined state.</I>
    * <P>
    * Pre-condition: The state must not be FULL
-   * 
+   *
    * @param value The object to put in the ChannelValueStore
    */
   @Override

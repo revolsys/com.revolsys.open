@@ -50,33 +50,33 @@ import com.revolsys.jts.geom.segment.Segment;
  * <p>
  * This class handles polygonal geometries with any number of shells and holes.
  * The orientation of the shell and hole rings is unimportant.
- * In order to compute a correct location for a given polygonal geometry, 
+ * In order to compute a correct location for a given polygonal geometry,
  * it is essential that <b>all</b> segments are counted which
  * <ul>
- * <li>touch the ray 
+ * <li>touch the ray
  * <li>lie in in any ring which may contain the point
  * </ul>
  * The only exception is when the point-on-segment situation is detected, in which
  * case no further processing is required.
- * The implication of the above rule is that segments 
+ * The implication of the above rule is that segments
  * which can be a priori determined to <i>not</i> touch the ray
- * (i.e. by a test of their bounding box or Y-extent) 
+ * (i.e. by a test of their bounding box or Y-extent)
  * do not need to be counted.  This allows for optimization by indexing.
- * 
+ *
  * @author Martin Davis
  *
  */
 public class RayCrossingCounter implements Visitor<LineSegment> {
 
   /**
-  * Determines the {@link Location} of a point in a ring. 
-  * 
-  * @param p
-  *            the point to test
-  * @param ring
-  *            a coordinate sequence forming a ring
-  * @return the location of the point in the ring
-  */
+   * Determines the {@link Location} of a point in a ring.
+   *
+   * @param p
+   *            the point to test
+   * @param ring
+   *            a coordinate sequence forming a ring
+   * @return the location of the point in the ring
+   */
   public static Location locatePointInRing(final Point coordinates,
     final LineString ring) {
     final RayCrossingCounter counter = new RayCrossingCounter(coordinates);
@@ -99,9 +99,9 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
   /**
    * Determines the {@link Location} of a point in a ring.
    * This method is an exemplar of how to use this class.
-   * 
+   *
    * @param p the point to test
-   * @param ring an array of Point forming a ring 
+   * @param ring an array of Point forming a ring
    * @return the location of the point in the ring
    */
   public static Location locatePointInRing(final Point p, final Point[] ring) {
@@ -138,12 +138,12 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
 
   public void countSegment(final double x1, final double y1, final double x2,
     final double y2) {
-    if (x1 < x && x2 < x) {
+    if (x1 < this.x && x2 < this.x) {
       // check if the segment is strictly to the left of the test point
-    } else if (x == x2 && y == y2) {
+    } else if (this.x == x2 && this.y == y2) {
       // check if the point is equal to the current ring vertex
-      pointOnSegment = true;
-    } else if (y1 == y && y2 == y) {
+      this.pointOnSegment = true;
+    } else if (y1 == this.y && y2 == this.y) {
       /**
        * For horizontal segments, check if the point is on the segment. Otherwise,
        * horizontal segments are not counted.
@@ -154,10 +154,10 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
         minX = x2;
         maxX = x1;
       }
-      if (x >= minX && x <= maxX) {
-        pointOnSegment = true;
+      if (this.x >= minX && this.x <= maxX) {
+        this.pointOnSegment = true;
       }
-    } else if ((y1 > y && y2 <= y) || (y2 > y && y1 <= y)) {
+    } else if (y1 > this.y && y2 <= this.y || y2 > this.y && y1 <= this.y) {
       /**
        * Evaluate all non-horizontal segments which cross a horizontal ray to the
        * right of the test pt. To avoid double-counting shared vertices, we use
@@ -170,10 +170,10 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
        * </ul>
        */
       // translate the segment so that the test point lies on the origin
-      final double deltaX1 = x1 - x;
-      final double deltaY1 = y1 - y;
-      final double deltaX2 = x2 - x;
-      final double deltaY2 = y2 - y;
+      final double deltaX1 = x1 - this.x;
+      final double deltaY1 = y1 - this.y;
+      final double deltaX2 = x2 - this.x;
+      final double deltaY2 = y2 - this.y;
 
       /**
        * The translated segment straddles the x-axis. Compute the sign of the
@@ -186,7 +186,7 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
       double xIntSign = RobustDeterminant.signOfDet2x2(deltaX1, deltaY1,
         deltaX2, deltaY2);
       if (xIntSign == 0.0) {
-        pointOnSegment = true;
+        this.pointOnSegment = true;
       } else {
         if (deltaY2 < deltaY1) {
           xIntSign = -xIntSign;
@@ -198,16 +198,16 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
         // + " = " + xIntSign);
         // The segment crosses the ray if the sign is strictly positive.
         if (xIntSign > 0.0) {
-          crossingCount++;
+          this.crossingCount++;
         }
       }
     }
   }
 
   /**
-    * For each segment, check if it crosses a horizontal ray running from the
-     * test point in the positive x direction.
-    * 
+   * For each segment, check if it crosses a horizontal ray running from the
+   * test point in the positive x direction.
+   *
    * @param p1 an endpoint of the segment
    * @param p2 another endpoint of the segment
    */
@@ -226,57 +226,57 @@ public class RayCrossingCounter implements Visitor<LineSegment> {
   }
 
   /**
-   * Gets the {@link Location} of the point relative to 
+   * Gets the {@link Location} of the point relative to
    * the ring, polygon
    * or multipolygon from which the processed segments were provided.
    * <p>
-   * This method only determines the correct location 
-   * if <b>all</b> relevant segments must have been processed. 
-   * 
+   * This method only determines the correct location
+   * if <b>all</b> relevant segments must have been processed.
+   *
    * @return the Location of the point
    */
   public Location getLocation() {
-    if (pointOnSegment) {
+    if (this.pointOnSegment) {
       return Location.BOUNDARY;
     }
 
     // The point is in the interior of the ring if the number of X-crossings is
     // odd.
-    if ((crossingCount % 2) == 1) {
+    if (this.crossingCount % 2 == 1) {
       return Location.INTERIOR;
     }
     return Location.EXTERIOR;
   }
 
   public double getX() {
-    return x;
+    return this.x;
   }
 
   public double getY() {
-    return y;
+    return this.y;
   }
 
   /**
    * Reports whether the point lies exactly on one of the supplied segments.
    * This method may be called at any time as segments are processed.
-   * If the result of this method is <tt>true</tt>, 
+   * If the result of this method is <tt>true</tt>,
    * no further segments need be supplied, since the result
    * will never change again.
-   * 
+   *
    * @return true if the point lies exactly on a segment
    */
   public boolean isOnSegment() {
-    return pointOnSegment;
+    return this.pointOnSegment;
   }
 
   /**
-   * Tests whether the point lies in or on 
+   * Tests whether the point lies in or on
    * the ring, polygon
    * or multipolygon from which the processed segments were provided.
    * <p>
-   * This method only determines the correct location 
-   * if <b>all</b> relevant segments must have been processed. 
-   * 
+   * This method only determines the correct location
+   * if <b>all</b> relevant segments must have been processed.
+   *
    * @return true if the point lies in or on the supplied polygon
    */
   public boolean isPointInPolygon() {

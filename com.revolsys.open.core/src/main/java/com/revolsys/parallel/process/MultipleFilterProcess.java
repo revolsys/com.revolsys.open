@@ -1,6 +1,5 @@
 package com.revolsys.parallel.process;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,12 +15,12 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
   /**
    * Add the filter with the channel to write the data object to if the filter
    * matches.
-   * 
+   *
    * @param filter The filter.
    * @param channel The channel.
    */
   private void addFiler(final Filter<T> filter, final Channel<T> channel) {
-    filters.put(filter, channel);
+    this.filters.put(filter, channel);
     if (channel != null) {
       channel.writeConnect();
     }
@@ -29,8 +28,7 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
 
   @Override
   protected void destroy() {
-    for (final Iterator<Channel<T>> channels = filters.values().iterator(); channels.hasNext();) {
-      final Channel<T> channel = channels.next();
+    for (Channel<T> channel : this.filters.values()) {
       if (channel != null) {
         channel.writeDisconnect();
       }
@@ -41,7 +39,7 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
    * @return the filters
    */
   public Map<Filter<T>, Channel<T>> getFilters() {
-    return filters;
+    return this.filters;
   }
 
   @Override
@@ -51,7 +49,7 @@ public class MultipleFilterProcess<T> extends BaseInOutProcess<T, T> {
   @Override
   protected void process(final Channel<T> in, final Channel<T> out,
     final T object) {
-    for (final Entry<Filter<T>, Channel<T>> entry : filters.entrySet()) {
+    for (final Entry<Filter<T>, Channel<T>> entry : this.filters.entrySet()) {
       final Filter<T> filter = entry.getKey();
       final Channel<T> filterOut = entry.getValue();
       if (processFilter(object, filter, filterOut)) {

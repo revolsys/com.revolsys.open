@@ -15,6 +15,11 @@ import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.SingleObjectVisitor;
 
 public class QuadTree<T> implements SpatialIndex<T>, Serializable {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static double[] ensureExtent(final double[] bounds,
     final double minExtent) {
     double minX = bounds[0];
@@ -47,7 +52,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   private int size = 0;
 
   public QuadTree() {
-    root = new Node<T>();
+    this.root = new Node<T>();
   }
 
   public QuadTree(final GeometryFactory geometryFactory) {
@@ -60,37 +65,37 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   public void clear() {
-    root.clear();
-    minExtent = 1.0;
-    size = 0;
+    this.root.clear();
+    this.minExtent = 1.0;
+    this.size = 0;
   }
 
   private void collectStats(final BoundingBox envelope) {
     final double delX = envelope.getWidth();
-    if (delX < minExtent && delX > 0.0) {
-      minExtent = delX;
+    if (delX < this.minExtent && delX > 0.0) {
+      this.minExtent = delX;
     }
 
     final double delY = envelope.getHeight();
-    if (delY < minExtent && delY > 0.0) {
-      minExtent = delY;
+    if (delY < this.minExtent && delY > 0.0) {
+      this.minExtent = delY;
     }
   }
 
   protected double[] convert(BoundingBox boundingBox) {
-    if (geometryFactory != null) {
-      boundingBox = boundingBox.convert(geometryFactory);
+    if (this.geometryFactory != null) {
+      boundingBox = boundingBox.convert(this.geometryFactory);
     }
     return boundingBox.getBounds(2);
   }
 
   public int depth() {
-    return root.depth();
+    return this.root.depth();
   }
 
   public List<T> getAll() {
     final CreateListVisitor<T> visitor = new CreateListVisitor<T>();
-    root.visit(this, visitor);
+    this.root.visit(this, visitor);
     return visitor.getList();
   }
 
@@ -110,11 +115,11 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   public int getSize() {
-    return size;
+    return this.size;
   }
 
   @Override
@@ -124,10 +129,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     } else {
       double[] bounds = convert(boundingBox);
       if (bounds != null) {
-        size++;
+        this.size++;
         collectStats(boundingBox);
-        bounds = ensureExtent(bounds, minExtent);
-        root.insertRoot(this, bounds, item);
+        bounds = ensureExtent(bounds, this.minExtent);
+        this.root.insertRoot(this, bounds, item);
       }
     }
   }
@@ -148,7 +153,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   public List<T> query(final BoundingBox boundingBox, final String methodName,
     final Object... parameters) {
     final InvokeMethodFilter<T> filter = new InvokeMethodFilter<T>(methodName,
-      parameters);
+        parameters);
     return query(boundingBox, filter);
   }
 
@@ -164,10 +169,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   @Override
   public boolean remove(final BoundingBox boundingBox, final T item) {
     double[] bounds = convert(boundingBox);
-    bounds = ensureExtent(bounds, minExtent);
-    final boolean removed = root.remove(this, bounds, item);
+    bounds = ensureExtent(bounds, this.minExtent);
+    final boolean removed = this.root.remove(this, bounds, item);
     if (removed) {
-      size--;
+      this.size--;
     }
     return removed;
   }
@@ -182,10 +187,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   public void visit(final BoundingBox boundingBox, final Visitor<T> visitor) {
     final double[] bounds = convert(boundingBox);
-    root.visit(this, bounds, visitor);
+    this.root.visit(this, bounds, visitor);
   }
 
   public void visitAll(final Visitor<T> visitor) {
-    root.visit(this, visitor);
+    this.root.visit(this, visitor);
   }
 }

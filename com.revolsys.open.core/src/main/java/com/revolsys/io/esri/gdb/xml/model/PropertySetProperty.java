@@ -6,11 +6,11 @@ public class PropertySetProperty {
   private Object value;
 
   public String getKey() {
-    return key;
+    return this.key;
   }
 
   public Object getValue() {
-    return value;
+    return this.value;
   }
 
   public void setKey(final String key) {
@@ -23,6 +23,6 @@ public class PropertySetProperty {
 
   @Override
   public String toString() {
-    return key + "=" + value;
+    return this.key + "=" + this.value;
   }
 }

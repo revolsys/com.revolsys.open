@@ -118,7 +118,7 @@ AbstractConnectionRegistryManager<RecordStoreConnectionRegistry, RecordStoreConn
     INSTANCE = new RecordStoreConnectionManager();
     final File appsDirectory = OS.getApplicationDataDirectory();
     final File oldDirectory = new File(appsDirectory,
-      "com.revolsys.gis/Data Stores");
+        "com.revolsys.gis/Data Stores");
     if (oldDirectory.exists()) {
       oldDirectory.renameTo(new File(appsDirectory,
           "com.revolsys.gis/Record Stores"));

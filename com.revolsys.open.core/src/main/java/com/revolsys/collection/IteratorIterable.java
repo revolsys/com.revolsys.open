@@ -12,7 +12,7 @@ public class IteratorIterable<V> implements Iterable<V> {
 
   @Override
   public Iterator<V> iterator() {
-    return iterator;
+    return this.iterator;
   }
 
 }

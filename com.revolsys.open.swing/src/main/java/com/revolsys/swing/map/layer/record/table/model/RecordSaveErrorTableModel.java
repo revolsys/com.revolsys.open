@@ -122,7 +122,7 @@ SortableTableModel, ListSelectionListener {
       final String layerPath = this.layer.getPath();
       final BasePanel panel = new BasePanel(new VerticalLayout(), new JLabel(
         "<html><p><b style=\"color:red\">Error saving changes for layer:</b></p><p>"
-          + layerPath + "</p>"), RecordSaveErrorTableModel.createPanel(this));
+            + layerPath + "</p>"), RecordSaveErrorTableModel.createPanel(this));
       panel.setPreferredSize(new Dimension(
         SwingUtil.getScreenBounds().width - 300, getRowCount() * 22 + 75));
 

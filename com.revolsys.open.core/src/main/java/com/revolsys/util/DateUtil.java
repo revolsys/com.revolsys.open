@@ -182,7 +182,7 @@ public class DateUtil {
                   final int millisIndex = 20;
                   tzIndex = 20;
                   while (tzIndex < length
-                    && Character.isDigit(dateString.charAt(tzIndex))) {
+                      && Character.isDigit(dateString.charAt(tzIndex))) {
                     tzIndex++;
                   }
                   if (millisIndex != tzIndex) {

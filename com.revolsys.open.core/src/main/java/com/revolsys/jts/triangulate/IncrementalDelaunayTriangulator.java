@@ -44,7 +44,7 @@ import com.revolsys.jts.triangulate.quadedge.Vertex;
 /**
  * Computes a Delauanay Triangulation of a set of {@link Vertex}es, using an
  * incrementatal insertion algorithm.
- * 
+ *
  * @author Martin Davis
  * @version 1.0
  */
@@ -56,13 +56,13 @@ public class IncrementalDelaunayTriangulator {
   /**
    * Creates a new triangulator using the given {@link QuadEdgeSubdivision}.
    * The triangulator uses the tolerance of the supplied subdivision.
-   * 
+   *
    * @param subdiv
    *          a subdivision in which to build the TIN
    */
   public IncrementalDelaunayTriangulator(final QuadEdgeSubdivision subdiv) {
     this.subdiv = subdiv;
-    isUsingTolerance = subdiv.getTolerance() > 0.0;
+    this.isUsingTolerance = subdiv.getTolerance() > 0.0;
 
   }
 
@@ -71,7 +71,7 @@ public class IncrementalDelaunayTriangulator {
    * triangulation, and fixes the affected edges so that the result is still a
    * Delaunay triangulation.
    * <p>
-   * 
+   *
    * @return a quadedge containing the inserted vertex
    */
   public QuadEdge insertSite(final Vertex v) {
@@ -83,28 +83,28 @@ public class IncrementalDelaunayTriangulator {
      * existing edge. Without this test zero-width triangles have been observed
      * to be created)
      */
-    QuadEdge e = subdiv.locate(v);
+    QuadEdge e = this.subdiv.locate(v);
 
-    if (subdiv.isVertexOfEdge(e, v)) {
+    if (this.subdiv.isVertexOfEdge(e, v)) {
       // point is already in subdivision.
       return e;
-    } else if (subdiv.isOnEdge(e, v.getCoordinate())) {
+    } else if (this.subdiv.isOnEdge(e, v.getCoordinate())) {
       // the point lies exactly on an edge, so delete the edge
       // (it will be replaced by a pair of edges which have the point as a
       // vertex)
       e = e.oPrev();
-      subdiv.delete(e.oNext());
+      this.subdiv.delete(e.oNext());
     }
 
     /**
-     * Connect the new point to the vertices of the containing triangle 
+     * Connect the new point to the vertices of the containing triangle
      * (or quadrilateral, if the new point fell on an existing edge.)
      */
-    QuadEdge base = subdiv.makeEdge(e.orig(), v);
+    QuadEdge base = this.subdiv.makeEdge(e.orig(), v);
     QuadEdge.splice(base, e);
     final QuadEdge startEdge = base;
     do {
-      base = subdiv.connect(e, base.sym());
+      base = this.subdiv.connect(e, base.sym());
       e = base.oPrev();
     } while (e.lNext() != startEdge);
 
@@ -128,9 +128,9 @@ public class IncrementalDelaunayTriangulator {
    * unique up to the provided tolerance value. (i.e. no two vertices should be
    * closer than the provided tolerance value). They do not have to be rounded
    * to the tolerance grid, however.
-   * 
+   *
    * @param vertices a Collection of Vertex
-   * 
+   *
    * @throws LocateFailureException if the location algorithm fails to converge in a reasonable number of iterations
    */
   public void insertSites(final Collection vertices) {

@@ -9,7 +9,7 @@ import java.util.Collection;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 
 public class PropertyChangeArrayList<T> extends ArrayList<T> implements
-  PropertyChangeListener, PropertyChangeSupportProxy {
+PropertyChangeListener, PropertyChangeSupportProxy {
   private static final long serialVersionUID = 1L;
 
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
@@ -27,7 +27,7 @@ public class PropertyChangeArrayList<T> extends ArrayList<T> implements
     if (object != null && !contains(object)) {
       super.add(index, object);
       addListener(object);
-      propertyChangeSupport.fireIndexedPropertyChange("objects", index, null,
+      this.propertyChangeSupport.fireIndexedPropertyChange("objects", index, null,
         object);
     }
   }
@@ -80,24 +80,24 @@ public class PropertyChangeArrayList<T> extends ArrayList<T> implements
 
   @Override
   public PropertyChangeSupport getPropertyChangeSupport() {
-    return propertyChangeSupport;
+    return this.propertyChangeSupport;
   }
 
   @Override
   public int hashCode() {
-    return propertyChangeSupport.hashCode();
+    return this.propertyChangeSupport.hashCode();
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    propertyChangeSupport.firePropertyChange(event);
+    this.propertyChangeSupport.firePropertyChange(event);
   }
 
   @Override
   public T remove(final int index) {
     final T object = super.remove(index);
     removeListener(object);
-    propertyChangeSupport.fireIndexedPropertyChange("objects", index, object,
+    this.propertyChangeSupport.fireIndexedPropertyChange("objects", index, object,
       null);
     return object;
   }
@@ -139,7 +139,7 @@ public class PropertyChangeArrayList<T> extends ArrayList<T> implements
     final T oldValue = super.set(index, value);
     if (value != oldValue) {
       removeListener(oldValue);
-      propertyChangeSupport.fireIndexedPropertyChange("objects", index,
+      this.propertyChangeSupport.fireIndexedPropertyChange("objects", index,
         oldValue, value);
       addListener(value);
     }

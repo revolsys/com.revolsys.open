@@ -112,7 +112,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   }
 
   private void doubleNotNaN(final ResourceEndianOutput out, final double value)
-    throws IOException {
+      throws IOException {
     if (MathUtil.isNanOrInfinite(value)) {
       out.writeLEDouble(0);
     } else {
@@ -161,8 +161,8 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         }
         if (this.geometryDataType == null) {
           this.geometryDataType = object.getRecordDefinition()
-            .getGeometryField()
-            .getType();
+              .getGeometryField()
+              .getType();
           if (DataTypes.GEOMETRY.equals(this.geometryDataType)) {
             final String geometryType = geometry.getGeometryType();
             this.geometryDataType = DataTypes.getType(geometryType);

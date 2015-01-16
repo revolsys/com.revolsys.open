@@ -45,7 +45,7 @@ import com.revolsys.jts.geom.impl.PointDouble;
  * A dynamic list of the vertices in a constructed offset curve.
  * Automatically removes adjacent vertices
  * which are closer than a given tolerance.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -56,20 +56,20 @@ class OffsetSegmentString {
   private GeometryFactory precisionModel = null;
 
   /**
-   * The distance below which two adjacent points on the curve 
+   * The distance below which two adjacent points on the curve
    * are considered to be coincident.
    * This is chosen to be a small fraction of the offset distance.
    */
   private double minimimVertexDistance = 0.0;
 
   public void addPt(final double... coordinates) {
-    if (!precisionModel.isFloating()) {
-      coordinates[0] = precisionModel.makePrecise(0, coordinates[0]);
-      coordinates[1] = precisionModel.makePrecise(1, coordinates[1]);
+    if (!this.precisionModel.isFloating()) {
+      coordinates[0] = this.precisionModel.makePrecise(0, coordinates[0]);
+      coordinates[1] = this.precisionModel.makePrecise(1, coordinates[1]);
     }
     final Point bufPt = new PointDouble(coordinates);
     if (!isRedundant(bufPt)) {
-      points.add(bufPt);
+      this.points.add(bufPt);
     }
   }
 
@@ -90,41 +90,41 @@ class OffsetSegmentString {
   }
 
   public void closeRing() {
-    if (points.size() < 1) {
+    if (this.points.size() < 1) {
       return;
     }
-    final Point startPt = new PointDouble(points.get(0));
-    final Point lastPt = points.get(points.size() - 1);
+    final Point startPt = new PointDouble(this.points.get(0));
+    final Point lastPt = this.points.get(this.points.size() - 1);
     Point last2Pt = null;
-    if (points.size() >= 2) {
-      last2Pt = points.get(points.size() - 2);
+    if (this.points.size() >= 2) {
+      last2Pt = this.points.get(this.points.size() - 2);
     }
     if (startPt.equals(lastPt)) {
       return;
     }
-    points.add(startPt);
+    this.points.add(startPt);
   }
 
   public LineString getPoints() {
-    return new LineStringDouble(2, points);
+    return new LineStringDouble(2, this.points);
   }
 
   /**
    * Tests whether the given point is redundant
    * relative to the previous
    * point in the list (up to tolerance).
-   * 
+   *
    * @param pt
    * @return true if the point is redundant
    */
   private boolean isRedundant(final Point pt) {
-    if (points.size() < 1) {
+    if (this.points.size() < 1) {
       return false;
     }
     // return points.get(points.size() - 1).equals(pt);
-    final Point lastPt = points.get(points.size() - 1);
+    final Point lastPt = this.points.get(this.points.size() - 1);
     final double ptDist = pt.distance(lastPt);
-    if (ptDist < minimimVertexDistance) {
+    if (ptDist < this.minimimVertexDistance) {
       return true;
     }
     return false;
@@ -145,10 +145,10 @@ class OffsetSegmentString {
   @Override
   public String toString() {
     final GeometryFactory geometryFactory = GeometryFactory.floating3();
-    if (points.size() == 1) {
-      return points.get(0).toString();
+    if (this.points.size() == 1) {
+      return this.points.get(0).toString();
     } else {
-      final LineString line = geometryFactory.lineString(points);
+      final LineString line = geometryFactory.lineString(this.points);
       return line.toString();
     }
   }

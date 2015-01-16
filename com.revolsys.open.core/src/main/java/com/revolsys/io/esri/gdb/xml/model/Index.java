@@ -13,23 +13,23 @@ public class Index {
   private List<Field> fields = new ArrayList<Field>();
 
   public void addField(final Field field) {
-    fields.add(field);
+    this.fields.add(field);
   }
 
   public List<Field> getFields() {
-    return fields;
+    return this.fields;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public boolean isIsAscending() {
-    return isAscending;
+    return this.isAscending;
   }
 
   public boolean isIsUnique() {
-    return isUnique;
+    return this.isUnique;
   }
 
   public void setFields(final List<Field> fields) {

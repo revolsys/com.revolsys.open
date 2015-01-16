@@ -40,12 +40,12 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.operation.valid.IsValidOp;
 
 /**
- * 
+ *
  * This class is used to create a line string within the specified bounding box.
- * 
+ *
  * Sucessive calls to create may or may not return the same geometry topology.
  *
- * @author David Zwiers, Vivid Solutions. 
+ * @author David Zwiers, Vivid Solutions.
  */
 public class LineStringGenerator extends GeometryGenerator {
   private static void fillArc(final double x, final double dx, final double y,
@@ -120,9 +120,9 @@ public class LineStringGenerator extends GeometryGenerator {
 
   /**
    * Create the points in an approximation of an open circle (one edge will not be included).
-   * 
+   *
    * Note: this requires the number of points to be greater than 2.
-   * 
+   *
    * @see #getNumberPoints()
    * @see #setNumberPoints(int)
    */
@@ -134,22 +134,22 @@ public class LineStringGenerator extends GeometryGenerator {
   private static final int RUNS = 5;
 
   /**
-   * As the user increases the number of points, the probability of creating a random valid linestring decreases. 
-   * Please take not of this when selecting the generation style, and the number of points. 
-   * 
+   * As the user increases the number of points, the probability of creating a random valid linestring decreases.
+   * Please take not of this when selecting the generation style, and the number of points.
+   *
    * May return null if a geometry could not be created.
-   * 
+   *
    * @see #getNumberPoints()
    * @see #setNumberPoints(int)
    * @see #getGenerationAlgorithm()
    * @see #setGenerationAlgorithm(int)
-   * 
+   *
    * @see #VERT
    * @see #HORZ
    * @see #ARC
-   * 
+   *
    * @see com.revolsys.jts.testold.generator.GeometryGenerator#create()
-   * 
+   *
    * @throws IllegalStateException When the alg is not valid or the number of points is invalid
    * @throws NullPointerException when either the Geometry Factory, or the Bounding Box are undefined.
    */
@@ -178,13 +178,13 @@ public class LineStringGenerator extends GeometryGenerator {
       switch (getGenerationAlgorithm()) {
         case VERT:
           fillVert(x, dx, y, dy, coords, this.geometryFactory);
-        break;
+          break;
         case HORZ:
           fillHorz(x, dx, y, dy, coords, this.geometryFactory);
-        break;
+          break;
         case ARC:
           fillArc(x, dx, y, dy, coords, this.geometryFactory);
-        break;
+          break;
         default:
           throw new IllegalStateException("Invalid Alg. Specified");
       }

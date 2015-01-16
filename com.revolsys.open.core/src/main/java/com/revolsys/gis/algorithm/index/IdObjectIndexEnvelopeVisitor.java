@@ -19,10 +19,10 @@ public final class IdObjectIndexEnvelopeVisitor<T> implements Visitor<Integer> {
 
   @Override
   public boolean visit(final Integer id) {
-    final T object = index.getObject(id);
-    final BoundingBox e = index.getEnvelope(object);
-    if (e.intersects(envelope)) {
-      if (!visitor.visit(object)) {
+    final T object = this.index.getObject(id);
+    final BoundingBox e = this.index.getEnvelope(object);
+    if (e.intersects(this.envelope)) {
+      if (!this.visitor.visit(object)) {
         return false;
       }
     }

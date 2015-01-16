@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class BaseAuthority implements Serializable, Authority {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 6255702398027894174L;
 
@@ -29,9 +29,9 @@ public class BaseAuthority implements Serializable, Authority {
       return true;
     } else if (object instanceof Authority) {
       final Authority authority = (Authority)object;
-      if (!name.equals(authority.getName())) {
+      if (!this.name.equals(authority.getName())) {
         return false;
-      } else if (!code.equals(authority.getCode())) {
+      } else if (!this.code.equals(authority.getCode())) {
         return false;
       } else {
         return true;
@@ -43,25 +43,25 @@ public class BaseAuthority implements Serializable, Authority {
 
   @Override
   public String getCode() {
-    return code;
+    return this.code;
   }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + name.hashCode();
-    result = prime * result + code.hashCode();
+    result = prime * result + this.name.hashCode();
+    result = prime * result + this.code.hashCode();
     return result;
   }
 
   @Override
   public String toString() {
-    return name + ":" + code;
+    return this.name + ":" + this.code;
   }
 }

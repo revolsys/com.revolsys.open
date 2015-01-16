@@ -87,7 +87,7 @@ class MCIndexedGeometry {
  * a {@link Polygonal} geometry, using indexing for efficiency.
  * This algorithm is suitable for use in cases where
  * many points will be tested against a given area.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -137,9 +137,9 @@ public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
 
   /**
    * Determines the {@link Location} of a point in an areal {@link Geometry}.
-   * 
+   *
    * @param p the point to test
-   * @return the location of the point in the geometry  
+   * @return the location of the point in the geometry
    */
   @Override
   public Location locate(final Point p) {

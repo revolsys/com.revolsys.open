@@ -24,7 +24,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public class ComponentViewport2D extends Viewport2D implements
-  PropertyChangeListener {
+PropertyChangeListener {
 
   private final JComponent component;
 
@@ -122,7 +122,7 @@ public class ComponentViewport2D extends Viewport2D implements
 
   public double getMaxScale() {
     final BoundingBox areaBoundingBox = getGeometryFactory().getCoordinateSystem()
-      .getAreaBoundingBox();
+        .getAreaBoundingBox();
     final Measurable<Length> areaWidth = areaBoundingBox.getWidthLength();
     final Measurable<Length> areaHeight = areaBoundingBox.getHeightLength();
 
@@ -182,7 +182,7 @@ public class ComponentViewport2D extends Viewport2D implements
 
   public Unit<Length> getScaleUnit(final double scale) {
     final Unit<Length> lengthUnit = getGeometryFactory().getCoordinateSystem()
-      .getLengthUnit();
+        .getLengthUnit();
     final Unit<Length> scaleUnit = lengthUnit.divide(scale);
     return scaleUnit;
   }
@@ -222,7 +222,7 @@ public class ComponentViewport2D extends Viewport2D implements
       modelUnitsPerViewUnit = 2 * Math.pow(10, -this.maxDecimalDigits);
       final double minModelWidth = getViewWidthPixels() * modelUnitsPerViewUnit;
       final double minModelHeight = getViewHeightPixels()
-        * modelUnitsPerViewUnit;
+          * modelUnitsPerViewUnit;
       validBoundingBox = validBoundingBox.expand(
         (minModelWidth - modelWidth) / 2, (minModelHeight - modelHeight) / 2);
     }
@@ -321,9 +321,9 @@ public class ComponentViewport2D extends Viewport2D implements
       final Insets insets = this.component.getInsets();
 
       final int viewWidth = this.component.getWidth() - insets.left
-        - insets.right;
+          - insets.right;
       final int viewHeight = this.component.getHeight() - insets.top
-        - insets.bottom;
+          - insets.bottom;
 
       setViewWidth(viewWidth);
       setViewHeight(viewHeight);

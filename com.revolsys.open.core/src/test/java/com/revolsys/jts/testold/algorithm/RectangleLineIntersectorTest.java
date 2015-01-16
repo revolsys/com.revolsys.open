@@ -65,7 +65,7 @@ public class RectangleLineIntersectorTest extends TestCase {
 /**
  * Tests optimized RectangleLineIntersector against
  * a brute force approach (which is assumed to be correct).
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -91,7 +91,7 @@ class RectangleLineIntersectorValidator {
   private BoundingBox createRectangle() {
     final BoundingBox rectEnv = new BoundingBoxDoubleGf(new PointDouble(this.baseX,
       this.baseY, Point.NULL_ORDINATE), new PointDouble(this.baseX
-      + this.rectSize, this.baseY + this.rectSize, Point.NULL_ORDINATE));
+        + this.rectSize, this.baseY + this.rectSize, Point.NULL_ORDINATE));
     return rectEnv;
   }
 

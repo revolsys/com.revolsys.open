@@ -17,7 +17,7 @@ public interface EndianOutput {
 
   /**
    * Write a big endian int.
-   * 
+   *
    * @param i The int.
    * @throws IOException If an I/O error occurs.
    */
@@ -27,7 +27,7 @@ public interface EndianOutput {
 
   /**
    * Write a big endian double.
-   * 
+   *
    * @param d The double.
    * @throws IOException If an I/O error occurs.
    */
@@ -35,7 +35,7 @@ public interface EndianOutput {
 
   /**
    * Write a big endian float.
-   * 
+   *
    * @param f The float.
    * @throws IOException If an I/O error occurs.
    */
@@ -43,7 +43,7 @@ public interface EndianOutput {
 
   /**
    * Write a big endian int.
-   * 
+   *
    * @param i The int.
    * @throws IOException If an I/O error occurs.
    */
@@ -51,7 +51,7 @@ public interface EndianOutput {
 
   /**
    * Write a little endian double.
-   * 
+   *
    * @param d The double.
    * @throws IOException If an I/O error occurs.
    */
@@ -59,7 +59,7 @@ public interface EndianOutput {
 
   /**
    * Write a little endian float.
-   * 
+   *
    * @param f The float.
    * @throws IOException If an I/O error occurs.
    */
@@ -67,7 +67,7 @@ public interface EndianOutput {
 
   /**
    * Write a little endian int.
-   * 
+   *
    * @param i The int.
    * @throws IOException If an I/O error occurs.
    */
@@ -75,7 +75,7 @@ public interface EndianOutput {
 
   /**
    * Write a little endian int.
-   * 
+   *
    * @param l The long.
    * @throws IOException If an I/O error occurs.
    */
@@ -83,7 +83,7 @@ public interface EndianOutput {
 
   /**
    * Write a little endian short.
-   * 
+   *
    * @param s The short.
    * @throws IOException If an I/O error occurs.
    */
@@ -91,7 +91,7 @@ public interface EndianOutput {
 
   /**
    * Write a big endian int.
-   * 
+   *
    * @param l The long.
    * @throws IOException If an I/O error occurs.
    */
@@ -99,7 +99,7 @@ public interface EndianOutput {
 
   /**
    * Write a big endian short.
-   * 
+   *
    * @param s The short.
    * @throws IOException If an I/O error occurs.
    */

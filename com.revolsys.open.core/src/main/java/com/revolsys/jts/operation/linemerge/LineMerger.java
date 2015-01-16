@@ -44,18 +44,18 @@ import com.revolsys.jts.planargraph.Node;
 import com.revolsys.jts.util.Assert;
 
 /**
- * Merges a collection of linear components to form maximal-length linestrings. 
- * <p> 
+ * Merges a collection of linear components to form maximal-length linestrings.
+ * <p>
  * Merging stops at nodes of degree 1 or degree 3 or more.
- * In other words, all nodes of degree 2 are merged together. 
+ * In other words, all nodes of degree 2 are merged together.
  * The exception is in the case of an isolated loop, which only has degree-2 nodes.
  * In this case one of the nodes is chosen as a starting point.
- * <p> 
+ * <p>
  * The direction of each
  * merged LineString will be that of the majority of the LineStrings from which it
  * was derived.
  * <p>
- * Any dimension of Geometry is handled - the constituent linework is extracted to 
+ * Any dimension of Geometry is handled - the constituent linework is extracted to
  * form the edges. The edges must be correctly noded; that is, they must only meet
  * at their endpoints.  The LineMerger will accept non-noded input
  * but will not merge non-noded edges.
@@ -86,11 +86,11 @@ public class LineMerger {
    * Adds a collection of Geometries to be processed. May be called multiple times.
    * Any dimension of Geometry may be added; the constituent linework will be
    * extracted.
-   * 
+   *
    * @param geometries the geometries to be line-merged
    */
   public void add(final Collection geometries) {
-    mergedLineStrings = null;
+    this.mergedLineStrings = null;
     for (final Iterator i = geometries.iterator(); i.hasNext();) {
       final Geometry geometry = (Geometry)i.next();
       add(geometry);
@@ -101,7 +101,7 @@ public class LineMerger {
    * Adds a Geometry to be processed. May be called multiple times.
    * Any dimension of Geometry may be added; the constituent linework will be
    * extracted.
-   * 
+   *
    * @param geometry geometry to be line-merged
    */
   public void add(final Geometry geometry) {
@@ -111,10 +111,10 @@ public class LineMerger {
   }
 
   private void add(final LineString lineString) {
-    if (factory == null) {
+    if (this.factory == null) {
       this.factory = lineString.getGeometryFactory();
     }
-    graph.addEdge(lineString);
+    this.graph.addEdge(lineString);
   }
 
   private void buildEdgeStringsForIsolatedLoops() {
@@ -122,7 +122,7 @@ public class LineMerger {
   }
 
   private void buildEdgeStringsForNonDegree2Nodes() {
-    for (final Iterator i = graph.getNodes().iterator(); i.hasNext();) {
+    for (final Iterator i = this.graph.getNodes().iterator(); i.hasNext();) {
       final Node node = (Node)i.next();
       if (node.getDegree() != 2) {
         buildEdgeStringsStartingAt(node);
@@ -136,7 +136,7 @@ public class LineMerger {
   }
 
   private void buildEdgeStringsForUnprocessedNodes() {
-    for (final Iterator i = graph.getNodes().iterator(); i.hasNext();) {
+    for (final Iterator i = this.graph.getNodes().iterator(); i.hasNext();) {
       final Node node = (Node)i.next();
       if (!node.isMarked()) {
         Assert.isTrue(node.getDegree() == 2);
@@ -152,13 +152,13 @@ public class LineMerger {
       if (directedEdge.getEdge().isMarked()) {
         continue;
       }
-      edgeStrings.add(buildEdgeStringStartingWith(directedEdge));
+      this.edgeStrings.add(buildEdgeStringStartingWith(directedEdge));
     }
   }
 
   private EdgeString buildEdgeStringStartingWith(
     final LineMergeDirectedEdge start) {
-    final EdgeString edgeString = new EdgeString(factory);
+    final EdgeString edgeString = new EdgeString(this.factory);
     LineMergeDirectedEdge current = start;
     do {
       edgeString.add(current);
@@ -170,30 +170,30 @@ public class LineMerger {
 
   /**
    * Gets the {@link LineString}s created by the merging process.
-   * 
+   *
    * @return the collection of merged LineStrings
    */
   public Collection getMergedLineStrings() {
     merge();
-    return mergedLineStrings;
+    return this.mergedLineStrings;
   }
 
   private void merge() {
-    if (mergedLineStrings != null) {
+    if (this.mergedLineStrings != null) {
       return;
     }
 
     // reset marks (this allows incremental processing)
-    GraphComponent.setMarked(graph.nodeIterator(), false);
-    GraphComponent.setMarked(graph.edgeIterator(), false);
+    GraphComponent.setMarked(this.graph.nodeIterator(), false);
+    GraphComponent.setMarked(this.graph.edgeIterator(), false);
 
-    edgeStrings = new ArrayList();
+    this.edgeStrings = new ArrayList();
     buildEdgeStringsForObviousStartNodes();
     buildEdgeStringsForIsolatedLoops();
-    mergedLineStrings = new ArrayList();
-    for (final Iterator i = edgeStrings.iterator(); i.hasNext();) {
+    this.mergedLineStrings = new ArrayList();
+    for (final Iterator i = this.edgeStrings.iterator(); i.hasNext();) {
       final EdgeString edgeString = (EdgeString)i.next();
-      mergedLineStrings.add(edgeString.toLineString());
+      this.mergedLineStrings.add(edgeString.toLineString());
     }
   }
 }

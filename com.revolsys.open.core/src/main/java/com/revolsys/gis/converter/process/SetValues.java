@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 import com.revolsys.data.record.Record;
 
 public class SetValues extends
-  AbstractSourceToTargetProcess<Record, Record> {
+AbstractSourceToTargetProcess<Record, Record> {
   private Map<String, ? extends Object> values = Collections.emptyMap();
 
   public SetValues(final Map<String, ? extends Object> values) {
@@ -15,12 +15,12 @@ public class SetValues extends
   }
 
   public Map<String, ? extends Object> getValues() {
-    return values;
+    return this.values;
   }
 
   @Override
   public void process(final Record source, final Record target) {
-    for (final Entry<String, ? extends Object> entry : values.entrySet()) {
+    for (final Entry<String, ? extends Object> entry : this.values.entrySet()) {
       final String name = entry.getKey();
       final Object value = entry.getValue();
       if (value != null) {
@@ -35,6 +35,6 @@ public class SetValues extends
 
   @Override
   public String toString() {
-    return "set" + values;
+    return "set" + this.values;
   }
 }

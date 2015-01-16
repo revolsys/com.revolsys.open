@@ -26,8 +26,8 @@ public class GeometryEqual2d extends Condition {
 
   @Override
   public boolean accept(final Map<String, Object> record) {
-    final Geometry geometry1 = geometry1Value.getValue(record);
-    final Geometry geometry2 = geometry2Value.getValue(record);
+    final Geometry geometry1 = this.geometry1Value.getValue(record);
+    final Geometry geometry2 = this.geometry2Value.getValue(record);
     if (geometry1 == null || geometry2 == null) {
       return false;
     } else {
@@ -39,27 +39,27 @@ public class GeometryEqual2d extends Condition {
   public void appendDefaultSql(final Query query,
     final RecordStore recordStore, final StringBuilder buffer) {
     buffer.append("ST_EQUALS(");
-    if (geometry1Value == null) {
+    if (this.geometry1Value == null) {
       buffer.append("NULL");
     } else {
-      geometry1Value.appendSql(query, recordStore, buffer);
+      this.geometry1Value.appendSql(query, recordStore, buffer);
     }
     buffer.append(", ");
-    if (geometry1Value == null) {
+    if (this.geometry1Value == null) {
       buffer.append("NULL");
     } else {
-      geometry1Value.appendSql(query, recordStore, buffer);
+      this.geometry1Value.appendSql(query, recordStore, buffer);
     }
     buffer.append(")");
   }
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    if (geometry1Value != null) {
-      index = geometry1Value.appendParameters(index, statement);
+    if (this.geometry1Value != null) {
+      index = this.geometry1Value.appendParameters(index, statement);
     }
-    if (geometry2Value != null) {
-      index = geometry2Value.appendParameters(index, statement);
+    if (this.geometry2Value != null) {
+      index = this.geometry2Value.appendParameters(index, statement);
     }
     return index;
   }
@@ -67,11 +67,11 @@ public class GeometryEqual2d extends Condition {
   @Override
   public GeometryEqual2d clone() {
     final GeometryEqual2d clone = (GeometryEqual2d)super.clone();
-    if (geometry1Value != null) {
-      clone.geometry1Value = geometry1Value.clone();
+    if (this.geometry1Value != null) {
+      clone.geometry1Value = this.geometry1Value.clone();
     }
-    if (geometry2Value != null) {
-      clone.geometry2Value = geometry2Value.clone();
+    if (this.geometry2Value != null) {
+      clone.geometry2Value = this.geometry2Value.clone();
     }
     return clone;
   }
@@ -81,7 +81,7 @@ public class GeometryEqual2d extends Condition {
     if (obj instanceof GeometryEqual2d) {
       final GeometryEqual2d condition = (GeometryEqual2d)obj;
       if (EqualsRegistry.equal(condition.geometry1Value, this.geometry1Value)) {
-        if (EqualsRegistry.equal(condition.geometry2Value, geometry1Value)) {
+        if (EqualsRegistry.equal(condition.geometry2Value, this.geometry1Value)) {
           return true;
         }
       }
@@ -90,22 +90,22 @@ public class GeometryEqual2d extends Condition {
   }
 
   public QueryValue getGeometry1Value() {
-    return geometry1Value;
+    return this.geometry1Value;
   }
 
   public QueryValue getGeometry2Value() {
-    return geometry2Value;
+    return this.geometry2Value;
   }
 
   @Override
   public List<QueryValue> getQueryValues() {
-    return Arrays.asList(geometry1Value, geometry2Value);
+    return Arrays.asList(this.geometry1Value, this.geometry2Value);
   }
 
   @Override
   public String toString() {
-    return "ST_EQUALS(" + StringConverterRegistry.toString(geometry1Value)
-      + "," + StringConverterRegistry.toString(geometry2Value) + ")";
+    return "ST_EQUALS(" + StringConverterRegistry.toString(this.geometry1Value)
+        + "," + StringConverterRegistry.toString(this.geometry2Value) + ")";
   }
 
 }

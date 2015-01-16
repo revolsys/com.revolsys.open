@@ -20,15 +20,15 @@ public class FilterRecordConverter {
   }
 
   public Converter<Record, Record> getConverter() {
-    return converter;
+    return this.converter;
   }
 
   public Filter<Record> getFilter() {
-    return filter;
+    return this.filter;
   }
 
   @Override
   public String toString() {
-    return "filter=" + filter + "\nconverter=" + converter;
+    return "filter=" + this.filter + "\nconverter=" + this.converter;
   }
 }

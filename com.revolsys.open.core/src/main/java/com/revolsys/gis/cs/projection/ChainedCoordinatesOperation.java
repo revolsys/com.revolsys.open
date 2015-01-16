@@ -18,7 +18,7 @@ public class ChainedCoordinatesOperation implements CoordinatesOperation {
   @Override
   public void perform(int sourceAxisCount, double[] sourceCoordinates,
     final int targetAxisCount, final double[] targetCoordinates) {
-    for (final CoordinatesOperation operation : operations) {
+    for (final CoordinatesOperation operation : this.operations) {
       operation.perform(sourceAxisCount, sourceCoordinates, targetAxisCount,
         targetCoordinates);
       sourceAxisCount = targetAxisCount;
@@ -28,6 +28,6 @@ public class ChainedCoordinatesOperation implements CoordinatesOperation {
 
   @Override
   public String toString() {
-    return operations.toString();
+    return this.operations.toString();
   }
 }

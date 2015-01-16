@@ -1,22 +1,13 @@
 package com.revolsys.jtstest.geomop;
 
-public class ArgumentConverter 
+public class ArgumentConverter
 {
-	public ArgumentConverter()
-	{
-		
-	}
-	
-  public Object[] convert(Class[] parameterTypes, Object[] args)
+  public ArgumentConverter()
   {
-  	Object[] actualArgs = new Object[args.length];
-    for (int i = 0; i < args.length; i++ ) {
-    	actualArgs[i] = convert(parameterTypes[i], args[i]);
-    }
-    return actualArgs;
+
   }
 
-  public Object convert(Class destClass, Object srcValue)
+  public Object convert(final Class destClass, final Object srcValue)
   {
     if (srcValue instanceof String) {
       return convertFromString(destClass, (String) srcValue);
@@ -28,7 +19,16 @@ public class ArgumentConverter
     return null;
   }
 
-  private Object convertFromString(Class destClass, String src)
+  public Object[] convert(final Class[] parameterTypes, final Object[] args)
+  {
+    final Object[] actualArgs = new Object[args.length];
+    for (int i = 0; i < args.length; i++ ) {
+      actualArgs[i] = convert(parameterTypes[i], args[i]);
+    }
+    return actualArgs;
+  }
+
+  private Object convertFromString(final Class destClass, final String src)
   {
     if (destClass == Boolean.class || destClass == boolean.class) {
       if (src.equals("true")) {
@@ -44,7 +44,7 @@ public class ArgumentConverter
       try {
         return new Integer(src);
       }
-      catch (NumberFormatException e) {
+      catch (final NumberFormatException e) {
         // eat this exception - it will be reported below
       }
     }
@@ -53,7 +53,7 @@ public class ArgumentConverter
       try {
         return new Double(src);
       }
-      catch (NumberFormatException e) {
+      catch (final NumberFormatException e) {
         // eat this exception - it will be reported below
       }
     }
@@ -64,8 +64,8 @@ public class ArgumentConverter
     return null;
   }
 
-  private void throwInvalidConversion(Class destClass, Object srcValue)
+  private void throwInvalidConversion(final Class destClass, final Object srcValue)
   {
-  	throw new IllegalArgumentException("Cannot convert " + srcValue + " to " + destClass.getName());
+    throw new IllegalArgumentException("Cannot convert " + srcValue + " to " + destClass.getName());
   }
 }

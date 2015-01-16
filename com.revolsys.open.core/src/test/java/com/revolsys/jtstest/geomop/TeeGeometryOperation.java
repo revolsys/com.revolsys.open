@@ -36,11 +36,11 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jtstest.testrunner.Result;
 
 /**
- * A {@link GeometryOperation} which executes the original operation 
+ * A {@link GeometryOperation} which executes the original operation
  * and returns that result,
  * but also executes a separate operation (which could be multiple operations).
- * The side operations can throw exceptions if they do not compute 
- * correct results.  This relies on the availability of 
+ * The side operations can throw exceptions if they do not compute
+ * correct results.  This relies on the availability of
  * another reliable implementation to provide the expected result.
  * <p>
  * This class can be used via the <tt>-geomop</tt> command-line option
@@ -59,7 +59,7 @@ public abstract class TeeGeometryOperation implements GeometryOperation {
   /**
    * Creates a new operation which chains to the given {@link GeometryMethodOperation}
    * for non-intercepted methods.
-   * 
+   *
    * @param chainOp the operation to chain to
    */
   public TeeGeometryOperation(final GeometryMethodOperation chainOp) {
@@ -68,12 +68,12 @@ public abstract class TeeGeometryOperation implements GeometryOperation {
 
   @Override
   public Class getReturnType(final String opName) {
-    return chainOp.getReturnType(opName);
+    return this.chainOp.getReturnType(opName);
   }
 
   /**
    * Invokes the named operation
-   * 
+   *
    * @param opName
    * @param geometry
    * @param args
@@ -86,7 +86,7 @@ public abstract class TeeGeometryOperation implements GeometryOperation {
     final Object[] args) throws Exception {
     runTeeOp(opName, geometry, args);
 
-    return chainOp.invoke(opName, geometry, args);
+    return this.chainOp.invoke(opName, geometry, args);
   }
 
   protected abstract void runTeeOp(String opName, Geometry geometry,

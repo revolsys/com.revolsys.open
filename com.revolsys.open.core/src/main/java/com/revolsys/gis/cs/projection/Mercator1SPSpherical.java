@@ -34,13 +34,13 @@ public class Mercator1SPSpherical extends AbstractCoordinatesProjection {
   public void inverse(final double x, final double y,
     final double[] targetCoordinates, final int targetOffset,
     final int targetAxisCount) {
-    final double dX = x - x0;
-    final double dY = y - y0;
+    final double dX = x - this.x0;
+    final double dY = y - this.y0;
 
-    final double lambda = dX / r + lambda0;
+    final double lambda = dX / this.r + this.lambda0;
 
     final double phi = Angle.PI_OVER_2 - 2
-      * Math.atan(Math.pow(Math.E, -dY / r));
+        * Math.atan(Math.pow(Math.E, -dY / this.r));
 
     targetCoordinates[targetOffset * targetAxisCount] = lambda;
     targetCoordinates[targetOffset * targetAxisCount + 1] = phi;
@@ -50,12 +50,12 @@ public class Mercator1SPSpherical extends AbstractCoordinatesProjection {
   public void project(final double lambda, final double phi,
     final double[] targetCoordinates, final int targetOffset,
     final int targetAxisCount) {
-    final double x = r * (lambda - lambda0);
+    final double x = this.r * (lambda - this.lambda0);
 
-    final double y = r * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2));
+    final double y = this.r * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2));
 
-    targetCoordinates[targetOffset * targetAxisCount] = x0 + x;
-    targetCoordinates[targetOffset * targetAxisCount + 1] = y0 + y;
+    targetCoordinates[targetOffset * targetAxisCount] = this.x0 + x;
+    targetCoordinates[targetOffset * targetAxisCount + 1] = this.y0 + y;
   }
 
 }

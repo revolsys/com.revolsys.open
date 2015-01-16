@@ -53,7 +53,7 @@ public class FixedScaleZoomMode implements ZoomMode {
    * <li>The bounding box will be converted to the coordinate system of the
    * viewport.</li>
    * </ul>
-   * 
+   *
    * @param viewport The viewport.
    * @param boundingBox The bounding box.
    * @return The bounding box.
@@ -132,23 +132,23 @@ public class FixedScaleZoomMode implements ZoomMode {
   }
 
   private double getNextScale(final double scale, final boolean larger) {
-    double previousScale = scales.get(0);
+    double previousScale = this.scales.get(0);
     if (scale - 1 > previousScale) {
 
-      if (!larger || scales.size() == 1) {
+      if (!larger || this.scales.size() == 1) {
         return previousScale;
       } else {
-        return scales.get(1);
+        return this.scales.get(1);
       }
     } else {
-      for (int i = 1; i < scales.size(); i++) {
-        final double nextScale = scales.get(i);
+      for (int i = 1; i < this.scales.size(); i++) {
+        final double nextScale = this.scales.get(i);
         if (Math.abs(scale - nextScale) < 1) {
           if (larger) {
-            if (i == scales.size() - 1) {
+            if (i == this.scales.size() - 1) {
               return nextScale;
             } else {
-              return scales.get(i + 1);
+              return this.scales.get(i + 1);
             }
           } else {
             return previousScale;
@@ -179,12 +179,12 @@ public class FixedScaleZoomMode implements ZoomMode {
   }
 
   private double getScale(final double scale, final boolean larger) {
-    double previousScale = scales.get(0);
+    double previousScale = this.scales.get(0);
     if (Double.isNaN(scale) || scale - 1 > previousScale) {
       return previousScale;
     } else {
-      for (int i = 1; i < scales.size(); i++) {
-        final double nextScale = scales.get(i);
+      for (int i = 1; i < this.scales.size(); i++) {
+        final double nextScale = this.scales.get(i);
         if (Math.abs(scale - nextScale) < 1) {
           return nextScale;
         } else if (scale > nextScale) {
@@ -201,30 +201,30 @@ public class FixedScaleZoomMode implements ZoomMode {
   }
 
   public double getScale(final int zoomLevel) {
-    return scales.get(zoomLevel);
+    return this.scales.get(zoomLevel);
   }
 
   public int getZoomLevel(final ComponentViewport2D viewport) {
     final double scale = viewport.getScale();
-    double previousScale = scales.get(0);
+    double previousScale = this.scales.get(0);
     if ((int)scale >= (int)previousScale) {
       return 0;
     } else {
-      for (int i = 1; i < scales.size(); i++) {
-        final double nextScale = scales.get(i);
+      for (int i = 1; i < this.scales.size(); i++) {
+        final double nextScale = this.scales.get(i);
         if ((int)scale >= (int)nextScale) {
           return i;
         }
         previousScale = nextScale;
       }
-      return scales.size() - 1;
+      return this.scales.size() - 1;
     }
 
   }
 
   /**
    * Zoom the map so that the specified bounding box is visible.
-   * 
+   *
    * @param viewport The viewport.
    * @param boundingBox The bounding box.
    */
@@ -238,7 +238,7 @@ public class FixedScaleZoomMode implements ZoomMode {
   /**
    * Zoom the map to include the bounding box specified by the model coordinate
    * pair.
-   * 
+   *
    * @param viewport The viewport.
    * @param x1 The first x coordinate.
    * @param y1 The first y coordinate.
@@ -271,7 +271,7 @@ public class FixedScaleZoomMode implements ZoomMode {
   /**
    * Zoom the map to the map scale at the view coordinate, re-centring the map
    * at the model coordinate represented by the view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -287,7 +287,7 @@ public class FixedScaleZoomMode implements ZoomMode {
   /**
    * Zoom the map in one level at the view coordinate, with the model coordinate
    * being maintained at the same view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -302,7 +302,7 @@ public class FixedScaleZoomMode implements ZoomMode {
   /**
    * Zoom the map in one level at the view coordinate, re-centring the map at
    * the model coordinate represented by the view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -318,7 +318,7 @@ public class FixedScaleZoomMode implements ZoomMode {
   /**
    * Zoom the map out one level at the view coordinate, with the model
    * coordinate being maintained at the same view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -333,7 +333,7 @@ public class FixedScaleZoomMode implements ZoomMode {
   /**
    * Zoom the map in one level at the view coordinate, re-centring the map at
    * the model coordinate represented by the view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -349,7 +349,7 @@ public class FixedScaleZoomMode implements ZoomMode {
   /**
    * Zoom the map in by the multiplication factor at the view coordinate, with
    * the model coordinate being maintained at the same view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.

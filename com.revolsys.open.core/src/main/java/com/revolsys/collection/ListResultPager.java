@@ -24,7 +24,7 @@ public class ListResultPager<T> implements ResultPager<T> {
 
   /**
    * Get the index of the last object in the current page.
-   * 
+   *
    * @return The index of the last object in the current page.
    */
   @Override
@@ -32,16 +32,16 @@ public class ListResultPager<T> implements ResultPager<T> {
     final int numPages = getNumPages();
     if (numPages == 0) {
       return 0;
-    } else if (pageNumber < numPages - 1) {
-      return (pageNumber + 1) * pageSize;
+    } else if (this.pageNumber < numPages - 1) {
+      return (this.pageNumber + 1) * this.pageSize;
     } else {
-      return list.size();
+      return this.list.size();
     }
   }
 
   /**
    * Get the list of objects in the current page.
-   * 
+   *
    * @return The list of objects in the current page.
    */
   @Override
@@ -51,73 +51,73 @@ public class ListResultPager<T> implements ResultPager<T> {
     } else {
       final int startIndex = getStartIndex() - 1;
       final int endIndex = getEndIndex();
-      return list.subList(startIndex, endIndex);
+      return this.list.subList(startIndex, endIndex);
     }
   }
 
   /**
    * Get the page number of the next page.
-   * 
+   *
    * @return Thepage number of the next page.
    */
   @Override
   public int getNextPageNumber() {
-    return pageNumber + 2;
+    return this.pageNumber + 2;
   }
 
   /**
    * Get the number of pages.
-   * 
+   *
    * @return The number of pages.
    */
   @Override
   public int getNumPages() {
-    return (int)Math.ceil((double)list.size() / getPageSize());
+    return (int)Math.ceil((double)this.list.size() / getPageSize());
   }
 
   /**
    * Get the total number of results returned.
-   * 
+   *
    * @return The total number of results returned.
    */
   @Override
   public int getNumResults() {
-    return list.size();
+    return this.list.size();
   }
 
   /**
    * Get the page number of the current page.
-   * 
+   *
    * @return Thepage number of the current page.
    */
   @Override
   public int getPageNumber() {
-    return pageNumber + 1;
+    return this.pageNumber + 1;
   }
 
   /**
    * Get the number of objects to display in a page.
-   * 
+   *
    * @return The number of objects to display in a page.
    */
   @Override
   public int getPageSize() {
-    return pageSize;
+    return this.pageSize;
   }
 
   /**
    * Get the page number of the previous page.
-   * 
+   *
    * @return Thepage number of the previous page.
    */
   @Override
   public int getPreviousPageNumber() {
-    return pageNumber;
+    return this.pageNumber;
   }
 
   /**
    * Get the index of the first object in the current page.
-   * 
+   *
    * @return The index of the first object in the current page.
    */
   @Override
@@ -125,56 +125,56 @@ public class ListResultPager<T> implements ResultPager<T> {
     final int numPages = getNumPages();
     if (numPages == 0) {
       return 0;
-    } else if (pageNumber < numPages - 1) {
-      return (pageNumber * pageSize) + 1;
+    } else if (this.pageNumber < numPages - 1) {
+      return this.pageNumber * this.pageSize + 1;
     } else {
-      return ((numPages - 1) * pageSize) + 1;
+      return (numPages - 1) * this.pageSize + 1;
     }
   }
 
   /**
    * Check to see if there is a next page.
-   * 
+   *
    * @return True if there is a next page.
    */
   @Override
   public boolean hasNextPage() {
-    return pageNumber < getNumPages();
+    return this.pageNumber < getNumPages();
   }
 
   /**
    * Check to see if there is a previous page.
-   * 
+   *
    * @return True if there is a previous page.
    */
   @Override
   public boolean hasPreviousPage() {
-    return pageNumber > 0;
+    return this.pageNumber > 0;
   }
 
   /**
    * Check to see if this is the first page.
-   * 
+   *
    * @return True if this is the first page.
    */
   @Override
   public boolean isFirstPage() {
-    return pageNumber == 0;
+    return this.pageNumber == 0;
   }
 
   /**
    * Check to see if this is the last page.
-   * 
+   *
    * @return True if this is the last page.
    */
   @Override
   public boolean isLastPage() {
-    return pageNumber == getNumPages();
+    return this.pageNumber == getNumPages();
   }
 
   /**
    * Set the current page number.
-   * 
+   *
    * @param pageNumber The current page number.
    */
   @Override
@@ -196,7 +196,7 @@ public class ListResultPager<T> implements ResultPager<T> {
 
   /**
    * Set the number of objects per page.
-   * 
+   *
    * @param pageSize The number of objects per page.
    */
   @Override

@@ -10,7 +10,12 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 
 public abstract class AbstractTableModel extends
-  javax.swing.table.AbstractTableModel implements PropertyChangeSupportProxy {
+javax.swing.table.AbstractTableModel implements PropertyChangeSupportProxy {
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
     this);

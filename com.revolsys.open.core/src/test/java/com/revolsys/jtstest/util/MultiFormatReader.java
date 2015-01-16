@@ -48,16 +48,6 @@ import com.revolsys.jts.io.WKTReader;
  * @version 1.7
  */
 public class MultiFormatReader {
-  public static final int FORMAT_UNKNOWN = 0;
-
-  public static final int FORMAT_WKT = 1;
-
-  public static final int FORMAT_WKB = 2;
-
-  public static final int FORMAT_GML = 3;
-
-  private static final int MAX_CHARS_TO_CHECK = 6;
-
   public static int format(final String s) {
     if (isWKB(s)) {
       return FORMAT_WKB;
@@ -104,6 +94,16 @@ public class MultiFormatReader {
     return !isWKB(s) && !isGML(s);
   }
 
+  public static final int FORMAT_UNKNOWN = 0;
+
+  public static final int FORMAT_WKT = 1;
+
+  public static final int FORMAT_WKB = 2;
+
+  public static final int FORMAT_GML = 3;
+
+  private static final int MAX_CHARS_TO_CHECK = 6;
+
   private final GeometryFactory geomFactory;
 
   private final WKTReader wktReader;
@@ -116,20 +116,20 @@ public class MultiFormatReader {
 
   public MultiFormatReader(final GeometryFactory geomFactory) {
     this.geomFactory = geomFactory;
-    wktReader = new WKTReader(geomFactory);
-    wkbReader = new WKBReader(geomFactory);
+    this.wktReader = new WKTReader(geomFactory);
+    this.wkbReader = new WKBReader(geomFactory);
   }
 
   public Geometry read(final String geomStr) throws ParseException, IOException {
     final String trimStr = geomStr.trim();
     if (isWKB(trimStr)) {
-      return IOUtil.readGeometriesFromWKBHexString(trimStr, geomFactory);
+      return IOUtil.readGeometriesFromWKBHexString(trimStr, this.geomFactory);
     }
     if (isGML(trimStr)) {
       return readGML(trimStr);
     }
 
-    return IOUtil.readGeometriesFromWKTString(trimStr, geomFactory);
+    return IOUtil.readGeometriesFromWKTString(trimStr, this.geomFactory);
   }
 
   private Geometry readGML(final String str) throws ParseException {

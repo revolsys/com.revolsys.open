@@ -10,7 +10,7 @@ import com.revolsys.parallel.channel.store.Buffer;
 import com.revolsys.parallel.process.AbstractInOutProcess;
 
 public abstract class AbstractMergeProcess extends
-  AbstractInOutProcess<Record, Record> {
+AbstractInOutProcess<Record, Record> {
 
   private static final int OTHER_INDEX = 1;
 
@@ -55,7 +55,7 @@ public abstract class AbstractMergeProcess extends
 
   /**
    * Add an object from the other (otherId) channel.
-   * 
+   *
    * @param object The object to add.
    */
   protected abstract void addOtherObject(Record object);
@@ -146,7 +146,7 @@ public abstract class AbstractMergeProcess extends
 
   /**
    * Add an object from the source (in) channel.
-   * 
+   *
    * @param object The object to add.
    */
   protected abstract void addSourceObject(Record object);
@@ -155,20 +155,20 @@ public abstract class AbstractMergeProcess extends
    * @return the in
    */
   public Channel<Record> getOtherIn() {
-    if (otherIn == null) {
-      if (otherInBufferSize < 1) {
+    if (this.otherIn == null) {
+      if (this.otherInBufferSize < 1) {
         setOtherIn(new Channel<Record>());
       } else {
         final Buffer<Record> buffer = new Buffer<Record>(
-          otherInBufferSize);
+            this.otherInBufferSize);
         setOtherIn(new Channel<Record>(buffer));
       }
     }
-    return otherIn;
+    return this.otherIn;
   }
 
   public int getOtherInBufferSize() {
-    return otherInBufferSize;
+    return this.otherInBufferSize;
   }
 
   protected abstract void processObjects(RecordDefinition currentType,
@@ -181,7 +181,7 @@ public abstract class AbstractMergeProcess extends
     try {
       RecordDefinition currentType = null;
       String currentTypeName = null;
-      final Channel<Record>[] channels = ArrayUtil.create(in, otherIn);
+      final Channel<Record>[] channels = ArrayUtil.create(in, this.otherIn);
 
       final boolean[] guard = new boolean[] {
         true, true
@@ -298,7 +298,7 @@ public abstract class AbstractMergeProcess extends
         }
       }
     } finally {
-      otherIn.readDisconnect();
+      this.otherIn.readDisconnect();
       tearDown();
     }
   }

@@ -20,6 +20,22 @@ public class SegmentDensifier {
     this.inputLine = line;
   }
 
+  public Geometry densify(final double segLength) {
+    this.newCoords = new CoordinateList();
+
+    final LineString seq = this.inputLine;
+
+    this.newCoords.add(seq.getPoint(0).clonePoint());
+
+    for (int i = 0; i < seq.getVertexCount() - 1; i++) {
+      final Point p0 = seq.getPoint(i);
+      final Point p1 = seq.getPoint(i + 1);
+      densify(p0, p1, segLength);
+    }
+    final Point[] newPts = this.newCoords.toCoordinateArray();
+    return this.inputLine.getGeometryFactory().lineString(newPts);
+  }
+
   private void densify(final Point p0, final Point p1,
     final double segLength) {
     final double origLen = p1.distance(p0);
@@ -36,21 +52,5 @@ public class SegmentDensifier {
       this.newCoords.add(pt, false);
     }
     this.newCoords.add(new PointDouble(p1), false);
-  }
-
-  public Geometry densify(final double segLength) {
-    this.newCoords = new CoordinateList();
-
-    final LineString seq = this.inputLine;
-
-    this.newCoords.add(seq.getPoint(0).clonePoint());
-
-    for (int i = 0; i < seq.getVertexCount() - 1; i++) {
-      final Point p0 = seq.getPoint(i);
-      final Point p1 = seq.getPoint(i + 1);
-      densify(p0, p1, segLength);
-    }
-    final Point[] newPts = this.newCoords.toCoordinateArray();
-    return this.inputLine.getGeometryFactory().lineString(newPts);
   }
 }

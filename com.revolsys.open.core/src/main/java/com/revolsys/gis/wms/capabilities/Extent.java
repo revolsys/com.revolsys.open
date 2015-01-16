@@ -12,23 +12,23 @@ public class Extent {
   private boolean current = false;
 
   public String getDefaultValue() {
-    return defaultValue;
+    return this.defaultValue;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public boolean isCurrent() {
-    return current;
+    return this.current;
   }
 
   public boolean isMultipleValues() {
-    return multipleValues;
+    return this.multipleValues;
   }
 
   public boolean isNearestValue() {
-    return nearestValue;
+    return this.nearestValue;
   }
 
   public void setCurrent(final boolean current) {

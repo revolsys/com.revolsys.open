@@ -52,17 +52,17 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public List<String> getFieldAliases() {
-    return this.domain.getFieldAliases();
-  }
-
-  @Override
   public Map<Identifier, List<Object>> getCodes() {
     return this.domain.getCodes();
   }
 
   public Domain getDomain() {
     return this.domain;
+  }
+
+  @Override
+  public List<String> getFieldAliases() {
+    return this.domain.getFieldAliases();
   }
 
   @Override
@@ -84,13 +84,13 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public String getIdFieldName() {
-    return this.domain.getIdFieldName();
+  public Identifier getIdExact(final Object... values) {
+    return getId(values);
   }
 
   @Override
-  public Identifier getIdExact(final Object... values) {
-    return getId(values);
+  public String getIdFieldName() {
+    return this.domain.getIdFieldName();
   }
 
   @Override

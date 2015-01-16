@@ -48,10 +48,10 @@ import com.revolsys.jts.geom.Point;
  */
 class LocationIndexOfLine {
   /**
-  * MD - this algorithm has been extracted into a class
-  * because it is intended to validate that the subline truly is a subline,
-  * and also to use the internal vertex information to unambiguously locate the subline.
-  */
+   * MD - this algorithm has been extracted into a class
+   * because it is intended to validate that the subline truly is a subline,
+   * and also to use the internal vertex information to unambiguously locate the subline.
+   */
   public static LinearLocation[] indicesOf(final Geometry linearGeom,
     final Geometry subLine) {
     final LocationIndexOfLine locater = new LocationIndexOfLine(linearGeom);
@@ -69,7 +69,7 @@ class LocationIndexOfLine {
     final LineString lastLine = (LineString)subLine.getGeometry(subLine.getGeometryCount() - 1);
     final Point endPt = lastLine.getPoint(lastLine.getVertexCount() - 1);
 
-    final LocationIndexOfPoint locPt = new LocationIndexOfPoint(linearGeom);
+    final LocationIndexOfPoint locPt = new LocationIndexOfPoint(this.linearGeom);
     final LinearLocation[] subLineLoc = new LinearLocation[2];
     subLineLoc[0] = locPt.indexOf(startPt);
 

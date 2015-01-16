@@ -41,10 +41,10 @@ public class RelateTest extends TestCase {
 
   /**
    * From GEOS #572
-   * 
+   *
    * The cause is that the longer line nodes the single-segment line.
    * The node then tests as not lying precisely on the original longer line.
-   * 
+   *
    * @throws Exception
    */
   public void testContainsIncorrectIMMatrix() throws Exception {

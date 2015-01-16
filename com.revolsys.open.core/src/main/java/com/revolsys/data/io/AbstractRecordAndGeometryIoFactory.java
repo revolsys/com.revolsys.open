@@ -21,7 +21,7 @@ import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractRecordAndGeometryIoFactory extends
 AbstractRecordAndGeometryReaderFactory implements RecordWriterFactory,
-  GeometryWriterFactory {
+GeometryWriterFactory {
 
   private Set<CoordinateSystem> coordinateSystems = EpsgCoordinateSystems.getCoordinateSystems();
 

@@ -11,7 +11,7 @@ public class FloatFieldDefinition extends AbstractFileGdbFieldDefinition {
   public FloatFieldDefinition(final Field field) {
     super(field.getName(), DataTypes.FLOAT,
       BooleanStringConverter.getBoolean(field.getRequired())
-        || !field.isIsNullable());
+      || !field.isIsNullable());
   }
 
   @Override
@@ -22,7 +22,7 @@ public class FloatFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore recordStore = getRecordStore();
+    final CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {

@@ -5,13 +5,13 @@
  * $Revision:$
 
  * Copyright 2004-2007 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ public class LessThanOrEqualDistanceFilter implements Filter<Geometry> {
 
   /**
    * Construct a new LineStringLessThanDistanceFilter.
-   * 
+   *
    * @param geometry The geometry to compare the data objects to to.
    * @param maxDistance
    */
@@ -45,7 +45,7 @@ public class LessThanOrEqualDistanceFilter implements Filter<Geometry> {
   @Override
   public boolean accept(final Geometry geometry) {
     final double distance = geometry.distance(this.geometry);
-    if (distance <= maxDistance) {
+    if (distance <= this.maxDistance) {
       return true;
     } else {
       return false;
@@ -54,20 +54,20 @@ public class LessThanOrEqualDistanceFilter implements Filter<Geometry> {
 
   /**
    * Get the geometry to compare the data objects to to.
-   * 
+   *
    * @return The geometry to compare the data objects to to.
    */
   public Geometry getGeometry() {
-    return geometry;
+    return this.geometry;
   }
 
   /**
    * Get the maximum maxDistance the object can be from the source geometry.
-   * 
+   *
    * @return The maximum maxDistance the object can be from the source geometry.
    */
   public double getMaxDistance() {
-    return maxDistance;
+    return this.maxDistance;
   }
 
 }

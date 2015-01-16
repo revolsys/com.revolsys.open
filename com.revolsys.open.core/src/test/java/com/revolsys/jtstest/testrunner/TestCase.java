@@ -58,7 +58,7 @@ import com.revolsys.util.Property;
  * @version 1.7
  */
 public class TestCase extends junit.framework.TestSuite implements
-  MapSerializer {
+MapSerializer {
   private String testDescription;
 
   private Geometry a;

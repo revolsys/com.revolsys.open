@@ -22,8 +22,6 @@ import com.revolsys.math.Angle;
 import com.revolsys.util.MathUtil;
 
 public class Triangle extends AbstractLineString {
-  private static final long serialVersionUID = -4513931832875328029L;
-
   public static Triangle createClockwiseTriangle(final Point c0,
     final Point c1, final Point c2) {
     try {
@@ -37,6 +35,8 @@ public class Triangle extends AbstractLineString {
     }
 
   }
+
+  private static final long serialVersionUID = -4513931832875328029L;
 
   private final double[] coordinates = new double[9];
 
@@ -53,9 +53,9 @@ public class Triangle extends AbstractLineString {
     }
     for (int i = 0; i < 3; i++) {
       final Point point = points[i];
-      coordinates[i * 3] = point.getX();
-      coordinates[i * 3 + 1] = point.getY();
-      coordinates[i * 3 + 2] = point.getZ();
+      this.coordinates[i * 3] = point.getX();
+      this.coordinates[i * 3 + 1] = point.getY();
+      this.coordinates[i * 3 + 2] = point.getZ();
     }
   }
 
@@ -89,7 +89,7 @@ public class Triangle extends AbstractLineString {
   /**
    * Computes the circumcircle of a triangle. The circumcircle is the smallest
    * circle which encloses the triangle.
-   * 
+   *
    * @return The circumcircle of the triangle.
    */
   public Circle getCircumcircle() {
@@ -103,7 +103,7 @@ public class Triangle extends AbstractLineString {
     final Point centre = CoordinatesUtil.circumcentre(x1, y1, x2, y2, x3, y3);
     final double angleB = Angle.angle(x1, y1, x2, y2, x3, y3);
     final double radius = MathUtil.distance(x1, y1, x3, y3) / Math.sin(angleB)
-      * 0.5;
+        * 0.5;
 
     return new Circle(centre, radius);
   }
@@ -111,12 +111,12 @@ public class Triangle extends AbstractLineString {
   @Override
   public double getCoordinate(final int index, final int axisIndex) {
     final int coordinateIndex = getCoordinatesIndex(index, axisIndex);
-    return coordinates[coordinateIndex];
+    return this.coordinates[coordinateIndex];
   }
 
   @Override
   public double[] getCoordinates() {
-    return coordinates;
+    return this.coordinates;
   }
 
   private int getCoordinatesIndex(final int index, int axisIndex) {
@@ -132,7 +132,7 @@ public class Triangle extends AbstractLineString {
 
   /**
    * Get the envelope of the Triangle.
-   * 
+   *
    * @return The envelope.
    */
   public BoundingBoxDoubleGf getEnvelopeInternal() {
@@ -160,11 +160,11 @@ public class Triangle extends AbstractLineString {
     final double circum = len0 + len1 + len2;
 
     final double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2
-      * c.getX())
-      / circum;
+        * c.getX())
+        / circum;
     final double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2
-      * c.getY())
-      / circum;
+        * c.getY())
+        / circum;
     return new PointDouble(inCentreX, inCentreY);
   }
 
@@ -194,7 +194,7 @@ public class Triangle extends AbstractLineString {
 
   /**
    * Returns true if the coordinate lies inside or on the edge of the Triangle.
-   * 
+   *
    * @param coordinate The coordinate.
    * @return True if the coordinate lies inside or on the edge of the Triangle.
    */
@@ -205,19 +205,19 @@ public class Triangle extends AbstractLineString {
     final int p0p1Orientation = CoordinatesUtil.orientationIndex(getP0(),
       getP1(), coordinate);
     if (p0p1Orientation != triangleOrientation
-      && p0p1Orientation != CGAlgorithms.COLLINEAR) {
+        && p0p1Orientation != CGAlgorithms.COLLINEAR) {
       return false;
     }
     final int p1p2Orientation = CoordinatesUtil.orientationIndex(getP1(),
       getP2(), coordinate);
     if (p1p2Orientation != triangleOrientation
-      && p1p2Orientation != CGAlgorithms.COLLINEAR) {
+        && p1p2Orientation != CGAlgorithms.COLLINEAR) {
       return false;
     }
     final int p2p0Orientation = CoordinatesUtil.orientationIndex(getP2(),
       getP0(), coordinate);
     if (p2p0Orientation != triangleOrientation
-      && p2p0Orientation != CGAlgorithms.COLLINEAR) {
+        && p2p0Orientation != CGAlgorithms.COLLINEAR) {
       return false;
     }
     return true;
@@ -261,7 +261,7 @@ public class Triangle extends AbstractLineString {
 
   @Override
   public boolean isEmpty() {
-    return coordinates == null;
+    return this.coordinates == null;
   }
 
   @Override

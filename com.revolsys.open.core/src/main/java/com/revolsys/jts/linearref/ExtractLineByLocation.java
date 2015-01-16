@@ -77,14 +77,14 @@ class ExtractLineByLocation {
   private Geometry computeLinear(final LinearLocation start,
     final LinearLocation end) {
     final LinearGeometryBuilder builder = new LinearGeometryBuilder(
-      line.getGeometryFactory());
+      this.line.getGeometryFactory());
     builder.setFixInvalidLines(true);
 
     if (!start.isVertex()) {
-      builder.add(start.getCoordinate(line));
+      builder.add(start.getCoordinate(this.line));
     }
 
-    for (final LinearIterator it = new LinearIterator(line, start); it.hasNext(); it.next()) {
+    for (final LinearIterator it = new LinearIterator(this.line, start); it.hasNext(); it.next()) {
       if (end.compareLocationValues(it.getComponentIndex(),
         it.getVertexIndex(), 0.0) < 0) {
         break;
@@ -97,7 +97,7 @@ class ExtractLineByLocation {
       }
     }
     if (!end.isVertex()) {
-      builder.add(end.getCoordinate(line));
+      builder.add(end.getCoordinate(this.line));
     }
 
     return builder.getGeometry();

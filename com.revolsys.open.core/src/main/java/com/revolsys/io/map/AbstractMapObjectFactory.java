@@ -13,12 +13,12 @@ public abstract class AbstractMapObjectFactory implements MapObjectFactory {
 
   @Override
   public String getDescription() {
-    return description;
+    return this.description;
   }
 
   @Override
   public String getTypeName() {
-    return typeName;
+    return this.typeName;
   }
 
   protected void setDescription(final String description) {
@@ -31,6 +31,6 @@ public abstract class AbstractMapObjectFactory implements MapObjectFactory {
 
   @Override
   public String toString() {
-    return description;
+    return this.description;
   }
 }

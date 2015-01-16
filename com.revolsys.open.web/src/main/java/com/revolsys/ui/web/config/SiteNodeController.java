@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
  * <dt>{@link PageController}</dt>
  * <dd>A controller that can be used to create a web page using a series of
  * {@link IafAction}s with a {@link Layout} to display some {@link Component}s.</dd>
- * 
+ *
  * @author paustin
  */
 public interface SiteNodeController extends Cloneable {

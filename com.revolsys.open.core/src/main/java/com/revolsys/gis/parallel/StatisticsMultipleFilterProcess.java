@@ -10,7 +10,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.MultipleFilterProcess;
 
 public class StatisticsMultipleFilterProcess extends
-  MultipleFilterProcess<Record> {
+MultipleFilterProcess<Record> {
 
   private final Map<Filter<Record>, Statistics> statisticsMap = new HashMap<Filter<Record>, Statistics>();
 
@@ -21,7 +21,7 @@ public class StatisticsMultipleFilterProcess extends
   @Override
   protected void destroy() {
     super.destroy();
-    for (final Statistics stats : statisticsMap.values()) {
+    for (final Statistics stats : this.statisticsMap.values()) {
       stats.disconnect();
     }
   }
@@ -30,32 +30,32 @@ public class StatisticsMultipleFilterProcess extends
    * @return the statisticsName
    */
   public String getStatisticsName() {
-    return statisticsName;
+    return this.statisticsName;
   }
 
   /**
    * @return the useStatistics
    */
   public boolean isUseStatistics() {
-    return useStatistics;
+    return this.useStatistics;
   }
 
   @Override
   protected boolean processFilter(final Record object,
     final Filter<Record> filter, final Channel<Record> filterOut) {
     if (super.processFilter(object, filter, filterOut)) {
-      if (useStatistics) {
-        Statistics stats = statisticsMap.get(filter);
+      if (this.useStatistics) {
+        Statistics stats = this.statisticsMap.get(filter);
         String name;
         if (stats == null) {
-          if (statisticsName != null) {
-            name = statisticsName + " " + filter.toString();
+          if (this.statisticsName != null) {
+            name = this.statisticsName + " " + filter.toString();
           } else {
             name = filter.toString();
           }
           stats = new Statistics(name);
           stats.connect();
-          statisticsMap.put(filter, stats);
+          this.statisticsMap.put(filter, stats);
         }
         stats.add(object);
       }

@@ -68,6 +68,11 @@ import com.revolsys.jts.geom.vertex.Vertex;
 public abstract class AbstractMultiPolygon extends AbstractGeometryCollection
 implements MultiPolygon {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V copy(final GeometryFactory geometryFactory) {

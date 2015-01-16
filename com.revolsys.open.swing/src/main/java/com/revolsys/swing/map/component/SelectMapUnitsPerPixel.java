@@ -17,7 +17,7 @@ import javax.measure.unit.Unit;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -56,7 +56,7 @@ PropertyChangeListener, ActionListener {
     setEditable(true);
     final InvokeMethodStringConverter renderer = new InvokeMethodStringConverter(
       this, "format");
-    renderer.setHorizontalAlignment(JLabel.RIGHT);
+    renderer.setHorizontalAlignment(SwingConstants.RIGHT);
     final SelectMapScaleEditor editor = new SelectMapScaleEditor(getEditor(),
       renderer);
     setEditor(editor);

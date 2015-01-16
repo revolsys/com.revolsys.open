@@ -11,5 +11,5 @@ public interface Action {
   void init(ServletContext context) throws ServletException;
 
   void process(HttpServletRequest request, HttpServletResponse response)
-    throws IOException, ServletException;
+      throws IOException, ServletException;
 }

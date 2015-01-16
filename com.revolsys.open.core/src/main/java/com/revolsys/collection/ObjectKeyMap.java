@@ -14,7 +14,7 @@ import java.util.WeakHashMap;
 /**
  * <p>Wrapper around {@link Map} where the key is wrapped in an {@link ObjectKey} so that
  * == is used instead of equals for equality.</p>
- * 
+ *
  * @param <K>
  * @param <V>
  */
@@ -58,7 +58,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
     @SuppressWarnings("unchecked")
     @Override
     public K getKey() {
-      if (entry == null) {
+      if (this.entry == null) {
         return this.key;
       } else {
         return (K)this.entry.getKey().getValue();
@@ -67,7 +67,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
 
     @Override
     public V getValue() {
-      if (entry == null) {
+      if (this.entry == null) {
         return this.value;
       } else {
         return this.entry.getValue();
@@ -76,8 +76,8 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
 
     @Override
     public int hashCode() {
-      return (((this.key == null) ? 0 : this.key.hashCode()) ^ ((this.value == null) ? 0
-        : this.value.hashCode()));
+      return (this.key == null ? 0 : this.key.hashCode()) ^ (this.value == null ? 0
+        : this.value.hashCode());
     }
 
     @Override
@@ -114,7 +114,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
           final ObjectKey objectKey = new ObjectKey(key);
           final V value = entry.getValue();
           final Map.Entry<ObjectKey, V> objectKeyEntry = new AbstractMap.SimpleEntry<ObjectKey, V>(
-            objectKey, value);
+              objectKey, value);
           return this.map.map.entrySet().contains(objectKeyEntry);
         }
       }
@@ -128,7 +128,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
 
     @Override
     public int size() {
-      return map.size();
+      return this.map.size();
     }
   }
 
@@ -166,7 +166,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean contains(final Object paramObject) {
-      return map.containsKey(paramObject);
+      return this.map.containsKey(paramObject);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
 
     @Override
     public int size() {
-      return map.size();
+      return this.map.size();
     }
   }
 
@@ -235,7 +235,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
 
   @Override
   public void clear() {
-    map.clear();
+    this.map.clear();
   }
 
   @Override
@@ -244,13 +244,13 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
       return false;
     } else {
       final ObjectKey objectKey = new ObjectKey(key);
-      return map.containsKey(objectKey);
+      return this.map.containsKey(objectKey);
     }
   }
 
   @Override
   public boolean containsValue(final Object value) {
-    return map.containsValue(value);
+    return this.map.containsValue(value);
   }
 
   @Override
@@ -267,7 +267,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
       return null;
     } else {
       final ObjectKey objectKey = new ObjectKey(key);
-      return map.get(objectKey);
+      return this.map.get(objectKey);
     }
   }
 
@@ -283,7 +283,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
 
   @Override
   public boolean isEmpty() {
-    return map.isEmpty();
+    return this.map.isEmpty();
   }
 
   @Override
@@ -301,9 +301,9 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
     } else {
       final ObjectKey objectKey = new ObjectKey(key);
       if (value == null) {
-        return map.remove(objectKey);
+        return this.map.remove(objectKey);
       } else {
-        return map.put(objectKey, value);
+        return this.map.put(objectKey, value);
       }
     }
   }
@@ -323,19 +323,19 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
       throw new NullPointerException("Key cannot be null");
     } else {
       final ObjectKey objectKey = new ObjectKey(key);
-      return map.remove(objectKey);
+      return this.map.remove(objectKey);
     }
   }
 
   @Override
   public int size() {
-    return map.size();
+    return this.map.size();
   }
 
   @Override
   public String toString() {
     final Iterator<Map.Entry<K, V>> localIterator = entrySet().iterator();
-    if (!(localIterator.hasNext())) {
+    if (!localIterator.hasNext()) {
       return "{}";
     }
     final StringBuilder localStringBuilder = new StringBuilder();
@@ -344,12 +344,12 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
       final Map.Entry<K, V> localEntry = localIterator.next();
       final Object localObject1 = localEntry.getKey();
       final Object localObject2 = localEntry.getValue();
-      localStringBuilder.append((localObject1 == this) ? "(this Map)"
+      localStringBuilder.append(localObject1 == this ? "(this Map)"
         : localObject1);
       localStringBuilder.append('=');
-      localStringBuilder.append((localObject2 == this) ? "(this Map)"
+      localStringBuilder.append(localObject2 == this ? "(this Map)"
         : localObject2);
-      if (!(localIterator.hasNext())) {
+      if (!localIterator.hasNext()) {
         return "}";
       }
       localStringBuilder.append(", ");
@@ -358,7 +358,7 @@ public class ObjectKeyMap<K, V> implements Map<K, V> {
 
   @Override
   public Collection<V> values() {
-    return map.values();
+    return this.map.values();
   }
 
 }

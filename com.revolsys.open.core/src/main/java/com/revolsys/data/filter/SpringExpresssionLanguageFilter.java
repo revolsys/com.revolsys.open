@@ -14,7 +14,7 @@ import com.revolsys.filter.Filter;
 import com.revolsys.io.map.MapSerializer;
 
 public class SpringExpresssionLanguageFilter implements Filter<Record>,
-  MapSerializer {
+MapSerializer {
   private static SpelParserConfiguration EXPRESSION_CONFIGURATION = new SpelParserConfiguration(
     true, true);
 
@@ -36,15 +36,15 @@ public class SpringExpresssionLanguageFilter implements Filter<Record>,
     final Map<String, ? extends Object> variables) {
     this.query = query;
     this.expression = EXPRESSION_PARSER.parseExpression(query);
-    context.addPropertyAccessor(new RecordAccessor());
-    context.setVariable("systemProperties", System.getProperties());
-    context.setVariables((Map<String, Object>)variables);
+    this.context.addPropertyAccessor(new RecordAccessor());
+    this.context.setVariable("systemProperties", System.getProperties());
+    this.context.setVariables((Map<String, Object>)variables);
   }
 
   @Override
   public boolean accept(final Record object) {
     try {
-      final Boolean value = expression.getValue(context, object, Boolean.class);
+      final Boolean value = this.expression.getValue(this.context, object, Boolean.class);
       return value;
     } catch (final Throwable e) {
       return false;
@@ -55,12 +55,12 @@ public class SpringExpresssionLanguageFilter implements Filter<Record>,
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     map.put("type", "queryFilter");
-    map.put("query", query);
+    map.put("query", this.query);
     return map;
   }
 
   @Override
   public String toString() {
-    return expression.getExpressionString();
+    return this.expression.getExpressionString();
   }
 }

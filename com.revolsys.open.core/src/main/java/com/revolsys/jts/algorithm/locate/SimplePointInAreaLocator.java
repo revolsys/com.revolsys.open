@@ -96,7 +96,7 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
   /**
    * Determines whether a point lies in a LinearRing,
    * using the ring envelope to short-circuit if possible.
-   * 
+   *
    * @param p the point to test
    * @param ring a linear ring
    * @return true if the point lies inside the ring
@@ -111,11 +111,11 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
 
   /**
    * Determines the {@link Location} of a point in an areal {@link Geometry}.
-   * Currently this will never return a value of BOUNDARY.  
-   * 
+   * Currently this will never return a value of BOUNDARY.
+   *
    * @param p the point to test
    * @param geom the areal geometry to test
-   * @return the Location of the point in the geometry  
+   * @return the Location of the point in the geometry
    */
   public static Location locate(final Point p, final Geometry geom) {
     if (geom.isEmpty()) {
@@ -136,7 +136,7 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
 
   @Override
   public Location locate(final Point p) {
-    return SimplePointInAreaLocator.locate(p, geom);
+    return SimplePointInAreaLocator.locate(p, this.geom);
   }
 
 }

@@ -41,59 +41,97 @@ import com.revolsys.jts.util.Assert;
  * @version 1.7
  */
 public class Node
-  extends NodeBase
+extends NodeBase
 {
-  public static Node createNode(Interval itemInterval)
+  public static Node createExpanded(final Node node, final Interval addInterval)
   {
-    Key key = new Key(itemInterval);
+    final Interval expandInt = new Interval(addInterval);
+    if (node != null) {
+      expandInt.expandToInclude(node.interval);
+    }
 
-//System.out.println("input: " + env + "  binaryEnv: " + key.getEnvelope());
-    Node node = new Node(key.getInterval(), key.getLevel());
-    return node;
-  }
-
-  public static Node createExpanded(Node node, Interval addInterval)
-  {
-    Interval expandInt = new Interval(addInterval);
-    if (node != null) expandInt.expandToInclude(node.interval);
-
-    Node largerNode = createNode(expandInt);
-    if (node != null) largerNode.insert(node);
+    final Node largerNode = createNode(expandInt);
+    if (node != null) {
+      largerNode.insert(node);
+    }
     return largerNode;
   }
 
-  private Interval interval;
-  private double centre;
-  private int level;
+  public static Node createNode(final Interval itemInterval)
+  {
+    final Key key = new Key(itemInterval);
 
-  public Node(Interval interval, int level)
+    //System.out.println("input: " + env + "  binaryEnv: " + key.getEnvelope());
+    final Node node = new Node(key.getInterval(), key.getLevel());
+    return node;
+  }
+
+  private final Interval interval;
+  private final double centre;
+  private final int level;
+
+  public Node(final Interval interval, final int level)
   {
     this.interval = interval;
     this.level = level;
-    centre = (interval.getMin() + interval.getMax()) / 2;
+    this.centre = (interval.getMin() + interval.getMax()) / 2;
   }
 
-  public Interval getInterval() { return interval; }
-
-  protected boolean isSearchMatch(Interval itemInterval)
+  private Node createSubnode(final int index)
   {
-//    System.out.println(itemInterval + " overlaps " + interval + " : "
-//                       + itemInterval.overlaps(interval));
-    return itemInterval.overlaps(interval);
+    // create a new subnode in the appropriate interval
+
+    double min = 0.0;
+    double max = 0.0;
+
+    switch (index) {
+      case 0:
+        min = this.interval.getMin();
+        max = this.centre;
+        break;
+      case 1:
+        min = this.centre;
+        max = this.interval.getMax();
+        break;
+    }
+    final Interval subInt = new Interval(min, max);
+    final Node node = new Node(subInt, this.level - 1);
+    return node;
   }
+
+  /**
+   * Returns the smallest <i>existing</i>
+   * node containing the envelope.
+   */
+  public NodeBase find(final Interval searchInterval)
+  {
+    final int subnodeIndex = getSubnodeIndex(searchInterval, this.centre);
+    if (subnodeIndex == -1) {
+      return this;
+    }
+    if (this.subnode[subnodeIndex] != null) {
+      // query lies in subnode, so search it
+      final Node node = this.subnode[subnodeIndex];
+      return node.find(searchInterval);
+    }
+    // no existing subnode, so return this one anyway
+    return this;
+  }
+
+  public Interval getInterval() { return this.interval; }
 
   /**
    * Returns the subnode containing the envelope.
    * Creates the node if
    * it does not already exist.
    */
-  public Node getNode(Interval searchInterval)
+  public Node getNode(final Interval searchInterval)
   {
-    int subnodeIndex = getSubnodeIndex(searchInterval, centre);
+    final int subnodeIndex = getSubnodeIndex(searchInterval, this.centre);
     // if index is -1 searchEnv is not contained in a subnode
     if (subnodeIndex != -1) {
       // create the node if it does not exist
-      Node node = getSubnode(subnodeIndex);
+      final Node node = getSubnode(subnodeIndex);
       // recursively search the found/created node
       return node.getNode(searchInterval);
     }
@@ -103,71 +141,39 @@ public class Node
   }
 
   /**
-   * Returns the smallest <i>existing</i>
-   * node containing the envelope.
+   * get the subnode for the index.
+   * If it doesn't exist, create it
    */
-  public NodeBase find(Interval searchInterval)
+  private Node getSubnode(final int index)
   {
-    int subnodeIndex = getSubnodeIndex(searchInterval, centre);
-    if (subnodeIndex == -1)
-      return this;
-    if (subnode[subnodeIndex] != null) {
-      // query lies in subnode, so search it
-      Node node = subnode[subnodeIndex];
-      return node.find(searchInterval);
+    if (this.subnode[index] == null) {
+      this.subnode[index] = createSubnode(index);
     }
-    // no existing subnode, so return this one anyway
-    return this;
+    return this.subnode[index];
   }
 
-  void insert(Node node)
+  void insert(final Node node)
   {
-    Assert.isTrue(interval == null || interval.contains(node.interval));
-    int index = getSubnodeIndex(node.interval, centre);
-    if (node.level == level - 1) {
-      subnode[index] = node;
+    Assert.isTrue(this.interval == null || this.interval.contains(node.interval));
+    final int index = getSubnodeIndex(node.interval, this.centre);
+    if (node.level == this.level - 1) {
+      this.subnode[index] = node;
     }
     else {
       // the node is not a direct child, so make a new child node to contain it
       // and recursively insert the node
-      Node childNode = createSubnode(index);
+      final Node childNode = createSubnode(index);
       childNode.insert(node);
-      subnode[index] = childNode;
+      this.subnode[index] = childNode;
     }
   }
 
-  /**
-   * get the subnode for the index.
-   * If it doesn't exist, create it
-   */
-  private Node getSubnode(int index)
+  @Override
+  protected boolean isSearchMatch(final Interval itemInterval)
   {
-    if (subnode[index] == null) {
-      subnode[index] = createSubnode(index);
-    }
-    return subnode[index];
-  }
-
-  private Node createSubnode(int index)
-  {
-        // create a new subnode in the appropriate interval
-
-      double min = 0.0;
-      double max = 0.0;
-
-      switch (index) {
-      case 0:
-        min = interval.getMin();
-        max = centre;
-        break;
-      case 1:
-        min = centre;
-        max = interval.getMax();
-        break;
-      }
-      Interval subInt = new Interval(min, max);
-      Node node = new Node(subInt, level - 1);
-    return node;
+    //    System.out.println(itemInterval + " overlaps " + interval + " : "
+    //                       + itemInterval.overlaps(interval));
+    return itemInterval.overlaps(this.interval);
   }
 
 }

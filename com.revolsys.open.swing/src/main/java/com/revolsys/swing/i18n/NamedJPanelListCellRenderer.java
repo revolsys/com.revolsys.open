@@ -9,7 +9,7 @@ import javax.swing.SwingConstants;
 public class NamedJPanelListCellRenderer extends DefaultListCellRenderer {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -5909086452296276015L;
 

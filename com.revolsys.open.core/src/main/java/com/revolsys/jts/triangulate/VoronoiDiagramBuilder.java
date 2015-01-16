@@ -51,14 +51,14 @@ import com.revolsys.jts.triangulate.quadedge.QuadEdgeSubdivision;
  * The diagram is returned as a {@link GeometryCollection} of {@link Polygon}s,
  * clipped to the larger of a supplied envelope or to an envelope determined
  * by the input sites.
- * 
+ *
  * @author Martin Davis
  *
  */
 public class VoronoiDiagramBuilder {
   private static Geometry clipGeometryCollection(final Geometry geom,
     final BoundingBox clipEnv) {
-    GeometryFactory r = geom.getGeometryFactory();
+    final GeometryFactory r = geom.getGeometryFactory();
     final Geometry clipPoly = clipEnv.toGeometry();
     final List<Geometry> clipped = new ArrayList<Geometry>();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
@@ -98,57 +98,57 @@ public class VoronoiDiagramBuilder {
   }
 
   private void create() {
-    if (subdiv != null) {
+    if (this.subdiv != null) {
       return;
     }
 
-    final BoundingBoxDoubleGf siteEnv = DelaunayTriangulationBuilder.envelope(siteCoords);
-    diagramEnv = siteEnv;
+    final BoundingBoxDoubleGf siteEnv = DelaunayTriangulationBuilder.envelope(this.siteCoords);
+    this.diagramEnv = siteEnv;
     // add a buffer around the final envelope
-    final double expandBy = Math.max(diagramEnv.getWidth(),
-      diagramEnv.getHeight());
-    diagramEnv = diagramEnv.expand(expandBy);
-    if (clipEnv != null) {
-      diagramEnv.expandToInclude(clipEnv);
+    final double expandBy = Math.max(this.diagramEnv.getWidth(),
+      this.diagramEnv.getHeight());
+    this.diagramEnv = this.diagramEnv.expand(expandBy);
+    if (this.clipEnv != null) {
+      this.diagramEnv.expandToInclude(this.clipEnv);
     }
 
-    final List vertices = DelaunayTriangulationBuilder.toVertices(siteCoords);
-    subdiv = new QuadEdgeSubdivision(siteEnv, tolerance);
+    final List vertices = DelaunayTriangulationBuilder.toVertices(this.siteCoords);
+    this.subdiv = new QuadEdgeSubdivision(siteEnv, this.tolerance);
     final IncrementalDelaunayTriangulator triangulator = new IncrementalDelaunayTriangulator(
-      subdiv);
+      this.subdiv);
     triangulator.insertSites(vertices);
   }
 
   /**
-   * Gets the faces of the computed diagram as a {@link GeometryCollection} 
+   * Gets the faces of the computed diagram as a {@link GeometryCollection}
    * of {@link Polygon}s, clipped as specified.
-   * 
+   *
    * @param geomFact the geometry factory to use to create the output
    * @return the faces of the diagram
    */
   public Geometry getDiagram(final GeometryFactory geomFact) {
     create();
-    final Geometry polys = subdiv.getVoronoiDiagram(geomFact);
+    final Geometry polys = this.subdiv.getVoronoiDiagram(geomFact);
 
     // clip polys to diagramEnv
-    return clipGeometryCollection(polys, diagramEnv);
+    return clipGeometryCollection(polys, this.diagramEnv);
   }
 
   /**
    * Gets the {@link QuadEdgeSubdivision} which models the computed diagram.
-   * 
+   *
    * @return the subdivision containing the triangulation
    */
   public QuadEdgeSubdivision getSubdivision() {
     create();
-    return subdiv;
+    return this.subdiv;
   }
 
   /**
    * Sets the envelope to clip the diagram to.
    * The diagram will be clipped to the larger
    * of this envelope or an envelope surrounding the sites.
-   * 
+   *
    * @param clipEnv the clip envelope.
    */
   public void setClipEnvelope(final BoundingBox clipEnv) {
@@ -158,30 +158,30 @@ public class VoronoiDiagramBuilder {
   /**
    * Sets the sites (point or vertices) which will be diagrammed
    * from a collection of {@link Coordinates}s.
-   * 
+   *
    * @param coords a collection of Coordinates.
    */
   public void setSites(final Collection coords) {
     // remove any duplicate points (they will cause the triangulation to fail)
-    siteCoords = DelaunayTriangulationBuilder.unique(CoordinateArrays.toCoordinateArray(coords));
+    this.siteCoords = DelaunayTriangulationBuilder.unique(CoordinateArrays.toCoordinateArray(coords));
   }
 
   /**
    * Sets the sites (point or vertices) which will be diagrammed.
    * All vertices of the given geometry will be used as sites.
-   * 
+   *
    * @param geom the geometry from which the sites will be extracted.
    */
   public void setSites(final Geometry geom) {
     // remove any duplicate points (they will cause the triangulation to fail)
-    siteCoords = DelaunayTriangulationBuilder.extractUniqueCoordinates(geom);
+    this.siteCoords = DelaunayTriangulationBuilder.extractUniqueCoordinates(geom);
   }
 
   /**
    * Sets the snapping tolerance which will be used
    * to improved the robustness of the triangulation computation.
    * A tolerance of 0.0 specifies that no snapping will take place.
-   * 
+   *
    * @param tolerance the tolerance distance to use
    */
   public void setTolerance(final double tolerance) {

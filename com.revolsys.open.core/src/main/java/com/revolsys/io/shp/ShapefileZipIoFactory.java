@@ -26,6 +26,13 @@ AbstractRecordAndGeometryIoFactory {
   }
 
   @Override
+  public RecordReader createRecordReader(final Resource resource,
+    final RecordFactory factory) {
+    return new ZipRecordReader(resource, ShapefileConstants.FILE_EXTENSION,
+      factory);
+  }
+
+  @Override
   public Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
@@ -40,13 +47,6 @@ AbstractRecordAndGeometryIoFactory {
     final Writer<Record> shapeWriter = new ShapefileRecordWriter(recordDefinition,
       tempResource);
     return new ZipWriter<Record>(directory, shapeWriter, outputStream);
-  }
-
-  @Override
-  public RecordReader createRecordReader(final Resource resource,
-    final RecordFactory factory) {
-    return new ZipRecordReader(resource, ShapefileConstants.FILE_EXTENSION,
-      factory);
   }
 
 }

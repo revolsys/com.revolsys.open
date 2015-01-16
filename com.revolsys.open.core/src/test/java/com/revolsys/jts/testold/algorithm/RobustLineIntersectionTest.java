@@ -19,7 +19,7 @@ import com.revolsys.jts.io.WKTReader;
  * in some tricky cases.
  * Failure modes can include exceptions thrown, or incorrect
  * results returned.
- * 
+ *
  * @author Owner
  *
  */
@@ -69,7 +69,7 @@ public class RobustLineIntersectionTest extends TestCase {
   /**
    * Check that intersection of segment defined by points in pt array
    * is equal to the expectedIntPt value (up to the given distanceTolerance).
-   * 
+   *
    * @param pt
    * @param expectedIntersectionNum
    * @param expectedIntPt the expected intersection points (maybe null if not tested)
@@ -107,7 +107,7 @@ public class RobustLineIntersectionTest extends TestCase {
             distanceTolerance);
         } else if (!(equals(expectedIntPt[1], li.getIntersection(0),
           distanceTolerance) || equals(expectedIntPt[1], li.getIntersection(1),
-          distanceTolerance))) {
+            distanceTolerance))) {
           checkIntPoints(expectedIntPt[1], li.getIntersection(0),
             distanceTolerance);
           checkIntPoints(expectedIntPt[1], li.getIntersection(1),
@@ -144,7 +144,7 @@ public class RobustLineIntersectionTest extends TestCase {
   }
 
   void checkIntersectionNone(final String wkt1, final String wkt2)
-    throws ParseException {
+      throws ParseException {
     final LineString l1 = (LineString)this.reader.read(wkt1);
     final LineString l2 = (LineString)this.reader.read(wkt2);
     final Point[] pt = new Point[] {
@@ -159,7 +159,7 @@ public class RobustLineIntersectionTest extends TestCase {
     final boolean isEqual = equals(expectedPt, actualPt, distanceTolerance);
     assertTrue(
       "Int Pts not equal - " + "expected " + EWktWriter.point(expectedPt)
-        + " VS " + "actual " + EWktWriter.point(actualPt), isEqual);
+      + " VS " + "actual " + EWktWriter.point(actualPt), isEqual);
   }
 
   /**
@@ -170,7 +170,7 @@ public class RobustLineIntersectionTest extends TestCase {
    * The fix is to use a new heuristic which out of the 4 endpoints
    * chooses the one which is closest to the other segment.
    * This works in all known failure cases.
-   * 
+   *
    * @throws ParseException
    */
   public void testCentralEndpointHeuristicFailure() throws ParseException {
@@ -195,13 +195,13 @@ public class RobustLineIntersectionTest extends TestCase {
     checkIntersection(new Point[] {
       new PointDouble(4348433.262114629, 5552595.478385733,
         Point.NULL_ORDINATE),
-      new PointDouble(4348440.849387404, 5552599.272022122,
-        Point.NULL_ORDINATE),
+        new PointDouble(4348440.849387404, 5552599.272022122,
+          Point.NULL_ORDINATE),
 
-      new PointDouble(4348433.26211463, 5552595.47838573,
-        Point.NULL_ORDINATE),
-      new PointDouble(4348440.8493874, 5552599.27202212,
-        Point.NULL_ORDINATE)
+          new PointDouble(4348433.26211463, 5552595.47838573,
+            Point.NULL_ORDINATE),
+            new PointDouble(4348440.8493874, 5552599.27202212,
+              Point.NULL_ORDINATE)
     }, 1, new Point[] {
       new PointDouble(4348440.8493874, 5552599.27202212,
         Point.NULL_ORDINATE),
@@ -210,7 +210,7 @@ public class RobustLineIntersectionTest extends TestCase {
 
   /**
    * Outside envelope using HCoordinate method.
-   * 
+   *
    * @throws ParseException
    */
   public void testCmp5CaseWKT() throws ParseException {
@@ -226,7 +226,7 @@ public class RobustLineIntersectionTest extends TestCase {
   /**
    * This used to be a failure case (exception), but apparently works now.
    * Possibly normalization has fixed this?
-   * 
+   *
    * @throws ParseException
    */
   public void testDaveSkeaCase() throws ParseException {
@@ -241,7 +241,7 @@ public class RobustLineIntersectionTest extends TestCase {
 
   /**
    * Test from strk which is bad in GEOS (2009-04-14).
-   * 
+   *
    * @throws ParseException
    */
   public void testGEOS_1() throws ParseException {
@@ -253,7 +253,7 @@ public class RobustLineIntersectionTest extends TestCase {
 
   /**
    * Test from strk which is bad in GEOS (2009-04-14).
-   * 
+   *
    * @throws ParseException
    */
   public void testGEOS_2() throws ParseException {
@@ -266,7 +266,7 @@ public class RobustLineIntersectionTest extends TestCase {
   /**
    * Test involving two non-almost-parallel lines.
    * Does not seem to cause problems with basic line intersection algorithm.
-   * 
+   *
    * @throws ParseException
    */
   public void testLeduc_1() throws ParseException {
@@ -277,12 +277,12 @@ public class RobustLineIntersectionTest extends TestCase {
   }
 
   /**
-   * Tests a case where intersection point is rounded, 
+   * Tests a case where intersection point is rounded,
    * and it is computed as a nearest endpoint.
-   * Exposed a bug due to aliasing of endpoint. 
-   * 
+   * Exposed a bug due to aliasing of endpoint.
+   *
    * MD 8 Mar 2013
-   * 
+   *
    * @throws ParseException
    */
   public void testRoundedPointsNotAltered() throws ParseException {
@@ -294,28 +294,28 @@ public class RobustLineIntersectionTest extends TestCase {
 
   /**
    * Test from Tomas Fa - JTS list 6/13/2012
-   * 
+   *
    * Fails using original JTS DeVillers determine orientation test.
    * Succeeds using DD and Shewchuk orientation
-   * 
+   *
    * @throws ParseException
    */
   public void testTomasFa_1() throws ParseException {
     checkIntersectionNone("LINESTRING (-42.0 163.2, 21.2 265.2)",
-      "LINESTRING (-26.2 188.7, 37.0 290.7)");
+        "LINESTRING (-26.2 188.7, 37.0 290.7)");
   }
 
   /**
    * Test from Tomas Fa - JTS list 6/13/2012
-   * 
+   *
    * Fails using original JTS DeVillers determine orientation test.
    * Succeeds using DD and Shewchuk orientation
-   * 
+   *
    * @throws ParseException
    */
   public void testTomasFa_2() throws ParseException {
     checkIntersectionNone("LINESTRING (-5.9 163.1, 76.1 250.7)",
-      "LINESTRING (14.6 185.0, 96.6 272.6)");
+        "LINESTRING (14.6 185.0, 96.6 272.6)");
   }
 
 }

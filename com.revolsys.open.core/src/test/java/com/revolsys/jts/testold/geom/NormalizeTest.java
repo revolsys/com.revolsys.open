@@ -64,34 +64,34 @@ public class NormalizeTest extends TestCase {
   }
 
   public void testCompareEmptyPoint() throws Exception {
-    final Point p1 = geometryFactory.geometry("POINT(30 30)");
-    final Point p2 = geometryFactory.geometry("POINT EMPTY");
+    final Point p1 = this.geometryFactory.geometry("POINT(30 30)");
+    final Point p2 = this.geometryFactory.geometry("POINT EMPTY");
     assertTrue(p1.compareTo(p2) > 0);
   }
 
   public void testComparePoint() throws Exception {
-    final Point p1 = geometryFactory.geometry("POINT(30 30)");
-    final Point p2 = geometryFactory.geometry("POINT(30 40)");
+    final Point p1 = this.geometryFactory.geometry("POINT(30 30)");
+    final Point p2 = this.geometryFactory.geometry("POINT(30 40)");
     assertTrue(p1.compareTo(p2) < 0);
   }
 
   public void testNormalizeEmptyLineString() throws Exception {
-    LineString l = (LineString)geometryFactory.geometry("LINESTRING EMPTY");
+    LineString l = (LineString)this.geometryFactory.geometry("LINESTRING EMPTY");
     l = l.normalize();
-    final LineString expectedValue = (LineString)geometryFactory.geometry("LINESTRING EMPTY");
+    final LineString expectedValue = (LineString)this.geometryFactory.geometry("LINESTRING EMPTY");
     assertEqualsExact(expectedValue, l);
   }
 
   public void testNormalizeEmptyPoint() throws Exception {
-    Point point = geometryFactory.geometry("POINT EMPTY");
+    Point point = this.geometryFactory.geometry("POINT EMPTY");
     point = point.normalize();
     assertEquals(null, point.getPoint());
   }
 
   public void testNormalizeEmptyPolygon() throws Exception {
-    Polygon actualValue = (Polygon)geometryFactory.geometry("POLYGON EMPTY");
+    Polygon actualValue = (Polygon)this.geometryFactory.geometry("POLYGON EMPTY");
     actualValue = actualValue.normalize();
-    final Polygon expectedValue = (Polygon)geometryFactory.geometry("POLYGON EMPTY");
+    final Polygon expectedValue = (Polygon)this.geometryFactory.geometry("POLYGON EMPTY");
     assertEqualsExact(expectedValue, actualValue);
   }
 
@@ -105,73 +105,73 @@ public class NormalizeTest extends TestCase {
   // }
 
   public void testNormalizeLineString1() throws Exception {
-    LineString l = (LineString)geometryFactory.geometry("LINESTRING(20 20,160 40,160 100,100 120,60 60)");
+    LineString l = (LineString)this.geometryFactory.geometry("LINESTRING(20 20,160 40,160 100,100 120,60 60)");
     l = l.normalize();
-    final LineString expectedValue = (LineString)geometryFactory.geometry("LINESTRING(20 20,160 40,160 100,100 120,60 60)");
+    final LineString expectedValue = (LineString)this.geometryFactory.geometry("LINESTRING(20 20,160 40,160 100,100 120,60 60)");
     assertEqualsExact(expectedValue, l);
   }
 
   public void testNormalizeLineString2() throws Exception {
-    LineString l = (LineString)geometryFactory.geometry("LINESTRING(20 20,160 40,160 100,100 120,60 60)");
+    LineString l = (LineString)this.geometryFactory.geometry("LINESTRING(20 20,160 40,160 100,100 120,60 60)");
     l = l.normalize();
-    final LineString expectedValue = (LineString)geometryFactory.geometry("LINESTRING (20 20,160 40,160 100,100 120,60 60)");
+    final LineString expectedValue = (LineString)this.geometryFactory.geometry("LINESTRING (20 20,160 40,160 100,100 120,60 60)");
     assertEqualsExact(expectedValue, l);
   }
 
   public void testNormalizeLineString3() throws Exception {
-    LineString l = (LineString)geometryFactory.geometry("LINESTRING(200 240,140 160,80 160,160 80,80 80)");
+    LineString l = (LineString)this.geometryFactory.geometry("LINESTRING(200 240,140 160,80 160,160 80,80 80)");
     l = l.normalize();
-    final LineString expectedValue = (LineString)geometryFactory.geometry("LINESTRING(80 80,160 80,80 160,140 160,200 240)");
+    final LineString expectedValue = (LineString)this.geometryFactory.geometry("LINESTRING(80 80,160 80,80 160,140 160,200 240)");
     assertEqualsExact(expectedValue, l);
   }
 
   public void testNormalizeLineString4() throws Exception {
-    LineString l = (LineString)geometryFactory.geometry("LINESTRING(200 240,140 160,80 160,160 80,80 80)");
+    LineString l = (LineString)this.geometryFactory.geometry("LINESTRING(200 240,140 160,80 160,160 80,80 80)");
     l = l.normalize();
-    final LineString expectedValue = (LineString)geometryFactory.geometry("LINESTRING(80 80,160 80,80 160,140 160,200 240)");
+    final LineString expectedValue = (LineString)this.geometryFactory.geometry("LINESTRING(80 80,160 80,80 160,140 160,200 240)");
     assertEqualsExact(expectedValue, l);
   }
 
   public void testNormalizeLineString5() throws Exception {
-    final LineString geometry = (LineString)geometryFactory.geometry("LINESTRING(200 340,140 240,140 160,60 240,140 240,200 340)");
+    final LineString geometry = (LineString)this.geometryFactory.geometry("LINESTRING(200 340,140 240,140 160,60 240,140 240,200 340)");
     final LineString normalized = geometry.normalize();
-    final LineString expectedValue = (LineString)geometryFactory.geometry("LINESTRING (200 340,140 240,60 240,140 160,140 240,200 340)");
+    final LineString expectedValue = (LineString)this.geometryFactory.geometry("LINESTRING (200 340,140 240,60 240,140 160,140 240,200 340)");
     assertEqualsExact(expectedValue, normalized);
   }
 
   public void testNormalizeMultiLineString() throws Exception {
-    MultiLineString actualValue = (MultiLineString)geometryFactory.geometry("MULTILINESTRING ((200 260,180 320,260 340),(120 180,140 100,40 80),(200 180,220 160,200 180),(100 280,120 260,140 260,140 240,120 240,120 260,100 280))");
+    MultiLineString actualValue = (MultiLineString)this.geometryFactory.geometry("MULTILINESTRING ((200 260,180 320,260 340),(120 180,140 100,40 80),(200 180,220 160,200 180),(100 280,120 260,140 260,140 240,120 240,120 260,100 280))");
     actualValue = actualValue.normalize();
-    final MultiLineString expectedValue = (MultiLineString)geometryFactory.geometry("MULTILINESTRING ((40 80,140 100,120 180),(100 280,120 260,120 240,140 240,140 260,120 260,100 280),(200 180,220 160,200 180),(200 260,180 320,260 340))");
+    final MultiLineString expectedValue = (MultiLineString)this.geometryFactory.geometry("MULTILINESTRING ((40 80,140 100,120 180),(100 280,120 260,120 240,140 240,140 260,120 260,100 280),(200 180,220 160,200 180),(200 260,180 320,260 340))");
     assertEqualsExact(expectedValue, actualValue);
   }
 
   public void testNormalizeMultiPoint() throws Exception {
-    MultiPoint m = (MultiPoint)geometryFactory.geometry("MULTIPOINT((30 20),(10 10),(20 20),(30 30),(20 10))");
+    MultiPoint m = (MultiPoint)this.geometryFactory.geometry("MULTIPOINT((30 20),(10 10),(20 20),(30 30),(20 10))");
     m = m.normalize();
-    final MultiPoint expectedValue = (MultiPoint)geometryFactory.geometry("MULTIPOINT((10 10),(20 10),(20 20),(30 20),(30 30))");
+    final MultiPoint expectedValue = (MultiPoint)this.geometryFactory.geometry("MULTIPOINT((10 10),(20 10),(20 20),(30 20),(30 30))");
     assertEqualsExact(expectedValue, m);
-    final MultiPoint unexpectedValue = (MultiPoint)geometryFactory.geometry("MULTIPOINT((20 10),(20 20),(30 20),(30 30),(10 10))");
+    final MultiPoint unexpectedValue = (MultiPoint)this.geometryFactory.geometry("MULTIPOINT((20 10),(20 20),(30 20),(30 30),(10 10))");
     assertTrue(!m.equals(2,unexpectedValue));
   }
 
   public void testNormalizeMultiPolygon() throws Exception {
-    MultiPolygon actualValue = (MultiPolygon)geometryFactory.geometry("MULTIPOLYGON(((40 360,40 280,140 280,140 360,40 360),(60 340,60 300,120 300,120 340,60 340)),((140 200,260 200,260 100,140 100,140 200),(160 180,240 180,240 120,160 120,160 180)))");
+    MultiPolygon actualValue = (MultiPolygon)this.geometryFactory.geometry("MULTIPOLYGON(((40 360,40 280,140 280,140 360,40 360),(60 340,60 300,120 300,120 340,60 340)),((140 200,260 200,260 100,140 100,140 200),(160 180,240 180,240 120,160 120,160 180)))");
     actualValue = actualValue.normalize();
-    final MultiPolygon expectedValue = (MultiPolygon)geometryFactory.geometry("MULTIPOLYGON(((40 280,40 360,140 360,140 280,40 280),(60 300,120 300,120 340,60 340,60 300)),((140 100,140 200,260 200,260 100,140 100),(160 120,240 120,240 180,160 180,160 120)))");
+    final MultiPolygon expectedValue = (MultiPolygon)this.geometryFactory.geometry("MULTIPOLYGON(((40 280,40 360,140 360,140 280,40 280),(60 300,120 300,120 340,60 340,60 300)),((140 100,140 200,260 200,260 100,140 100),(160 120,240 120,240 180,160 180,160 120)))");
     assertEqualsExact(expectedValue, actualValue);
   }
 
   public void testNormalizePoint() throws Exception {
-    Point point = geometryFactory.geometry("POINT (30 30)");
+    Point point = this.geometryFactory.geometry("POINT (30 30)");
     point = point.normalize();
     CoordinateTest.assertEquals(point.getPoint(), 30, 30);
   }
 
   public void testNormalizePolygon1() throws Exception {
-    Polygon actualValue = (Polygon)geometryFactory.geometry("POLYGON((120 320,240 200,120 80,20 200,120 320),(60 200,80 220,80 200,60 200),(160 200,180 200,180 220,160 200),(120 140,140 140,140 160,120 140),(140 240,140 220,120 260,140 240))");
+    Polygon actualValue = (Polygon)this.geometryFactory.geometry("POLYGON((120 320,240 200,120 80,20 200,120 320),(60 200,80 220,80 200,60 200),(160 200,180 200,180 220,160 200),(120 140,140 140,140 160,120 140),(140 240,140 220,120 260,140 240))");
     actualValue = actualValue.normalize();
-    final Polygon expectedValue = (Polygon)geometryFactory.geometry("POLYGON((20 200,120 320,240 200,120 80,20 200),(60 200,80 200,80 220,60 200),(120 140,140 140,140 160,120 140),(120 260,140 220,140 240,120 260),(160 200,180 200,180 220,160 200))");
+    final Polygon expectedValue = (Polygon)this.geometryFactory.geometry("POLYGON((20 200,120 320,240 200,120 80,20 200),(60 200,80 200,80 220,60 200),(120 140,140 140,140 160,120 140),(120 260,140 220,140 240,120 260),(160 200,180 200,180 220,160 200))");
     assertEqualsExact(expectedValue, actualValue);
   }
 }

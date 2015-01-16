@@ -11,16 +11,16 @@ import com.revolsys.jts.math.DD;
  * versions are provided, which are more robust
  * (i.e. they produce correct answers in more cases).
  * These are used in triangulation algorithms.
- * 
+ *
  * @author Martin Davis
  *
  */
 public class TriPredicate {
   /**
-   * Tests if a point is inside the circle defined by the points a, b, c. 
+   * Tests if a point is inside the circle defined by the points a, b, c.
    * This test uses simple
    * double-precision arithmetic, and thus may not be robust.
-   * 
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -30,25 +30,25 @@ public class TriPredicate {
   public static boolean isInCircle(final Point a, final Point b,
     final Point c, final Point p) {
     final boolean isInCircle = (a.getX() * a.getX() + a.getY() * a.getY()) * triArea(b, c, p)
-      - (b.getX() * b.getX() + b.getY() * b.getY()) * triArea(a, c, p) + (c.getX() * c.getX() + c.getY() * c.getY())
-      * triArea(a, b, p) - (p.getX() * p.getX() + p.getY() * p.getY()) * triArea(a, b, c) > 0;
-    return isInCircle;
+        - (b.getX() * b.getX() + b.getY() * b.getY()) * triArea(a, c, p) + (c.getX() * c.getX() + c.getY() * c.getY())
+        * triArea(a, b, p) - (p.getX() * p.getX() + p.getY() * p.getY()) * triArea(a, b, c) > 0;
+        return isInCircle;
   }
 
   /**
-   * Computes the inCircle test using distance from the circumcentre. 
+   * Computes the inCircle test using distance from the circumcentre.
    * Uses standard double-precision arithmetic.
    * <p>
    * In general this doesn't
    * appear to be any more robust than the standard calculation. However, there
    * is at least one case where the test point is far enough from the
-   * circumcircle that this test gives the correct answer. 
+   * circumcircle that this test gives the correct answer.
    * <pre>
    * LINESTRING
    * (1507029.9878 518325.7547, 1507022.1120341457 518332.8225183258,
    * 1507029.9833 518325.7458, 1507029.9896965567 518325.744909031)
    * </pre>
-   * 
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -64,9 +64,9 @@ public class TriPredicate {
   }
 
   /**
-   * Tests if a point is inside the circle defined by the points a, b, c. 
+   * Tests if a point is inside the circle defined by the points a, b, c.
    * The computation uses {@link DD} arithmetic for robustness.
-   * 
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -85,17 +85,17 @@ public class TriPredicate {
     final DD cy = new DD(c.getY());
 
     final DD aTerm = ax.multiply(ax)
-      .add(ay.multiply(ay))
-      .multiply(triAreaDD(bx, by, cx, cy, px, py));
+        .add(ay.multiply(ay))
+        .multiply(triAreaDD(bx, by, cx, cy, px, py));
     final DD bTerm = bx.multiply(bx)
-      .add(by.multiply(by))
-      .multiply(triAreaDD(ax, ay, cx, cy, px, py));
+        .add(by.multiply(by))
+        .multiply(triAreaDD(ax, ay, cx, cy, px, py));
     final DD cTerm = cx.multiply(cx)
-      .add(cy.multiply(cy))
-      .multiply(triAreaDD(ax, ay, bx, by, px, py));
+        .add(cy.multiply(cy))
+        .multiply(triAreaDD(ax, ay, bx, by, px, py));
     final DD pTerm = px.multiply(px)
-      .add(py.multiply(py))
-      .multiply(triAreaDD(ax, ay, bx, by, cx, cy));
+        .add(py.multiply(py))
+        .multiply(triAreaDD(ax, ay, bx, by, cx, cy));
 
     final DD sum = aTerm.subtract(bTerm).add(cTerm).subtract(pTerm);
     final boolean isInCircle = sum.doubleValue() > 0;
@@ -106,17 +106,17 @@ public class TriPredicate {
   public static boolean isInCircleDD2(final Point a, final Point b,
     final Point c, final Point p) {
     final DD aTerm = DD.sqr(a.getX())
-      .selfAdd(DD.sqr(a.getY()))
-      .selfMultiply(triAreaDD2(b, c, p));
+        .selfAdd(DD.sqr(a.getY()))
+        .selfMultiply(triAreaDD2(b, c, p));
     final DD bTerm = DD.sqr(b.getX())
-      .selfAdd(DD.sqr(b.getY()))
-      .selfMultiply(triAreaDD2(a, c, p));
+        .selfAdd(DD.sqr(b.getY()))
+        .selfMultiply(triAreaDD2(a, c, p));
     final DD cTerm = DD.sqr(c.getX())
-      .selfAdd(DD.sqr(c.getY()))
-      .selfMultiply(triAreaDD2(a, b, p));
+        .selfAdd(DD.sqr(c.getY()))
+        .selfMultiply(triAreaDD2(a, b, p));
     final DD pTerm = DD.sqr(p.getX())
-      .selfAdd(DD.sqr(p.getY()))
-      .selfMultiply(triAreaDD2(a, b, c));
+        .selfAdd(DD.sqr(p.getY()))
+        .selfMultiply(triAreaDD2(a, b, c));
 
     final DD sum = aTerm.selfSubtract(bTerm).selfAdd(cTerm).selfSubtract(pTerm);
     final boolean isInCircle = sum.doubleValue() > 0;
@@ -141,8 +141,8 @@ public class TriPredicate {
     final DD clift = cdx.multiply(cdx).selfSubtract(cdy.multiply(cdy));
 
     final DD sum = alift.selfMultiply(bcdet)
-      .selfAdd(blift.selfMultiply(cadet))
-      .selfAdd(clift.selfMultiply(abdet));
+        .selfAdd(blift.selfMultiply(cadet))
+        .selfAdd(clift.selfMultiply(abdet));
 
     final boolean isInCircle = sum.doubleValue() > 0;
 
@@ -150,9 +150,9 @@ public class TriPredicate {
   }
 
   /**
-   * Tests if a point is inside the circle defined by the points a, b, c. 
+   * Tests if a point is inside the circle defined by the points a, b, c.
    * This test uses robust computation.
-   * 
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -168,7 +168,7 @@ public class TriPredicate {
   /**
    * Computes twice the area of the oriented triangle (a, b, c), i.e., the area is positive if the
    * triangle is oriented counterclockwise.
-   * 
+   *
    * @param a a vertex of the triangle
    * @param b a vertex of the triangle
    * @param c a vertex of the triangle
@@ -182,7 +182,7 @@ public class TriPredicate {
    * Computes twice the area of the oriented triangle (a, b, c), i.e., the area
    * is positive if the triangle is oriented counterclockwise.
    * The computation uses {@link DD} arithmetic for robustness.
-   * 
+   *
    * @param ax the x ordinate of a vertex of the triangle
    * @param ay the y ordinate of a vertex of the triangle
    * @param bx the x ordinate of a vertex of the triangle
@@ -193,20 +193,20 @@ public class TriPredicate {
   public static DD triAreaDD(final DD ax, final DD ay, final DD bx,
     final DD by, final DD cx, final DD cy) {
     return bx.subtract(ax)
-      .multiply(cy.subtract(ay))
-      .subtract(by.subtract(ay).multiply(cx.subtract(ax)));
+        .multiply(cy.subtract(ay))
+        .subtract(by.subtract(ay).multiply(cx.subtract(ax)));
   }
 
   public static DD triAreaDD2(final Point a, final Point b,
     final Point c) {
 
     final DD t1 = DD.valueOf(b.getX())
-      .selfSubtract(a.getX())
-      .selfMultiply(DD.valueOf(c.getY()).selfSubtract(a.getY()));
+        .selfSubtract(a.getX())
+        .selfMultiply(DD.valueOf(c.getY()).selfSubtract(a.getY()));
 
     final DD t2 = DD.valueOf(b.getY())
-      .selfSubtract(a.getY())
-      .selfMultiply(DD.valueOf(c.getX()).selfSubtract(a.getX()));
+        .selfSubtract(a.getY())
+        .selfMultiply(DD.valueOf(c.getX()).selfSubtract(a.getX()));
 
     return t1.selfSubtract(t2);
   }

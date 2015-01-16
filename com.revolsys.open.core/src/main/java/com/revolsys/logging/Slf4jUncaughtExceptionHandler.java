@@ -5,11 +5,11 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import org.slf4j.LoggerFactory;
 
 public class Slf4jUncaughtExceptionHandler implements UncaughtExceptionHandler {
-  static {
-    Thread.setDefaultUncaughtExceptionHandler(new Slf4jUncaughtExceptionHandler());
+  public static void init() {
   }
 
-  public static void init() {
+  static {
+    Thread.setDefaultUncaughtExceptionHandler(new Slf4jUncaughtExceptionHandler());
   }
 
   @Override

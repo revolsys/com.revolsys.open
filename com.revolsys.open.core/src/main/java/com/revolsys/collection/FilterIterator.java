@@ -19,27 +19,27 @@ public class FilterIterator<T> extends AbstractIterator<T> {
   @Override
   protected void doClose() {
     super.doClose();
-    if (iterator instanceof AbstractIterator) {
-      final AbstractIterator<T> abstractIterator = (AbstractIterator<T>)iterator;
+    if (this.iterator instanceof AbstractIterator) {
+      final AbstractIterator<T> abstractIterator = (AbstractIterator<T>)this.iterator;
       abstractIterator.close();
     }
-    filter = null;
-    iterator = null;
+    this.filter = null;
+    this.iterator = null;
   }
 
   protected Filter<T> getFilter() {
-    return filter;
+    return this.filter;
   }
 
   protected Iterator<T> getIterator() {
-    return iterator;
+    return this.iterator;
   }
 
   @Override
   protected T getNext() throws NoSuchElementException {
-    while (iterator != null && iterator.hasNext()) {
-      final T value = iterator.next();
-      if (filter == null || filter.accept(value)) {
+    while (this.iterator != null && this.iterator.hasNext()) {
+      final T value = this.iterator.next();
+      if (this.filter == null || this.filter.accept(value)) {
         return value;
       }
     }

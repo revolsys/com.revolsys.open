@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.springframework.core.io.Resource;
 
 public class ByteArrayResource extends
-  org.springframework.core.io.ByteArrayResource {
+org.springframework.core.io.ByteArrayResource {
 
   private final String filename;
 
@@ -32,6 +32,6 @@ public class ByteArrayResource extends
 
   @Override
   public String getFilename() throws IllegalStateException {
-    return filename;
+    return this.filename;
   }
 }

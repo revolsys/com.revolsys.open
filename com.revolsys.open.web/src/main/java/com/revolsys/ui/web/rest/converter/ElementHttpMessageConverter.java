@@ -14,7 +14,7 @@ import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class ElementHttpMessageConverter extends
-  AbstractHttpMessageConverter<Element> {
+AbstractHttpMessageConverter<Element> {
 
   private static final Collection<MediaType> WRITE_MEDIA_TYPES = Arrays.asList(
     MediaType.APPLICATION_XHTML_XML, MediaType.TEXT_HTML);
@@ -33,7 +33,7 @@ public class ElementHttpMessageConverter extends
 
         final OutputStream out = outputMessage.getBody();
         if (MediaType.TEXT_HTML.equals(mediaType)
-          || MediaType.APPLICATION_XHTML_XML.equals(mediaType)) {
+            || MediaType.APPLICATION_XHTML_XML.equals(mediaType)) {
           element.serialize(out);
         }
       }

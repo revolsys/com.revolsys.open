@@ -18,8 +18,6 @@ import com.revolsys.util.CompareUtil;
 public class EqualAttributeCountComparator implements Comparator<Record> {
   private final Record object;
 
-  private final boolean invert;
-
   private final List<String> fieldNames;
 
   public EqualAttributeCountComparator(final Record object) {
@@ -30,7 +28,6 @@ public class EqualAttributeCountComparator implements Comparator<Record> {
     this.object = object;
     final RecordDefinition recordDefinition = object.getRecordDefinition();
     this.fieldNames = recordDefinition.getFieldNames();
-    this.invert = invert;
   }
 
   @Override

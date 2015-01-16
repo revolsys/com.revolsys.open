@@ -27,8 +27,8 @@ public class ImageViewport extends Viewport2D implements AutoCloseable {
 
   @Override
   public void close() {
-    if (graphics != null) {
-      graphics.dispose();
+    if (this.graphics != null) {
+      this.graphics.dispose();
     }
   }
 

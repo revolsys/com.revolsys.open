@@ -14,8 +14,8 @@ public class FixedPrecisionSnappingTest extends TestCase {
   }
 
   public void testTriangles() throws ParseException {
-    final Polygon a = factory.geometry("POLYGON((545 317, 617 379, 581 321, 545 317))");
-    final Polygon b = factory.geometry("POLYGON((484 290, 558 359, 543 309, 484 290))");
+    final Polygon a = this.factory.geometry("POLYGON((545 317, 617 379, 581 321, 545 317))");
+    final Polygon b = this.factory.geometry("POLYGON((484 290, 558 359, 543 309, 484 290))");
     a.intersection(b);
   }
 }

@@ -4,7 +4,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.io.DelegatingObjectWithProperties;
 
 public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements
-  JdbcWriter {
+JdbcWriter {
   private JdbcWriter writer;
 
   public JdbcWriterWrapper(final JdbcWriter writer) {
@@ -16,13 +16,13 @@ public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements
   public void close() throws RuntimeException {
     flush();
     setObject(null);
-    writer = null;
+    this.writer = null;
   }
 
   @Override
   public void flush() {
-    if (writer != null) {
-      writer.flush();
+    if (this.writer != null) {
+      this.writer.flush();
     }
   }
 
@@ -33,8 +33,8 @@ public class JdbcWriterWrapper extends DelegatingObjectWithProperties implements
 
   @Override
   public void write(final Record record) {
-    if (writer != null) {
-      writer.write(record);
+    if (this.writer != null) {
+      this.writer.write(record);
     }
   }
 }

@@ -51,7 +51,7 @@ public class ArcGisServerRestLayer extends AbstractTiledImageLayer {
           }
         } catch (final Throwable e) {
           throw new RuntimeException("Error connecting to ArcGIS rest server "
-            + this.url, e);
+              + this.url, e);
         }
       } else {
         return true;

@@ -56,19 +56,19 @@ public class PointPairDistance {
   }
 
   public Point getCoordinate(final int i) {
-    return pt[i];
+    return this.pt[i];
   }
 
   public Point[] getCoordinates() {
-    return pt;
+    return this.pt;
   }
 
   public double getDistance() {
-    return distance;
+    return this.distance;
   }
 
   public void initialize() {
-    isNull = true;
+    this.isNull = true;
   }
 
   public void initialize(final Point p0, final Point p1) {
@@ -83,19 +83,19 @@ public class PointPairDistance {
    */
   private void initialize(final Point p0, final Point p1,
     final double distance) {
-    pt[0] = p0.clonePoint();
-    pt[1] = p1.clonePoint();
+    this.pt[0] = p0.clonePoint();
+    this.pt[1] = p1.clonePoint();
     this.distance = distance;
-    isNull = false;
+    this.isNull = false;
   }
 
   public void setMaximum(final Point p0, final Point p1) {
-    if (isNull) {
+    if (this.isNull) {
       initialize(p0, p1);
       return;
     }
     final double dist = p0.distance(p1);
-    if (dist > distance) {
+    if (dist > this.distance) {
       initialize(p0, p1, dist);
     }
   }
@@ -105,12 +105,12 @@ public class PointPairDistance {
   }
 
   public void setMinimum(final Point p0, final Point p1) {
-    if (isNull) {
+    if (this.isNull) {
       initialize(p0, p1);
       return;
     }
     final double dist = p0.distance(p1);
-    if (dist < distance) {
+    if (dist < this.distance) {
       initialize(p0, p1, dist);
     }
   }
@@ -121,6 +121,6 @@ public class PointPairDistance {
 
   @Override
   public String toString() {
-    return EWktWriter.lineString(pt[0], pt[1]);
+    return EWktWriter.lineString(this.pt[0], this.pt[1]);
   }
 }

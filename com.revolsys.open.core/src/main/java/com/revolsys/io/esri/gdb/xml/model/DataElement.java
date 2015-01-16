@@ -24,9 +24,9 @@ public class DataElement implements Cloneable {
   public DataElement clone() {
     try {
       final DataElement clone = (DataElement)super.clone();
-      if (children != null) {
+      if (this.children != null) {
         clone.children = new ArrayList<DataElement>();
-        for (final DataElement child : children) {
+        for (final DataElement child : this.children) {
           clone.children.add(child.clone());
         }
       }
@@ -37,31 +37,31 @@ public class DataElement implements Cloneable {
   }
 
   public String getCatalogPath() {
-    return catalogPath;
+    return this.catalogPath;
   }
 
   public List<DataElement> getChildren() {
-    return children;
+    return this.children;
   }
 
   public Boolean getChildrenExpanded() {
-    return childrenExpanded;
+    return this.childrenExpanded;
   }
 
   public Boolean getFullPropsRetrieved() {
-    return fullPropsRetrieved;
+    return this.fullPropsRetrieved;
   }
 
   public String getMetadata() {
-    return metadata;
+    return this.metadata;
   }
 
   public Boolean getMetadataRetrieved() {
-    return metadataRetrieved;
+    return this.metadataRetrieved;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public String getParentCatalogPath() {
@@ -79,14 +79,14 @@ public class DataElement implements Cloneable {
   }
 
   public QName getTypeName() {
-    final int slashIndex = catalogPath.lastIndexOf('\\');
+    final int slashIndex = this.catalogPath.lastIndexOf('\\');
     if (slashIndex == -1) {
-      return new QName(catalogPath);
+      return new QName(this.catalogPath);
     } else if (slashIndex == 0) {
-      return new QName(catalogPath.substring(1));
+      return new QName(this.catalogPath.substring(1));
     } else {
-      final String namespaceUri = catalogPath.substring(1, slashIndex);
-      final String localPart = catalogPath.substring(slashIndex + 1);
+      final String namespaceUri = this.catalogPath.substring(1, slashIndex);
+      final String localPart = this.catalogPath.substring(slashIndex + 1);
       return new QName(namespaceUri, localPart);
     }
   }
@@ -123,14 +123,14 @@ public class DataElement implements Cloneable {
     final String namespaceUri = catalogPath.getNamespaceURI();
     this.name = catalogPath.getLocalPart();
     if (namespaceUri.length() == 0) {
-      this.catalogPath = "\\" + name;
+      this.catalogPath = "\\" + this.name;
     } else {
-      this.catalogPath = "\\" + namespaceUri + "\\" + name;
+      this.catalogPath = "\\" + namespaceUri + "\\" + this.name;
     }
   }
 
   @Override
   public String toString() {
-    return name;
+    return this.name;
   }
 }

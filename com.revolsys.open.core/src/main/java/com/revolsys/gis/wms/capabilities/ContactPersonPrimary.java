@@ -6,11 +6,11 @@ public class ContactPersonPrimary {
   private String contactOrganization;
 
   public String getContactOrganization() {
-    return contactOrganization;
+    return this.contactOrganization;
   }
 
   public String getContactPerson() {
-    return contactPerson;
+    return this.contactPerson;
   }
 
   public void setContactOrganization(final String contactOrganization) {

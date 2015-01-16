@@ -29,30 +29,30 @@ public abstract class BinaryArithmatic extends QueryValue {
   }
 
   @Override
-  public void appendDefaultSql(Query query,
+  public void appendDefaultSql(final Query query,
     final RecordStore recordStore, final StringBuilder buffer) {
-    if (left == null) {
+    if (this.left == null) {
       buffer.append("NULL");
     } else {
-      left.appendSql(query, recordStore, buffer);
+      this.left.appendSql(query, recordStore, buffer);
     }
     buffer.append(" ");
-    buffer.append(operator);
+    buffer.append(this.operator);
     buffer.append(" ");
-    if (right == null) {
+    if (this.right == null) {
       buffer.append("NULL");
     } else {
-      right.appendSql(query, recordStore, buffer);
+      this.right.appendSql(query, recordStore, buffer);
     }
   }
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    if (left != null) {
-      index = left.appendParameters(index, statement);
+    if (this.left != null) {
+      index = this.left.appendParameters(index, statement);
     }
-    if (right != null) {
-      index = right.appendParameters(index, statement);
+    if (this.right != null) {
+      index = this.right.appendParameters(index, statement);
     }
     return index;
   }
@@ -60,8 +60,8 @@ public abstract class BinaryArithmatic extends QueryValue {
   @Override
   public BinaryArithmatic clone() {
     final BinaryArithmatic clone = (BinaryArithmatic)super.clone();
-    clone.left = left.clone();
-    clone.right = right.clone();
+    clone.left = this.left.clone();
+    clone.right = this.right.clone();
     return clone;
   }
 
@@ -82,26 +82,26 @@ public abstract class BinaryArithmatic extends QueryValue {
 
   @SuppressWarnings("unchecked")
   public <V extends QueryValue> V getLeft() {
-    return (V)left;
+    return (V)this.left;
   }
 
   public String getOperator() {
-    return operator;
+    return this.operator;
   }
 
   @Override
   public List<QueryValue> getQueryValues() {
-    return Arrays.asList(left, right);
+    return Arrays.asList(this.left, this.right);
   }
 
   @SuppressWarnings("unchecked")
   public <V extends QueryValue> V getRight() {
-    return (V)right;
+    return (V)this.right;
   }
 
   @Override
   public String toString() {
-    return StringConverterRegistry.toString(left) + " " + operator + " "
-      + StringConverterRegistry.toString(right);
+    return StringConverterRegistry.toString(this.left) + " " + this.operator + " "
+        + StringConverterRegistry.toString(this.right);
   }
 }

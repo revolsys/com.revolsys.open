@@ -72,7 +72,7 @@ public class PostgreSQLDatabaseFactory extends AbstractJdbcDatabaseFactory {
             JavaBeanUtil.setProperty(dataSource, name, value);
           } catch (final Throwable t) {
             LOG.debug("Unable to set data source property " + name + " = "
-              + value + " for " + url, t);
+                + value + " for " + url, t);
           }
         }
 
@@ -88,7 +88,7 @@ public class PostgreSQLDatabaseFactory extends AbstractJdbcDatabaseFactory {
         return dataSource;
       } else {
         throw new IllegalArgumentException("Not a valid postgres JDBC URL "
-          + url);
+            + url);
       }
     }
   }

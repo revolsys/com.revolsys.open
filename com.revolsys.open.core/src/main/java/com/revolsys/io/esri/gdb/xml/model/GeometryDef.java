@@ -33,35 +33,35 @@ public class GeometryDef {
   }
 
   public int getAvgNumPoints() {
-    return avgNumPoints;
+    return this.avgNumPoints;
   }
 
   public GeometryType getGeometryType() {
-    return geometryType;
+    return this.geometryType;
   }
 
   public double getGridSize0() {
-    return gridSize0;
+    return this.gridSize0;
   }
 
   public Double getGridSize1() {
-    return gridSize1;
+    return this.gridSize1;
   }
 
   public Double getGridSize2() {
-    return gridSize2;
+    return this.gridSize2;
   }
 
   public SpatialReference getSpatialReference() {
-    return spatialReference;
+    return this.spatialReference;
   }
 
   public boolean isHasM() {
-    return hasM;
+    return this.hasM;
   }
 
   public boolean isHasZ() {
-    return hasZ;
+    return this.hasZ;
   }
 
   public void setAvgNumPoints(final int avgNumPoints) {

@@ -50,7 +50,7 @@ import com.revolsys.jtstest.testrunner.Result;
 public interface GeometryOperation {
   /**
    * Gets the class of the return type of the given operation.
-   * 
+   *
    * @param opName the name of the operation
    * @return the class of the return type of the specified operation
    */
@@ -66,5 +66,5 @@ public interface GeometryOperation {
    * @throws Exception if some error was encountered trying to find or process the operation
    */
   Result invoke(String opName, Geometry geometry, Object[] args)
-    throws Exception;
+      throws Exception;
 }

@@ -157,7 +157,7 @@ public class WktParser {
           } else {
             throw new IllegalArgumentException(
               "Too many coordinates, vertex must have " + axisCount
-                + " coordinates not " + (axisNum + 1));
+              + " coordinates not " + (axisNum + 1));
           }
           if (c == ')') {
             finished = true;
@@ -173,7 +173,7 @@ public class WktParser {
           } else {
             throw new IllegalArgumentException(
               "Too many coordinates, vertex must have " + axisCount
-                + " coordinates not " + (axisNum + 1));
+              + " coordinates not " + (axisNum + 1));
 
           }
         }
@@ -354,10 +354,10 @@ public class WktParser {
         } else {
           throw new IllegalArgumentException("Expecting ) not" + text);
         }
-      break;
+        break;
       case ')':
         text.delete(0, 2);
-      break;
+        break;
 
       default:
         throw new IllegalArgumentException("Expecting ( not" + text);
@@ -383,10 +383,10 @@ public class WktParser {
         } else {
           throw new IllegalArgumentException("Expecting ) not" + text);
         }
-      break;
+        break;
       case ')':
         text.delete(0, 2);
-      break;
+        break;
 
       default:
         throw new IllegalArgumentException("Expecting ( not" + text);

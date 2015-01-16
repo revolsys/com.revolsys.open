@@ -43,7 +43,7 @@ public class WktCsParser {
   }
 
   public CoordinateSystem parse() {
-    if (value.length() == 0) {
+    if (this.value.length() == 0) {
       return null;
     } else {
       return (CoordinateSystem)parseValue();
@@ -52,57 +52,57 @@ public class WktCsParser {
   }
 
   private String parseName() {
-    final int startIndex = index;
+    final int startIndex = this.index;
 
-    while (value.charAt(index) != '[' && value.charAt(index) != ']') {
-      index++;
+    while (this.value.charAt(this.index) != '[' && this.value.charAt(this.index) != ']') {
+      this.index++;
     }
-    final String name = new String(value.substring(startIndex, index)).trim();
+    final String name = new String(this.value.substring(startIndex, this.index)).trim();
     return name;
   }
 
   private double parseNumber() {
-    final int startIndex = index;
+    final int startIndex = this.index;
 
-    char currentChar = value.charAt(index);
+    char currentChar = this.value.charAt(this.index);
     while (Character.isDigit(currentChar) || currentChar == '.'
-      || currentChar == '-') {
-      index++;
-      currentChar = value.charAt(index);
+        || currentChar == '-') {
+      this.index++;
+      currentChar = this.value.charAt(this.index);
     }
-    final String string = value.substring(startIndex, index);
+    final String string = this.value.substring(startIndex, this.index);
     return Double.parseDouble(string);
   }
 
   private String parseString() {
-    final int startIndex = index;
+    final int startIndex = this.index;
 
-    char currentChar = value.charAt(index);
+    char currentChar = this.value.charAt(this.index);
     while (currentChar != '"') {
-      index++;
-      currentChar = value.charAt(index);
+      this.index++;
+      currentChar = this.value.charAt(this.index);
     }
-    final String string = new String(value.substring(startIndex, index));
-    index++;
+    final String string = new String(this.value.substring(startIndex, this.index));
+    this.index++;
     return string;
   }
 
   private Object parseValue() {
-    char currentChar = value.charAt(index);
+    char currentChar = this.value.charAt(this.index);
     if (currentChar == '"') {
-      index++;
+      this.index++;
       return parseString();
     } else if (Character.isDigit(currentChar) || currentChar == '-') {
       return parseNumber();
     } else {
       final String name = parseName();
-      nameStack.push(name);
+      this.nameStack.push(name);
       try {
         final List<Object> values = new ArrayList<Object>();
-        currentChar = value.charAt(index);
+        currentChar = this.value.charAt(this.index);
         if (currentChar == '[') {
           do {
-            index++;
+            this.index++;
             currentChar = skipWhitespace();
             if (currentChar != ']') {
               final Object value = parseValue();
@@ -110,7 +110,7 @@ public class WktCsParser {
             }
             currentChar = skipWhitespace();
           } while (currentChar == ',');
-          index++;
+          this.index++;
           if (name.equals("AUTHORITY")) {
             return processAuthority(values);
           } else if (name.equals("AXIS")) {
@@ -130,7 +130,7 @@ public class WktCsParser {
           } else if (name.equals("TOWGS84")) {
             return processToWgs84(values);
           } else if (name.equals("UNIT")) {
-            if (nameStack.get(nameStack.size() - 2).equals("GEOGCS")) {
+            if (this.nameStack.get(this.nameStack.size() - 2).equals("GEOGCS")) {
               return processAngularUnit(values);
             } else {
               return processLinearUnit(values);
@@ -142,7 +142,7 @@ public class WktCsParser {
           return name;
         }
       } finally {
-        nameStack.pop();
+        this.nameStack.pop();
       }
     }
   }
@@ -306,10 +306,10 @@ public class WktCsParser {
   }
 
   private char skipWhitespace() {
-    char currentChar = value.charAt(index);
+    char currentChar = this.value.charAt(this.index);
     while (Character.isWhitespace(currentChar)) {
-      index++;
-      currentChar = value.charAt(index);
+      this.index++;
+      currentChar = this.value.charAt(this.index);
     }
     return currentChar;
   }

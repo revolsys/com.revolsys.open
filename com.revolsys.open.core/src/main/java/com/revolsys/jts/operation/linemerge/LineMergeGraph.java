@@ -41,8 +41,8 @@ import com.revolsys.jts.planargraph.Node;
 import com.revolsys.jts.planargraph.PlanarGraph;
 
 /**
- * A planar graph of edges that is analyzed to sew the edges together. The 
- * <code>marked</code> flag on @{link com.vividsolutions.planargraph.Edge}s 
+ * A planar graph of edges that is analyzed to sew the edges together. The
+ * <code>marked</code> flag on @{link com.vividsolutions.planargraph.Edge}s
  * and @{link com.vividsolutions.planargraph.Node}s indicates whether they have been
  * logically deleted from the graph.
  *
@@ -51,22 +51,22 @@ import com.revolsys.jts.planargraph.PlanarGraph;
 public class LineMergeGraph extends PlanarGraph {
   /**
    * Adds an Edge, DirectedEdges, and Nodes for the given LineString representation
-   * of an edge. 
+   * of an edge.
    * Empty lines or lines with all coordinates equal are not added.
-   * 
+   *
    * @param line the linestring to add to the graph
    */
   public void addEdge(final LineString line) {
     if (line.isEmpty()) {
       return;
     }
-    
+
     final LineString points = CleanDuplicatePoints.clean(line);
     final int vertexCount = points.getVertexCount();
     if (vertexCount > 1) {
       final Point startCoordinate = points.getPoint(0).clonePoint();
       final Point endCoordinate = points.getPoint(vertexCount - 1)
-        .clonePoint();
+          .clonePoint();
       final Node startNode = getNode(startCoordinate);
       final Node endNode = getNode(endCoordinate);
       final DirectedEdge directedEdge0 = new LineMergeDirectedEdge(startNode,

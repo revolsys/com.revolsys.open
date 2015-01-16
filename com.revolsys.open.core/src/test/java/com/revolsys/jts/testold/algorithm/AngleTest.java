@@ -44,11 +44,11 @@ import com.revolsys.math.Angle;
  */
 public class AngleTest extends TestCase {
 
-  private static final double TOLERANCE = 1E-5;
-
   public static void main(final String args[]) {
     TestRunner.run(AngleTest.class);
   }
+
+  private static final double TOLERANCE = 1E-5;
 
   public AngleTest(final String name) {
     super(name);

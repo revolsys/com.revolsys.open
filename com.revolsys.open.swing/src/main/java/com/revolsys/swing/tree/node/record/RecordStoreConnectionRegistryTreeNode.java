@@ -18,10 +18,10 @@ import com.revolsys.swing.tree.node.file.FileTreeNode;
 import com.revolsys.util.OS;
 
 public class RecordStoreConnectionRegistryTreeNode extends LazyLoadTreeNode
-  implements PropertyChangeListener {
+implements PropertyChangeListener {
 
   private static final MenuFactory MENU = new MenuFactory(
-      "Record Store Connections");
+    "Record Store Connections");
 
   static {
     if (OS.isMac()) {

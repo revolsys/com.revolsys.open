@@ -34,7 +34,7 @@ public class DirectoryNameField extends JPanel implements Field {
     add(this.directoryName);
     this.browseButton.setText("Browse...");
     this.browseButton.addActionListener(new InvokeMethodActionListener(this,
-      "browseClick"));
+        "browseClick"));
     add(this.browseButton);
     SpringLayoutUtil.makeCompactGrid(this, 1, 2, 5, 5, 5, 5);
   }
@@ -49,7 +49,7 @@ public class DirectoryNameField extends JPanel implements Field {
       final File initialFile = new File(directoryPath);
 
       if (initialFile.getParentFile() != null
-        && initialFile.getParentFile().exists()) {
+          && initialFile.getParentFile().exists()) {
         fileChooser.setCurrentDirectory(initialFile.getParentFile());
       }
 

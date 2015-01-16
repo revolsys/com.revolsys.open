@@ -62,10 +62,10 @@ public class EdgeList implements Iterable<Edge> {
    * Insert an edge unless it is already in the list
    */
   public void add(final Edge edge) {
-    edges.add(edge);
+    this.edges.add(edge);
     final OrientedCoordinateArray oca = new OrientedCoordinateArray(
       edge.getPoints());
-    ocaMap.put(oca, edge);
+    this.ocaMap.put(oca, edge);
   }
 
   public void addAll(final Collection<? extends Edge> edges) {
@@ -81,7 +81,7 @@ public class EdgeList implements Iterable<Edge> {
    */
   public int findEdgeIndex(final Edge e) {
     int i = 0;
-    for (final Edge edge : edges) {
+    for (final Edge edge : this.edges) {
       if (edge.equals(e)) {
         return i;
       }
@@ -100,26 +100,26 @@ public class EdgeList implements Iterable<Edge> {
     final OrientedCoordinateArray oca = new OrientedCoordinateArray(
       e.getPoints());
     // will return null if no edge matches
-    final Edge matchEdge = ocaMap.get(oca);
+    final Edge matchEdge = this.ocaMap.get(oca);
     return matchEdge;
   }
 
   public Edge get(final int i) {
-    return edges.get(i);
+    return this.edges.get(i);
   }
 
   public List<Edge> getEdges() {
-    return edges;
+    return this.edges;
   }
 
   @Override
   public Iterator<Edge> iterator() {
-    return edges.iterator();
+    return this.edges.iterator();
   }
 
   @Override
   public String toString() {
-    return edges.toString();
+    return this.edges.toString();
   }
 
 }

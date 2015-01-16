@@ -28,7 +28,7 @@ public class TestUtil {
     boolean valid = true;
     final Resource resource = new ClassPathResource(file, clazz);
     try (
-      Reader<Record> reader = RecordIo.recordReader(resource)) {
+        Reader<Record> reader = RecordIo.recordReader(resource)) {
       int i = 0;
       for (final Record object : reader) {
         final int srid = object.getInteger("srid");
@@ -67,7 +67,7 @@ public class TestUtil {
       return true;
     } else {
       System.err.println("Equals Exact\t" + expectedGeometry + "\t"
-        + actualGeometry);
+          + actualGeometry);
       return false;
     }
   }
@@ -78,13 +78,13 @@ public class TestUtil {
     final int expectedSrid = expectedGeometry.getSrid();
     if (actualSrid != expectedSrid) {
       System.err.println(i + "\tEquals Srid\t" + expectedSrid + "\t"
-        + actualSrid);
+          + actualSrid);
       return false;
     } else if (actualGeometry.equals(2, expectedGeometry)) {
       return true;
     } else {
       System.err.println(i + "\tEquals Exact\t" + expectedGeometry + "\t"
-        + actualGeometry);
+          + actualGeometry);
       return false;
     }
   }
@@ -112,11 +112,11 @@ public class TestUtil {
     final String actualString = String.valueOf(actual);
     if (expectedString.equals(actualString)) {
       return formatted + "expected: "
-        + formatClassAndValue(expected, expectedString) + " but was: "
-        + formatClassAndValue(actual, actualString);
+          + formatClassAndValue(expected, expectedString) + " but was: "
+          + formatClassAndValue(actual, actualString);
     } else {
       return formatted + "expected:<" + expectedString + "> but was:<"
-        + actualString + ">";
+          + actualString + ">";
     }
   }
 

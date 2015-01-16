@@ -25,8 +25,8 @@ import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public class CsvRecordIterator extends AbstractIterator<Record> implements
@@ -321,8 +321,8 @@ RecordIterator {
       }
     }
     if (this.hasPointFields) {
-      final Double x = CollectionUtil.getDouble(object, this.pointXFieldName);
-      final Double y = CollectionUtil.getDouble(object, this.pointYFieldName);
+      final Double x = Maps.getDouble(object, this.pointXFieldName);
+      final Double y = Maps.getDouble(object, this.pointYFieldName);
       if (x != null && y != null) {
         final Geometry geometry = this.geometryFactory.point(x, y);
         object.setGeometryValue(geometry);

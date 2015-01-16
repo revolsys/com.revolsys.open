@@ -18,11 +18,11 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
   @Override
   public String getLink(final JexlContext context) {
     final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
-      beanFactory, typePath);
+      this.beanFactory, this.typePath);
     if (htmlUiBuilder == null) {
       return null;
     } else {
-      final String link = htmlUiBuilder.getPageUrl(pageName, getParameters());
+      final String link = htmlUiBuilder.getPageUrl(this.pageName, getParameters());
       if (link == null) {
         return null;
       } else {
@@ -39,39 +39,40 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
   @Override
   public String getLinkTitle(final JexlContext context) {
     final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
-      beanFactory, typePath);
+      this.beanFactory, this.typePath);
     if (htmlUiBuilder == null) {
       return null;
     } else {
-      Page page = htmlUiBuilder.getPage(pageName);
+      Page page = htmlUiBuilder.getPage(this.pageName);
       if (page == null) {
-        page = new Page(null, htmlUiBuilder.getPluralTitle(), pageName, false);
+        page = new Page(null, htmlUiBuilder.getPluralTitle(), this.pageName, false);
       }
       return page.getExpandedTitle();
     }
   }
 
   public String getPageName() {
-    return pageName;
+    return this.pageName;
   }
 
   public String getTypeName() {
-    return typePath;
+    return this.typePath;
   }
 
   @Override
   public boolean isVisible() {
     final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
-      beanFactory, typePath);
+      this.beanFactory, this.typePath);
     if (htmlUiBuilder == null) {
       return false;
     } else {
-      return htmlUiBuilder.getPageUrl(pageName, getParameters()) != null;
+      return htmlUiBuilder.getPageUrl(this.pageName, getParameters()) != null;
     }
   }
 
+  @Override
   public void setBeanFactory(final BeanFactory beanFactory)
-    throws BeansException {
+      throws BeansException {
     this.beanFactory = beanFactory;
   }
 

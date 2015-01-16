@@ -182,8 +182,8 @@ public class JavaDoclet {
   public static int optionLength(String optionName) {
     optionName = optionName.toLowerCase();
     if (optionName.equals("-d") || optionName.equals("-doctitle")
-      || optionName.equals("-docid") || optionName.equals("-htmlfooter")
-      || optionName.equals("-htmlheader")) {
+        || optionName.equals("-docid") || optionName.equals("-htmlfooter")
+        || optionName.equals("-htmlheader")) {
       return 2;
     }
     return -1;
@@ -260,11 +260,11 @@ public class JavaDoclet {
         }
         if (!file.isDirectory()) {
           docerrorreporter.printError("Destination not a directory"
-            + file.getPath());
+              + file.getPath());
           return false;
         } else if (!file.canWrite()) {
           docerrorreporter.printError("Destination directory not writable "
-            + file.getPath());
+              + file.getPath());
           return false;
         }
       } else if (argName.equals("-htmlheader")) {

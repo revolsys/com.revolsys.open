@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,18 +25,16 @@ public class PageBreadcrumbsView extends ObjectView {
 
   private final WebUiContext context;
 
-  private String pageNode;
-
   public PageBreadcrumbsView() {
-    context = WebUiContext.get();
-    setObject(context.getPage());
+    this.context = WebUiContext.get();
+    setObject(this.context.getPage());
   }
 
   private void crumb(final XmlWriter out, final Page page, final boolean current) {
     if (page == null) {
       out.startTag(HtmlUtil.LI);
       out.startTag(HtmlUtil.A);
-      out.attribute(HtmlUtil.ATTR_HREF, context.getConfig().getBasePath() + "/");
+      out.attribute(HtmlUtil.ATTR_HREF, this.context.getConfig().getBasePath() + "/");
       out.text("HOME");
       out.endTag(HtmlUtil.A);
       out.text(" >");
@@ -62,7 +60,7 @@ public class PageBreadcrumbsView extends ObjectView {
   public void serializeElement(final XmlWriter out) {
     final Page page = (Page)getObject();
     out.startTag(HtmlUtil.DIV);
-    out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
+    out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
 
     out.startTag(HtmlUtil.UL);
     crumb(out, page, true);
@@ -76,7 +74,7 @@ public class PageBreadcrumbsView extends ObjectView {
     if (value != null) {
       super.setProperty(name, value.toString());
       if (name.equals("cssClass")) {
-        cssClass = value.toString();
+        this.cssClass = value.toString();
       }
     }
   }

@@ -31,7 +31,7 @@ public class WKTReaderParseErrorTest extends TestCase {
     try {
       final Geometry g = this.rdr.read(wkt);
     } catch (final ParseException ex) {
-    //  System.out.println(ex.getMessage());
+      //  System.out.println(ex.getMessage());
       threwParseEx = true;
     }
     assertTrue(threwParseEx);

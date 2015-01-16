@@ -24,7 +24,7 @@ import com.revolsys.parallel.process.BaseInOutProcess;
 import com.revolsys.util.JexlUtil;
 
 public class CreateObjectsWithinDistanceOfGeometry extends
-  BaseInOutProcess<Record, Record> {
+BaseInOutProcess<Record, Record> {
 
   private Map<String, Object> attributes = new HashMap<String, Object>();
 
@@ -54,12 +54,12 @@ public class CreateObjectsWithinDistanceOfGeometry extends
     this.recordDefinitionGeometryMap = null;
   }
 
-  public Map<String, Object> getFields() {
-    return this.attributes;
-  }
-
   public double getDistance() {
     return this.distance;
+  }
+
+  public Map<String, Object> getFields() {
+    return this.attributes;
   }
 
   public Channel<Record> getGeometryIn() {
@@ -85,7 +85,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends
         if (geometry != null) {
           final JexlContext context = new HashMapContext();
           final Map<String, Object> vars = new HashMap<String, Object>(
-            this.attributes);
+              this.attributes);
           vars.putAll(record);
           vars.put("typePath", recordDefinition.getPath());
           context.setVars(vars);
@@ -174,9 +174,9 @@ public class CreateObjectsWithinDistanceOfGeometry extends
         typePathTemplate, "%\\{([^\\}]+)\\}");
     } catch (final Exception e) {
       throw new IllegalArgumentException(new StringBuilder().append(
-        "Invalid type name template: ")
-        .append(typePathTemplate)
-        .toString(), e);
+          "Invalid type name template: ")
+          .append(typePathTemplate)
+          .toString(), e);
     }
   }
 

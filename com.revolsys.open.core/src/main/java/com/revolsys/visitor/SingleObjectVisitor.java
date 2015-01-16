@@ -32,7 +32,7 @@ public class SingleObjectVisitor<T> extends BaseVisitor<T> {
   }
 
   public T getObject() {
-    return object;
+    return this.object;
   }
 
   public void reset() {

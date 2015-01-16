@@ -55,27 +55,27 @@ public class NamedChannelBundle<T> {
   }
 
   public void close() {
-    closed = true;
-    synchronized (monitor) {
-      valueQueueByName = null;
-      sequence = null;
-      sequenceQueueByName = null;
-      monitor.notifyAll();
+    this.closed = true;
+    synchronized (this.monitor) {
+      this.valueQueueByName = null;
+      this.sequence = null;
+      this.sequenceQueueByName = null;
+      this.monitor.notifyAll();
     }
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   private Queue<T> getNextValueQueue(Collection<String> names) {
     String selectedName = null;
     long lowestSequence = Long.MAX_VALUE;
     if (names == null) {
-      names = sequenceQueueByName.keySet();
+      names = this.sequenceQueueByName.keySet();
     }
     for (final String name : names) {
-      final Queue<Long> sequenceQueue = sequenceQueueByName.get(name);
+      final Queue<Long> sequenceQueue = this.sequenceQueueByName.get(name);
       if (sequenceQueue != null && !sequenceQueue.isEmpty()) {
         final long sequence = sequenceQueue.peek();
         if (sequence < lowestSequence) {
@@ -87,36 +87,36 @@ public class NamedChannelBundle<T> {
     if (selectedName == null) {
       return null;
     } else {
-      final Queue<Long> sequenceQueue = sequenceQueueByName.get(selectedName);
+      final Queue<Long> sequenceQueue = this.sequenceQueueByName.get(selectedName);
       sequenceQueue.remove();
       return getValueQueue(selectedName);
     }
   }
 
   private Queue<Long> getSequenceQueue(final String name) {
-    Queue<Long> queue = sequenceQueueByName.get(name);
+    Queue<Long> queue = this.sequenceQueueByName.get(name);
     if (queue == null) {
       queue = new LinkedList<Long>();
-      sequenceQueueByName.put(name, queue);
+      this.sequenceQueueByName.put(name, queue);
     }
     return queue;
   }
 
   private Queue<T> getValueQueue(final String name) {
-    Queue<T> queue = valueQueueByName.get(name);
+    Queue<T> queue = this.valueQueueByName.get(name);
     if (queue == null) {
       queue = new LinkedList<T>();
-      valueQueueByName.put(name, queue);
+      this.valueQueueByName.put(name, queue);
     }
     return queue;
   }
 
   public boolean isClosed() {
-    if (!closed) {
-      if (writeClosed) {
+    if (!this.closed) {
+      if (this.writeClosed) {
         boolean empty = true;
-        synchronized (monitor) {
-          for (final Queue<T> queue : valueQueueByName.values()) {
+        synchronized (this.monitor) {
+          for (final Queue<T> queue : this.valueQueueByName.values()) {
             if (!queue.isEmpty()) {
               empty = false;
             }
@@ -128,13 +128,13 @@ public class NamedChannelBundle<T> {
       }
     }
 
-    return closed;
+    return this.closed;
   }
 
   public void notifyReaders() {
-    synchronized (monitor) {
-      readerNotifyCount++;
-      monitor.notifyAll();
+    synchronized (this.monitor) {
+      this.readerNotifyCount++;
+      this.monitor.notifyAll();
     }
   }
 
@@ -142,7 +142,7 @@ public class NamedChannelBundle<T> {
    * Reads an Object from the Channel. This method also ensures only one of the
    * readers can actually be reading at any time. All other readers are blocked
    * until it completes the read.
-   * 
+   *
    * @return The object returned from the Channel.
    */
   public T read() {
@@ -158,7 +158,7 @@ public class NamedChannelBundle<T> {
    * readers can actually be reading at any time. All other readers are blocked
    * until it completes the read. If no data is available to be read after the
    * timeout the method will return null.
-   * 
+   *
    * @param timeout The maximum time to wait in milliseconds.
    * @return The object returned from the Channel.
    */
@@ -167,8 +167,8 @@ public class NamedChannelBundle<T> {
   }
 
   public T read(final long timeout, final Collection<String> names) {
-    synchronized (readMonitor) {
-      synchronized (monitor) {
+    synchronized (this.readMonitor) {
+      synchronized (this.monitor) {
         final int readerNotifyCount = this.readerNotifyCount;
         try {
           long maxTime = 0;
@@ -181,7 +181,7 @@ public class NamedChannelBundle<T> {
           Queue<T> queue = getNextValueQueue(names);
           if (timeout == 0) {
             while (queue == null && readerNotifyCount == this.readerNotifyCount) {
-              ThreadUtil.pause(monitor);
+              ThreadUtil.pause(this.monitor);
               if (isClosed()) {
                 throw new ClosedException();
               }
@@ -191,8 +191,8 @@ public class NamedChannelBundle<T> {
           } else if (timeout > 0) {
             long waitTime = maxTime - System.currentTimeMillis();
             while (queue == null && waitTime > 0
-              && readerNotifyCount == this.readerNotifyCount) {
-              ThreadUtil.pause(monitor, waitTime);
+                && readerNotifyCount == this.readerNotifyCount) {
+              ThreadUtil.pause(this.monitor, waitTime);
               if (isClosed()) {
                 throw new ClosedException();
               }
@@ -207,12 +207,12 @@ public class NamedChannelBundle<T> {
             return null;
           } else {
             final T value = queue.remove();
-            monitor.notifyAll();
+            this.monitor.notifyAll();
             return value;
           }
         } catch (final ThreadInterruptedException e) {
           close();
-          monitor.notifyAll();
+          this.monitor.notifyAll();
           throw new ClosedException();
         }
       }
@@ -228,23 +228,23 @@ public class NamedChannelBundle<T> {
   }
 
   public void readConnect() {
-    synchronized (monitor) {
+    synchronized (this.monitor) {
       if (isClosed()) {
         throw new IllegalStateException("Cannot connect to a closed channel");
       } else {
-        numReaders++;
+        this.numReaders++;
       }
 
     }
   }
 
   public void readDisconnect() {
-    synchronized (monitor) {
-      if (!closed) {
-        numReaders--;
-        if (numReaders <= 0) {
+    synchronized (this.monitor) {
+      if (!this.closed) {
+        this.numReaders--;
+        if (this.numReaders <= 0) {
           close();
-          monitor.notifyAll();
+          this.monitor.notifyAll();
         }
       }
 
@@ -252,10 +252,10 @@ public class NamedChannelBundle<T> {
   }
 
   public Collection<T> remove(final String name) {
-    synchronized (monitor) {
-      sequenceQueueByName.remove(name);
-      final Queue<T> values = valueQueueByName.remove(name);
-      monitor.notifyAll();
+    synchronized (this.monitor) {
+      this.sequenceQueueByName.remove(name);
+      final Queue<T> values = this.valueQueueByName.remove(name);
+      this.monitor.notifyAll();
       return values;
     }
   }
@@ -265,14 +265,14 @@ public class NamedChannelBundle<T> {
    * the writers can actually be writing at any time. All other writers are
    * blocked until it completes the write. The channel can never be full so it
    * does not block on write.
-   * 
+   *
    * @param value The object to write to the Channel.
    */
   public void write(final String name, final T value) {
-    synchronized (writeMonitor) {
-      synchronized (monitor) {
-        if (closed) {
-          monitor.notifyAll();
+    synchronized (this.writeMonitor) {
+      synchronized (this.monitor) {
+        if (this.closed) {
+          this.monitor.notifyAll();
           throw new ClosedException();
         } else {
           final Long sequence = this.sequence.getAndIncrement();
@@ -282,30 +282,30 @@ public class NamedChannelBundle<T> {
           final Queue<T> queue = getValueQueue(name);
           queue.add(value);
 
-          monitor.notifyAll();
+          this.monitor.notifyAll();
         }
       }
     }
   }
 
   public void writeConnect() {
-    synchronized (monitor) {
-      if (writeClosed) {
+    synchronized (this.monitor) {
+      if (this.writeClosed) {
         throw new IllegalStateException("Cannot connect to a closed channel");
       } else {
-        numWriters++;
+        this.numWriters++;
       }
 
     }
   }
 
   public void writeDisconnect() {
-    synchronized (monitor) {
-      if (!writeClosed) {
-        numWriters--;
-        if (numWriters <= 0) {
-          writeClosed = true;
-          monitor.notifyAll();
+    synchronized (this.monitor) {
+      if (!this.writeClosed) {
+        this.numWriters--;
+        if (this.numWriters <= 0) {
+          this.writeClosed = true;
+          this.monitor.notifyAll();
         }
       }
     }

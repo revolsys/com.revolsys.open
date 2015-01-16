@@ -24,7 +24,7 @@ public abstract class ChannelValueStore<T> implements Cloneable {
    * constructing a new instance with the same parameters as the original.
    * <I>NOTE: Only the sizes of the data should be cloned not the stored
    * data.</I>
-   * 
+   *
    * @return The cloned instance of this Object.
    */
   @Override
@@ -35,7 +35,7 @@ public abstract class ChannelValueStore<T> implements Cloneable {
    * getState should be called before this method to check that the state is not
    * EMPTY. If the state is EMPTY unpredictable results will occur.</I>
    * Pre-condition: The state must not be EMPTY
-   * 
+   *
    * @return The next available Object from the ChannelValueStore
    */
   protected abstract T get();
@@ -43,7 +43,7 @@ public abstract class ChannelValueStore<T> implements Cloneable {
   /**
    * Returns the current state of the ChannelValueStore, should be called to
    * ensure the Pre-conditions of the other methods are not broken.
-   * 
+   *
    * @return The current state of the ChannelValueStore (EMPTY, NONEMPTYFULL or
    *         FULL)
    */
@@ -54,7 +54,7 @@ public abstract class ChannelValueStore<T> implements Cloneable {
    * called before this method to check that the state is not FULL. If the state
    * is FULL unpredictable results will occur.</I> Pre-condition: The state must
    * not be FULL
-   * 
+   *
    * @param value The object to put in the ChannelValueStore
    */
   protected abstract void put(T value);

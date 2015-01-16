@@ -24,7 +24,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   public T add(final T object) {
     final BoundingBox envelope = getEnvelope(object);
     final int id = getId(object);
-    index.insert(envelope, id);
+    this.index.insert(envelope, id);
     return object;
   }
 
@@ -41,7 +41,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   }
 
   public List<T> queryAll() {
-    final List<Integer> ids = index.getAll();
+    final List<Integer> ids = this.index.getAll();
     return getObjects(ids);
   }
 
@@ -49,7 +49,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   public boolean remove(final T object) {
     final BoundingBox envelope = getEnvelope(object);
     final int id = getId(object);
-    return index.remove(envelope, id);
+    return this.index.remove(envelope, id);
   }
 
   public void removeAll(final Collection<T> objects) {
@@ -61,8 +61,8 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   @Override
   public void visit(final BoundingBox envelope, final Visitor<T> visitor) {
     final IdObjectIndexItemVisitor<T> itemVisitor = new IdObjectIndexItemVisitor<T>(
-      this, envelope, visitor);
-    index.visit(envelope, itemVisitor);
+        this, envelope, visitor);
+    this.index.visit(envelope, itemVisitor);
   }
 
 }

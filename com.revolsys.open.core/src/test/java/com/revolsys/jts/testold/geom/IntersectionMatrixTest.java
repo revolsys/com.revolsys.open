@@ -45,15 +45,15 @@ import com.revolsys.jts.geom.IntersectionMatrix;
  */
 public class IntersectionMatrixTest extends TestCase {
 
+  public static Test suite() {
+    return new TestSuite(IntersectionMatrixTest.class);
+  }
+
   private static int A = Dimension.A;
 
   private static int L = Dimension.L;
 
   private static int P = Dimension.P;
-
-  public static Test suite() {
-    return new TestSuite(IntersectionMatrixTest.class);
-  }
 
   public IntersectionMatrixTest(final String name) {
     super(name);

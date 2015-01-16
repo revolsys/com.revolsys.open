@@ -15,8 +15,8 @@ import org.springframework.core.io.Resource;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.json.JsonParser;
 import com.revolsys.spring.SpringUtil;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 @SuppressWarnings("unchecked")
@@ -33,7 +33,7 @@ public class MapObjectFactoryRegistry {
   }
 
   public static <V> V toObject(final Map<String, ? extends Object> map) {
-    final String typeClass = CollectionUtil.getString(map, "typeClass");
+    final String typeClass = Maps.getString(map, "typeClass");
     if (Property.hasValue(typeClass)) {
       final Constructor<V> configConstructor = JavaBeanUtil.getConstructor(
         typeClass, Map.class);
@@ -45,7 +45,7 @@ public class MapObjectFactoryRegistry {
       }
       return object;
     } else {
-      final String type = CollectionUtil.getString(map, "type");
+      final String type = Maps.getString(map, "type");
       final MapObjectFactory objectFactory = TYPE_NAME_TO_FACTORY.get(type);
       if (objectFactory == null) {
         LoggerFactory.getLogger(MapObjectFactoryRegistry.class).error(

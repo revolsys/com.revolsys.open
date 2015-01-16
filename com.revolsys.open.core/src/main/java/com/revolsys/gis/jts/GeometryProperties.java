@@ -12,17 +12,11 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class GeometryProperties {
 
-  public static final String FEATURE_PROPERTY = "feature";
-
-  static {
-    GeometryEqualsExact3d.addExclude(FEATURE_PROPERTY);
-  }
-
   @SuppressWarnings("unchecked")
   public static void copyUserData(final Geometry oldGeometry,
     final Geometry newGeometry) {
     if (oldGeometry != null && newGeometry != null
-      && oldGeometry != newGeometry) {
+        && oldGeometry != newGeometry) {
       Object userData = oldGeometry.getUserData();
       if (userData instanceof Map) {
         final Map<String, Object> oldValues = (Map<String, Object>)userData;
@@ -87,6 +81,12 @@ public class GeometryProperties {
     final Map<Object, Object> map = (Map<Object, Object>)userData;
     map.put(name.toString(), value);
 
+  }
+
+  public static final String FEATURE_PROPERTY = "feature";
+
+  static {
+    GeometryEqualsExact3d.addExclude(FEATURE_PROPERTY);
   }
 
 }

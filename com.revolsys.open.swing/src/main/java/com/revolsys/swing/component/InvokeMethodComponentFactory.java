@@ -9,7 +9,7 @@ import com.revolsys.beans.InvokeMethodCallable;
 import com.revolsys.util.ExceptionUtil;
 
 public class InvokeMethodComponentFactory<T extends Component> extends
-  AbstractComponentFactory<T> {
+AbstractComponentFactory<T> {
 
   private Callable<T> callable;
 

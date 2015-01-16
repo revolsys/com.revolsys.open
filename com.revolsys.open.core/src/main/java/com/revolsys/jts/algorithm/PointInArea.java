@@ -6,7 +6,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.segment.LineSegment;
 
 public class PointInArea extends RayCrossingCounter implements
-  Visitor<LineSegment> {
+Visitor<LineSegment> {
 
   private final GeometryFactory geometryFactory;
 
@@ -24,8 +24,8 @@ public class PointInArea extends RayCrossingCounter implements
     final double y2 = segment.getY(1);
     final double x = getX();
     final double y = getY();
-    final double scaleXY = geometryFactory.getScaleXY();
-    if (!geometryFactory.isFloating()) {
+    final double scaleXY = this.geometryFactory.getScaleXY();
+    if (!this.geometryFactory.isFloating()) {
       final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
       final double minDistance = 1 / scaleXY;
       if (distance < minDistance) {

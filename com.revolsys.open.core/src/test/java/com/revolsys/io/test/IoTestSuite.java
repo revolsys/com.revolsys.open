@@ -45,7 +45,7 @@ public class IoTestSuite {
       DataTypes.MULTI_LINE_STRING, DataTypes.MULTI_POLYGON);
     for (final DataType dataType : geometryDataTypes) {
       final TestSuite dataTypeSuite = new TestSuite(namePrefix + " "
-        + dataType.toString());
+          + dataType.toString());
       suite.addTest(dataTypeSuite);
       for (int axisCount = 2; axisCount < 5; axisCount++) {
         int maxGeometryCount = 1;
@@ -76,7 +76,7 @@ public class IoTestSuite {
                 geometryFactory, dataType, geometryCount, ringCount,
                 vertexCount, delta);
               String name = namePrefix + " " + dataType + " A=" + axisCount
-                + " G=" + geometryCount;
+                  + " G=" + geometryCount;
               if (maxVertexCount > 2) {
                 name += " V=" + vertexCount;
               }
@@ -109,14 +109,14 @@ public class IoTestSuite {
     recordDefinition.addField("GEOMETRY", dataType, true);
     recordDefinition.setGeometryFactory(geometryFactory);
     final File file = new File("/tmp/revolsystest/io/" + fileExtension + "/"
-      + geometryTypeString + "_" + geometryFactory.getAxisCount() + "_"
-      + geometry.getVertexCount() + "." + fileExtension);
+        + geometryTypeString + "_" + geometryFactory.getAxisCount() + "_"
+        + geometry.getVertexCount() + "." + fileExtension);
     file.delete();
     file.getParentFile().mkdirs();
     final FileSystemResource resource = new FileSystemResource(file);
     try (
-      Writer<Record> writer = RecordIo.recordWriter(
-        recordDefinition, resource)) {
+        Writer<Record> writer = RecordIo.recordWriter(
+          recordDefinition, resource)) {
       writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 
@@ -126,7 +126,7 @@ public class IoTestSuite {
       writer.write(record);
     }
     try (
-      Reader<Geometry> reader = AbstractGeometryReaderFactory.geometryReader(resource)) {
+        Reader<Geometry> reader = AbstractGeometryReaderFactory.geometryReader(resource)) {
       reader.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
       final List<Geometry> geometries = reader.read();
       Assert.assertEquals("Geometry Count", 1, geometries.size());
@@ -138,7 +138,7 @@ public class IoTestSuite {
         if (!actual.equals(axisCount, geometry)) {
           // Allow for conversion of multi part to single part
           if (geometry.getGeometryCount() != 1
-            || !actual.equals(axisCount, geometry.getGeometry(0))) {
+              || !actual.equals(axisCount, geometry.getGeometry(0))) {
             TestUtil.failNotEquals("Geometry Equal Exact", geometry, actual);
           }
         }

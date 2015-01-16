@@ -39,23 +39,23 @@ package com.revolsys.jts.index.sweepline;
  */
 public class SweepLineInterval {
 
-  private double min, max;
-  private Object item;
+  private final double min, max;
+  private final Object item;
 
-  public SweepLineInterval(double min, double max)
+  public SweepLineInterval(final double min, final double max)
   {
     this(min, max, null);
   }
 
-  public SweepLineInterval(double min, double max, Object item)
+  public SweepLineInterval(final double min, final double max, final Object item)
   {
     this.min = min < max ? min : max;
     this.max = max > min ? max : min;
     this.item = item;
   }
 
-  public double getMin() { return min;  }
-  public double getMax() { return max;  }
-  public Object getItem() { return item; }
+  public Object getItem() { return this.item; }
+  public double getMax() { return this.max;  }
+  public double getMin() { return this.min;  }
 
 }

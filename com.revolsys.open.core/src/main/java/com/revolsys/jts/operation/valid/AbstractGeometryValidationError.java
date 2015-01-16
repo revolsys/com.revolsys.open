@@ -4,7 +4,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 
 public abstract class AbstractGeometryValidationError implements
-  GeometryValidationError {
+GeometryValidationError {
 
   private final String message;
 
@@ -16,6 +16,7 @@ public abstract class AbstractGeometryValidationError implements
     this.geometry = geometry;
   }
 
+  @Override
   public Geometry getErrorGeometry() {
     return getErrorPoint();
   }

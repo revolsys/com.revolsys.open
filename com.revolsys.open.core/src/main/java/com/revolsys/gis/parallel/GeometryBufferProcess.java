@@ -7,12 +7,12 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class GeometryBufferProcess extends
-  BaseInOutProcess<Record, Record> {
+BaseInOutProcess<Record, Record> {
 
   private int buffer;
 
   public int getBuffer() {
-    return buffer;
+    return this.buffer;
   }
 
   @Override
@@ -22,7 +22,7 @@ public class GeometryBufferProcess extends
     if (geometry == null) {
       out.write(object);
     } else {
-      final Geometry bufferedGeometry = geometry.buffer(buffer);
+      final Geometry bufferedGeometry = geometry.buffer(this.buffer);
       final Record newObject = RecordUtil.copy(object, bufferedGeometry);
       out.write(newObject);
     }

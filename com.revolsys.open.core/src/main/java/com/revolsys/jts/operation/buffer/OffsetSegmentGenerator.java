@@ -456,7 +456,7 @@ class OffsetSegmentGenerator {
         // add a square defined by extensions of the offset segment endpoints
         final Point squareCapSideOffset = new PointDouble(
           Math.abs(this.distance) * Math.cos(angle), Math.abs(this.distance)
-            * Math.sin(angle));
+          * Math.sin(angle));
 
         final double lx = lp1.getX() + squareCapSideOffset.getX();
         final double ly = lp1.getY() + squareCapSideOffset.getY();
@@ -530,9 +530,9 @@ class OffsetSegmentGenerator {
     final int orientation = CGAlgorithmsDD.orientationIndex(this.s0, this.s1,
       this.s2);
     final boolean outsideTurn = orientation == CGAlgorithms.CLOCKWISE
-      && this.side == Position.LEFT
+        && this.side == Position.LEFT
         || orientation == CGAlgorithms.COUNTERCLOCKWISE
-      && this.side == Position.RIGHT;
+        && this.side == Position.RIGHT;
 
     if (orientation == 0) { // lines are collinear
       addCollinear(addStartPoint);

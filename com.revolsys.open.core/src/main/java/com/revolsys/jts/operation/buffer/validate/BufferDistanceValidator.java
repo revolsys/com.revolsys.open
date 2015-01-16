@@ -48,7 +48,7 @@ import com.revolsys.jts.operation.distance.DistanceOp;
 
 /**
  * Validates that a given buffer curve lies an appropriate distance
- * from the input generating it. 
+ * from the input generating it.
  * Useful only for round buffers (cap and join).
  * Can be used for either positive or negative distances.
  * <p>
@@ -56,7 +56,7 @@ import com.revolsys.jts.operation.distance.DistanceOp;
  * (I.e. it may fail to detect an invalid result.)
  * It should never return a false negative result, however
  * (I.e. it should never report a valid result as invalid.)
- * 
+ *
  * @author mbdavis
  *
  */
@@ -64,7 +64,7 @@ public class BufferDistanceValidator {
   private static boolean VERBOSE = false;
 
   /**
-   * Maximum allowable fraction of buffer distance the 
+   * Maximum allowable fraction of buffer distance the
    * actual distance can differ by.
    * 1% sometimes causes an error - 1.2% should be safe.
    */
@@ -105,7 +105,7 @@ public class BufferDistanceValidator {
    * This uses the Oriented Hausdorff distance metric.
    * It corresponds to finding
    * the point on the buffer curve which is furthest from <i>some</i> point on the input.
-   * 
+   *
    * @param input a geometry
    * @param bufCurve a geometry
    * @param maxDist the maximum distance that a buffer result can be from the input
@@ -119,22 +119,22 @@ public class BufferDistanceValidator {
     final DiscreteHausdorffDistance haus = new DiscreteHausdorffDistance(
       bufCurve, input);
     haus.setDensifyFraction(0.25);
-    maxDistanceFound = haus.orientedDistance();
+    this.maxDistanceFound = haus.orientedDistance();
 
-    if (maxDistanceFound > maxDist) {
-      isValid = false;
+    if (this.maxDistanceFound > maxDist) {
+      this.isValid = false;
       final Point[] pts = haus.getCoordinates();
-      errorLocation = pts[1];
-      errorIndicator = input.getGeometryFactory().lineString(pts);
-      errMsg = "Distance between buffer curve and input is too large " + "("
-        + maxDistanceFound + " at " + EWktWriter.lineString(pts[0], pts[1])
-        + ")";
+      this.errorLocation = pts[1];
+      this.errorIndicator = input.getGeometryFactory().lineString(pts);
+      this.errMsg = "Distance between buffer curve and input is too large " + "("
+          + this.maxDistanceFound + " at " + EWktWriter.lineString(pts[0], pts[1])
+          + ")";
     }
   }
 
   /**
    * Checks that two geometries are at least a minumum distance apart.
-   * 
+   *
    * @param g1 a geometry
    * @param g2 a geometry
    * @param minDist the minimum distance the geometries should be separated by
@@ -142,16 +142,16 @@ public class BufferDistanceValidator {
   private void checkMinimumDistance(final Geometry g1, final Geometry g2,
     final double minDist) {
     final DistanceOp distOp = new DistanceOp(g1, g2, minDist);
-    minDistanceFound = distOp.distance();
+    this.minDistanceFound = distOp.distance();
 
-    if (minDistanceFound < minDist) {
-      isValid = false;
+    if (this.minDistanceFound < minDist) {
+      this.isValid = false;
       final Point[] pts = distOp.nearestPoints();
-      errorLocation = distOp.nearestPoints()[1];
-      errorIndicator = g1.getGeometryFactory().lineString(pts);
-      errMsg = "Distance between buffer curve and input is too small " + "("
-        + minDistanceFound + " at " + EWktWriter.lineString(pts[0], pts[1])
-        + " )";
+      this.errorLocation = distOp.nearestPoints()[1];
+      this.errorIndicator = g1.getGeometryFactory().lineString(pts);
+      this.errMsg = "Distance between buffer curve and input is too small " + "("
+          + this.minDistanceFound + " at " + EWktWriter.lineString(pts[0], pts[1])
+          + " )";
     }
   }
 
@@ -159,26 +159,26 @@ public class BufferDistanceValidator {
     // Assert: only polygonal inputs can be checked for negative buffers
 
     // MD - could generalize this to handle GCs too
-    if (!(input instanceof Polygon || input instanceof MultiPolygon || input instanceof GeometryCollection)) {
+    if (!(this.input instanceof Polygon || this.input instanceof MultiPolygon || this.input instanceof GeometryCollection)) {
       return;
     }
-    final Geometry inputCurve = getPolygonLines(input);
-    checkMinimumDistance(inputCurve, result, minValidDistance);
-    if (!isValid) {
+    final Geometry inputCurve = getPolygonLines(this.input);
+    checkMinimumDistance(inputCurve, this.result, this.minValidDistance);
+    if (!this.isValid) {
       return;
     }
 
-    checkMaximumDistance(inputCurve, result, maxValidDistance);
+    checkMaximumDistance(inputCurve, this.result, this.maxValidDistance);
   }
 
   private void checkPositiveValid() {
-    final Geometry bufCurve = result.getBoundary();
-    checkMinimumDistance(input, bufCurve, minValidDistance);
-    if (!isValid) {
+    final Geometry bufCurve = this.result.getBoundary();
+    checkMinimumDistance(this.input, bufCurve, this.minValidDistance);
+    if (!this.isValid) {
       return;
     }
 
-    checkMaximumDistance(input, bufCurve, maxValidDistance);
+    checkMaximumDistance(this.input, bufCurve, this.maxValidDistance);
   }
 
   /**
@@ -186,20 +186,20 @@ public class BufferDistanceValidator {
    * <p>
    * The indicator is a line segment showing the location and size
    * of the distance discrepancy.
-   * 
+   *
    * @return a geometric error indicator
    * or null if no error was found
    */
   public Geometry getErrorIndicator() {
-    return errorIndicator;
+    return this.errorIndicator;
   }
 
   public Point getErrorLocation() {
-    return errorLocation;
+    return this.errorLocation;
   }
 
   public String getErrorMessage() {
-    return errMsg;
+    return this.errMsg;
   }
 
   private Geometry getPolygonLines(final Geometry geometry) {
@@ -212,27 +212,27 @@ public class BufferDistanceValidator {
   }
 
   public boolean isValid() {
-    final double posDistance = Math.abs(bufDistance);
+    final double posDistance = Math.abs(this.bufDistance);
     final double distDelta = MAX_DISTANCE_DIFF_FRAC * posDistance;
-    minValidDistance = posDistance - distDelta;
-    maxValidDistance = posDistance + distDelta;
+    this.minValidDistance = posDistance - distDelta;
+    this.maxValidDistance = posDistance + distDelta;
 
     // can't use this test if either is empty
-    if (input.isEmpty() || result.isEmpty()) {
+    if (this.input.isEmpty() || this.result.isEmpty()) {
       return true;
     }
 
-    if (bufDistance > 0.0) {
+    if (this.bufDistance > 0.0) {
       checkPositiveValid();
     } else {
       checkNegativeValid();
     }
     if (VERBOSE) {
-      System.out.println("Min Dist= " + minDistanceFound + "  err= "
-        + (1.0 - minDistanceFound / bufDistance) + "  Max Dist= "
-        + maxDistanceFound + "  err= " + (maxDistanceFound / bufDistance - 1.0));
+      System.out.println("Min Dist= " + this.minDistanceFound + "  err= "
+          + (1.0 - this.minDistanceFound / this.bufDistance) + "  Max Dist= "
+          + this.maxDistanceFound + "  err= " + (this.maxDistanceFound / this.bufDistance - 1.0));
     }
-    return isValid;
+    return this.isValid;
   }
 
   /*

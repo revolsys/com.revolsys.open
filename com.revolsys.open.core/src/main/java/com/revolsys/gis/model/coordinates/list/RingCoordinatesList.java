@@ -6,7 +6,7 @@ import com.revolsys.jts.geom.impl.LineStringDouble;
 public class RingCoordinatesList extends LineStringDouble {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 5660399503744099455L;
 

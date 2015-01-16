@@ -67,7 +67,7 @@ import com.revolsys.spring.SpringUtil;
  * @see SaifWriter
  */
 public class SaifReader extends AbstractReader<Record> implements
-  RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
+RecordIterator, RecordDefinitionFactory, com.revolsys.data.io.RecordReader {
   /** The logging instance. */
   private static final Logger log = Logger.getLogger(SaifReader.class);
 
@@ -234,7 +234,7 @@ public class SaifReader extends AbstractReader<Record> implements
         loadGlobalMetadata();
       } catch (final IOException e) {
         throw new RuntimeException("Unable to load globmeta.osn: "
-          + e.getMessage());
+            + e.getMessage());
       }
     }
     return this.globalMetadata;
@@ -251,7 +251,7 @@ public class SaifReader extends AbstractReader<Record> implements
         loadImportedObjects();
       } catch (final IOException e) {
         throw new RuntimeException("Unable to load imports.dir: "
-          + e.getMessage());
+            + e.getMessage());
       }
     }
     return this.importedObjects;
@@ -277,7 +277,7 @@ public class SaifReader extends AbstractReader<Record> implements
         loadInternallyReferencedObjects();
       } catch (final IOException e) {
         throw new RuntimeException("Unable to load internal.dir: "
-          + e.getMessage());
+            + e.getMessage());
       }
     }
     return this.internallyReferencedObjects;
@@ -391,7 +391,7 @@ public class SaifReader extends AbstractReader<Record> implements
   private void loadExportedObjects() throws IOException {
     final boolean setNames = this.includeTypeNames.isEmpty();
     final ClassPathResource resource = new ClassPathResource(
-      "com/revolsys/io/saif/saifzip.csn");
+        "com/revolsys/io/saif/saifzip.csn");
     final RecordDefinitionFactory schema = new SaifSchemaReader().loadSchema(resource);
     final OsnReader reader = getOsnReader(schema, this.factory, "/exports.dir");
     try {
@@ -413,7 +413,7 @@ public class SaifReader extends AbstractReader<Record> implements
             }
 
             if (setNames && !fileName.equals("metdat00.osn")
-              && !fileName.equals("refsys00.osn")) {
+                && !fileName.equals("refsys00.osn")) {
               names.put(typePath.toString(), typePath);
             }
           }
@@ -657,7 +657,7 @@ public class SaifReader extends AbstractReader<Record> implements
   @Override
   public void remove() {
     throw new UnsupportedOperationException(
-      "Removing SAIF objects is not supported");
+        "Removing SAIF objects is not supported");
   }
 
   /**

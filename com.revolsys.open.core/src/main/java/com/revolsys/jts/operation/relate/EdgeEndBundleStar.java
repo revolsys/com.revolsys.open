@@ -49,7 +49,7 @@ import com.revolsys.jts.geomgraph.EdgeEndStar;
  * @version 1.7
  */
 public class EdgeEndBundleStar
-  extends EdgeEndStar
+extends EdgeEndStar
 {
   /**
    * Creates a new empty EdgeEndBundleStar
@@ -64,9 +64,10 @@ public class EdgeEndBundleStar
    * to contain the EdgeEnd.
    * <br>
    */
-  public void insert(EdgeEnd e)
+  @Override
+  public void insert(final EdgeEnd e)
   {
-    EdgeEndBundle eb = (EdgeEndBundle) edgeMap.get(e);
+    EdgeEndBundle eb = (EdgeEndBundle) this.edgeMap.get(e);
     if (eb == null) {
       eb = new EdgeEndBundle(e);
       insertEdgeEnd(e, eb);
@@ -79,10 +80,10 @@ public class EdgeEndBundleStar
   /**
    * Update the IM with the contribution for the EdgeStubs around the node.
    */
-  void updateIM(IntersectionMatrix im)
+  void updateIM(final IntersectionMatrix im)
   {
-    for (Iterator it = iterator(); it.hasNext(); ) {
-      EdgeEndBundle esb = (EdgeEndBundle) it.next();
+    for (final Iterator it = iterator(); it.hasNext(); ) {
+      final EdgeEndBundle esb = (EdgeEndBundle) it.next();
       esb.updateIM(im);
     }
   }

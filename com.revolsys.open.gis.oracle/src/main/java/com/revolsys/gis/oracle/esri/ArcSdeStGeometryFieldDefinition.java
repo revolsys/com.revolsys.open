@@ -149,7 +149,7 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
     if (value instanceof BoundingBox) {
       final BoundingBox boundingBox = (BoundingBox)value;
-      value = boundingBox.convert(geometryFactory).toPolygon(1);
+      value = boundingBox.convert(this.geometryFactory).toPolygon(1);
     }
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;
@@ -174,9 +174,9 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
       final double length = geometry.getLength();
 
       final boolean hasZ = this.dimension > 2 && zOffset != null
-        && zScale != null;
+          && zScale != null;
       final boolean hasM = this.dimension > 3 && mOffset != null
-        && mScale != null;
+          && mScale != null;
 
       int numPoints = 0;
       byte[] data;

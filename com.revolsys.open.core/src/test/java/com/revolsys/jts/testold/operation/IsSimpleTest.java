@@ -51,11 +51,11 @@ import com.revolsys.jts.operation.IsSimpleOp;
  * @version 1.7
  */
 public class IsSimpleTest extends TestCase {
-  private static final double TOLERANCE = 0.00005;
-
   public static void main(final String args[]) {
     TestRunner.run(IsSimpleTest.class);
   }
+
+  private static final double TOLERANCE = 0.00005;
 
   private final GeometryFactory fact = GeometryFactory.floating3();
 
@@ -66,7 +66,7 @@ public class IsSimpleTest extends TestCase {
   }
 
   private void runIsSimpleTest(final String wkt, final boolean expectedResult)
-    throws ParseException {
+      throws ParseException {
     runIsSimpleTest(wkt, expectedResult, null);
   }
 
@@ -99,7 +99,7 @@ public class IsSimpleTest extends TestCase {
 
   /**
    * 3 LineStrings touching at an endpoint.
-   * 
+   *
    * @throws Exception
    */
   public void test3TouchAtEndpoint() throws Exception {

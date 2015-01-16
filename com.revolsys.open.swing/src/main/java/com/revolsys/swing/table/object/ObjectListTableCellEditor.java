@@ -10,10 +10,10 @@ import javax.swing.table.TableCellEditor;
 import com.revolsys.converter.string.StringConverterRegistry;
 
 public class ObjectListTableCellEditor extends AbstractCellEditor implements
-  TableCellEditor {
+TableCellEditor {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 

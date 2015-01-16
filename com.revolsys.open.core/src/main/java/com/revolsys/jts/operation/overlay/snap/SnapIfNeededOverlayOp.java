@@ -42,10 +42,10 @@ import com.revolsys.jts.operation.overlay.OverlayOp;
  * to improve the robustness of the result.
  * This class only uses snapping
  * if an error is detected when running the standard JTS overlay code.
- * Errors detected include thrown exceptions 
+ * Errors detected include thrown exceptions
  * (in particular, {@link TopologyException})
  * and invalid overlay computations.
- *     
+ *
  * @author Martin Davis
  * @version 1.7
  */
@@ -75,8 +75,8 @@ public class SnapIfNeededOverlayOp {
   private final Geometry[] geom = new Geometry[2];
 
   public SnapIfNeededOverlayOp(final Geometry g1, final Geometry g2) {
-    geom[0] = g1;
-    geom[1] = g2;
+    this.geom[0] = g1;
+    this.geom[1] = g2;
   }
 
   public Geometry getResultGeometry(final int opCode) {
@@ -85,7 +85,7 @@ public class SnapIfNeededOverlayOp {
     RuntimeException savedException = null;
     try {
       // try basic operation with input geometries
-      result = OverlayOp.overlayOp(geom[0], geom[1], opCode);
+      result = OverlayOp.overlayOp(this.geom[0], this.geom[1], opCode);
       final boolean isValid = true;
       // not needed if noding validation is used
       // boolean isValid = OverlayResultValidator.isValid(geom[0], geom[1],
@@ -107,7 +107,7 @@ public class SnapIfNeededOverlayOp {
       // if so, throw the original exception since it has the input coordinates
 
       try {
-        result = SnapOverlayOp.overlayOp(geom[0], geom[1], opCode);
+        result = SnapOverlayOp.overlayOp(this.geom[0], this.geom[1], opCode);
       } catch (final RuntimeException ex) {
         throw savedException;
       }

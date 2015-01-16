@@ -8,7 +8,7 @@ import com.revolsys.util.JavaBeanUtil;
 
 /**
  * Serialize a date with the specified date format
- * 
+ *
  * @author Paul Austin
  */
 public class DateFormatKeySerializer extends AbstractKeySerializer {
@@ -29,16 +29,16 @@ public class DateFormatKeySerializer extends AbstractKeySerializer {
 
   /**
    * Get the dete format.
-   * 
+   *
    * @return The date format.
    */
   public String getDateFormat() {
-    return dateFormat;
+    return this.dateFormat;
   }
 
   /**
    * Serialize the value to the XML writer.
-   * 
+   *
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
    */
@@ -48,7 +48,7 @@ public class DateFormatKeySerializer extends AbstractKeySerializer {
     if (value == null) {
       out.text("-");
     } else if (value instanceof Date) {
-      out.text(DateUtil.format(dateFormat, (Date)value));
+      out.text(DateUtil.format(this.dateFormat, (Date)value));
     } else {
       out.text(value);
     }
@@ -56,7 +56,7 @@ public class DateFormatKeySerializer extends AbstractKeySerializer {
 
   /**
    * Set the dete format.
-   * 
+   *
    * @param dateFormat The date format.
    */
   public void setDateFormat(final String dateFormat) {

@@ -17,10 +17,12 @@ public class Slf4jLogServletFilter implements Filter {
 
   private Logger log;
 
+  @Override
   public void destroy() {
-    log = null;
+    this.log = null;
   }
 
+  @Override
   public void doFilter(
     final ServletRequest request,
     final ServletResponse response,
@@ -32,16 +34,17 @@ public class Slf4jLogServletFilter implements Filter {
     } catch (final ServletException e) {
       throw e;
     } catch (final RuntimeException e) {
-      HttpServletLogUtil.logRequestException(log, (HttpServletRequest)request, e);
+      HttpServletLogUtil.logRequestException(this.log, (HttpServletRequest)request, e);
       throw e;
     } catch (final Error e) {
-      HttpServletLogUtil.logRequestException(log, (HttpServletRequest)request, e);
+      HttpServletLogUtil.logRequestException(this.log, (HttpServletRequest)request, e);
       throw e;
     }
   }
 
+  @Override
   public void init(final FilterConfig filterConfig) throws ServletException {
-    log = LoggerFactory.getLogger(getClass());
+    this.log = LoggerFactory.getLogger(getClass());
   }
 
 }

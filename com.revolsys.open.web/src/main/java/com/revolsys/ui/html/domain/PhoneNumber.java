@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,16 +27,13 @@ import org.apache.commons.jexl.context.HashMapContext;
 import com.revolsys.util.JexlUtil;
 
 public final class PhoneNumber {
-  /** The default country to use if one was not specified. */
-  private static Country defaultCountry = Country.getCountry("US");
-
   /**
    * Format the phone number using the format for the default country. If the
    * phone number does not match the specification for that country the first
    * few digits of the phone number will be used to lookup a matching country
    * and formatted using that country, if that fails the unformatted phone
    * number will be returned.
-   * 
+   *
    * @param phoneNumber The normalized phone number to format.
    * @return The formatted phone number.
    */
@@ -50,7 +47,7 @@ public final class PhoneNumber {
    * country the first few digits of the phone number will be used to lookup a
    * matching country and formatted using that country, if that fails the
    * unformatted phone number will be returned.
-   * 
+   *
    * @param phoneNumber The normalized phone number to format.
    * @param country The Country the phone number should be formatted for.
    * @return The formatted phone number.
@@ -67,7 +64,7 @@ public final class PhoneNumber {
    * for that country the first few digits of the phone number will be used to
    * lookup a matching country and formatted using that country's international
    * format, if that fails the unformatted phone number will be returned.
-   * 
+   *
    * @param phoneNumber The normalized phone number to format.
    * @param country The Country the phone number should be formatted for.
    * @param international True if the phone number should use the international
@@ -111,7 +108,7 @@ public final class PhoneNumber {
    * locale the first few digits of the phone number will be used to lookup a
    * matching country and formatted using that locale, if that fails the
    * unformatted phone number will be returned.
-   * 
+   *
    * @param phoneNumber The normalized phone number to format.
    * @param locale The Locale the phone number should be formatted for.
    * @return The formatted phone number.
@@ -123,7 +120,7 @@ public final class PhoneNumber {
   /**
    * Parse a phone number using the regular expression and if it matches the
    * phone number, format it using the specified format otherwise return null.
-   * 
+   *
    * @param phoneNumber The normalized phone number to format.
    * @param regex The regular expression to match phone numbers.
    * @param format The format specification.
@@ -168,7 +165,7 @@ public final class PhoneNumber {
 
   /**
    * Normalize the phone number removing any non-digit characters.
-   * 
+   *
    * @param phoneNumber The phone number.
    * @return The normalized phone number.
    */
@@ -178,6 +175,9 @@ public final class PhoneNumber {
     }
     return phoneNumber;
   }
+
+  /** The default country to use if one was not specified. */
+  private static Country defaultCountry = Country.getCountry("US");
 
   /**
    * Construct a new PhoneNumber.

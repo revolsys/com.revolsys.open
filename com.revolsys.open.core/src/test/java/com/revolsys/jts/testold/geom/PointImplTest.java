@@ -72,55 +72,55 @@ public class PointImplTest extends TestCase {
   }
 
   public void testEquals1() throws Exception {
-    final Point p1 = geometryFactory.geometry("POINT(1.234 5.678)");
-    final Point p2 = geometryFactory.geometry("POINT(1.234 5.678)");
+    final Point p1 = this.geometryFactory.geometry("POINT(1.234 5.678)");
+    final Point p2 = this.geometryFactory.geometry("POINT(1.234 5.678)");
     assertTrue(p1.equals(p2));
   }
 
   public void testEquals2() throws Exception {
-    final Point p1 = geometryFactory.geometry("POINT(1.23 5.67)");
-    final Point p2 = geometryFactory.geometry("POINT(1.23 5.67)");
+    final Point p1 = this.geometryFactory.geometry("POINT(1.23 5.67)");
+    final Point p2 = this.geometryFactory.geometry("POINT(1.23 5.67)");
     assertTrue(p1.equals(p2));
   }
 
   public void testEquals3() throws Exception {
-    final Point p1 = geometryFactory.geometry("POINT(1.235 5.678)");
-    final Point p2 = geometryFactory.geometry("POINT(1.234 5.678)");
+    final Point p1 = this.geometryFactory.geometry("POINT(1.235 5.678)");
+    final Point p2 = this.geometryFactory.geometry("POINT(1.234 5.678)");
     assertTrue(!p1.equals(p2));
   }
 
   public void testEquals4() throws Exception {
-    final Point p1 = geometryFactory.geometry("POINT(1.2334 5.678)");
-    final Point p2 = geometryFactory.geometry("POINT(1.2333 5.678)");
+    final Point p1 = this.geometryFactory.geometry("POINT(1.2334 5.678)");
+    final Point p2 = this.geometryFactory.geometry("POINT(1.2333 5.678)");
     assertTrue(p1.equals(p2));
   }
 
   public void testEquals5() throws Exception {
-    final Point p1 = geometryFactory.geometry("POINT(1.2334 5.678)");
-    final Point p2 = geometryFactory.geometry("POINT(1.2335 5.678)");
+    final Point p1 = this.geometryFactory.geometry("POINT(1.2334 5.678)");
+    final Point p2 = this.geometryFactory.geometry("POINT(1.2335 5.678)");
     assertTrue(!p1.equals(p2));
   }
 
   public void testEquals6() throws Exception {
-    final Point p1 = geometryFactory.geometry("POINT(1.2324 5.678)");
-    final Point p2 = geometryFactory.geometry("POINT(1.2325 5.678)");
+    final Point p1 = this.geometryFactory.geometry("POINT(1.2324 5.678)");
+    final Point p2 = this.geometryFactory.geometry("POINT(1.2325 5.678)");
     assertTrue(!p1.equals(p2));
   }
 
   public void testIsSimple() throws Exception {
-    final Point p1 = geometryFactory.geometry("POINT(1.2324 5.678)");
+    final Point p1 = this.geometryFactory.geometry("POINT(1.2324 5.678)");
     assertTrue(p1.isSimple());
-    final Point p2 = geometryFactory.geometry("POINT EMPTY");
+    final Point p2 = this.geometryFactory.geometry("POINT EMPTY");
     assertTrue(p2.isSimple());
   }
 
   public void testNegRounding1() throws Exception {
-    final Point pLo = geometryFactory.geometry("POINT(-1.233 5.678)");
-    final Point pHi = geometryFactory.geometry("POINT(-1.232 5.678)");
+    final Point pLo = this.geometryFactory.geometry("POINT(-1.233 5.678)");
+    final Point pHi = this.geometryFactory.geometry("POINT(-1.232 5.678)");
 
-    final Point p1 = geometryFactory.geometry("POINT(-1.2326 5.678)");
-    final Point p2 = geometryFactory.geometry("POINT(-1.2325 5.678)");
-    final Point p3 = geometryFactory.geometry("POINT(-1.2324 5.678)");
+    final Point p1 = this.geometryFactory.geometry("POINT(-1.2326 5.678)");
+    final Point p2 = this.geometryFactory.geometry("POINT(-1.2325 5.678)");
+    final Point p3 = this.geometryFactory.geometry("POINT(-1.2324 5.678)");
 
     assertTrue(!p1.equals(p2));
     assertTrue(p3.equals(p2));
@@ -131,14 +131,14 @@ public class PointImplTest extends TestCase {
   }
 
   public void testProjection() {
-    final Point albersPoint = albers3d.geometry("SRID=3005;POINT Z(1000000 1500000 10)");
-    final Point webMercatorPoint = albersPoint.convert(worldMercator);
-    final Point albersPoint2 = webMercatorPoint.convert(albers3d);
+    final Point albersPoint = this.albers3d.geometry("SRID=3005;POINT Z(1000000 1500000 10)");
+    final Point webMercatorPoint = albersPoint.convert(this.worldMercator);
+    final Point albersPoint2 = webMercatorPoint.convert(this.albers3d);
     if (!albersPoint.equals(2,albersPoint2)) {
       failNotEquals("Not Equal Exact", albersPoint, albersPoint2);
     }
-    final Point albersPoint3 = webMercatorPoint.convert(albers2d);
-    final Point albersPoint4 = albersPoint3.convert(albers3d);
+    final Point albersPoint3 = webMercatorPoint.convert(this.albers2d);
+    final Point albersPoint4 = albersPoint3.convert(this.albers3d);
     // System.out.println(webMercatorPoint);
     // System.out.println(albersPoint);
 

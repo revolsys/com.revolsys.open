@@ -8,7 +8,7 @@ import com.revolsys.jts.math.DD;
 /**
  * Various tests involving computing known mathematical quantities
  * using the basic {@link DD} arithmetic operations.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -25,7 +25,7 @@ public class DDComputeTest extends TestCase {
    * Computes the arctangent based on the Taylor series expansion
    *
    *    arctan(x) = x - x^3 / 3 + x^5 / 5 - x^7 / 7 + ...
-   *    
+   *
    * @param x the argument
    * @return an approximation to the arctangent of the input
    */
@@ -56,9 +56,9 @@ public class DDComputeTest extends TestCase {
 
   /**
    * Uses Taylor series to compute e
-   * 
+   *
    * e = 1 + 1 + 1/2! + 1/3! + 1/4! + ...
-   * 
+   *
    * @return an approximation to e
    */
   private DD computeEByTaylorSeries() {
@@ -81,7 +81,7 @@ public class DDComputeTest extends TestCase {
    * Uses Machin's arctangent formula to compute Pi:
    *
    *    Pi / 4  =  4 arctan(1/5) - arctan(1/239)
-   *    
+   *
    * @return an approximation to Pi
    */
   private DD computePiByMachin() {

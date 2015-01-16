@@ -3,7 +3,7 @@ package com.revolsys.jts.testold.perf;
 /**
  * Base class for test cases which depend on threading.
  * A common example of usage is to test for race conditions.
- * 
+ *
  * @author Martin Davis
  *
  */

@@ -8,7 +8,7 @@ import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.swing.tree.MenuSourcePropertyEnableCheck;
 
 public abstract class AbstractEnableCheck extends AbstractPropertyChangeObject
-  implements EnableCheck, PropertyChangeListener {
+implements EnableCheck, PropertyChangeListener {
 
   public static AbstractEnableCheck enableCheck(final Map<String, Object> config) {
     if (config != null) {

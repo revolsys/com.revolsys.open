@@ -53,10 +53,15 @@ import java.util.List;
  *
  * @version 1.7
  */
-public abstract class EdgeSetIntersector 
+public abstract class EdgeSetIntersector
 {
   public EdgeSetIntersector() {
   }
+
+  /**
+   * Computes all mutual intersections between two sets of edges.
+   */
+  abstract public void computeIntersections(List edges0, List edges1, SegmentIntersector si);
 
   /**
    * Computes all self-intersections between edges in a set of edges,
@@ -67,11 +72,6 @@ public abstract class EdgeSetIntersector
    * @param testAllSegments true if self-intersections are to be tested as well
    */
   abstract public void computeIntersections(List edges, SegmentIntersector si, boolean testAllSegments);
-
-  /**
-   * Computes all mutual intersections between two sets of edges.
-   */
-  abstract public void computeIntersections(List edges0, List edges1, SegmentIntersector si);
 
 
 

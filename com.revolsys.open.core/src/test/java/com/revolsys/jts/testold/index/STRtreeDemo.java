@@ -55,7 +55,7 @@ public class STRtreeDemo {
 
   public static class TestTree extends STRtree {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -91,18 +91,6 @@ public class STRtreeDemo {
       return super.verticalSlices(childBoundables, size);
     }
   }
-
-  private static final double EXTENT = 100;
-
-  private static final double MAX_ITEM_EXTENT = 15;
-
-  private static final double MIN_ITEM_EXTENT = 3;
-
-  private static final int ITEM_COUNT = 20;
-
-  private static final int NODE_CAPACITY = 4;
-
-  private static GeometryFactory factory = GeometryFactory.floating3();
 
   private static BoundingBox envelope(final Boundable b) {
     return (BoundingBox)b.getBounds();
@@ -174,9 +162,9 @@ public class STRtreeDemo {
 
   private static Polygon randomRectangle() {
     final double width = MIN_ITEM_EXTENT + (MAX_ITEM_EXTENT - MIN_ITEM_EXTENT)
-      * Math.random();
+        * Math.random();
     final double height = MIN_ITEM_EXTENT + (MAX_ITEM_EXTENT - MIN_ITEM_EXTENT)
-      * Math.random();
+        * Math.random();
     final double bottom = EXTENT * Math.random();
     final double left = EXTENT * Math.random();
     final double top = bottom + height;
@@ -200,11 +188,23 @@ public class STRtreeDemo {
 
   private static String toString(final Boundable b) {
     return "POLYGON((" + envelope(b).getMinX() + " " + envelope(b).getMinY()
-      + ", " + envelope(b).getMinX() + " " + envelope(b).getMaxY() + ", "
-      + envelope(b).getMaxX() + " " + envelope(b).getMaxY() + ", "
-      + envelope(b).getMaxX() + " " + envelope(b).getMinY() + ","
-      + envelope(b).getMinX() + " " + envelope(b).getMinY() + "))";
+        + ", " + envelope(b).getMinX() + " " + envelope(b).getMaxY() + ", "
+        + envelope(b).getMaxX() + " " + envelope(b).getMaxY() + ", "
+        + envelope(b).getMaxX() + " " + envelope(b).getMinY() + ","
+        + envelope(b).getMinX() + " " + envelope(b).getMinY() + "))";
   }
+
+  private static final double EXTENT = 100;
+
+  private static final double MAX_ITEM_EXTENT = 15;
+
+  private static final double MIN_ITEM_EXTENT = 3;
+
+  private static final int ITEM_COUNT = 20;
+
+  private static final int NODE_CAPACITY = 4;
+
+  private static GeometryFactory factory = GeometryFactory.floating3();
 
   public STRtreeDemo() {
   }

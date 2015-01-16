@@ -117,6 +117,6 @@ public class Assert {
    */
   public static void shouldNeverReachHere(final String message) {
     throw new AssertionError("Should never reach here"
-      + (message != null ? ": " + message : ""));
+        + (message != null ? ": " + message : ""));
   }
 }

@@ -12,6 +12,11 @@ import javax.swing.text.html.StyleSheet;
 import com.revolsys.swing.SwingUtil;
 
 public class JRendererTextPane extends JTextPane {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   static {
     UIManager.put("TextPane.font", SwingUtil.FONT);
   }

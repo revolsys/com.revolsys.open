@@ -131,7 +131,7 @@ public class EpsgCsWktWriter {
       final Projection projection = coordinateSystem.getProjection();
       write(out, projection);
       for (final Entry<String, Object> parameter : coordinateSystem.getParameters()
-        .entrySet()) {
+          .entrySet()) {
         final String name = parameter.getKey();
         final Object value = parameter.getValue();
         write(out, name, value);

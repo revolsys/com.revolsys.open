@@ -17,10 +17,10 @@ public class Intersection implements Filter<LineString> {
 
   @Override
   public boolean accept(final LineString line) {
-    return graph.intersects(line);
+    return this.graph.intersects(line);
   }
 
   public LineString getLine() {
-    return line;
+    return this.line;
   }
 }

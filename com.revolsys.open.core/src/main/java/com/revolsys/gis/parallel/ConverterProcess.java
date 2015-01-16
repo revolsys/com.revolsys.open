@@ -18,14 +18,14 @@ public class ConverterProcess extends BaseInOutProcess<Record, Record> {
   }
 
   public Converter<Record, Record> getConverter() {
-    return converter;
+    return this.converter;
   }
 
   @Override
   protected void process(final Channel<Record> in,
     final Channel<Record> out, final Record object) {
-    if (converter != null) {
-      final Record target = converter.convert(object);
+    if (this.converter != null) {
+      final Record target = this.converter.convert(object);
       out.write(target);
     }
   }

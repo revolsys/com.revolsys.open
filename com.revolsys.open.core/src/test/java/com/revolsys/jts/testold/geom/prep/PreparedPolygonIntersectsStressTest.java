@@ -49,20 +49,20 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 /**
  * Stress tests {@link PreparedPolygon#intersects(Geometry)}
  * to confirm it finds intersections correctly.
- * 
+ *
  * @author Martin Davis
  *
  */
 public class PreparedPolygonIntersectsStressTest extends TestCase {
+  public static void main(final String args[]) {
+    TestRunner.run(PreparedPolygonIntersectsStressTest.class);
+  }
+
   static final int MAX_ITER = 10000;
 
   private static final GeometryFactory fact = GeometryFactory.floating(0, 2);
 
   private static WKTReader wktRdr = new WKTReader(fact);
-
-  public static void main(final String args[]) {
-    TestRunner.run(PreparedPolygonIntersectsStressTest.class);
-  }
 
   boolean testFailed = false;
 

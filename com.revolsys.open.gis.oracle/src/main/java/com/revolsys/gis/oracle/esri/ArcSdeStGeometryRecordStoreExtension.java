@@ -20,7 +20,7 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
 
 public class ArcSdeStGeometryRecordStoreExtension implements
-  RecordStoreExtension {
+RecordStoreExtension {
 
   public ArcSdeStGeometryRecordStoreExtension() {
   }
@@ -116,7 +116,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements
       while (resultSet.next()) {
         final String tableName = resultSet.getString(2);
         final String typePath = Path.toPath(schemaName, tableName)
-          .toUpperCase();
+            .toUpperCase();
 
         final int registrationId = resultSet.getInt(1);
         JdbcFieldAdder.setTableProperty(schema, typePath,
@@ -156,7 +156,7 @@ public class ArcSdeStGeometryRecordStoreExtension implements
     final OracleRecordStore oracleRecordStore = (OracleRecordStore)recordStore;
     try {
       try (
-        final Connection connection = oracleRecordStore.getJdbcConnection()) {
+          final Connection connection = oracleRecordStore.getJdbcConnection()) {
         final String schemaName = oracleRecordStore.getDatabaseSchemaName(schema);
         loadTableProperties(connection, schema, schemaName);
         loadColumnProperties(schema, schemaName, connection);

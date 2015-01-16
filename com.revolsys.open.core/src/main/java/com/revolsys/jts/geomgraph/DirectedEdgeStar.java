@@ -70,7 +70,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
     final int startDepth = de.getDepth(Position.LEFT);
     final int targetLastDepth = de.getDepth(Position.RIGHT);
     // compute the depths from this edge up to the end of the edge array
-    final int nextDepth = computeDepths(edgeIndex + 1, edgeList.size(),
+    final int nextDepth = computeDepths(edgeIndex + 1, this.edgeList.size(),
       startDepth);
     // compute the depths for the initial part of the array
     final int lastDepth = computeDepths(0, edgeIndex, nextDepth);
@@ -88,7 +88,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
     final int startDepth) {
     int currDepth = startDepth;
     for (int i = startIndex; i < endIndex; i++) {
-      final DirectedEdge nextDe = (DirectedEdge)edgeList.get(i);
+      final DirectedEdge nextDe = (DirectedEdge)this.edgeList.get(i);
       final Label label = nextDe.getLabel();
       nextDe.setEdgeDepths(Position.RIGHT, currDepth);
       currDepth = nextDe.getDepth(Position.LEFT);
@@ -107,7 +107,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
 
     // determine the overall labelling for this DirectedEdgeStar
     // (i.e. for the node it is based at)
-    label = new Label(Location.NONE);
+    this.label = new Label(Location.NONE);
     for (final Iterator it = iterator(); it.hasNext();) {
       final EdgeEnd ee = (EdgeEnd)it.next();
       final Edge e = ee.getEdge();
@@ -115,7 +115,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
       for (int i = 0; i < 2; i++) {
         final Location eLoc = eLabel.getLocation(i);
         if (eLoc == Location.INTERIOR || eLoc == Location.BOUNDARY) {
-          label.setLocation(i, Location.INTERIOR);
+          this.label.setLocation(i, Location.INTERIOR);
         }
       }
     }
@@ -185,7 +185,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
   }
 
   public Label getLabel() {
-    return label;
+    return this.label;
   }
 
   public int getOutgoingDegree() {
@@ -212,17 +212,17 @@ public class DirectedEdgeStar extends EdgeEndStar {
 
   private List getResultAreaEdges() {
     // print(System.out);
-    if (resultAreaEdgeList != null) {
-      return resultAreaEdgeList;
+    if (this.resultAreaEdgeList != null) {
+      return this.resultAreaEdgeList;
     }
-    resultAreaEdgeList = new ArrayList();
+    this.resultAreaEdgeList = new ArrayList();
     for (final Iterator it = iterator(); it.hasNext();) {
       final DirectedEdge de = (DirectedEdge)it.next();
       if (de.isInResult() || de.getSym().isInResult()) {
-        resultAreaEdgeList.add(de);
+        this.resultAreaEdgeList.add(de);
       }
     }
-    return resultAreaEdgeList;
+    return this.resultAreaEdgeList;
   }
 
   public DirectedEdge getRightmostEdge() {
@@ -275,8 +275,8 @@ public class DirectedEdgeStar extends EdgeEndStar {
     DirectedEdge prevOut = null;
     DirectedEdge firstIn = null;
     // link edges in CW order
-    for (int i = edgeList.size() - 1; i >= 0; i--) {
-      final DirectedEdge nextOut = (DirectedEdge)edgeList.get(i);
+    for (int i = this.edgeList.size() - 1; i >= 0; i--) {
+      final DirectedEdge nextOut = (DirectedEdge)this.edgeList.get(i);
       final DirectedEdge nextIn = nextOut.getSym();
       if (firstIn == null) {
         firstIn = nextIn;
@@ -295,10 +295,10 @@ public class DirectedEdgeStar extends EdgeEndStar {
     // find first area edge (if any) to start linking at
     DirectedEdge firstOut = null;
     DirectedEdge incoming = null;
-    int state = SCANNING_FOR_INCOMING;
+    int state = this.SCANNING_FOR_INCOMING;
     // link edges in CW order
-    for (int i = resultAreaEdgeList.size() - 1; i >= 0; i--) {
-      final DirectedEdge nextOut = (DirectedEdge)resultAreaEdgeList.get(i);
+    for (int i = this.resultAreaEdgeList.size() - 1; i >= 0; i--) {
+      final DirectedEdge nextOut = (DirectedEdge)this.resultAreaEdgeList.get(i);
       final DirectedEdge nextIn = nextOut.getSym();
 
       // record first outgoing edge, in order to link the last incoming edge
@@ -312,22 +312,22 @@ public class DirectedEdgeStar extends EdgeEndStar {
             continue;
           }
           incoming = nextIn;
-          state = LINKING_TO_OUTGOING;
-        break;
+          state = this.LINKING_TO_OUTGOING;
+          break;
         case LINKING_TO_OUTGOING:
           if (nextOut.getEdgeRing() != er) {
             continue;
           }
           incoming.setNextMin(nextOut);
-          state = SCANNING_FOR_INCOMING;
-        break;
+          state = this.SCANNING_FOR_INCOMING;
+          break;
       }
     }
     // print(System.out);
-    if (state == LINKING_TO_OUTGOING) {
+    if (state == this.LINKING_TO_OUTGOING) {
       Assert.isTrue(firstOut != null, "found null for first outgoing dirEdge");
       Assert.isTrue(firstOut.getEdgeRing() == er,
-        "unable to link last incoming dirEdge");
+          "unable to link last incoming dirEdge");
       incoming.setNextMin(firstOut);
     }
   }
@@ -356,10 +356,10 @@ public class DirectedEdgeStar extends EdgeEndStar {
     // find first area edge (if any) to start linking at
     DirectedEdge firstOut = null;
     DirectedEdge incoming = null;
-    int state = SCANNING_FOR_INCOMING;
+    int state = this.SCANNING_FOR_INCOMING;
     // link edges in CCW order
-    for (int i = 0; i < resultAreaEdgeList.size(); i++) {
-      final DirectedEdge nextOut = (DirectedEdge)resultAreaEdgeList.get(i);
+    for (int i = 0; i < this.resultAreaEdgeList.size(); i++) {
+      final DirectedEdge nextOut = (DirectedEdge)this.resultAreaEdgeList.get(i);
       final DirectedEdge nextIn = nextOut.getSym();
 
       // skip de's that we're not interested in
@@ -380,19 +380,19 @@ public class DirectedEdgeStar extends EdgeEndStar {
             continue;
           }
           incoming = nextIn;
-          state = LINKING_TO_OUTGOING;
-        break;
+          state = this.LINKING_TO_OUTGOING;
+          break;
         case LINKING_TO_OUTGOING:
           if (!nextOut.isInResult()) {
             continue;
           }
           incoming.setNext(nextOut);
-          state = SCANNING_FOR_INCOMING;
-        break;
+          state = this.SCANNING_FOR_INCOMING;
+          break;
       }
     }
     // Debug.print(this);
-    if (state == LINKING_TO_OUTGOING) {
+    if (state == this.LINKING_TO_OUTGOING) {
       // Debug.print(firstOut == null, this);
       if (firstOut == null) {
         throw new TopologyException("no outgoing dirEdge found",
@@ -401,7 +401,7 @@ public class DirectedEdgeStar extends EdgeEndStar {
       // Assert.isTrue(firstOut != null, "no outgoing dirEdge found (at " +
       // getCoordinate() );
       Assert.isTrue(firstOut.isInResult(),
-        "unable to link last incoming dirEdge");
+          "unable to link last incoming dirEdge");
       incoming.setNext(firstOut);
     }
   }

@@ -42,14 +42,14 @@ import com.revolsys.jts.geom.LineString;
  * Dissolves a noded collection of {@link SegmentString}s to produce
  * a set of merged linework with unique segments.
  * A custom {@link SegmentStringMerger} merging strategy
- * can be supplied.  
+ * can be supplied.
  * This strategy will be called when two identical (up to orientation)
  * strings are dissolved together.
  * The default merging strategy is simply to discard one of the merged strings.
  * <p>
  * A common use for this class is to merge noded edges
  * while preserving topological labelling.
- * This requires a custom merging strategy to be supplied 
+ * This requires a custom merging strategy to be supplied
  * to merge the topology labels appropriately.
  *
  * @version 1.7
@@ -57,9 +57,9 @@ import com.revolsys.jts.geom.LineString;
  */
 public class SegmentStringDissolver {
   /**
-   * A merging strategy which can be used to update the context data of {@link SegmentString}s 
+   * A merging strategy which can be used to update the context data of {@link SegmentString}s
    * which are merged during the dissolve process.
-   * 
+   *
    * @author mbdavis
    *
    */
@@ -102,7 +102,7 @@ public class SegmentStringDissolver {
 
   private void add(final OrientedCoordinateArray oca,
     final SegmentString segString) {
-    ocaMap.put(oca, segString);
+    this.ocaMap.put(oca, segString);
     // testAddedSS.add(oca);
   }
 
@@ -128,10 +128,10 @@ public class SegmentStringDissolver {
     if (existing == null) {
       add(oca, segString);
     } else {
-      if (merger != null) {
+      if (this.merger != null) {
         final boolean isSameOrientation = equals(existing.getPoints(), 2,
           segString.getPoints());
-        merger.merge(existing, segString, isSameOrientation);
+        this.merger.merge(existing, segString, isSameOrientation);
       }
     }
   }
@@ -164,7 +164,7 @@ public class SegmentStringDissolver {
 
   private SegmentString findMatching(final OrientedCoordinateArray oca,
     final SegmentString segString) {
-    final SegmentString matchSS = (SegmentString)ocaMap.get(oca);
+    final SegmentString matchSS = (SegmentString)this.ocaMap.get(oca);
     /*
      * boolean hasBeenAdded = checkAdded(oca); if (matchSS == null &&
      * hasBeenAdded) { System.out.println("added!"); }
@@ -185,6 +185,6 @@ public class SegmentStringDissolver {
    * @return the unique {@link SegmentString}s
    */
   public Collection getDissolved() {
-    return ocaMap.values();
+    return this.ocaMap.values();
   }
 }

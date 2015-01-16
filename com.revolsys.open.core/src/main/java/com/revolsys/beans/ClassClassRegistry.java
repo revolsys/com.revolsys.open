@@ -16,14 +16,14 @@ public class ClassClassRegistry<T> {
    * method.
    */
   private void clearFindCache() {
-    findCache.clear();
+    this.findCache.clear();
   }
 
   /**
    * Find the value by class. If no direct match was found, a match for the
    * super class will be found until a match is found. Returns null if no match
    * was found on any super class.
-   * 
+   *
    * @param clazz The class.
    * @return The class if a match was found for this class or one of the super
    *         classes or null if no match was found.
@@ -34,12 +34,12 @@ public class ClassClassRegistry<T> {
     } else {
       Class<?> value = getClass(clazz);
       if (value == null) {
-        value = findCache.get(clazz);
+        value = this.findCache.get(clazz);
         if (value == null) {
           final Class<?> superClass = clazz.getSuperclass();
           value = findClass(superClass);
           if (value != null) {
-            findCache.put(clazz, value);
+            this.findCache.put(clazz, value);
           }
         }
       }
@@ -50,12 +50,12 @@ public class ClassClassRegistry<T> {
   /**
    * Get the value from the registry using the key. Returns null if an exact
    * match by class is not found.
-   * 
+   *
    * @param clazz The class.
    * @return The value, or null if no value has been registered for this class.
    */
   public Class<?> getClass(final Class<?> clazz) {
-    return registry.get(clazz);
+    return this.registry.get(clazz);
   }
 
   public T newInstance(final Class<?> clazz, final Object... parameters) {
@@ -82,13 +82,13 @@ public class ClassClassRegistry<T> {
 
   /**
    * Register the value for the specified class.
-   * 
+   *
    * @param clazz The class.
    * @param value The value.
    */
   public void put(final Class<?> clazz, final Class<?> value) {
     if (getClass(clazz) != value) {
-      registry.put(clazz, value);
+      this.registry.put(clazz, value);
       clearFindCache();
     }
   }

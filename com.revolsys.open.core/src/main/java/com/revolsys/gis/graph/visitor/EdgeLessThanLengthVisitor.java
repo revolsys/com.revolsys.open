@@ -7,8 +7,8 @@ import com.revolsys.gis.graph.RecordGraph;
 import com.revolsys.util.ObjectProcessor;
 
 public class EdgeLessThanLengthVisitor extends
-  AbstractEdgeListenerVisitor<Record> implements
-  ObjectProcessor<RecordGraph> {
+AbstractEdgeListenerVisitor<Record> implements
+ObjectProcessor<RecordGraph> {
 
   private double minLength;
 
@@ -28,7 +28,7 @@ public class EdgeLessThanLengthVisitor extends
   }
 
   public double getMinLength() {
-    return minLength;
+    return this.minLength;
   }
 
   @Override
@@ -43,11 +43,11 @@ public class EdgeLessThanLengthVisitor extends
   @Override
   public boolean visit(final Edge<Record> edge) {
     final double length = edge.getLength();
-    if (length < minLength) {
+    if (length < this.minLength) {
       edgeEvent(edge, "Edge less than length", "Review", length + " < "
-        + minLength);
-      if (visitor != null) {
-        visitor.visit(edge);
+          + this.minLength);
+      if (this.visitor != null) {
+        this.visitor.visit(edge);
       }
     }
     return true;

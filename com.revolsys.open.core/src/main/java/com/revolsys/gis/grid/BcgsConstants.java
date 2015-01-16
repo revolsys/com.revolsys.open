@@ -28,7 +28,7 @@ public interface BcgsConstants {
   String REGEX_SIXTEENTH_LETTER = "([a-pA-P])";
 
   String REGEX_20000 = NtsConstants.REGEX_250000 + "\\.?"
-    + REGEX_HUNDRETH_NUMBER;
+      + REGEX_HUNDRETH_NUMBER;
 
   String REGEX_2000 = REGEX_20000 + "\\.?" + REGEX_HUNDRETH_NUMBER;
 

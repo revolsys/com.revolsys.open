@@ -12,7 +12,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
-  implements GeometryWriterFactory {
+implements GeometryWriterFactory {
 
   public static Writer<Geometry> createWriter(final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
@@ -32,7 +32,7 @@ public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
 
   /**
    * Create a writer to write to the specified resource.
-   * 
+   *
    * @param resource The resource to write to.
    * @return The writer.
    */
@@ -46,7 +46,7 @@ public abstract class AbstractGeometryWriterFactory extends AbstractIoFactory
 
   /**
    * Create a reader for the file using the ({@link ArrayGeometryFactory}).
-   * 
+   *
    * @param baseName The base file name to write to.
    * @param out The output stream to write to.
    * @return The writer.

@@ -5,7 +5,7 @@ import org.springframework.security.core.Authentication;
 /**
  * Extended expression root object which contains extra method-specific
  * functionality.
- * 
+ *
  * @author Luke Taylor
  * @since 3.0
  */
@@ -29,11 +29,11 @@ public class MethodSecurityExpressionRoot extends SecurityExpressionRoot {
   }
 
   public Object getFilterObject() {
-    return filterObject;
+    return this.filterObject;
   }
 
   public Object getReturnObject() {
-    return returnObject;
+    return this.returnObject;
   }
 
   public void setFilterObject(final Object filterObject) {

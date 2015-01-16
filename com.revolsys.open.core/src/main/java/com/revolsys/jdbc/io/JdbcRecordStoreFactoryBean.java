@@ -13,7 +13,7 @@ import org.springframework.context.ApplicationContextAware;
 import com.revolsys.util.Property;
 
 public class JdbcRecordStoreFactoryBean extends
-  AbstractFactoryBean<JdbcRecordStore> implements ApplicationContextAware {
+AbstractFactoryBean<JdbcRecordStore> implements ApplicationContextAware {
 
   private Map<String, Object> config = new LinkedHashMap<String, Object>();
 
@@ -26,35 +26,35 @@ public class JdbcRecordStoreFactoryBean extends
   @Override
   protected JdbcRecordStore createInstance() throws Exception {
     JdbcRecordStore recordStore;
-    final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(applicationContext);
-    if (dataSource == null) {
-      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(config);
-      recordStore = databaseFactory.createRecordStore(config);
+    final JdbcFactoryRegistry jdbcFactoryRegistry = JdbcFactoryRegistry.getFactory(this.applicationContext);
+    if (this.dataSource == null) {
+      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(this.config);
+      recordStore = databaseFactory.createRecordStore(this.config);
     } else {
-      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(dataSource);
-      recordStore = databaseFactory.createRecordStore(dataSource);
+      final JdbcDatabaseFactory databaseFactory = jdbcFactoryRegistry.getDatabaseFactory(this.dataSource);
+      recordStore = databaseFactory.createRecordStore(this.dataSource);
     }
-    Property.set(recordStore, properties);
+    Property.set(recordStore, this.properties);
     recordStore.initialize();
     return recordStore;
   }
 
   @Override
   protected void destroyInstance(final JdbcRecordStore recordStore)
-    throws Exception {
+      throws Exception {
     recordStore.close();
-    config = null;
-    dataSource = null;
-    properties = null;
-    applicationContext = null;
+    this.config = null;
+    this.dataSource = null;
+    this.properties = null;
+    this.applicationContext = null;
   }
 
   public Map<String, Object> getConfig() {
-    return config;
+    return this.config;
   }
 
   public DataSource getDataSource() {
-    return dataSource;
+    return this.dataSource;
   }
 
   @Override
@@ -63,12 +63,12 @@ public class JdbcRecordStoreFactoryBean extends
   }
 
   public Map<String, Object> getProperties() {
-    return properties;
+    return this.properties;
   }
 
   @Override
   public void setApplicationContext(final ApplicationContext applicationContext)
-    throws BeansException {
+      throws BeansException {
     this.applicationContext = applicationContext;
   }
 

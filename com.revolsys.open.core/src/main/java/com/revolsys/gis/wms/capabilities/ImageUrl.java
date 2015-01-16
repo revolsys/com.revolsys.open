@@ -6,11 +6,11 @@ public class ImageUrl extends FormatUrl {
   private int height;
 
   public int getHeight() {
-    return height;
+    return this.height;
   }
 
   public int getWidth() {
-    return width;
+    return this.width;
   }
 
   public void setHeight(final int height) {

@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -73,7 +73,7 @@ public class JavaComponent extends Component {
   public boolean equals(final Object o) {
     if (o instanceof JavaComponent) {
       final JavaComponent c = (JavaComponent)o;
-      if (c.className.equals(className) && super.equals(o)) {
+      if (c.className.equals(this.className) && super.equals(o)) {
         return true;
       }
     }
@@ -82,28 +82,28 @@ public class JavaComponent extends Component {
 
   /**
    * Generate the hash code for the object.
-   * 
+   *
    * @return The hashCode.
    */
   @Override
   public int hashCode() {
-    return className.hashCode();
+    return this.className.hashCode();
   }
 
   @Override
   public void includeComponent(final PageContext context)
-    throws ServletException, IOException {
+      throws ServletException, IOException {
     Object instance;
     try {
-      instance = componentClass.newInstance();
+      instance = this.componentClass.newInstance();
     } catch (final Exception e) {
       throw new ServletException("Unable to create component instance", e);
     }
     try {
-      final Iterator propertyNames = properties.keySet().iterator();
+      final Iterator propertyNames = this.properties.keySet().iterator();
       while (propertyNames.hasNext()) {
         final String propertyName = (String)propertyNames.next();
-        Object value = properties.get(propertyName);
+        Object value = this.properties.get(propertyName);
         final WebUiContext niceContext = WebUiContext.get();
         try {
           final Expression expression = JexlUtil.createExpression(value.toString());
@@ -114,7 +114,7 @@ public class JavaComponent extends Component {
           throw new ServletException(e.getMessage(), e);
         }
 
-        setPropertyMethod.invoke(instance, new Object[] {
+        this.setPropertyMethod.invoke(instance, new Object[] {
           propertyName, value
         });
       }
@@ -128,7 +128,7 @@ public class JavaComponent extends Component {
     }
     try {
       final Writer out = context.getOut();
-      serializeMethod.invoke(instance, new Object[] {
+      this.serializeMethod.invoke(instance, new Object[] {
         out
       });
     } catch (final IllegalAccessException e) {
@@ -146,38 +146,38 @@ public class JavaComponent extends Component {
   private void setClassName(final String className) {
     this.className = className;
     try {
-      componentClass = Class.forName(className);
+      this.componentClass = Class.forName(className);
     } catch (final ClassNotFoundException e) {
       throw new IllegalArgumentException(e.getMessage());
     }
     try {
-      setPropertyMethod = componentClass.getMethod("setProperty",
+      this.setPropertyMethod = this.componentClass.getMethod("setProperty",
         SET_PROPERTY_ARGS);
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException(
         "Class "
-          + className
-          + " must have a method with the signature 'public void setProperty(String name, Object value)'");
+            + className
+            + " must have a method with the signature 'public void setProperty(String name, Object value)'");
     }
     try {
-      serializeMethod = componentClass.getMethod("serialize",
+      this.serializeMethod = this.componentClass.getMethod("serialize",
         SERIALIZE_METHOD_ARGS);
     } catch (final NoSuchMethodException e) {
       throw new IllegalArgumentException(
         "Class "
-          + className
-          + " must have a method with the signature 'public void serialize(Writer out) throws IOException'");
+            + className
+            + " must have a method with the signature 'public void serialize(Writer out) throws IOException'");
     }
   }
 
   public void setProperty(final String name, final String value) {
-    properties.put(name, value);
+    this.properties.put(name, value);
   }
 
   @Override
   public String toString() {
-    final StringBuilder s = new StringBuilder(className).append("(");
-    for (final Iterator props = properties.entrySet().iterator(); props.hasNext();) {
+    final StringBuilder s = new StringBuilder(this.className).append("(");
+    for (final Iterator props = this.properties.entrySet().iterator(); props.hasNext();) {
       final Map.Entry prop = (Map.Entry)props.next();
       s.append(prop.getKey()).append("=").append(prop.getValue());
       if (props.hasNext()) {

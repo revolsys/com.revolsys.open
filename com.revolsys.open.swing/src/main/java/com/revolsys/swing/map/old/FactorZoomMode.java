@@ -16,7 +16,7 @@ public class FactorZoomMode implements ZoomMode {
 
   /**
    * Get the best bounding box matching the zoom mode policy
-   * 
+   *
    * @param viewport The viewport.
    * @param boundingBox The bounding box.
    * @return The bounding box.
@@ -61,7 +61,7 @@ public class FactorZoomMode implements ZoomMode {
 
   /**
    * Zoom the map so that the specified bounding box is visible.
-   * 
+   *
    * @param viewport The viewport.
    * @param boundingBox The bounding box.
    */
@@ -75,7 +75,7 @@ public class FactorZoomMode implements ZoomMode {
   /**
    * Zoom the map to include the bounding box specified by the model coordinate
    * pair.
-   * 
+   *
    * @param viewport The viewport.
    * @param x1 The first x coordinate.
    * @param y1 The first y coordinate.
@@ -100,7 +100,7 @@ public class FactorZoomMode implements ZoomMode {
   /**
    * Zoom the map in by the multiplication at the view coordinate, re-centring
    * the map at the model coordinate represented by the view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -131,7 +131,7 @@ public class FactorZoomMode implements ZoomMode {
   /**
    * Zoom the map in one level at the view coordinate, with the model coordinate
    * being maintained at the same view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -139,13 +139,13 @@ public class FactorZoomMode implements ZoomMode {
   @Override
   public void zoomIn(final ComponentViewport2D viewport, final double x,
     final double y) {
-    zoomProportional(viewport, x, y, 1 / factor);
+    zoomProportional(viewport, x, y, 1 / this.factor);
   }
 
   /**
    * Zoom the map in one level at the view coordinate, re-centring the map at
    * the model coordinate represented by the view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -153,13 +153,13 @@ public class FactorZoomMode implements ZoomMode {
   @Override
   public void zoomInAndRecentre(final ComponentViewport2D viewport,
     final double x, final double y) {
-    zoomAndRecentre(viewport, x, y, 1 / factor);
+    zoomAndRecentre(viewport, x, y, 1 / this.factor);
   }
 
   /**
    * Zoom the map out one level at the view coordinate, with the model
    * coordinate being maintained at the same view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -167,13 +167,13 @@ public class FactorZoomMode implements ZoomMode {
   @Override
   public void zoomOut(final ComponentViewport2D viewport, final double x,
     final double y) {
-    zoomProportional(viewport, x, y, factor);
+    zoomProportional(viewport, x, y, this.factor);
   }
 
   /**
    * Zoom the map in one level at the view coordinate, re-centring the map at
    * the model coordinate represented by the view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.
@@ -181,13 +181,13 @@ public class FactorZoomMode implements ZoomMode {
   @Override
   public void zoomOutAndRecentre(final ComponentViewport2D viewport,
     final double x, final double y) {
-    zoomAndRecentre(viewport, x, y, factor);
+    zoomAndRecentre(viewport, x, y, this.factor);
   }
 
   /**
    * Zoom the map in by the multiplication factor at the view coordinate, with
    * the model coordinate being maintained at the same view coordinate.
-   * 
+   *
    * @param viewport The viewport to zoom.
    * @param x The x coordinate.
    * @param y The y coordinate.

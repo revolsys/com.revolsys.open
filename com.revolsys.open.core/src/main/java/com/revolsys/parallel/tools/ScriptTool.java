@@ -44,34 +44,16 @@ import com.revolsys.util.JexlUtil;
 import com.revolsys.util.ManifestUtil;
 
 public class ScriptTool {
-  private static final Logger LOG = LoggerFactory.getLogger(ScriptTool.class);
-
-  private static final String LOG_FILE = "logFile";
-
-  private static final String LOG_FILE_OPTION = "l";
-
-  private static final String PROPERTIES = "properties";
-
-  private static final String PROPERTIES_OPTION = "p";
-
-  private static final String SCRIPT = "script";
-
-  private static final String SCRIPT_OPTION = "s";
-
-  private static final String VERSION = "version";
-
-  private static final String VERSION_OPTION = "v";
-
   private static Throwable getBeanExceptionCause(final BeanCreationException e) {
     Throwable cause = e.getCause();
     if (cause == null) {
       return e;
     }
     while (cause instanceof BeanCreationException
-      || cause instanceof MethodInvocationException
-      || cause instanceof PropertyAccessException
-      || cause instanceof PropertyBatchUpdateException
-      || cause instanceof InvalidPropertyException) {
+        || cause instanceof MethodInvocationException
+        || cause instanceof PropertyAccessException
+        || cause instanceof PropertyBatchUpdateException
+        || cause instanceof InvalidPropertyException) {
       Throwable newCause;
       if (cause instanceof PropertyBatchUpdateException) {
         final PropertyBatchUpdateException batchEx = (PropertyBatchUpdateException)cause;
@@ -96,6 +78,24 @@ public class ScriptTool {
     app.start(args);
   }
 
+  private static final Logger LOG = LoggerFactory.getLogger(ScriptTool.class);
+
+  private static final String LOG_FILE = "logFile";
+
+  private static final String LOG_FILE_OPTION = "l";
+
+  private static final String PROPERTIES = "properties";
+
+  private static final String PROPERTIES_OPTION = "p";
+
+  private static final String SCRIPT = "script";
+
+  private static final String SCRIPT_OPTION = "s";
+
+  private static final String VERSION = "version";
+
+  private static final String VERSION_OPTION = "v";
+
   private CommandLine commandLine;
 
   private boolean displayVersion;
@@ -118,24 +118,24 @@ public class ScriptTool {
 
   private void createOptions() {
     final Option script = new Option(SCRIPT_OPTION, SCRIPT, true,
-      "the script file that defines the processor pipeline");
+        "the script file that defines the processor pipeline");
     script.setRequired(false);
-    options.addOption(script);
+    this.options.addOption(script);
 
     final Option logFile = new Option(LOG_FILE_OPTION, LOG_FILE, true,
-      "The file to write log messages to");
+        "The file to write log messages to");
     logFile.setRequired(false);
-    options.addOption(logFile);
+    this.options.addOption(logFile);
 
     final Option properties = new Option(PROPERTIES_OPTION, PROPERTIES, true,
-      "The file to load properties from");
+        "The file to load properties from");
     properties.setRequired(false);
-    options.addOption(properties);
+    this.options.addOption(properties);
 
     final Option version = new Option(VERSION_OPTION, VERSION, false,
-      "Display the version number");
+        "Display the version number");
     properties.setRequired(false);
-    options.addOption(version);
+    this.options.addOption(version);
 
     OptionBuilder.withDescription("use value for given property");
     OptionBuilder.withArgName("property=value");
@@ -143,11 +143,11 @@ public class ScriptTool {
     OptionBuilder.hasArgs(2);
     final Option property = OptionBuilder.create("D");
 
-    options.addOption(property);
+    this.options.addOption(property);
   }
 
   private void displayVersion() {
-    displayVersion = true;
+    this.displayVersion = true;
     final String implementationTitle = System.getProperty("script.implementationTitle");
     if (implementationTitle != null) {
       final String build = ManifestUtil.getMainAttributeByImplementationTitle(
@@ -194,57 +194,56 @@ public class ScriptTool {
     try {
       loadProperties("script.properties");
       final CommandLineParser parser = new PosixParser();
-      commandLine = parser.parse(options, args);
-      final Option[] options = commandLine.getOptions();
-      for (int i = 0; i < options.length; i++) {
-        final Option option = options[i];
+      this.commandLine = parser.parse(this.options, args);
+      final Option[] options = this.commandLine.getOptions();
+      for (final Option option : options) {
         final String shortOpt = option.getOpt();
         if (shortOpt != null && shortOpt.equals("D")) {
-          final Properties properties = commandLine.getOptionProperties("D");
+          final Properties properties = this.commandLine.getOptionProperties("D");
           for (final Entry<Object, Object> property : properties.entrySet()) {
             final String key = (String)property.getKey();
             final String value = (String)property.getValue();
-            parameters.put(key, value);
+            this.parameters.put(key, value);
             System.setProperty(key, value);
             ThreadSharedAttributes.setAttribute(key, value);
           }
         }
 
       }
-      if (commandLine.hasOption(SCRIPT_OPTION)) {
-        if (!setScriptFileName(commandLine.getOptionValue(SCRIPT_OPTION))) {
+      if (this.commandLine.hasOption(SCRIPT_OPTION)) {
+        if (!setScriptFileName(this.commandLine.getOptionValue(SCRIPT_OPTION))) {
           return false;
         }
       }
-      if (commandLine.hasOption(PROPERTIES_OPTION)) {
-        propertiesName = commandLine.getOptionValue(PROPERTIES_OPTION);
+      if (this.commandLine.hasOption(PROPERTIES_OPTION)) {
+        this.propertiesName = this.commandLine.getOptionValue(PROPERTIES_OPTION);
         try {
-          final File propertiesFile = new File(propertiesName);
+          final File propertiesFile = new File(this.propertiesName);
           if (propertiesFile.exists()) {
             final InputStream in = new FileInputStream(propertiesFile);
-            loadProperties(propertiesName, in);
+            loadProperties(this.propertiesName, in);
           } else {
-            if (!loadProperties(propertiesName)) {
-              System.err.println("Properties file '" + propertiesName
+            if (!loadProperties(this.propertiesName)) {
+              System.err.println("Properties file '" + this.propertiesName
                 + "' does not exist");
               return false;
             }
           }
 
         } catch (final IOException e) {
-          System.err.println("Properties file '" + propertiesName
+          System.err.println("Properties file '" + this.propertiesName
             + "' could not be read:" + e.getMessage());
           return false;
         }
       }
 
-      if (commandLine.hasOption(LOG_FILE_OPTION)) {
-        logFile = new File(commandLine.getOptionValue(LOG_FILE_OPTION));
-        final File logDirectory = logFile.getParentFile();
+      if (this.commandLine.hasOption(LOG_FILE_OPTION)) {
+        this.logFile = new File(this.commandLine.getOptionValue(LOG_FILE_OPTION));
+        final File logDirectory = this.logFile.getParentFile();
         if (!logDirectory.exists()) {
           if (!logDirectory.mkdirs()) {
             System.err.println("Unable to create Log directory '"
-              + logDirectory.getAbsolutePath() + "'");
+                + logDirectory.getAbsolutePath() + "'");
             return false;
           }
         }
@@ -265,20 +264,20 @@ public class ScriptTool {
           }
         }
       }
-      if (logFile != null) {
-        if (logFile.exists() && !logFile.isFile()) {
-          System.err.println("Log file '" + logFile.getAbsolutePath()
+      if (this.logFile != null) {
+        if (this.logFile.exists() && !this.logFile.isFile()) {
+          System.err.println("Log file '" + this.logFile.getAbsolutePath()
             + "' is not a file");
           return false;
         }
-        System.setProperty("logFile", logFile.getAbsolutePath());
+        System.setProperty("logFile", this.logFile.getAbsolutePath());
       }
-      if (commandLine.hasOption(VERSION_OPTION)) {
+      if (this.commandLine.hasOption(VERSION_OPTION)) {
         displayVersion();
         return false;
       }
-      if (scriptFileName == null) {
-        final String[] extraArgs = commandLine.getArgs();
+      if (this.scriptFileName == null) {
+        final String[] extraArgs = this.commandLine.getArgs();
         if (extraArgs.length > 0) {
           if (!setScriptFileName(extraArgs[0])) {
             return false;
@@ -287,7 +286,7 @@ public class ScriptTool {
       }
       return true;
     } catch (final MissingOptionException e) {
-      if (commandLine.hasOption(VERSION_OPTION)) {
+      if (this.commandLine.hasOption(VERSION_OPTION)) {
         displayVersion();
       } else {
         System.err.println("Missing " + e.getMessage() + " argument");
@@ -295,7 +294,7 @@ public class ScriptTool {
       return false;
     } catch (final ParseException e) {
       System.err.println("Unable to process command line arguments: "
-        + e.getMessage());
+          + e.getMessage());
       return false;
     }
   }
@@ -304,37 +303,37 @@ public class ScriptTool {
     final long startTime = System.currentTimeMillis();
 
     final ThreadLocalFileAppender localAppender = ThreadLocalFileAppender.getAppender();
-    if (localAppender != null && logFile != null) {
-      final File parentFile = logFile.getParentFile();
+    if (localAppender != null && this.logFile != null) {
+      final File parentFile = this.logFile.getParentFile();
       if (parentFile != null) {
         parentFile.mkdirs();
       }
-      localAppender.setLocalFile(logFile.getAbsolutePath());
-    } else if (logFile != null) {
+      localAppender.setLocalFile(this.logFile.getAbsolutePath());
+    } else if (this.logFile != null) {
 
       final org.apache.log4j.Logger rootLogger = org.apache.log4j.Logger.getRootLogger();
       try {
         final Layout layout = new PatternLayout("%d\t%p\t%m%n");
         final Appender appender = new FileAppender(layout,
-          logFile.getAbsolutePath(), false);
+          this.logFile.getAbsolutePath(), false);
         rootLogger.addAppender(appender);
       } catch (final IOException e) {
         final Layout layout = new PatternLayout("%p\t%m%n");
         final Appender appender = new ConsoleAppender(layout);
         rootLogger.addAppender(appender);
-        LOG.error("Cannot find log file " + logFile, e);
+        LOG.error("Cannot find log file " + this.logFile, e);
       }
 
     }
 
     final StringBuilder message = new StringBuilder("Processing ");
     message.append(" -s ");
-    message.append(scriptFileName);
-    if (propertiesName != null) {
+    message.append(this.scriptFileName);
+    if (this.propertiesName != null) {
       message.append(" -p ");
-      message.append(propertiesName);
+      message.append(this.propertiesName);
     }
-    for (final Entry<String, String> parameter : parameters.entrySet()) {
+    for (final Entry<String, String> parameter : this.parameters.entrySet()) {
       message.append(" ");
       message.append(parameter.getKey());
       message.append("=");
@@ -352,12 +351,12 @@ public class ScriptTool {
       beans.getBeanFactory().addPropertyEditorRegistrar(
         new ResourceEditorRegistrar());
 
-      if (scriptFile != null) {
+      if (this.scriptFile != null) {
         new XmlBeanDefinitionReader(beans).loadBeanDefinitions("file:"
-          + scriptFile.getAbsolutePath());
+            + this.scriptFile.getAbsolutePath());
       } else {
         new XmlBeanDefinitionReader(beans).loadBeanDefinitions("classpath:"
-          + scriptFileName);
+            + this.scriptFileName);
       }
       beans.refresh();
       try {
@@ -387,7 +386,7 @@ public class ScriptTool {
   private boolean setScriptFileName(final String scriptFileName) {
     if (new File(scriptFileName).exists()) {
       this.scriptFileName = scriptFileName;
-      scriptFile = new File(scriptFileName);
+      this.scriptFile = new File(scriptFileName);
       return true;
     } else if (getClass().getClassLoader().getResource(scriptFileName) == null) {
       System.err.println("The script '" + scriptFileName + "' does not exist");
@@ -402,9 +401,9 @@ public class ScriptTool {
     if (processArguments(args)) {
       run();
     } else {
-      if (!displayVersion) {
+      if (!this.displayVersion) {
         final HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("scriptTool", options);
+        formatter.printHelp("scriptTool", this.options);
       }
     }
 

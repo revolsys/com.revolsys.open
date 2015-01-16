@@ -5,6 +5,10 @@ import java.util.NoSuchElementException;
 import com.revolsys.jts.geom.MultiPoint;
 
 public class MultiPointVertex extends AbstractVertex {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private int partIndex;
 
   public MultiPointVertex(final MultiPoint geometry, final int... vertexId) {

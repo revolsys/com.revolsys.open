@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,40 +48,40 @@ public class Argument {
     this.inheritable = inheritable;
     if (type != null) {
       try {
-        constructor = type.getConstructor(new Class[] {
+        this.constructor = type.getConstructor(new Class[] {
           String.class
         });
       } catch (final NoSuchMethodException e) {
         throw new IllegalArgumentException(
           type.getName()
-            + " must have a constructor that takes a java.lang.String as an argument");
+          + " must have a constructor that takes a java.lang.String as an argument");
       }
     }
   }
 
   public String getDefault() {
-    return defaultValue;
+    return this.defaultValue;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public Class getType() {
-    return type;
+    return this.type;
   }
 
   public boolean isInheritable() {
-    return inheritable;
+    return this.inheritable;
   }
 
   public boolean isRequired() {
-    return required;
+    return this.required;
   }
 
   /**
    * Convert the string value into an object of the specified type.
-   * 
+   *
    * @param value
    * @return
    */
@@ -89,7 +89,7 @@ public class Argument {
     Object[] args;
     if (value == null) {
       args = new Object[] {
-        defaultValue
+        this.defaultValue
       };
     } else {
       args = new Object[] {
@@ -97,7 +97,7 @@ public class Argument {
       };
     }
     try {
-      return constructor.newInstance(args);
+      return this.constructor.newInstance(args);
     } catch (final InstantiationException e) {
       throw new RuntimeException(e.getMessage(), e);
     } catch (final IllegalAccessException e) {

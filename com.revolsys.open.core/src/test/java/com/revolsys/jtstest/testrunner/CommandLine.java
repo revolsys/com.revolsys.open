@@ -49,17 +49,17 @@ public class CommandLine {
   Vector optVec = new Vector(); // used to store options in order of entry
 
   char optionChar; // the char that indicates an option. Default is '/', which
-                   // is
-                   // NT Standard, but this causes problems on Unix systems, so
-                   // '-' should
-                   // be used for cross-platform apps
+  // is
+  // NT Standard, but this causes problems on Unix systems, so
+  // '-' should
+  // be used for cross-platform apps
 
   public CommandLine() {
     this('/');
   }
 
   public CommandLine(final char optionCh) {
-    optionChar = optionCh;
+    this.optionChar = optionCh;
   }
 
   /**
@@ -67,14 +67,14 @@ public class CommandLine {
    */
   void addOption(final Option opt) {
     final String name = opt.getName();
-    ((OptionSpec)optSpecs.get(name.toLowerCase())).addOption(opt);
+    ((OptionSpec)this.optSpecs.get(name.toLowerCase())).addOption(opt);
   }
 
   public void addOptionSpec(final OptionSpec optSpec) {
     final String name = optSpec.getName();
     // should check for duplicate option names here
-    optSpecs.put(name.toLowerCase(), optSpec);
-    optVec.add(optSpec);
+    this.optSpecs.put(name.toLowerCase(), optSpec);
+    this.optVec.add(optSpec);
   }
 
   public Option getOption(final String name) {
@@ -91,8 +91,8 @@ public class CommandLine {
   }
 
   OptionSpec getOptionSpec(final String name) {
-    if (optSpecs.containsKey(name.toLowerCase())) {
-      return (OptionSpec)optSpecs.get(name.toLowerCase());
+    if (this.optSpecs.containsKey(name.toLowerCase())) {
+      return (OptionSpec)this.optSpecs.get(name.toLowerCase());
     }
     return null;
   }
@@ -112,7 +112,7 @@ public class CommandLine {
     int i = 0;
     int paramStart;
     while (i < args.length) {
-      if (args[i].charAt(0) == optionChar) {
+      if (args[i].charAt(0) == this.optionChar) {
         optName = args[i].substring(1);
         noOptMsg = "Invalid option: " + args[i];
         paramStart = i + 1;
@@ -153,7 +153,7 @@ public class CommandLine {
       expected = 999999999;
     }
     while (i < args.length && count < expected
-      && args[i].charAt(0) != optionChar) {
+        && args[i].charAt(0) != this.optionChar) {
       params.addElement(args[i++]);
       count++;
     }
@@ -162,9 +162,9 @@ public class CommandLine {
   public void printDoc(final PrintStream out) {
     OptionSpec os = null;
     out.println("Options:");
-    for (final Iterator i = optVec.iterator(); i.hasNext();) {
+    for (final Iterator i = this.optVec.iterator(); i.hasNext();) {
       os = (OptionSpec)i.next();
-      String name = optionChar + os.getName();
+      String name = this.optionChar + os.getName();
       if (os.getName() == OptionSpec.OPTION_FREE_ARGS) {
         name = "(free)";
       }

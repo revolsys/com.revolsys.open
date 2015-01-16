@@ -222,7 +222,7 @@ public class ProjectFrame extends BaseFrame {
     if (directory != null) {
       addToRecentProjects(directory);
       Invoke.later(this, "setTitle", this.project.getName() + " - "
-        + this.frameTitle);
+          + this.frameTitle);
     }
   }
 
@@ -344,7 +344,7 @@ public class ProjectFrame extends BaseFrame {
     final MenuFactory file = new MenuFactory("File");
 
     file.addMenuItemTitleIcon("projectOpen", "New Project", "layout_add", this,
-      "actionNewProject").setAcceleratorControlKey(KeyEvent.VK_N);
+        "actionNewProject").setAcceleratorControlKey(KeyEvent.VK_N);
 
     file.addMenuItemTitleIcon("projectOpen", "Open Project...", "layout_add",
       this, "actionOpenProject").setAcceleratorControlKey(KeyEvent.VK_O);
@@ -363,16 +363,16 @@ public class ProjectFrame extends BaseFrame {
       SaveAsPdf.class, "save");
 
     file.addMenuItemTitleIcon("print", "Print", "printer", SinglePage.class,
-      "print").setAcceleratorControlKey(KeyEvent.VK_P);
+        "print").setAcceleratorControlKey(KeyEvent.VK_P);
 
     if (OS.isWindows()) {
       file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit")
-        .setAcceleratorKey(
-          KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK));
+      .setAcceleratorKey(
+        KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
     } else if (OS.isUnix()) {
       file.addMenuItemTitleIcon("exit", "Exit", null, this, "exit")
-        .setAcceleratorKey(
-          KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK));
+      .setAcceleratorKey(
+        KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
     }
 
     return file;
@@ -384,10 +384,10 @@ public class ProjectFrame extends BaseFrame {
     tools.addCheckboxMenuItem("map",
       new InvokeMethodAction("Measure", Icons.getIcon("ruler"), map,
         "toggleMode", MeasureOverlay.MEASURE), new ObjectPropertyEnableCheck(
-        map, "overlayAction", MeasureOverlay.MEASURE));
+          map, "overlayAction", MeasureOverlay.MEASURE));
 
     tools.addMenuItemTitleIcon("script", "Run Script...", "script_go", this,
-      "actionRunScript");
+        "actionRunScript");
     return tools;
   }
 
@@ -587,7 +587,7 @@ public class ProjectFrame extends BaseFrame {
     final FileSystemResource resource = new FileSystemResource(projectDirectory);
     this.project.readProject(resource);
     Invoke.later(this, "setTitle", this.project.getName() + " - "
-      + this.frameTitle);
+        + this.frameTitle);
 
     final Object frameBoundsObject = this.project.getProperty("frameBounds");
     setBounds(frameBoundsObject);
@@ -626,7 +626,7 @@ public class ProjectFrame extends BaseFrame {
         Invoke.background("Load project", this, "loadProject", projectDirectory);
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to open project:"
-          + projectDirectory, e);
+            + projectDirectory, e);
       }
     }
   }

@@ -21,6 +21,11 @@ import com.revolsys.jts.geom.vertex.Vertex;
 public abstract class AbstractMultiPoint extends AbstractGeometryCollection
 implements MultiPoint {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V appendVertex(final Point newPoint,

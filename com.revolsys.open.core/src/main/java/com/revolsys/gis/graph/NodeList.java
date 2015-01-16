@@ -18,13 +18,13 @@ public class NodeList<T> extends AbstractList<Node<T>> {
   @Override
   public void add(final int index, final Node<T> node) {
     final int nodeId = node.getId();
-    nodeIds.add(index, nodeId);
+    this.nodeIds.add(index, nodeId);
   }
 
   @Override
   public boolean add(final Node<T> node) {
     final int nodeId = node.getId();
-    return nodeIds.add(nodeId);
+    return this.nodeIds.add(nodeId);
   }
 
   @Override
@@ -49,8 +49,8 @@ public class NodeList<T> extends AbstractList<Node<T>> {
 
   @Override
   public Node<T> get(final int index) {
-    final Integer nodeId = nodeIds.get(index);
-    return graph.getNode(nodeId);
+    final Integer nodeId = this.nodeIds.get(index);
+    return this.graph.getNode(nodeId);
   }
 
   @Override
@@ -59,7 +59,7 @@ public class NodeList<T> extends AbstractList<Node<T>> {
       @SuppressWarnings("unchecked")
       final Node<T> node = (Node<T>)o;
       final Object id = node.getId();
-      return nodeIds.remove(id);
+      return this.nodeIds.remove(id);
     } else {
       return false;
     }
@@ -77,13 +77,13 @@ public class NodeList<T> extends AbstractList<Node<T>> {
   @Override
   public Node<T> set(final int index, final Node<T> edge) {
     final int nodeId = edge.getId();
-    nodeIds.set(index, nodeId);
+    this.nodeIds.set(index, nodeId);
     return edge;
   }
 
   @Override
   public int size() {
-    return nodeIds.size();
+    return this.nodeIds.size();
   }
 
 }

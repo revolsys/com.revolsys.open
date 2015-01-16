@@ -16,9 +16,9 @@ public class ProcessRunnable extends AbstractRunnable {
   @Override
   public void doRun() {
     try {
-      process.run();
+      this.process.run();
     } finally {
-      processManager.removeProcess(process);
+      this.processManager.removeProcess(this.process);
     }
   }
 }

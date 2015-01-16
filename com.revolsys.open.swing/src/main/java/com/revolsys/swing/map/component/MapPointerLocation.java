@@ -102,7 +102,7 @@ PropertyChangeListener {
     }
     final int srid = geometryFactory.getSrid();
     this.geometryFactory = geometryFactory;
-    CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     this.setToolTipText(coordinateSystem.getName());
     this.title = String.valueOf(srid);
 

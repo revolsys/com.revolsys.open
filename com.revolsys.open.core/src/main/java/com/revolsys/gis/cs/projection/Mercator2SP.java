@@ -36,28 +36,28 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
     this.lambda0 = Math.toRadians(centralMeridian);
     this.a = spheroid.getSemiMajorAxis();
     this.e = spheroid.getEccentricity();
-    this.eOver2 = e / 2;
+    this.eOver2 = this.e / 2;
     this.phi1 = cs.getDoubleParameter(ProjectionParameterNames.STANDARD_PARALLEL_1);
-    final double sinPhi1 = Math.sin(phi1);
-    this.multiple = Math.cos(phi1) / Math.sqrt(1 - e * e * sinPhi1 * sinPhi1);
+    final double sinPhi1 = Math.sin(this.phi1);
+    this.multiple = Math.cos(this.phi1) / Math.sqrt(1 - this.e * this.e * sinPhi1 * sinPhi1);
   }
 
   @Override
   public void inverse(final double x, final double y,
     final double[] targetCoordinates, final int targetOffset,
     final int targetAxisCount) {
-    final double dX = (x - x0) / multiple;
-    final double dY = (y - y0) / multiple;
+    final double dX = (x - this.x0) / this.multiple;
+    final double dY = (y - this.y0) / this.multiple;
 
-    final double lambda = dX / a + lambda0;
+    final double lambda = dX / this.a + this.lambda0;
 
-    final double t = Math.pow(Math.E, -dY / a);
+    final double t = Math.pow(Math.E, -dY / this.a);
     double phi = Angle.PI_OVER_2 - 2 * Math.atan(t);
     double delta = 10e010;
     do {
-      final double eSinPhi = e * Math.sin(phi);
+      final double eSinPhi = this.e * Math.sin(phi);
       final double phi1 = Angle.PI_OVER_2 - 2
-        * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), eOver2));
+          * Math.atan(t * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2));
       delta = Math.abs(phi1 - phi);
       phi = phi1;
     } while (delta > 1.0e-011);
@@ -71,15 +71,15 @@ public class Mercator2SP extends AbstractCoordinatesProjection {
     final double[] targetCoordinates, final int targetOffset,
     final int targetAxisCount) {
 
-    final double x = (a * (lambda - lambda0)) * multiple;
+    final double x = this.a * (lambda - this.lambda0) * this.multiple;
 
-    final double eSinPhi = e * Math.sin(phi);
-    final double y = (a * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2)
-      * Math.pow((1 - eSinPhi) / (1 + eSinPhi), eOver2)))
-      * multiple;
+    final double eSinPhi = this.e * Math.sin(phi);
+    final double y = this.a * Math.log(Math.tan(Angle.PI_OVER_4 + phi / 2)
+      * Math.pow((1 - eSinPhi) / (1 + eSinPhi), this.eOver2))
+      * this.multiple;
 
-    targetCoordinates[targetOffset * targetAxisCount] = x0 + x;
-    targetCoordinates[targetOffset * targetAxisCount + 1] = y0 + y;
+    targetCoordinates[targetOffset * targetAxisCount] = this.x0 + x;
+    targetCoordinates[targetOffset * targetAxisCount + 1] = this.y0 + y;
   }
 
 }

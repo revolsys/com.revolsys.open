@@ -38,9 +38,9 @@ import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.math.Vector3D;
 
 /**
- * Basic computational geometry algorithms 
+ * Basic computational geometry algorithms
  * for geometry and coordinates defined in 3-dimensional Cartesian space.
- * 
+ *
  * @author mdavis
  *
  */
@@ -72,15 +72,15 @@ public class CGAlgorithms3D {
      */
 
     final double len2 = (B.getX() - A.getX()) * (B.getX() - A.getX())
-      + (B.getY() - A.getY()) * (B.getY() - A.getY()) + (B.getZ() - A.getZ())
-      * (B.getZ() - A.getZ());
+        + (B.getY() - A.getY()) * (B.getY() - A.getY()) + (B.getZ() - A.getZ())
+        * (B.getZ() - A.getZ());
     if (Double.isNaN(len2)) {
       throw new IllegalArgumentException("Ordinates must not be NaN");
     }
     final double r = ((p.getX() - A.getX()) * (B.getX() - A.getX())
-      + (p.getY() - A.getY()) * (B.getY() - A.getY()) + (p.getZ() - A.getZ())
-      * (B.getZ() - A.getZ()))
-      / len2;
+        + (p.getY() - A.getY()) * (B.getY() - A.getY()) + (p.getZ() - A.getZ())
+        * (B.getZ() - A.getZ()))
+        / len2;
 
     if (r <= 0.0) {
       return distance(p, A);
@@ -102,7 +102,7 @@ public class CGAlgorithms3D {
 
   /**
    * Computes the distance between two 3D segments.
-   * 
+   *
    * @param A the start point of the first segment
    * @param B the end point of the first segment
    * @param C the start point of the second segment
@@ -112,7 +112,7 @@ public class CGAlgorithms3D {
   public static double distanceSegmentSegment(final Point A, final Point B,
     final Point C, final Point D) {
     /**
-     * This calculation is susceptible to roundoff errors when 
+     * This calculation is susceptible to roundoff errors when
      * passed large ordinate values.
      * It may be possible to improve this by using {@link DD} arithmetic.
      */
@@ -141,7 +141,7 @@ public class CGAlgorithms3D {
     double t;
     if (denom <= 0.0) {
       /**
-       * The lines are parallel. 
+       * The lines are parallel.
        * In this case solve for the parameters s and t by assuming s is 0.
        */
       s = 0;

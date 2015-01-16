@@ -5,7 +5,7 @@ import javax.swing.JPanel;
 
 public class NamedJPanel extends JPanel {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 226865239947837466L;
 

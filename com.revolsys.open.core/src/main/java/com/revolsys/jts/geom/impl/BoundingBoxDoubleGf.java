@@ -971,6 +971,7 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     return getMin(1);
   }
 
+  @Override
   public Point getRandomPointWithin() {
     final double x = getMinX() + getWidth() * Math.random();
     final double y = getMinY() + getHeight() * Math.random();

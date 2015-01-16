@@ -64,18 +64,18 @@ public class EdgeString {
    * Adds a directed edge which is known to form part of this line.
    */
   public void add(final LineMergeDirectedEdge directedEdge) {
-    directedEdges.add(directedEdge);
+    this.directedEdges.add(directedEdge);
   }
 
   /**
    * Converts this EdgeString into a LineString.
    */
   public LineString toLineString() {
-    if (line == null) {
+    if (this.line == null) {
       int forwardDirectedEdges = 0;
       int reverseDirectedEdges = 0;
       final CoordinateList coordinateList = new CoordinateList();
-      for (final LineMergeDirectedEdge directedEdge : directedEdges) {
+      for (final LineMergeDirectedEdge directedEdge : this.directedEdges) {
         if (directedEdge.getEdgeDirection()) {
           forwardDirectedEdges++;
         } else {
@@ -85,11 +85,11 @@ public class EdgeString {
         coordinateList.add(edge.getLine(), false,
           directedEdge.getEdgeDirection());
       }
-      line = factory.lineString(coordinateList);
+      this.line = this.factory.lineString(coordinateList);
       if (reverseDirectedEdges > forwardDirectedEdges) {
-        line = line.reverse();
+        this.line = this.line.reverse();
       }
     }
-    return line;
+    return this.line;
   }
 }

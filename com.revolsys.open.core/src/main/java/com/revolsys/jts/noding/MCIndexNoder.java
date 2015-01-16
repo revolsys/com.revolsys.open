@@ -64,7 +64,7 @@ public class MCIndexNoder extends SinglePassNoder {
       final MonotoneChain mc2, final int start2) {
       final SegmentString ss1 = (SegmentString)mc1.getContext();
       final SegmentString ss2 = (SegmentString)mc2.getContext();
-      si.processIntersections(ss1, start1, ss2, start2);
+      this.si.processIntersections(ss1, start1, ss2, start2);
     }
 
   }
@@ -88,9 +88,9 @@ public class MCIndexNoder extends SinglePassNoder {
     final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(
       segStr.getPoints(), segStr);
     for (final MonotoneChain mc : segChains) {
-      mc.setId(idCounter++);
-      index.insert(mc.getEnvelope(), mc);
-      monoChains.add(mc);
+      mc.setId(this.idCounter++);
+      this.index.insert(mc.getEnvelope(), mc);
+      this.monoChains.add(mc);
     }
   }
 
@@ -99,7 +99,7 @@ public class MCIndexNoder extends SinglePassNoder {
   })
   @Override
   public void computeNodes(final Collection<NodedSegmentString> segments) {
-    this.nodedSegStrings = (Collection)segments;
+    this.nodedSegStrings = segments;
     for (final SegmentString segment : segments) {
       add(segment);
     }
@@ -107,11 +107,11 @@ public class MCIndexNoder extends SinglePassNoder {
   }
 
   public SpatialIndex getIndex() {
-    return index;
+    return this.index;
   }
 
   public List<MonotoneChain> getMonotoneChains() {
-    return monoChains;
+    return this.monoChains;
   }
 
   @SuppressWarnings({
@@ -119,16 +119,16 @@ public class MCIndexNoder extends SinglePassNoder {
   })
   @Override
   public Collection<NodedSegmentString> getNodedSubstrings() {
-    return (Collection)NodedSegmentString.getNodedSubstrings(nodedSegStrings);
+    return NodedSegmentString.getNodedSubstrings(this.nodedSegStrings);
   }
 
   @SuppressWarnings("unchecked")
   private void intersectChains() {
     final MonotoneChainOverlapAction overlapAction = new SegmentOverlapAction(
-      segInt);
+      this.segInt);
 
-    for (final MonotoneChain queryChain : monoChains) {
-      final List<MonotoneChain> overlapChains = index.query(queryChain.getEnvelope());
+    for (final MonotoneChain queryChain : this.monoChains) {
+      final List<MonotoneChain> overlapChains = this.index.query(queryChain.getEnvelope());
       for (final MonotoneChain testChain : overlapChains) {
         /**
          * following test makes sure we only compare each pair of chains once
@@ -138,7 +138,7 @@ public class MCIndexNoder extends SinglePassNoder {
           queryChain.computeOverlaps(testChain, overlapAction);
         }
         // short-circuit if possible
-        if (segInt.isDone()) {
+        if (this.segInt.isDone()) {
           return;
         }
       }

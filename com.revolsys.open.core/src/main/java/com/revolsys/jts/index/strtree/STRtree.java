@@ -63,9 +63,14 @@ import com.revolsys.jts.util.PriorityQueue;
  * @version 1.7
  */
 public class STRtree extends AbstractSTRtree implements SpatialIndex,
-  Serializable {
+Serializable {
 
   private static final class STRtreeNode extends AbstractNode {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     private STRtreeNode(final int level) {
       super(level);
     }
@@ -85,8 +90,20 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
     }
   }
 
+  private static double avg(final double a, final double b) {
+    return (a + b) / 2d;
+  }
+
+  private static double centreX(final BoundingBox e) {
+    return avg(e.getMinX(), e.getMaxX());
+  }
+
+  private static double centreY(final BoundingBox e) {
+    return avg(e.getMinY(), e.getMaxY());
+  }
+
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 259274702368956900L;
 
@@ -115,18 +132,6 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
 
   private static final int DEFAULT_NODE_CAPACITY = 10;
 
-  private static double avg(final double a, final double b) {
-    return (a + b) / 2d;
-  }
-
-  private static double centreX(final BoundingBox e) {
-    return avg(e.getMinX(), e.getMaxX());
-  }
-
-  private static double centreY(final BoundingBox e) {
-    return avg(e.getMinY(), e.getMaxY());
-  }
-
   /**
    * Constructs an STRtree with the default node capacity.
    */
@@ -139,7 +144,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
    * a node may have.
    * <p>
    * The minimum recommended capacity setting is 4.
-   * 
+   *
    */
   public STRtree(final int nodeCapacity) {
     super(nodeCapacity);
@@ -161,7 +166,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
   protected List createParentBoundables(final List childBoundables,
     final int newLevel) {
     Assert.isTrue(!childBoundables.isEmpty());
-    final int minLeafCount = (int)Math.ceil((childBoundables.size() / (double)getNodeCapacity()));
+    final int minLeafCount = (int)Math.ceil(childBoundables.size() / (double)getNodeCapacity());
     final ArrayList sortedChildBoundables = new ArrayList(childBoundables);
     Collections.sort(sortedChildBoundables, xComparator);
     final List[] verticalSlices = verticalSlices(sortedChildBoundables,
@@ -178,9 +183,9 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
     final List[] verticalSlices, final int newLevel) {
     Assert.isTrue(verticalSlices.length > 0);
     final List parentBoundables = new ArrayList();
-    for (int i = 0; i < verticalSlices.length; i++) {
+    for (final List verticalSlice : verticalSlices) {
       parentBoundables.addAll(createParentBoundablesFromVerticalSlice(
-        verticalSlices[i], newLevel));
+        verticalSlice, newLevel));
     }
     return parentBoundables;
   }
@@ -251,8 +256,8 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
        * If the pair members are leaves
        * then their distance is the exact lower bound.
        * Update the distanceLowerBound to reflect this
-       * (which must be smaller, due to the test 
-       * immediately prior to this). 
+       * (which must be smaller, due to the test
+       * immediately prior to this).
        */
       if (bndPair.isLeaves()) {
         // assert: currentDistance < minimumDistanceFound
@@ -268,7 +273,7 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
 
         /**
          * Otherwise, expand one side of the pair,
-         * (the choice of which side to expand is heuristically determined) 
+         * (the choice of which side to expand is heuristically determined)
          * and insert the new expanded pairs into the queue
          */
         bndPair.expandToQueue(priQ, distanceLowerBound);
@@ -282,16 +287,16 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
   }
 
   /**
-   * Finds the item in this tree which is nearest to the given {@link Object}, 
+   * Finds the item in this tree which is nearest to the given {@link Object},
    * using {@link ItemDistance} as the distance metric.
    * A Branch-and-Bound tree traversal algorithm is used
    * to provide an efficient search.
    * <p>
-   * The query <tt>object</tt> does <b>not</b> have to be 
-   * contained in the tree, but it does 
-   * have to be compatible with the <tt>itemDist</tt> 
-   * distance metric. 
-   * 
+   * The query <tt>object</tt> does <b>not</b> have to be
+   * contained in the tree, but it does
+   * have to be compatible with the <tt>itemDist</tt>
+   * distance metric.
+   *
    * @param env the envelope of the query item
    * @param item the item to find the nearest neighbour of
    * @param itemDist a distance metric applicable to the items in this tree and the query item
@@ -305,11 +310,11 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
   }
 
   /**
-   * Finds the two nearest items in the tree, 
+   * Finds the two nearest items in the tree,
    * using {@link ItemDistance} as the distance metric.
    * A Branch-and-Bound tree traversal algorithm is used
    * to provide an efficient search.
-   * 
+   *
    * @param itemDist a distance metric applicable to the items in this tree
    * @return the pair of the nearest items
    */
@@ -320,15 +325,15 @@ public class STRtree extends AbstractSTRtree implements SpatialIndex,
   }
 
   /**
-   * Finds the two nearest items from this tree 
+   * Finds the two nearest items from this tree
    * and another tree,
    * using {@link ItemDistance} as the distance metric.
    * A Branch-and-Bound tree traversal algorithm is used
    * to provide an efficient search.
-   * The result value is a pair of items, 
+   * The result value is a pair of items,
    * the first from this tree and the second
    * from the argument tree.
-   * 
+   *
    * @param tree another tree
    * @param itemDist a distance metric applicable to the items in the trees
    * @return the pair of the nearest items, one from each tree

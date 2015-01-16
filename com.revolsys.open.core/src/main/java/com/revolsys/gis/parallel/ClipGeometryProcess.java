@@ -10,7 +10,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
 
 public class ClipGeometryProcess extends
-  BaseInOutProcess<Record, Record> {
+BaseInOutProcess<Record, Record> {
 
   private Polygon clipPolygon;
 
@@ -18,7 +18,7 @@ public class ClipGeometryProcess extends
    * @return the clipPolygon
    */
   public Polygon getClipPolygon() {
-    return clipPolygon;
+    return this.clipPolygon;
   }
 
   @Override
@@ -26,9 +26,9 @@ public class ClipGeometryProcess extends
     final Channel<Record> out, final Record object) {
     final Geometry geometry = object.getGeometryValue();
     if (geometry != null) {
-      final Geometry intersection = geometry.intersection(clipPolygon);
+      final Geometry intersection = geometry.intersection(this.clipPolygon);
       if (!intersection.isEmpty()
-        && intersection.getClass() == geometry.getClass()) {
+          && intersection.getClass() == geometry.getClass()) {
         if (intersection instanceof LineString) {
           final LineString original = (LineString)geometry;
           LineString lineString = (LineString)intersection;

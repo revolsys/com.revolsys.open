@@ -43,12 +43,12 @@ import com.revolsys.jts.geom.Polygon;
 
 /**
  * Represents a polygon with linear edges, which may include holes.
- * The outer boundary (shell) 
+ * The outer boundary (shell)
  * and inner boundaries (holes) of the polygon are represented by {@link LinearRing}s.
  * The boundary rings of the polygon may have any orientation.
  * Polygons are closed, simple geometries by definition.
  * <p>
- * The polygon model conforms to the assertions specified in the 
+ * The polygon model conforms to the assertions specified in the
  * <A HREF="http://www.opengis.org/techno/specs.htm">OpenGIS Simple Features
  * Specification for SQL</A>.
  * <p>
@@ -59,8 +59,8 @@ import com.revolsys.jts.geom.Polygon;
  * (i.e. are closed and do not self-intersect)
  * <li>holes touch the shell or another hole at at most one point
  * (which implies that the rings of the shell and holes must not cross)
- * <li>the interior of the polygon is connected,  
- * or equivalently no sequence of touching holes 
+ * <li>the interior of the polygon is connected,
+ * or equivalently no sequence of touching holes
  * makes the interior of the polygon disconnected
  * (i.e. effectively split the polygon into two pieces).
  * </ul>
@@ -108,7 +108,7 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
           final LinearRing ring = rings[i];
           if (!ring.isEmpty()) {
             throw new IllegalArgumentException("shell is empty but hole "
-              + (i - 1) + " is not");
+                + (i - 1) + " is not");
           }
         }
       } else {
@@ -126,10 +126,10 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
   @Override
   public PolygonImpl clone() {
     final PolygonImpl poly = (PolygonImpl)super.clone();
-    if (rings != null) {
-      poly.rings = rings.clone();
-      for (int i = 0; i < rings.length; i++) {
-        poly.rings[i] = rings[i].clone();
+    if (this.rings != null) {
+      poly.rings = this.rings.clone();
+      for (int i = 0; i < this.rings.length; i++) {
+        poly.rings[i] = this.rings[i].clone();
       }
     }
     return poly;
@@ -137,24 +137,24 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
 
   @Override
   public BoundingBox getBoundingBox() {
-    if (boundingBox == null) {
+    if (this.boundingBox == null) {
       if (isEmpty()) {
-        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
+        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
-        boundingBox = computeBoundingBox();
+        this.boundingBox = computeBoundingBox();
       }
     }
-    return boundingBox;
+    return this.boundingBox;
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   @Override
   public LinearRing getRing(final int ringIndex) {
-    if (isEmpty() || ringIndex < 0 || ringIndex >= rings.length) {
+    if (isEmpty() || ringIndex < 0 || ringIndex >= this.rings.length) {
       return null;
     } else {
       return this.rings[ringIndex];
@@ -166,13 +166,13 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
     if (isEmpty()) {
       return 0;
     } else {
-      return rings.length;
+      return this.rings.length;
     }
   }
 
   @Override
   public List<LinearRing> getRings() {
-    return new ArrayList<>(Arrays.asList(rings));
+    return new ArrayList<>(Arrays.asList(this.rings));
   }
 
   /**
@@ -182,12 +182,12 @@ public class PolygonImpl extends AbstractPolygon implements Polygon {
    */
   @Override
   public Object getUserData() {
-    return userData;
+    return this.userData;
   }
 
   @Override
   public boolean isEmpty() {
-    return rings == null;
+    return this.rings == null;
   }
 
   /**

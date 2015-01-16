@@ -56,15 +56,20 @@ import com.revolsys.jts.operation.predicate.RectangleIntersects;
  * A prepared version for {@link Polygonal} geometries.
  * This class supports both {@link Polygon}s and {@link MultiPolygon}s.
  * <p>
- * This class does <b>not</b> support MultiPolygons which are non-valid 
- * (e.g. with overlapping elements). 
+ * This class does <b>not</b> support MultiPolygons which are non-valid
+ * (e.g. with overlapping elements).
  * <p>
  * Instances of this class are thread-safe and immutable.
- * 
+ *
  * @author mbdavis
  *
  */
 public class PreparedPolygon extends AbstractPolygon {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final boolean isRectangle;
 
   // create these lazily, since they are expensive
@@ -82,7 +87,7 @@ public class PreparedPolygon extends AbstractPolygon {
   @Override
   public boolean contains(final Geometry g) {
     if (envelopeCovers(g)) {
-      if (isRectangle) {
+      if (this.isRectangle) {
         return RectangleContains.contains(getPolygon(), g);
       } else {
         final PreparedPolygonContains contains = new PreparedPolygonContains(
@@ -101,7 +106,7 @@ public class PreparedPolygon extends AbstractPolygon {
       /**
        * Do point-in-poly tests first, since they are cheaper and may result
        * in a quick negative result.
-       * 
+       *
        * If a point of any test components does not lie in the target interior, result is false
        */
       final boolean isAllInPrepGeomAreaInterior = AbstractPreparedPolygonContains.isAllTestComponentsInTargetInterior(
@@ -144,56 +149,56 @@ public class PreparedPolygon extends AbstractPolygon {
   public boolean covers(final Geometry geometry) {
     if (!envelopeCovers(geometry)) {
       return false;
-    } else if (isRectangle) {
+    } else if (this.isRectangle) {
       return true;
     } else {
-      return new PreparedPolygonCovers(this, polygon).covers(geometry);
+      return new PreparedPolygonCovers(this, this.polygon).covers(geometry);
     }
   }
 
   @Override
   public BoundingBox getBoundingBox() {
-    return polygon.getBoundingBox();
+    return this.polygon.getBoundingBox();
   }
 
   /**
    * Gets the indexed intersection finder for this geometry.
-   * 
+   *
    * @return the intersection finder
    */
   public synchronized FastSegmentSetIntersectionFinder getIntersectionFinder() {
     /**
-     * MD - Another option would be to use a simple scan for 
-     * segment testing for small geometries.  
-     * However, testing indicates that there is no particular advantage 
+     * MD - Another option would be to use a simple scan for
+     * segment testing for small geometries.
+     * However, testing indicates that there is no particular advantage
      * to this approach.
      */
-    if (segIntFinder == null) {
-      segIntFinder = new FastSegmentSetIntersectionFinder(
+    if (this.segIntFinder == null) {
+      this.segIntFinder = new FastSegmentSetIntersectionFinder(
         SegmentStringUtil.extractSegmentStrings(getPolygon()));
     }
-    return segIntFinder;
+    return this.segIntFinder;
   }
 
   public synchronized PointOnGeometryLocator getPointLocator() {
-    if (pia == null) {
-      pia = new IndexedPointInAreaLocator(getPolygon());
+    if (this.pia == null) {
+      this.pia = new IndexedPointInAreaLocator(getPolygon());
     }
 
-    return pia;
+    return this.pia;
   }
 
   public Polygon getPolygon() {
-    return polygon;
+    return this.polygon;
   }
 
   /**
    * Gets the list of representative points for this geometry.
    * One vertex is included for every component of the geometry
    * (i.e. including one for every ring of polygonal geometries).
-   * 
+   *
    * Do not modify the returned list!
-   * 
+   *
    * @return a List of Coordinate
    */
   public List<Point> getRepresentativePoints() {
@@ -206,30 +211,30 @@ public class PreparedPolygon extends AbstractPolygon {
 
   @Override
   public LinearRing getRing(final int ringIndex) {
-    return polygon.getRing(ringIndex);
+    return this.polygon.getRing(ringIndex);
   }
 
   @Override
   public int getRingCount() {
-    return polygon.getRingCount();
+    return this.polygon.getRingCount();
   }
 
   @Override
   public List<LinearRing> getRings() {
-    return polygon.getRings();
+    return this.polygon.getRings();
   }
 
   @Override
   public boolean intersects(final Geometry geometry) {
     if (envelopesIntersect(geometry)) {
-      if (isRectangle) {
+      if (this.isRectangle) {
         return RectangleIntersects.intersects(getPolygon(), geometry);
       } else {
-        PointOnGeometryLocator pointLocator = getPointLocator();
+        final PointOnGeometryLocator pointLocator = getPointLocator();
         /**
          * Do point-in-poly tests first, since they are cheaper and may result in a
          * quick positive result.
-         * 
+         *
          * If a point of any test components lie in target, result is true
          */
         final boolean isInPrepGeomArea = AbstractPreparedPolygonContains.isAnyTestComponentInTarget(

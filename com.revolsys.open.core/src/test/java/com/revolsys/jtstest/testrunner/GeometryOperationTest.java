@@ -34,7 +34,6 @@ package com.revolsys.jtstest.testrunner;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -214,14 +213,6 @@ MapSerializer {
     return this.testIndex;
   }
 
-  private boolean isExpectedResultGeometryValid() {
-    if (this.expectedResult instanceof GeometryResult) {
-      final Geometry expectedGeom = ((GeometryResult)this.expectedResult).getGeometry();
-      return expectedGeom.isValid();
-    }
-    return true;
-  }
-
   /**
    *  Returns whether the Test is passed.
    */
@@ -297,13 +288,13 @@ MapSerializer {
     xml += "<test>" + StringUtil.newLine;
     if (this.testDescription != null && this.testDescription.length() > 0) {
       xml += "  <desc>" + StringUtil.escapeHTML(this.testDescription)
-        + "</desc>" + StringUtil.newLine;
+          + "</desc>" + StringUtil.newLine;
     }
     xml += "  <op name=\"" + this.operation + "\"";
     xml += " arg1=\"" + this.geometryIndex + "\"";
     int j = 2;
-    for (final Iterator i = this.arguments.iterator(); i.hasNext();) {
-      final String argument = (String)i.next();
+    for (final Object element : this.arguments) {
+      final String argument = (String)element;
       Assert.assertTrue(argument != null);
       xml += " arg" + j + "=\"" + argument + "\"";
       j++;

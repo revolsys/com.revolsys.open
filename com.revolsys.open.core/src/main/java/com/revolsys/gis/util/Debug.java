@@ -25,7 +25,7 @@ public class Debug {
     final double y1, final double x2, final double y2) {
     final LineString points = line;
     if (points.getPoint(0).equals(x1, y1)
-      && points.getPoint(points.getVertexCount() - 1).equals(x2, y2)) {
+        && points.getPoint(points.getVertexCount() - 1).equals(x2, y2)) {
       noOp();
       return true;
     } else {

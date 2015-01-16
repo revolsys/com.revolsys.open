@@ -29,7 +29,7 @@ public class MavenUrlStreamHandler extends URLStreamHandler {
         final String subUrl = file.substring(0, separator++);
         if (subUrl.startsWith("mvn")) {
           final String mavenId = subUrl.substring(4);
-          final Resource resource = mavenRepository.getResource(mavenId);
+          final Resource resource = this.mavenRepository.getResource(mavenId);
           final URL resourceUrl = resource.getURL();
 
           String entryName = "/";
@@ -43,7 +43,7 @@ public class MavenUrlStreamHandler extends URLStreamHandler {
       }
     } else if (protocol.equals("mvn")) {
       final String mavenId = url.getFile();
-      final Resource resource = mavenRepository.getResource(mavenId);
+      final Resource resource = this.mavenRepository.getResource(mavenId);
       final URL resourceUrl = resource.getURL();
       return resourceUrl.openConnection();
     }

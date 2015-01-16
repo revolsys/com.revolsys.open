@@ -49,6 +49,7 @@ import com.revolsys.jts.geomgraph.PlanarGraph;
  * @version 1.7
  */
 public class OverlayNodeFactory extends NodeFactory {
+  @Override
   public Node createNode(final Point coord) {
     return new Node(coord, new DirectedEdgeStar());
   }

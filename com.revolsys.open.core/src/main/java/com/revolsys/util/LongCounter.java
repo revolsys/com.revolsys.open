@@ -3,6 +3,10 @@ package com.revolsys.util;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class LongCounter extends AtomicLong implements Counter {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private final String name;
 
   public LongCounter(final String name) {

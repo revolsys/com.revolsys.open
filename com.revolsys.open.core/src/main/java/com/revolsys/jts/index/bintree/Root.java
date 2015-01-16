@@ -64,7 +64,7 @@ public class Root extends NodeBase {
      * the item must be contained in one interval, so insert it into the
      * tree for that interval (which may not yet exist)
      */
-    final Node node = subnode[index];
+    final Node node = this.subnode[index];
     /**
      *  If the subnode doesn't exist or this item is not contained in it,
      *  have to expand the tree upward to contain the item.
@@ -72,13 +72,13 @@ public class Root extends NodeBase {
 
     if (node == null || !node.getInterval().contains(itemInterval)) {
       final Node largerNode = Node.createExpanded(node, itemInterval);
-      subnode[index] = largerNode;
+      this.subnode[index] = largerNode;
     }
     /**
      * At this point we have a subnode which exists and must contain
      * contains the env for the item.  Insert the item into the tree.
      */
-    insertContained(subnode[index], itemInterval, item);
+    insertContained(this.subnode[index], itemInterval, item);
     // System.out.println("depth = " + root.depth() + " size = " + root.size());
   }
 

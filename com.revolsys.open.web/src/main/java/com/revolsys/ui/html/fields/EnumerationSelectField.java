@@ -17,12 +17,12 @@ public class EnumerationSelectField extends SelectField {
     field.setRequired(isRequired());
     field.setReadOnly(isReadOnly());
     field.setNullValueLabel(getNullValueLabel());
-    field.setEnumClass(enumClass);
+    field.setEnumClass(this.enumClass);
     return field;
   }
 
   public Class<? extends Enum<?>> getEnumClass() {
-    return enumClass;
+    return this.enumClass;
   }
 
   public void setEnumClass(final Class<? extends Enum<?>> enumClass) {

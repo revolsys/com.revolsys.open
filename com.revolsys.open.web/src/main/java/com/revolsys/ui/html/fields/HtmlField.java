@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,20 +62,20 @@ public class HtmlField extends Field {
   }
 
   public String getInputValue() {
-    return inputValue;
+    return this.inputValue;
   }
 
   public final int getMaxLength() {
-    return maxLength;
+    return this.maxLength;
   }
 
   public int getMinLength() {
-    return minLength;
+    return this.minLength;
   }
 
   @Override
   public boolean hasValue() {
-    return inputValue != null && !inputValue.equals("");
+    return this.inputValue != null && !this.inputValue.equals("");
   }
 
   /*
@@ -87,11 +87,11 @@ public class HtmlField extends Field {
   @Override
   public void initialize(final Form form, final HttpServletRequest request) {
     form.addOnSubmit(this.getName() + "IafHtml.updateTextArea()");
-    inputValue = request.getParameter(getName());
-    if (inputValue == null) {
+    this.inputValue = request.getParameter(getName());
+    if (this.inputValue == null) {
       setValue(getInitialValue(request));
       if (getValue() != null) {
-        inputValue = getValue().toString();
+        this.inputValue = getValue().toString();
       }
     }
   }
@@ -102,18 +102,18 @@ public class HtmlField extends Field {
     if (!super.isValid()) {
       valid = false;
     } else if (hasValue()) {
-      final int length = inputValue.length();
-      if (length > maxLength) {
-        inputValue = inputValue.substring(0, maxLength);
-        addValidationError("Cannot exceed " + maxLength + " characters");
+      final int length = this.inputValue.length();
+      if (length > this.maxLength) {
+        this.inputValue = this.inputValue.substring(0, this.maxLength);
+        addValidationError("Cannot exceed " + this.maxLength + " characters");
         valid = false;
-      } else if (length < minLength) {
-        addValidationError("Must be at least " + minLength + " characters");
+      } else if (length < this.minLength) {
+        addValidationError("Must be at least " + this.minLength + " characters");
         valid = false;
       }
     }
     if (valid) {
-      setValue(inputValue);
+      setValue(this.inputValue);
     }
     return valid;
   }
@@ -190,8 +190,8 @@ public class HtmlField extends Field {
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_COLS, "40");
     out.attribute(HtmlUtil.ATTR_ROWS, "10");
-    if (inputValue != null) {
-      out.text(inputValue);
+    if (this.inputValue != null) {
+      out.text(this.inputValue);
     } else {
       out.text("");
     }

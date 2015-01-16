@@ -4,8 +4,6 @@ import com.revolsys.util.ThreadLocalMap;
 
 public class ChannelThreadConnection {
 
-  private static final ThreadLocalMap<ChannelOutput<?>, ChannelThreadConnection> connections = new ThreadLocalMap<ChannelOutput<?>, ChannelThreadConnection>();
-
   public static void writeConnect(final ChannelOutput<?> channel) {
     synchronized (connections) {
       ChannelThreadConnection connection = connections.get(channel);
@@ -17,6 +15,8 @@ public class ChannelThreadConnection {
     }
   }
 
+  private static final ThreadLocalMap<ChannelOutput<?>, ChannelThreadConnection> connections = new ThreadLocalMap<ChannelOutput<?>, ChannelThreadConnection>();
+
   private final ChannelOutput<?> channel;
 
   private ChannelThreadConnection(final ChannelOutput<?> channel) {
@@ -25,6 +25,6 @@ public class ChannelThreadConnection {
 
   @Override
   public void finalize() {
-    channel.writeDisconnect();
+    this.channel.writeDisconnect();
   }
 }

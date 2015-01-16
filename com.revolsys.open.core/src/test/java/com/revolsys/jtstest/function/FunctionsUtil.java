@@ -9,9 +9,6 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class FunctionsUtil {
 
-  public static final BoundingBox DEFAULT_ENVELOPE = new BoundingBoxDoubleGf(2, 0, 0, 100,
-    100);
-
   public static Geometry buildGeometry(final List geoms,
     final Geometry parentGeom) {
     if (geoms.size() <= 0) {
@@ -43,5 +40,8 @@ public class FunctionsUtil {
       return g.getGeometryFactory();
     }
   }
+
+  public static final BoundingBox DEFAULT_ENVELOPE = new BoundingBoxDoubleGf(2, 0, 0, 100,
+    100);
 
 }

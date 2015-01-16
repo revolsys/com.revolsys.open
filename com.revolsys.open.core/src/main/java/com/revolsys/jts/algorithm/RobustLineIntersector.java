@@ -54,18 +54,18 @@ import com.revolsys.jts.util.BoundingBoxUtil;
 public class RobustLineIntersector extends LineIntersector {
 
   /**
-   * Finds the endpoint of the segments P and Q which 
+   * Finds the endpoint of the segments P and Q which
    * is closest to the other segment.
-   * This is a reasonable surrogate for the true 
+   * This is a reasonable surrogate for the true
    * intersection points in ill-conditioned cases
    * (e.g. where two segments are nearly coincident,
    * or where the endpoint of one segment lies almost on the other segment).
    * <p>
    * This replaces the older CentralEndpoint heuristic,
    * which chose the wrong endpoint in some cases
-   * where the segments had very distinct slopes 
+   * where the segments had very distinct slopes
    * and one endpoint lay almost on the other segment.
-   * 
+   *
    * @param p1 an endpoint of segment P
    * @param p2 an endpoint of segment P
    * @param q1 an endpoint of segment Q
@@ -110,36 +110,36 @@ public class RobustLineIntersector extends LineIntersector {
     final boolean q1p2q2 = BoundingBoxUtil.intersects(q1, q2, p2);
 
     if (p1q1p2 && p1q2p2) {
-      intPt[0] = q1;
-      intPt[1] = q2;
+      this.intPt[0] = q1;
+      this.intPt[1] = q2;
       return COLLINEAR_INTERSECTION;
     }
     if (q1p1q2 && q1p2q2) {
-      intPt[0] = p1;
-      intPt[1] = p2;
+      this.intPt[0] = p1;
+      this.intPt[1] = p2;
       return COLLINEAR_INTERSECTION;
     }
     if (p1q1p2 && q1p1q2) {
-      intPt[0] = q1;
-      intPt[1] = p1;
+      this.intPt[0] = q1;
+      this.intPt[1] = p1;
       return q1.equals(p1) && !p1q2p2 && !q1p2q2 ? POINT_INTERSECTION
         : COLLINEAR_INTERSECTION;
     }
     if (p1q1p2 && q1p2q2) {
-      intPt[0] = q1;
-      intPt[1] = p2;
+      this.intPt[0] = q1;
+      this.intPt[1] = p2;
       return q1.equals(p2) && !p1q2p2 && !q1p1q2 ? POINT_INTERSECTION
         : COLLINEAR_INTERSECTION;
     }
     if (p1q2p2 && q1p1q2) {
-      intPt[0] = q2;
-      intPt[1] = p1;
+      this.intPt[0] = q2;
+      this.intPt[1] = p1;
       return q2.equals(p1) && !p1q1p2 && !q1p2q2 ? POINT_INTERSECTION
         : COLLINEAR_INTERSECTION;
     }
     if (p1q2p2 && q1p2q2) {
-      intPt[0] = q2;
-      intPt[1] = p2;
+      this.intPt[0] = q2;
+      this.intPt[1] = p2;
       return q2.equals(p2) && !p1q1p2 && !q1p1q2 ? POINT_INTERSECTION
         : COLLINEAR_INTERSECTION;
     }
@@ -149,7 +149,7 @@ public class RobustLineIntersector extends LineIntersector {
   @Override
   protected int computeIntersect(final Point p1, final Point p2,
     final Point q1, final Point q2) {
-    isProper = false;
+    this.isProper = false;
 
     // first try a fast test to see if the envelopes of the lines intersect
     if (!BoundingBoxUtil.intersects(p1, p2, q1, q2)) {
@@ -162,14 +162,14 @@ public class RobustLineIntersector extends LineIntersector {
     final int Pq1 = CGAlgorithmsDD.orientationIndex(p1, p2, q1);
     final int Pq2 = CGAlgorithmsDD.orientationIndex(p1, p2, q2);
 
-    if ((Pq1 > 0 && Pq2 > 0) || (Pq1 < 0 && Pq2 < 0)) {
+    if (Pq1 > 0 && Pq2 > 0 || Pq1 < 0 && Pq2 < 0) {
       return NO_INTERSECTION;
     }
 
     final int Qp1 = CGAlgorithmsDD.orientationIndex(q1, q2, p1);
     final int Qp2 = CGAlgorithmsDD.orientationIndex(q1, q2, p2);
 
-    if ((Qp1 > 0 && Qp2 > 0) || (Qp1 < 0 && Qp2 < 0)) {
+    if (Qp1 > 0 && Qp2 > 0 || Qp1 < 0 && Qp2 < 0) {
       return NO_INTERSECTION;
     }
 
@@ -192,65 +192,65 @@ public class RobustLineIntersector extends LineIntersector {
      *  intersect.
      */
     if (Pq1 == 0 || Pq2 == 0 || Qp1 == 0 || Qp2 == 0) {
-      isProper = false;
+      this.isProper = false;
 
       /**
-       * Check for two equal endpoints.  
+       * Check for two equal endpoints.
        * This is done explicitly rather than by the orientation tests
        * below in order to improve robustness.
-       * 
+       *
        * [An example where the orientation tests fail to be consistent is
        * the following (where the true intersection is at the shared endpoint
        * POINT (19.850257749638203 46.29709338043669)
-       * 
-       * LINESTRING ( 19.850257749638203 46.29709338043669, 20.31970698357233 46.76654261437082 ) 
-       * and 
+       *
+       * LINESTRING ( 19.850257749638203 46.29709338043669, 20.31970698357233 46.76654261437082 )
+       * and
        * LINESTRING ( -48.51001596420236 -22.063180333403878, 19.850257749638203 46.29709338043669 )
-       * 
+       *
        * which used to produce the INCORRECT result: (20.31970698357233, 46.76654261437082, NaN)
-       * 
+       *
        */
       if (p1.equals(2, q1) || p1.equals(2, q2)) {
-        intPt[0] = p1;
+        this.intPt[0] = p1;
       } else if (p2.equals(2, q1) || p2.equals(2, q2)) {
-        intPt[0] = p2;
+        this.intPt[0] = p2;
       }
 
       /**
        * Now check to see if any endpoint lies on the interior of the other segment.
        */
       else if (Pq1 == 0) {
-        intPt[0] = new PointDouble(q1);
+        this.intPt[0] = new PointDouble(q1);
       } else if (Pq2 == 0) {
-        intPt[0] = new PointDouble(q2);
+        this.intPt[0] = new PointDouble(q2);
       } else if (Qp1 == 0) {
-        intPt[0] = new PointDouble(p1);
+        this.intPt[0] = new PointDouble(p1);
       } else if (Qp2 == 0) {
-        intPt[0] = new PointDouble(p2);
+        this.intPt[0] = new PointDouble(p2);
       }
     } else {
-      isProper = true;
-      intPt[0] = intersection(p1, p2, q1, q2);
+      this.isProper = true;
+      this.intPt[0] = intersection(p1, p2, q1, q2);
     }
     return POINT_INTERSECTION;
   }
 
   @Override
   public void computeIntersection(final Point p, final Point p1, final Point p2) {
-    isProper = false;
+    this.isProper = false;
     // do between check first, since it is faster than the orientation test
     if (BoundingBoxUtil.intersects(p1, p2, p)) {
-      if ((CGAlgorithmsDD.orientationIndex(p1, p2, p) == 0)
-        && (CGAlgorithmsDD.orientationIndex(p2, p1, p) == 0)) {
-        isProper = true;
+      if (CGAlgorithmsDD.orientationIndex(p1, p2, p) == 0
+          && CGAlgorithmsDD.orientationIndex(p2, p1, p) == 0) {
+        this.isProper = true;
         if (p.equals(p1) || p.equals(p2)) {
-          isProper = false;
+          this.isProper = false;
         }
-        result = POINT_INTERSECTION;
+        this.result = POINT_INTERSECTION;
         return;
       }
     }
-    result = NO_INTERSECTION;
+    this.result = NO_INTERSECTION;
   }
 
   /**
@@ -274,15 +274,15 @@ public class RobustLineIntersector extends LineIntersector {
     /**
      * Due to rounding it can happen that the computed intersection is
      * outside the envelopes of the input segments.  Clearly this
-     * is inconsistent. 
+     * is inconsistent.
      * This code checks this condition and forces a more reasonable answer
-     * 
+     *
      * MD - May 4 2005 - This is still a problem.  Here is a failure case:
      *
      * LINESTRING (2089426.5233462777 1180182.3877339689, 2085646.6891757075 1195618.7333999649)
      * LINESTRING (1889281.8148903656 1997547.0560044837, 2259977.3672235999 483675.17050843034)
      * int point = (2097408.2633752143,1144595.8008114607)
-     * 
+     *
      * MD - Dec 14 2006 - This does not seem to be a failure case any longer
      */
     if (!isInSegmentEnvelopes(intPt)) {
@@ -352,8 +352,8 @@ public class RobustLineIntersector extends LineIntersector {
    * @return <code>true</code> if the input point lies within both input segment envelopes
    */
   private boolean isInSegmentEnvelopes(final Point intPt) {
-    final BoundingBox env0 = new BoundingBoxDoubleGf(inputLines[0][0], inputLines[0][1]);
-    final BoundingBox env1 = new BoundingBoxDoubleGf(inputLines[1][0], inputLines[1][1]);
+    final BoundingBox env0 = new BoundingBoxDoubleGf(this.inputLines[0][0], this.inputLines[0][1]);
+    final BoundingBox env1 = new BoundingBoxDoubleGf(this.inputLines[1][0], this.inputLines[1][1]);
     return env0.covers(intPt) && env1.covers(intPt);
   }
 
@@ -362,7 +362,7 @@ public class RobustLineIntersector extends LineIntersector {
    * error can cause the raw computation to fail, (usually due to the segments
    * being approximately parallel). If this happens, a reasonable approximation
    * is computed instead.
-   * 
+   *
    * @param p1 a segment endpoint
    * @param p2 a segment endpoint
    * @param q1 a segment endpoint

@@ -21,17 +21,17 @@ public class Cast extends QueryValue {
   }
 
   @Override
-  public int appendParameters(final int index, final PreparedStatement statement) {
-    return value.appendParameters(index, statement);
+  public void appendDefaultSql(final Query query, final RecordStore recordStore, final StringBuilder buffer) {
+    buffer.append("CAST(");
+    this.value.appendSql(query, recordStore, buffer);
+    buffer.append(" AS ");
+    buffer.append(this.dataType);
+    buffer.append(")");
   }
 
   @Override
-  public void appendDefaultSql(Query query, RecordStore recordStore, final StringBuilder buffer) {
-    buffer.append("CAST(");
-    value.appendSql(query, recordStore, buffer);
-    buffer.append(" AS ");
-    buffer.append(dataType);
-    buffer.append(")");
+  public int appendParameters(final int index, final PreparedStatement statement) {
+    return this.value.appendParameters(index, statement);
   }
 
   @Override
@@ -48,30 +48,30 @@ public class Cast extends QueryValue {
   }
 
   public String getDataType() {
-    return dataType;
+    return this.dataType;
   }
 
   @Override
   public String getStringValue(final Map<String, Object> record) {
-    return value.getStringValue(record);
+    return this.value.getStringValue(record);
   }
 
   public QueryValue getValue() {
-    return value;
+    return this.value;
   }
 
   @Override
   public <V> V getValue(final Map<String, Object> record) {
-    return value.getValue(record);
+    return this.value.getValue(record);
   }
 
   @Override
   public String toString() {
     final StringBuilder buffer = new StringBuilder();
     buffer.append("CAST(");
-    buffer.append(value);
+    buffer.append(this.value);
     buffer.append(" AS ");
-    buffer.append(dataType);
+    buffer.append(this.dataType);
     buffer.append(")");
     return buffer.toString();
   }

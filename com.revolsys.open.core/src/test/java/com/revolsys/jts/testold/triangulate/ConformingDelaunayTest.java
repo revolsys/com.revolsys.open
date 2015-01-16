@@ -43,7 +43,7 @@ import com.revolsys.jts.triangulate.ConformingDelaunayTriangulationBuilder;
 
 /**
  * Tests Delaunay Triangulatin classes
- * 
+ *
  */
 public class ConformingDelaunayTest extends TestCase {
 
@@ -61,7 +61,7 @@ public class ConformingDelaunayTest extends TestCase {
 
   void runDelaunay(final String sitesWKT, final String constraintsWKT,
     final boolean computeTriangles, final String expectedWKT)
-    throws ParseException {
+        throws ParseException {
     final Geometry sites = this.reader.read(sitesWKT);
     final Geometry constraints = this.reader.read(constraintsWKT);
 

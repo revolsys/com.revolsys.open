@@ -49,7 +49,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -92,7 +91,7 @@ public class SwingUtil {
   public static void addAction(final JComponent component,
     final KeyStroke keyStroke, final String actionKey, final Object object,
     final String methodName, final Object... parameters) {
-    final InputMap inputMap = component.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    final InputMap inputMap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     inputMap.put(keyStroke, actionKey);
 
     final ActionMap actionMap = component.getActionMap();

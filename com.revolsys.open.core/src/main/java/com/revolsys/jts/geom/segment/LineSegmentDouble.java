@@ -53,6 +53,10 @@ import com.revolsys.jts.geom.impl.PointDouble;
  */
 public class LineSegmentDouble extends AbstractLineSegment {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private double[] coordinates;
 
   public LineSegmentDouble() {
@@ -64,7 +68,7 @@ public class LineSegmentDouble extends AbstractLineSegment {
     if (coordinates == null || coordinates.length == 0 || axisCount < 1) {
       this.coordinates = null;
     } else if (coordinates.length % axisCount == 0
-      && coordinates.length / 2 == axisCount) {
+        && coordinates.length / 2 == axisCount) {
       this.coordinates = coordinates;
       if (coordinates != null && geometryFactory != null) {
         int coordinateIndex = 0;
@@ -79,7 +83,7 @@ public class LineSegmentDouble extends AbstractLineSegment {
       }
     } else {
       throw new IllegalArgumentException("(coordinates.length) "
-        + coordinates.length + " != 2 * " + axisCount + " (axisCount)");
+          + coordinates.length + " != 2 * " + axisCount + " (axisCount)");
     }
   }
 
@@ -91,10 +95,10 @@ public class LineSegmentDouble extends AbstractLineSegment {
   protected LineSegmentDouble(final GeometryFactory geometryFactory,
     final Point point1, final Point point2) {
     final int axisCount = geometryFactory.getAxisCount();
-    coordinates = new double[axisCount * 2];
-    CoordinatesListUtil.setCoordinates(geometryFactory, coordinates, axisCount,
+    this.coordinates = new double[axisCount * 2];
+    CoordinatesListUtil.setCoordinates(geometryFactory, this.coordinates, axisCount,
       0, point1);
-    CoordinatesListUtil.setCoordinates(geometryFactory, coordinates, axisCount,
+    CoordinatesListUtil.setCoordinates(geometryFactory, this.coordinates, axisCount,
       1, point2);
   }
 
@@ -102,11 +106,11 @@ public class LineSegmentDouble extends AbstractLineSegment {
     if (coordinates == null || coordinates.length == 0 || axisCount < 1) {
       this.coordinates = null;
     } else if (coordinates.length % axisCount == 0
-      && coordinates.length / 2 == axisCount) {
+        && coordinates.length / 2 == axisCount) {
       this.coordinates = coordinates;
     } else {
       throw new IllegalArgumentException("(coordinates.length) "
-        + coordinates.length + " != 2 * " + axisCount + " (axisCount)");
+          + coordinates.length + " != 2 * " + axisCount + " (axisCount)");
     }
   }
 
@@ -116,9 +120,9 @@ public class LineSegmentDouble extends AbstractLineSegment {
 
   public LineSegmentDouble(final Point point1, final Point point2) {
     final int axisCount = Math.max(point1.getAxisCount(), point2.getAxisCount());
-    coordinates = new double[axisCount * 2];
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, point1);
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 1, point2);
+    this.coordinates = new double[axisCount * 2];
+    CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, 0, point1);
+    CoordinatesListUtil.setCoordinates(this.coordinates, axisCount, 1, point2);
   }
 
   @Override
@@ -145,7 +149,7 @@ public class LineSegmentDouble extends AbstractLineSegment {
 
   @Override
   public int getAxisCount() {
-    return coordinates.length / 2;
+    return this.coordinates.length / 2;
   }
 
   @Override
@@ -154,7 +158,7 @@ public class LineSegmentDouble extends AbstractLineSegment {
     if (axisIndex >= 0 && axisIndex < axisCount) {
       if (index >= 0 && index < 2) {
         final int valueIndex = index * axisCount + axisIndex;
-        final double value = coordinates[valueIndex];
+        final double value = this.coordinates[valueIndex];
         return value;
       }
     }
@@ -163,16 +167,16 @@ public class LineSegmentDouble extends AbstractLineSegment {
 
   @Override
   public double[] getCoordinates() {
-    if (coordinates == null) {
-      return coordinates;
+    if (this.coordinates == null) {
+      return this.coordinates;
     } else {
-      return coordinates.clone();
+      return this.coordinates.clone();
     }
   }
 
   @Override
   public boolean isEmpty() {
-    return coordinates == null;
+    return this.coordinates == null;
   }
 
 }

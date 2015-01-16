@@ -9,11 +9,11 @@ import com.revolsys.jts.io.ParseException;
 import com.revolsys.jts.testold.junit.GeometryUtils;
 
 public class DiscreteHausdorffDistanceTest extends TestCase {
-  private static final double TOLERANCE = 0.00001;
-
   public static void main(final String args[]) {
     TestRunner.run(DiscreteHausdorffDistanceTest.class);
   }
+
+  private static final double TOLERANCE = 0.00001;
 
   public DiscreteHausdorffDistanceTest(final String name) {
     super(name);
@@ -30,7 +30,7 @@ public class DiscreteHausdorffDistanceTest extends TestCase {
 
   private void runTest(final String wkt1, final String wkt2,
     final double densifyFrac, final double expectedDistance)
-    throws ParseException {
+        throws ParseException {
     final Geometry g1 = GeometryUtils.readWKT(wkt1);
     final Geometry g2 = GeometryUtils.readWKT(wkt2);
 
@@ -54,7 +54,7 @@ public class DiscreteHausdorffDistanceTest extends TestCase {
   /**
    * Shows effects of limiting HD to vertices
    * Answer is not true Hausdorff distance.
-   * 
+   *
    * @throws Exception
    */
   public void testLinesShowingDiscretenessEffect() throws Exception {

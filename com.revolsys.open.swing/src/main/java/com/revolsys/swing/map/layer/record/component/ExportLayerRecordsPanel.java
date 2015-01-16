@@ -37,6 +37,11 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class ExportLayerRecordsPanel extends BasePanel {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final AbstractRecordLayer layer;
 
   private TogglePanel recordsFilterType;
@@ -56,7 +61,7 @@ public class ExportLayerRecordsPanel extends BasePanel {
   private void addFileChooser(final JComponent component) {
 
     final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(),
-      "currentDirectory");
+        "currentDirectory");
 
     final List<FileFilter> recordFileFilters = new ArrayList<FileFilter>();
     final Set<String> allRecordExtensions = new TreeSet<String>();
@@ -94,7 +99,7 @@ public class ExportLayerRecordsPanel extends BasePanel {
 
   public void doExport() {
     this.exportResource = new FileSystemResource("/Users/paustin/Desktop/"
-      + getName() + ".gpx");
+        + getName() + ".gpx");
 
     final RecordDefinition recordDefinition = getRecordDefinition();
     final Query query = new Query(recordDefinition);
@@ -125,8 +130,8 @@ public class ExportLayerRecordsPanel extends BasePanel {
 
   private void writeRecords(final Iterable<LayerRecord> records) {
     try (
-      Writer<Record> writer = RecordIo.recordWriter(
-        this.layer.getRecordDefinition(), this.exportResource)) {
+        Writer<Record> writer = RecordIo.recordWriter(
+          this.layer.getRecordDefinition(), this.exportResource)) {
       for (final LayerRecord record : records) {
         writer.write(record);
       }

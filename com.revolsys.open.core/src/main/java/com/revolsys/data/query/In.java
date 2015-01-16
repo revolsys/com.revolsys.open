@@ -62,25 +62,25 @@ public class In extends Condition {
   }
 
   @Override
-  public void appendDefaultSql(Query query,
+  public void appendDefaultSql(final Query query,
     final RecordStore recordStore, final StringBuilder buffer) {
-    if (left == null) {
+    if (this.left == null) {
       buffer.append("NULL");
     } else {
-      left.appendSql(query, recordStore, buffer);
+      this.left.appendSql(query, recordStore, buffer);
     }
     buffer.append(" ");
     buffer.append(" IN ");
-    values.appendSql(query, recordStore, buffer);
+    this.values.appendSql(query, recordStore, buffer);
   }
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    if (left != null) {
-      index = left.appendParameters(index, statement);
+    if (this.left != null) {
+      index = this.left.appendParameters(index, statement);
     }
-    if (values != null) {
-      index = values.appendParameters(index, statement);
+    if (this.values != null) {
+      index = this.values.appendParameters(index, statement);
     }
     return index;
   }
@@ -88,8 +88,8 @@ public class In extends Condition {
   @Override
   public In clone() {
     final In clone = (In)super.clone();
-    clone.left = left.clone();
-    clone.values = values.clone();
+    clone.left = this.left.clone();
+    clone.values = this.values.clone();
     return clone;
   }
 
@@ -108,21 +108,21 @@ public class In extends Condition {
 
   @SuppressWarnings("unchecked")
   public <V extends QueryValue> V getLeft() {
-    return (V)left;
+    return (V)this.left;
   }
 
   @Override
   public List<QueryValue> getQueryValues() {
-    return Arrays.asList(left, values);
+    return Arrays.asList(this.left, this.values);
   }
 
   public CollectionValue getValues() {
-    return values;
+    return this.values;
   }
 
   @Override
   public String toString() {
-    return StringConverterRegistry.toString(left) + " IN "
-      + StringConverterRegistry.toString(values);
+    return StringConverterRegistry.toString(this.left) + " IN "
+        + StringConverterRegistry.toString(this.values);
   }
 }

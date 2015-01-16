@@ -8,11 +8,11 @@ public class FormatUrl {
   private URL onlineResource;
 
   public String getFormat() {
-    return format;
+    return this.format;
   }
 
   public URL getOnlineResource() {
-    return onlineResource;
+    return this.onlineResource;
   }
 
   public void setFormat(final String format) {

@@ -42,7 +42,7 @@ import com.revolsys.jts.util.Stopwatch;
  * Intended to test the robustness of buffering.
  * Repeated buffering tends to generate challenging
  * somewhat pathological linework, which stresses the buffer algorithm.
- * 
+ *
  * @version 1.7
  */
 public class IteratedBufferStressTest {

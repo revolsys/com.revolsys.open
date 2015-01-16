@@ -25,7 +25,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
     boundingBox = boundingBox.expand(maxDistance);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
     final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<T>(node,
-      boundingBox, maxDistance, results);
+        boundingBox, maxDistance, results);
     index.visit(boundingBox, visitor);
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
@@ -52,10 +52,10 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
 
   @Override
   public boolean visit(final Edge<T> edge) {
-    if (!edge.hasNode(node)) {
+    if (!edge.hasNode(this.node)) {
       final LineString line = edge.getLine();
-      if (line.getBoundingBox().intersects(boundingBox)) {
-        if (LineStringUtil.isPointOnLine(line, point, maxDistance)) {
+      if (line.getBoundingBox().intersects(this.boundingBox)) {
+        if (LineStringUtil.isPointOnLine(line, this.point, this.maxDistance)) {
           super.visit(edge);
         }
       }

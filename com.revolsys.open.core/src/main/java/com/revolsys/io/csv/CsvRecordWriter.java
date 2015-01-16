@@ -92,7 +92,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         @SuppressWarnings("unchecked")
         final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
         final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-          .getConverter(dataTypeClass);
+            .getConverter(dataTypeClass);
         if (converter == null) {
           string(value);
         } else {

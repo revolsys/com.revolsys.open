@@ -12,13 +12,13 @@ public class XmlFieldDefinition extends AbstractFileGdbFieldDefinition {
   public XmlFieldDefinition(final Field field) {
     super(field.getName(), DataTypes.STRING, field.getLength(),
       BooleanStringConverter.getBoolean(field.getRequired())
-        || !field.isIsNullable());
+      || !field.isIsNullable());
   }
 
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    CapiFileGdbRecordStore recordStore = getRecordStore();
+    final CapiFileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {

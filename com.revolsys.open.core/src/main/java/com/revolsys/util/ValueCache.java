@@ -9,13 +9,13 @@ public class ValueCache<T> {
   private boolean readOnly = false;
 
   public void addValue(final T value) {
-    if (!readOnly && !cache.containsKey(value)) {
-      cache.put(value, value);
+    if (!this.readOnly && !this.cache.containsKey(value)) {
+      this.cache.put(value, value);
     }
   }
 
   public T getValue(final T value) {
-    final T cachedValue = cache.get(value);
+    final T cachedValue = this.cache.get(value);
     if (cachedValue == null) {
       return value;
     } else {
@@ -24,7 +24,7 @@ public class ValueCache<T> {
   }
 
   public boolean isReadOnly() {
-    return readOnly;
+    return this.readOnly;
   }
 
   public void setReadOnly(final boolean readOnly) {

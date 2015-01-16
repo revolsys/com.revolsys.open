@@ -11,23 +11,23 @@ public class Request {
   private final List<DcpType> dcpTypes = new ArrayList<DcpType>();
 
   public void addDcpType(final DcpType dcpType) {
-    dcpTypes.add(dcpType);
+    this.dcpTypes.add(dcpType);
   }
 
   public void addFormat(final String format) {
-    formats.add(format);
+    this.formats.add(format);
   }
 
   public List<DcpType> getDcpTypes() {
-    return dcpTypes;
+    return this.dcpTypes;
   }
 
   public List<String> getFormats() {
-    return formats;
+    return this.formats;
   }
 
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public void setName(final String name) {
@@ -36,6 +36,6 @@ public class Request {
 
   @Override
   public String toString() {
-    return name;
+    return this.name;
   }
 }

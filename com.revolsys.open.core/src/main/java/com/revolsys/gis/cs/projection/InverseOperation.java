@@ -15,7 +15,7 @@ public class InverseOperation implements CoordinatesOperation {
     for (int vertexIndex = 0; vertexIndex < numPoints; vertexIndex++) {
       final double x = sourceCoordinates[vertexIndex * sourceAxisCount + 0];
       final double y = sourceCoordinates[vertexIndex * sourceAxisCount + 1];
-      projection.inverse(x, y, targetCoordinates, vertexIndex, targetAxisCount);
+      this.projection.inverse(x, y, targetCoordinates, vertexIndex, targetAxisCount);
       for (int axisIndex = 2; axisIndex < targetAxisCount; axisIndex++) {
         double value;
         if (axisIndex < sourceAxisCount) {
@@ -30,6 +30,6 @@ public class InverseOperation implements CoordinatesOperation {
 
   @Override
   public String toString() {
-    return projection + " -> geographics";
+    return this.projection + " -> geographics";
   }
 }

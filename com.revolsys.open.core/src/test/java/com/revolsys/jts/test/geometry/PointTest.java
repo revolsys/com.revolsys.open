@@ -191,10 +191,10 @@ public class PointTest implements TestConstants {
         switch (i) {
           case 0:
             value = UTM10_X_START;
-          break;
+            break;
           case 1:
             value = UTM10_Y_START;
-          break;
+            break;
           default:
             value = i * 10 + i;
         }

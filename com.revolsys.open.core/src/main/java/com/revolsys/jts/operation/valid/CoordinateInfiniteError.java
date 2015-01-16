@@ -7,7 +7,7 @@ import com.revolsys.util.CollectionUtil;
 public class CoordinateInfiniteError extends VertexCoordinateError {
   public CoordinateInfiniteError(final Vertex vertex, final int axisIndex) {
     super("Coordinate value " + GeometryFactory.getAxisName(axisIndex) + "="
-      + vertex.getCoordinate(axisIndex) + " is invalid for vertex "
-      + CollectionUtil.toString(",", vertex.getVertexId()), vertex, axisIndex);
+        + vertex.getCoordinate(axisIndex) + " is invalid for vertex "
+        + CollectionUtil.toString(",", vertex.getVertexId()), vertex, axisIndex);
   }
 }

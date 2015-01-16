@@ -15,9 +15,9 @@ public class Workspace implements Cloneable {
   public Workspace clone() {
     try {
       final Workspace clone = (Workspace)super.clone();
-      workspaceDefinition = workspaceDefinition.clone();
-      clone.workspaceData = new ArrayList<AnyDatasetData>(workspaceData.size());
-      for (final AnyDatasetData data : workspaceData) {
+      this.workspaceDefinition = this.workspaceDefinition.clone();
+      clone.workspaceData = new ArrayList<AnyDatasetData>(this.workspaceData.size());
+      for (final AnyDatasetData data : this.workspaceData) {
         clone.workspaceData.add(data.clone());
       }
       return clone;
@@ -27,11 +27,11 @@ public class Workspace implements Cloneable {
   }
 
   public List<AnyDatasetData> getWorkspaceData() {
-    return workspaceData;
+    return this.workspaceData;
   }
 
   public WorkspaceDefinition getWorkspaceDefinition() {
-    return workspaceDefinition;
+    return this.workspaceDefinition;
   }
 
   public void setWorkspaceData(final List<AnyDatasetData> workspaceData) {

@@ -12,7 +12,7 @@ import com.revolsys.data.io.RecordStoreFactory;
 import com.revolsys.data.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 
 public class FileGdbRecordStoreFactory implements RecordStoreFactory {
 
@@ -23,7 +23,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
       synchronized (COUNTS) {
         final String fileName = FileUtil.getCanonicalPath(file);
         file = new File(fileName);
-        final AtomicInteger count = CollectionUtil.get(COUNTS, fileName,
+        final AtomicInteger count = Maps.get(COUNTS, fileName,
           new AtomicInteger());
         count.incrementAndGet();
         CapiFileGdbRecordStore recordStore = DATA_STORES.get(fileName);
@@ -43,7 +43,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     } else {
       synchronized (COUNTS) {
         fileName = FileUtil.getCanonicalPath(fileName);
-        final AtomicInteger countHolder = CollectionUtil.get(COUNTS, fileName,
+        final AtomicInteger countHolder = Maps.get(COUNTS, fileName,
           new AtomicInteger());
         final int count = countHolder.decrementAndGet();
         if (count <= 0) {
@@ -76,7 +76,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
   public FileGdbRecordStore createRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
     final Map<String, Object> properties = new LinkedHashMap<String, Object>(
-      connectionProperties);
+        connectionProperties);
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);
 

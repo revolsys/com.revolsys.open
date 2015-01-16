@@ -9,15 +9,6 @@ import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 
 public class RecordDefinitionTableModel extends AbstractTableModel {
-  private static final long serialVersionUID = 1L;
-
-  private static final List<String> COLUMN_NAMES = Arrays.asList("#", "Field",
-    "Type", "Length", "Scale", "Min", "Max", "Required", "Description");
-
-  private static final List<Class<?>> COLUMN_CLASSES = Arrays.<Class<?>> asList(
-    Integer.class, String.class, String.class, Integer.class, Integer.class,
-    Object.class, Object.class, Boolean.class, String.class);
-
   public static BaseJTable createTable(final RecordDefinition recordDefinition) {
     if (recordDefinition == null) {
       return null;
@@ -29,6 +20,15 @@ public class RecordDefinitionTableModel extends AbstractTableModel {
       return table;
     }
   }
+
+  private static final long serialVersionUID = 1L;
+
+  private static final List<String> COLUMN_NAMES = Arrays.asList("#", "Field",
+    "Type", "Length", "Scale", "Min", "Max", "Required", "Description");
+
+  private static final List<Class<?>> COLUMN_CLASSES = Arrays.<Class<?>> asList(
+    Integer.class, String.class, String.class, Integer.class, Integer.class,
+    Object.class, Object.class, Boolean.class, String.class);
 
   private final RecordDefinition recordDefinition;
 

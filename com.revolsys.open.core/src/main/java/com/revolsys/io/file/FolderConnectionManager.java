@@ -14,16 +14,8 @@ import com.revolsys.io.connection.AbstractConnectionRegistryManager;
 import com.revolsys.util.OS;
 
 public class FolderConnectionManager extends
-  AbstractConnectionRegistryManager<FolderConnectionRegistry, FolderConnection>
-  implements URLStreamHandlerFactory {
-
-  private static final FolderConnectionManager INSTANCE;
-
-  static {
-    INSTANCE = new FolderConnectionManager();
-    final File directory = OS.getApplicationDataDirectory("com.revolsys.gis/Folder Connections");
-    INSTANCE.addConnectionRegistry("User", new FileSystemResource(directory));
-  }
+AbstractConnectionRegistryManager<FolderConnectionRegistry, FolderConnection>
+implements URLStreamHandlerFactory {
 
   public static FolderConnectionManager get() {
     return INSTANCE;
@@ -45,6 +37,14 @@ public class FolderConnectionManager extends
       }
     }
     return null;
+  }
+
+  private static final FolderConnectionManager INSTANCE;
+
+  static {
+    INSTANCE = new FolderConnectionManager();
+    final File directory = OS.getApplicationDataDirectory("com.revolsys.gis/Folder Connections");
+    INSTANCE.addConnectionRegistry("User", new FileSystemResource(directory));
   }
 
   public FolderConnectionManager() {

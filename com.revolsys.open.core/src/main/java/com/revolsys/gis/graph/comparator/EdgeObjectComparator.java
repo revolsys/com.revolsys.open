@@ -21,12 +21,12 @@ public class EdgeObjectComparator<T> implements Comparator<Edge<T>> {
     } else {
       final T object1 = edge1.getObject();
       final T object2 = edge2.getObject();
-      return comparator.compare(object1, object2);
+      return this.comparator.compare(object1, object2);
     }
   }
 
   public Comparator<T> getComparator() {
-    return comparator;
+    return this.comparator;
   }
 
   public void setComparator(final Comparator<T> comparator) {

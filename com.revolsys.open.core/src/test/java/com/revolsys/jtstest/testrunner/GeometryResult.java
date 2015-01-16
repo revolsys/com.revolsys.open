@@ -52,32 +52,33 @@ public class GeometryResult implements Result {
     final GeometryResult otherGeometryResult = (GeometryResult)other;
     final Geometry otherGeometry = otherGeometryResult.geometry;
 
-    final Geometry thisGeometryClone = geometry.normalize();
+    final Geometry thisGeometryClone = this.geometry.normalize();
     final Geometry otherGeometryClone = otherGeometry.normalize();
     return thisGeometryClone.equalsExact(otherGeometryClone, tolerance);
   }
 
   public Geometry getGeometry() {
-    return geometry;
+    return this.geometry;
   }
 
+  @Override
   public Geometry getResult() {
-    return geometry;
+    return this.geometry;
   }
 
   @Override
   public String toFormattedString() {
-    return geometry.toWkt();
+    return this.geometry.toWkt();
   }
 
   @Override
   public String toLongString() {
-    return geometry.toWkt();
+    return this.geometry.toWkt();
   }
 
   @Override
   public String toShortString() {
-    return geometry.getClass().getName();
+    return this.geometry.getClass().getName();
   }
 
   @Override

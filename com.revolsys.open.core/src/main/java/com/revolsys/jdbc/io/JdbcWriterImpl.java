@@ -705,16 +705,16 @@ public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {
         switch (state) {
           case New:
             insert(object);
-          break;
+            break;
           case Modified:
             update(object);
-          break;
+            break;
           case Persisted:
-          // No action required
-          break;
+            // No action required
+            break;
           case Deleted:
             delete(object);
-          break;
+            break;
           default:
             throw new IllegalStateException("State not known");
         }

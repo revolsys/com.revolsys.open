@@ -19,7 +19,7 @@ public class MenuViewController {
   @RequestMapping("/view/menu/{menuName}")
   public void getMenu(final HttpServletRequest request,
     final HttpServletResponse response, @PathVariable final String menuName)
-    throws IOException {
+        throws IOException {
     final Menu menu = (Menu)request.getAttribute(menuName);
     if (menu != null) {
       final MenuElement menuElement = new MenuElement(menu, menuName);

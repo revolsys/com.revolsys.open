@@ -18,7 +18,7 @@ public class StringClob implements Clob {
 
   @Override
   public void free() throws SQLException {
-    string = null;
+    this.string = null;
   }
 
   @Override
@@ -28,13 +28,13 @@ public class StringClob implements Clob {
 
   @Override
   public Reader getCharacterStream() throws SQLException {
-    return new StringReader(string);
+    return new StringReader(this.string);
   }
 
   @Override
   public Reader getCharacterStream(final long offset, final long length)
-    throws SQLException {
-    return new StringReader(string.substring((int)offset - 1, (int)length));
+      throws SQLException {
+    return new StringReader(this.string.substring((int)offset - 1, (int)length));
   }
 
   @Override
@@ -44,7 +44,7 @@ public class StringClob implements Clob {
 
   @Override
   public long length() throws SQLException {
-    return string.length();
+    return this.string.length();
   }
 
   @Override

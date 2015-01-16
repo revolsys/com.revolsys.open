@@ -40,7 +40,7 @@ import com.revolsys.math.Angle;
 /**
  * Represents a planar triangle, and provides methods for calculating various
  * properties of triangles.
- * 
+ *
  * @version 1.7
  */
 public class Triangle {
@@ -48,7 +48,7 @@ public class Triangle {
   /**
    * Computes the point at which the bisector of the angle ABC cuts the segment
    * AC.
-   * 
+   *
    * @param a
    *          a vertex of the triangle
    * @param b
@@ -76,7 +76,7 @@ public class Triangle {
 
   /**
    * Computes the 2D area of a triangle. The area value is always non-negative.
-   * 
+   *
    * @param a
    *          a vertex of the triangle
    * @param b
@@ -84,13 +84,13 @@ public class Triangle {
    * @param c
    *          a vertex of the triangle
    * @return the area of the triangle
-   * 
+   *
    * @see #signedArea(Coordinate, Coordinate, Coordinate)
    */
   public static double area(final Point a, final Point b,
     final Point c) {
     return Math.abs(((c.getX() - a.getX()) * (b.getY() - a.getY()) - (b.getX() - a.getX())
-      * (c.getY() - a.getY())) / 2);
+        * (c.getY() - a.getY())) / 2);
   }
 
   /**
@@ -99,7 +99,7 @@ public class Triangle {
    * also the common intersection point of the perpendicular bisectors of the
    * sides of the triangle, and is the only point which has equal distance to
    * all three vertices of the triangle.
-   * 
+   *
    * @param a
    *          a vertx of the triangle
    * @param b
@@ -127,7 +127,7 @@ public class Triangle {
   /**
    * Computes the 3D area of a triangle. The value computed is alway
    * non-negative.
-   * 
+   *
    * @param a
    *          a vertex of the triangle
    * @param b
@@ -170,8 +170,8 @@ public class Triangle {
    * side). The centroid divides each median in a ratio of 2:1.
    * <p>
    * The centroid always lies within the triangle.
-   * 
-   * 
+   *
+   *
    * @param a
    *          a vertex of the triangle
    * @param b
@@ -200,7 +200,7 @@ public class Triangle {
    * This method uses an algorithm due to J.R.Shewchuk which uses normalization
    * to the origin to improve the accuracy of computation. (See <i>Lecture Notes
    * on Geometric Robustness</i>, Jonathan Richard Shewchuk, 1999).
-   * 
+   *
    * @param a
    *          a vertx of the triangle
    * @param b
@@ -231,7 +231,7 @@ public class Triangle {
   /**
    * Computes the determinant of a 2x2 matrix. Uses standard double-precision
    * arithmetic, so is susceptible to round-off error.
-   * 
+   *
    * @param m00
    *          the [0,0] entry of the matrix
    * @param m01
@@ -255,7 +255,7 @@ public class Triangle {
    * is tangent to each of the triangle's three sides.
    * <p>
    * The incentre always lies within the triangle.
-   * 
+   *
    * @param a
    *          a vertx of the triangle
    * @param b
@@ -273,11 +273,11 @@ public class Triangle {
     final double circum = len0 + len1 + len2;
 
     final double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2
-      * c.getX())
-      / circum;
+        * c.getX())
+        / circum;
     final double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2
-      * c.getY())
-      / circum;
+        * c.getY())
+        / circum;
     return new PointDouble(inCentreX, inCentreY, Point.NULL_ORDINATE);
   }
 
@@ -289,7 +289,7 @@ public class Triangle {
    * <p>
    * This method can be used to interpolate the Z-value of a point inside a
    * triangle (for example, of a TIN facet with elevations on the vertices).
-   * 
+   *
    * @param p
    *          the point to compute the Z-value of
    * @param v0
@@ -314,7 +314,7 @@ public class Triangle {
     final double t = (d * dx - b * dy) / det;
     final double u = (-c * dx + a * dy) / det;
     final double z = v0.getZ() + t * (v1.getZ() - v0.getZ()) + u
-      * (v2.getZ() - v0.getZ());
+        * (v2.getZ() - v0.getZ());
     return z;
   }
 
@@ -325,7 +325,7 @@ public class Triangle {
    * <p>
    * Note: this implementation is not robust for angles very close to 90
    * degrees.
-   * 
+   *
    * @param a
    *          a vertex of the triangle
    * @param b
@@ -350,7 +350,7 @@ public class Triangle {
 
   /**
    * Computes the length of the longest side of a triangle
-   * 
+   *
    * @param a
    *          a vertex of the triangle
    * @param b
@@ -377,7 +377,7 @@ public class Triangle {
   /**
    * Computes the line which is the perpendicular bisector of the line segment
    * a-b.
-   * 
+   *
    * @param a
    *          a point
    * @param b
@@ -404,7 +404,7 @@ public class Triangle {
    * implementation in this method is susceptible to round-off errors. Use
    * {@link CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)}
    * for robust orientation calculation.
-   * 
+   *
    * @param a
    *          a vertex of the triangle
    * @param b
@@ -412,7 +412,7 @@ public class Triangle {
    * @param c
    *          a vertex of the triangle
    * @return the signed 2D area of the triangle
-   * 
+   *
    * @see CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)
    */
   public static double signedArea(final Point a, final Point b,
@@ -423,7 +423,7 @@ public class Triangle {
      * simplifies to the expression below
      */
     return ((c.getX() - a.getX()) * (b.getY() - a.getY()) - (b.getX() - a.getX())
-      * (c.getY() - a.getY())) / 2;
+        * (c.getY() - a.getY())) / 2;
   }
 
   /**
@@ -433,7 +433,7 @@ public class Triangle {
 
   /**
    * Creates a new triangle with the given vertices.
-   * 
+   *
    * @param p0
    *          a vertex
    * @param p1
@@ -451,9 +451,9 @@ public class Triangle {
   /**
    * Computes the 2D area of this triangle. The area value is always
    * non-negative.
-   * 
+   *
    * @return the area of this triangle
-   * 
+   *
    * @see #signedArea()
    */
   public double area() {
@@ -463,7 +463,7 @@ public class Triangle {
   /**
    * Computes the 3D area of this triangle. The value computed is alway
    * non-negative.
-   * 
+   *
    * @return the 3D area of this triangle
    */
   public double area3D() {
@@ -477,7 +477,7 @@ public class Triangle {
    * side). The centroid divides each median in a ratio of 2:1.
    * <p>
    * The centroid always lies within the triangle.
-   * 
+   *
    * @return the centroid of this triangle
    */
   public Point centroid() {
@@ -496,7 +496,7 @@ public class Triangle {
    * This method uses an algorithm due to J.R.Shewchuk which uses normalization
    * to the origin to improve the accuracy of computation. (See <i>Lecture Notes
    * on Geometric Robustness</i>, Jonathan Richard Shewchuk, 1999).
-   * 
+   *
    * @return the circumcentre of this triangle
    */
   public Point circumcentre() {
@@ -509,11 +509,11 @@ public class Triangle {
    * also the point at which the bisectors of the triangle's angles meet. It is
    * the centre of the triangle's <i>incircle</i>, which is the unique circle
    * that is tangent to each of the triangle's three sides.
-   * 
+   *
    * @return the point which is the inCentre of this triangle
    */
   public Point inCentre() {
-    return inCentre(p0, p1, p2);
+    return inCentre(this.p0, this.p1, this.p2);
   }
 
   /**
@@ -524,7 +524,7 @@ public class Triangle {
    * <p>
    * This method can be used to interpolate the Z-value of a point inside this
    * triangle (for example, of a TIN facet with elevations on the vertices).
-   * 
+   *
    * @param p
    *          the point to compute the Z-value of
    * @return the computed Z-value (elevation) of the point
@@ -543,7 +543,7 @@ public class Triangle {
    * <p>
    * Note: this implementation is not robust for angles very close to 90
    * degrees.
-   * 
+   *
    * @return true if this triangle is acute
    */
   public boolean isAcute() {
@@ -552,7 +552,7 @@ public class Triangle {
 
   /**
    * Computes the length of the longest side of this triangle
-   * 
+   *
    * @return the length of the longest side of this triangle
    */
   public double longestSideLength() {
@@ -567,9 +567,9 @@ public class Triangle {
    * implementation in this method is susceptible to round-off errors. Use
    * {@link CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)}
    * for robust orientation calculation.
-   * 
+   *
    * @return the signed 2D area of this triangle
-   * 
+   *
    * @see CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)
    */
   public double signedArea() {

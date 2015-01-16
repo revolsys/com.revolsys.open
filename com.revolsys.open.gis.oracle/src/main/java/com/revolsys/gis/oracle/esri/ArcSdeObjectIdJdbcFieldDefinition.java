@@ -16,7 +16,7 @@ public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
     final String rowIdColumn) {
     final JdbcFieldDefinition objectIdAttribute = (JdbcFieldDefinition)recordDefinition.getField(rowIdColumn);
     if (objectIdAttribute != null
-      && !(objectIdAttribute instanceof ArcSdeObjectIdJdbcFieldDefinition)) {
+        && !(objectIdAttribute instanceof ArcSdeObjectIdJdbcFieldDefinition)) {
       final String name = objectIdAttribute.getName();
       final String description = objectIdAttribute.getDescription();
       final Map<String, Object> properties = objectIdAttribute.getProperties();
@@ -28,7 +28,7 @@ public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
       final RecordDefinitionImpl recordDefinitionImpl = (RecordDefinitionImpl)recordDefinition;
       recordDefinitionImpl.replaceField(objectIdAttribute, newObjectIdAttribute);
       if (recordDefinition.getIdFieldName() == null
-        && recordDefinition.getIdFieldNames().isEmpty()) {
+          && recordDefinition.getIdFieldNames().isEmpty()) {
         recordDefinitionImpl.setIdFieldName(name);
       }
     }

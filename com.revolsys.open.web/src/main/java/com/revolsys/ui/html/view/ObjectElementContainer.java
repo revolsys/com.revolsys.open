@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.revolsys.ui.html.view;
-
-import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,15 +27,15 @@ public class ObjectElementContainer extends ElementContainer {
   public Object getInitialValue(
     final Field field,
     final HttpServletRequest request) {
-    if (object != null) {
+    if (this.object != null) {
       final String propertyName = field.getName();
-      return JavaBeanUtil.getProperty(object, propertyName);
+      return JavaBeanUtil.getProperty(this.object, propertyName);
     }
     return null;
   }
 
   public Object getObject() {
-    return object;
+    return this.object;
   }
 
   public void setObject(final Object object) {
@@ -47,14 +45,14 @@ public class ObjectElementContainer extends ElementContainer {
   @Override
   public boolean validate() {
     boolean valid = true;
-    if (object != null) {
-      for (final Iterator fields = getFields().values().iterator(); fields.hasNext();) {
-        final Field field = (Field)fields.next();
+    if (this.object != null) {
+      for (final Object element : getFields().values()) {
+        final Field field = (Field)element;
         if (!field.hasValidationErrors()) {
           final String propertyName = field.getName();
           final Object value = field.getValue();
           try {
-            JavaBeanUtil.setProperty(object, propertyName, value);
+            JavaBeanUtil.setProperty(this.object, propertyName, value);
           } catch (final IllegalArgumentException e) {
             field.addValidationError(e.getMessage());
             valid = false;

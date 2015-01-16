@@ -7,7 +7,7 @@ import com.revolsys.gis.graph.Node;
 /**
  * A filter for {@link Node} objects which contains an {@link Edge} matching the
  * edge filter.
- * 
+ *
  * @author Paul Austin
  * @param <T>
  */
@@ -22,7 +22,7 @@ public class NodeMatchingEdgeFilter<T> implements Filter<Node<T>> {
   @Override
   public boolean accept(final Node<T> node) {
     for (final Edge<T> edge : node.getEdges()) {
-      if (edgeFilter.accept(edge)) {
+      if (this.edgeFilter.accept(edge)) {
         return true;
       }
     }

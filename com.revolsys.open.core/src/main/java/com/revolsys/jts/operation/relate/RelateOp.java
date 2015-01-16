@@ -45,10 +45,10 @@ import com.revolsys.jts.operation.GeometryGraphOperation;
  * to be used during the relate computation.
  * <p>
  * If named spatial predicates are used on the result {@link IntersectionMatrix}
- * of the RelateOp, the result may or not be affected by the 
+ * of the RelateOp, the result may or not be affected by the
  * choice of <tt>BoundaryNodeRule</tt>, depending on the exact nature of the pattern.
- * For instance, {@link IntersectionMatrix#isIntersects()} is insensitive 
- * to the choice of <tt>BoundaryNodeRule</tt>, 
+ * For instance, {@link IntersectionMatrix#isIntersects()} is insensitive
+ * to the choice of <tt>BoundaryNodeRule</tt>,
  * whereas {@link IntersectionMatrix#isTouches(int, int)} is affected by the rule chosen.
  * <p>
  * <b>Note:</b> custom Boundary Node Rules do not (currently)
@@ -100,7 +100,7 @@ public class RelateOp extends GeometryGraphOperation {
    */
   public RelateOp(final Geometry g0, final Geometry g1) {
     super(g0, g1);
-    relate = new RelateComputer(arg);
+    this.relate = new RelateComputer(this.arg);
   }
 
   /**
@@ -113,7 +113,7 @@ public class RelateOp extends GeometryGraphOperation {
   public RelateOp(final Geometry g0, final Geometry g1,
     final BoundaryNodeRule boundaryNodeRule) {
     super(g0, g1, boundaryNodeRule);
-    relate = new RelateComputer(arg);
+    this.relate = new RelateComputer(this.arg);
   }
 
   /**
@@ -123,7 +123,7 @@ public class RelateOp extends GeometryGraphOperation {
    * @return the IntersectonMatrix for the spatial relationship between the input geometries
    */
   public IntersectionMatrix getIntersectionMatrix() {
-    return relate.computeIM();
+    return this.relate.computeIM();
   }
 
 }

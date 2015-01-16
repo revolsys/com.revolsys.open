@@ -17,7 +17,7 @@ import com.revolsys.parallel.channel.ChannelValueStore;
  * The getState method will return EMPTY if the Channel does not contain any
  * Objects, FULL if it cannot accept more data and NONEMPTYFULL otherwise.
  * </p>
- * 
+ *
  * @author P.D.Austin
  */
 public class Buffer<T> extends ChannelValueStore<T> {
@@ -38,7 +38,7 @@ public class Buffer<T> extends ChannelValueStore<T> {
 
   /**
    * Construct a new Buffer with the specified maximum size.
-   * 
+   *
    * @param maxSize The maximum number of Objects the Buffer can store
    */
   public Buffer(final int maxSize) {
@@ -47,7 +47,7 @@ public class Buffer<T> extends ChannelValueStore<T> {
 
   /**
    * Construct a new Buffer with the no maximum size.
-   * 
+   *
    * @param buffer The buffer to store the elements in.
    */
   public Buffer(final Queue<T> buffer) {
@@ -56,7 +56,7 @@ public class Buffer<T> extends ChannelValueStore<T> {
 
   /**
    * Construct a new Buffer with the specified maximum size.
-   * 
+   *
    * @param buffer The buffer to store the elements in.
    * @param size The maximum number of Objects the Buffer can store
    */
@@ -69,7 +69,7 @@ public class Buffer<T> extends ChannelValueStore<T> {
    * Empty the buffer.
    */
   public synchronized void clear() {
-    buffer.clear();
+    this.buffer.clear();
   }
 
   /**
@@ -79,12 +79,12 @@ public class Buffer<T> extends ChannelValueStore<T> {
    * constructing a new instance with the same parameters as the original.
    * <I>NOTE: Only the sizes of the data should be cloned not the stored
    * data.</I>
-   * 
+   *
    * @return The cloned instance of this Object.
    */
   @Override
   protected Object clone() {
-    return new Buffer<T>(maxSize);
+    return new Buffer<T>(this.maxSize);
   }
 
   /**
@@ -96,25 +96,25 @@ public class Buffer<T> extends ChannelValueStore<T> {
    * undefined state.</I>
    * <P>
    * Pre-condition: The state must not be EMPTY
-   * 
+   *
    * @return The next available Object from the Buffer
    */
   @Override
   protected synchronized T get() {
-    return buffer.remove();
+    return this.buffer.remove();
   }
 
   /**
    * Returns the current state of the Buffer, should be called to ensure the
    * Pre-conditions of the other methods are not broken.
-   * 
+   *
    * @return The current state of the Buffer (EMPTY, NONEMPTYFULL or FULL)
    */
   @Override
   protected synchronized int getState() {
-    if (buffer.isEmpty()) {
+    if (this.buffer.isEmpty()) {
       return EMPTY;
-    } else if (!discardIfFull && maxSize > 0 && buffer.size() == maxSize) {
+    } else if (!this.discardIfFull && this.maxSize > 0 && this.buffer.size() == this.maxSize) {
       return FULL;
     } else {
       return NONEMPTYFULL;
@@ -129,25 +129,25 @@ public class Buffer<T> extends ChannelValueStore<T> {
    * undefined state.</I>
    * <P>
    * Pre-condition: The state must not be FULL
-   * 
+   *
    * @param value The object to put in the Buffer
    */
   @Override
   protected synchronized void put(final T value) {
-    if (maxSize == 0 || buffer.size() < maxSize) {
-      buffer.offer(value);
+    if (this.maxSize == 0 || this.buffer.size() < this.maxSize) {
+      this.buffer.offer(value);
     }
   }
 
   /**
    * Remove the object from the buffer.
-   * 
+   *
    * @param object The object to remove.
    * @return True if the object was removed.
    */
   public boolean remove(final T object) {
-    if (buffer.contains(object)) {
-      buffer.remove(object);
+    if (this.buffer.contains(object)) {
+      this.buffer.remove(object);
       return true;
     } else {
       return false;
@@ -156,15 +156,15 @@ public class Buffer<T> extends ChannelValueStore<T> {
 
   /**
    * The number of items in the buffer.
-   * 
+   *
    * @return The number of items in the buffer.
    */
   public int size() {
-    return buffer.size();
+    return this.buffer.size();
   }
 
   @Override
   public String toString() {
-    return buffer.toString();
+    return this.buffer.toString();
   }
 }

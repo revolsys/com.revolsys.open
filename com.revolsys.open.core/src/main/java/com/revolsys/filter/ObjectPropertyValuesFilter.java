@@ -18,8 +18,8 @@ public class ObjectPropertyValuesFilter<T> implements Filter<T> {
   @Override
   public boolean accept(final T object) {
     try {
-      final Object value = PropertyUtils.getProperty(object, propertyName);
-      return values.contains(value);
+      final Object value = PropertyUtils.getProperty(object, this.propertyName);
+      return this.values.contains(value);
     } catch (final Throwable e) {
       throw new RuntimeException(e);
     }

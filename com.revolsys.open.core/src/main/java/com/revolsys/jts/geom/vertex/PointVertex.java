@@ -5,6 +5,10 @@ import java.util.NoSuchElementException;
 import com.revolsys.jts.geom.Point;
 
 public class PointVertex extends AbstractVertex {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private int vertexIndex;
 
   public PointVertex(final Point geometry, final int... vertexId) {

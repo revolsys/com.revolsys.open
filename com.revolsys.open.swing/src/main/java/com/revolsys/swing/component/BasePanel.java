@@ -9,6 +9,11 @@ import org.jdesktop.swingx.VerticalLayout;
 
 public class BasePanel extends JXPanel {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public BasePanel() {
     this(true);
   }

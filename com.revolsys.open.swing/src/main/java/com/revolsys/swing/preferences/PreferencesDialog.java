@@ -17,13 +17,13 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.field.Field;
 
 public class PreferencesDialog extends JDialog {
-  private static final long serialVersionUID = 1L;
-
-  private static final PreferencesDialog INSTANCE = new PreferencesDialog();
-
   public static PreferencesDialog get() {
     return INSTANCE;
   }
+
+  private static final long serialVersionUID = 1L;
+
+  private static final PreferencesDialog INSTANCE = new PreferencesDialog();
 
   private final JTabbedPane tabs = new JTabbedPane();
 
@@ -59,7 +59,7 @@ public class PreferencesDialog extends JDialog {
   public void addPreference(final String title, final String applicationName,
     final String path, final String propertyName, final Class<?> valueClass,
     final Object defaultValue, final Field field) {
-    PreferencesPanel panel = panels.get(title);
+    PreferencesPanel panel = this.panels.get(title);
     if (panel == null) {
       panel = new SimplePreferencesPanel(title);
       addPanel(panel);

@@ -17,7 +17,7 @@ public class LineEqualIgnoreDirectionFilter implements Filter<LineString> {
 
   @Override
   public boolean accept(final LineString line) {
-    return LineStringUtil.equalsIgnoreDirection(line, this.line, dimension);
+    return LineStringUtil.equalsIgnoreDirection(line, this.line, this.dimension);
   }
 
 }

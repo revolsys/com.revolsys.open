@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,16 +43,16 @@ public class CsvWriter {
   }
 
   public void print(final String value) throws IOException {
-    if (firstCol) {
-      firstCol = false;
+    if (this.firstCol) {
+      this.firstCol = false;
     } else {
-      out.write(",");
+      this.out.write(",");
     }
-    out.write("\"");
+    this.out.write("\"");
     if (value != null) {
-      out.write(value.replaceAll("\"", "\"\""));
+      this.out.write(value.replaceAll("\"", "\"\""));
     }
-    out.write("\"");
+    this.out.write("\"");
   }
 
   public void print(final TableModel model) throws IOException {
@@ -69,12 +69,12 @@ public class CsvWriter {
   }
 
   public void println() throws IOException {
-    out.write('\n');
-    firstCol = true;
+    this.out.write('\n');
+    this.firstCol = true;
   }
 
   private void printRow(final TableModel model, final int row)
-    throws IOException {
+      throws IOException {
     final int colCount = model.getColumnCount();
     for (int col = 0; col < colCount; col++) {
       final String value = model.getBodyCell(row, col);

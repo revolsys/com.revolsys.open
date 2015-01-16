@@ -7,7 +7,7 @@ import com.revolsys.gis.graph.Edge;
 /**
  * A comparator which will compare the length of the lines of two edges, edges
  * with a shorter length will be returned before those with a longer length.
- * 
+ *
  * @author Paul Austin
  */
 public class EdgeLengthComparator<T> implements Comparator<Edge<T>> {
@@ -28,7 +28,7 @@ public class EdgeLengthComparator<T> implements Comparator<Edge<T>> {
     final double length2 = edge2.getLength();
     compare = Double.compare(length1, length2);
 
-    if (invert) {
+    if (this.invert) {
       return -compare;
     } else {
       return compare;

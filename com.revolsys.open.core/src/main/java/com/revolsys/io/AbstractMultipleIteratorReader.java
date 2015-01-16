@@ -8,7 +8,7 @@ import javax.annotation.PreDestroy;
 import com.revolsys.collection.AbstractIterator;
 
 public abstract class AbstractMultipleIteratorReader<T> extends
-  AbstractReader<T> implements Iterator<T> {
+AbstractReader<T> implements Iterator<T> {
 
   private AbstractIterator<T> iterator;
 
@@ -19,9 +19,9 @@ public abstract class AbstractMultipleIteratorReader<T> extends
   @Override
   @PreDestroy
   public void close() {
-    if (iterator != null) {
-      iterator.close();
-      iterator = null;
+    if (this.iterator != null) {
+      this.iterator.close();
+      this.iterator = null;
     }
   }
 
@@ -29,22 +29,22 @@ public abstract class AbstractMultipleIteratorReader<T> extends
 
   @Override
   public boolean hasNext() {
-    if (loadNext) {
-      if (iterator == null) {
-        iterator = getNextIterator();
-        if (iterator == null) {
+    if (this.loadNext) {
+      if (this.iterator == null) {
+        this.iterator = getNextIterator();
+        if (this.iterator == null) {
           close();
           return false;
         }
       }
-      while (!iterator.hasNext()) {
-        iterator.close();
-        iterator = getNextIterator();
-        if (iterator == null) {
+      while (!this.iterator.hasNext()) {
+        this.iterator.close();
+        this.iterator = getNextIterator();
+        if (this.iterator == null) {
           return false;
         }
       }
-      loadNext = false;
+      this.loadNext = false;
     }
     return true;
   }
@@ -58,9 +58,9 @@ public abstract class AbstractMultipleIteratorReader<T> extends
   @Override
   public T next() {
     if (hasNext()) {
-      final T object = iterator.next();
+      final T object = this.iterator.next();
       process(object);
-      loadNext = true;
+      this.loadNext = true;
       return object;
     } else {
       throw new NoSuchElementException();
@@ -69,8 +69,8 @@ public abstract class AbstractMultipleIteratorReader<T> extends
 
   @Override
   public void open() {
-    if (!open) {
-      open = true;
+    if (!this.open) {
+      this.open = true;
     }
   }
 
@@ -79,6 +79,6 @@ public abstract class AbstractMultipleIteratorReader<T> extends
 
   @Override
   public void remove() {
-    iterator.remove();
+    this.iterator.remove();
   }
 }

@@ -133,9 +133,9 @@ public class PageController implements SiteNodeController {
     if (o instanceof PageController) {
       final PageController p = (PageController)o;
       if (super.equals(o)
-        && p.menuId == this.menuId
-        && p.getPath().equals(getPath())
-        && (p.title == this.title || p.title != null && this.title != null
+          && p.menuId == this.menuId
+          && p.getPath().equals(getPath())
+          && (p.title == this.title || p.title != null && this.title != null
           && p.title.equals(this.title))
           && p.properties.equals(this.properties)) {
         return true;
@@ -179,15 +179,15 @@ public class PageController implements SiteNodeController {
     return this.arguments;
   }
 
-  public List getFields() {
-    return this.attributes;
-  }
-
   /**
    * @return Returns the config.
    */
   public Config getConfig() {
     return this.config;
+  }
+
+  public List getFields() {
+    return this.attributes;
   }
 
   public String getFullPath() {
@@ -358,7 +358,7 @@ public class PageController implements SiteNodeController {
    * @throws PageNotFoundException
    */
   private void processArguments(final HttpServletRequest request)
-    throws ActionException {
+      throws ActionException {
     for (final Iterator arguments = getArguments().iterator(); arguments.hasNext();) {
       final Argument argument = (Argument)arguments.next();
       final String name = argument.getName();
@@ -390,7 +390,7 @@ public class PageController implements SiteNodeController {
    * @throws PageNotFoundException
    */
   private void processAttributes(final HttpServletRequest request)
-    throws ActionException {
+      throws ActionException {
     for (final Iterator attributes = getFields().iterator(); attributes.hasNext();) {
       final Attribute attribute = (Attribute)attributes.next();
       final String name = attribute.getName();

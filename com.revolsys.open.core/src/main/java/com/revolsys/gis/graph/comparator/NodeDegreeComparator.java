@@ -31,7 +31,7 @@ public class NodeDegreeComparator<T> implements Comparator<Node<T>> {
       compare = 1;
     }
 
-    if (invert) {
+    if (this.invert) {
       return -compare;
     } else {
       return compare;
@@ -39,7 +39,7 @@ public class NodeDegreeComparator<T> implements Comparator<Node<T>> {
   }
 
   public boolean isInvert() {
-    return invert;
+    return this.invert;
   }
 
 }

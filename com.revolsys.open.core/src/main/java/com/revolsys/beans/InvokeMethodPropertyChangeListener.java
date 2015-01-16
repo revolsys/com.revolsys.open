@@ -6,7 +6,7 @@ import java.beans.PropertyChangeListener;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class InvokeMethodPropertyChangeListener extends InvokeMethodRunnable
-  implements PropertyChangeListener, NonWeakListener {
+implements PropertyChangeListener, NonWeakListener {
 
   public InvokeMethodPropertyChangeListener(final Class<?> clazz,
     final String methodName, final Object... parameters) {

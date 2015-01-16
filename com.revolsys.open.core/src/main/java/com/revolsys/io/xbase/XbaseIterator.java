@@ -32,7 +32,7 @@ import com.revolsys.util.DateUtil;
 import com.revolsys.util.ExceptionUtil;
 
 public class XbaseIterator extends AbstractIterator<Record> implements
-  RecordIterator {
+RecordIterator {
   public static final char CHARACTER_TYPE = 'C';
 
   private static final Map<Character, DataType> DATA_TYPES = new HashMap<>();
@@ -101,7 +101,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
     final Resource codePageResource = SpringUtil.getResourceWithExtension(
       resource, "cpg");
     if (!(codePageResource instanceof NonExistingResource)
-      && codePageResource.exists()) {
+        && codePageResource.exists()) {
       final String charsetName = SpringUtil.getContents(codePageResource);
       try {
         this.charset = Charset.forName(charsetName);
@@ -199,7 +199,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
   }
 
   private Object getMemo(final int startIndex, final int len)
-    throws IOException {
+      throws IOException {
     return null;
     /*
      * String memoIndexString = new String(record, startIndex, len).trim(); if
@@ -397,7 +397,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements
 
     } else {
       throw new UnsupportedOperationException(
-        "The position can only be set on files");
+          "The position can only be set on files");
     }
   }
 

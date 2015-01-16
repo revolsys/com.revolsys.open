@@ -123,7 +123,7 @@ public class JdbcFactoryRegistry {
         }
       }
       throw new IllegalArgumentException("Data Source Factory not found for "
-        + url);
+          + url);
     }
   }
 
@@ -131,7 +131,7 @@ public class JdbcFactoryRegistry {
     final JdbcDatabaseFactory databaseFactory = this.databaseFactoriesByProductName.get(productName);
     if (databaseFactory == null) {
       throw new IllegalArgumentException("Record Store not found for "
-        + productName);
+          + productName);
     } else {
       return databaseFactory;
     }

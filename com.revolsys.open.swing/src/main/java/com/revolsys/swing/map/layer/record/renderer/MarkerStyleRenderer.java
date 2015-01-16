@@ -51,7 +51,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     final Viewport2D viewport, final Geometry geometry, final MarkerStyle style) {
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null && geometry != null
-      && !geometry.isEmpty()) {
+        && !geometry.isEmpty()) {
       Point point = null;
       double orientation = 0;
       final String placementType = style.getMarkerPlacementType();
@@ -314,7 +314,7 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   private static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
-    .geometry();
+      .geometry();
 
   private static final Icon ICON = Icons.getIcon("style_marker");
 

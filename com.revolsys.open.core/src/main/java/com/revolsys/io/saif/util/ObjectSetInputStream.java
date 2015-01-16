@@ -5,13 +5,13 @@
  * $Revision$
 
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,24 +46,24 @@ public class ObjectSetInputStream extends InputStream {
   private ZipFile zipFile;
 
   public ObjectSetInputStream(final File directory, final String fileName)
-    throws IOException {
+      throws IOException {
     this.directory = directory;
     this.fileName = fileName;
-    prefix = ObjectSetUtil.getObjectSubsetPrefix(fileName);
-    in = openFile(fileName);
-    if (in == null) {
+    this.prefix = ObjectSetUtil.getObjectSubsetPrefix(fileName);
+    this.in = openFile(fileName);
+    if (this.in == null) {
       throw new IllegalArgumentException("File " + fileName
         + " does not exist ");
     }
   }
 
   public ObjectSetInputStream(final ZipFile zipFile, final String fileName)
-    throws IOException {
+      throws IOException {
     this.zipFile = zipFile;
     this.fileName = fileName;
-    in = openFile(fileName);
-    prefix = ObjectSetUtil.getObjectSubsetPrefix(fileName);
-    if (in == null) {
+    this.in = openFile(fileName);
+    this.prefix = ObjectSetUtil.getObjectSubsetPrefix(fileName);
+    if (this.in == null) {
       throw new IllegalArgumentException("File " + fileName
         + " does not exist ");
     }
@@ -72,10 +72,10 @@ public class ObjectSetInputStream extends InputStream {
   @Override
   public void close() throws IOException {
     if (log.isDebugEnabled()) {
-      log.debug("Closing object subset '" + fileName + "' from reading");
+      log.debug("Closing object subset '" + this.fileName + "' from reading");
     }
-    if (in != null) {
-      in.close();
+    if (this.in != null) {
+      this.in.close();
     }
   }
 
@@ -83,13 +83,13 @@ public class ObjectSetInputStream extends InputStream {
     if (log.isDebugEnabled()) {
       log.debug("Opening object subset '" + fileName + "' for reading");
     }
-    if (zipFile != null) {
-      final ZipEntry entry = zipFile.getEntry(fileName);
+    if (this.zipFile != null) {
+      final ZipEntry entry = this.zipFile.getEntry(fileName);
       if (entry != null) {
-        return new BufferedInputStream(zipFile.getInputStream(entry));
+        return new BufferedInputStream(this.zipFile.getInputStream(entry));
       }
     } else {
-      final File file = new File(directory, fileName);
+      final File file = new File(this.directory, fileName);
       if (file.exists()) {
         return new BufferedInputStream(new FileInputStream(file));
       }
@@ -99,11 +99,11 @@ public class ObjectSetInputStream extends InputStream {
 
   private boolean openNextFile() throws IOException {
     close();
-    index++;
-    final String fileName = ObjectSetUtil.getObjectSubsetName(prefix, index);
+    this.index++;
+    final String fileName = ObjectSetUtil.getObjectSubsetName(this.prefix, this.index);
 
-    in = openFile(fileName);
-    if (in != null) {
+    this.in = openFile(fileName);
+    if (this.in != null) {
       return true;
     } else {
       return false;
@@ -112,12 +112,12 @@ public class ObjectSetInputStream extends InputStream {
 
   @Override
   public int read() throws IOException {
-    int bytesRead = in.read();
+    int bytesRead = this.in.read();
     if (bytesRead == -1) {
       if (!openNextFile()) {
         return -1;
       } else {
-        bytesRead = in.read();
+        bytesRead = this.in.read();
       }
     }
     return bytesRead;
@@ -130,16 +130,16 @@ public class ObjectSetInputStream extends InputStream {
 
   @Override
   public int read(final byte[] b, final int off, final int len)
-    throws IOException {
-    if (in == null) {
+      throws IOException {
+    if (this.in == null) {
       return -1;
     } else {
-      int bytesRead = in.read(b, off, len);
+      int bytesRead = this.in.read(b, off, len);
       if (bytesRead == -1) {
         if (!openNextFile()) {
           return -1;
         } else {
-          bytesRead = in.read(b, off, len);
+          bytesRead = this.in.read(b, off, len);
         }
       }
       return bytesRead;

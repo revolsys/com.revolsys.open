@@ -44,7 +44,7 @@ package com.revolsys.jts.planargraph;
  * @version 1.7
  */
 public class Edge
-    extends GraphComponent
+extends GraphComponent
 {
 
   /**
@@ -66,43 +66,32 @@ public class Edge
    * DirectedEdge: sets the Edge, sets the symmetric DirectedEdge, and adds
    * this Edge to its from-Node.
    */
-  public Edge(DirectedEdge de0, DirectedEdge de1)
+  public Edge(final DirectedEdge de0, final DirectedEdge de1)
   {
     setDirectedEdges(de0, de1);
-  }
-
-  /**
-   * Initializes this Edge's two DirectedEdges, and for each DirectedEdge: sets the
-   * Edge, sets the symmetric DirectedEdge, and adds this Edge to its from-Node.
-   */
-  public void setDirectedEdges(DirectedEdge de0, DirectedEdge de1)
-  {
-    dirEdge = new DirectedEdge[] { de0, de1 };
-    de0.setEdge(this);
-    de1.setEdge(this);
-    de0.setSym(de1);
-    de1.setSym(de0);
-    de0.getFromNode().addOutEdge(de0);
-    de1.getFromNode().addOutEdge(de1);
   }
 
   /**
    * Returns one of the DirectedEdges associated with this Edge.
    * @param i 0 or 1.  0 returns the forward directed edge, 1 returns the reverse
    */
-  public DirectedEdge getDirEdge(int i)
+  public DirectedEdge getDirEdge(final int i)
   {
-    return dirEdge[i];
+    return this.dirEdge[i];
   }
 
   /**
    * Returns the {@link DirectedEdge} that starts from the given node, or null if the
    * node is not one of the two nodes associated with this Edge.
    */
-  public DirectedEdge getDirEdge(Node fromNode)
+  public DirectedEdge getDirEdge(final Node fromNode)
   {
-    if (dirEdge[0].getFromNode() == fromNode) return dirEdge[0];
-    if (dirEdge[1].getFromNode() == fromNode) return dirEdge[1];
+    if (this.dirEdge[0].getFromNode() == fromNode) {
+      return this.dirEdge[0];
+    }
+    if (this.dirEdge[1].getFromNode() == fromNode) {
+      return this.dirEdge[1];
+    }
     // node not found
     // possibly should throw an exception here?
     return null;
@@ -112,13 +101,28 @@ public class Edge
    * If <code>node</code> is one of the two nodes associated with this Edge,
    * returns the other node; otherwise returns null.
    */
-  public Node getOppositeNode(Node node)
+  public Node getOppositeNode(final Node node)
   {
-    if (dirEdge[0].getFromNode() == node) return dirEdge[0].getToNode();
-    if (dirEdge[1].getFromNode() == node) return dirEdge[1].getToNode();
+    if (this.dirEdge[0].getFromNode() == node) {
+      return this.dirEdge[0].getToNode();
+    }
+    if (this.dirEdge[1].getFromNode() == node) {
+      return this.dirEdge[1].getToNode();
+    }
     // node not found
     // possibly should throw an exception here?
     return null;
+  }
+
+  /**
+   * Tests whether this edge has been removed from its containing graph
+   *
+   * @return <code>true</code> if this edge is removed
+   */
+  @Override
+  public boolean isRemoved()
+  {
+    return this.dirEdge == null;
   }
 
   /**
@@ -129,13 +133,18 @@ public class Edge
   }
 
   /**
-   * Tests whether this edge has been removed from its containing graph
-   *
-   * @return <code>true</code> if this edge is removed
+   * Initializes this Edge's two DirectedEdges, and for each DirectedEdge: sets the
+   * Edge, sets the symmetric DirectedEdge, and adds this Edge to its from-Node.
    */
-  public boolean isRemoved()
+  public void setDirectedEdges(final DirectedEdge de0, final DirectedEdge de1)
   {
-    return dirEdge == null;
+    this.dirEdge = new DirectedEdge[] { de0, de1 };
+    de0.setEdge(this);
+    de1.setEdge(this);
+    de0.setSym(de1);
+    de1.setSym(de0);
+    de0.getFromNode().addOutEdge(de0);
+    de1.getFromNode().addOutEdge(de1);
   }
 
 }

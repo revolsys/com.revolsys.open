@@ -61,8 +61,8 @@ public class OpenStreetMapLayer extends AbstractTiledImageLayer {
       final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(viewport);
       final BoundingBox geographicBoundingBox = viewport.getBoundingBox()
-        .convert(GEOMETRY_FACTORY)
-        .intersection(MAX_BOUNDING_BOX);
+          .convert(GEOMETRY_FACTORY)
+          .intersection(MAX_BOUNDING_BOX);
       final double minX = geographicBoundingBox.getMinX();
       final double minY = geographicBoundingBox.getMinY();
       final double maxX = geographicBoundingBox.getMaxX();

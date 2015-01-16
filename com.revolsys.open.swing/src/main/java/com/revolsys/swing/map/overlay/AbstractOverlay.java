@@ -58,12 +58,13 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.LineCap;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class AbstractOverlay extends JComponent implements
-  PropertyChangeListener, MouseListener, MouseMotionListener,
-  MouseWheelListener, KeyListener, FocusListener {
+PropertyChangeListener, MouseListener, MouseMotionListener,
+MouseWheelListener, KeyListener, FocusListener {
   public static final Cursor CURSOR_LINE_ADD_NODE = Icons.getCursor(
     "cursor_line_node_add", 8, 6);
 
@@ -576,7 +577,7 @@ public class AbstractOverlay extends JComponent implements
             boundingBox);
           if (closeLocation != null) {
             final Point closePoint = closeLocation.getPoint();
-            CollectionUtil.addToSet(snapLocations, closePoint, closeLocation);
+            Maps.addToSet(snapLocations, closePoint, closeLocation);
 
           }
         }
@@ -751,7 +752,7 @@ public class AbstractOverlay extends JComponent implements
 
       boolean nodeSnap = false;
       final StringBuilder text = new StringBuilder(
-        "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
+          "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
       text.append("<li style=\"padding: 2px; margin:1px;");
       if (0 == this.snapPointIndex) {
         text.append("border: 2px solid maroon");
@@ -788,7 +789,7 @@ public class AbstractOverlay extends JComponent implements
           if ("Point".equals(locationType) || "End-Vertex".equals(locationType)) {
             nodeSnap = true;
           }
-          CollectionUtil.addToSet(typeLocationsMap, typePath
+          Maps.addToSet(typeLocationsMap, typePath
             + " (<b style=\"color:red\">" + locationType + "</b>)",
             snapLocation);
         }

@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,34 +38,39 @@ public class HtmlUiBuilderDetailSerializer implements LabelValueListSerializer {
     }
   }
 
+  @Override
   public String getLabelCss(final int index) {
     return "detailTitle";
   }
 
   public Object getObject() {
-    return object;
+    return this.object;
   }
 
+  @Override
   public int getSize() {
-    return size;
+    return this.size;
   }
 
+  @Override
   public String getValueCss(final int index) {
     return "detailValue";
   }
 
+  @Override
   public void serializeLabel(final XmlWriter out, final int index) {
-    if (index < size) {
-      final String key = (String)keys.get(index);
-      out.text(builder.getLabel(key));
+    if (index < this.size) {
+      final String key = (String)this.keys.get(index);
+      out.text(this.builder.getLabel(key));
     } else {
       out.entityRef("nbsp");
     }
   }
 
+  @Override
   public void serializeValue(final XmlWriter out, final int index) {
-    if (index < size) {
-      builder.serialize(out, object, (String)keys.get(index));
+    if (index < this.size) {
+      this.builder.serialize(out, this.object, (String)this.keys.get(index));
     } else {
       out.entityRef("nbsp");
     }

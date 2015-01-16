@@ -41,15 +41,15 @@ jdbc:oracle:oci:@<host>:<port>/<service>
 public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
   public static List<String> getTnsConnectionNames() {
     File tnsFile = new File(System.getProperty("oracle.net.tns_admin"),
-      "tnsnames.ora");
+        "tnsnames.ora");
     if (!tnsFile.exists()) {
       tnsFile = new File(System.getenv("TNS_ADMIN"), "tnsnames.ora");
       if (!tnsFile.exists()) {
         tnsFile = new File(System.getenv("ORACLE_HOME") + "/network/admin",
-          "tnsnames.ora");
+            "tnsnames.ora");
         if (!tnsFile.exists()) {
           tnsFile = new File(System.getenv("ORACLE_HOME") + "/NETWORK/ADMIN",
-            "tnsnames.ora");
+              "tnsnames.ora");
 
         }
       }
@@ -119,7 +119,7 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
     } else {
       try {
         final Map<String, Object> newConfig = new HashMap<String, Object>(
-          config);
+            config);
         final Properties cacheProperties = new Properties();
         final String url = (String)newConfig.remove("url");
         final String username = (String)newConfig.remove("username");
@@ -158,7 +158,7 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
         return dataSource;
       } catch (final Throwable e) {
         throw new IllegalArgumentException("Unable to create data source for "
-          + config, e);
+            + config, e);
       }
     }
   }

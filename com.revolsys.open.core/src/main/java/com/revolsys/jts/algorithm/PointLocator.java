@@ -42,7 +42,7 @@ import com.revolsys.jts.geom.Polygon;
 /**
  * Computes the topological ({@link Location})
  * of a single point to a {@link Geometry}.
- * A {@link BoundaryNodeRule} may be specified 
+ * A {@link BoundaryNodeRule} may be specified
  * to control the evaluation of whether the point lies on the boundary or not
  * The default rule is to use the the <i>SFS Boundary Determination Rule</i>
  * <p>
@@ -110,12 +110,12 @@ public class PointLocator {
       return locate(point, (Polygon)geometry);
     }
 
-    isIn = false;
+    this.isIn = false;
     final int numBoundaries = computeLocation(point, geometry);
-    if (boundaryRule.isInBoundary(numBoundaries)) {
+    if (this.boundaryRule.isInBoundary(numBoundaries)) {
       return Location.BOUNDARY;
     }
-    if (numBoundaries > 0 || isIn) {
+    if (numBoundaries > 0 || this.isIn) {
       return Location.INTERIOR;
     }
 
@@ -187,7 +187,7 @@ public class PointLocator {
   private int updateLocationInfo(final Location loc) {
 
     if (loc == Location.INTERIOR) {
-      isIn = true;
+      this.isIn = true;
     } else if (loc == Location.BOUNDARY) {
       return 1;
     }

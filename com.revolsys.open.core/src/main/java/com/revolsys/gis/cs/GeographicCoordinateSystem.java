@@ -15,13 +15,6 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class GeographicCoordinateSystem implements CoordinateSystem {
-  public static final double EARTH_RADIUS = 6378137;
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 8655274386401351222L;
-
   public static double distanceMetres(final double lon1, final double lat1,
     final double lon2, final double lat2) {
     final double lon1Radians = Math.toRadians(lon1);
@@ -36,12 +29,19 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     final double sinHeightOver2 = Math.sin(height / 2);
     final double sinWidthOver2 = Math.sin(width / 2);
     final double distance = 2
-      * EARTH_RADIUS
-      * Math.asin(Math.sqrt(sinHeightOver2 * sinHeightOver2
-        + Math.cos(lat1Radians) * Math.cos(lat2Radians) * sinWidthOver2
-        * sinWidthOver2));
+        * EARTH_RADIUS
+        * Math.asin(Math.sqrt(sinHeightOver2 * sinHeightOver2
+          + Math.cos(lat1Radians) * Math.cos(lat2Radians) * sinWidthOver2
+          * sinWidthOver2));
     return distance;
   }
+
+  public static final double EARTH_RADIUS = 6378137;
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 8655274386401351222L;
 
   private final AngularUnit angularUnit;
 
@@ -125,11 +125,11 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
       return true;
     } else if (object instanceof GeographicCoordinateSystem) {
       final GeographicCoordinateSystem cs = (GeographicCoordinateSystem)object;
-      if (!equals(datum, cs.datum)) {
+      if (!equals(this.datum, cs.datum)) {
         return false;
       } else if (!equals(getPrimeMeridian(), cs.getPrimeMeridian())) {
         return false;
-      } else if (!equals(angularUnit, cs.angularUnit)) {
+      } else if (!equals(this.angularUnit, cs.angularUnit)) {
         return false;
       } else {
         return true;
@@ -155,21 +155,21 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
     } else if (cs == this) {
       return true;
     } else {
-      if (!equals(angularUnit, cs.angularUnit)) {
+      if (!equals(this.angularUnit, cs.angularUnit)) {
         return false;
-      } else if (!equals(area, cs.area)) {
+      } else if (!equals(this.area, cs.area)) {
         return false;
-      } else if (!equals(authority, cs.authority)) {
+      } else if (!equals(this.authority, cs.authority)) {
         return false;
-      } else if (!equals(axis, cs.axis)) {
+      } else if (!equals(this.axis, cs.axis)) {
         return false;
-      } else if (!equals(datum, cs.datum)) {
+      } else if (!equals(this.datum, cs.datum)) {
         return false;
-      } else if (deprecated != cs.deprecated) {
+      } else if (this.deprecated != cs.deprecated) {
         return false;
-      } else if (id != cs.id) {
+      } else if (this.id != cs.id) {
         return false;
-      } else if (!equals(name, cs.name)) {
+      } else if (!equals(this.name, cs.name)) {
         return false;
       } else if (!equals(getPrimeMeridian(), cs.getPrimeMeridian())) {
         return false;
@@ -180,19 +180,19 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   }
 
   public AngularUnit getAngularUnit() {
-    return angularUnit;
+    return this.angularUnit;
   }
 
   @Override
   public Area getArea() {
-    return area;
+    return this.area;
   }
 
   @Override
   public BoundingBox getAreaBoundingBox() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    if (area != null) {
-      return area.getLatLonBounds().convert(geometryFactory);
+    if (this.area != null) {
+      return this.area.getLatLonBounds().convert(geometryFactory);
     } else {
       return new BoundingBoxDoubleGf(geometryFactory, 2, -180, -90, 180, 90);
     }
@@ -200,12 +200,12 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   @Override
   public Authority getAuthority() {
-    return authority;
+    return this.authority;
   }
 
   @Override
   public List<Axis> getAxis() {
-    return axis;
+    return this.axis;
   }
 
   @Override
@@ -214,7 +214,7 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   }
 
   public Datum getDatum() {
-    return datum;
+    return this.datum;
   }
 
   @Override
@@ -224,15 +224,15 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   @Override
   public int getId() {
-    return id;
+    return this.id;
   }
 
   @Override
   public Unit<Length> getLengthUnit() {
-    final Unit<Angle> unit = angularUnit.getUnit();
+    final Unit<Angle> unit = this.angularUnit.getUnit();
     final UnitConverter radianConverter = unit.getConverterTo(SI.RADIAN);
 
-    final Spheroid spheroid = datum.getSpheroid();
+    final Spheroid spheroid = this.datum.getSpheroid();
     final double radius = spheroid.getSemiMajorAxis();
     final double radianFactor = radianConverter.convert(1);
     return SI.METRE.times(radius).times(radianFactor);
@@ -240,25 +240,25 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
   }
 
   public PrimeMeridian getPrimeMeridian() {
-    if (primeMeridian == null) {
-      if (datum == null) {
+    if (this.primeMeridian == null) {
+      if (this.datum == null) {
         return null;
       } else {
-        return datum.getPrimeMeridian();
+        return this.datum.getPrimeMeridian();
       }
     } else {
-      return primeMeridian;
+      return this.primeMeridian;
     }
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public Unit<Angle> getUnit() {
-    return angularUnit.getUnit();
+    return this.angularUnit.getUnit();
   }
 
   // public Unit<Angle> getUnit() {
@@ -269,8 +269,8 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    if (datum != null) {
-      result = prime * result + datum.hashCode();
+    if (this.datum != null) {
+      result = prime * result + this.datum.hashCode();
     }
     if (getPrimeMeridian() != null) {
       result = prime * result + getPrimeMeridian().hashCode();
@@ -280,11 +280,11 @@ public class GeographicCoordinateSystem implements CoordinateSystem {
 
   @Override
   public boolean isDeprecated() {
-    return deprecated;
+    return this.deprecated;
   }
 
   @Override
   public String toString() {
-    return name;
+    return this.name;
   }
 }

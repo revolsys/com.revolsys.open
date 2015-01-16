@@ -80,7 +80,7 @@ public class MultiPointImpl extends AbstractMultiPoint implements MultiPoint {
       this.points = null;
     } else if (hasNullElements(points)) {
       throw new IllegalArgumentException(
-        "geometries must not contain null elements");
+          "geometries must not contain null elements");
     } else {
       this.points = points;
     }
@@ -88,48 +88,48 @@ public class MultiPointImpl extends AbstractMultiPoint implements MultiPoint {
 
   @Override
   public BoundingBox getBoundingBox() {
-    if (boundingBox == null) {
+    if (this.boundingBox == null) {
       if (isEmpty()) {
-        boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
+        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
       } else {
-        boundingBox = computeBoundingBox();
+        this.boundingBox = computeBoundingBox();
       }
     }
-    return boundingBox;
+    return this.boundingBox;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (points == null) {
+    if (this.points == null) {
       return new ArrayList<V>();
     } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(points));
+      return (List<V>)new ArrayList<>(Arrays.asList(this.points));
     }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (points == null) {
+    if (this.points == null) {
       return null;
     } else {
-      return (V)points[n];
+      return (V)this.points[n];
     }
   }
 
   @Override
   public int getGeometryCount() {
-    if (points == null) {
+    if (this.points == null) {
       return 0;
     } else {
-      return points.length;
+      return this.points.length;
     }
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    return geometryFactory;
+    return this.geometryFactory;
   }
 
   /**
@@ -139,12 +139,12 @@ public class MultiPointImpl extends AbstractMultiPoint implements MultiPoint {
    */
   @Override
   public Object getUserData() {
-    return userData;
+    return this.userData;
   }
 
   @Override
   public boolean isEmpty() {
-    return points == null;
+    return this.points == null;
   }
 
   @Override

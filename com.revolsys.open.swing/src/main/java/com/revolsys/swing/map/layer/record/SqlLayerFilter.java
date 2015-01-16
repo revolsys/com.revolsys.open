@@ -45,11 +45,11 @@ public class SqlLayerFilter implements Filter<Record>, MapSerializer {
   }
 
   private synchronized Condition getCondition() {
-    if (condition == null) {
-      if (!initialized) {
-        final RecordDefinition recordDefinition = layer.getRecordDefinition();
+    if (this.condition == null) {
+      if (!this.initialized) {
+        final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
         if (recordDefinition != null) {
-          initialized = true;
+          this.initialized = true;
           try {
             final Properties properties = System.getProperties();
             final HashMap<String, Object> uriVariables = new HashMap<String, Object>();
@@ -62,31 +62,31 @@ public class SqlLayerFilter implements Filter<Record>, MapSerializer {
             }
 
             final String query = new UriTemplate(this.query).expandString(uriVariables);
-            condition = QueryValue.parseWhere(recordDefinition, query);
+            this.condition = QueryValue.parseWhere(recordDefinition, query);
           } catch (final Throwable e) {
             LoggerFactory.getLogger(getClass()).error(
-              "Invalid query: " + query, e);
+              "Invalid query: " + this.query, e);
           }
         }
       }
     }
-    return condition;
+    return this.condition;
   }
 
   public String getQuery() {
-    return query;
+    return this.query;
   }
 
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<String, Object>();
     map.put("type", "sqlFilter");
-    map.put("query", query);
+    map.put("query", this.query);
     return map;
   }
 
   @Override
   public String toString() {
-    return query;
+    return this.query;
   }
 }

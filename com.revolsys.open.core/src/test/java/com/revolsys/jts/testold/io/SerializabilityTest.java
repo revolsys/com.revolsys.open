@@ -44,11 +44,11 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 
 public class SerializabilityTest extends TestCase {
 
-  static GeometryFactory fact = GeometryFactory.floating3();
-
   public static void main(final String args[]) {
     TestRunner.run(SerializabilityTest.class);
   }
+
+  static GeometryFactory fact = GeometryFactory.floating3();
 
   public SerializabilityTest(final String name) {
     super(name);

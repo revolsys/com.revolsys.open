@@ -45,7 +45,7 @@ public final class SiteNode implements Comparable, Cloneable {
   /**
    * Construct a deep copy of the node. Does not retain the reference to the
    * parent node.
-   * 
+   *
    * @param node The node to copy.
    */
   public SiteNode(final SiteNode node) {
@@ -59,7 +59,7 @@ public final class SiteNode implements Comparable, Cloneable {
 
   /**
    * Construct a new SiteNode for the controller.
-   * 
+   *
    * @param controller The controller.
    */
   public SiteNode(final SiteNodeController controller) {
@@ -68,7 +68,7 @@ public final class SiteNode implements Comparable, Cloneable {
 
   /**
    * Construct a new site node with the specified path.
-   * 
+   *
    * @param path The path.
    */
   public SiteNode(final String path) {
@@ -77,28 +77,28 @@ public final class SiteNode implements Comparable, Cloneable {
 
   /**
    * Add the node as a child of this node.
-   * 
+   *
    * @param node The node.
    */
   protected void addNode(final SiteNode node) {
     node.setParent(this);
-    nodeMap.put(node.getPath(), node);
-    nodes.add(node);
+    this.nodeMap.put(node.getPath(), node);
+    this.nodes.add(node);
   }
 
   /**
    * Add the path for the parent node and this node to the string buffer.
-   * 
+   *
    * @param buffer The buffer to add the path to.
    */
   private void addPath(final StringBuilder buffer) {
     if (hasParent()) {
-      parent.addPath(buffer);
+      this.parent.addPath(buffer);
     }
     if (buffer.length() == 0 || buffer.charAt(buffer.length() - 1) != '/') {
       buffer.append("/");
     }
-    if (path != null) {
+    if (this.path != null) {
       buffer.append(getPath());
     }
   }
@@ -106,7 +106,7 @@ public final class SiteNode implements Comparable, Cloneable {
   /**
    * Create a deep copy of this node. Does not retain the reference to the
    * parent node.
-   * 
+   *
    * @return The cloned node.
    */
   @Override
@@ -116,19 +116,20 @@ public final class SiteNode implements Comparable, Cloneable {
 
   /**
    * Compare this node to another node. The comparison is performed on the path.
-   * 
+   *
    * @param o The object to compare.
    * @return -1 (less than), 0 (equal) or 1 (greater than).
    */
+  @Override
   public int compareTo(final Object o) {
     if (o instanceof SiteNode) {
       final SiteNode node = (SiteNode)o;
-      if (path == null) {
+      if (this.path == null) {
         return -1;
       } else if (node.path == null) {
         return 1;
       } else {
-        return path.compareTo(node.path);
+        return this.path.compareTo(node.path);
       }
     }
     return -1;
@@ -136,7 +137,7 @@ public final class SiteNode implements Comparable, Cloneable {
 
   /**
    * Find the site node matching the path.
-   * 
+   *
    * @param path The path.
    * @return The site node.
    */
@@ -157,10 +158,10 @@ public final class SiteNode implements Comparable, Cloneable {
       node = getNode(path);
     }
     if (node == null) {
-      for (final Iterator nodeIter = regexPatterns.iterator(); nodeIter.hasNext();) {
+      for (final Iterator nodeIter = this.regexPatterns.iterator(); nodeIter.hasNext();) {
         final Pattern pattern = (Pattern)nodeIter.next();
         if (pattern.matcher(path).matches()) {
-          return (SiteNode)regexNodes.get(pattern.pattern());
+          return (SiteNode)this.regexNodes.get(pattern.pattern());
         }
       }
       return null;
@@ -171,17 +172,17 @@ public final class SiteNode implements Comparable, Cloneable {
 
   /**
    * Get the controller for this node.
-   * 
+   *
    * @return The controller for this node.
    */
   public SiteNodeController getController() {
-    return controller;
+    return this.controller;
   }
 
   /**
    * Get the controller for the node specified by the path (see
    * {@link #findSiteNode(String)} for a description how the path is processed.
-   * 
+   *
    * @param path The path.
    * @return The controller.
    */
@@ -196,7 +197,7 @@ public final class SiteNode implements Comparable, Cloneable {
 
   /**
    * Get the full path to the node, including the path's of all parents.
-   * 
+   *
    * @return The path.
    */
   public String getFullPath() {
@@ -209,42 +210,42 @@ public final class SiteNode implements Comparable, Cloneable {
    * Get the child site node with the specified name. The name cannot contain
    * the '/' character, see ({@link #findSiteNode(String)} to get a child node
    * using a path.
-   * 
+   *
    * @param name The child node name.
    * @return The site node or null if not found.
    */
   public SiteNode getNode(final String name) {
-    return (SiteNode)nodeMap.get(name);
+    return (SiteNode)this.nodeMap.get(name);
   }
 
   /**
    * Get the collection of child nodes.
-   * 
+   *
    * @return The collection of nodes.
    */
   public Collection getNodes() {
-    return nodes;
+    return this.nodes;
   }
 
   /**
    * @return Returns the parent.
    */
   public SiteNode getParent() {
-    return parent;
+    return this.parent;
   }
 
   /**
    * Get the path for the node relative to the parenr node.
-   * 
+   *
    * @return The path.
    */
   public String getPath() {
-    if (path != null) {
-      return path;
-    } else if (parent == null) {
+    if (this.path != null) {
+      return this.path;
+    } else if (this.parent == null) {
       return null;
-    } else if (controller != null) {
-      return controller.getPath();
+    } else if (this.controller != null) {
+      return this.controller.getPath();
     } else {
       return null;
     }
@@ -252,25 +253,25 @@ public final class SiteNode implements Comparable, Cloneable {
 
   /**
    * Check to see if this node has a controller.
-   * 
+   *
    * @return True if the node has a controller.
    */
   public boolean hasController() {
-    return controller != null;
+    return this.controller != null;
   }
 
   /**
    * Check to see if this node has a parent.
-   * 
+   *
    * @return True if the node has a parent.
    */
   public boolean hasParent() {
-    return parent != null;
+    return this.parent != null;
   }
 
   /**
    * Merge the values of the specified node with this node.
-   * 
+   *
    * @param node The node to merge from.
    */
   protected void mergeNode(final SiteNode node) {
@@ -283,7 +284,7 @@ public final class SiteNode implements Comparable, Cloneable {
 
   /**
    * Set the controller for this node.
-   * 
+   *
    * @param controller The controller.
    */
   public void setController(final SiteNodeController controller) {
@@ -296,7 +297,7 @@ public final class SiteNode implements Comparable, Cloneable {
    * changing the values on the controller on one path does not affect the
    * other. See {@link #setNode(String, SiteNode)} for details on how the
    * controller for the node is set.
-   * 
+   *
    * @param path The path.
    * @param controller The controller.
    */
@@ -318,7 +319,7 @@ public final class SiteNode implements Comparable, Cloneable {
    * element in the path if one does not exist. If the last element does not
    * exist the node will be set as the node for that element. If it does exist
    * the values for the existing node will be merged from the new node. *
-   * 
+   *
    * @param path The path.
    * @param node The node.
    */
@@ -327,8 +328,8 @@ public final class SiteNode implements Comparable, Cloneable {
       if (path.startsWith("regex:")) {
         addNode(node);
         final String regex = path.substring(6);
-        regexNodes.put(regex, node);
-        regexPatterns.add(Pattern.compile(regex));
+        this.regexNodes.put(regex, node);
+        this.regexPatterns.add(Pattern.compile(regex));
       } else {
         final String[] names = path.split("/");
         SiteNode currentNode = this;
@@ -373,7 +374,7 @@ public final class SiteNode implements Comparable, Cloneable {
    * {@link SiteNodeController} instances the node from the controller will be
    * merged with the existing node for the path if a node with that path already
    * existed.
-   * 
+   *
    * @param nodes The site nodes
    */
   public void setNodes(final Collection nodes) {
@@ -425,7 +426,7 @@ public final class SiteNode implements Comparable, Cloneable {
 
   /**
    * Get the string representation of the node.
-   * 
+   *
    * @return The string representation.
    */
   @Override

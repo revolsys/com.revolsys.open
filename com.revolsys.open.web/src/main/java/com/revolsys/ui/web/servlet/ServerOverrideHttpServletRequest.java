@@ -32,7 +32,7 @@ public class ServerOverrideHttpServletRequest extends HttpServletRequestWrapper 
         this.secureServerUrl = "https://" + this.serverName;
       } else {
         this.serverUrl = this.scheme + "://" + this.serverName + ":"
-          + this.serverPort;
+            + this.serverPort;
         this.secureServerUrl = "https://" + this.serverName;
       }
     } catch (final MalformedURLException e) {

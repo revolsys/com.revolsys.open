@@ -112,7 +112,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
 
   public void testExtractLineBeyondRange() {
     checkExtractLine("LINESTRING (0 0, 10 10)", -100, 100,
-      "LINESTRING (0 0, 10 10)");
+        "LINESTRING (0 0, 10 10)");
   }
 
   public void testExtractLineBothIndicesAtEndpoint() {
@@ -145,7 +145,7 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
       -1, "LINESTRING (20 0, 25 0, 29 0)");
     checkExtractLine(
       "MULTILINESTRING ((0 0, 10 0), (10 0, 10 0), (20 0, 25 0, 30 0))", 5, 10,
-      "LINESTRING (5 0, 10 0)");
+        "LINESTRING (5 0, 10 0)");
     checkExtractLine(
       "MULTILINESTRING ((0 0, 10 0), (10 0, 10 0), (10 0, 10 0), (20 0, 25 0, 30 0))",
       10, 10, "LINESTRING (10 0, 10 0)");
@@ -188,11 +188,11 @@ public class LengthIndexedLineTest extends AbstractIndexedLineTest {
   @Override
   public void testOffsetStartPointRepeatedPoint() {
     runOffsetTest("LINESTRING (0 0, 10 10, 10 10, 20 20)", "POINT(0 0)", 1.0,
-      "POINT (-0.7071067811865475 0.7071067811865475)");
+        "POINT (-0.7071067811865475 0.7071067811865475)");
     runOffsetTest("LINESTRING (0 0, 10 10, 10 10, 20 20)", "POINT(0 0)", -1.0,
-      "POINT (0.7071067811865475 -0.7071067811865475)");
+        "POINT (0.7071067811865475 -0.7071067811865475)");
     runOffsetTest("LINESTRING (0 0, 10 10, 10 10, 20 20)", "POINT(10 10)", 5.0,
-      "POINT (6.464466094067262 13.535533905932738)");
+        "POINT (6.464466094067262 13.535533905932738)");
     runOffsetTest("LINESTRING (0 0, 10 10, 10 10, 20 20)", "POINT(10 10)",
       -5.0, "POINT (13.535533905932738 6.464466094067262)");
   }

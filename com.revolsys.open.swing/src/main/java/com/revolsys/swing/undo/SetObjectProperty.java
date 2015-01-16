@@ -57,6 +57,6 @@ public class SetObjectProperty extends AbstractUndoableEdit {
   @Override
   public String toString() {
     return this.propertyName + " old=" + this.oldValue + ", new="
-      + this.newValue;
+        + this.newValue;
   }
 }

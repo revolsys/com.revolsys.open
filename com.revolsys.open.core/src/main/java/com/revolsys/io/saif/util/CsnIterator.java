@@ -226,7 +226,7 @@ public class CsnIterator {
   }
 
   private int findStartDefinition(final StringBuilder buffer)
-    throws IOException {
+      throws IOException {
     if (buffer.charAt(0) != '<') {
       return UNKNOWN;
     } else {
@@ -254,7 +254,7 @@ public class CsnIterator {
       this.line = this.reader.readLine();
       this.lineNumber++;
       while (this.line != null
-        && (this.line.startsWith("//") || this.line.length() == 0)) {
+          && (this.line.startsWith("//") || this.line.length() == 0)) {
         this.line = this.reader.readLine();
         this.lineNumber++;
       }
@@ -562,7 +562,7 @@ public class CsnIterator {
   }
 
   private void processDefinitions(final StringBuilder buffer)
-    throws IOException {
+      throws IOException {
     final char c = buffer.charAt(0);
     // End of Definition
     if (c == '>') {
@@ -894,6 +894,6 @@ public class CsnIterator {
   @Override
   public String toString() {
     return this.fileName + "[" + this.lineNumber + "," + this.columnNumber
-      + "]";
+        + "]";
   }
 }

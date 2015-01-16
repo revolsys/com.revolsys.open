@@ -14,14 +14,8 @@ import org.springframework.util.ClassUtils;
 
 public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder {
 
-  private static volatile SimpleNamingContextBuilder activated;
-
-  private static final Object initializationLock = new Object();
-
-  private static boolean initialized = false;
-
   public static SimpleNamingContextBuilder emptyActivatedContextBuilder()
-    throws NamingException {
+      throws NamingException {
     if (activated != null) {
       activated.clear();
     } else {
@@ -35,6 +29,12 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
     return activated;
   }
 
+  private static volatile SimpleNamingContextBuilder activated;
+
+  private static final Object initializationLock = new Object();
+
+  private static boolean initialized = false;
+
   private final Hashtable<String, Object> boundObjects = new Hashtable<String, Object>();
 
   private final Logger log = LoggerFactory.getLogger(getClass());
@@ -43,12 +43,12 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
   }
 
   public void activate() throws IllegalStateException, NamingException {
-    log.info("Activating simple JNDI environment");
+    this.log.info("Activating simple JNDI environment");
     synchronized (initializationLock) {
       if (!initialized) {
         if (NamingManager.hasInitialContextFactoryBuilder()) {
           throw new IllegalStateException(
-            "Cannot activate SimpleNamingContextBuilder: there is already a JNDI provider registered. Note that JNDI is a JVM-wide service, shared at the JVM system class loader level, with no reset option. As a consequence, a JNDI provider must only be registered once per JVM.");
+              "Cannot activate SimpleNamingContextBuilder: there is already a JNDI provider registered. Note that JNDI is a JVM-wide service, shared at the JVM system class loader level, with no reset option. As a consequence, a JNDI provider must only be registered once per JVM.");
         }
         NamingManager.setInitialContextFactoryBuilder(this);
         initialized = true;
@@ -58,18 +58,18 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
   }
 
   public void bind(final String name, final Object obj) {
-    if (log.isInfoEnabled()) {
-      log.info((new StringBuilder("Static JNDI binding: [")).append(name)
+    if (this.log.isInfoEnabled()) {
+      this.log.info(new StringBuilder("Static JNDI binding: [").append(name)
         .append("] = [")
         .append(obj)
         .append("]")
         .toString());
     }
-    boundObjects.put(name, obj);
+    this.boundObjects.put(name, obj);
   }
 
   public void clear() {
-    boundObjects.clear();
+    this.boundObjects.clear();
   }
 
   @Override
@@ -86,26 +86,26 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
             getClass().getClassLoader());
         } else {
           throw new IllegalArgumentException(
-            (new StringBuilder(
-              "Invalid value type for environment key [java.naming.factory.initial]: ")).append(
-              icf.getClass().getName())
-              .toString());
+            new StringBuilder(
+                "Invalid value type for environment key [java.naming.factory.initial]: ").append(
+                  icf.getClass().getName())
+                  .toString());
         }
         if (!InitialContextFactory.class.isAssignableFrom(icfClass)) {
-          throw new IllegalArgumentException((new StringBuilder(
-            "Specified class does not implement [")).append(
-            InitialContextFactory.class.getName())
-            .append("]: ")
-            .append(icf)
-            .toString());
+          throw new IllegalArgumentException(new StringBuilder(
+              "Specified class does not implement [").append(
+                InitialContextFactory.class.getName())
+                .append("]: ")
+                .append(icf)
+                .toString());
         }
         try {
           return (InitialContextFactory)icfClass.newInstance();
         } catch (final Throwable ex) {
           final IllegalStateException ise = new IllegalStateException(
-            (new StringBuilder(
-              "Cannot instantiate specified InitialContextFactory: ")).append(
-              icf).toString());
+            new StringBuilder(
+                "Cannot instantiate specified InitialContextFactory: ").append(
+                  icf).toString());
           ise.initCause(ex);
           throw ise;
         }
@@ -115,13 +115,13 @@ public class SimpleNamingContextBuilder implements InitialContextFactoryBuilder 
 
       @Override
       public Context getInitialContext(final Hashtable environment) {
-        return new SimpleNamingContext("", boundObjects, environment);
+        return new SimpleNamingContext("", SimpleNamingContextBuilder.this.boundObjects, environment);
       }
     };
   }
 
   public void deactivate() {
-    log.info("Deactivating simple JNDI environment");
+    this.log.info("Deactivating simple JNDI environment");
     activated = null;
   }
 

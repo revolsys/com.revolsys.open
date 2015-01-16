@@ -38,10 +38,10 @@ import java.util.NoSuchElementException;
 /**
  *  Iterates over all {@link Geometry}s in a {@link Geometry},
  *  (which may be either a collection or an atomic geometry).
- *  The iteration sequence follows a pre-order, depth-first traversal of the 
+ *  The iteration sequence follows a pre-order, depth-first traversal of the
  *  structure of the <code>GeometryCollection</code>
  *  (which may be nested). The original <code>Geometry</code> object is
- *  returned as well (as the first object), as are all sub-collections and atomic elements. 
+ *  returned as well (as the first object), as are all sub-collections and atomic elements.
  *  It is  simple to ignore the intermediate <code>GeometryCollection</code> objects if they are not
  *  needed.
  *
@@ -55,7 +55,7 @@ public class GeometryCollectionIterator implements Iterator<Geometry> {
   private final Geometry parent;
 
   /**
-   *  Indicates whether or not the first element 
+   *  Indicates whether or not the first element
    *  (the root <code>GeometryCollection</code>) has been returned.
    */
   private boolean atStart;
@@ -86,28 +86,28 @@ public class GeometryCollectionIterator implements Iterator<Geometry> {
    */
   public GeometryCollectionIterator(final Geometry parent) {
     this.parent = parent;
-    atStart = true;
-    index = 0;
-    max = parent.getGeometryCount();
+    this.atStart = true;
+    this.index = 0;
+    this.max = parent.getGeometryCount();
   }
 
   /**
    * Tests whether any geometry elements remain to be returned.
-   * 
+   *
    * @return true if more geometry elements remain
    */
   @Override
   public boolean hasNext() {
-    if (atStart) {
+    if (this.atStart) {
       return true;
     }
-    if (subcollectionIterator != null) {
-      if (subcollectionIterator.hasNext()) {
+    if (this.subcollectionIterator != null) {
+      if (this.subcollectionIterator.hasNext()) {
         return true;
       }
-      subcollectionIterator = null;
+      this.subcollectionIterator = null;
     }
-    if (index >= max) {
+    if (this.index >= this.max) {
       return false;
     }
     return true;
@@ -115,31 +115,31 @@ public class GeometryCollectionIterator implements Iterator<Geometry> {
 
   /**
    * Gets the next geometry in the iteration sequence.
-   * 
+   *
    * @return the next geometry in the iteration
    */
   @Override
   public Geometry next() {
     // the parent GeometryCollection is the first object returned
-    if (atStart) {
-      atStart = false;
-      return parent;
+    if (this.atStart) {
+      this.atStart = false;
+      return this.parent;
     }
-    if (subcollectionIterator != null) {
-      if (subcollectionIterator.hasNext()) {
-        return subcollectionIterator.next();
+    if (this.subcollectionIterator != null) {
+      if (this.subcollectionIterator.hasNext()) {
+        return this.subcollectionIterator.next();
       } else {
-        subcollectionIterator = null;
+        this.subcollectionIterator = null;
       }
     }
-    if (index >= max) {
+    if (this.index >= this.max) {
       throw new NoSuchElementException();
     }
-    final Geometry obj = parent.getGeometry(index++);
+    final Geometry obj = this.parent.getGeometry(this.index++);
     if (obj instanceof GeometryCollection) {
-      subcollectionIterator = new GeometryCollectionIterator(obj);
+      this.subcollectionIterator = new GeometryCollectionIterator(obj);
       // there will always be at least one element in the sub-collection
-      return subcollectionIterator.next();
+      return this.subcollectionIterator.next();
     }
     return obj;
   }

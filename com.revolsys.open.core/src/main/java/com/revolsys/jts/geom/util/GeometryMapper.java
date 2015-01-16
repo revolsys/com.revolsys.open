@@ -41,15 +41,45 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 
 /**
- * Methods to map various collections 
- * of {@link Geometry}s  
+ * Methods to map various collections
+ * of {@link Geometry}s
  * via defined mapping functions.
- * 
+ *
  * @author Martin Davis
  *
  */
-public class GeometryMapper 
+public class GeometryMapper
 {
+  /**
+   * An interface for geometry functions used for mapping.
+   *
+   * @author Martin Davis
+   *
+   */
+  public interface MapOp
+  {
+    /**
+     * Computes a new geometry value.
+     *
+     * @param g the input geometry
+     * @return a result geometry
+     */
+    Geometry map(Geometry g);
+  }
+
+  public static Collection map(final Collection geoms, final MapOp op)
+  {
+    final List mapped = new ArrayList();
+    for (final Iterator i = geoms.iterator(); i.hasNext(); ) {
+      final Geometry g = (Geometry) i.next();
+      final Geometry gr = op.map(g);
+      if (gr != null) {
+        mapped.add(gr);
+      }
+    }
+    return mapped;
+  }
+
   /**
    * Maps the members of a {@link Geometry}
    * (which may be atomic or composite)
@@ -57,48 +87,20 @@ public class GeometryMapper
    * <tt>null</tt> results are skipped.
    * In the case of hierarchical {@link GeometryCollection}s,
    * only the first level of members are mapped.
-   *  
+   *
    * @param geom the input atomic or composite geometry
    * @param op the mapping operation
    * @return a result collection or geometry of most specific type
    */
-  public static Geometry map(Geometry geom, MapOp op)
+  public static Geometry map(final Geometry geom, final MapOp op)
   {
-    List mapped = new ArrayList();
+    final List mapped = new ArrayList();
     for (int i = 0; i < geom.getGeometryCount(); i++) {
-      Geometry g = op.map(geom.getGeometry(i));
-      if (g != null)
+      final Geometry g = op.map(geom.getGeometry(i));
+      if (g != null) {
         mapped.add(g);
+      }
     }
     return geom.getGeometryFactory().buildGeometry(mapped);
-  }
-  
-  public static Collection map(Collection geoms, MapOp op)
-  {
-    List mapped = new ArrayList();
-    for (Iterator i = geoms.iterator(); i.hasNext(); ) {
-      Geometry g = (Geometry) i.next();
-      Geometry gr = op.map(g);
-      if (gr != null)
-        mapped.add(gr);
-    }
-    return mapped;
-  }
-  
-  /**
-   * An interface for geometry functions used for mapping.
-   * 
-   * @author Martin Davis
-   *
-   */
-  public interface MapOp 
-  {
-    /**
-     * Computes a new geometry value.
-     * 
-     * @param g the input geometry
-     * @return a result geometry
-     */
-    Geometry map(Geometry g);
   }
 }

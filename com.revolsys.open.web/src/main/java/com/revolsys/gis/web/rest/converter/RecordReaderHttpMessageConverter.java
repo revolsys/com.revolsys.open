@@ -38,7 +38,7 @@ import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class RecordReaderHttpMessageConverter extends
-  AbstractHttpMessageConverter<RecordReader> {
+AbstractHttpMessageConverter<RecordReader> {
 
   private List<String> requestAttributeNames = Arrays.asList(
     IoConstants.SINGLE_OBJECT_PROPERTY, Kml22Constants.STYLE_URL_PROPERTY,
@@ -79,12 +79,12 @@ public class RecordReaderHttpMessageConverter extends
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"
-        + mediaType.getSubtype();
+          + mediaType.getSubtype();
       final RecordReaderFactory readerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
         RecordReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format"
-          + mediaType);
+            + mediaType);
       } else {
         final Reader<Record> reader = readerFactory.createRecordReader(new InputStreamResource(
           "recordInput", body));
@@ -126,7 +126,7 @@ public class RecordReaderHttpMessageConverter extends
         final Charset charset = HttpServletUtils.setContentTypeWithCharset(
           outputMessage, actualMediaType);
         final String mediaTypeString = actualMediaType.getType() + "/"
-          + actualMediaType.getSubtype();
+            + actualMediaType.getSubtype();
         final RecordWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
           RecordWriterFactory.class, mediaTypeString);
         if (writerFactory == null) {
@@ -146,10 +146,10 @@ public class RecordReaderHttpMessageConverter extends
             contentDisposition = "attachment";
           }
           final String fileName = baseName + "."
-            + writerFactory.getFileExtension(mediaTypeString);
+              + writerFactory.getFileExtension(mediaTypeString);
           final HttpHeaders headers = outputMessage.getHeaders();
           headers.set("Content-Disposition", contentDisposition + "; filename="
-            + fileName);
+              + fileName);
 
           final OutputStream body = outputMessage.getBody();
           final Writer<Record> writer = writerFactory.createRecordWriter(
@@ -170,7 +170,7 @@ public class RecordReaderHttpMessageConverter extends
             final Object value = requestAttributes.getAttribute(attributeName,
               RequestAttributes.SCOPE_REQUEST);
             if (value != null && attributeName.startsWith("java:")
-              || this.requestAttributeNames.contains(attributeName)) {
+                || this.requestAttributeNames.contains(attributeName)) {
               writer.setProperty(attributeName, value);
             }
           }

@@ -24,6 +24,11 @@ import com.revolsys.jts.geom.impl.PointDouble;
 
 public class Circle extends PointDouble {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private BoundingBox envelope;
 
   private final double radius;
@@ -34,30 +39,30 @@ public class Circle extends PointDouble {
     super(centre);
     this.radius = radius;
     this.envelope = new BoundingBoxDoubleGf(2, getX(), getY());
-    envelope = envelope.expand(radius);
+    this.envelope = this.envelope.expand(radius);
   }
 
   public boolean contains(final Point point) {
     final double distanceFromCentre = distance(point);
-    return distanceFromCentre < (this.radius + tolerance);
+    return distanceFromCentre < this.radius + this.tolerance;
   }
 
   public BoundingBox getEnvelopeInternal() {
-    return envelope;
+    return this.envelope;
   }
 
   public double getRadius() {
-    return radius;
+    return this.radius;
   }
 
   public Geometry toGeometry() {
     final GeometryFactory factory = GeometryFactory.floating3();
     final Point point = factory.point(this);
-    return point.buffer(radius);
+    return point.buffer(this.radius);
   }
 
   @Override
   public String toString() {
-    return "CIRCLE(" + getX() + " " + getY() + " " + radius + ")";
+    return "CIRCLE(" + getX() + " " + getY() + " " + this.radius + ")";
   }
 }

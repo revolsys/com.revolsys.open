@@ -39,7 +39,7 @@ public class EdgeIntersectLineVisitor<T> implements Visitor<Edge<T>> {
     final LineString line = edge.getLine();
     final IntersectionMatrix relate = this.line.relate(line);
     if (relate.get(0, 0) == Dimension.L) {
-      matchVisitor.visit(edge);
+      this.matchVisitor.visit(edge);
     }
     return true;
   }

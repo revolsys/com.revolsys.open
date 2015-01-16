@@ -11,7 +11,7 @@ public class RunnableSwingWorkerProcess extends AbstractSwingWorker<Void, Void> 
   @Override
   protected Void doInBackground() throws Exception {
     do {
-      final Runnable task = manager.getNextTask();
+      final Runnable task = this.manager.getNextTask();
       if (task == null) {
         return null;
       } else {
@@ -22,6 +22,6 @@ public class RunnableSwingWorkerProcess extends AbstractSwingWorker<Void, Void> 
 
   @Override
   public String toString() {
-    return manager.toString();
+    return this.manager.toString();
   }
 }

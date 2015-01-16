@@ -45,9 +45,9 @@ import com.revolsys.jts.util.GeometricShapeFactory;
 /**
  * Creates geometries which are shaped like multi-armed stars
  * with each arm shaped like a sine wave.
- * These kinds of geometries are useful as a more complex 
+ * These kinds of geometries are useful as a more complex
  * geometry for testing algorithms.
- * 
+ *
  * @author Martin Davis
  *
  */
@@ -78,14 +78,14 @@ public class SineStarFactory extends GeometricShapeFactory {
 
   /**
    * Generates the geometry for the sine star
-   * 
+   *
    * @return the geometry representing the sine star
    */
   public Geometry createSineStar() {
-    final BoundingBox env = dim.getEnvelope();
+    final BoundingBox env = this.dim.getEnvelope();
     final double radius = env.getWidth() / 2.0;
 
-    double armRatio = armLengthRatio;
+    double armRatio = this.armLengthRatio;
     if (armRatio < 0.0) {
       armRatio = 0.0;
     }
@@ -99,11 +99,11 @@ public class SineStarFactory extends GeometricShapeFactory {
     final double centreX = env.getMinX() + radius;
     final double centreY = env.getMinY() + radius;
 
-    final Point[] pts = new Point[nPts + 1];
+    final Point[] pts = new Point[this.nPts + 1];
     int iPt = 0;
-    for (int i = 0; i < nPts; i++) {
+    for (int i = 0; i < this.nPts; i++) {
       // the fraction of the way thru the current arm - in [0,1]
-      final double ptArcFrac = (i / (double)nPts) * numArms;
+      final double ptArcFrac = i / (double)this.nPts * this.numArms;
       final double armAngFrac = ptArcFrac - Math.floor(ptArcFrac);
 
       // the angle for the current arm - in [0,2Pi]
@@ -116,15 +116,15 @@ public class SineStarFactory extends GeometricShapeFactory {
       final double curveRadius = insideRadius + armMaxLen * armLenFrac;
 
       // the current angle of the curve
-      final double ang = i * (2 * Math.PI / nPts);
+      final double ang = i * (2 * Math.PI / this.nPts);
       final double x = curveRadius * Math.cos(ang) + centreX;
       final double y = curveRadius * Math.sin(ang) + centreY;
       pts[iPt++] = coord(x, y);
     }
     pts[iPt] = new PointDouble(pts[0]);
 
-    final LinearRing ring = geomFact.linearRing(pts);
-    final Polygon poly = geomFact.polygon(ring);
+    final LinearRing ring = this.geomFact.linearRing(pts);
+    final Polygon poly = this.geomFact.polygon(ring);
     return poly;
   }
 
@@ -132,7 +132,7 @@ public class SineStarFactory extends GeometricShapeFactory {
    * Sets the ration of the length of each arm to the distance from the tip
    * of the arm to the centre of the star.
    * Value should be between 0.0 and 1.0
-   * 
+   *
    * @param armLengthRatio
    */
   public void setArmLengthRatio(final double armLengthRatio) {
@@ -141,7 +141,7 @@ public class SineStarFactory extends GeometricShapeFactory {
 
   /**
    * Sets the number of arms in the star
-   * 
+   *
    * @param numArms the number of arms to generate
    */
   public void setNumArms(final int numArms) {

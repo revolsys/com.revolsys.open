@@ -3,6 +3,7 @@ package com.revolsys.swing.map.overlay;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -33,13 +34,18 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.MathUtil;
 
 public class MeasureOverlay extends AbstractOverlay {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private static final Geometry EMPTY_GEOMETRY = GeometryFactory.wgs84()
-    .geometry();
+      .geometry();
 
   public static final String MEASURE = "Measure";
 
@@ -350,7 +356,7 @@ public class MeasureOverlay extends AbstractOverlay {
 
   protected boolean modeMeasureStart(final MouseEvent event) {
     final int modifiers = event.getModifiersEx();
-    if (modifiers == MouseEvent.BUTTON1_DOWN_MASK) {
+    if (modifiers == InputEvent.BUTTON1_DOWN_MASK) {
       if (isOverlayAction(MEASURE)) {
         if (!getMouseOverLocations().isEmpty()) {
           repaint();
@@ -524,9 +530,9 @@ public class MeasureOverlay extends AbstractOverlay {
 
       for (final CloseLocation location : this.mouseOverLocations) {
         if (location.getVertexId() == null) {
-          CollectionUtil.addToSet(segmentLocations, "Measure", location);
+          Maps.addToSet(segmentLocations, "Measure", location);
         } else {
-          CollectionUtil.addToSet(vertexLocations, "Measure", location);
+          Maps.addToSet(vertexLocations, "Measure", location);
         }
       }
       final StringBuilder text = new StringBuilder("<html>");

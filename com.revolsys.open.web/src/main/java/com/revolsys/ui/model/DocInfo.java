@@ -11,14 +11,6 @@ public class DocInfo {
 
   private boolean html = false;
 
-  public void setHtml(boolean html) {
-    this.html = html;
-  }
-
-  public boolean isHtml() {
-    return html;
-  }
-
   public DocInfo() {
   }
 
@@ -50,19 +42,27 @@ public class DocInfo {
   }
 
   public String getDescription() {
-    return description;
+    return this.description;
   }
 
   public Locale getLocale() {
-    return locale;
+    return this.locale;
   }
 
   public String getTitle() {
-    return title;
+    return this.title;
+  }
+
+  public boolean isHtml() {
+    return this.html;
   }
 
   public void setDescription(final String description) {
     this.description = description;
+  }
+
+  public void setHtml(final boolean html) {
+    this.html = html;
   }
 
   public void setTitle(final String title) {

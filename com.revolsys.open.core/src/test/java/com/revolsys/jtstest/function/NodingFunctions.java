@@ -62,7 +62,7 @@ public class NodingFunctions {
     for (final Iterator i = segStrings.iterator(); i.hasNext();) {
       final SegmentString ss = (SegmentString)i.next();
       final LineString line = FunctionsUtil.getFactoryOrDefault(null)
-        .lineString(ss.getPoints());
+          .lineString(ss.getPoints());
       lines[index++] = line;
     }
     return FunctionsUtil.getFactoryOrDefault(null).multiLineString(lines);
@@ -92,7 +92,7 @@ public class NodingFunctions {
   /**
    * Runs a ScaledNoder on input.
    * Input vertices should be rounded to precision model.
-   * 
+   *
    * @param geom
    * @param scaleFactor
    * @return the noded geometry

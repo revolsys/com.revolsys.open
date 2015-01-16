@@ -75,7 +75,7 @@ public class SortedPackedIntervalRTree<V> {
         dest.add(n1);
       } else {
         final IntervalRTreeNode<V> node = new IntervalRTreeBranchNode<V>(
-          src.get(i), src.get(i + 1));
+            src.get(i), src.get(i + 1));
         // printNode(node);
         // System.out.println(node);
         dest.add(node);
@@ -122,7 +122,7 @@ public class SortedPackedIntervalRTree<V> {
   public void insert(final double min, final double max, final V item) {
     if (this.root != null) {
       throw new IllegalStateException(
-        "Index cannot be added to once it has been queried");
+          "Index cannot be added to once it has been queried");
     }
     this.leaves.add(new IntervalRTreeLeafNode<V>(min, max, item));
   }

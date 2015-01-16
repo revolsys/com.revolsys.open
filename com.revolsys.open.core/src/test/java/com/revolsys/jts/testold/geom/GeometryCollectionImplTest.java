@@ -84,8 +84,8 @@ public class GeometryCollectionImplTest extends TestCase {
 
   public void testGetLength() throws Exception {
     final GeometryCollection g = (GeometryCollection)new WKTReader().read("MULTIPOLYGON("
-      + "((0 0, 10 0, 10 10, 0 10, 0 0), (3 3, 3 7, 7 7, 7 3, 3 3)),"
-      + "((100 100, 110 100, 110 110, 100 110, 100 100), (103 103, 103 107, 107 107, 107 103, 103 103)))");
+        + "((0 0, 10 0, 10 10, 0 10, 0 0), (3 3, 3 7, 7 7, 7 3, 3 3)),"
+        + "((100 100, 110 100, 110 110, 100 110, 100 100), (103 103, 103 107, 107 107, 107 103, 103 103)))");
     assertEquals(112, g.getLength(), 1E-15);
   }
 

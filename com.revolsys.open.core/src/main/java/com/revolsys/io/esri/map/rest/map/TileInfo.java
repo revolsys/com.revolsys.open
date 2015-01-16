@@ -7,7 +7,7 @@ import com.revolsys.io.esri.map.rest.AbstractMapWrapper;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 
 public class TileInfo extends AbstractMapWrapper {
   private double originX = Double.NaN;
@@ -67,8 +67,8 @@ public class TileInfo extends AbstractMapWrapper {
     if (origin == null) {
       return null;
     } else {
-      final Double x = CollectionUtil.getDoubleValue(origin, "x");
-      final Double y = CollectionUtil.getDoubleValue(origin, "y");
+      final Double x = Maps.getDoubleValue(origin, "x");
+      final Double y = Maps.getDoubleValue(origin, "y");
       return new PointDouble(x, y);
     }
   }
@@ -80,11 +80,11 @@ public class TileInfo extends AbstractMapWrapper {
   }
 
   public double getOriginX() {
-    return originX;
+    return this.originX;
   }
 
   public double getOriginY() {
-    return originY;
+    return this.originY;
   }
 
   public double getPixelSize() {
@@ -102,11 +102,11 @@ public class TileInfo extends AbstractMapWrapper {
     super.setValues(values);
     final Map<String, Object> origin = getValue("origin");
     if (origin == null) {
-      originX = Double.NaN;
-      originY = Double.NaN;
+      this.originX = Double.NaN;
+      this.originY = Double.NaN;
     } else {
-      originX = CollectionUtil.getDoubleValue(origin, "x");
-      originY = CollectionUtil.getDoubleValue(origin, "y");
+      this.originX = Maps.getDoubleValue(origin, "x");
+      this.originY = Maps.getDoubleValue(origin, "y");
     }
   }
 }

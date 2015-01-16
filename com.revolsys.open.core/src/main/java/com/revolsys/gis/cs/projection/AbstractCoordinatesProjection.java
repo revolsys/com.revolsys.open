@@ -1,7 +1,7 @@
 package com.revolsys.gis.cs.projection;
 
 public abstract class AbstractCoordinatesProjection implements
-  CoordinatesProjection {
+CoordinatesProjection {
 
   private final CoordinatesOperation inverseOperation = new InverseOperation(
     this);
@@ -9,11 +9,13 @@ public abstract class AbstractCoordinatesProjection implements
   private final CoordinatesOperation projectOperation = new ProjectOperation(
     this);
 
+  @Override
   public CoordinatesOperation getInverseOperation() {
-    return inverseOperation;
+    return this.inverseOperation;
   }
 
+  @Override
   public CoordinatesOperation getProjectOperation() {
-    return projectOperation;
+    return this.projectOperation;
   }
 }

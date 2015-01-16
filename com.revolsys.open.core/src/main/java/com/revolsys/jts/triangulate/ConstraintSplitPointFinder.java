@@ -43,17 +43,17 @@ import com.revolsys.jts.geom.Point;
  * especially at narrow constraint angles, since the split point will end up encroaching on the
  * segment containing the original encroaching point. With detailed knowledge of the geometry of the
  * constraints, it is sometimes possible to choose better locations for splitting.
- * 
+ *
  * @author mbdavis
  */
 public interface ConstraintSplitPointFinder {
-    /**
-     * Finds a point at which to split an encroached segment to allow the original segment to appear
-     * as edges in a constrained Delaunay triangulation.
-     * 
-     * @param seg the encroached segment
-     * @param encroachPt the encroaching point
-     * @return the point at which to split the encroached segment
-     */
-    Point findSplitPoint(Segment seg, Point encroachPt);
+  /**
+   * Finds a point at which to split an encroached segment to allow the original segment to appear
+   * as edges in a constrained Delaunay triangulation.
+   *
+   * @param seg the encroached segment
+   * @param encroachPt the encroaching point
+   * @return the point at which to split the encroached segment
+   */
+  Point findSplitPoint(Segment seg, Point encroachPt);
 }

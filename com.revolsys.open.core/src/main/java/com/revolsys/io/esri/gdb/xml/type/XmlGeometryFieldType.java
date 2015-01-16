@@ -52,7 +52,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
     if (multiLine.isEmpty()) {
       hasZ = false;
     } else {
-      final LineString points = ((LineString)multiLine.getGeometry(0));
+      final LineString points = (LineString)multiLine.getGeometry(0);
       hasZ = points.getAxisCount() > 2;
     }
     out.element(HAS_ID, false);

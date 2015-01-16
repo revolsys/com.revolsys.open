@@ -40,7 +40,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.MenuSourcePropertyEnableCheck;
 import com.revolsys.swing.tree.MenuSourceRunnable;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
@@ -96,7 +96,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
     setSelectSupported(false);
     setQuerySupported(false);
     setRenderer(new GeoReferencedImageLayerRenderer(this));
-    final int opacity = CollectionUtil.getInteger(properties, "opacity", 255);
+    final int opacity = Maps.getInteger(properties, "opacity", 255);
     setOpacity(opacity);
     setIcon(Icons.getIcon("picture"));
   }

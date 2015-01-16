@@ -55,7 +55,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
   public GeometryFieldDefinition(final Field field) {
     super(field.getName(), DataTypes.GEOMETRY,
       BooleanStringConverter.getBoolean(field.getRequired())
-        || !field.isIsNullable());
+      || !field.isIsNullable());
     final GeometryDef geometryDef = field.getGeometryDef();
     if (geometryDef == null) {
       throw new IllegalArgumentException(
@@ -65,16 +65,16 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
       final SpatialReference spatialReference = geometryDef.getSpatialReference();
       if (spatialReference == null) {
         throw new IllegalArgumentException(
-          "Field definition does not include a spatial reference");
+            "Field definition does not include a spatial reference");
       } else {
         final GeometryType geometryType = geometryDef.getGeometryType();
         final DataType dataType = GEOMETRY_TYPE_DATA_TYPE_MAP.get(geometryType);
         setType(dataType);
         this.geometryFactory = spatialReference.getGeometryFactory();
-        if (geometryFactory == null) {
+        if (this.geometryFactory == null) {
           throw new IllegalArgumentException(
             "Field definition does not include a valid coordinate system "
-              + spatialReference.getLatestWKID());
+                + spatialReference.getLatestWKID());
         }
 
         int axisCount = 2;
@@ -86,23 +86,23 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
         if (hasM) {
           axisCount = 4;
         }
-        if (axisCount != geometryFactory.getAxisCount()) {
-          final int srid = geometryFactory.getSrid();
-          final double scaleXY = geometryFactory.getScaleXY();
-          final double scaleZ = geometryFactory.getScaleZ();
-          geometryFactory = GeometryFactory.fixed(srid, axisCount,
+        if (axisCount != this.geometryFactory.getAxisCount()) {
+          final int srid = this.geometryFactory.getSrid();
+          final double scaleXY = this.geometryFactory.getScaleXY();
+          final double scaleZ = this.geometryFactory.getScaleZ();
+          this.geometryFactory = GeometryFactory.fixed(srid, axisCount,
             scaleXY, scaleZ);
         }
-        setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+        setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
 
         final String geometryTypeKey = dataType.toString() + hasZ + hasM;
-        readMethod = ShapefileGeometryUtil.getReadMethod(geometryTypeKey);
-        if (readMethod == null) {
+        this.readMethod = ShapefileGeometryUtil.getReadMethod(geometryTypeKey);
+        if (this.readMethod == null) {
           throw new IllegalArgumentException(
             "No read method for geometry type " + geometryTypeKey);
         }
-        writeMethod = ShapefileGeometryUtil.getWriteMethod(geometryTypeKey);
-        if (writeMethod == null) {
+        this.writeMethod = ShapefileGeometryUtil.getWriteMethod(geometryTypeKey);
+        if (this.writeMethod == null) {
           throw new IllegalArgumentException(
             "No write method for geometry type " + geometryTypeKey);
         }
@@ -134,22 +134,22 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
         if (type == 0) {
           final DataType dataType = getType();
           if (DataTypes.POINT.equals(dataType)) {
-            return geometryFactory.point();
+            return this.geometryFactory.point();
           } else if (DataTypes.MULTI_POINT.equals(dataType)) {
-            return geometryFactory.multiPoint();
+            return this.geometryFactory.multiPoint();
           } else if (DataTypes.LINE_STRING.equals(dataType)) {
-            return geometryFactory.lineString();
+            return this.geometryFactory.lineString();
           } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
-            return geometryFactory.multiLineString();
+            return this.geometryFactory.multiLineString();
           } else if (DataTypes.POLYGON.equals(dataType)) {
-            return geometryFactory.polygon();
+            return this.geometryFactory.polygon();
           } else if (DataTypes.MULTI_POLYGON.equals(dataType)) {
-            return geometryFactory.multiPolygon();
+            return this.geometryFactory.multiPolygon();
           } else {
             return null;
           }
         } else {
-          final Geometry geometry = SHP_UTIL.read(readMethod, geometryFactory,
+          final Geometry geometry = SHP_UTIL.read(this.readMethod, this.geometryFactory,
             in, -1);
           return geometry;
         }
@@ -175,7 +175,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
       return null;
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
-      final Geometry projectedGeometry = geometry.convert(geometryFactory);
+      final Geometry projectedGeometry = geometry.convert(this.geometryFactory);
       final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       final EndianOutput out = new EndianOutputStream(byteOut);
       if (geometry.isEmpty()) {
@@ -184,7 +184,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
         } catch (final IOException e) {
         }
       } else {
-        SHP_UTIL.write(writeMethod, out, projectedGeometry);
+        SHP_UTIL.write(this.writeMethod, out, projectedGeometry);
       }
       final byte[] bytes = byteOut.toByteArray();
       synchronized (getRecordStore()) {

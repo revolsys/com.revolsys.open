@@ -10,7 +10,7 @@ import com.revolsys.gis.cs.Spheroid;
  * An implementation of the Transverse Mercator projection. See section 1.3.5 of
  * <a href="http://www.epsg.org/guides/G7-2.html">OGP Surveying and Positioning
  * Guidance Note number 7, part 2</a>.
- * 
+ *
  * @author Paul Austin
  */
 public class TransverseMercator extends AbstractCoordinatesProjection {
@@ -50,7 +50,7 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
 
   /**
    * Construct a new TransverseMercator projection.
-   * 
+   *
    * @param coordinateSystem The coordinate system.
    */
   public TransverseMercator(final ProjectedCoordinateSystem coordinateSystem) {
@@ -68,18 +68,18 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
     this.a = spheroid.getSemiMajorAxis();
     this.k0 = scaleFactor;
     final double phi0 = Math.toRadians(latitudeOfNaturalOrigin);
-    eSq = spheroid.getEccentricitySquared();
-    ePow4 = eSq * eSq;
-    ePow6 = ePow4 * eSq;
+    this.eSq = spheroid.getEccentricitySquared();
+    this.ePow4 = this.eSq * this.eSq;
+    this.ePow6 = this.ePow4 * this.eSq;
     this.m0 = m(phi0);
-    this.ePrimeSq = eSq / (1 - eSq);
+    this.ePrimeSq = this.eSq / (1 - this.eSq);
 
   }
 
   /**
    * Project the projected coordinates in metres to lon/lat ordinates in
    * degrees.
-   * 
+   *
    * <pre>
    * ϕ = ϕ1 – (ν1 * tanϕ1 / ρ1 ) * [
    *   D &circ; 2/2 –
@@ -92,17 +92,17 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
    *   (5 – 2 * C1 + 28 * T1 –
    *   3 * C1 &circ; 2 + 8 * e' &circ; 2 + 24 * T1 &circ; 2) * D &circ; 5 / 120
    * ] / cosϕ1
-   * 
+   *
    * ν1 = a /(1 – e &circ; 2 * sinϕ1 &circ; 2) &circ; 0.5
    * ρ1 = a * (1 – e &circ; 2) / (1 – e &circ; 2 * sinϕ1 &circ; 2) &circ; 1.5
-   * 
+   *
    * ϕ1 = μ1 +
    *   (3 * e1 / 2 – 27 * e1 &circ; 3 /32 + .....) * sin(2 * μ1) +
    *   (21 * e1 &circ; 2 / 16 – 55 * e1 &circ; 4 / 32 + ....) * sin(4 * μ1) +
    *   (151 * e1 &circ; 3 / 96 + .....) * sin(6 * μ1) +
    *   (1097 * e1 &circ; 4 / 512 – ....) * sin(8 * μ1) +
    *   ......
-   *   
+   *
    * e1 = [1 – (1 – e &circ; 2) &circ; 0.5] / [1 + (1 – e &circ; 2) &circ; 0.5]
    * μ1 = M1 / [a * (1 – e &circ; 2 / 4 – 3 * e &circ; 4 / 64 – 5 * e &circ; 6 / 256 – ....)]
    * M1 = MO + (y – y0) / k0
@@ -111,7 +111,7 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
    * e' &circ; 2 = e &circ; 2 / (1 – e &circ; 2)
    * D = (x – x0) / (ν1 * kO)
    * </pre>
-   * 
+   *
    * @param from The ordinates to convert.
    * @param to The ordinates to write the converted ordinates to.
    */
@@ -119,30 +119,30 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
   public void inverse(final double x, final double y,
     final double[] targetCoordinates, final int targetOffset,
     final int targetAxisCount) {
-    final double m = m0 + (y - y0) / k0;
-    final double sqrt1MinusESq = Math.sqrt(1 - eSq);
+    final double m = this.m0 + (y - this.y0) / this.k0;
+    final double sqrt1MinusESq = Math.sqrt(1 - this.eSq);
     final double e1 = (1 - sqrt1MinusESq) / (1 + sqrt1MinusESq);
     final double mu = m
-      / (a * (1 - eSq / 4 - 3 * ePow4 / 64 - 5 * ePow6 / 256));
+        / (this.a * (1 - this.eSq / 4 - 3 * this.ePow4 / 64 - 5 * this.ePow6 / 256));
     final double e1Pow2 = e1 * e1;
     final double e1Pow3 = e1Pow2 * e1;
     final double e1Pow4 = e1Pow2 * e1Pow2;
     final double phi11 = mu + (3 * e1 / 2 - 27 * e1Pow3 / 32)
-      * Math.sin(2 * mu) + (21 * e1Pow2 / 16 - 55 * e1Pow4 / 32)
-      * Math.sin(4 * mu) + (151 * e1Pow3 / 96) * Math.sin(6 * mu)
-      + (1097 * e1Pow4 / 512) * Math.sin(8 * mu);
+        * Math.sin(2 * mu) + (21 * e1Pow2 / 16 - 55 * e1Pow4 / 32)
+        * Math.sin(4 * mu) + 151 * e1Pow3 / 96 * Math.sin(6 * mu)
+        + 1097 * e1Pow4 / 512 * Math.sin(8 * mu);
 
     final double phi1 = phi11;
     final double cosPhi1 = Math.cos(phi1);
     final double sinPhi = Math.sin(phi1);
     final double tanPhi1 = Math.tan(phi1);
 
-    final double oneMinusESqSinPhi1Sq = 1 - eSq * sinPhi * sinPhi;
-    final double nu1 = a / Math.sqrt(oneMinusESqSinPhi1Sq);
-    final double rho1 = a * (1 - eSq)
-      / (oneMinusESqSinPhi1Sq * Math.sqrt(oneMinusESqSinPhi1Sq));
-    final double c1 = ePrimeSq * cosPhi1 * cosPhi1;
-    final double d = (x - x0) / (nu1 * k0);
+    final double oneMinusESqSinPhi1Sq = 1 - this.eSq * sinPhi * sinPhi;
+    final double nu1 = this.a / Math.sqrt(oneMinusESqSinPhi1Sq);
+    final double rho1 = this.a * (1 - this.eSq)
+        / (oneMinusESqSinPhi1Sq * Math.sqrt(oneMinusESqSinPhi1Sq));
+    final double c1 = this.ePrimeSq * cosPhi1 * cosPhi1;
+    final double d = (x - this.x0) / (nu1 * this.k0);
     final double d2 = d * d;
     final double d3 = d2 * d;
     final double d4 = d2 * d2;
@@ -153,15 +153,15 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
     final double c1Sq = c1 * c1;
     final double t1Sq = t1 * t1;
     final double phi = phi1
-      - (nu1 * tanPhi1 / rho1)
-      * (d2 / 2 - (5 + 3 * t1 + 10 * c1 - 4 * c1Sq - 9 * ePrimeSq) * d4 / 24 + (61
-        + 90 * t1 + 298 * c1 + 45 * t1Sq - 252 * ePrimeSq - 3 * c1Sq)
-        * d6 / 720);
+        - nu1 * tanPhi1 / rho1
+        * (d2 / 2 - (5 + 3 * t1 + 10 * c1 - 4 * c1Sq - 9 * this.ePrimeSq) * d4 / 24 + (61
+            + 90 * t1 + 298 * c1 + 45 * t1Sq - 252 * this.ePrimeSq - 3 * c1Sq)
+            * d6 / 720);
 
-    final double lambda = lambda0
-      + (d - (1 + 2 * t1 + c1) * d3 / 6 + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + 8
-        * ePrimeSq + 24 * t1Sq)
-        * d5 / 120) / cosPhi1;
+    final double lambda = this.lambda0
+        + (d - (1 + 2 * t1 + c1) * d3 / 6 + (5 - 2 * c1 + 28 * t1 - 3 * c1Sq + 8
+            * this.ePrimeSq + 24 * t1Sq)
+            * d5 / 120) / cosPhi1;
 
     targetCoordinates[targetOffset * targetAxisCount] = lambda;
     targetCoordinates[targetOffset * targetAxisCount + 1] = phi;
@@ -170,31 +170,31 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
   /**
    * Calculate the value of m for the given value of phi using the following
    * forumla.
-   * 
+   *
    * <pre>
    * m = a [
    *   (1 – e2/4 – 3e4/64 – 5e6/256 –....)ϕ –
-   *   (3e2/8 + 3e4/32 + 45e6/1024+....)sin2ϕ + 
-   *   (15e4/256 + 45e6/1024 +.....)sin4ϕ – 
+   *   (3e2/8 + 3e4/32 + 45e6/1024+....)sin2ϕ +
+   *   (15e4/256 + 45e6/1024 +.....)sin4ϕ –
    *   (35e6/3072 + ....)sin6ϕ + .....
    * ]
    * </pre>
-   * 
+   *
    * @param phi The phi value in radians.
    * @return The value of m.
    */
   private double m(final double phi) {
-    return a
-      * ((1 - eSq / 4 - 3 * ePow4 / 64 - 5 * ePow6 / 256) * phi
-        - (3 * eSq / 8 + 3 * ePow4 / 32 + 45 * ePow6 / 1024)
-        * Math.sin(2 * phi) + (15 * ePow4 / 256 + 45 * ePow6 / 1024)
-        * Math.sin(4 * phi) - (35 * ePow6 / 3072) * Math.sin(6 * phi));
+    return this.a
+        * ((1 - this.eSq / 4 - 3 * this.ePow4 / 64 - 5 * this.ePow6 / 256) * phi
+            - (3 * this.eSq / 8 + 3 * this.ePow4 / 32 + 45 * this.ePow6 / 1024)
+            * Math.sin(2 * phi) + (15 * this.ePow4 / 256 + 45 * this.ePow6 / 1024)
+            * Math.sin(4 * phi) - 35 * this.ePow6 / 3072 * Math.sin(6 * phi));
   }
 
   /**
    * Project the lon/lat ordinates in degrees to projected coordinates in
    * metres.
-   * 
+   *
    * <pre>
    * x = x0 + kO * ν * [
    *   A + (1 – T + C) * A &circ; 3 / 6 +
@@ -205,13 +205,13 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
    *   (5 – T + 9 * C + 4 * C &circ; 2) * A &circ; 4 / 24 +
    *   (61 – 58 * T + T &circ; 2 + 600 * C – 330 * e' &circ; 2 ) * A &circ; 6 / 720
    * ]}
-   * 
+   *
    * T = tanϕ * 2
    * C = e &circ; 2 * cosϕ &circ; 2 / (1 – e &circ; 2)
    * A = (λ – λO) * cosϕ
    * ν = a / (1 – e &circ; 2 * sinϕ &circ; 2) &circ; 0.5
    * </pre>
-   * 
+   *
    * @param from The ordinates to convert.
    * @param to The ordinates to write the converted ordinates to.
    */
@@ -223,42 +223,42 @@ public class TransverseMercator extends AbstractCoordinatesProjection {
     final double sinPhi = Math.sin(phi);
     final double tanPhi = Math.tan(phi);
 
-    final double nu = a / Math.sqrt(1 - eSq * sinPhi * sinPhi);
+    final double nu = this.a / Math.sqrt(1 - this.eSq * sinPhi * sinPhi);
     final double t = tanPhi * tanPhi;
     final double tSq = t * t;
-    final double c = ePrimeSq * cosPhi * cosPhi;
+    final double c = this.ePrimeSq * cosPhi * cosPhi;
     final double cSq = c * c;
-    final double a1 = (lambda - lambda0) * cosPhi;
+    final double a1 = (lambda - this.lambda0) * cosPhi;
     final double a1Pow2 = a1 * a1;
     final double a1Pow3 = a1Pow2 * a1;
     final double a1Pow4 = a1Pow2 * a1Pow2;
     final double a1Pow5 = a1Pow4 * a1;
     final double a1Pow6 = a1Pow4 * a1Pow2;
-    final double x = x0
-      + k0
-      * nu
-      * (a1 + (1 - t + c) * a1Pow3 / 6 + (5 - 18 * t + tSq + 72 * c - 58 * ePrimeSq)
-        * a1Pow5 / 120);
+    final double x = this.x0
+        + this.k0
+        * nu
+        * (a1 + (1 - t + c) * a1Pow3 / 6 + (5 - 18 * t + tSq + 72 * c - 58 * this.ePrimeSq)
+            * a1Pow5 / 120);
 
     final double m = m(phi);
-    final double y = y0
-      + k0
-      * (m - m0 + nu
-        * tanPhi
-        * (a1Pow2 / 2 + (5 - t + 9 * c + 4 * cSq) * a1Pow4 / 24 + (61 - 58 * t
-          + tSq + 600 * c - 330 * ePrimeSq)
-          * a1Pow6 / 720));
+    final double y = this.y0
+        + this.k0
+        * (m - this.m0 + nu
+            * tanPhi
+            * (a1Pow2 / 2 + (5 - t + 9 * c + 4 * cSq) * a1Pow4 / 24 + (61 - 58 * t
+                + tSq + 600 * c - 330 * this.ePrimeSq)
+                * a1Pow6 / 720));
     targetCoordinates[targetOffset * targetAxisCount] = x;
     targetCoordinates[targetOffset * targetAxisCount + 1] = y;
   }
 
   /**
    * Return the string representation of the projection.
-   * 
+   *
    * @return The string.
    */
   @Override
   public String toString() {
-    return coordinateSystem.getName();
+    return this.coordinateSystem.getName();
   }
 }

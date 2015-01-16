@@ -6,17 +6,17 @@ import com.revolsys.math.Angle;
 
 /**
  * The EdgeToAngleComparator class is used to return edges in a clockwise order.
- * 
+ *
  * @author Paul Austin
  * @param <T> The type of object stored on the edges in the graph.
  */
 public class EdgeToAngleComparator<T> implements Comparator<Edge<T>> {
-  private static final EdgeToAngleComparator<?> INSTANCE = new EdgeToAngleComparator<Object>();
-
   @SuppressWarnings("unchecked")
   public static <T> EdgeToAngleComparator<T> get() {
     return (EdgeToAngleComparator<T>)INSTANCE;
   }
+
+  private static final EdgeToAngleComparator<?> INSTANCE = new EdgeToAngleComparator<Object>();
 
   /**
    * Construct a new EdgeToAngleComparator.
@@ -26,7 +26,7 @@ public class EdgeToAngleComparator<T> implements Comparator<Edge<T>> {
 
   /**
    * Compare the to angle for two edges.
-   * 
+   *
    * @param edge1 The first edge.
    * @param edge2 The second edge.
    * @see Angle#getTurn(double, double)

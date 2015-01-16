@@ -500,7 +500,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    */
   void addEntry(final int key, final T value, final int bucketIndex) {
     this.table[bucketIndex] = new IntEntry<T>(key, value,
-      this.table[bucketIndex]);
+        this.table[bucketIndex]);
     if (this.size++ >= this.threshold) {
       resize(2 * this.table.length);
     }
@@ -583,8 +583,8 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    */
   private boolean containsNullValue() {
     final IntEntry<T> tab[] = this.table;
-    for (int i = 0; i < tab.length; i++) {
-      for (IntEntry<T> e = tab[i]; e != null; e = e.next) {
+    for (final IntEntry<T> element : tab) {
+      for (IntEntry<T> e = element; e != null; e = e.next) {
         if (e.value == null) {
           return true;
         }
@@ -608,8 +608,8 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     }
 
     final IntEntry<T> tab[] = this.table;
-    for (int i = 0; i < tab.length; i++) {
-      for (IntEntry<T> e = tab[i]; e != null; e = e.next) {
+    for (final IntEntry<T> element : tab) {
+      for (IntEntry<T> e = element; e != null; e = e.next) {
         if (value.equals(e.value)) {
           return true;
         }
@@ -631,7 +631,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
    */
   void createEntry(final int key, final T value, final int bucketIndex) {
     this.table[bucketIndex] = new IntEntry<T>(key, value,
-      this.table[bucketIndex]);
+        this.table[bucketIndex]);
     this.size++;
   }
 
@@ -846,8 +846,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   }
 
   void putAllForCreate(final IntHashMap<T> m) {
-    for (final Iterator<IntEntry<T>> i = m.entryIntSet().iterator(); i.hasNext();) {
-      final IntEntry<T> e = i.next();
+    for (IntEntry<T> e : m.entryIntSet()) {
       putForCreate(e.getIntKey(), e.getValue());
     }
   }

@@ -43,7 +43,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.Point;
 
 /**
- * Creates a map between the vertex {@link Coordinates}s of a 
+ * Creates a map between the vertex {@link Coordinates}s of a
  * set of {@link Geometry}s,
  * and the parent geometry, and transfers the source geometry
  * data objects to geometry components tagged with the coordinates.
@@ -51,7 +51,7 @@ import com.revolsys.jts.geom.Point;
  * This class can be used in conjunction with {@link VoronoiDiagramBuilder}
  * to transfer data objects from the input site geometries
  * to the constructed Voronoi polygons.
- * 
+ *
  * @author Martin Davis
  * @see VoronoiDiagramBuilder
  *
@@ -64,7 +64,7 @@ public class VertexTaggedGeometryDataMapper {
   }
 
   public List<Point> getCoordinates() {
-    return new ArrayList<>(coordDataMap.keySet());
+    return new ArrayList<>(this.coordDataMap.keySet());
   }
 
   public void loadSourceGeometries(final Collection<Geometry> geoms) {
@@ -83,7 +83,7 @@ public class VertexTaggedGeometryDataMapper {
   private void loadVertices(final Iterable<? extends Point> points,
     final Object data) {
     for (final Point point : points) {
-      coordDataMap.put(point.clonePoint(), data);
+      this.coordDataMap.put(point.clonePoint(), data);
     }
   }
 
@@ -92,8 +92,8 @@ public class VertexTaggedGeometryDataMapper {
    * in which every component has its userData
    * set to be a Point which is the key to the output data.
    * The Point is used to determine
-   * the output data object to be written back into the component. 
-   * 
+   * the output data object to be written back into the component.
+   *
    * @param targetGeom
    */
   public void transferData(final Geometry targetGeom) {
@@ -103,7 +103,7 @@ public class VertexTaggedGeometryDataMapper {
       if (vertexKey == null) {
         continue;
       }
-      geom.setUserData(coordDataMap.get(vertexKey));
+      geom.setUserData(this.coordDataMap.get(vertexKey));
     }
   }
 }

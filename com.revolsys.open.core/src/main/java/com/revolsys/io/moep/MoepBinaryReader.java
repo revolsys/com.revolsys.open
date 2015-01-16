@@ -15,13 +15,13 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractReader;
 
 public class MoepBinaryReader extends AbstractReader<Record> implements
-  RecordReader {
+RecordReader {
 
   private MoepBinaryIterator iterator;
 
   /**
    * Construct a new MoepBinaryReader.
-   * 
+   *
    * @param moepDirectoryReader
    * @param file The the file.
    * @param factory The factory used to create Record instances.
@@ -38,7 +38,7 @@ public class MoepBinaryReader extends AbstractReader<Record> implements
 
   /**
    * Construct a new MoepBinaryReader.
-   * 
+   *
    * @param url The url to the file.
    * @param factory The factory used to create Record instances.
    */
@@ -58,7 +58,12 @@ public class MoepBinaryReader extends AbstractReader<Record> implements
 
   @Override
   public void close() {
-    iterator.close();
+    this.iterator.close();
+  }
+
+  @Override
+  public Map<String, Object> getProperties() {
+    return this.iterator.getProperties();
   }
 
   @Override
@@ -66,24 +71,19 @@ public class MoepBinaryReader extends AbstractReader<Record> implements
     return MoepConstants.RECORD_DEFINITION;
   }
 
-  @Override
-  public Map<String, Object> getProperties() {
-    return iterator.getProperties();
-  }
-
   /**
    * Get the iterator for the MOEP file.
-   * 
+   *
    * @return The iterator.
    */
   @Override
   public Iterator iterator() {
-    return iterator;
+    return this.iterator;
   }
 
   @Override
   public void open() {
-    iterator.hasNext();
+    this.iterator.hasNext();
   }
 
 }

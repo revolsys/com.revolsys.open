@@ -64,27 +64,27 @@ public class InvalidProtocolBufferException extends IOException {
   static InvalidProtocolBufferException negativeSize() {
     return new InvalidProtocolBufferException(
       "CodedInputStream encountered an embedded string or message "
-        + "which claimed to have negative size.");
+          + "which claimed to have negative size.");
   }
 
   static InvalidProtocolBufferException recursionLimitExceeded() {
     return new InvalidProtocolBufferException(
       "Protocol message had too many levels of nesting.  May be malicious.  "
-        + "Use CodedInputStream.setRecursionLimit() to increase the depth limit.");
+          + "Use CodedInputStream.setRecursionLimit() to increase the depth limit.");
   }
 
   static InvalidProtocolBufferException sizeLimitExceeded() {
     return new InvalidProtocolBufferException(
       "Protocol message was too large.  May be malicious.  "
-        + "Use CodedInputStream.setSizeLimit() to increase the size limit.");
+          + "Use CodedInputStream.setSizeLimit() to increase the size limit.");
   }
 
   static InvalidProtocolBufferException truncatedMessage() {
     return new InvalidProtocolBufferException(
       "While parsing a protocol message, the input ended unexpectedly "
-        + "in the middle of a field.  This could mean either than the "
-        + "input has been truncated or that an embedded message "
-        + "misreported its own length.");
+          + "in the middle of a field.  This could mean either than the "
+          + "input has been truncated or that an embedded message "
+          + "misreported its own length.");
   }
 
   private static final long serialVersionUID = -1616151763072450476L;

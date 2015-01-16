@@ -43,9 +43,6 @@ import com.revolsys.jts.geom.impl.PointDouble;
 
 public class DistanceLineLineStressTest extends TestCase {
 
-  // make results reproducible
-  static Random randGen = new Random(123456);
-
   public static void main(final String args[]) {
     TestRunner.run(DistanceLineLineStressTest.class);
   }
@@ -59,12 +56,15 @@ public class DistanceLineLineStressTest extends TestCase {
     final double x2 = x1 + gap;
     final double x3 = x1 + gap + 10;
     seg[0] = new PointDouble((double)0, 0, Point.NULL_ORDINATE);
-    seg[1] = new PointDouble((double)x1, slope * x1, Point.NULL_ORDINATE);
-    seg[2] = new PointDouble((double)x2, slope * x2, Point.NULL_ORDINATE);
-    seg[3] = new PointDouble((double)x3, slope * x3, Point.NULL_ORDINATE);
+    seg[1] = new PointDouble(x1, slope * x1, Point.NULL_ORDINATE);
+    seg[2] = new PointDouble(x2, slope * x2, Point.NULL_ORDINATE);
+    seg[3] = new PointDouble(x3, slope * x3, Point.NULL_ORDINATE);
 
     return seg;
   }
+
+  // make results reproducible
+  static Random randGen = new Random(123456);
 
   public DistanceLineLineStressTest(final String name) {
     super(name);
@@ -84,7 +84,7 @@ public class DistanceLineLineStressTest extends TestCase {
         failCount++;
       }
     }
-  //  System.out.println("# failed = " + failCount + " out of " + n);
+    //  System.out.println("# failed = " + failCount + " out of " + n);
   }
 
 }

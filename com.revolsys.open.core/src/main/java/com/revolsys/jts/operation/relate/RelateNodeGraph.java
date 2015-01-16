@@ -107,9 +107,9 @@ public class RelateNodeGraph {
     for (final Iterator edgeIt = geomGraph.getEdgeIterator(); edgeIt.hasNext();) {
       final Edge e = (Edge)edgeIt.next();
       final Location eLoc = e.getLabel().getLocation(argIndex);
-      for (final Iterator eiIt = e.getEdgeIntersectionList().iterator(); eiIt.hasNext();) {
-        final EdgeIntersection ei = (EdgeIntersection)eiIt.next();
-        final RelateNode n = (RelateNode)nodes.addNode(ei.coord);
+      for (final Object element : e.getEdgeIntersectionList()) {
+        final EdgeIntersection ei = (EdgeIntersection)element;
+        final RelateNode n = (RelateNode)this.nodes.addNode(ei.coord);
         if (eLoc == Location.BOUNDARY) {
           n.setLabelBoundary(argIndex);
         } else {
@@ -135,20 +135,20 @@ public class RelateNodeGraph {
     final int argIndex) {
     for (final Iterator nodeIt = geomGraph.getNodeIterator(); nodeIt.hasNext();) {
       final Node graphNode = (Node)nodeIt.next();
-      final Node newNode = nodes.addNode(graphNode.getCoordinate());
+      final Node newNode = this.nodes.addNode(graphNode.getCoordinate());
       newNode.setLabel(argIndex, graphNode.getLabel().getLocation(argIndex));
       // node.print(System.out);
     }
   }
 
   public Iterator getNodeIterator() {
-    return nodes.iterator();
+    return this.nodes.iterator();
   }
 
   public void insertEdgeEnds(final List ee) {
     for (final Iterator i = ee.iterator(); i.hasNext();) {
       final EdgeEnd e = (EdgeEnd)i.next();
-      nodes.add(e);
+      this.nodes.add(e);
     }
   }
 

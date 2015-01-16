@@ -58,11 +58,9 @@ import com.revolsys.util.ExceptionUtil;
  * @version 1.7
  */
 public class StringUtil {
-  public final static String newLine = System.getProperty("line.separator");
-
   /**
    * Capitalizes the given string.
-   * 
+   *
    * @param s the string to capitalize
    * @return the capitalized string
    */
@@ -149,22 +147,22 @@ public class StringUtil {
       switch (c) {
         case '<':
           sb.append("&lt;");
-        break;
+          break;
         case '>':
           sb.append("&gt;");
-        break;
+          break;
         case '&':
           sb.append("&amp;");
-        break;
+          break;
         case '"':
           sb.append("&quot;");
-        break;
+          break;
         case '\n':
           sb.append("<BR>");
-        break;
+          break;
         default:
           sb.append(c);
-        break;
+          break;
       }
     }
     return sb.toString();
@@ -176,7 +174,7 @@ public class StringUtil {
   public static String format(final double d, final int decimals) {
     final double factor = Math.pow(10, decimals);
     final double digits = Math.round(factor * d);
-    return ((int)Math.floor(digits / factor)) + "." + ((int)(digits % factor));
+    return (int)Math.floor(digits / factor) + "." + (int)(digits % factor);
   }
 
   /**
@@ -567,5 +565,7 @@ public class StringUtil {
     }
     return b.toString();
   }
+
+  public final static String newLine = System.getProperty("line.separator");
 
 }

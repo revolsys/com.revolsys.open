@@ -53,9 +53,9 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
 public class RecordStoreSearchTextField extends JXSearchField implements
-  DocumentListener, KeyListener, MouseListener, FocusListener,
-  ListDataListener, ItemSelectable, Field, ListSelectionListener,
-  HighlightPredicate {
+DocumentListener, KeyListener, MouseListener, FocusListener,
+ListDataListener, ItemSelectable, Field, ListSelectionListener,
+HighlightPredicate {
   private static final long serialVersionUID = 1L;
 
   private final String displayFieldName;
@@ -125,7 +125,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
     final String typeName, final String displayFieldName) {
     this(recordStore, displayFieldName, new Query(typeName, new Equal(
       F.upper(displayFieldName), new Value(null))), new Query(typeName,
-      Q.iLike(displayFieldName, "")));
+        Q.iLike(displayFieldName, "")));
   }
 
   @Override
@@ -278,7 +278,7 @@ public class RecordStoreSearchTextField extends JXSearchField implements
         }
         this.list.setSelectedIndex(selectedIndex);
         e.consume();
-      break;
+        break;
       case KeyEvent.VK_ENTER:
         if (size > 0) {
           if (selectedIndex >= 0 && selectedIndex < size) {
@@ -297,9 +297,9 @@ public class RecordStoreSearchTextField extends JXSearchField implements
           findButton.doClick();
           setText("");
         }
-      break;
+        break;
       default:
-      break;
+        break;
     }
     showMenu();
   }

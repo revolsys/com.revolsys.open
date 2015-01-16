@@ -42,6 +42,7 @@ package com.revolsys.jts.algorithm;
  * @version 1.7
  * @deprecated use CGAlgorithms instead
  */
+@Deprecated
 public class RobustCGAlgorithms extends CGAlgorithms {
 
 }

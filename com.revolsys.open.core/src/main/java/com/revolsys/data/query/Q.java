@@ -355,7 +355,7 @@ public class Q {
       left = F.regexpReplace(F.upper(fieldName), "[^A-Z0-9]", "", "g");
     }
     final String right = "%"
-      + StringConverterRegistry.toString(value)
+        + StringConverterRegistry.toString(value)
         .toUpperCase()
         .replaceAll("[^A-Z0-9]", "") + "%";
     return Q.like(left, right);

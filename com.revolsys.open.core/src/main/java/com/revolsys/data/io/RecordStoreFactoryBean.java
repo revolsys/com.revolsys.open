@@ -9,7 +9,7 @@ import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public class RecordStoreFactoryBean extends
-  AbstractFactoryBean<RecordStore> {
+AbstractFactoryBean<RecordStore> {
 
   private Map<String, Object> config = new LinkedHashMap<String, Object>();
 
@@ -17,22 +17,22 @@ public class RecordStoreFactoryBean extends
 
   @Override
   protected RecordStore createInstance() throws Exception {
-    final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(config);
-    Property.set(recordStore, properties);
+    final RecordStore recordStore = RecordStoreFactoryRegistry.createRecordStore(this.config);
+    Property.set(recordStore, this.properties);
     recordStore.initialize();
     return recordStore;
   }
 
   @Override
   protected void destroyInstance(final RecordStore recordStore)
-    throws Exception {
+      throws Exception {
     recordStore.close();
-    properties = null;
-    config = null;
+    this.properties = null;
+    this.config = null;
   }
 
   public Map<String, Object> getConfig() {
-    return config;
+    return this.config;
   }
 
   @Override
@@ -41,7 +41,7 @@ public class RecordStoreFactoryBean extends
   }
 
   public Map<String, Object> getProperties() {
-    return properties;
+    return this.properties;
   }
 
   public void setConfig(final Map<String, Object> config) {
@@ -53,6 +53,6 @@ public class RecordStoreFactoryBean extends
   }
 
   public void setUrl(final String url) {
-    config.put("url", url);
+    this.config.put("url", url);
   }
 }

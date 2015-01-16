@@ -163,10 +163,10 @@ public class GeometryFunctionRegistry {
   public List createFunctions(final Class functionClass) {
     final List funcs = new ArrayList();
     final Method[] method = functionClass.getMethods();
-    for (int i = 0; i < method.length; i++) {
-      final int mod = method[i].getModifiers();
+    for (final Method element : method) {
+      final int mod = element.getModifiers();
       if (Modifier.isStatic(mod) && Modifier.isPublic(mod)) {
-        funcs.add(StaticMethodGeometryFunction.createFunction(method[i]));
+        funcs.add(StaticMethodGeometryFunction.createFunction(element));
       }
     }
     return funcs;

@@ -582,8 +582,8 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
    */
   private boolean containsNullValue() {
     final Entry<T> tab[] = this.table;
-    for (int i = 0; i < tab.length; i++) {
-      for (Entry<T> e = tab[i]; e != null; e = e.next) {
+    for (final Entry<T> element : tab) {
+      for (Entry<T> e = element; e != null; e = e.next) {
         if (e.value == null) {
           return true;
         }
@@ -607,8 +607,8 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
     }
 
     final Entry<T> tab[] = this.table;
-    for (int i = 0; i < tab.length; i++) {
-      for (Entry<T> e = tab[i]; e != null; e = e.next) {
+    for (final Entry<T> element : tab) {
+      for (Entry<T> e = element; e != null; e = e.next) {
         if (value.equals(e.value)) {
           return true;
         }
@@ -844,8 +844,7 @@ public class LongHashMap<T> implements Map<Long, T>, Cloneable, Serializable {
   }
 
   void putAllForCreate(final LongHashMap<T> m) {
-    for (final Iterator<Entry<T>> i = m.entryIntSet().iterator(); i.hasNext();) {
-      final Entry<T> e = i.next();
+    for (Entry<T> e : m.entryIntSet()) {
       putForCreate(e.getLongKey(), e.getValue());
     }
   }

@@ -12,17 +12,17 @@ import java.util.prefs.Preferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 
 public class WmsConnectionManager {
-
-  private static final Logger LOG = LoggerFactory.getLogger(WmsConnectionManager.class);
-
-  private static WmsConnectionManager INSTANCE = new WmsConnectionManager();
 
   public static WmsConnectionManager get() {
     return INSTANCE;
   }
+
+  private static final Logger LOG = LoggerFactory.getLogger(WmsConnectionManager.class);
+
+  private static WmsConnectionManager INSTANCE = new WmsConnectionManager();
 
   private final Map<String, WmsClient> wmsConnections = new HashMap<String, WmsClient>();
 
@@ -30,13 +30,13 @@ public class WmsConnectionManager {
 
   public WmsConnectionManager() {
     this(Preferences.userRoot(), "com/revolsys/gis/wms/connections");
-    final Preferences node = wmsConnectionsPrefereneces.node("BC Government Maps");
+    final Preferences node = this.wmsConnectionsPrefereneces.node("BC Government Maps");
     node.put("connectionUrl", "http://openmaps.gov.bc.ca/mapserver/base2");
   }
 
   public WmsConnectionManager(final Preferences root,
     final String preferencesPath) {
-    wmsConnectionsPrefereneces = root.node(preferencesPath);
+    this.wmsConnectionsPrefereneces = root.node(preferencesPath);
   }
 
   public WmsConnectionManager(final String preferencesPath) {
@@ -45,7 +45,7 @@ public class WmsConnectionManager {
 
   public List<String> getConnectionNames() {
     try {
-      final String[] names = wmsConnectionsPrefereneces.childrenNames();
+      final String[] names = this.wmsConnectionsPrefereneces.childrenNames();
       return Arrays.asList(names);
     } catch (final BackingStoreException e) {
       throw new RuntimeException(e);
@@ -65,21 +65,21 @@ public class WmsConnectionManager {
   }
 
   private Preferences getPreferences(final String connectionName) {
-    return wmsConnectionsPrefereneces.node(connectionName);
+    return this.wmsConnectionsPrefereneces.node(connectionName);
   }
 
   private WmsClient getWmsConnection(final String connectionName) {
-    WmsClient wmsConnection = wmsConnections.get(connectionName);
+    WmsClient wmsConnection = this.wmsConnections.get(connectionName);
     if (wmsConnection == null) {
       final Preferences preferences = getPreferences(connectionName);
-      final Map<String, Object> config = CollectionUtil.toMap(preferences);
+      final Map<String, Object> config = Maps.toMap(preferences);
       final String connectionUrl = (String)config.get("connectionUrl");
       try {
         wmsConnection = new WmsClient(connectionName, connectionUrl);
       } catch (final MalformedURLException e) {
         LOG.error("Unable to get connection " + connectionUrl, e);
       }
-      wmsConnections.put(connectionName, wmsConnection);
+      this.wmsConnections.put(connectionName, wmsConnection);
     }
     return wmsConnection;
   }

@@ -384,7 +384,7 @@ public class HalfEdge {
   @Override
   public String toString() {
     return "HE(" + this.orig.getX() + " " + this.orig.getY() + ", "
-      + this.sym.orig.getX() + " " + this.sym.orig.getY() + ")";
+        + this.sym.orig.getX() + " " + this.sym.orig.getY() + ")";
   }
 
 }

@@ -186,17 +186,17 @@ public class EdgeEndBundle extends EdgeEnd {
   }
 
   public List getEdgeEnds() {
-    return edgeEnds;
+    return this.edgeEnds;
   }
 
   public void insert(final EdgeEnd e) {
     // Assert: start point is the same
     // Assert: direction is the same
-    edgeEnds.add(e);
+    this.edgeEnds.add(e);
   }
 
   public Iterator iterator() {
-    return edgeEnds.iterator();
+    return this.edgeEnds.iterator();
   }
 
   @Override

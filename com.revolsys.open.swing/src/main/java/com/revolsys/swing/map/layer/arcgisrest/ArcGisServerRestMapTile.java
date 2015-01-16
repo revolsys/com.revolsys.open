@@ -82,6 +82,6 @@ public class ArcGisServerRestMapTile extends MapTile {
   @Override
   public String toString() {
     return this.mapServer.getMapName() + " " + this.zoomLevel + "/"
-      + this.tileX + "/" + this.tileY;
+        + this.tileX + "/" + this.tileY;
   }
 }

@@ -43,7 +43,7 @@ import com.revolsys.jts.geom.Point;
  * and adds them as nodes
  * using {@link NodedSegmentString#addIntersection(LineIntersector, int, int, int)}.
  * <p>
- * This class is used primarily for Snap-Rounding.  
+ * This class is used primarily for Snap-Rounding.
  * For general-purpose noding, use {@link IntersectionAdder}.
  *
  * @version 1.7
@@ -61,16 +61,16 @@ public class InteriorIntersectionFinderAdder implements SegmentIntersector {
    */
   public InteriorIntersectionFinderAdder(final LineIntersector li) {
     this.li = li;
-    interiorIntersections = new ArrayList();
+    this.interiorIntersections = new ArrayList();
   }
 
   public List getInteriorIntersections() {
-    return interiorIntersections;
+    return this.interiorIntersections;
   }
 
   /**
    * Always process all intersections
-   * 
+   *
    * @return false always
    */
   @Override
@@ -99,15 +99,15 @@ public class InteriorIntersectionFinderAdder implements SegmentIntersector {
     final Point p10 = e1.getCoordinate(segIndex1);
     final Point p11 = e1.getCoordinate(segIndex1 + 1);
 
-    li.computeIntersection(p00, p01, p10, p11);
+    this.li.computeIntersection(p00, p01, p10, p11);
 
-    if (li.hasIntersection()) {
-      if (li.isInteriorIntersection()) {
-        for (int intIndex = 0; intIndex < li.getIntersectionNum(); intIndex++) {
-          interiorIntersections.add(li.getIntersection(intIndex));
+    if (this.li.hasIntersection()) {
+      if (this.li.isInteriorIntersection()) {
+        for (int intIndex = 0; intIndex < this.li.getIntersectionNum(); intIndex++) {
+          this.interiorIntersections.add(this.li.getIntersection(intIndex));
         }
-        ((NodedSegmentString)e0).addIntersections(li, segIndex0, 0);
-        ((NodedSegmentString)e1).addIntersections(li, segIndex1, 1);
+        ((NodedSegmentString)e0).addIntersections(this.li, segIndex0, 0);
+        ((NodedSegmentString)e1).addIntersections(this.li, segIndex1, 1);
       }
     }
   }

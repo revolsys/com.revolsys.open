@@ -5,13 +5,13 @@
  * $Revision:265 $
 
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.io.filter.ExtensionFilenameFilter;
 
 public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
-  implements Iterator<T> {
+implements Iterator<T> {
   /** The list of base file names to read. */
   private final List<String> baseFileNames = new ArrayList<String>();
 
@@ -79,8 +79,8 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
   private final Map<File, Reader<T>> readers = new LinkedHashMap<File, Reader<T>>();
 
   /**
-    * Construct a new AbstractDirectoryReader.
-    */
+   * Construct a new AbstractDirectoryReader.
+   */
   public AbstractDirectoryReader() {
   }
 
@@ -89,14 +89,14 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
    */
   @Override
   public void close() {
-    if (currentReader != null) {
-      currentReader.close();
+    if (this.currentReader != null) {
+      this.currentReader.close();
     }
   }
 
   /**
    * Create a new {@link Reader} to read the file.
-   * 
+   *
    * @param file The file to read.
    * @return The reader for the file.
    */
@@ -104,47 +104,47 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
 
   /**
    * Get the list of base file names to read.
-   * 
+   *
    * @return The list of base file names to read.
    */
   public List<String> getBaseFileNames() {
-    return baseFileNames;
+    return this.baseFileNames;
   }
 
   /**
    * Get the directory containing the files to read.
-   * 
+   *
    * @return The directory containing the files to read.
    */
   public File getDirectory() {
-    return directory;
+    return this.directory;
   }
 
   /**
    * Get the filter used to select files from the directory.
-   * 
+   *
    * @return The filter used to select files from the directory.
    */
   public FilenameFilter getFileNameFilter() {
-    return fileNameFilter;
+    return this.fileNameFilter;
   }
 
   /**
    * Get the files that are to be read by this reader. This must be overwritten
    * in sub classes to return the files in the working directory that are to be
    * read by instances of the write returned by {@link #createReader(File)}.
-   * 
+   *
    * @return The list of files.
    */
   protected List<File> getFiles() {
     final File[] files;
-    if (fileNameFilter == null) {
-      files = directory.listFiles();
+    if (this.fileNameFilter == null) {
+      files = this.directory.listFiles();
     } else {
-      files = directory.listFiles(fileNameFilter);
+      files = this.directory.listFiles(this.fileNameFilter);
     }
     List<File> fileList;
-    if (baseFileNames.isEmpty()) {
+    if (this.baseFileNames.isEmpty()) {
       Arrays.sort(files);
       fileList = Arrays.asList(files);
     } else {
@@ -154,7 +154,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
         final String baseName = FileUtil.getBaseName(file).toUpperCase();
         fileBaseNameMap.put(baseName, file);
       }
-      for (final String baseName : baseFileNames) {
+      for (final String baseName : this.baseFileNames) {
         final File file = fileBaseNameMap.get(baseName);
         if (file != null) {
           fileList.add(file);
@@ -166,40 +166,40 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
 
   /**
    * Check to see if the reader has more data objects to be read.
-   * 
+   *
    * @return True if the reader has more data objects to be read.
    */
   @Override
   public boolean hasNext() {
-    while (hasNext && (currentIterator == null || !currentIterator.hasNext())) {
-      if (readerIterator.hasNext()) {
-        if (currentReader != null) {
+    while (this.hasNext && (this.currentIterator == null || !this.currentIterator.hasNext())) {
+      if (this.readerIterator.hasNext()) {
+        if (this.currentReader != null) {
           try {
-            currentReader.close();
+            this.currentReader.close();
           } catch (final Throwable t) {
-            log.warn(t.getMessage(), t);
+            this.log.warn(t.getMessage(), t);
           }
         }
-        final Entry<File, Reader<T>> entry = readerIterator.next();
-        currentFile = entry.getKey();
+        final Entry<File, Reader<T>> entry = this.readerIterator.next();
+        this.currentFile = entry.getKey();
         try {
-          currentReader = entry.getValue();
-          currentIterator = currentReader.iterator();
-          hasNext = currentIterator.hasNext();
+          this.currentReader = entry.getValue();
+          this.currentIterator = this.currentReader.iterator();
+          this.hasNext = this.currentIterator.hasNext();
         } catch (final Throwable e) {
-          hasNext = false;
-          log.error(e.getMessage(), e);
+          this.hasNext = false;
+          this.log.error(e.getMessage(), e);
         }
       } else {
-        hasNext = false;
+        this.hasNext = false;
       }
     }
-    return hasNext;
+    return this.hasNext;
   }
 
   /**
    * Get the iterator.
-   * 
+   *
    * @return The iterator.
    */
   @Override
@@ -209,14 +209,14 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
 
   /**
    * Get the next data object read by this reader.
-   * 
+   *
    * @return The next Record.
    * @exception NoSuchElementException If the reader has no more data objects.
    */
   @Override
   public T next() {
     if (hasNext()) {
-      final T record = currentIterator.next();
+      final T record = this.currentIterator.next();
       return record;
     } else {
       throw new NoSuchElementException();
@@ -231,10 +231,10 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
       final Reader<T> reader = createReader(resource);
       reader.open();
       if (reader != null) {
-        readers.put(file, reader);
+        this.readers.put(file, reader);
       }
     }
-    readerIterator = readers.entrySet().iterator();
+    this.readerIterator = this.readers.entrySet().iterator();
     hasNext();
   }
 
@@ -248,7 +248,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
 
   /**
    * Set the list of base file names to read.
-   * 
+   *
    * @param baseFileNames The list of base file names to read.
    */
   public void setBaseFileNames(final Collection<String> baseFileNames) {
@@ -260,16 +260,16 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
 
   /**
    * Set the directory containing the files to read.
-   * 
+   *
    * @param directory The directory containing the files to read.
    */
   public void setDirectory(final File directory) {
     if (!directory.isDirectory()) {
       throw new IllegalArgumentException("File must exist and be a directory "
-        + directory);
+          + directory);
     } else {
       this.directory = directory;
-      files = getFiles();
+      this.files = getFiles();
 
     }
   }
@@ -284,7 +284,7 @@ public abstract class AbstractDirectoryReader<T> extends AbstractReader<T>
 
   /**
    * Set the filter used to select files from the directory.
-   * 
+   *
    * @param fileNameFilter The filter used to select files from the directory.
    */
   public void setFileNameFilter(final FilenameFilter fileNameFilter) {

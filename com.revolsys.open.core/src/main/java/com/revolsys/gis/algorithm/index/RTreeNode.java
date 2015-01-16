@@ -18,11 +18,11 @@ public abstract class RTreeNode<T> {
   }
 
   public double getArea() {
-    return boundingBox.getArea();
+    return this.boundingBox.getArea();
   }
 
   public BoundingBox getBoundingBox() {
-    return boundingBox;
+    return this.boundingBox;
   }
 
   public abstract boolean remove(LinkedList<RTreeNode<T>> path,
@@ -34,7 +34,7 @@ public abstract class RTreeNode<T> {
 
   @Override
   public String toString() {
-    return boundingBox.toString();
+    return this.boundingBox.toString();
   }
 
   protected abstract void updateEnvelope();

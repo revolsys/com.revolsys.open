@@ -6,7 +6,7 @@ import com.revolsys.util.JavaBeanUtil;
 
 /**
  * Serialize a url as a hyperlink
- * 
+ *
  * @author Paul Austin
  */
 public class UrlKeySerializer extends AbstractKeySerializer {
@@ -19,10 +19,11 @@ public class UrlKeySerializer extends AbstractKeySerializer {
 
   /**
    * Serialize the value to the XML writer.
-   * 
+   *
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
    */
+  @Override
   public void serialize(final XmlWriter out, final Object object) {
     final Object url = JavaBeanUtil.getProperty(object, getName());
     if (url != null) {

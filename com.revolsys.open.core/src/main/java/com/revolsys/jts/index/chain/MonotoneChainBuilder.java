@@ -51,8 +51,8 @@ public class MonotoneChainBuilder {
    * starting at a given point.
    * Any repeated points (0-length segments) will be included
    * in the monotone chain returned.
-   * 
-   * @return the index of the last point in the monotone chain 
+   *
+   * @return the index of the last point in the monotone chain
    * starting at <code>start</code>.
    */
   private static int findChainEnd(final LineString points, final int start) {
@@ -61,7 +61,7 @@ public class MonotoneChainBuilder {
     // (since they cannot be used to establish a quadrant)
     final int size = points.getVertexCount();
     while (safeStart < size - 1
-      && points.getPoint(safeStart).equals(2,points.getPoint(safeStart + 1))) {
+        && points.getPoint(safeStart).equals(2,points.getPoint(safeStart + 1))) {
       safeStart++;
     }
     // check if there are NO non-zero-length segments
@@ -128,14 +128,6 @@ public class MonotoneChainBuilder {
     } while (start < points.getVertexCount() - 1);
     // copy list to an array of ints, for efficiency
     return startIndexList;
-  }
-
-  private static int[] toIntArray(final List<Integer> list) {
-    final int[] array = new int[list.size()];
-    for (int i = 0; i < array.length; i++) {
-      array[i] = list.get(i).intValue();
-    }
-    return array;
   }
 
   public MonotoneChainBuilder() {

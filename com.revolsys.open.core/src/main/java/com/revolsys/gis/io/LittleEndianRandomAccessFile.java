@@ -5,13 +5,13 @@
  * $Revision$
 
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,15 +26,15 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class LittleEndianRandomAccessFile extends RandomAccessFile implements
-  EndianInputOutput {
+EndianInputOutput {
 
   public LittleEndianRandomAccessFile(final File file, final String mode)
-    throws FileNotFoundException {
+      throws FileNotFoundException {
     super(file, mode);
   }
 
   public LittleEndianRandomAccessFile(final String name, final String mode)
-    throws FileNotFoundException {
+      throws FileNotFoundException {
     super(name, mode);
   }
 
@@ -81,7 +81,7 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
   public long readLELong() throws IOException {
     long value = 0;
     for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
-      value |= ((long)(read() & 0xff)) << shiftBy;
+      value |= (long)(read() & 0xff) << shiftBy;
     }
     return value;
   }
@@ -122,9 +122,9 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
   @Override
   public void writeLEInt(final int i) throws IOException {
     write(i & 0xFF);
-    write((i >>> 8) & 0xFF);
-    write((i >>> 16) & 0xFF);
-    write((i >>> 24) & 0xFF);
+    write(i >>> 8 & 0xFF);
+    write(i >>> 16 & 0xFF);
+    write(i >>> 24 & 0xFF);
   }
 
   /*
@@ -150,12 +150,12 @@ public class LittleEndianRandomAccessFile extends RandomAccessFile implements
   @Override
   public void writeLEShort(final short s) throws IOException {
     write(s & 0xFF);
-    write((s >>> 8) & 0xFF);
+    write(s >>> 8 & 0xFF);
   }
 
   @Override
   public void writeShort(final short s) throws IOException {
-    write((s >>> 8) & 0xFF);
+    write(s >>> 8 & 0xFF);
     write(s & 0xFF);
   }
 }

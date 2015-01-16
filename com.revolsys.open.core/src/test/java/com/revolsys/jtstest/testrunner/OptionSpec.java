@@ -61,8 +61,8 @@ public class OptionSpec {
   public final static int NARGS_ZERO_OR_ONE = -3;
 
   public final static String OPTION_FREE_ARGS = "**FREE_ARGS**"; // option name
-                                                                 // for free
-                                                                 // args
+  // for free
+  // args
 
   String name;
 
@@ -77,79 +77,79 @@ public class OptionSpec {
   Vector options = new Vector();
 
   public OptionSpec(final String optName) {
-    name = optName;
-    nAllowedArgs = 0;
+    this.name = optName;
+    this.nAllowedArgs = 0;
   }
 
   public OptionSpec(final String optName, final int nAllowed) {
     this(optName);
     // check for invalid input
-    if (nAllowedArgs >= NARGS_ZERO_OR_ONE) {
-      nAllowedArgs = nAllowed;
+    if (this.nAllowedArgs >= NARGS_ZERO_OR_ONE) {
+      this.nAllowedArgs = nAllowed;
     }
   }
 
   public OptionSpec(final String optName, final String _syntaxPattern) {
     this(optName);
-    syntaxPattern = _syntaxPattern;
+    this.syntaxPattern = _syntaxPattern;
   }
 
   void addOption(final Option opt) {
-    options.addElement(opt);
+    this.options.addElement(opt);
   }
 
   void checkNumArgs(final String[] args) throws ParseException {
-    if (nAllowedArgs == NARGS_ZERO_OR_MORE) {
+    if (this.nAllowedArgs == NARGS_ZERO_OR_MORE) {
       // args must be ok
-    } else if (nAllowedArgs == NARGS_ONE_OR_MORE) {
+    } else if (this.nAllowedArgs == NARGS_ONE_OR_MORE) {
       if (args.length <= 0) {
-        throw new ParseException("option " + name
+        throw new ParseException("option " + this.name
           + ": expected one or more args, found " + args.length);
       }
-    } else if (nAllowedArgs == NARGS_ZERO_OR_ONE) {
+    } else if (this.nAllowedArgs == NARGS_ZERO_OR_ONE) {
       if (args.length > 1) {
-        throw new ParseException("option " + name
+        throw new ParseException("option " + this.name
           + ": expected zero or one arg, found " + args.length);
       }
-    } else if (args.length != nAllowedArgs) {
-      throw new ParseException("option " + name + ": expected " + nAllowedArgs
+    } else if (args.length != this.nAllowedArgs) {
+      throw new ParseException("option " + this.name + ": expected " + this.nAllowedArgs
         + " args, found " + args.length);
     }
   }
 
   int getAllowedArgs() {
-    return nAllowedArgs;
+    return this.nAllowedArgs;
   }
 
   public String getArgDesc() {
-    return argDoc;
+    return this.argDoc;
   }
 
   public String getDocDesc() {
-    return doc;
+    return this.doc;
   }
 
   String getName() {
-    return name;
+    return this.name;
   }
 
   public int getNumOptions() {
-    return options.size();
+    return this.options.size();
   }
 
   public Option getOption(final int i) {
-    if (options.size() > 0) {
-      return (Option)options.elementAt(i);
+    if (this.options.size() > 0) {
+      return (Option)this.options.elementAt(i);
     }
     return null;
   }
 
   public Iterator getOptions() {
-    return options.iterator();
+    return this.options.iterator();
   }
 
   public boolean hasOption() {
-    return options.size() > 0;
+    return this.options.size() > 0;
   }
 
   Option parse(final String[] args) throws ParseException {
@@ -158,8 +158,8 @@ public class OptionSpec {
   }
 
   public void setDoc(final String _argDoc, final String docLine) {
-    argDoc = _argDoc;
-    doc = docLine;
+    this.argDoc = _argDoc;
+    this.doc = docLine;
   }
 
 }

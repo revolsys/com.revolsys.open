@@ -34,13 +34,13 @@ import com.revolsys.util.ObjectProcessor;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
-  AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
+AbstractVisitor<Edge<Record>> implements ObjectProcessor<RecordGraph> {
 
   private static final Logger LOG = LoggerFactory.getLogger(LinearIntersectionNotEqualLineEdgeCleanupVisitor.class);
 
   private Set<String> equalExcludeAttributes = new HashSet<String>(
-    Arrays.asList(RecordEquals.EXCLUDE_ID,
-      RecordEquals.EXCLUDE_GEOMETRY));
+      Arrays.asList(RecordEquals.EXCLUDE_ID,
+        RecordEquals.EXCLUDE_GEOMETRY));
 
   private Statistics duplicateStatistics;
 
@@ -52,24 +52,24 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
 
   @PreDestroy
   public void destroy() {
-    if (duplicateStatistics != null) {
-      duplicateStatistics.disconnect();
+    if (this.duplicateStatistics != null) {
+      this.duplicateStatistics.disconnect();
     }
-    duplicateStatistics = null;
+    this.duplicateStatistics = null;
   }
 
   public Set<String> getEqualExcludeAttributes() {
-    return equalExcludeAttributes;
+    return this.equalExcludeAttributes;
   }
 
   public Comparator<Record> getNewerComparator() {
-    return newerComparator;
+    return this.newerComparator;
   }
 
   @PostConstruct
   public void init() {
-    duplicateStatistics = new Statistics("Duplicate intersecting lines");
-    duplicateStatistics.connect();
+    this.duplicateStatistics = new Statistics("Duplicate intersecting lines");
+    this.duplicateStatistics.connect();
   }
 
   private boolean middleCoordinatesEqual(final LineString points1,
@@ -123,7 +123,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     final AndFilter<Edge<Record>> attributeAndGeometryFilter = new AndFilter<Edge<Record>>();
 
     attributeAndGeometryFilter.addFilter(new EdgeTypeNameFilter<Record>(
-      typePath));
+        typePath));
 
     final Filter<Edge<Record>> filter = getFilter();
     if (filter != null) {
@@ -131,14 +131,14 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends
     }
 
     final Filter<Record> notEqualLineFilter = new NotFilter<Record>(
-      new RecordGeometryFilter<LineString>(
-        new EqualFilter<LineString>(line)));
+        new RecordGeometryFilter<LineString>(
+            new EqualFilter<LineString>(line)));
 
     final RecordGeometryFilter<LineString> linearIntersectionFilter = new RecordGeometryFilter<LineString>(
-      new LinearIntersectionFilter(line));
+        new LinearIntersectionFilter(line));
 
     attributeAndGeometryFilter.addFilter(new EdgeObjectFilter<Record>(
-      new AndFilter<Record>(notEqualLineFilter, linearIntersectionFilter)));
+        new AndFilter<Record>(notEqualLineFilter, linearIntersectionFilter)));
 
     final List<Edge<Record>> intersectingEdges = graph.getEdges(
       attributeAndGeometryFilter, line);

@@ -6,7 +6,7 @@ import com.revolsys.util.JavaBeanUtil;
 
 /**
  * Serialize an email address as a mailto:link.
- * 
+ *
  * @author Paul Austin
  */
 public class EmailKeySerializer extends AbstractKeySerializer {
@@ -19,10 +19,11 @@ public class EmailKeySerializer extends AbstractKeySerializer {
 
   /**
    * Serialize the value to the XML writer.
-   * 
+   *
    * @param out The XML writer to serialize to.
    * @param object The object to get the value from.
    */
+  @Override
   public void serialize(final XmlWriter out, final Object object) {
     final Object email = JavaBeanUtil.getProperty(object, getName());
     if (email != null) {

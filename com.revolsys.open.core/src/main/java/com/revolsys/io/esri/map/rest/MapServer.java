@@ -120,7 +120,7 @@ public class MapServer extends Service {
 
   public String getTileUrl(final int zoomLevel, final int tileX, final int tileY) {
     return getServiceUrl() + getPath() + "/tile/" + zoomLevel + "/" + tileY
-      + "/" + tileX;
+        + "/" + tileX;
   }
 
   public int getTileX(final int zoomLevel, final double x) {
@@ -168,9 +168,9 @@ public class MapServer extends Service {
         } else {
           final double previousLevelMetresPerPixel = previousLevel.getResolution();
           final double range = levelMetresPerPixel
-            - previousLevelMetresPerPixel;
+              - previousLevelMetresPerPixel;
           final double ratio = (metresPerPixel - previousLevelMetresPerPixel)
-            / range;
+              / range;
           if (ratio < 0.8) {
             return previousLevel.getLevel();
           } else {

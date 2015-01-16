@@ -1,12 +1,12 @@
 /*
  * Copyright 2004-2005 Revolution Systems Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,7 @@ public class PageRefMenuItem extends MenuItem {
   private final String pageRef;
 
   public PageRefMenuItem(final String title, final String pageRef)
-    throws Exception {
+      throws Exception {
     this(title, title, pageRef);
   }
 
@@ -41,7 +41,7 @@ public class PageRefMenuItem extends MenuItem {
 
   public PageRefMenuItem(final String name, final String title,
     final String pageRef, final String anchor, final String condition)
-    throws Exception {
+        throws Exception {
     super(name, title, null, anchor, condition);
     this.pageRef = pageRef;
   }
@@ -50,10 +50,10 @@ public class PageRefMenuItem extends MenuItem {
     final WebUiContext context = WebUiContext.get();
     final Page currentPage = context.getPage();
     if (currentPage != null) {
-      return currentPage.getPage(pageRef);
+      return currentPage.getPage(this.pageRef);
     } else {
       try {
-        return context.getConfig().getPage(pageRef);
+        return context.getConfig().getPage(this.pageRef);
       } catch (final PageNotFoundException e) {
         return null;
       }

@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 public class NoRepeatArrayList extends ArrayList {
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -8395301622287658179L;
 

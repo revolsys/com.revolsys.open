@@ -118,8 +118,6 @@ public class TreeTimeTest {
     }
   }
 
-  public static final int NUM_ITEMS = 10000;
-
   public static void main(final String[] args) throws Exception {
     final int n = 10000;
     final TreeTimeTest test = new TreeTimeTest();
@@ -134,11 +132,13 @@ public class TreeTimeTest {
     test.run(items);
   }
 
+  public static final int NUM_ITEMS = 10000;
+
   public TreeTimeTest() {
   }
 
   public IndexTester.IndexResult run(final Index index, final List items)
-    throws Exception {
+      throws Exception {
     return new IndexTester(index).testAll(items);
   }
 

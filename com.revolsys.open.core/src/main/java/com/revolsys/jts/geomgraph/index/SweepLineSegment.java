@@ -50,18 +50,18 @@ public class SweepLineSegment {
 
   public void computeIntersections(final SweepLineSegment ss,
     final SegmentIntersector si) {
-    si.addIntersections(edge, ptIndex, ss.edge, ss.ptIndex);
+    si.addIntersections(this.edge, this.ptIndex, ss.edge, ss.ptIndex);
   }
 
   public double getMaxX() {
-    final double x1 = edge.getCoordinate(ptIndex).getX();
-    final double x2 = edge.getCoordinate(ptIndex + 1).getX();
+    final double x1 = this.edge.getCoordinate(this.ptIndex).getX();
+    final double x2 = this.edge.getCoordinate(this.ptIndex + 1).getX();
     return x1 > x2 ? x1 : x2;
   }
 
   public double getMinX() {
-    final double x1 = edge.getCoordinate(ptIndex).getX();
-    final double x2 = edge.getCoordinate(ptIndex + 1).getX();
+    final double x1 = this.edge.getCoordinate(this.ptIndex).getX();
+    final double x2 = this.edge.getCoordinate(this.ptIndex + 1).getX();
     return x1 < x2 ? x1 : x2;
   }
 

@@ -15,7 +15,7 @@ public class ProjectOperation implements CoordinatesOperation {
     for (int vertexIndex = 0; vertexIndex < numPoints; vertexIndex++) {
       final double x = sourceCoordinates[vertexIndex * sourceAxisCount + 0];
       final double y = sourceCoordinates[vertexIndex * sourceAxisCount + 1];
-      projection.project(x, y, targetCoordinates, vertexIndex, targetAxisCount);
+      this.projection.project(x, y, targetCoordinates, vertexIndex, targetAxisCount);
       for (int axisIndex = 2; axisIndex < targetAxisCount; axisIndex++) {
         double value;
         if (axisIndex < sourceAxisCount) {
@@ -30,6 +30,6 @@ public class ProjectOperation implements CoordinatesOperation {
 
   @Override
   public String toString() {
-    return "geographics -> " + projection;
+    return "geographics -> " + this.projection;
   }
 }

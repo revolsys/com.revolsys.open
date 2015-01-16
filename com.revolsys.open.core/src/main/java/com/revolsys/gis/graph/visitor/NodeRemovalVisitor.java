@@ -3,7 +3,6 @@ package com.revolsys.gis.graph.visitor;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.revolsys.collection.Visitor;
 import com.revolsys.data.equals.EqualsInstance;
@@ -43,7 +42,7 @@ public class NodeRemovalVisitor implements Visitor<Node<Record>> {
   /**
    * Check the direction of the edge by checking following the edge to the TO
    * node until the degree of the node != 2 of the next edge is reversed.
-   * 
+   *
    * @param node
    * @param edge The edge.
    * @return The type of edge.
@@ -72,37 +71,6 @@ public class NodeRemovalVisitor implements Visitor<Node<Record>> {
 
   }
 
-  /**
-   * Check to see if one of the two edges can be reversed and add the edge to
-   * the list of resersedEdges.
-   * 
-   * @param node
-   * @param reversedEdges The edges that can be reversed.
-   * @param edge1 The first edge.
-   * @param edge2 The second edge.
-   * @return True if one of the edges can be reversed, false otherwise.
-   */
-  private boolean fixReversedEdges(final Node<Record> node,
-    final Set<Edge<Record>> reversedEdges, final Edge<Record> edge1,
-    final Edge<Record> edge2) {
-    final EdgeType edge1Direction = checkDirection(node, edge1);
-    final EdgeType edge2Direction = checkDirection(node, edge2);
-    if (edge1Direction == edge2Direction) {
-      return false;
-    } else if (edge1Direction == EdgeType.BACKWARDS) {
-      reversedEdges.add(edge1);
-      return true;
-    } else if (edge2Direction == EdgeType.BACKWARDS) {
-      reversedEdges.add(edge2);
-      return true;
-    } else if (edge1Direction == EdgeType.END_DEGREE_N
-      || edge1Direction == EdgeType.END_DEGREE_N) {
-      return false;
-    } else {
-      return false;
-    }
-  }
-
   @Override
   public boolean visit(final Node<Record> node) {
     if (node.getDegree() == 2) {
@@ -114,16 +82,16 @@ public class NodeRemovalVisitor implements Visitor<Node<Record>> {
           final Record object1 = edge1.getObject();
           final Record object2 = edge2.getObject();
           if (EqualsInstance.INSTANCE.equals(object1, object2,
-            excludedAttributes)) {
+            this.excludedAttributes)) {
             if (edge1.isForwards(node) == edge2.isForwards(node)) {
               // if (!fixReversedEdges(node, reversedEdges, edge1, edge2)) {
               return true;
               // }
             }
             if (edge1.isForwards(node)) {
-              graph.merge(node, edge2, edge1);
+              this.graph.merge(node, edge2, edge1);
             } else {
-              graph.merge(node, edge1, edge2);
+              this.graph.merge(node, edge1, edge2);
             }
           }
         }

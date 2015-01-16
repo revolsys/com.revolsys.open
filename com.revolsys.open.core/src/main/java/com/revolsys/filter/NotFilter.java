@@ -12,11 +12,11 @@ public class NotFilter<T> implements Filter<T> {
 
   @Override
   public boolean accept(final T object) {
-    return !filter.accept(object);
+    return !this.filter.accept(object);
   }
 
   public Filter<T> getFilter() {
-    return filter;
+    return this.filter;
   }
 
   public void setFilter(final Filter<T> filter) {
@@ -25,6 +25,6 @@ public class NotFilter<T> implements Filter<T> {
 
   @Override
   public String toString() {
-    return "NOT " + filter;
+    return "NOT " + this.filter;
   }
 }

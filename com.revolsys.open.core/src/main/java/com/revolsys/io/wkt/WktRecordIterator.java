@@ -20,7 +20,7 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class WktRecordIterator extends AbstractIterator<Record>
-  implements RecordIterator {
+implements RecordIterator {
 
   private RecordFactory factory;
 
@@ -40,17 +40,17 @@ public class WktRecordIterator extends AbstractIterator<Record>
 
   @Override
   protected void doClose() {
-    FileUtil.closeSilent(in);
-    factory = null;
-    in = null;
-    wktParser = null;
-    recordDefinition = null;
+    FileUtil.closeSilent(this.in);
+    this.factory = null;
+    this.in = null;
+    this.wktParser = null;
+    this.recordDefinition = null;
   }
 
   @Override
   protected void doInit() {
     GeometryFactory geometryFactory;
-    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+    final FieldDefinition geometryField = this.recordDefinition.getGeometryField();
     if (geometryField == null) {
       geometryFactory = GeometryFactory.floating3();
     } else {
@@ -64,23 +64,18 @@ public class WktRecordIterator extends AbstractIterator<Record>
           geometryFactory);
       }
     }
-    wktParser = new WktParser(geometryFactory);
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    return recordDefinition;
+    this.wktParser = new WktParser(geometryFactory);
   }
 
   @Override
   protected Record getNext() {
     try {
-      final String wkt = in.readLine();
-      final Geometry geometry = wktParser.parseGeometry(wkt);
+      final String wkt = this.in.readLine();
+      final Geometry geometry = this.wktParser.parseGeometry(wkt);
       if (geometry == null) {
         throw new NoSuchElementException();
       } else {
-        final Record object = factory.createRecord(getRecordDefinition());
+        final Record object = this.factory.createRecord(getRecordDefinition());
         object.setGeometryValue(geometry);
         return object;
       }
@@ -88,6 +83,11 @@ public class WktRecordIterator extends AbstractIterator<Record>
       throw new RuntimeException("Error reading geometry ", e);
     }
 
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   @Override

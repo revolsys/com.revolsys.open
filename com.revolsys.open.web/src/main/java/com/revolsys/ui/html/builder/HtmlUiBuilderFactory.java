@@ -14,6 +14,28 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
 
   @SuppressWarnings("unchecked")
   public static <T extends HtmlUiBuilder> T get(final BeanFactory factory,
+    final Class<?> objectClass) {
+    HtmlUiBuilder<?> builder = null;
+    if (objectClass != null) {
+      Map<Class<?>, HtmlUiBuilder<?>> buildersByClass = buildersByFactoryAndClass.get(factory);
+      if (buildersByClass == null) {
+        buildersByClass = new WeakHashMap<Class<?>, HtmlUiBuilder<?>>();
+        buildersByFactoryAndClass.put(factory, buildersByClass);
+      }
+      builder = buildersByClass.get(factory);
+      if (builder == null) {
+        final Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>();
+        builder = get(buildersByClass, interfaces, factory, objectClass);
+        if (builder == null) {
+          builder = get(buildersByClass, factory, objectClass, interfaces);
+        }
+      }
+    }
+    return (T)builder;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends HtmlUiBuilder> T get(final BeanFactory factory,
     final String typePath) {
     final String beanName = typePath + "-htmlbuilder";
     if (factory.containsBean(beanName)) {
@@ -21,6 +43,21 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
     } else {
       return null;
     }
+  }
+
+  private static HtmlUiBuilder<?> get(
+    final Map<Class<?>, HtmlUiBuilder<?>> buildersByClass,
+    final BeanFactory factory, final Class<?> objectClass,
+    final Set<Class<?>> interfaces) {
+    HtmlUiBuilder<?> builder = null;
+    for (final Class<?> interfaceClass : interfaces) {
+      builder = get(buildersByClass, interfaces, factory, interfaceClass);
+      if (builder != null) {
+        buildersByClass.put(objectClass, builder);
+        return builder;
+      }
+    }
+    return builder;
   }
 
   private static HtmlUiBuilder<?> get(
@@ -52,54 +89,17 @@ public class HtmlUiBuilderFactory implements BeanFactoryAware {
 
   private static Map<BeanFactory, Map<Class<?>, HtmlUiBuilder<?>>> buildersByFactoryAndClass = new WeakHashMap<BeanFactory, Map<Class<?>, HtmlUiBuilder<?>>>();
 
-  @SuppressWarnings("unchecked")
-  public static <T extends HtmlUiBuilder> T get(final BeanFactory factory,
-    final Class<?> objectClass) {
-    HtmlUiBuilder<?> builder = null;
-    if (objectClass != null) {
-      Map<Class<?>, HtmlUiBuilder<?>> buildersByClass = buildersByFactoryAndClass.get(factory);
-      if (buildersByClass == null) {
-        buildersByClass = new WeakHashMap<Class<?>, HtmlUiBuilder<?>>();
-        buildersByFactoryAndClass.put(factory, buildersByClass);
-      }
-      builder = buildersByClass.get(factory);
-      if (builder == null) {
-        final Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>();
-        builder = get(buildersByClass, interfaces, factory, objectClass);
-        if (builder == null) {
-          builder = get(buildersByClass, factory, objectClass, interfaces);
-        }
-      }
-    }
-    return (T)builder;
-  }
-
-  private static HtmlUiBuilder<?> get(
-    final Map<Class<?>, HtmlUiBuilder<?>> buildersByClass,
-    final BeanFactory factory, final Class<?> objectClass,
-    final Set<Class<?>> interfaces) {
-    HtmlUiBuilder<?> builder = null;
-    for (final Class<?> interfaceClass : interfaces) {
-      builder = get(buildersByClass, interfaces, factory, interfaceClass);
-      if (builder != null) {
-        buildersByClass.put(objectClass, builder);
-        return builder;
-      }
-    }
-    return builder;
-  }
-
   @PreDestroy
   public void destory() {
-    buildersByFactoryAndClass.remove(beanFactory);
+    buildersByFactoryAndClass.remove(this.beanFactory);
   }
 
   public <T extends HtmlUiBuilder<?>> T get(final Class<?> objectClass) {
-    return (T)get(beanFactory, objectClass);
+    return (T)get(this.beanFactory, objectClass);
   }
 
   public <T extends HtmlUiBuilder<?>> T get(final String objectClassName) {
-    return (T)get(beanFactory, objectClassName);
+    return (T)get(this.beanFactory, objectClassName);
   }
 
   @Override

@@ -27,13 +27,13 @@ public class StaticMethodFilter<T> implements Filter<T> {
   @Override
   public boolean accept(final T object) {
     try {
-      if (args.length == 0) {
-        return (Boolean)method.invoke(null, object);
+      if (this.args.length == 0) {
+        return (Boolean)this.method.invoke(null, object);
       } else {
-        final Object[] newArgs = new Object[args.length + 1];
-        System.arraycopy(args, 0, newArgs, 0, args.length);
-        newArgs[args.length] = object;
-        return (Boolean)method.invoke(null, newArgs);
+        final Object[] newArgs = new Object[this.args.length + 1];
+        System.arraycopy(this.args, 0, newArgs, 0, this.args.length);
+        newArgs[this.args.length] = object;
+        return (Boolean)this.method.invoke(null, newArgs);
       }
     } catch (final RuntimeException e) {
       throw e;
@@ -45,29 +45,29 @@ public class StaticMethodFilter<T> implements Filter<T> {
   }
 
   public Class<?> getMethodClass() {
-    return methodClass;
+    return this.methodClass;
   }
 
   public String getMethodName() {
-    return methodName;
+    return this.methodName;
   }
 
   @PostConstruct
   public void initialize() {
-    final Method[] methods = methodClass.getMethods();
+    final Method[] methods = this.methodClass.getMethods();
     for (final Method method : methods) {
-      if (method.getName().equals(methodName)
-        && method.getParameterTypes().length == 1 + args.length) {
+      if (method.getName().equals(this.methodName)
+          && method.getParameterTypes().length == 1 + this.args.length) {
         if (this.method != null) {
           throw new IllegalArgumentException("Multiple method match for "
-            + methodClass + "." + methodName);
+              + this.methodClass + "." + this.methodName);
         }
         this.method = method;
       }
     }
-    if (method == null) {
+    if (this.method == null) {
       throw new IllegalArgumentException("Method could not be found "
-        + methodClass + "." + methodName);
+          + this.methodClass + "." + this.methodName);
     }
   }
 
@@ -81,6 +81,6 @@ public class StaticMethodFilter<T> implements Filter<T> {
 
   @Override
   public String toString() {
-    return methodClass.getName() + "." + methodName;
+    return this.methodClass.getName() + "." + this.methodName;
   }
 }

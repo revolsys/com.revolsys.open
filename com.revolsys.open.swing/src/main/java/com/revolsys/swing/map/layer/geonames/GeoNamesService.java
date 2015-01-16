@@ -94,9 +94,9 @@ public class GeoNamesService {
     final double width = geographicBoundingBox.getWidth();
     final double diagonal = Math.sqrt(width * width + height * height);
     final double radiusKm = cs.getUnit()
-      .getConverterTo(SI.RADIAN)
-      .convert(diagonal)
-      * radius / 1000;
+        .getConverterTo(SI.RADIAN)
+        .convert(diagonal)
+        * radius / 1000;
 
     params.put("lat", geographicBoundingBox.getCentreY());
     params.put("lng", geographicBoundingBox.getCentreX());
@@ -110,7 +110,7 @@ public class GeoNamesService {
       return mapToObjects(NAME_RECORD_DEFINITION, result);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to connect to URL:"
-        + searchUrlString);
+          + searchUrlString);
     }
   }
 
@@ -131,7 +131,7 @@ public class GeoNamesService {
       return mapToObjects(WIKIPEDIA_RECORD_DEFINITION, result);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to connect to URL:"
-        + searchUrlString);
+          + searchUrlString);
     }
   }
 
@@ -191,7 +191,7 @@ public class GeoNamesService {
       return mapToObjects(NAME_RECORD_DEFINITION, result);
     } catch (final IOException e) {
       throw new IllegalArgumentException("Unable to connect to URL:"
-        + searchUrlString);
+          + searchUrlString);
     }
   }
 }

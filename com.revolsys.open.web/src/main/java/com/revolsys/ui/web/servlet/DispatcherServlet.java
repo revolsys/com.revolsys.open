@@ -14,7 +14,11 @@ import org.springframework.web.util.WebUtils;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
 public class DispatcherServlet extends
-  org.springframework.web.servlet.DispatcherServlet {
+org.springframework.web.servlet.DispatcherServlet {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(DispatcherServlet.class);
 
   @Override

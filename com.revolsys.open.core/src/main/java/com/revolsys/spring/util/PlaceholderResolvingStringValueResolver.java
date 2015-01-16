@@ -16,7 +16,7 @@ import org.springframework.util.StringValueResolver;
  * to the <code>parseStringValue</code> method of the containing class.
  */
 public class PlaceholderResolvingStringValueResolver implements
-  StringValueResolver {
+StringValueResolver {
   private static final Logger LOG = LoggerFactory.getLogger(PlaceholderResolvingStringValueResolver.class);
 
   private final Map<String, Object> attributes;
@@ -67,7 +67,7 @@ public class PlaceholderResolvingStringValueResolver implements
    * Parse the given String value recursively, to be able to resolve nested
    * placeholders (when resolved property values in turn contain placeholders
    * again).
-   * 
+   *
    * @param strVal the String value to parse
    * @param props the Properties to resolve placeholders against
    * @param visitedPlaceholders the placeholders that have already been visited
@@ -79,20 +79,20 @@ public class PlaceholderResolvingStringValueResolver implements
    */
   protected String parseStringValue(final String strVal,
     final Map<String, Object> attributes, final Set<String> visitedPlaceholders)
-    throws BeanDefinitionStoreException {
+        throws BeanDefinitionStoreException {
 
     final StringBuilder buf = new StringBuilder(strVal);
 
-    int startIndex = strVal.indexOf(placeholderPrefix);
+    int startIndex = strVal.indexOf(this.placeholderPrefix);
     while (startIndex != -1) {
       final int endIndex = findPlaceholderEndIndex(buf, startIndex);
       if (endIndex != -1) {
         String placeholder = buf.substring(
-          startIndex + placeholderPrefix.length(), endIndex);
+          startIndex + this.placeholderPrefix.length(), endIndex);
         if (!visitedPlaceholders.add(placeholder)) {
           throw new BeanDefinitionStoreException(
             "Circular placeholder reference '" + placeholder
-              + "' in property definitions");
+            + "' in property definitions");
         }
         // Recursive invocation, parsing placeholders contained in the
         // placeholder key.
@@ -133,6 +133,6 @@ public class PlaceholderResolvingStringValueResolver implements
   public String resolveStringValue(final String strVal) throws BeansException {
     final String value = parseStringValue(strVal, this.attributes,
       new HashSet<String>());
-    return (value.equals(nullValue) ? null : value);
+    return value.equals(this.nullValue) ? null : value;
   }
 }

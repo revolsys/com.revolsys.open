@@ -3,7 +3,7 @@ package com.revolsys.ui.web.exception;
 /**
  * The RedirectException can be used to redirect a user to a specified url. This
  * is used instead of sendRedirect on the ServletResponse.
- * 
+ *
  * @author P.D.Austin
  * @version 1.0
  */
@@ -21,7 +21,7 @@ public class RedirectException extends RuntimeException {
 
   /**
    * Construct a new PageNotFoundException with the specified message.
-   * 
+   *
    * @param message The reason the exception was thrown
    */
   public RedirectException(final String url) {
@@ -29,6 +29,6 @@ public class RedirectException extends RuntimeException {
   }
 
   public String getUrl() {
-    return url;
+    return this.url;
   }
 }

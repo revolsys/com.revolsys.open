@@ -14,12 +14,12 @@ import com.revolsys.parallel.process.BaseInOutProcess;
 public class SortByType extends BaseInOutProcess<Record, Record> {
 
   private final Map<RecordDefinition, Collection<Record>> objectsByType = new TreeMap<RecordDefinition, Collection<Record>>(
-    new RecordDefinitionNameComparator());
+      new RecordDefinitionNameComparator());
 
   @Override
   protected void postRun(final Channel<Record> in,
     final Channel<Record> out) {
-    for (final Collection<Record> objects : objectsByType.values()) {
+    for (final Collection<Record> objects : this.objectsByType.values()) {
       for (final Record object : objects) {
         out.write(object);
       }
@@ -30,10 +30,10 @@ public class SortByType extends BaseInOutProcess<Record, Record> {
   protected void process(final Channel<Record> in,
     final Channel<Record> out, final Record object) {
     final RecordDefinition recordDefinition = object.getRecordDefinition();
-    Collection<Record> objects = objectsByType.get(recordDefinition);
+    Collection<Record> objects = this.objectsByType.get(recordDefinition);
     if (objects == null) {
       objects = new ArrayList<Record>();
-      objectsByType.put(recordDefinition, objects);
+      this.objectsByType.put(recordDefinition, objects);
     }
     objects.add(object);
   }

@@ -17,14 +17,14 @@ public class ViewportHotspot {
   }
 
   public Point getCoordinate() {
-    return coordinate;
+    return this.coordinate;
   }
 
   public String getText() {
-    return text;
+    return this.text;
   }
 
   public String getUrl() {
-    return url;
+    return this.url;
   }
 }

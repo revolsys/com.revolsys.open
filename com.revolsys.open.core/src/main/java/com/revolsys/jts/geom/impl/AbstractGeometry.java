@@ -229,8 +229,8 @@ public abstract class AbstractGeometry implements Geometry {
    *      <code>null</code>
    */
   protected static boolean hasNullElements(final Object[] array) {
-    for (int i = 0; i < array.length; i++) {
-      if (array[i] == null) {
+    for (final Object element : array) {
+      if (element == null) {
         return true;
       }
     }
@@ -369,7 +369,7 @@ public abstract class AbstractGeometry implements Geometry {
     final DataType dataType = geometry.getDataType();
     if (dataType.equals(DataTypes.GEOMETRY_COLLECTION)) {
       throw new IllegalArgumentException(
-        "This method does not support GeometryCollection arguments");
+          "This method does not support GeometryCollection arguments");
     }
   }
 
@@ -1423,11 +1423,11 @@ public abstract class AbstractGeometry implements Geometry {
       final Geometry g2 = other;
       return GeometryCollectionMapper.map((GeometryCollection)this,
         new GeometryMapper.MapOp() {
-          @Override
-          public Geometry map(final Geometry g) {
-            return g.intersection(g2);
-          }
-        });
+        @Override
+        public Geometry map(final Geometry g) {
+          return g.intersection(g2);
+        }
+      });
     }
     // if (isGeometryCollection(other))
     // return other.intersection(this);

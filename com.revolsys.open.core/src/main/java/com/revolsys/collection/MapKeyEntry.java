@@ -24,7 +24,7 @@ public class MapKeyEntry<K, V> implements Entry<K, V> {
       if (k1 == k2) {
         final Object v1 = getValue();
         final Object v2 = e.getValue();
-        if (v1 == v2 || (v1 != null && v1.equals(v2))) {
+        if (v1 == v2 || v1 != null && v1.equals(v2)) {
           return true;
         }
       }
@@ -35,23 +35,23 @@ public class MapKeyEntry<K, V> implements Entry<K, V> {
 
   @Override
   public K getKey() {
-    return key;
+    return this.key;
   }
 
   @Override
   public V getValue() {
-    return map.get(key);
+    return this.map.get(this.key);
   }
 
   @Override
   public int hashCode() {
-    return key.hashCode();
+    return this.key.hashCode();
   }
 
   @Override
   public V setValue(final V newValue) {
-    final V oldValue = map.get(key);
-    map.put(key, newValue);
+    final V oldValue = this.map.get(this.key);
+    this.map.put(this.key, newValue);
     return oldValue;
   }
 

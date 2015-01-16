@@ -14,6 +14,11 @@ import org.jdom.Namespace;
  *
  */
 public class LineNumberElement extends Element {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private int _startLine;
 
   private int _endLine;
@@ -40,19 +45,19 @@ public class LineNumberElement extends Element {
   }
 
   public int getEndLine() {
-    return _endLine;
+    return this._endLine;
   }
 
   public int getStartLine() {
-    return _startLine;
+    return this._startLine;
   }
 
   public void setEndLine(final int i) {
-    _endLine = i;
+    this._endLine = i;
   }
 
   public void setStartLine(final int i) {
-    _startLine = i;
+    this._startLine = i;
   }
 
 }

@@ -26,7 +26,7 @@ import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 
 public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
-  implements UIResource {
+implements UIResource {
   private class EmptyIcon implements Icon, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,8 +57,6 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
 
   }
 
-  private static final long serialVersionUID = 1L;
-
   public static SortOrder getColumnSortOrder(final JTable table,
     final int column) {
     if (table != null) {
@@ -78,6 +76,8 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
     }
     return null;
   }
+
+  private static final long serialVersionUID = 1L;
 
   private final EmptyIcon emptyIcon;
 
@@ -145,15 +145,15 @@ public class SortableTableCellHeaderRenderer extends DefaultTableCellRenderer
           switch (sortorder) {
             case ASCENDING:
               icon = (Icon)UIManager.get("Table.ascendingSortIcon");
-            break;
+              break;
 
             case DESCENDING:
               icon = (Icon)UIManager.get("Table.descendingSortIcon");
-            break;
+              break;
 
             case UNSORTED:
               icon = (Icon)UIManager.get("Table.naturalSortIcon");
-            break;
+              break;
           }
         }
       }

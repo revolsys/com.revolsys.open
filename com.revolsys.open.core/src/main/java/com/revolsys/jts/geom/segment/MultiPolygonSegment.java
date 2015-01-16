@@ -10,7 +10,12 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 public class MultiPolygonSegment extends AbstractSegment implements
-  Iterator<Segment> {
+Iterator<Segment> {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private int segmentIndex;
 
   private int ringIndex;
@@ -32,7 +37,7 @@ public class MultiPolygonSegment extends AbstractSegment implements
       if (ring == null) {
         return Double.NaN;
       } else {
-        return ring.getCoordinate(segmentIndex + vertexIndex, axisIndex);
+        return ring.getCoordinate(this.segmentIndex + vertexIndex, axisIndex);
       }
     }
   }
@@ -41,9 +46,9 @@ public class MultiPolygonSegment extends AbstractSegment implements
   public Vertex getGeometryVertex(final int index) {
     final MultiPolygon polygon = getMultiPolygon();
     if (index == 0) {
-      return polygon.getVertex(partIndex, ringIndex, segmentIndex);
+      return polygon.getVertex(this.partIndex, this.ringIndex, this.segmentIndex);
     } else if (index == 1) {
-      return polygon.getVertex(partIndex, ringIndex, segmentIndex + 1);
+      return polygon.getVertex(this.partIndex, this.ringIndex, this.segmentIndex + 1);
     } else {
       return null;
     }
@@ -55,7 +60,7 @@ public class MultiPolygonSegment extends AbstractSegment implements
 
   @Override
   public int getPartIndex() {
-    return partIndex;
+    return this.partIndex;
   }
 
   public Polygon getPolygon() {
@@ -63,7 +68,7 @@ public class MultiPolygonSegment extends AbstractSegment implements
     if (multiPolygon == null) {
       return null;
     } else {
-      return multiPolygon.getPolygon(partIndex);
+      return multiPolygon.getPolygon(this.partIndex);
     }
   }
 
@@ -72,25 +77,25 @@ public class MultiPolygonSegment extends AbstractSegment implements
     if (polygon == null) {
       return null;
     } else {
-      return polygon.getRing(ringIndex);
+      return polygon.getRing(this.ringIndex);
     }
   }
 
   @Override
   public int getRingIndex() {
-    return ringIndex;
+    return this.ringIndex;
   }
 
   @Override
   public int[] getSegmentId() {
     return new int[] {
-      partIndex, ringIndex, segmentIndex
+      this.partIndex, this.ringIndex, this.segmentIndex
     };
   }
 
   @Override
   public int getSegmentIndex() {
-    return segmentIndex;
+    return this.segmentIndex;
   }
 
   @Override
@@ -129,32 +134,32 @@ public class MultiPolygonSegment extends AbstractSegment implements
   @Override
   public boolean isLineEnd() {
     final LineString line = getRing();
-    return segmentIndex == line.getSegmentCount();
+    return this.segmentIndex == line.getSegmentCount();
   }
 
   @Override
   public boolean isLineStart() {
-    return segmentIndex == 0;
+    return this.segmentIndex == 0;
   }
 
   @Override
   public Segment next() {
-    segmentIndex++;
+    this.segmentIndex++;
     final MultiPolygon multiPolygon = getMultiPolygon();
-    while (partIndex < multiPolygon.getGeometryCount()) {
+    while (this.partIndex < multiPolygon.getGeometryCount()) {
       final Polygon polygon = getPolygon();
-      while (ringIndex < polygon.getRingCount()) {
-        final LinearRing ring = polygon.getRing(ringIndex);
-        if (segmentIndex < ring.getSegmentCount()) {
+      while (this.ringIndex < polygon.getRingCount()) {
+        final LinearRing ring = polygon.getRing(this.ringIndex);
+        if (this.segmentIndex < ring.getSegmentCount()) {
           return this;
         } else {
-          ringIndex++;
-          segmentIndex = 0;
+          this.ringIndex++;
+          this.segmentIndex = 0;
         }
       }
-      partIndex++;
-      ringIndex = 0;
-      segmentIndex = 0;
+      this.partIndex++;
+      this.ringIndex = 0;
+      this.segmentIndex = 0;
     }
     throw new NoSuchElementException();
   }

@@ -1,14 +1,6 @@
 package com.revolsys.gis.grid;
 
 public class GridUtil {
-  private static final int HUNDREDTH_GRID_SQUARE = 10;
-
-  private static final int QUARTER_GRID_SQUARE = 2;
-
-  public static final int SIXTEENTH_GRID_SQUARE = 4;
-
-  public static final int TWELTH_GRID_HEIGHT = 3;
-
   public static String formatSheetNumber100(final int sheetNumber) {
     if (sheetNumber < 10) {
       return "00" + sheetNumber;
@@ -26,12 +18,12 @@ public class GridUtil {
 
     final double ySheet = (y + 90) / height;
     final int row = (int)Math.floor(ySheet + 0.00000000001)
-      % TWELTH_GRID_HEIGHT;
+        % TWELTH_GRID_HEIGHT;
 
     if (row % 2 == 0) {
       return (char)('a' + row * SIXTEENTH_GRID_SQUARE + col);
     } else {
-      return (char)('a' + row * SIXTEENTH_GRID_SQUARE + (3 - col));
+      return (char)('a' + row * SIXTEENTH_GRID_SQUARE + 3 - col);
     }
   }
 
@@ -42,12 +34,12 @@ public class GridUtil {
 
     final double ySheet = (y + 90) / height;
     final int row = (int)Math.floor(ySheet + 0.00000000001)
-      % SIXTEENTH_GRID_SQUARE;
+        % SIXTEENTH_GRID_SQUARE;
 
     if (row % 2 == 0) {
       return (char)('a' + row * SIXTEENTH_GRID_SQUARE + col);
     } else {
-      return (char)('a' + row * SIXTEENTH_GRID_SQUARE + (3 - col));
+      return (char)('a' + row * SIXTEENTH_GRID_SQUARE + 3 - col);
     }
   }
 
@@ -55,7 +47,7 @@ public class GridUtil {
     if (row % 2 == 0) {
       return (char)('a' + row * SIXTEENTH_GRID_SQUARE + col);
     } else {
-      return (char)('a' + row * SIXTEENTH_GRID_SQUARE + (3 - col));
+      return (char)('a' + row * SIXTEENTH_GRID_SQUARE + 3 - col);
     }
   }
 
@@ -81,12 +73,12 @@ public class GridUtil {
 
     final double ySheet = (y + 90) / height;
     final int row = (int)Math.floor(ySheet + 0.00000000001)
-      % QUARTER_GRID_SQUARE;
+        % QUARTER_GRID_SQUARE;
 
     if (row % 2 == 0) {
       return (char)('a' + row * QUARTER_GRID_SQUARE + col);
     } else {
-      return (char)('a' + row * QUARTER_GRID_SQUARE + (1 - col));
+      return (char)('a' + row * QUARTER_GRID_SQUARE + 1 - col);
     }
   }
 
@@ -112,7 +104,7 @@ public class GridUtil {
     if (row % 2 == 0) {
       return (char)('a' + row * SIXTEENTH_GRID_SQUARE + col);
     } else {
-      return (char)('a' + row * SIXTEENTH_GRID_SQUARE + (3 - col));
+      return (char)('a' + row * SIXTEENTH_GRID_SQUARE + 3 - col);
     }
   }
 
@@ -138,14 +130,14 @@ public class GridUtil {
 
     final double ySheet = (y + 90) / height;
     final int row = (int)Math.floor(ySheet + 0.00000000001)
-      % HUNDREDTH_GRID_SQUARE;
+        % HUNDREDTH_GRID_SQUARE;
 
-    final int sheetNumber = row * HUNDREDTH_GRID_SQUARE + (col + 1);
+    final int sheetNumber = row * HUNDREDTH_GRID_SQUARE + col + 1;
     return formatSheetNumber100(sheetNumber);
   }
 
   public static String getNumber100(final int row, final int col) {
-    final int sheetNumber = row * HUNDREDTH_GRID_SQUARE + (col + 1);
+    final int sheetNumber = row * HUNDREDTH_GRID_SQUARE + col + 1;
     return formatSheetNumber100(sheetNumber);
   }
 
@@ -153,17 +145,17 @@ public class GridUtil {
     if (row % 2 == 0) {
       return 1 + row * SIXTEENTH_GRID_SQUARE + col;
     } else {
-      return 1 + row * SIXTEENTH_GRID_SQUARE + (3 - col);
+      return 1 + row * SIXTEENTH_GRID_SQUARE + 3 - col;
     }
   }
 
   public static String getNumber4(final int row, final int col) {
-    final int sheetNumber = row * QUARTER_GRID_SQUARE + (col + 1);
+    final int sheetNumber = row * QUARTER_GRID_SQUARE + col + 1;
     return String.valueOf(sheetNumber);
   }
 
   public static int getNumberCol100(final int sheetNumber) {
-    final int col = 9 - ((sheetNumber - 1) % HUNDREDTH_GRID_SQUARE);
+    final int col = 9 - (sheetNumber - 1) % HUNDREDTH_GRID_SQUARE;
     return col;
   }
 
@@ -207,4 +199,12 @@ public class GridUtil {
   public static int getNumberRow4(final String num) {
     return getNumberRow4(Integer.parseInt(num));
   }
+
+  private static final int HUNDREDTH_GRID_SQUARE = 10;
+
+  private static final int QUARTER_GRID_SQUARE = 2;
+
+  public static final int SIXTEENTH_GRID_SQUARE = 4;
+
+  public static final int TWELTH_GRID_HEIGHT = 3;
 }

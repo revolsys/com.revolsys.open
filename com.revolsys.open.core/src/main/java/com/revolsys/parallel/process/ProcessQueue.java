@@ -11,7 +11,7 @@ public class ProcessQueue {
   private final Buffer<Process> processBuffer = new Buffer<Process>(200);
 
   private final Channel<Process> processChannel = new Channel<Process>(
-    processBuffer);
+      this.processBuffer);
 
   private final Set<ProcessQueueWorker> workers = Collections.synchronizedSet(new HashSet<ProcessQueueWorker>());
 
@@ -25,16 +25,16 @@ public class ProcessQueue {
   }
 
   void addWorker(final ProcessQueueWorker worker) {
-    synchronized (workers) {
-      workers.add(worker);
+    synchronized (this.workers) {
+      this.workers.add(worker);
     }
   }
 
   public synchronized void cancelProcess(final Process process) {
 
-    if (process != null && !processBuffer.remove(process)) {
-      synchronized (workers) {
-        for (final ProcessQueueWorker worker : workers) {
+    if (process != null && !this.processBuffer.remove(process)) {
+      synchronized (this.workers) {
+        for (final ProcessQueueWorker worker : this.workers) {
           if (worker.getProcess() == process) {
             worker.interrupt();
           }
@@ -44,26 +44,26 @@ public class ProcessQueue {
   }
 
   public void clear() {
-    processBuffer.clear();
+    this.processBuffer.clear();
   }
 
   public int getMaxWorkerIdleTime() {
-    return maxWorkerIdleTime;
+    return this.maxWorkerIdleTime;
   }
 
   Channel<Process> getProcessChannel() {
-    return processChannel;
+    return this.processChannel;
   }
 
   void removeWorker(final ProcessQueueWorker worker) {
-    synchronized (workers) {
-      workers.remove(worker);
+    synchronized (this.workers) {
+      this.workers.remove(worker);
     }
   }
 
   public synchronized void runProcess(final Process process) {
-    processChannel.write(process);
-    if (workers.size() < maxWorkers && processBuffer.size() > workers.size()) {
+    this.processChannel.write(process);
+    if (this.workers.size() < this.maxWorkers && this.processBuffer.size() > this.workers.size()) {
       final ProcessQueueWorker worker = new ProcessQueueWorker(this);
       worker.start();
     }
@@ -71,13 +71,13 @@ public class ProcessQueue {
 
   public void stop() {
     clear();
-    processChannel.close();
-    synchronized (workers) {
-      for (final ProcessQueueWorker worker : workers) {
+    this.processChannel.close();
+    synchronized (this.workers) {
+      for (final ProcessQueueWorker worker : this.workers) {
         worker.interrupt();
       }
     }
-    workers.clear();
+    this.workers.clear();
   }
 
 }

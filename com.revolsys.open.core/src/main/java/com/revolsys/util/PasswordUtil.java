@@ -12,8 +12,6 @@ import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class PasswordUtil {
-  private static final Pattern PATTERN = Pattern.compile("\\{(\\w+)\\}(.+)");
-
   public static String decrypt(final String encryptedString) {
     final Matcher matcher = PATTERN.matcher(encryptedString);
     if (matcher.matches()) {
@@ -57,13 +55,13 @@ public class PasswordUtil {
   public static String decryptSqlDeveloper(final String encryptedPassword) {
     if (encryptedPassword.length() % 2 != 0) {
       throw new IllegalArgumentException(
-        "Password must consist of hex pairs.  Length is odd (not even).");
+          "Password must consist of hex pairs.  Length is odd (not even).");
     } else {
 
       final byte[] secret = new byte[encryptedPassword.length() / 2];
       for (int i = 0; i < encryptedPassword.length(); i += 2) {
         final String pair = encryptedPassword.substring(i, i + 2);
-        secret[i / 2] = (byte)(Integer.parseInt(pair, 16));
+        secret[i / 2] = (byte)Integer.parseInt(pair, 16);
       }
       return new String(decryptSqlDeveloper(secret));
     }
@@ -87,4 +85,6 @@ public class PasswordUtil {
   public static String encrypt(final String password) {
     return "{BASE64}" + Base64.encode(password);
   }
+
+  private static final Pattern PATTERN = Pattern.compile("\\{(\\w+)\\}(.+)");
 }

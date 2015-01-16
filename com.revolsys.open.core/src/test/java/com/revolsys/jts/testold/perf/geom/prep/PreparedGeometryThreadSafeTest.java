@@ -10,7 +10,7 @@ import com.revolsys.jts.testold.perf.ThreadTestRunner;
 
 /**
  * Tests for race conditons in the Geometry classes.
- * 
+ *
  * @author Martin Davis
  *
  */

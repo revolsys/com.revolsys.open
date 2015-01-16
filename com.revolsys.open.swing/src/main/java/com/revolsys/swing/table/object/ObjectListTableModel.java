@@ -19,7 +19,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
 
 public class ObjectListTableModel<T> extends AbstractTableModel implements
-  Reorderable, PropertyChangeListener {
+Reorderable, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -102,10 +102,6 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
     this.objects.getPropertyChangeSupport().firePropertyChange(event);
   }
 
-  public String getFieldName(final int columnIndex) {
-    return this.columnNames.get(columnIndex);
-  }
-
   @Override
   public Class<?> getColumnClass(final int columnIndex) {
     return Object.class;
@@ -121,8 +117,12 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
     return this.columnTitles.get(columnIndex);
   }
 
+  public String getFieldName(final int columnIndex) {
+    return this.columnNames.get(columnIndex);
+  }
+
   public T getObject(final int index) {
-    if (objects != null) {
+    if (this.objects != null) {
       if (index < this.objects.size()) {
         return this.objects.get(index);
       }
@@ -179,7 +179,7 @@ public class ObjectListTableModel<T> extends AbstractTableModel implements
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (event.getSource() == objects) {
+    if (event.getSource() == this.objects) {
       if (event instanceof IndexedPropertyChangeEvent) {
         final IndexedPropertyChangeEvent indexedEvent = (IndexedPropertyChangeEvent)event;
         final int index = indexedEvent.getIndex();

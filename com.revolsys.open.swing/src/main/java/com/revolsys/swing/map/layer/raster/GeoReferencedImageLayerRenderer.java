@@ -15,7 +15,7 @@ import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 
 public class GeoReferencedImageLayerRenderer extends
-  AbstractLayerRenderer<GeoReferencedImageLayer> {
+AbstractLayerRenderer<GeoReferencedImageLayer> {
 
   public static void render(final Viewport2D viewport,
     final Graphics2D graphics, final GeoReferencedImage image,

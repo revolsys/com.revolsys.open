@@ -46,19 +46,19 @@ public class Listener {
       switch (id) {
         case MouseEvent.MOUSE_PRESSED:
           listener.mousePressed(e);
-        break;
+          break;
         case MouseEvent.MOUSE_RELEASED:
           listener.mouseReleased(e);
-        break;
+          break;
         case MouseEvent.MOUSE_CLICKED:
           listener.mouseClicked(e);
-        break;
+          break;
         case MouseEvent.MOUSE_EXITED:
           listener.mouseExited(e);
-        break;
+          break;
         case MouseEvent.MOUSE_ENTERED:
           listener.mouseEntered(e);
-        break;
+          break;
       }
     }
   }

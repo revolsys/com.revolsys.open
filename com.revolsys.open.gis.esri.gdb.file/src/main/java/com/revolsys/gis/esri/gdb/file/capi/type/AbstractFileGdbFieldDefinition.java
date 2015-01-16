@@ -24,18 +24,14 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
   }
 
   public CapiFileGdbRecordStore getRecordStore() {
-    if (recordStore == null) {
+    if (this.recordStore == null) {
       return null;
     } else {
-      return recordStore.get();
+      return this.recordStore.get();
     }
   }
 
   public abstract Object getValue(Row row);
-
-  public void setRecordStore(final CapiFileGdbRecordStore recordStore) {
-    this.recordStore = new WeakReference<CapiFileGdbRecordStore>(recordStore);
-  }
 
   public Object setInsertValue(final Record object, final Row row,
     final Object value) {
@@ -43,6 +39,10 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
   }
 
   public void setPostInsertValue(final Record object, final Row row) {
+  }
+
+  public void setRecordStore(final CapiFileGdbRecordStore recordStore) {
+    this.recordStore = new WeakReference<CapiFileGdbRecordStore>(recordStore);
   }
 
   public Object setUpdateValue(final Record object, final Row row,

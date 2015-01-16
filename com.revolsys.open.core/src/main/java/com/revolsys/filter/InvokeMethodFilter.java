@@ -15,15 +15,15 @@ public class InvokeMethodFilter<T> implements Filter<T> {
   /** The name of the method to invoke. */
   private final String methodName;
 
-  public InvokeMethodFilter(final String methodName, final Object... parameters) {
-    this(null, methodName, parameters);
-  }
-
   public InvokeMethodFilter(final Object object, final String methodName,
     final Object... parameters) {
     this.object = object;
     this.methodName = methodName;
     this.parameters = parameters;
+  }
+
+  public InvokeMethodFilter(final String methodName, final Object... parameters) {
+    this(null, methodName, parameters);
   }
 
   @Override
@@ -45,9 +45,9 @@ public class InvokeMethodFilter<T> implements Filter<T> {
       }
       if (object instanceof Class<?>) {
         final Class<?> clazz = (Class<?>)object;
-        result = MethodUtils.invokeStaticMethod(clazz, methodName, parameters);
+        result = MethodUtils.invokeStaticMethod(clazz, this.methodName, parameters);
       } else {
-        result = MethodUtils.invokeMethod(object, methodName, parameters);
+        result = MethodUtils.invokeMethod(object, this.methodName, parameters);
       }
 
     } catch (final Throwable e) {
@@ -59,10 +59,10 @@ public class InvokeMethodFilter<T> implements Filter<T> {
 
   @Override
   public String toString() {
-    if (object == null) {
-      return methodName + parameters;
+    if (this.object == null) {
+      return this.methodName + this.parameters;
     } else {
-      return object.getClass() + "." + methodName + parameters;
+      return this.object.getClass() + "." + this.methodName + this.parameters;
     }
   }
 }

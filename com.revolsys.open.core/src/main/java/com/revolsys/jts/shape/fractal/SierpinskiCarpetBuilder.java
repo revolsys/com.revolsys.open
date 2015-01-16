@@ -94,19 +94,19 @@ public class SierpinskiCarpetBuilder extends GeometricShapeBuilder {
       new PointDouble(x, y + width, Point.NULL_ORDINATE),
       new PointDouble(x, y, Point.NULL_ORDINATE)
     };
-    return geometryFactory.linearRing(pts);
+    return this.geometryFactory.linearRing(pts);
   }
 
   @Override
   public Geometry getGeometry() {
-    final int level = recursionLevelForSize(numPts);
+    final int level = recursionLevelForSize(this.numPts);
     final LineSegment baseLine = getSquareBaseLine();
     final Point origin = baseLine.getPoint(0);
     final List<LinearRing> rings = new ArrayList<>();
     final LinearRing shell = ((Polygon)getSquareExtent().toGeometry()).getExteriorRing();
     rings.add(shell);
     addHoles(level, origin.getX(), origin.getY(), getDiameter(), rings);
-    return geometryFactory.polygon(shell);
+    return this.geometryFactory.polygon(shell);
   }
 
 }

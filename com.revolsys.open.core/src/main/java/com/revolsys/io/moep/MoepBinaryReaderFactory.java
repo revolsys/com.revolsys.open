@@ -8,7 +8,7 @@ import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 
 public class MoepBinaryReaderFactory extends
-  AbstractRecordAndGeometryReaderFactory {
+AbstractRecordAndGeometryReaderFactory {
   public MoepBinaryReaderFactory() {
     super("MOEP (BC Ministry of Environment and Parks)", true);
     addMediaTypeAndFileExtension("application/x-bcgov-moep-bin", "bin");

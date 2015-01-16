@@ -314,8 +314,7 @@ public class PdfViewport extends Viewport2D implements AutoCloseable {
             }
             transform.translate(dx, dy);
 
-            for (int i = 0; i < lines.length; i++) {
-              final String line = lines[i];
+            for (final String line : lines) {
               transform.translate(0, ascent);
               final AffineTransform lineTransform = new AffineTransform(
                 transform);

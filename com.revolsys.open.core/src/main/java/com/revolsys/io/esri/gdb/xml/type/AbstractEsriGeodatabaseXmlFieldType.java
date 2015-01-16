@@ -7,7 +7,7 @@ import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.io.xml.XsiConstants;
 
 public abstract class AbstractEsriGeodatabaseXmlFieldType implements
-  EsriGeodatabaseXmlFieldType, EsriGeodatabaseXmlConstants {
+EsriGeodatabaseXmlFieldType, EsriGeodatabaseXmlConstants {
 
   private final FieldType esriFieldType;
 
@@ -24,12 +24,12 @@ public abstract class AbstractEsriGeodatabaseXmlFieldType implements
 
   @Override
   public DataType getDataType() {
-    return dataType;
+    return this.dataType;
   }
 
   @Override
   public FieldType getEsriFieldType() {
-    return esriFieldType;
+    return this.esriFieldType;
   }
 
   @Override
@@ -38,12 +38,12 @@ public abstract class AbstractEsriGeodatabaseXmlFieldType implements
   }
 
   protected String getType(final Object value) {
-    return xmlSchemaTypeName;
+    return this.xmlSchemaTypeName;
   }
 
   @Override
   public String getXmlSchemaTypeName() {
-    return xmlSchemaTypeName;
+    return this.xmlSchemaTypeName;
   }
 
   @Override

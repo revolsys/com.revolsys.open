@@ -19,13 +19,13 @@ public class ToWgs84 {
   private final double ppm;
 
   public ToWgs84(final List<Object> values) {
-    dx = ((Number)values.get(0)).doubleValue();
-    dy = ((Number)values.get(1)).doubleValue();
-    dz = ((Number)values.get(2)).doubleValue();
-    ex = ((Number)values.get(3)).doubleValue();
-    ey = ((Number)values.get(4)).doubleValue();
-    ez = ((Number)values.get(5)).doubleValue();
-    ppm = ((Number)values.get(6)).doubleValue();
+    this.dx = ((Number)values.get(0)).doubleValue();
+    this.dy = ((Number)values.get(1)).doubleValue();
+    this.dz = ((Number)values.get(2)).doubleValue();
+    this.ex = ((Number)values.get(3)).doubleValue();
+    this.ey = ((Number)values.get(4)).doubleValue();
+    this.ez = ((Number)values.get(5)).doubleValue();
+    this.ppm = ((Number)values.get(6)).doubleValue();
   }
 
   @Override
@@ -36,19 +36,19 @@ public class ToWgs84 {
       return true;
     } else if (object instanceof ToWgs84) {
       final ToWgs84 toWgs84 = (ToWgs84)object;
-      if (dx != toWgs84.dx) {
+      if (this.dx != toWgs84.dx) {
         return false;
-      } else if (dy != toWgs84.dy) {
+      } else if (this.dy != toWgs84.dy) {
         return false;
-      } else if (dz != toWgs84.dz) {
+      } else if (this.dz != toWgs84.dz) {
         return false;
-      } else if (ex != toWgs84.ex) {
+      } else if (this.ex != toWgs84.ex) {
         return false;
-      } else if (ey != toWgs84.ey) {
+      } else if (this.ey != toWgs84.ey) {
         return false;
-      } else if (ez != toWgs84.ez) {
+      } else if (this.ez != toWgs84.ez) {
         return false;
-      } else if (ppm != toWgs84.ppm) {
+      } else if (this.ppm != toWgs84.ppm) {
         return false;
       } else {
         return true;
@@ -59,57 +59,57 @@ public class ToWgs84 {
   }
 
   public double getDx() {
-    return dx;
+    return this.dx;
   }
 
   public double getDy() {
-    return dy;
+    return this.dy;
   }
 
   public double getDz() {
-    return dz;
+    return this.dz;
   }
 
   public double getEx() {
-    return ex;
+    return this.ex;
   }
 
   public double getEy() {
-    return ey;
+    return this.ey;
   }
 
   public double getEz() {
-    return ez;
+    return this.ez;
   }
 
   public double getPpm() {
-    return ppm;
+    return this.ppm;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    long temp = Double.doubleToLongBits(dx);
-    result = prime * result + (int)(temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(dy);
-    result = prime * result + (int)(temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(dz);
-    result = prime * result + (int)(temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(ex);
-    result = prime * result + (int)(temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(ey);
-    result = prime * result + (int)(temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(ez);
-    result = prime * result + (int)(temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(ppm);
-    result = prime * result + (int)(temp ^ (temp >>> 32));
+    long temp = Double.doubleToLongBits(this.dx);
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    temp = Double.doubleToLongBits(this.dy);
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    temp = Double.doubleToLongBits(this.dz);
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    temp = Double.doubleToLongBits(this.ex);
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    temp = Double.doubleToLongBits(this.ey);
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    temp = Double.doubleToLongBits(this.ez);
+    result = prime * result + (int)(temp ^ temp >>> 32);
+    temp = Double.doubleToLongBits(this.ppm);
+    result = prime * result + (int)(temp ^ temp >>> 32);
     return result;
   }
 
   @Override
   public String toString() {
-    return dx + ", " + dy + ", " + dz + ", " + ex + ", " + ey + ", " + ez
-      + ", " + ppm;
+    return this.dx + ", " + this.dy + ", " + this.dz + ", " + this.ex + ", " + this.ey + ", " + this.ez
+        + ", " + this.ppm;
   }
 }

@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
 import com.revolsys.data.io.RecordWriterFactory;
-import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public class IoFactoryRegistry {
@@ -90,7 +90,7 @@ public class IoFactoryRegistry {
                   addFactory(factory);
                 } else {
                   LOG.error(factoryClassName + " is not a subclass of "
-                    + IoFactory.class);
+                      + IoFactory.class);
                 }
               } catch (final Throwable e) {
                 LOG.error("Unable to load: " + factoryClassName, e);
@@ -125,7 +125,7 @@ public class IoFactoryRegistry {
         final Set<IoFactory> factories = getFactories(ioInterface);
         if (factories.add(factory)) {
           for (final String fileExtension : factory.getFileExtensions()) {
-            CollectionUtil.addToTreeSet(this.classFileExtensions, ioInterface,
+            Maps.addToTreeSet(this.classFileExtensions, ioInterface,
               fileExtension);
             final Map<String, IoFactory> factoriesByFileExtension = getFactoriesByFileExtensionMap(ioInterface);
             factoriesByFileExtension.put(fileExtension, factory);
@@ -282,7 +282,7 @@ public class IoFactoryRegistry {
       return Collections.emptySet();
     } else {
       final Set<String> emptySet = Collections.<String> emptySet();
-      return CollectionUtil.get(this.classFileExtensions, factoryClass,
+      return Maps.get(this.classFileExtensions, factoryClass,
         emptySet);
     }
   }

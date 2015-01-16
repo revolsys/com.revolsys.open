@@ -46,6 +46,11 @@ import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
  * from the index.
  */
 class TaggedLineSegment extends LineSegmentDouble {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final Geometry parent;
 
   private final int index;
@@ -72,15 +77,15 @@ class TaggedLineSegment extends LineSegmentDouble {
   protected LineSegment createLineSegment(
     final GeometryFactory geometryFactory, final int axisCount,
     final double... coordinates) {
-    return new LineSegmentDoubleGF(parent.getGeometryFactory(), axisCount,
+    return new LineSegmentDoubleGF(this.parent.getGeometryFactory(), axisCount,
       coordinates);
   }
 
   public int getIndex() {
-    return index;
+    return this.index;
   }
 
   public Geometry getParent() {
-    return parent;
+    return this.parent;
   }
 }

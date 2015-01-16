@@ -46,8 +46,7 @@ public final class HttpServletLogUtil {
         }
 
         if (headerNames != null) {
-          for (int i = 0; i < headerNames.length; i++) {
-            final String headerName = headerNames[i];
+          for (final String headerName : headerNames) {
             final String value = request.getHeader(headerName);
             if (value != null) {
               text.append('\n').append(headerName).append('\t').append(value);

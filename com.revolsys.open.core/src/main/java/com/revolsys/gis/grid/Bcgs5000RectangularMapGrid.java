@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class Bcgs5000RectangularMapGrid extends Bcgs10000RectangularMapGrid {
   private static final Pattern NAME_PATTERN = Pattern.compile("^"
-    + BcgsConstants.REGEX_5000 + ".*");
+      + BcgsConstants.REGEX_5000 + ".*");
 
   public Bcgs5000RectangularMapGrid() {
     this(BcgsConstants.WIDTH_5000, BcgsConstants.HEIGHT_5000);
@@ -73,7 +73,7 @@ public class Bcgs5000RectangularMapGrid extends Bcgs10000RectangularMapGrid {
     final String letterBlock = super.getMapTileName(x, y);
 
     final double xSheet = (x + 180) * 20;
-    final int col = (int)((Math.ceil(xSheet - 0.000000000001)) % 2);
+    final int col = (int)(Math.ceil(xSheet - 0.000000000001) % 2);
 
     final double ySheet = (y + 90) * 40;
     final int row = (int)Math.floor(ySheet + 0.000000000001) % 2;

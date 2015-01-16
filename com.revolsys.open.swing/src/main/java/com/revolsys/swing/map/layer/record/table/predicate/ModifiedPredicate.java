@@ -18,9 +18,6 @@ import com.revolsys.swing.table.record.row.RecordRowTable;
 
 public class ModifiedPredicate implements HighlightPredicate {
 
-  private static final Border BORDER = BorderFactory.createLineBorder(
-    WebColors.Green, 2);
-
   public static void add(final RecordRowTable table) {
     final RecordLayerTableModel model = (RecordLayerTableModel)table.getModel();
     final Highlighter highlighter = getHighlighter(model);
@@ -31,6 +28,9 @@ public class ModifiedPredicate implements HighlightPredicate {
     final ModifiedPredicate predicate = new ModifiedPredicate(model);
     return new BorderHighlighter(predicate, BORDER);
   }
+
+  private static final Border BORDER = BorderFactory.createLineBorder(
+    WebColors.Green, 2);
 
   private final RecordLayerTableModel model;
 

@@ -82,7 +82,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
     }
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     if (viewportGeometryFactory != null && geometry != null
-      && !geometry.isEmpty()) {
+        && !geometry.isEmpty()) {
       final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
       Point point = null;
@@ -283,7 +283,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
           final int ascent = fontMetrics.getAscent();
           final int leading = fontMetrics.getLeading();
           final double maxHeight = lines.length * (ascent + descent)
-            + (lines.length - 1) * leading;
+              + (lines.length - 1) * leading;
           final String verticalAlignment = style.getTextVerticalAlignment();
           if ("top".equals(verticalAlignment)) {
           } else if ("middle".equals(verticalAlignment)) {
@@ -323,8 +323,7 @@ public class TextStyleRenderer extends AbstractRecordLayerRenderer {
             graphics.rotate(-Math.toRadians(orientation), 0, 0);
           }
           graphics.translate(dx, dy);
-          for (int i = 0; i < lines.length; i++) {
-            final String line = lines[i];
+          for (final String line : lines) {
             graphics.translate(0, ascent);
             final AffineTransform lineTransform = graphics.getTransform();
             final Rectangle2D bounds = fontMetrics.getStringBounds(line,
