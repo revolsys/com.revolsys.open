@@ -25,17 +25,15 @@ import com.revolsys.io.Path;
 import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
 
-public class CodeTableProperty extends AbstractCodeTable implements
-RecordDefinitionProperty {
+public class CodeTableProperty extends AbstractCodeTable implements RecordDefinitionProperty {
 
-  public static final CodeTableProperty getProperty(
-    final RecordDefinition recordDefinition) {
+  public static final CodeTableProperty getProperty(final RecordDefinition recordDefinition) {
     final CodeTableProperty property = recordDefinition.getProperty(PROPERTY_NAME);
     return property;
   }
 
   private static final ArrayList<String> DEFAULT_FIELD_NAMES = new ArrayList<String>(
-      Arrays.asList("VALUE"));
+    Arrays.asList("VALUE"));
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
 
@@ -66,6 +64,8 @@ RecordDefinitionProperty {
   private boolean loadMissingCodes = true;
 
   private final ThreadLocal<Boolean> threadLoading = new ThreadLocal<Boolean>();
+
+  private boolean loaded = false;
 
   public CodeTableProperty() {
   }
@@ -266,17 +266,18 @@ RecordDefinitionProperty {
             query.addOrderBy(order, true);
           }
           try (
-              Reader<Record> reader = this.recordStore.query(query)) {
+            Reader<Record> reader = this.recordStore.query(query)) {
             final List<Record> codes = reader.read();
             this.recordStore.getStatistics()
-            .getStatistics("query")
-            .add(this.typePath, -codes.size());
+              .getStatistics("query")
+              .add(this.typePath, -codes.size());
             Collections.sort(codes, new RecordAttributeComparator(this.orderBy));
             addValues(codes);
           }
           Property.firePropertyChange(this, "valuesChanged", false, true);
         } finally {
           this.loading = false;
+          this.loaded = true;
           this.threadLoading.set(null);
         }
       }
@@ -284,8 +285,7 @@ RecordDefinitionProperty {
   }
 
   @Override
-  protected synchronized Identifier loadId(final List<Object> values,
-    final boolean createId) {
+  protected synchronized Identifier loadId(final List<Object> values, final boolean createId) {
     if (this.loadAll && !this.loadMissingCodes && !isEmpty()) {
       return null;
     }
@@ -313,9 +313,7 @@ RecordDefinitionProperty {
       final Reader<Record> reader = this.recordStore.query(query);
       try {
         final List<Record> codes = reader.read();
-        this.recordStore.getStatistics()
-        .getStatistics("query")
-        .add(this.typePath, -codes.size());
+        this.recordStore.getStatistics().getStatistics("query").add(this.typePath, -codes.size());
         addValues(codes);
         id = getIdByValue(values);
         Property.firePropertyChange(this, "valuesChanged", false, true);
@@ -332,24 +330,22 @@ RecordDefinitionProperty {
 
   @Override
   protected List<Object> loadValues(final Object id) {
-    List<Object> values = null;
-    if (this.loadAll) {
+    if (this.loadAll && !this.loaded) {
       loadAll();
-      values = getValueById(id);
     } else {
       final Record code = this.recordStore.load(this.typePath, id);
       if (code != null) {
         addValue(code);
-        values = getValueById(id);
       }
     }
-    return values;
+    return getValueById(id);
   }
 
   @Override
   public synchronized void refresh() {
     super.refresh();
     if (isLoadAll()) {
+      this.loaded = false;
       loadAll();
     }
   }
@@ -358,8 +354,7 @@ RecordDefinitionProperty {
     this.createMissingCodes = createMissingCodes;
   }
 
-  public void setCreationTimestampFieldName(
-    final String creationTimestampFieldName) {
+  public void setCreationTimestampFieldName(final String creationTimestampFieldName) {
     this.creationTimestampFieldName = creationTimestampFieldName;
   }
 
@@ -379,8 +374,7 @@ RecordDefinitionProperty {
     this.loadMissingCodes = loadMissingCodes;
   }
 
-  public void setModificationTimestampFieldName(
-    final String modificationTimestampFieldName) {
+  public void setModificationTimestampFieldName(final String modificationTimestampFieldName) {
     this.modificationTimestampFieldName = modificationTimestampFieldName;
   }
 

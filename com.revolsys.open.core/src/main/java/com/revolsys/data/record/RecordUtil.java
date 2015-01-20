@@ -14,6 +14,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -29,8 +30,8 @@ import com.revolsys.util.Property;
 
 public final class RecordUtil {
 
-  public static int compareNullFirst(final Record record1,
-    final Record record2, final String fieldName) {
+  public static int compareNullFirst(final Record record1, final Record record2,
+    final String fieldName) {
     final Object value1 = getValue(record1, fieldName);
     final Object value2 = getValue(record2, fieldName);
     if (value1 == value2) {
@@ -46,8 +47,8 @@ public final class RecordUtil {
     }
   }
 
-  public static int compareNullFirst(final Record record1,
-    final Record record2, final String... fieldNames) {
+  public static int compareNullFirst(final Record record1, final Record record2,
+    final String... fieldNames) {
     for (final String fieldName : fieldNames) {
       final Object value1 = getValue(record1, fieldName);
       final Object value2 = getValue(record2, fieldName);
@@ -105,8 +106,7 @@ public final class RecordUtil {
     return 0;
   }
 
-  public static Record copy(final RecordDefinition recordDefinition,
-    final Record object) {
+  public static Record copy(final RecordDefinition recordDefinition, final Record object) {
     final Record copy = new ArrayRecord(recordDefinition);
     copy.setValues(object);
     return copy;
@@ -122,8 +122,7 @@ public final class RecordUtil {
    * @return The copied object.
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Record> T copy(final T object,
-    final Geometry geometry) {
+  public static <T extends Record> T copy(final T object, final Geometry geometry) {
     final Geometry oldGeometry = object.getGeometryValue();
     final T newObject = (T)object.clone();
     newObject.setGeometryValue(geometry);
@@ -132,8 +131,7 @@ public final class RecordUtil {
   }
 
   public static RecordDefinition createGeometryRecordDefinition() {
-    final FieldDefinition geometryField = new FieldDefinition("geometry",
-      DataTypes.GEOMETRY, true);
+    final FieldDefinition geometryField = new FieldDefinition("geometry", DataTypes.GEOMETRY, true);
     return new RecordDefinitionImpl("Feature", geometryField);
   }
 
@@ -165,7 +163,7 @@ public final class RecordUtil {
         return number.intValue() == 1;
       } else {
         final String stringValue = value.toString();
-        if (stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+        if (stringValue.equals("Y") || stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
           return true;
         } else {
           return false;
@@ -222,8 +220,7 @@ public final class RecordUtil {
         }
       } else if (propertyValue instanceof Geometry) {
         final Geometry geometry = (Geometry)propertyValue;
-        propertyValue = GeometryProperties.getGeometryProperty(geometry,
-          propertyName);
+        propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
       } else if (propertyValue instanceof Map) {
         final Map<String, Object> map = (Map<String, Object>)propertyValue;
         propertyValue = map.get(propertyName);
@@ -244,6 +241,17 @@ public final class RecordUtil {
       }
     }
     return (T)propertyValue;
+  }
+
+  public static Set<Identifier> getIdentifiers(final Collection<? extends Record> records) {
+    final Set<Identifier> identifiers = new TreeSet<>();
+    for (final Record record : records) {
+      final Identifier identifier = record.getIdentifier();
+      if (identifier != null) {
+        identifiers.add(identifier);
+      }
+    }
+    return identifiers;
   }
 
   public static Integer getInteger(final Record object, final String fieldName) {
@@ -304,7 +312,7 @@ public final class RecordUtil {
             object.setValue(name, value);
           } else {
             final StringConverter<Object> converter = StringConverterRegistry.getInstance()
-                .getConverter(dataTypeClass);
+              .getConverter(dataTypeClass);
             if (converter == null) {
               object.setValue(name, value);
             } else {
@@ -318,8 +326,7 @@ public final class RecordUtil {
     return object;
   }
 
-  public static List<Record> getObjects(
-    final RecordDefinition recordDefinition,
+  public static List<Record> getObjects(final RecordDefinition recordDefinition,
     final Collection<? extends Map<String, Object>> list) {
     final List<Record> objects = new ArrayList<Record>();
     for (final Map<String, Object> map : list) {
@@ -337,9 +344,8 @@ public final class RecordUtil {
     }
   }
 
-  public static void mergeStringListValue(final Map<String, Object> object,
-    final Record object1, final Record object2, final String fieldName,
-    final String separator) {
+  public static void mergeStringListValue(final Map<String, Object> object, final Record object1,
+    final Record object2, final String fieldName, final String separator) {
     final String value1 = object1.getString(fieldName);
     final String value2 = object2.getString(fieldName);
     Object value;
@@ -358,9 +364,8 @@ public final class RecordUtil {
     object.put(fieldName, value);
   }
 
-  public static void mergeValue(final Map<String, Object> object,
-    final Record object1, final Record object2, final String fieldName,
-    final String separator) {
+  public static void mergeValue(final Map<String, Object> object, final Record object1,
+    final Record object2, final String fieldName, final String separator) {
     final String value1 = object1.getString(fieldName);
     final String value2 = object2.getString(fieldName);
     Object value;
@@ -377,8 +382,7 @@ public final class RecordUtil {
   }
 
   public static void setValues(final Record target, final Record source,
-    final Collection<String> fieldNames,
-    final Collection<String> ignoreFieldNames) {
+    final Collection<String> fieldNames, final Collection<String> ignoreFieldNames) {
     for (final String fieldName : fieldNames) {
       if (!ignoreFieldNames.contains(fieldName)) {
         final Object oldValue = getValue(target, fieldName);
@@ -391,16 +395,50 @@ public final class RecordUtil {
     }
   }
 
-  public static Geometry unionGeometry(
-    final Collection<? extends Record> records) {
+  public static Geometry unionGeometry(final Collection<?> objects) {
     Geometry union = null;
-    for (final Record record : records) {
-      final Geometry geometry = record.getGeometryValue();
+    for (final Object object : objects) {
+      final Geometry geometry = unionGeometry(object);
       if (geometry != null) {
         union = geometry.union(union);
       }
     }
     return union;
+  }
+
+  public static Geometry unionGeometry(final Map<?, ?> map) {
+    Geometry union = null;
+    for (final Entry<?, ?> entry : map.entrySet()) {
+      final Object key = entry.getKey();
+      final Geometry keyGeometry = unionGeometry(key);
+      if (keyGeometry != null) {
+        union = keyGeometry.union(union);
+      }
+      final Object value = entry.getValue();
+      final Geometry valueGeometry = unionGeometry(value);
+      if (valueGeometry != null) {
+        union = valueGeometry.union(union);
+      }
+    }
+    return union;
+  }
+
+  public static Geometry unionGeometry(final Object object) {
+    if (object instanceof Geometry) {
+      final Geometry geometry = (Geometry)object;
+      return geometry;
+    } else if (object instanceof Record) {
+      final Record record = (Record)object;
+      return record.getGeometryValue();
+    } else if (object instanceof Collection) {
+      final Collection<?> objects = (Collection<?>)object;
+      return unionGeometry(objects);
+    } else if (object instanceof Map) {
+      final Map<?, ?> map = (Map)object;
+      return unionGeometry(map);
+    } else {
+      return null;
+    }
   }
 
   private RecordUtil() {

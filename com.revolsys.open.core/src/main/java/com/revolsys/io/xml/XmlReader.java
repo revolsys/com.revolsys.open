@@ -18,7 +18,7 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public class XmlReader implements XMLStreamConstants {
+public class XmlReader implements XMLStreamConstants, AutoCloseable {
   private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
   private XMLStreamReader parser;
@@ -36,6 +36,15 @@ public class XmlReader implements XMLStreamConstants {
     }
   }
 
+  @Override
+  public void close() {
+    try {
+      this.parser.close();
+    } catch (final XMLStreamException e) {
+      ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
   public int getDepth() {
     return this.depth;
   }
@@ -48,7 +57,7 @@ public class XmlReader implements XMLStreamConstants {
         switch (this.parser.getEventType()) {
           case XMLStreamConstants.CHARACTERS:
             text.append(this.parser.getText());
-            break;
+          break;
         }
       }
     }
@@ -101,13 +110,13 @@ public class XmlReader implements XMLStreamConstants {
       switch (next) {
         case XMLStreamConstants.START_ELEMENT:
           this.depth++;
-          break;
+        break;
         case XMLStreamConstants.END_ELEMENT:
           this.depth--;
-          break;
+        break;
 
         default:
-          break;
+        break;
       }
       return next;
     } catch (final XMLStreamException e) {
@@ -141,8 +150,7 @@ public class XmlReader implements XMLStreamConstants {
     return false;
   }
 
-  public boolean skipToStartElements(final int depth,
-    final Collection<QName> elementNames) {
+  public boolean skipToStartElements(final int depth, final Collection<QName> elementNames) {
     try {
       while (this.depth >= depth) {
         next();
@@ -162,8 +170,7 @@ public class XmlReader implements XMLStreamConstants {
     return false;
   }
 
-  public boolean skipToStartElements(final int depth,
-    final QName... elementNames) {
+  public boolean skipToStartElements(final int depth, final QName... elementNames) {
     return skipToStartElements(depth, Arrays.asList(elementNames));
   }
 

@@ -19,14 +19,14 @@ import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.Property;
 
-public abstract class AbstractCodeTable implements Closeable,
-PropertyChangeSupportProxy, CodeTable, Cloneable {
+public abstract class AbstractCodeTable implements Closeable, PropertyChangeSupportProxy,
+  CodeTable, Cloneable {
 
   private boolean capitalizeWords = false;
 
-  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private Map<Identifier, List<Object>> idValueCache = new LinkedHashMap<>();
 
@@ -51,8 +51,7 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
     this.capitalizeWords = capitalizeWords;
   }
 
-  protected synchronized void addValue(final Identifier id,
-    final List<Object> values) {
+  protected synchronized void addValue(final Identifier id, final List<Object> values) {
     if (id instanceof Number) {
       final Number number = (Number)id;
       final long longValue = number.longValue();
@@ -77,8 +76,7 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
 
   }
 
-  protected synchronized void addValues(
-    final Map<Identifier, List<Object>> valueMap) {
+  protected synchronized void addValues(final Map<Identifier, List<Object>> valueMap) {
 
     for (final Entry<Identifier, List<Object>> entry : valueMap.entrySet()) {
       final Identifier id = entry.getKey();
@@ -191,8 +189,7 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
     return getIdExact(values, true);
   }
 
-  public Identifier getIdExact(final List<Object> values,
-    final boolean loadValues) {
+  public Identifier getIdExact(final List<Object> values, final boolean loadValues) {
     Identifier id = this.valueIdCache.get(values);
     if (id == null && loadValues) {
       synchronized (this) {
@@ -207,6 +204,10 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
   public Identifier getIdExact(final Object... values) {
     final List<Object> valueList = Arrays.asList(values);
     return getIdExact(valueList);
+  }
+
+  public Map<Identifier, List<Object>> getIdValueCache() {
+    return this.idValueCache;
   }
 
   @Override
@@ -263,7 +264,7 @@ PropertyChangeSupportProxy, CodeTable, Cloneable {
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Identifier id) {
     final List<Object> values = getValues(id);
-    if (values != null) {
+    if (Property.hasValue(values)) {
       return (V)values.get(0);
     } else {
       return null;
