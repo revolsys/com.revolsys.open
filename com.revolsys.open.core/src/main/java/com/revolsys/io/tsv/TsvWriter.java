@@ -1,5 +1,6 @@
 package com.revolsys.io.tsv;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -12,12 +13,10 @@ public class TsvWriter implements AutoCloseable {
   /** The writer */
   private final PrintWriter out;
 
-  /**
-   * Constructs CSVReader with supplied separator and quote char.
-   *
-   * @param reader The reader to the CSV file.
-   * @throws IOException
-   */
+  public TsvWriter(final File file) {
+    this(FileUtil.getWriter(file));
+  }
+
   public TsvWriter(final Writer out) {
     this.out = new PrintWriter(out);
   }

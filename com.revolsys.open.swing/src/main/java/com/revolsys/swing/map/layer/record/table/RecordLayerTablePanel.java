@@ -46,8 +46,7 @@ import com.revolsys.swing.table.record.row.RecordRowRunnable;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
-public class RecordLayerTablePanel extends TablePanel implements
-PropertyChangeListener {
+public class RecordLayerTablePanel extends TablePanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
   public static final String FILTER_GEOMETRY = "filter_geometry";
@@ -62,8 +61,7 @@ PropertyChangeListener {
 
   private final JButton fieldSetsButton;
 
-  public RecordLayerTablePanel(final AbstractRecordLayer layer,
-    final RecordLayerTable table) {
+  public RecordLayerTablePanel(final AbstractRecordLayer layer, final RecordLayerTable table) {
     super(table);
     this.layer = layer;
     this.tableModel = getTableModel();
@@ -78,18 +76,15 @@ PropertyChangeListener {
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     final boolean hasGeometry = recordDefinition.getGeometryFieldIndex() != -1;
-    final EnableCheck deletableEnableCheck = new RecordRowPropertyEnableCheck(
-        "deletable");
+    final EnableCheck deletableEnableCheck = new RecordRowPropertyEnableCheck("deletable");
 
-    final EnableCheck modifiedEnableCheck = new RecordRowPropertyEnableCheck(
-        "modified");
-    final EnableCheck notDeletedEnableCheck = new ObjectPropertyEnableCheck(
-      this, "recordDeleted", false);
-    final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(
-      modifiedEnableCheck, new RecordRowPropertyEnableCheck("deleted"));
+    final EnableCheck modifiedEnableCheck = new RecordRowPropertyEnableCheck("modified");
+    final EnableCheck notDeletedEnableCheck = new ObjectPropertyEnableCheck(this, "recordDeleted",
+      false);
+    final OrEnableCheck modifiedOrDeleted = new OrEnableCheck(modifiedEnableCheck,
+      new RecordRowPropertyEnableCheck("deleted"));
 
-    final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(
-      layer, "editable");
+    final EnableCheck editableEnableCheck = new ObjectPropertyEnableCheck(layer, "editable");
 
     menu.addGroup(0, "default");
     menu.addGroup(1, "record");
@@ -97,56 +92,48 @@ PropertyChangeListener {
 
     final MenuFactory layerMenuFactory = MenuFactory.findMenu(layer);
     if (layerMenuFactory != null) {
-      menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer",
-        layerMenuFactory));
+      menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", layerMenuFactory));
     }
 
-    menu.addMenuItemTitleIcon("record", "View/Edit Record", "table_edit",
-      notDeletedEnableCheck, this, "editRecord");
+    menu.addMenuItemTitleIcon("record", "View/Edit Record", "table_edit", notDeletedEnableCheck,
+      this, "editRecord");
 
     if (hasGeometry) {
-      menu.addMenuItemTitleIcon("record", "Zoom to Record",
-        "magnifier_zoom_selected", notDeletedEnableCheck, this, "zoomToRecord");
+      menu.addMenuItemTitleIcon("record", "Zoom to Record", "magnifier_zoom_selected",
+        notDeletedEnableCheck, this, "zoomToRecord");
     }
-    menu.addMenuItemTitleIcon("record", "Delete Record", "table_row_delete",
-      deletableEnableCheck, this, "deleteRecord");
+    menu.addMenuItemTitleIcon("record", "Delete Record", "table_row_delete", deletableEnableCheck,
+      this, "deleteRecord");
 
-    menu.addMenuItem("record", RecordRowRunnable.createAction("Revert Record",
-      "arrow_revert", modifiedOrDeleted, "revertChanges"));
+    menu.addMenuItem("record", RecordRowRunnable.createAction("Revert Record", "arrow_revert",
+      modifiedOrDeleted, "revertChanges"));
 
-    menu.addMenuItem("record", RecordRowRunnable.createAction(
-      "Revert Empty Fields", "field_empty_revert", modifiedEnableCheck,
-        "revertEmptyFields"));
+    menu.addMenuItem("record", RecordRowRunnable.createAction("Revert Empty Fields",
+      "field_empty_revert", modifiedEnableCheck, "revertEmptyFields"));
 
-    menu.addMenuItemTitleIcon("dnd", "Copy Record", "page_copy", this,
-        "copyRecord");
+    menu.addMenuItemTitleIcon("dnd", "Copy Record", "page_copy", this, "copyRecord");
 
     if (hasGeometry) {
-      menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "geometry_paste",
-        new AndEnableCheck(editableEnableCheck, new InvokeMethodEnableCheck(
-          this, "canPasteRecordGeometry")), this, "pasteGeometry");
+      menu.addMenuItemTitleIcon("dnd", "Paste Geometry", "geometry_paste", new AndEnableCheck(
+        editableEnableCheck, new InvokeMethodEnableCheck(this, "canPasteRecordGeometry")), this,
+        "pasteGeometry");
 
       final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
       editMenu.setEnableCheck(notDeletedEnableCheck);
-      final DataType geometryDataType = recordDefinition.getGeometryField()
-          .getType();
+      final DataType geometryDataType = recordDefinition.getGeometryField().getType();
       if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
-        if (DirectionalAttributes.getProperty(recordDefinition)
-            .hasDirectionalAttributes()) {
-          editMenu.addMenuItemTitleIcon("geometry",
-            LayerRecordForm.FLIP_RECORD_NAME, LayerRecordForm.FLIP_RECORD_ICON,
-            editableEnableCheck, this, "flipRecordOrientation");
-          editMenu.addMenuItemTitleIcon("geometry",
-            LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
-            LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck,
-            this, "flipLineOrientation");
-          editMenu.addMenuItemTitleIcon("geometry",
-            LayerRecordForm.FLIP_FIELDS_NAME, LayerRecordForm.FLIP_FIELDS_ICON,
-            editableEnableCheck, this, "flipFields");
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        if (DirectionalAttributes.getProperty(recordDefinition).hasDirectionalAttributes()) {
+          editMenu.addMenuItemTitleIcon("geometry", LayerRecordForm.FLIP_RECORD_NAME,
+            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, this, "flipRecordOrientation");
+          editMenu.addMenuItemTitleIcon("geometry", LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
+            LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck, this,
+            "flipLineOrientation");
+          editMenu.addMenuItemTitleIcon("geometry", LayerRecordForm.FLIP_FIELDS_NAME,
+            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, this, "flipFields");
         } else {
-          editMenu.addMenuItemTitleIcon("geometry", "Flip Line Orientation",
-            "flip_line", editableEnableCheck, this, "flipLineOrientation");
+          editMenu.addMenuItemTitleIcon("geometry", "Flip Line Orientation", "flip_line",
+            editableEnableCheck, this, "flipLineOrientation");
         }
       }
       menu.addComponentFactory("record", 2, editMenu);
@@ -156,54 +143,55 @@ PropertyChangeListener {
     final ToolBar toolBar = getToolBar();
 
     if (layerMenuFactory != null) {
-      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
-        layerMenuFactory, "show", layer, this, 10, 10);
+      toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu", layerMenuFactory, "show", layer,
+        this, 10, 10);
+    }
+    if (hasGeometry) {
+      final EnableCheck hasSelectedRecords = new ObjectPropertyEnableCheck(layer,
+        "hasSelectedRecords");
+      toolBar.addButton("layer", "Zoom to Selected", "magnifier_zoom_selected", hasSelectedRecords,
+        layer, "zoomToSelected");
     }
     toolBar.addComponent("count", new TableRowCount(this.tableModel));
 
-    toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this,
-        "refresh");
+    toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this, "refresh");
 
-    this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets",
-      "fields_filter", this, "actionShowFieldSetsMenu");
+    this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets", "fields_filter", this,
+      "actionShowFieldSetsMenu");
 
-    final FieldFilterPanel attributeFilterPanel = new FieldFilterPanel(
-      this, this.tableModel);
+    final FieldFilterPanel attributeFilterPanel = new FieldFilterPanel(this, this.tableModel);
     toolBar.addComponent("search", attributeFilterPanel);
 
-    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits",
-      attributeFilterPanel, "showAdvancedFilter");
+    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits", attributeFilterPanel,
+      "showAdvancedFilter");
 
-    final EnableCheck hasFilter = new ObjectPropertyEnableCheck(
-      this.tableModel, "hasFilter");
+    final EnableCheck hasFilter = new ObjectPropertyEnableCheck(this.tableModel, "hasFilter");
 
-    toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter,
-      attributeFilterPanel, "clear");
+    toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter, attributeFilterPanel,
+      "clear");
 
     // Filter buttons
 
-    final JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(
-      FILTER_ATTRIBUTE, -1, "Show All Records", "table_filter",
-      this.tableModel, "setFieldFilterMode", RecordLayerTableModel.MODE_ALL);
+    final JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(FILTER_ATTRIBUTE, -1,
+      "Show All Records", "table_filter", this.tableModel, "setFieldFilterMode",
+      RecordLayerTableModel.MODE_ALL);
     clearFilter.doClick();
 
     toolBar.addToggleButton(FILTER_ATTRIBUTE, -1, "Show Only Changed Records",
-      "change_table_filter", editableEnableCheck, this.tableModel,
-      "setFieldFilterMode", RecordLayerTableModel.MODE_EDITS);
+      "change_table_filter", editableEnableCheck, this.tableModel, "setFieldFilterMode",
+      RecordLayerTableModel.MODE_EDITS);
 
     this.selectedButton = toolBar.addToggleButton(FILTER_ATTRIBUTE, -1,
-      "Show Only Selected Records", "filter_selected", null, this.tableModel,
-      "setFieldFilterMode", RecordLayerTableModel.MODE_SELECTED);
+      "Show Only Selected Records", "filter_selected", null, this.tableModel, "setFieldFilterMode",
+      RecordLayerTableModel.MODE_SELECTED);
 
     if (hasGeometry) {
-      final JToggleButton showAllGeometries = toolBar.addToggleButtonTitleIcon(
-        FILTER_GEOMETRY, -1, "Show All Records ", "world_filter",
-        this.tableModel, "setFilterByBoundingBox", false);
+      final JToggleButton showAllGeometries = toolBar.addToggleButtonTitleIcon(FILTER_GEOMETRY, -1,
+        "Show All Records ", "world_filter", this.tableModel, "setFilterByBoundingBox", false);
       showAllGeometries.doClick();
 
-      toolBar.addToggleButtonTitleIcon(FILTER_GEOMETRY, -1,
-        "Show Records on Map", "map_filter", this.tableModel,
-        "setFilterByBoundingBox", true);
+      toolBar.addToggleButtonTitleIcon(FILTER_GEOMETRY, -1, "Show Records on Map", "map_filter",
+        this.tableModel, "setFilterByBoundingBox", true);
     }
     Property.addListener(layer, this);
   }
@@ -211,9 +199,8 @@ PropertyChangeListener {
   public void actionShowFieldSetsMenu() {
     final JPopupMenu menu = new JPopupMenu();
 
-    final JMenuItem editMenuItem = InvokeMethodAction.createMenuItem(
-      "Edit Field Sets", "fields_filter_edit", this.layer, "showProperties",
-        "Field Sets");
+    final JMenuItem editMenuItem = InvokeMethodAction.createMenuItem("Edit Field Sets",
+      "fields_filter_edit", this.layer, "showProperties", "Field Sets");
     menu.add(editMenuItem);
 
     menu.addSeparator();
@@ -221,8 +208,8 @@ PropertyChangeListener {
     final AbstractRecordLayer layer = getLayer();
     final String fieldSetName = layer.getFieldNamesSetName();
     for (final String fieldSetName2 : layer.getFieldNamesSetNames()) {
-      final JCheckBoxMenuItem menuItem = InvokeMethodAction.createCheckBoxMenuItem(
-        fieldSetName2, layer, "setFieldNamesSetName", fieldSetName2);
+      final JCheckBoxMenuItem menuItem = InvokeMethodAction.createCheckBoxMenuItem(fieldSetName2,
+        layer, "setFieldNamesSetName", fieldSetName2);
       if (fieldSetName2.equalsIgnoreCase(fieldSetName)) {
         menuItem.setSelected(true);
       }
@@ -369,8 +356,8 @@ PropertyChangeListener {
     if (geometry != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox boundingBox = geometry.getBoundingBox()
-          .convert(geometryFactory)
-          .expandPercent(0.1);
+        .convert(geometryFactory)
+        .expandPercent(0.1);
       project.setViewBoundingBox(boundingBox);
     }
   }

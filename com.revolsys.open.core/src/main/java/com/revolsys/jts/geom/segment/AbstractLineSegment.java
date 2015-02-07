@@ -629,7 +629,7 @@ LineSegment {
 
   @Override
   public boolean isPerpendicularTo(Point point) {
-    if (Property.hasValues(point, this)) {
+    if (Property.hasValuesAll(point, this)) {
       final GeometryFactory geometryFactory = getGeometryFactory();
       point = point.convert(geometryFactory, 2);
       final double x = point.getX();
