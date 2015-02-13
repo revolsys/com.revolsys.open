@@ -93,4 +93,12 @@ public class Strings {
       return text.substring(startIndex, endIndex);
     }
   }
+
+  public static String trim(final String text) {
+    if (text == null) {
+      return null;
+    } else {
+      return text.trim();
+    }
+  }
 }

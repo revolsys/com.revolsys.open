@@ -245,6 +245,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     return this.loadAll;
   }
 
+  public boolean isLoaded() {
+    return this.loaded;
+  }
+
   protected synchronized void loadAll() {
     if (this.threadLoading.get() != Boolean.TRUE) {
       if (this.loading) {

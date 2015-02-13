@@ -12,6 +12,10 @@ public class SingleIdentifier extends AbstractIdentifier {
   public static Identifier create(final Object value) {
     if (value == null) {
       return null;
+    } else if (value instanceof Integer) {
+      return new IntegerIdentifier((Integer)value);
+    } else if (value instanceof Long) {
+      return new LongIdentifier((Long)value);
     } else if (value instanceof Identifier) {
       return (Identifier)value;
     } else if (value instanceof Collection) {

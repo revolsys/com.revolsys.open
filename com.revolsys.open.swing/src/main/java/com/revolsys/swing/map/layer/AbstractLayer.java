@@ -4,8 +4,6 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.TextArea;
 import java.awt.Window;
-import java.awt.event.ContainerAdapter;
-import java.awt.event.ContainerEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -27,7 +25,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.ScrollableSizeHint;
@@ -55,7 +52,6 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.border.TitledBorder;
 import com.revolsys.swing.component.BasePanel;
-import com.revolsys.swing.component.ButtonTabComponent;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.Field;
@@ -63,6 +59,7 @@ import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
+import com.revolsys.swing.map.ProjectFramePanel;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -71,20 +68,18 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractLayer extends AbstractObjectWithProperties
-implements Layer, PropertyChangeListener, PropertyChangeSupportProxy,
-EventsEnabler {
+public abstract class AbstractLayer extends AbstractObjectWithProperties implements Layer,
+  PropertyChangeListener, PropertyChangeSupportProxy, EventsEnabler, ProjectFramePanel {
   public static final ImageIcon ICON_LAYER = Icons.getIcon("map");
 
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   static {
-    MenuFactory.createMenu(AbstractLayer.class, "ZoomToLayer", "MinScale",
-      "MaxScale", "Refresh", "DeleteLayer", "LayerProperties");
+    MenuFactory.createMenu(AbstractLayer.class, "ZoomToLayer", "MinScale", "MaxScale", "Refresh",
+      "DeleteLayer", "LayerProperties");
   }
 
-  private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(
-    this);
+  private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
 
   private boolean editable = false;
 
@@ -108,8 +103,7 @@ EventsEnabler {
 
   private String name;
 
-  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private boolean queryable = true;
 
@@ -141,8 +135,7 @@ EventsEnabler {
     this.name = name;
   }
 
-  public AbstractLayer(final String name,
-    final Map<String, ? extends Object> properties) {
+  public AbstractLayer(final String name, final Map<String, ? extends Object> properties) {
     this.name = name;
     setProperties(properties);
   }
@@ -168,14 +161,11 @@ EventsEnabler {
     if (directory != null) {
       final Logger log = LoggerFactory.getLogger(getClass());
       if (!directory.exists()) {
-        log.error("Unable to save layer " + getPath()
-          + " directory does not exist " + directory);
+        log.error("Unable to save layer " + getPath() + " directory does not exist " + directory);
       } else if (!directory.isDirectory()) {
-        log.error("Unable to save layer " + getPath()
-          + " file is not a directory " + directory);
+        log.error("Unable to save layer " + getPath() + " file is not a directory " + directory);
       } else if (!directory.canWrite()) {
-        log.error("Unable to save layer " + getPath()
-          + " directory is not writable " + directory);
+        log.error("Unable to save layer " + getPath() + " directory is not writable " + directory);
       } else {
         return true;
       }
@@ -220,16 +210,19 @@ EventsEnabler {
   }
 
   @Override
+  public Component createPanelComponent() {
+    return createTableViewComponent();
+  }
+
+  @Override
   public TabbedValuePanel createPropertiesPanel() {
-    final TabbedValuePanel tabPanel = new TabbedValuePanel("Layer " + this
-      + " Properties", this);
+    final TabbedValuePanel tabPanel = new TabbedValuePanel("Layer " + this + " Properties", this);
     createPropertiesTabGeneral(tabPanel);
     createPropertiesTabCoordinateSystem(tabPanel);
     return tabPanel;
   }
 
-  protected JPanel createPropertiesTabCoordinateSystem(
-    final TabbedValuePanel tabPanel) {
+  protected JPanel createPropertiesTabCoordinateSystem(final TabbedValuePanel tabPanel) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory != null) {
       final JPanel panel = new JPanel(new VerticalLayout(5));
@@ -244,18 +237,15 @@ EventsEnabler {
       } else {
         final JLabel extentLabel = new JLabel(
           "<html><table cellspacing=\"3\" style=\"margin:0px\">"
-              + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-              + StringConverterRegistry.toString(boundingBox.getMaximum(1))
-              + "</td><td>&nbsp;</td></tr><tr>"
-              + "<td><b>Left</b>: "
-              + StringConverterRegistry.toString(boundingBox.getMinimum(0))
-              + "</td><td>&nbsp;</td><td>&nbsp;</td>"
-              + "<td><b>Right</b>: "
-              + StringConverterRegistry.toString(boundingBox.getMaximum(0))
-              + "</td></tr>"
-              + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-              + StringConverterRegistry.toString(boundingBox.getMinimum(1))
-              + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
+            + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
+            + StringConverterRegistry.toString(boundingBox.getMaximum(1))
+            + "</td><td>&nbsp;</td></tr><tr>" + "<td><b>Left</b>: "
+            + StringConverterRegistry.toString(boundingBox.getMinimum(0))
+            + "</td><td>&nbsp;</td><td>&nbsp;</td>" + "<td><b>Right</b>: "
+            + StringConverterRegistry.toString(boundingBox.getMaximum(0)) + "</td></tr>"
+            + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
+            + StringConverterRegistry.toString(boundingBox.getMinimum(1))
+            + "</td><td>&nbsp;</td></tr><tr>" + "</tr></table></html>");
         extentLabel.setFont(SwingUtil.FONT);
         extentPanel.add(extentLabel);
 
@@ -272,33 +262,28 @@ EventsEnabler {
         final int axisCount = geometryFactory.getAxisCount();
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "ID",
           coordinateSystem.getId(), 10);
-        SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel,
-          "axisCount", axisCount, 10);
+        SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "axisCount", axisCount, 10);
 
         final double scaleXY = geometryFactory.getScaleXY();
         if (scaleXY > 0) {
-          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel,
-            "scaleXy", scaleXY, 10);
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy", scaleXY, 10);
         } else {
-          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel,
-            "scaleXy", "Floating", 10);
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy", "Floating", 10);
         }
 
         if (axisCount > 2) {
           final double scaleZ = geometryFactory.getScaleZ();
           if (scaleZ > 0) {
-            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel,
-              "scaleZ", scaleZ, 10);
+            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleZ", scaleZ, 10);
           } else {
-            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel,
-              "scaleZ", "Floating", 10);
+            SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleZ", "Floating", 10);
           }
         }
 
         final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems.getCoordinateSystem(coordinateSystem);
         SwingUtil.addLabel(coordinateSystemPanel, "ESRI WKT");
-        final TextArea wktTextArea = new TextArea(
-          EsriCsWktWriter.toString(esriCoordinateSystem), 10, 80);
+        final TextArea wktTextArea = new TextArea(EsriCsWktWriter.toString(esriCoordinateSystem),
+          10, 80);
         wktTextArea.setEditable(false);
         wktTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
         coordinateSystemPanel.add(wktTextArea);
@@ -326,8 +311,7 @@ EventsEnabler {
     return generalPanel;
   }
 
-  protected ValueField createPropertiesTabGeneralPanelGeneral(
-    final BasePanel parent) {
+  protected ValueField createPropertiesTabGeneralPanelGeneral(final BasePanel parent) {
     final ValueField panel = new ValueField(this);
     SwingUtil.setTitledBorder(panel, "General");
     final Field nameField = (Field)SwingUtil.addObjectField(panel, this, "name");
@@ -343,8 +327,7 @@ EventsEnabler {
     return panel;
   }
 
-  protected ValueField createPropertiesTabGeneralPanelSource(
-    final BasePanel parent) {
+  protected ValueField createPropertiesTabGeneralPanelSource(final BasePanel parent) {
     final ValueField panel = new ValueField(this);
     SwingUtil.setTitledBorder(panel, "Source");
 
@@ -360,16 +343,9 @@ EventsEnabler {
   public void delete() {
     setExists(false);
     this.beanPropertyListener = null;
-    final Component component = getProperty("TableView");
-    if (component != null) {
-      final ProjectFrame projectFrame = ProjectFrame.get(this);
-      if (projectFrame != null) {
-        final JTabbedPane bottomTabs = projectFrame.getBottomTabs();
-        if (bottomTabs != null) {
-          bottomTabs.remove(component);
-        }
-      }
-      setProperty("TableView", null);
+    final ProjectFrame projectFrame = ProjectFrame.get(this);
+    if (projectFrame != null) {
+      projectFrame.removeBottomTab(this);
     }
     firePropertyChange("deleted", false, true);
     setEventsEnabled(false);
@@ -386,8 +362,8 @@ EventsEnabler {
 
   public void deleteWithConfirm() {
     final int confirm = JOptionPane.showConfirmDialog(MapPanel.get(this),
-      "Delete the layer and any child layers? This action cannot be undone.",
-      "Delete Layer", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+      "Delete the layer and any child layers? This action cannot be undone.", "Delete Layer",
+      JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
     if (confirm == JOptionPane.OK_OPTION) {
       delete();
     }
@@ -415,19 +391,17 @@ EventsEnabler {
     return true;
   }
 
-  protected void fireIndexedPropertyChange(final String propertyName,
-    final int index, final Object oldValue, final Object newValue) {
+  protected void fireIndexedPropertyChange(final String propertyName, final int index,
+    final Object oldValue, final Object newValue) {
     if (this.propertyChangeSupport != null) {
-      this.propertyChangeSupport.fireIndexedPropertyChange(propertyName, index,
-        oldValue, newValue);
+      this.propertyChangeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
   }
 
-  public void firePropertyChange(final String propertyName,
-    final Object oldValue, final Object newValue) {
+  public void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
     if (this.propertyChangeSupport != null && isEventsEnabled()) {
-      this.propertyChangeSupport.firePropertyChange(propertyName, oldValue,
-        newValue);
+      this.propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
   }
 
@@ -585,8 +559,7 @@ EventsEnabler {
         final boolean exists = doInitialize();
         setExists(exists);
       } catch (final Throwable e) {
-        ExceptionUtil.log(getClass(), "Unable to initialize layer: "
-            + getPath(), e);
+        ExceptionUtil.log(getClass(), "Unable to initialize layer: " + getPath(), e);
         setExists(false);
       } finally {
         setInitialized(true);
@@ -665,8 +638,7 @@ EventsEnabler {
 
   @Override
   public boolean isSelectable() {
-    return isExists() && isVisible()
-        && (isSelectSupported() && this.selectable || isEditable());
+    return isExists() && isVisible() && (isSelectSupported() && this.selectable || isEditable());
   }
 
   @Override
@@ -688,8 +660,7 @@ EventsEnabler {
   @Override
   public boolean isVisible(final double scale) {
     final LayerGroup parent = getParent();
-    if (isExists() && isVisible()
-        && (parent == null || parent.isVisible(scale))) {
+    if (isExists() && isVisible() && (parent == null || parent.isVisible(scale))) {
       final long longScale = (long)scale;
       final long minimumScale = getMinimumScale();
       final long maximumScale = getMaximumScale();
@@ -724,8 +695,7 @@ EventsEnabler {
       try {
         doRefresh();
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unable to refresh layer: " + getName(), e);
+        LoggerFactory.getLogger(getClass()).error("Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
     }
@@ -739,8 +709,7 @@ EventsEnabler {
       try {
         doRefreshAll();
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Unable to refresh layer: " + getName(), e);
+        LoggerFactory.getLogger(getClass()).error("Unable to refresh layer: " + getName(), e);
       }
       firePropertyChange("refresh", false, true);
     }
@@ -880,8 +849,8 @@ EventsEnabler {
     } else {
       final Object oldValue = getProperty(name);
       if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
-        final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(
-          this, "property", oldValue, value, name);
+        final KeyedPropertyChangeEvent event = new KeyedPropertyChangeEvent(this, "property",
+          oldValue, value, name);
         if (this.propertyChangeSupport != null) {
           this.propertyChangeSupport.firePropertyChange(event);
         }
@@ -889,8 +858,7 @@ EventsEnabler {
           JavaBeanUtil.setProperty(this, name, value);
           super.setProperty(name, value);
         } catch (final Throwable e) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Unable to set property:" + name, e);
+          LoggerFactory.getLogger(getClass()).error("Unable to set property:" + name, e);
         }
       }
     }
@@ -998,42 +966,8 @@ EventsEnabler {
   }
 
   protected <C extends Component> C showTableView() {
-    final JTabbedPane tabs = ProjectFrame.get(this).getBottomTabs();
-    final Object tableView = getProperty("TableView");
-    Component component = null;
-    if (tableView instanceof Component) {
-      component = (Component)tableView;
-      if (component.getParent() != tabs) {
-        component = null;
-      }
-    }
-    if (component == null) {
-      component = createTableViewComponent();
-
-      if (component != null) {
-        final int tabIndex = tabs.getTabCount();
-        final String name = getName();
-        tabs.addTab(name, getIcon(), component);
-        tabs.setTabComponentAt(tabIndex, new ButtonTabComponent(tabs));
-        if (component != null) {
-          final Component tabComponent = component;
-          setPropertyWeak("TableView", tabComponent);
-          tabs.addContainerListener(new ContainerAdapter() {
-            @Override
-            public void componentRemoved(final ContainerEvent e) {
-              final Component eventComponent = e.getChild();
-              if (eventComponent == tabComponent) {
-                setProperty("TableView", null);
-              }
-            }
-          });
-          tabs.setSelectedIndex(tabIndex);
-        }
-      }
-    } else {
-      tabs.setSelectedComponent(component);
-    }
-    return (C)component;
+    final ProjectFrame projectFrame = ProjectFrame.get(this);
+    return projectFrame.addBottomTab(this);
   }
 
   public void toggleEditable() {
@@ -1075,6 +1009,7 @@ EventsEnabler {
         }
       }
     }
+    map.remove("bottomTab");
     return map;
   }
 
@@ -1088,8 +1023,8 @@ EventsEnabler {
     final GeometryFactory geometryFactory = project.getGeometryFactory();
     final BoundingBox layerBoundingBox = getBoundingBox();
     final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-        .expandPercent(0.1)
-        .clipToCoordinateSystem();
+      .expandPercent(0.1)
+      .clipToCoordinateSystem();
     project.setViewBoundingBox(boundingBox);
   }
 }

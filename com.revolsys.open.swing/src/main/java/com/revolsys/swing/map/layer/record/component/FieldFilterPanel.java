@@ -58,8 +58,8 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class FieldFilterPanel extends JComponent implements ActionListener,
-ItemListener, DocumentListener, PropertyChangeListener {
+public class FieldFilterPanel extends JComponent implements ActionListener, ItemListener,
+  DocumentListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -81,17 +81,16 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   private final AbstractRecordLayer layer;
 
-  private final ComboBox numericOperatorField = new ComboBox("=", "<>",
-    "IS NULL", "IS NOT NULL", "<", "<=", ">", ">=");
+  private final ComboBox numericOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL",
+    "<", "<=", ">", ">=");
 
-  private final ComboBox dateOperatorField = new ComboBox("=", "<>", "IS NULL",
-    "IS NOT NULL", "<", "<=", ">", ">=");
+  private final ComboBox dateOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL", "<",
+    "<=", ">", ">=");
 
-  private final ComboBox generalOperatorField = new ComboBox("=", "<>", "Like",
-    "IS NULL", "IS NOT NULL");
+  private final ComboBox generalOperatorField = new ComboBox("=", "<>", "Like", "IS NULL",
+    "IS NOT NULL");
 
-  private final ComboBox codeTableOperatorField = new ComboBox("=", "<>",
-    "IS NULL", "IS NOT NULL");
+  private final ComboBox codeTableOperatorField = new ComboBox("=", "<>", "IS NULL", "IS NOT NULL");
 
   private ComboBox operatorField;
 
@@ -101,14 +100,15 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   private final JLabel whereLabel;
 
+  private Object lastValue = null;
+
   private CodeTable codeTable;
 
   private boolean settingFilter = false;
 
   private FieldDefinition attribute;
 
-  public FieldFilterPanel(final TablePanel tablePanel,
-    final RecordLayerTableModel tableModel) {
+  public FieldFilterPanel(final TablePanel tablePanel, final RecordLayerTableModel tableModel) {
     this.tableModel = tableModel;
     this.layer = tableModel.getLayer();
     this.recordDefinition = this.layer.getRecordDefinition();
@@ -118,17 +118,14 @@ ItemListener, DocumentListener, PropertyChangeListener {
     this.whereLabel.setFont(SwingUtil.FONT);
     this.whereLabel.setOpaque(true);
     this.whereLabel.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createLoweredBevelBorder(),
-      BorderFactory.createEmptyBorder(1, 2, 1, 2)));
+      BorderFactory.createLoweredBevelBorder(), BorderFactory.createEmptyBorder(1, 2, 1, 2)));
     this.whereLabel.setBackground(WebColors.White);
     add(this.whereLabel);
 
     this.fieldNames = new ArrayList<String>(this.layer.getFieldNamesSet());
     this.fieldNames.remove(this.recordDefinition.getGeometryFieldName());
-    final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(
-      this.layer);
-    this.nameField = new ComboBox(converter, false,
-      this.fieldNames.toArray());
+    final AttributeTitleStringConveter converter = new AttributeTitleStringConveter(this.layer);
+    this.nameField = new ComboBox(converter, false, this.fieldNames.toArray());
     this.nameField.setRenderer(converter);
     this.nameField.addActionListener(this);
     add(this.nameField);
@@ -203,14 +200,13 @@ ItemListener, DocumentListener, PropertyChangeListener {
     }
   }
 
-  public void fireSearchChanged(final String propertyName,
-    final Object oldValue, final Object newValue) {
+  public void fireSearchChanged(final String propertyName, final Object oldValue,
+    final Object newValue) {
     if (!EqualsRegistry.equal(oldValue, newValue)) {
       if (SwingUtilities.isEventDispatchThread()) {
-        final Method method = JavaBeanUtil.getMethod(getClass(),
-          "fireSearchChanged", String.class, Object.class, Object.class);
-        Invoke.background("Change search", this, method, propertyName,
-          oldValue, newValue);
+        final Method method = JavaBeanUtil.getMethod(getClass(), "fireSearchChanged", String.class,
+          Object.class, Object.class);
+        Invoke.background("Change search", this, method, propertyName, oldValue, newValue);
       } else {
         firePropertyChange(propertyName, oldValue, newValue);
       }
@@ -455,6 +451,10 @@ ItemListener, DocumentListener, PropertyChangeListener {
     } else {
       this.searchFieldPanel.setVisible(true);
       addListeners(searchField);
+      if (searchField instanceof Field) {
+        final Field field = (Field)searchField;
+        field.setFieldValue(this.lastValue);
+      }
       if (this.searchField instanceof RecordStoreQueryTextField) {
         final RecordStoreQueryTextField recordStoreSearchTextField = (RecordStoreQueryTextField)this.searchField;
         recordStoreSearchTextField.setPreferredSize(new Dimension(200, 22));
@@ -470,13 +470,13 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   private void setSearchFieldName(final String searchFieldName) {
     if (!EqualsRegistry.equal(searchFieldName, this.previousSearchFieldName)) {
+      this.lastValue = null;
       this.previousSearchFieldName = searchFieldName;
       this.layer.setProperty("searchField", searchFieldName);
       final RecordDefinition recordDefinition = this.tableModel.getRecordDefinition();
       this.attribute = recordDefinition.getField(searchFieldName);
       final Class<?> attributeClass = this.attribute.getTypeClass();
-      if (!EqualsRegistry.equal(searchFieldName,
-        this.nameField.getSelectedItem())) {
+      if (!EqualsRegistry.equal(searchFieldName, this.nameField.getSelectedItem())) {
         this.nameField.setFieldValue(searchFieldName);
       }
       if (searchFieldName.equals(recordDefinition.getIdFieldName())) {
@@ -533,8 +533,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
           }
           this.codeTable = null;
         } else {
-          searchField = QueryWhereConditionField.createSearchField(
-            this.attribute, this.codeTable);
+          searchField = QueryWhereConditionField.createSearchField(this.attribute, this.codeTable);
         }
 
         setSearchField(searchField);
@@ -545,14 +544,15 @@ ItemListener, DocumentListener, PropertyChangeListener {
 
   public void showAdvancedFilter() {
     final Condition filter = getFilter();
-    final QueryWhereConditionField advancedFilter = new QueryWhereConditionField(
-      this.layer, this, filter);
+    final QueryWhereConditionField advancedFilter = new QueryWhereConditionField(this.layer, this,
+      filter);
     advancedFilter.showDialog(this);
   }
 
   public void updateCondition() {
     if (this.eventsEnabled) {
       final Object searchValue = getSearchValue();
+      this.lastValue = searchValue;
       Condition condition = null;
       final String searchOperator = getSearchOperator();
       if ("IS NULL".equalsIgnoreCase(searchOperator)) {
@@ -571,8 +571,7 @@ ItemListener, DocumentListener, PropertyChangeListener {
             if (this.codeTable == null) {
               try {
                 final Class<?> attributeClass = this.attribute.getTypeClass();
-                value = StringConverterRegistry.toObject(attributeClass,
-                  searchValue);
+                value = StringConverterRegistry.toObject(attributeClass, searchValue);
               } catch (final Throwable t) {
                 return;
               }
