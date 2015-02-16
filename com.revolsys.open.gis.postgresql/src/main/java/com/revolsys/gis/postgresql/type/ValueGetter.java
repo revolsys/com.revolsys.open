@@ -1,104 +1,106 @@
 package com.revolsys.gis.postgresql.type;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import com.revolsys.gis.io.EndianInputStream;
+import com.revolsys.util.ExceptionUtil;
+
 public abstract class ValueGetter {
-  public static class NDR extends ValueGetter {
-    public static final byte NUMBER = 1;
+  protected static class BigEndian extends ValueGetter {
 
-    public NDR(final ByteGetter data) {
-      super(data, NUMBER);
+    public BigEndian(final InputStream data) {
+      super(data, true);
     }
 
     @Override
-    protected int getInt(final int index) {
-      return (this.data.get(index + 3) << 24) + (this.data.get(index + 2) << 16)
-        + (this.data.get(index + 1) << 8) + this.data.get(index);
+    public int getInt() {
+      try {
+        return this.data.readInt();
+      } catch (final IOException e) {
+        return ExceptionUtil.throwUncheckedException(e);
+      }
     }
 
     @Override
-    protected long getLong(final int index) {
-      return ((long)this.data.get(index + 7) << 56) + ((long)this.data.get(index + 6) << 48)
-        + ((long)this.data.get(index + 5) << 40) + ((long)this.data.get(index + 4) << 32)
-        + ((long)this.data.get(index + 3) << 24) + ((long)this.data.get(index + 2) << 16)
-        + ((long)this.data.get(index + 1) << 8) + ((long)this.data.get(index) << 0);
+    public long getLong() {
+      try {
+        return this.data.readLELong();
+      } catch (final IOException e) {
+        return ExceptionUtil.throwUncheckedException(e);
+      }
     }
   }
 
-  public static class XDR extends ValueGetter {
-    public static final byte NUMBER = 0;
-
-    public XDR(final ByteGetter data) {
-      super(data, NUMBER);
+  protected static class LittleEndian extends ValueGetter {
+    public LittleEndian(final InputStream data) {
+      super(data, false);
     }
 
     @Override
-    protected int getInt(final int index) {
-      return (this.data.get(index) << 24) + (this.data.get(index + 1) << 16)
-        + (this.data.get(index + 2) << 8) + this.data.get(index + 3);
+    public int getInt() {
+      try {
+        return this.data.readLEInt();
+      } catch (final IOException e) {
+        return ExceptionUtil.throwUncheckedException(e);
+      }
     }
 
     @Override
-    protected long getLong(final int index) {
-      return ((long)this.data.get(index) << 56) + ((long)this.data.get(index + 1) << 48)
-        + ((long)this.data.get(index + 2) << 40) + ((long)this.data.get(index + 3) << 32)
-        + ((long)this.data.get(index + 4) << 24) + ((long)this.data.get(index + 5) << 16)
-        + ((long)this.data.get(index + 6) << 8) + ((long)this.data.get(index + 7) << 0);
+    public long getLong() {
+      try {
+        return this.data.readLELong();
+      } catch (final IOException e) {
+        return ExceptionUtil.throwUncheckedException(e);
+      }
     }
   }
 
-  public static ValueGetter valueGetterForEndian(final ByteGetter bytes) {
-    if (bytes.get(0) == ValueGetter.XDR.NUMBER) { // XDR
-      return new ValueGetter.XDR(bytes);
-    } else if (bytes.get(0) == ValueGetter.NDR.NUMBER) {
-      return new ValueGetter.NDR(bytes);
-    } else {
-      throw new IllegalArgumentException("Unknown Endian type:" + bytes.get(0));
+  public static ValueGetter create(final InputStream in) {
+    try {
+      final int endianType = in.read();
+      if (endianType == 0) { // BigEndian
+        return new BigEndian(in);
+      } else if (endianType == 1) {
+        return new LittleEndian(in);
+      } else {
+        throw new IllegalArgumentException("Unknown Endian type:" + endianType);
+      }
+    } catch (final IOException e) {
+      return ExceptionUtil.throwUncheckedException(e);
     }
   }
 
-  ByteGetter data;
+  protected EndianInputStream data;
 
-  int position;
+  private final boolean bigEndian;
 
-  public final byte endian;
-
-  public ValueGetter(final ByteGetter data, final byte endian) {
-    this.data = data;
-    this.endian = endian;
+  public ValueGetter(final InputStream data, final boolean bigEndian) {
+    this.data = new EndianInputStream(data);
+    this.bigEndian = bigEndian;
   }
 
   /**
    * Get a byte, should be equal for all endians
    */
   public byte getByte() {
-    return (byte)this.data.get(this.position++);
+    try {
+      return this.data.readByte();
+    } catch (final IOException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
   }
 
-  /**
-   * Get a double.
-   */
   public double getDouble() {
     final long bitrep = getLong();
     return Double.longBitsToDouble(bitrep);
   }
 
-  public int getInt() {
-    final int res = getInt(this.position);
-    this.position += 4;
-    return res;
+  public abstract int getInt();
+
+  public abstract long getLong();
+
+  public boolean isBigEndian() {
+    return this.bigEndian;
   }
-
-  /** Get a 32-Bit integer */
-  protected abstract int getInt(int index);
-
-  public long getLong() {
-    final long res = getLong(this.position);
-    this.position += 8;
-    return res;
-  }
-
-  /**
-   * Get a long value. This is not needed directly, but as a nice side-effect
-   * from GetDouble.
-   */
-  protected abstract long getLong(int index);
 }

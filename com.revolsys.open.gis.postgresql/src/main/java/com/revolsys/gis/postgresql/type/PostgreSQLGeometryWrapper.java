@@ -1,5 +1,7 @@
 package com.revolsys.gis.postgresql.type;
 
+import java.io.InputStream;
+
 import org.postgresql.util.PGobject;
 
 import com.revolsys.jts.geom.Geometry;
@@ -60,8 +62,8 @@ public class PostgreSQLGeometryWrapper extends PGobject {
   }
 
   private Geometry parse(final String value) {
-    final ByteGetter.StringByteGetter bytes = new ByteGetter.StringByteGetter(value);
-    final ValueGetter valueGetter = ValueGetter.valueGetterForEndian(bytes);
+    final InputStream in = new StringByteInputStream(value);
+    final ValueGetter valueGetter = ValueGetter.create(in);
     return parseGeometry(valueGetter);
   }
 
@@ -107,10 +109,6 @@ public class PostgreSQLGeometryWrapper extends PGobject {
   }
 
   private Geometry parseGeometry(final ValueGetter data) {
-    final byte endian = data.getByte();
-    if (endian != data.endian) {
-      throw new IllegalArgumentException("Endian inconsistency!");
-    }
     final int typeword = data.getInt();
 
     final int realtype = typeword & 0x1FFFFFFF;
@@ -155,6 +153,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
 
   private void parseGeometryArray(final ValueGetter data, final Geometry[] container) {
     for (int i = 0; i < container.length; ++i) {
+      data.getByte(); // read endian
       container[i] = parseGeometry(data);
     }
   }
