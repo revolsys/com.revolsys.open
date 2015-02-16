@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.WeakCache;
 import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.codes.CodeTableProperty;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
@@ -35,8 +36,8 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Maps;
 
-public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
-implements RecordDefinition {
+public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement implements
+  RecordDefinition {
   public static RecordDefinitionImpl create(final Map<String, Object> properties) {
     return new RecordDefinitionImpl(properties);
   }
@@ -120,8 +121,7 @@ implements RecordDefinition {
   }
 
   public RecordDefinitionImpl(final RecordDefinition recordDefinition) {
-    this(recordDefinition.getPath(), recordDefinition.getProperties(),
-      recordDefinition.getFields());
+    this(recordDefinition.getPath(), recordDefinition.getProperties(), recordDefinition.getFields());
     setIdFieldIndex(recordDefinition.getIdFieldIndex());
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
@@ -144,9 +144,8 @@ implements RecordDefinition {
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
-  public RecordDefinitionImpl(final RecordStoreSchema schema,
-    final String path, final Map<String, Object> properties,
-    final List<FieldDefinition> fields) {
+  public RecordDefinitionImpl(final RecordStoreSchema schema, final String path,
+    final Map<String, Object> properties, final List<FieldDefinition> fields) {
     this(schema, path);
     for (final FieldDefinition field : fields) {
       addField(field.clone());
@@ -159,23 +158,21 @@ implements RecordDefinition {
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
-  public RecordDefinitionImpl(final String path,
+  public RecordDefinitionImpl(final String path, final FieldDefinition... fields) {
+    this(path, null, fields);
+  }
+
+  public RecordDefinitionImpl(final String path, final List<FieldDefinition> fields) {
+    this(path, null, fields);
+  }
+
+  public RecordDefinitionImpl(final String path, final Map<String, Object> properties,
     final FieldDefinition... fields) {
-    this(path, null, fields);
-  }
-
-  public RecordDefinitionImpl(final String path,
-    final List<FieldDefinition> fields) {
-    this(path, null, fields);
-  }
-
-  public RecordDefinitionImpl(final String path,
-    final Map<String, Object> properties, final FieldDefinition... fields) {
     this(path, properties, Arrays.asList(fields));
   }
 
-  public RecordDefinitionImpl(final String path,
-    final Map<String, Object> properties, final List<FieldDefinition> fields) {
+  public RecordDefinitionImpl(final String path, final Map<String, Object> properties,
+    final List<FieldDefinition> fields) {
     super(path);
     for (final FieldDefinition field : fields) {
       addField(field.clone());
@@ -232,31 +229,27 @@ implements RecordDefinition {
     return addField(fieldName, type, false);
   }
 
-  public FieldDefinition addField(final String name, final DataType type,
-    final boolean required) {
+  public FieldDefinition addField(final String name, final DataType type, final boolean required) {
     final FieldDefinition field = new FieldDefinition(name, type, required);
     addField(field);
     return field;
   }
 
-  public FieldDefinition addField(final String name, final DataType type,
-    final int length, final boolean required) {
-    final FieldDefinition field = new FieldDefinition(name, type, length,
-      required);
+  public FieldDefinition addField(final String name, final DataType type, final int length,
+    final boolean required) {
+    final FieldDefinition field = new FieldDefinition(name, type, length, required);
     addField(field);
     return field;
   }
 
-  public FieldDefinition addField(final String name, final DataType type,
-    final int length, final int scale, final boolean required) {
-    final FieldDefinition field = new FieldDefinition(name, type, length,
-      scale, required);
+  public FieldDefinition addField(final String name, final DataType type, final int length,
+    final int scale, final boolean required) {
+    final FieldDefinition field = new FieldDefinition(name, type, length, scale, required);
     addField(field);
     return field;
   }
 
-  public void addRestriction(final String fieldPath,
-    final Collection<Object> values) {
+  public void addRestriction(final String fieldPath, final Collection<Object> values) {
     this.restrictions.put(fieldPath, values);
   }
 
@@ -332,6 +325,12 @@ implements RecordDefinition {
       CodeTable codeTable = this.codeTableByColumnMap.get(column);
       if (codeTable == null && recordStore != null) {
         codeTable = recordStore.getCodeTableByColumn(column);
+      }
+      if (codeTable instanceof CodeTableProperty) {
+        final CodeTableProperty property = (CodeTableProperty)codeTable;
+        if (property.getRecordDefinition() == this) {
+          return null;
+        }
       }
       return codeTable;
     }
@@ -612,22 +611,19 @@ implements RecordDefinition {
     return false;
   }
 
-  private void readObject(final ObjectInputStream ois)
-      throws ClassNotFoundException, IOException {
+  private void readObject(final ObjectInputStream ois) throws ClassNotFoundException, IOException {
     ois.defaultReadObject();
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public RecordDefinitionImpl rename(final String path) {
-    final RecordDefinitionImpl clone = new RecordDefinitionImpl(path,
-      getProperties(), this.fields);
+    final RecordDefinitionImpl clone = new RecordDefinitionImpl(path, getProperties(), this.fields);
     clone.setIdFieldIndex(this.idFieldDefinitionIndex);
     clone.setProperties(getProperties());
     return clone;
   }
 
-  public void replaceField(final FieldDefinition field,
-    final FieldDefinition newFieldDefinition) {
+  public void replaceField(final FieldDefinition field, final FieldDefinition newFieldDefinition) {
     final String name = field.getName();
     final String lowerName = name.toLowerCase();
     final String newName = newFieldDefinition.getName();
@@ -641,8 +637,7 @@ implements RecordDefinition {
     }
   }
 
-  public void setCodeTableByColumnMap(
-    final Map<String, CodeTable> codeTableByColumnMap) {
+  public void setCodeTableByColumnMap(final Map<String, CodeTable> codeTableByColumnMap) {
     this.codeTableByColumnMap = codeTableByColumnMap;
   }
 
@@ -663,8 +658,7 @@ implements RecordDefinition {
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     final FieldDefinition geometryFieldDefinition = getGeometryField();
     if (geometryFieldDefinition != null) {
-      geometryFieldDefinition.setProperty(FieldProperties.GEOMETRY_FACTORY,
-        geometryFactory);
+      geometryFieldDefinition.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
     }
   }
 
@@ -747,8 +741,7 @@ implements RecordDefinition {
 
   }
 
-  public void setRecordDefinitionFactory(
-    final RecordDefinitionFactory recordDefinitionFactory) {
+  public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
     this.recordDefinitionFactory = recordDefinitionFactory;
   }
 

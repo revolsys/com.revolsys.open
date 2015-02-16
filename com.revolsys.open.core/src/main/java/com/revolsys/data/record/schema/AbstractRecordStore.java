@@ -49,8 +49,8 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecordStore extends AbstractObjectWithProperties
-implements RecordStore {
+public abstract class AbstractRecordStore extends AbstractObjectWithProperties implements
+  RecordStore {
 
   private Map<String, Object> connectionProperties = new HashMap<String, Object>();
 
@@ -110,8 +110,7 @@ implements RecordStore {
             final String idFieldName = recordDefinition.getIdFieldName();
             for (final FieldDefinition attribute : recordDefinition.getFields()) {
               final String fieldName = attribute.getName();
-              if (fieldName.equals(columnName)
-                  && !fieldName.equals(idFieldName)) {
+              if (fieldName.equals(columnName) && !fieldName.equals(idFieldName)) {
                 attribute.setCodeTable(codeTable);
               }
             }
@@ -141,8 +140,7 @@ implements RecordStore {
     }
   }
 
-  protected void addRecordDefinitionProperties(
-    final RecordDefinitionImpl recordDefinition) {
+  protected void addRecordDefinitionProperties(final RecordDefinitionImpl recordDefinition) {
     final String typePath = recordDefinition.getPath();
     for (final RecordDefinitionProperty property : this.commonRecordDefinitionProperties) {
       final RecordDefinitionProperty clonedProperty = property.clone();
@@ -172,8 +170,7 @@ implements RecordStore {
   }
 
   @Override
-  public void addStatistic(final String statisticName, final String typePath,
-    final int count) {
+  public void addStatistic(final String statisticName, final String typePath, final int count) {
     if (this.statistics != null) {
       this.statistics.add(statisticName, typePath, count);
     }
@@ -245,12 +242,10 @@ implements RecordStore {
   }
 
   @Override
-  public Record create(final String typePath,
-    final Map<String, ? extends Object> values) {
+  public Record create(final String typePath, final Map<String, ? extends Object> values) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null) {
-      throw new IllegalArgumentException("Cannot find table " + typePath
-        + " for " + this);
+      throw new IllegalArgumentException("Cannot find table " + typePath + " for " + this);
     } else {
       final Record record = create(recordDefinition);
       if (record != null) {
@@ -268,8 +263,7 @@ implements RecordStore {
 
   }
 
-  public AbstractIterator<Record> createIterator(final Query query,
-    Map<String, Object> properties) {
+  public AbstractIterator<Record> createIterator(final Query query, Map<String, Object> properties) {
     if (properties == null) {
       properties = Collections.emptyMap();
     }
@@ -379,6 +373,7 @@ implements RecordStore {
   @Override
   public CodeTable getCodeTableByColumn(final String columnName) {
     final CodeTable codeTable = this.columnToTableMap.get(columnName);
+
     return codeTable;
 
   }
@@ -411,8 +406,7 @@ implements RecordStore {
   }
 
   @Override
-  public RecordDefinition getRecordDefinition(
-    final RecordDefinition objectRecordDefinition) {
+  public RecordDefinition getRecordDefinition(final RecordDefinition objectRecordDefinition) {
     final String typePath = objectRecordDefinition.getPath();
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     return recordDefinition;
@@ -570,11 +564,10 @@ implements RecordStore {
       final List<Object> values = id.getValues();
       final List<String> idFieldNames = recordDefinition.getIdFieldNames();
       if (idFieldNames.isEmpty()) {
-        throw new IllegalArgumentException(typePath
-          + " does not have a primary key");
+        throw new IllegalArgumentException(typePath + " does not have a primary key");
       } else if (values.size() != idFieldNames.size()) {
-        throw new IllegalArgumentException(id + " not a valid id for "
-            + typePath + " requires " + idFieldNames);
+        throw new IllegalArgumentException(id + " not a valid id for " + typePath + " requires "
+          + idFieldNames);
       } else {
         final Query query = new Query(recordDefinition);
         for (int i = 0; i < idFieldNames.size(); i++) {
@@ -596,11 +589,10 @@ implements RecordStore {
     } else {
       final List<String> idFieldNames = recordDefinition.getIdFieldNames();
       if (idFieldNames.isEmpty()) {
-        throw new IllegalArgumentException(typePath
-          + " does not have a primary key");
+        throw new IllegalArgumentException(typePath + " does not have a primary key");
       } else if (id.length != idFieldNames.size()) {
-        throw new IllegalArgumentException(Arrays.toString(id)
-          + " not a valid id for " + typePath + " requires " + idFieldNames);
+        throw new IllegalArgumentException(Arrays.toString(id) + " not a valid id for " + typePath
+          + " requires " + idFieldNames);
       } else {
         final Query query = new Query(recordDefinition);
         for (int i = 0; i < idFieldNames.size(); i++) {
@@ -622,8 +614,7 @@ implements RecordStore {
     } else {
       final String idFieldName = recordDefinition.getIdFieldName();
       if (idFieldName == null) {
-        throw new IllegalArgumentException(typePath
-          + " does not have a primary key");
+        throw new IllegalArgumentException(typePath + " does not have a primary key");
       } else {
         final Query query = Query.equal(recordDefinition, idFieldName, id);
         query.setLockResults(true);
@@ -709,8 +700,7 @@ implements RecordStore {
     return Collections.emptyMap();
   }
 
-  public void setCodeTableColumNames(
-    final Map<String, List<String>> domainColumNames) {
+  public void setCodeTableColumNames(final Map<String, List<String>> domainColumNames) {
     this.codeTableColumNames = domainColumNames;
   }
 
@@ -719,8 +709,7 @@ implements RecordStore {
     this.commonRecordDefinitionProperties = commonRecordDefinitionProperties;
   }
 
-  protected void setConnectionProperties(
-    final Map<String, ? extends Object> connectionProperties) {
+  protected void setConnectionProperties(final Map<String, ? extends Object> connectionProperties) {
     this.connectionProperties = Maps.createHashMap(connectionProperties);
   }
 
@@ -728,8 +717,7 @@ implements RecordStore {
     this.geometryFactory = geometryFactory;
   }
 
-  public void setIteratorFactory(
-    final RecordStoreIteratorFactory iteratorFactory) {
+  public void setIteratorFactory(final RecordStoreIteratorFactory iteratorFactory) {
     this.iteratorFactory = iteratorFactory;
   }
 

@@ -32,8 +32,7 @@ import com.revolsys.swing.map.layer.record.style.panel.MarkerStylePanel;
 
 public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
 
-  public static Geometry getGeometry(final Viewport2D viewport,
-    final Geometry geometry) {
+  public static Geometry getGeometry(final Viewport2D viewport, final Geometry geometry) {
     final BoundingBox viewExtent = viewport.getBoundingBox();
     if (geometry != null) {
       if (!viewExtent.isEmpty()) {
@@ -47,18 +46,16 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     return EMPTY_GEOMETRY;
   }
 
-  public static PointWithOrientation getMarkerLocation(
-    final Viewport2D viewport, final Geometry geometry, final MarkerStyle style) {
+  public static PointWithOrientation getMarkerLocation(final Viewport2D viewport,
+    final Geometry geometry, final MarkerStyle style) {
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
-    if (viewportGeometryFactory != null && geometry != null
-        && !geometry.isEmpty()) {
+    if (viewportGeometryFactory != null && geometry != null && !geometry.isEmpty()) {
       Point point = null;
       double orientation = 0;
       final String placementType = style.getMarkerPlacementType();
       final int vertexCount = geometry.getVertexCount();
       if (vertexCount > 1) {
-        final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(
-          placementType);
+        final Matcher matcher = Pattern.compile("point\\((.*)\\)").matcher(placementType);
         final boolean matches = matcher.matches();
         if (matches) {
           final String argument = matcher.group(1);
@@ -73,10 +70,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
             } else if (index + 1 == vertexCount) {
               index--;
             }
-            point = geometry.getToVertex(index).convert(
-              viewportGeometryFactory, 2);
-            final Point p2 = geometry.getToVertex(index + 1).convert(
-              viewportGeometryFactory);
+            point = geometry.getToVertex(index).convert(viewportGeometryFactory, 2);
+            final Point p2 = geometry.getToVertex(index + 1).convert(viewportGeometryFactory);
             orientation = Math.toDegrees(p2.angle2d(point));
 
           } else {
@@ -86,10 +81,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
             } else if (index + 1 == vertexCount) {
               index--;
             }
-            point = geometry.getVertex(index).convert(viewportGeometryFactory,
-              2);
-            final Point p2 = geometry.getVertex(index + 1).convert(
-              viewportGeometryFactory);
+            point = geometry.getVertex(index).convert(viewportGeometryFactory, 2);
+            final Point p2 = geometry.getVertex(index + 1).convert(viewportGeometryFactory);
             orientation = Math.toDegrees(-point.angle2d(p2));
           }
         } else {
@@ -103,8 +96,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
               final Point p2 = projectedGeometry.getVertex(i);
               final double segmentLength = p1.distance(p2);
               if (segmentLength + currentLength >= centreLength) {
-                point = LineSegmentUtil.project(2, p1, p2,
-                  (centreLength - currentLength) / segmentLength);
+                point = LineSegmentUtil.project(2, p1, p2, (centreLength - currentLength)
+                  / segmentLength);
                 // TODO parameter to use orientation or not
                 orientation = Math.toDegrees(-p1.angle2d(p2));
               }
@@ -127,10 +120,10 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     return null;
   }
 
-  public static void renderMarker(final Viewport2D viewport,
-    final Geometry geometry, final MarkerStyle style) {
+  public static void renderMarker(final Viewport2D viewport, final Geometry geometry,
+    final MarkerStyle style) {
     final Graphics2D graphics = viewport.getGraphics();
-    if (graphics != null) {
+    if (graphics != null && geometry != null) {
       if ("vertices".equals(style.getMarkerPlacementType())) {
         renderMarkerVertices(viewport, graphics, geometry, style);
       } else {
@@ -151,8 +144,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  private static void renderMarker(final Viewport2D viewport,
-    final Graphics2D graphics, final LineString line, final MarkerStyle style) {
+  private static void renderMarker(final Viewport2D viewport, final Graphics2D graphics,
+    final LineString line, final MarkerStyle style) {
     final PointWithOrientation point = getMarkerLocation(viewport, line, style);
     if (point != null) {
       final double orientation = point.getOrientation();
@@ -160,8 +153,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  public static final void renderMarker(final Viewport2D viewport,
-    final Graphics2D graphics, final Point point, final MarkerStyle style) {
+  public static final void renderMarker(final Viewport2D viewport, final Graphics2D graphics,
+    final Point point, final MarkerStyle style) {
     final Geometry geometry = getGeometry(viewport, point);
     if (!geometry.isEmpty()) {
       final Point coordinates = geometry.getPoint();
@@ -177,9 +170,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
    * @param point
    * @param style
    */
-  public static void renderMarker(final Viewport2D viewport,
-    final Graphics2D graphics, final Point point, final MarkerStyle style,
-    final double orientation) {
+  public static void renderMarker(final Viewport2D viewport, final Graphics2D graphics,
+    final Point point, final MarkerStyle style, final double orientation) {
     if (viewport.getBoundingBox().covers(point)) {
       final Paint paint = graphics.getPaint();
       try {
@@ -193,8 +185,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  private static void renderMarker(final Viewport2D viewport,
-    final Graphics2D graphics, final Polygon polygon, final MarkerStyle style) {
+  private static void renderMarker(final Viewport2D viewport, final Graphics2D graphics,
+    final Polygon polygon, final MarkerStyle style) {
     final Point point = polygon.getPointWithin();
     renderMarker(viewport, graphics, point, style);
   }
@@ -207,8 +199,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
    * @param style
    * @param point
    */
-  public static void renderMarkers(final Viewport2D viewport,
-    final Graphics2D graphics, final LineString line, final MarkerStyle style) {
+  public static void renderMarkers(final Viewport2D viewport, final Graphics2D graphics,
+    final LineString line, final MarkerStyle style) {
     final Paint paint = graphics.getPaint();
     try {
       final Marker marker = style.getMarker();
@@ -238,9 +230,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  public static void renderMarkers(final Viewport2D viewport,
-    final Graphics2D graphics, final LineString line,
-    final MarkerStyle styleFirst, final MarkerStyle styleLast,
+  public static void renderMarkers(final Viewport2D viewport, final Graphics2D graphics,
+    final LineString line, final MarkerStyle styleFirst, final MarkerStyle styleLast,
     final MarkerStyle styleVertex) {
     if (line != null) {
       final Paint paint = graphics.getPaint();
@@ -301,9 +292,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  public static final void renderMarkerVerticesNoPoint(
-    final Viewport2D viewport, final Graphics2D graphics, Geometry geometry,
-    final MarkerStyle style) {
+  public static final void renderMarkerVerticesNoPoint(final Viewport2D viewport,
+    final Graphics2D graphics, Geometry geometry, final MarkerStyle style) {
     geometry = getGeometry(viewport, geometry);
     if (!geometry.isEmpty()) {
       final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
@@ -313,34 +303,31 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3()
-      .geometry();
+  private static final Geometry EMPTY_GEOMETRY = GeometryFactory.floating3().geometry();
 
   private static final Icon ICON = Icons.getIcon("style_marker");
 
   private MarkerStyle style;
 
-  public MarkerStyleRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent) {
+  public MarkerStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
     this(layer, parent, new MarkerStyle());
   }
 
-  public MarkerStyleRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent, final Map<String, Object> geometryStyle) {
+  public MarkerStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
+    final Map<String, Object> geometryStyle) {
     super("markerStyle", "Marker Style", layer, parent, geometryStyle);
     this.style = new MarkerStyle(geometryStyle);
     setIcon(ICON);
   }
 
-  public MarkerStyleRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent, final MarkerStyle style) {
+  public MarkerStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
+    final MarkerStyle style) {
     super("markerStyle", "Marker Style", layer, parent);
     this.style = style;
     setIcon(ICON);
   }
 
-  public MarkerStyleRenderer(final AbstractRecordLayer layer,
-    final MarkerStyle style) {
+  public MarkerStyleRenderer(final AbstractRecordLayer layer, final MarkerStyle style) {
     this(layer, null, style);
   }
 
@@ -372,9 +359,8 @@ public class MarkerStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractLayer layer,
-    final LayerRecord object) {
+  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
+    final AbstractLayer layer, final LayerRecord object) {
     if (isVisible(object)) {
       final Geometry geometry = object.getGeometryValue();
       renderMarker(viewport, geometry, this.style);

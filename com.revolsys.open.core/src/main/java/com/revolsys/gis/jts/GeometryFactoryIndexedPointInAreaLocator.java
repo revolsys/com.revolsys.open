@@ -6,11 +6,9 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Location;
 
-public class GeometryFactoryIndexedPointInAreaLocator extends
-IndexedPointInAreaLocator {
+public class GeometryFactoryIndexedPointInAreaLocator extends IndexedPointInAreaLocator {
 
-  public static GeometryFactoryIndexedPointInAreaLocator get(
-    final Geometry geometry) {
+  public static GeometryFactoryIndexedPointInAreaLocator get(final Geometry geometry) {
     GeometryFactoryIndexedPointInAreaLocator locator = GeometryProperties.getGeometryProperty(
       geometry, KEY);
     if (locator == null) {

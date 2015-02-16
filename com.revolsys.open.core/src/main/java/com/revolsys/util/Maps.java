@@ -67,6 +67,12 @@ public class Maps {
     return mapValue.containsKey(key2);
   }
 
+  public static <K, V> Map<K, V> create(final K key, final V value) {
+    final Map<K, V> map = new LinkedHashMap<>();
+    map.put(key, value);
+    return map;
+  }
+
   public static <K, V> Map<K, V> createHashMap(final Map<K, ? extends V> map) {
     final Map<K, V> copy = new HashMap<K, V>();
     if (map != null) {
@@ -379,6 +385,12 @@ public class Maps {
     }
   }
 
+  public static <K, V> Map<K, V> hashMap(final K key, final V value) {
+    final Map<K, V> map = new HashMap<>();
+    map.put(key, value);
+    return map;
+  }
+
   public static boolean isNotNullAndNotZero(final Map<String, Object> object, final String name) {
     final Integer value = getInteger(object, name);
     if (value == null || value == 0) {
@@ -481,6 +493,12 @@ public class Maps {
       }
       return map;
     }
+  }
+
+  public static <K, V> Map<K, V> treeMap(final K key, final V value) {
+    final Map<K, V> map = new TreeMap<>();
+    map.put(key, value);
+    return map;
   }
 
 }

@@ -100,8 +100,8 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
   }
 
-  public static GeometryFactory fixed(final CoordinateSystem coordinateSystem,
-    final int axisCount, final double... scales) {
+  public static GeometryFactory fixed(final CoordinateSystem coordinateSystem, final int axisCount,
+    final double... scales) {
     if (coordinateSystem == null) {
       return fixed(0, axisCount, scales);
     } else {
@@ -153,8 +153,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
    *          metres.
    * @return The geometry factory.
    */
-  public static GeometryFactory fixed(final int srid, final int axisCount,
-    double... scales) {
+  public static GeometryFactory fixed(final int srid, final int axisCount, double... scales) {
     synchronized (factoriesBySrid) {
       scales = getScales(axisCount, scales);
       GeometryFactory factory = null;
@@ -203,8 +202,8 @@ public class GeometryFactory implements Serializable, MapSerializer {
   /**
    * get a  geometry factory with a floating scale.
    */
-  public static GeometryFactory floating(
-    final CoordinateSystem coordinateSystem, final int axisCount) {
+  public static GeometryFactory floating(final CoordinateSystem coordinateSystem,
+    final int axisCount) {
     if (coordinateSystem == null) {
       return floating(0, axisCount);
     } else {
@@ -248,8 +247,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   /**
    * get a 3d geometry factory with a floating scale.
    */
-  public static GeometryFactory floating3(
-    final CoordinateSystem coordinateSystem) {
+  public static GeometryFactory floating3(final CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
       return floating3();
     } else {
@@ -324,8 +322,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     }
   }
 
-  private static Set<DataType> getGeometryDataTypes(
-    final Collection<? extends Geometry> geometries) {
+  private static Set<DataType> getGeometryDataTypes(final Collection<? extends Geometry> geometries) {
     final Set<DataType> dataTypes = new LinkedHashSet<DataType>();
     for (final Geometry geometry : geometries) {
       final DataType dataType = geometry.getDataType();
@@ -374,22 +371,20 @@ public class GeometryFactory implements Serializable, MapSerializer {
 
   private double[] scales;
 
-  protected GeometryFactory(final CoordinateSystem coordinateSystem,
-    final int axisCount, final double... scales) {
+  protected GeometryFactory(final CoordinateSystem coordinateSystem, final int axisCount,
+    final double... scales) {
     this.srid = coordinateSystem.getId();
     this.coordinateSystem = coordinateSystem;
     init(axisCount, scales);
   }
 
-  protected GeometryFactory(final int srid, final int axisCount,
-    final double... scales) {
+  protected GeometryFactory(final int srid, final int axisCount, final double... scales) {
     this.srid = srid;
     this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(srid);
     init(axisCount, scales);
   }
 
-  public void addGeometries(final List<Geometry> geometryList,
-    final Geometry geometry) {
+  public void addGeometries(final List<Geometry> geometryList, final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       for (final Geometry part : geometry.geometries()) {
         if (part != null && !part.isEmpty()) {
@@ -472,8 +467,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     } else if (DataTypes.POLYGON.equals(collectionDataType)) {
       return multiPolygon(geometries);
     } else {
-      throw new IllegalArgumentException("Unknown geometry type "
-          + collectionDataType);
+      throw new IllegalArgumentException("Unknown geometry type " + collectionDataType);
     }
   }
 
@@ -546,8 +540,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
         }
 
         if (point != null && point.getAxisCount() > 1) {
-          CoordinatesListUtil.setCoordinates(this, coordinates, axisCount, i,
-            point);
+          CoordinatesListUtil.setCoordinates(this, coordinates, axisCount, i, point);
           i++;
         }
       }
@@ -571,8 +564,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   @SuppressWarnings({
     "unchecked"
   })
-  public <V extends Geometry> V geometry(final Class<?> targetClass,
-    Geometry geometry) {
+  public <V extends Geometry> V geometry(final Class<?> targetClass, Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       geometry = geometry.copy(this);
       if (geometry instanceof GeometryCollection) {
@@ -641,8 +633,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * @return
    */
   @SuppressWarnings("unchecked")
-  public <V extends Geometry> V geometry(
-    final Collection<? extends Geometry> geometries) {
+  public <V extends Geometry> V geometry(final Collection<? extends Geometry> geometries) {
     final Collection<? extends Geometry> geometryList = getGeometries(geometries);
     if (geometryList == null || geometries.size() == 0) {
       return (V)geometryCollection();
@@ -690,8 +681,8 @@ public class GeometryFactory implements Serializable, MapSerializer {
       final int srid = getSrid();
       final int geometrySrid = geometry.getSrid();
       if (srid == 0 && geometrySrid != 0) {
-        final GeometryFactory geometryFactory = GeometryFactory.fixed(
-          geometrySrid, this.axisCount, getScaleXY(), getScaleZ());
+        final GeometryFactory geometryFactory = GeometryFactory.fixed(geometrySrid, this.axisCount,
+          getScaleXY(), getScaleZ());
         return geometryFactory.geometry(geometry);
       } else if (srid != 0 && geometrySrid != 0 && geometrySrid != srid) {
         if (geometry instanceof MultiPoint) {
@@ -796,8 +787,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
   }
 
   @SuppressWarnings("unchecked")
-  public <V extends GeometryCollection> V geometryCollection(
-    final Geometry... geometries) {
+  public <V extends GeometryCollection> V geometryCollection(final Geometry... geometries) {
     return (V)geometryCollection(Arrays.asList(geometries));
   }
 
@@ -818,12 +808,10 @@ public class GeometryFactory implements Serializable, MapSerializer {
    * @param geometryFactory The geometry factory to convert to.
    * @return The coordinates operation or null if no conversion is available.
    */
-  public CoordinatesOperation getCoordinatesOperation(
-    final GeometryFactory geometryFactory) {
+  public CoordinatesOperation getCoordinatesOperation(final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = getCoordinateSystem();
     final CoordinateSystem otherCoordinateSystem = geometryFactory.getCoordinateSystem();
-    return ProjectionFactory.getCoordinatesOperation(coordinateSystem,
-      otherCoordinateSystem);
+    return ProjectionFactory.getCoordinatesOperation(coordinateSystem, otherCoordinateSystem);
   }
 
   public CoordinateSystem getCoordinateSystem() {
@@ -843,8 +831,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     }
   }
 
-  public List<Geometry> getGeometries(
-    final Collection<? extends Geometry> geometries) {
+  public List<Geometry> getGeometries(final Collection<? extends Geometry> geometries) {
     final List<Geometry> geometryList = new ArrayList<Geometry>();
     for (final Geometry geometry : geometries) {
       addGeometries(geometryList, geometry);
@@ -1226,6 +1213,31 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return multiLineString(lineArray);
   }
 
+  public MultiLineString multiLineString(final Geometry geometry) {
+    if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry.convert(this);
+      return new MultiLineStringImpl(this, line);
+    } else if (geometry instanceof MultiLineString) {
+      final MultiLineString multiLineString = (MultiLineString)geometry;
+      return multiLineString.convert(this);
+    } else if (geometry instanceof GeometryCollection) {
+      final GeometryCollection collection = (GeometryCollection)geometry;
+      final List<LineString> lines = new ArrayList<>();
+      for (final Geometry part : collection.geometries()) {
+        if (part instanceof LineString) {
+          lines.add((LineString)part);
+        } else {
+          throw new IllegalArgumentException("Cannot convert class " + part.getClass() + " to "
+            + MultiLineString.class + "\n" + geometry);
+        }
+      }
+      return multiLineString(lines);
+    } else {
+      throw new IllegalArgumentException("Cannot convert class " + geometry.getClass() + " to "
+        + MultiLineString.class + "\n" + geometry);
+    }
+  }
+
   /**
    * Creates a MultiLineString using the given LineStrings; a null or empty
    * array will create an empty MultiLineString.
@@ -1250,18 +1262,42 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return multiPoint(pointArray);
   }
 
+  public MultiPoint multiPoint(final Geometry geometry) {
+    if (geometry instanceof Point) {
+      final Point point = (Point)geometry.convert(this);
+      return new MultiPointImpl(this, point);
+    } else if (geometry instanceof MultiPoint) {
+      final MultiPoint multiPoint = (MultiPoint)geometry;
+      return multiPoint.convert(this);
+    } else if (geometry instanceof GeometryCollection) {
+      final GeometryCollection collection = (GeometryCollection)geometry;
+      final List<Point> points = new ArrayList<>();
+      for (final Geometry part : collection.geometries()) {
+        if (part instanceof Point) {
+          points.add((Point)part);
+        } else {
+          throw new IllegalArgumentException("Cannot convert class " + part.getClass() + " to "
+            + MultiPoint.class + "\n" + geometry);
+        }
+      }
+      return multiPoint(points);
+    } else {
+      throw new IllegalArgumentException("Cannot convert class " + geometry.getClass() + " to "
+        + MultiPoint.class + "\n" + geometry);
+    }
+  }
+
   public MultiPoint multiPoint(final int axisCount, final double... coordinates) {
     if (coordinates == null || coordinates.length == 0 || axisCount < 2) {
       return multiPoint();
     } else if (coordinates.length % axisCount != 0) {
-      throw new IllegalArgumentException("Coordinates length="
-          + coordinates.length + " must be a multiple of " + axisCount);
+      throw new IllegalArgumentException("Coordinates length=" + coordinates.length
+        + " must be a multiple of " + axisCount);
     } else {
       final Point[] points = new Point[coordinates.length / axisCount];
       for (int i = 0; i < points.length; i++) {
         final double[] newCoordinates = new double[axisCount];
-        System.arraycopy(coordinates, i * axisCount, newCoordinates, 0,
-          axisCount);
+        System.arraycopy(coordinates, i * axisCount, newCoordinates, 0, axisCount);
         final Point point = point(newCoordinates);
         points[i] = point;
       }
@@ -1313,6 +1349,31 @@ public class GeometryFactory implements Serializable, MapSerializer {
   public MultiPolygon multiPolygon(final Collection<?> polygons) {
     final Polygon[] polygonArray = getPolygonArray(polygons);
     return multiPolygon(polygonArray);
+  }
+
+  public MultiPolygon multiPolygon(final Geometry geometry) {
+    if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry.convert(this);
+      return new MultiPolygonImpl(this, polygon);
+    } else if (geometry instanceof MultiPolygon) {
+      final MultiPolygon multiPolygon = (MultiPolygon)geometry;
+      return multiPolygon.convert(this);
+    } else if (geometry instanceof GeometryCollection) {
+      final GeometryCollection collection = (GeometryCollection)geometry;
+      final List<Polygon> polygons = new ArrayList<>();
+      for (final Geometry part : collection.geometries()) {
+        if (part instanceof Polygon) {
+          polygons.add((Polygon)part);
+        } else {
+          throw new IllegalArgumentException("Cannot convert class " + part.getClass() + " to "
+            + MultiPolygon.class + "\n" + geometry);
+        }
+      }
+      return multiPolygon(polygons);
+    } else {
+      throw new IllegalArgumentException("Cannot convert class " + geometry.getClass() + " to "
+        + MultiPolygon.class + "\n" + geometry);
+    }
   }
 
   public MultiPolygon multiPolygon(final Object... polygons) {
@@ -1384,8 +1445,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
         }
         return point(coordinates);
       } else {
-        throw new IllegalArgumentException("Point can only have 1 vertex not "
-            + size);
+        throw new IllegalArgumentException("Point can only have 1 vertex not " + size);
       }
     }
   }
@@ -1418,8 +1478,7 @@ public class GeometryFactory implements Serializable, MapSerializer {
     } else if (object instanceof LineString) {
       return point((LineString)object);
     } else {
-      throw new IllegalArgumentException("Cannot create a point from "
-          + object.getClass());
+      throw new IllegalArgumentException("Cannot create a point from " + object.getClass());
     }
   }
 

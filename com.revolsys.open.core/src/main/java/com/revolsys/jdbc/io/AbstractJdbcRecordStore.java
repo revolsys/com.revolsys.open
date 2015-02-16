@@ -56,8 +56,8 @@ import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Maps;
 
-public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
-implements JdbcRecordStore, RecordStoreExtension {
+public abstract class AbstractJdbcRecordStore extends AbstractRecordStore implements
+  JdbcRecordStore, RecordStoreExtension {
   public static final AbstractIterator<Record> createJdbcIterator(
     final AbstractJdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
@@ -127,8 +127,8 @@ implements JdbcRecordStore, RecordStoreExtension {
 
   public AbstractJdbcRecordStore(final RecordFactory recordFactory) {
     super(recordFactory);
-    setIteratorFactory(new RecordStoreIteratorFactory(
-      AbstractJdbcRecordStore.class, "createJdbcIterator"));
+    setIteratorFactory(new RecordStoreIteratorFactory(AbstractJdbcRecordStore.class,
+      "createJdbcIterator"));
     addRecordStoreExtension(this);
   }
 
@@ -140,30 +140,27 @@ implements JdbcRecordStore, RecordStoreExtension {
     addExcludeTablePaths(tableName);
   }
 
-  protected JdbcFieldDefinition addField(
-    final RecordDefinitionImpl recordDefinition, final String dbColumnName,
-    final String name, final String dataType, final int sqlType,
-    final int length, final int scale, final boolean required,
-    final String description) {
+  protected JdbcFieldDefinition addField(final RecordDefinitionImpl recordDefinition,
+    final String dbColumnName, final String name, final String dataType, final int sqlType,
+    final int length, final int scale, final boolean required, final String description) {
     JdbcFieldAdder attributeAdder = this.attributeAdders.get(dataType);
     if (attributeAdder == null) {
       attributeAdder = new JdbcFieldAdder(DataTypes.OBJECT);
     }
-    return (JdbcFieldDefinition)attributeAdder.addField(recordDefinition,
-      dbColumnName, name, dataType, sqlType, length, scale, required,
-      description);
+    return (JdbcFieldDefinition)attributeAdder.addField(recordDefinition, dbColumnName, name,
+      dataType, sqlType, length, scale, required, description);
   }
 
   protected void addField(final ResultSetMetaData resultSetMetaData,
-    final RecordDefinitionImpl recordDefinition, final String name,
-    final int i, final String description) throws SQLException {
+    final RecordDefinitionImpl recordDefinition, final String name, final int i,
+    final String description) throws SQLException {
     final String dataType = resultSetMetaData.getColumnTypeName(i);
     final int sqlType = resultSetMetaData.getColumnType(i);
     final int length = resultSetMetaData.getPrecision(i);
     final int scale = resultSetMetaData.getScale(i);
     final boolean required = false;
-    addField(recordDefinition, name, name.toUpperCase(), dataType, sqlType,
-      length, scale, required, description);
+    addField(recordDefinition, name, name.toUpperCase(), dataType, sqlType, length, scale,
+      required, description);
   }
 
   public void addFieldAdder(final String sqlTypeName, final JdbcFieldAdder adder) {
@@ -242,13 +239,13 @@ implements JdbcRecordStore, RecordStoreExtension {
     }
     final String sql = JdbcUtils.getDeleteSql(query);
     try (
-        Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
       try (
-          JdbcConnection connection = getJdbcConnection(isAutoCommit());
-          final PreparedStatement statement = connection.prepareStatement(sql)) {
+        JdbcConnection connection = getJdbcConnection(isAutoCommit());
+        final PreparedStatement statement = connection.prepareStatement(sql)) {
 
         JdbcUtils.setPreparedStatementParameters(statement, query);
         return statement.executeUpdate();
@@ -367,9 +364,9 @@ implements JdbcRecordStore, RecordStoreExtension {
     final Set<String> schemaNames = new TreeSet<String>();
     try {
       try (
-          final Connection connection = getJdbcConnection();
-          final PreparedStatement statement = connection.prepareStatement(this.schemaPermissionsSql);
-          final ResultSet resultSet = statement.executeQuery();) {
+        final Connection connection = getJdbcConnection();
+        final PreparedStatement statement = connection.prepareStatement(this.schemaPermissionsSql);
+        final ResultSet resultSet = statement.executeQuery();) {
         while (resultSet.next()) {
           final String schemaName = resultSet.getString("SCHEMA_NAME");
           addAllSchemaNames(schemaName);
@@ -379,8 +376,7 @@ implements JdbcRecordStore, RecordStoreExtension {
         }
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Unable to get schema and table permissions", e);
+      LoggerFactory.getLogger(getClass()).error("Unable to get schema and table permissions", e);
     }
     return schemaNames;
   }
@@ -390,12 +386,16 @@ implements JdbcRecordStore, RecordStoreExtension {
     return this.tableNameMap.get(typePath);
   }
 
+  protected DataSource getDataSource() {
+    return this.dataSource;
+  }
+
   public Set<String> getExcludeTablePaths() {
     return this.excludeTablePaths;
   }
 
-  public JdbcFieldDefinition getField(final String schemaName,
-    final String tableName, final String columnName) {
+  public JdbcFieldDefinition getField(final String schemaName, final String tableName,
+    final String columnName) {
     final String typePath = Path.toPath(schemaName, tableName);
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null) {
@@ -408,8 +408,8 @@ implements JdbcRecordStore, RecordStoreExtension {
 
   @Override
   public String getGeneratePrimaryKeySql(final RecordDefinition recordDefinition) {
-    throw new UnsupportedOperationException(
-      "Cannot create SQL to generate Primary Key for " + recordDefinition);
+    throw new UnsupportedOperationException("Cannot create SQL to generate Primary Key for "
+      + recordDefinition);
   }
 
   public String getHints() {
@@ -441,8 +441,7 @@ implements JdbcRecordStore, RecordStoreExtension {
     try {
       final String schemaName = Path.getPath(typePath);
       final RecordStoreSchema schema = getSchema(schemaName);
-      final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-        schema, typePath);
+      final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, typePath);
 
       final String idFieldName = getIdFieldName(typePath);
       for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
@@ -457,8 +456,7 @@ implements JdbcRecordStore, RecordStoreExtension {
 
       return recordDefinition;
     } catch (final SQLException e) {
-      throw new IllegalArgumentException("Unable to load metadata for "
-          + typePath);
+      throw new IllegalArgumentException("Unable to load metadata for " + typePath);
     }
   }
 
@@ -470,12 +468,12 @@ implements JdbcRecordStore, RecordStoreExtension {
     query.setOrderBy(Collections.<String, Boolean> emptyMap());
     final String sql = JdbcUtils.getSelectSql(query);
     try (
-        JdbcConnection connection = getJdbcConnection()) {
+      JdbcConnection connection = getJdbcConnection()) {
       try (
-          final PreparedStatement statement = connection.prepareStatement(sql)) {
+        final PreparedStatement statement = connection.prepareStatement(sql)) {
         JdbcUtils.setPreparedStatementParameters(statement, query);
         try (
-            final ResultSet resultSet = statement.executeQuery()) {
+          final ResultSet resultSet = statement.executeQuery()) {
           if (resultSet.next()) {
             final int rowCount = resultSet.getInt(1);
             return rowCount;
@@ -500,9 +498,7 @@ implements JdbcRecordStore, RecordStoreExtension {
       sqlBuffer.append(" into ");
       sqlBuffer.append(tableName);
       sqlBuffer.append(" (");
-      sqlBuffer.append('"')
-      .append(recordDefinition.getIdFieldName())
-      .append('"');
+      sqlBuffer.append('"').append(recordDefinition.getIdFieldName()).append('"');
       sqlBuffer.append(",");
       for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
         if (i != recordDefinition.getIdFieldIndex()) {
@@ -564,7 +560,7 @@ implements JdbcRecordStore, RecordStoreExtension {
     JdbcWriterImpl writer;
     final JdbcWriterResourceHolder resourceHolder = (JdbcWriterResourceHolder)TransactionSynchronizationManager.getResource(writerKey);
     if (resourceHolder != null
-        && (resourceHolder.hasWriter() || resourceHolder.isSynchronizedWithTransaction())) {
+      && (resourceHolder.hasWriter() || resourceHolder.isSynchronizedWithTransaction())) {
       resourceHolder.requested();
       if (resourceHolder.hasWriter()) {
         writer = resourceHolder.getWriter();
@@ -583,8 +579,8 @@ implements JdbcRecordStore, RecordStoreExtension {
           holderToUse.setWriter(writer);
         }
         holderToUse.requested();
-        final JdbcWriterSynchronization synchronization = new JdbcWriterSynchronization(
-          this, holderToUse, writerKey);
+        final JdbcWriterSynchronization synchronization = new JdbcWriterSynchronization(this,
+          holderToUse, writerKey);
         TransactionSynchronizationManager.registerSynchronization(synchronization);
         holderToUse.setSynchronizedWithTransaction(true);
         if (holderToUse != resourceHolder) {
@@ -600,8 +596,7 @@ implements JdbcRecordStore, RecordStoreExtension {
   public void initialize() {
     super.initialize();
     if (this.dataSource != null) {
-      this.transactionManager = new DataSourceTransactionManager(
-        this.dataSource);
+      this.transactionManager = new DataSourceTransactionManager(this.dataSource);
     }
   }
 
@@ -640,8 +635,7 @@ implements JdbcRecordStore, RecordStoreExtension {
   }
 
   protected boolean isExcluded(final String dbSchemaName, final String tableName) {
-    final String path = ("/" + dbSchemaName + "/" + tableName).toUpperCase()
-        .replaceAll("/+", "/");
+    final String path = ("/" + dbSchemaName + "/" + tableName).toUpperCase().replaceAll("/+", "/");
     if (this.excludeTablePaths.contains(path)) {
       return true;
     } else {
@@ -660,28 +654,25 @@ implements JdbcRecordStore, RecordStoreExtension {
 
   public abstract boolean isSchemaExcluded(String schemaName);
 
-  protected synchronized Map<String, List<String>> loadIdColumnNames(
-    final String dbSchemaName) {
+  protected synchronized Map<String, List<String>> loadIdColumnNames(final String dbSchemaName) {
     final String schemaName = "/" + dbSchemaName.toUpperCase();
     final Map<String, List<String>> idColumnNames = new HashMap<String, List<String>>();
     try {
       try (
-          final Connection connection = getJdbcConnection();
-          final PreparedStatement statement = connection.prepareStatement(this.primaryKeySql);) {
+        final Connection connection = getJdbcConnection();
+        final PreparedStatement statement = connection.prepareStatement(this.primaryKeySql);) {
         statement.setString(1, dbSchemaName);
         try (
-            final ResultSet rs = statement.executeQuery()) {
+          final ResultSet rs = statement.executeQuery()) {
           while (rs.next()) {
             final String tableName = rs.getString("TABLE_NAME").toUpperCase();
             final String idFieldName = rs.getString("COLUMN_NAME");
-            Maps.addToList(idColumnNames, schemaName + "/"
-                + tableName, idFieldName);
+            Maps.addToList(idColumnNames, schemaName + "/" + tableName, idFieldName);
           }
         }
       }
     } catch (final Throwable e) {
-      throw new IllegalArgumentException("Unable to primary keys for schema "
-          + dbSchemaName, e);
+      throw new IllegalArgumentException("Unable to primary keys for schema " + dbSchemaName, e);
     }
     return idColumnNames;
   }
@@ -690,17 +681,16 @@ implements JdbcRecordStore, RecordStoreExtension {
     final Map<String, List<String>> tablePermissionsMap,
     final Map<String, String> tableDescriptionMap) {
     try (
-        final Connection connection = getJdbcConnection();
-        final PreparedStatement statement = connection.prepareStatement(this.tablePermissionsSql)) {
+      final Connection connection = getJdbcConnection();
+      final PreparedStatement statement = connection.prepareStatement(this.tablePermissionsSql)) {
       statement.setString(1, schemaName);
       try (
-          final ResultSet resultSet = statement.executeQuery()) {
+        final ResultSet resultSet = statement.executeQuery()) {
         while (resultSet.next()) {
           final String dbTableName = resultSet.getString("TABLE_NAME");
           if (!isExcluded(schemaName, dbTableName)) {
             final String privilege = resultSet.getString("PRIVILEGE");
-            Maps.addToList(tablePermissionsMap, dbTableName,
-              privilege);
+            Maps.addToList(tablePermissionsMap, dbTableName, privilege);
 
             final String description = resultSet.getString("REMARKS");
             tableDescriptionMap.put(dbTableName, description);
@@ -708,8 +698,7 @@ implements JdbcRecordStore, RecordStoreExtension {
         }
       }
     } catch (final Throwable e) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Unable to get schema and table permissions", e);
+      LoggerFactory.getLogger(getClass()).error("Unable to get schema and table permissions", e);
     }
   }
 
@@ -755,14 +744,13 @@ implements JdbcRecordStore, RecordStoreExtension {
       final String dbSchemaName = getDatabaseSchemaName(schemaName);
       final Map<String, String> tableDescriptionMap = new HashMap<String, String>();
       final Map<String, List<String>> tablePermissionsMap = new TreeMap<String, List<String>>();
-      loadSchemaTablePermissions(dbSchemaName, tablePermissionsMap,
-        tableDescriptionMap);
+      loadSchemaTablePermissions(dbSchemaName, tablePermissionsMap, tableDescriptionMap);
 
       final Map<String, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
       final Map<String, RecordDefinition> recordDefinitionMap = new TreeMap<>();
       try {
         try (
-            final Connection connection = getJdbcConnection()) {
+          final Connection connection = getJdbcConnection()) {
           final DatabaseMetaData databaseMetaData = connection.getMetaData();
           final List<String> removedPaths = schema.getTypeNames();
           final Map<String, List<String>> idFieldNameMap = loadIdColumnNames(dbSchemaName);
@@ -772,22 +760,19 @@ implements JdbcRecordStore, RecordStoreExtension {
             final String typePath = Path.toPath(schemaName, tableName);
             removedPaths.remove(typePath);
             this.tableNameMap.put(typePath, dbTableName);
-            final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-              schema, typePath);
+            final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, typePath);
             final String description = tableDescriptionMap.get(dbTableName);
             recordDefinition.setDescription(description);
-            final List<String> permissions = Maps.get(
-              tablePermissionsMap, dbTableName, DEFAULT_PERMISSIONS);
+            final List<String> permissions = Maps.get(tablePermissionsMap, dbTableName,
+              DEFAULT_PERMISSIONS);
             recordDefinition.setProperty("permissions", permissions);
             recordDefinitionMap.put(typePath, recordDefinition);
             elementsByPath.put(typePath.toUpperCase(), recordDefinition);
           }
           try (
-              final ResultSet columnsRs = databaseMetaData.getColumns(null,
-                dbSchemaName, "%", "%")) {
+            final ResultSet columnsRs = databaseMetaData.getColumns(null, dbSchemaName, "%", "%")) {
             while (columnsRs.next()) {
-              final String tableName = columnsRs.getString("TABLE_NAME")
-                  .toUpperCase();
+              final String tableName = columnsRs.getString("TABLE_NAME").toUpperCase();
               final String typePath = Path.toPath(schemaName, tableName);
               final RecordDefinitionImpl recordDefinition = (RecordDefinitionImpl)recordDefinitionMap.get(typePath);
               if (recordDefinition != null) {
@@ -800,11 +785,10 @@ implements JdbcRecordStore, RecordStoreExtension {
                 if (columnsRs.wasNull()) {
                   scale = -1;
                 }
-                final boolean required = !columnsRs.getString("IS_NULLABLE")
-                    .equals("YES");
+                final boolean required = !columnsRs.getString("IS_NULLABLE").equals("YES");
                 final String description = columnsRs.getString("REMARKS");
-                addField(recordDefinition, dbColumnName, name, dataType,
-                  sqlType, length, scale, required, description);
+                addField(recordDefinition, dbColumnName, name, dataType, sqlType, length, scale,
+                  required, description);
               }
             }
 
@@ -817,8 +801,7 @@ implements JdbcRecordStore, RecordStoreExtension {
           }
         }
       } catch (final Throwable e) {
-        throw new IllegalArgumentException(
-          "Unable to load metadata for schema " + schemaName, e);
+        throw new IllegalArgumentException("Unable to load metadata for schema " + schemaName, e);
       }
 
       return elementsByPath;
@@ -848,8 +831,7 @@ implements JdbcRecordStore, RecordStoreExtension {
   }
 
   public void setExcludeTablePatterns(final String... excludeTablePatterns) {
-    this.excludeTablePatterns = new ArrayList<String>(
-        Arrays.asList(excludeTablePatterns));
+    this.excludeTablePatterns = new ArrayList<String>(Arrays.asList(excludeTablePatterns));
   }
 
   public void setFlushBetweenTypes(final boolean flushBetweenTypes) {
@@ -890,8 +872,7 @@ implements JdbcRecordStore, RecordStoreExtension {
     writeAll(records, null);
   }
 
-  protected Record write(final JdbcWriter writer, Record record,
-    final RecordState state) {
+  protected Record write(final JdbcWriter writer, Record record, final RecordState state) {
     if (state == RecordState.New) {
       if (record.getState() != state) {
         record = copy(record);
@@ -912,12 +893,12 @@ implements JdbcRecordStore, RecordStoreExtension {
 
   protected void write(final Record record, final RecordState state) {
     try (
-        Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
       try (
-          JdbcWriter writer = getWriter(true)) {
+        JdbcWriter writer = getWriter(true)) {
         write(writer, record, state);
       } catch (final RuntimeException e) {
         transaction.setRollbackOnly();
@@ -929,15 +910,14 @@ implements JdbcRecordStore, RecordStoreExtension {
     }
   }
 
-  protected void writeAll(final Collection<Record> records,
-    final RecordState state) {
+  protected void writeAll(final Collection<Record> records, final RecordState state) {
     try (
-        Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      Transaction transaction = createTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions
       // won't get caught on closing the writer and the transaction won't get
       // rolled back.
       try (
-          final JdbcWriter writer = getWriter(true)) {
+        final JdbcWriter writer = getWriter(true)) {
         for (final Record record : records) {
           write(writer, record, state);
         }

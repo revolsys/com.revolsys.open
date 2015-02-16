@@ -49,8 +49,7 @@ import com.revolsys.jts.geom.prep.PreparedMultiLineString;
  *
  *@version 1.7
  */
-public class MultiLineStringImpl extends AbstractMultiLineString implements
-MultiLineString {
+public class MultiLineStringImpl extends AbstractMultiLineString implements MultiLineString {
 
   private static final long serialVersionUID = 8166665132445433741L;
 
@@ -62,14 +61,12 @@ MultiLineString {
     this.geometryFactory = geometryFactory;
   }
 
-  public MultiLineStringImpl(final GeometryFactory geometryFactory,
-    final LineString[] lines) {
+  public MultiLineStringImpl(final GeometryFactory geometryFactory, final LineString... lines) {
     this.geometryFactory = geometryFactory;
     if (lines == null || lines.length == 0) {
       this.lines = null;
     } else if (hasNullElements(lines)) {
-      throw new IllegalArgumentException(
-          "geometries must not contain null elements");
+      throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
       this.lines = new LineString[lines.length];
       for (int i = 0; i < lines.length; i++) {

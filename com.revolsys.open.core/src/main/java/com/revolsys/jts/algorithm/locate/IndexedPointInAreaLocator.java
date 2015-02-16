@@ -75,15 +75,13 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
       }
     }
 
-    public void query(final double min, final double max,
-      final Visitor<LineSegment> visitor) {
+    public void query(final double min, final double max, final Visitor<LineSegment> visitor) {
       this.index.query(min, max, visitor);
     }
   }
 
   public static IndexedPointInAreaLocator get(final Geometry geometry) {
-    IndexedPointInAreaLocator locator = GeometryProperties.getGeometryProperty(
-      geometry, KEY);
+    IndexedPointInAreaLocator locator = GeometryProperties.getGeometryProperty(geometry, KEY);
     if (locator == null) {
       locator = new IndexedPointInAreaLocator(geometry);
       GeometryProperties.setGeometryProperty(geometry, KEY, locator);
@@ -120,6 +118,11 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
 
   public IntervalIndexedGeometry getIndex() {
     return this.index;
+  }
+
+  public boolean intersects(final Point point) {
+    final Location location = locate(point);
+    return !location.equals(Location.EXTERIOR);
   }
 
   public Location locate(final double x, final double y) {

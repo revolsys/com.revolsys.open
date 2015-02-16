@@ -55,8 +55,7 @@ import com.revolsys.jts.geom.prep.PreparedMultiPolygon;
  *
  *@version 1.7
  */
-public class MultiPolygonImpl extends AbstractMultiPolygon implements
-MultiPolygon {
+public class MultiPolygonImpl extends AbstractMultiPolygon implements MultiPolygon {
 
   private static final long serialVersionUID = 8166665132445433741L;
 
@@ -79,14 +78,12 @@ MultiPolygon {
     this.geometryFactory = geometryFactory;
   }
 
-  public MultiPolygonImpl(final GeometryFactory geometryFactory,
-    final Polygon[] polygons) {
+  public MultiPolygonImpl(final GeometryFactory geometryFactory, final Polygon... polygons) {
     this.geometryFactory = geometryFactory;
     if (polygons == null || polygons.length == 0) {
       this.polygons = null;
     } else if (hasNullElements(polygons)) {
-      throw new IllegalArgumentException(
-          "geometries must not contain null elements");
+      throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
       this.polygons = polygons;
     }

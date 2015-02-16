@@ -73,14 +73,12 @@ public class MultiPointImpl extends AbstractMultiPoint implements MultiPoint {
     this.geometryFactory = geometryFactory;
   }
 
-  public MultiPointImpl(final GeometryFactory geometryFactory,
-    final Point[] points) {
+  public MultiPointImpl(final GeometryFactory geometryFactory, final Point... points) {
     this.geometryFactory = geometryFactory;
     if (points == null || points.length == 0) {
       this.points = null;
     } else if (hasNullElements(points)) {
-      throw new IllegalArgumentException(
-          "geometries must not contain null elements");
+      throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
       this.points = points;
     }
