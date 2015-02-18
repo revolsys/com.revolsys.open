@@ -16,8 +16,8 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.util.Property;
 
-public class LayerRecordTableModel extends
-AbstractSingleRecordTableModel implements PropertyChangeListener {
+public class LayerRecordTableModel extends AbstractSingleRecordTableModel implements
+  PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -101,8 +101,7 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
         if (idField != null) {
           final String idFieldName = idField.getName();
           if (fieldName.equals(idFieldName)) {
-            if (this.record != null
-                && this.record.getState() == RecordState.New) {
+            if (this.record != null && this.record.getState() == RecordState.New) {
               if (!Number.class.isAssignableFrom(idField.getTypeClass())) {
                 return true;
               }
@@ -151,9 +150,9 @@ AbstractSingleRecordTableModel implements PropertyChangeListener {
   }
 
   @Override
-  protected Object setObjectValue(final int rowIndex, final Object value) {
-    final Object oldValue = this.record.getValue(rowIndex);
-    this.record.setValue(rowIndex, value);
+  protected Object setObjectValue(final String fieldName, final Object value) {
+    final Object oldValue = this.record.getValue(fieldName);
+    this.record.setValue(fieldName, value);
     return oldValue;
   }
 

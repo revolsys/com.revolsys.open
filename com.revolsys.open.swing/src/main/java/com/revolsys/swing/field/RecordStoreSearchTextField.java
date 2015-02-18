@@ -52,10 +52,9 @@ import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
-public class RecordStoreSearchTextField extends JXSearchField implements
-DocumentListener, KeyListener, MouseListener, FocusListener,
-ListDataListener, ItemSelectable, Field, ListSelectionListener,
-HighlightPredicate {
+public class RecordStoreSearchTextField extends JXSearchField implements DocumentListener,
+  KeyListener, MouseListener, FocusListener, ListDataListener, ItemSelectable, Field,
+  ListSelectionListener, HighlightPredicate {
   private static final long serialVersionUID = 1L;
 
   private final String displayFieldName;
@@ -66,7 +65,7 @@ HighlightPredicate {
 
   private final RecordStoreQueryListModel listModel;
 
-  public Record selectedItem;
+  private Record selectedItem;
 
   private String errorMessage;
 
@@ -74,25 +73,29 @@ HighlightPredicate {
 
   private final CascadingUndoManager undoManager = new CascadingUndoManager();
 
+  private final RecordStore recordStore;
+
+  private final List<Query> queries;
+
   public RecordStoreSearchTextField(final RecordDefinition recordDefinition,
     final String displayFieldName) {
-    this(recordDefinition.getRecordStore(), displayFieldName, new Query(
-      recordDefinition, new Equal(F.upper(displayFieldName), new Value(null))),
-      new Query(recordDefinition, Q.iLike(displayFieldName, "")));
+    this(recordDefinition.getRecordStore(), displayFieldName, new Query(recordDefinition,
+      new Equal(F.upper(displayFieldName), new Value(null))), new Query(recordDefinition, Q.iLike(
+      displayFieldName, "")));
   }
 
-  public RecordStoreSearchTextField(final RecordStore recordStore,
-    final String displayFieldName, final List<Query> queries) {
+  public RecordStoreSearchTextField(final RecordStore recordStore, final String displayFieldName,
+    final List<Query> queries) {
+    this.recordStore = recordStore;
     this.displayFieldName = displayFieldName;
-
+    this.queries = queries;
     final Document document = getDocument();
     document.addDocumentListener(this);
     addFocusListener(new WeakFocusListener(this));
     addKeyListener(this);
     addMouseListener(this);
 
-    this.listModel = new RecordStoreQueryListModel(recordStore,
-      displayFieldName, queries);
+    this.listModel = new RecordStoreQueryListModel(recordStore, displayFieldName, queries);
     this.list = new JXList(this.listModel);
     this.list.setCellRenderer(new RecordListCellRenderer(displayFieldName));
     this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -100,14 +103,12 @@ HighlightPredicate {
     this.list.addMouseListener(this);
     this.listModel.addListDataListener(this);
     this.list.addListSelectionListener(this);
-    this.list.addHighlighter(new ColorHighlighter(this, WebColors.Blue,
-      WebColors.White));
+    this.list.addHighlighter(new ColorHighlighter(this, WebColors.Blue, WebColors.White));
     this.menu.add(this.list);
     this.menu.setFocusable(false);
     this.menu.setBorderPainted(true);
     this.menu.setBorder(BorderFactory.createCompoundBorder(
-      BorderFactory.createLineBorder(Color.DARK_GRAY),
-      BorderFactory.createEmptyBorder(1, 2, 1, 2)));
+      BorderFactory.createLineBorder(Color.DARK_GRAY), BorderFactory.createEmptyBorder(1, 2, 1, 2)));
 
     setEditable(true);
     setSearchMode(SearchMode.REGULAR);
@@ -115,17 +116,16 @@ HighlightPredicate {
     this.undoManager.addKeyMap(this);
   }
 
-  public RecordStoreSearchTextField(final RecordStore recordStore,
-    final String displayFieldName, final Query... queries) {
+  public RecordStoreSearchTextField(final RecordStore recordStore, final String displayFieldName,
+    final Query... queries) {
     this(recordStore, displayFieldName, Arrays.asList(queries));
 
   }
 
-  public RecordStoreSearchTextField(final RecordStore recordStore,
-    final String typeName, final String displayFieldName) {
-    this(recordStore, displayFieldName, new Query(typeName, new Equal(
-      F.upper(displayFieldName), new Value(null))), new Query(typeName,
-        Q.iLike(displayFieldName, "")));
+  public RecordStoreSearchTextField(final RecordStore recordStore, final String typeName,
+    final String displayFieldName) {
+    this(recordStore, displayFieldName, new Query(typeName, new Equal(F.upper(displayFieldName),
+      new Value(null))), new Query(typeName, Q.iLike(displayFieldName, "")));
   }
 
   @Override
@@ -136,6 +136,11 @@ HighlightPredicate {
   @Override
   public void changedUpdate(final DocumentEvent e) {
     search();
+  }
+
+  @Override
+  public Field clone() {
+    return new RecordStoreSearchTextField(this.recordStore, this.displayFieldName, this.queries);
   }
 
   @Override
@@ -153,8 +158,8 @@ HighlightPredicate {
   }
 
   @Override
-  public void firePropertyChange(final String propertyName,
-    final Object oldValue, final Object newValue) {
+  public void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
     super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
@@ -231,8 +236,7 @@ HighlightPredicate {
   }
 
   @Override
-  public boolean isHighlighted(final Component renderer,
-    final ComponentAdapter adapter) {
+  public boolean isHighlighted(final Component renderer, final ComponentAdapter adapter) {
     final Record object = this.listModel.getElementAt(adapter.row);
     final String text = getText();
     final String value = object.getString(this.displayFieldName);
@@ -278,7 +282,7 @@ HighlightPredicate {
         }
         this.list.setSelectedIndex(selectedIndex);
         e.consume();
-        break;
+      break;
       case KeyEvent.VK_ENTER:
         if (size > 0) {
           if (selectedIndex >= 0 && selectedIndex < size) {
@@ -297,9 +301,9 @@ HighlightPredicate {
           findButton.doClick();
           setText("");
         }
-        break;
+      break;
       default:
-        break;
+      break;
     }
     showMenu();
   }
@@ -362,8 +366,8 @@ HighlightPredicate {
     if (this.selectedItem != null) {
       final Record oldValue = this.selectedItem;
       this.selectedItem = null;
-      fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
-        oldValue, ItemEvent.DESELECTED));
+      fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED, oldValue,
+        ItemEvent.DESELECTED));
     }
     final String text = getText();
     this.listModel.setSearchText(text);
@@ -371,8 +375,8 @@ HighlightPredicate {
 
     this.selectedItem = this.listModel.getSelectedItem();
     if (this.selectedItem != null) {
-      fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
-        this.selectedItem, ItemEvent.SELECTED));
+      fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED, this.selectedItem,
+        ItemEvent.SELECTED));
     }
   }
 
@@ -393,8 +397,8 @@ HighlightPredicate {
   }
 
   @Override
-  public void setFieldInvalid(final String message,
-    final Color foregroundColor, final Color backgroundColor) {
+  public void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
     setForeground(foregroundColor);
     setSelectedTextColor(foregroundColor);
     setBackground(backgroundColor);

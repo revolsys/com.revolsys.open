@@ -88,35 +88,32 @@ import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class SwingUtil {
-  public static void addAction(final JComponent component,
-    final KeyStroke keyStroke, final String actionKey, final Object object,
-    final String methodName, final Object... parameters) {
+  public static void addAction(final JComponent component, final KeyStroke keyStroke,
+    final String actionKey, final Object object, final String methodName,
+    final Object... parameters) {
     final InputMap inputMap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     inputMap.put(keyStroke, actionKey);
 
     final ActionMap actionMap = component.getActionMap();
-    final InvokeMethodAction action = new InvokeMethodAction(actionKey, object,
-      methodName, parameters);
+    final InvokeMethodAction action = new InvokeMethodAction(actionKey, object, methodName,
+      parameters);
     actionMap.put(actionKey, action);
     if (component instanceof JComboBox) {
       final JComboBox comboBox = (JComboBox)component;
-      final JComponent editorComponent = (JComponent)comboBox.getEditor()
-          .getEditorComponent();
-      addAction(editorComponent, keyStroke, actionKey, object, methodName,
-        parameters);
+      final JComponent editorComponent = (JComponent)comboBox.getEditor().getEditorComponent();
+      addAction(editorComponent, keyStroke, actionKey, object, methodName, parameters);
     }
   }
 
-  public static JComponent addField(final Container panel,
-    final String fieldName, final Object fieldValue) {
+  public static JComponent addField(final Container panel, final String fieldName,
+    final Object fieldValue) {
     return addField(panel, fieldName, fieldName, fieldValue);
   }
 
-  public static JComponent addField(final Container panel,
-    final String fieldName, final String label, final Object fieldValue) {
+  public static JComponent addField(final Container panel, final String fieldName,
+    final String label, final Object fieldValue) {
     addLabel(panel, label);
-    final JComponent field = SwingUtil.createField(fieldValue.getClass(),
-      fieldName, fieldValue);
+    final JComponent field = SwingUtil.createField(fieldValue.getClass(), fieldName, fieldValue);
     panel.add(field);
     return field;
   }
@@ -128,39 +125,38 @@ public class SwingUtil {
     return label;
   }
 
-  public static void addLabelledReadOnlyTextField(final JPanel container,
-    final String fieldName, final Object value) {
+  public static void addLabelledReadOnlyTextField(final JPanel container, final String fieldName,
+    final Object value) {
     final String string = StringConverterRegistry.toString(value);
     final int length = Math.max(1, string.length());
     addLabelledReadOnlyTextField(container, fieldName, value, length);
   }
 
-  public static void addLabelledReadOnlyTextField(final JPanel container,
-    final String fieldName, final Object value, final int length) {
+  public static void addLabelledReadOnlyTextField(final JPanel container, final String fieldName,
+    final Object value, final int length) {
     addLabel(container, fieldName);
     addReadOnlyTextField(container, fieldName, value, length);
   }
 
-  public static JComponent addObjectField(final Container container,
-    final Object object, final String fieldName) {
+  public static JComponent addObjectField(final Container container, final Object object,
+    final String fieldName) {
     return addObjectField(container, object, fieldName, fieldName);
   }
 
-  public static JComponent addObjectField(final Container panel,
-    final Object object, final String fieldName, final String label) {
+  public static JComponent addObjectField(final Container panel, final Object object,
+    final String fieldName, final String label) {
     final Object fieldValue = Property.get(object, fieldName);
     return addField(panel, fieldName, label, fieldValue);
   }
 
-  public static void addReadOnlyTextField(final JPanel container,
-    final String fieldName, final Object value, final int length) {
+  public static void addReadOnlyTextField(final JPanel container, final String fieldName,
+    final Object value, final int length) {
     final TextField field = new TextField(fieldName, value, length);
     field.setEditable(false);
     container.add(field);
   }
 
-  public static Rectangle applyInsets(final Rectangle bounds,
-    final Insets insets) {
+  public static Rectangle applyInsets(final Rectangle bounds, final Insets insets) {
     final int x = bounds.x + insets.left;
     final int y = bounds.y + insets.top;
     final int width = bounds.width - insets.left - insets.right;
@@ -179,24 +175,22 @@ public class SwingUtil {
     setLocationCentre(bounds, window);
   }
 
-  public static ComboBox createComboBox(final CodeTable codeTable,
-    final boolean required, final int maxLength) {
+  public static ComboBox createComboBox(final CodeTable codeTable, final boolean required,
+    final int maxLength) {
     return createComboBox("fieldValue", codeTable, required, maxLength);
   }
 
-  public static ComboBox createComboBox(final String fieldName,
-    final CodeTable codeTable, final boolean required, final int maxLength) {
+  public static ComboBox createComboBox(final String fieldName, final CodeTable codeTable,
+    final boolean required, final int maxLength) {
     if (codeTable == null) {
       return null;
     } else {
-      final ComboBox comboBox = CodeTableComboBoxModel.create(fieldName,
-        codeTable, !required);
+      final ComboBox comboBox = CodeTableComboBoxModel.create(fieldName, codeTable, !required);
       if (comboBox.getModel().getSize() > 0) {
         comboBox.setSelectedIndex(0);
       }
       int longestLength = -1;
-      for (final Entry<Identifier, List<Object>> codes : codeTable.getCodes()
-          .entrySet()) {
+      for (final Entry<Identifier, List<Object>> codes : codeTable.getCodes().entrySet()) {
         final List<Object> values = codes.getValue();
         if (values != null && !values.isEmpty()) {
           final String text = CollectionUtil.toString(values);
@@ -236,15 +230,13 @@ public class SwingUtil {
     try {
       return new DataFlavor(mimeType);
     } catch (final ClassNotFoundException e) {
-      throw new IllegalArgumentException("Cannot create data flavor for "
-          + mimeType, e);
+      throw new IllegalArgumentException("Cannot create data flavor for " + mimeType, e);
     }
   }
 
   public static DateField createDateField(final String fieldName) {
     final DateField dateField = new DateField(fieldName);
-    dateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd",
-        "yyyy/MMM/dd");
+    dateField.setFormats("yyyy-MM-dd", "yyyy/MM/dd", "yyyy-MMM-dd", "yyyy/MMM/dd");
     PopupMenu.getPopupMenuFactory(dateField.getEditor());
     return dateField;
   }
@@ -254,8 +246,8 @@ public class SwingUtil {
     final String fieldName, final Object fieldValue) {
     JComponent field;
     if (Number.class.isAssignableFrom(fieldClass)) {
-      final NumberTextField numberTextField = new NumberTextField(fieldName,
-        DataTypes.DOUBLE, 10, 2);
+      final NumberTextField numberTextField = new NumberTextField(fieldName, DataTypes.DOUBLE, 10,
+        2);
       if (fieldValue instanceof Number) {
         final Number number = (Number)fieldValue;
         numberTextField.setFieldValue(number);
@@ -295,9 +287,8 @@ public class SwingUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T extends Field> T createField(
-    final RecordDefinition recordDefinition, final String fieldName,
-    final boolean editable) {
+  public static <T extends Field> T createField(final RecordDefinition recordDefinition,
+    final String fieldName, final boolean editable) {
     Field field;
     final FieldDefinition attribute = recordDefinition.getField(fieldName);
     if (attribute == null) {
@@ -326,7 +317,7 @@ public class SwingUtil {
           if (component == null) {
             field = createComboBox(fieldName, codeTable, required, -1);
           } else {
-            field = (Field)component;
+            field = ((Field)component).clone();
           }
         } else {
           field = new ObjectLabelField(fieldName, columns, codeTable);
@@ -339,8 +330,8 @@ public class SwingUtil {
         final int scale = attribute.getScale();
         final Number minValue = attribute.getMinValue();
         final Number maxValue = attribute.getMaxValue();
-        final NumberTextField numberTextField = new NumberTextField(fieldName,
-          type, length, scale, minValue, maxValue);
+        final NumberTextField numberTextField = new NumberTextField(fieldName, type, length, scale,
+          minValue, maxValue);
         field = numberTextField;
       } else if (Date.class.isAssignableFrom(javaClass)) {
         field = createDateField(fieldName);
@@ -365,8 +356,7 @@ public class SwingUtil {
     final String preferenceName) {
     final JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Open File");
-    final String currentDirectoryName = PreferencesUtil.getString(
-      preferencesClass, preferenceName);
+    final String currentDirectoryName = PreferencesUtil.getString(preferencesClass, preferenceName);
     if (Property.hasValue(currentDirectoryName)) {
       final File directory = new File(currentDirectoryName);
       if (directory.exists() && directory.canRead()) {
@@ -376,12 +366,12 @@ public class SwingUtil {
     return fileChooser;
   }
 
-  public static JFileChooser createFileChooser(final String title,
-    final String preferencesGroup, final String preferenceName) {
+  public static JFileChooser createFileChooser(final String title, final String preferencesGroup,
+    final String preferenceName) {
     final JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle(title);
-    final String currentDirectoryName = PreferencesUtil.getUserString(
-      preferencesGroup, preferenceName);
+    final String currentDirectoryName = PreferencesUtil.getUserString(preferencesGroup,
+      preferenceName);
     if (Property.hasValue(currentDirectoryName)) {
       final File directory = new File(currentDirectoryName);
       if (directory.exists() && directory.canRead()) {
@@ -402,8 +392,7 @@ public class SwingUtil {
     return textField;
   }
 
-  public static TextArea createTextArea(final String fieldName, final int rows,
-    final int columns) {
+  public static TextArea createTextArea(final String fieldName, final int rows, final int columns) {
     final TextArea textField = new TextArea(fieldName, rows, columns);
     return textField;
   }
@@ -413,8 +402,7 @@ public class SwingUtil {
     return textField;
   }
 
-  public static TextField createTextField(final String fieldName,
-    final int columns) {
+  public static TextField createTextField(final String fieldName, final int columns) {
     final TextField textField = new TextField(fieldName, columns);
     return textField;
   }
@@ -511,8 +499,7 @@ public class SwingUtil {
         final Rectangle bounds = config.getBounds();
 
         if (point != null && bounds.contains(point)) {
-          final Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(
-            config);
+          final Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(config);
           return applyInsets(bounds, insets);
         } else if (firstBounds == null) {
           firstBounds = bounds;
@@ -619,8 +606,7 @@ public class SwingUtil {
 
   public static boolean isControlOrMetaDown(final InputEvent event) {
     final int modifiersEx = event.getModifiersEx();
-    final int flag = modifiersEx
-        & (InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
+    final int flag = modifiersEx & (InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
     return flag != 0;
   }
 
@@ -652,8 +638,7 @@ public class SwingUtil {
 
   public static boolean isLeftButtonAndNoModifiers(final MouseEvent event) {
     final int modifiers = event.getModifiers();
-    return SwingUtilities.isLeftMouseButton(event)
-        && InputEvent.BUTTON1_MASK == modifiers;
+    return SwingUtilities.isLeftMouseButton(event) && InputEvent.BUTTON1_MASK == modifiers;
   }
 
   public static boolean isLeftButtonOnly(final MouseEvent event) {
@@ -685,8 +670,8 @@ public class SwingUtil {
   public static boolean isModifierKeyDown(final InputEvent event) {
     final int modifiersEx = event.getModifiersEx();
     final int flag = modifiersEx
-        & (InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK
-            | InputEvent.ALT_GRAPH_DOWN_MASK | InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
+      & (InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK | InputEvent.ALT_GRAPH_DOWN_MASK
+        | InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK);
     return flag != 0;
   }
 
@@ -699,10 +684,8 @@ public class SwingUtil {
   public static boolean isScrollReversed() {
     if (OS.isMac()) {
       final String[] cmdAttribs = new String[] {
-        "/usr/bin/defaults",
-        "read",
-        System.getProperty("user.home")
-        + "/Library/Preferences/.GlobalPreferences.plist",
+        "/usr/bin/defaults", "read",
+        System.getProperty("user.home") + "/Library/Preferences/.GlobalPreferences.plist",
         "com.apple.swipescrolldirection"
       };
       Process process = null;
@@ -760,8 +743,7 @@ public class SwingUtil {
     PreferencesUtil.setString(preferencesClass, preferenceName, path);
   }
 
-  public static void setDescendantsEnabled(final Component component,
-    final boolean enabled) {
+  public static void setDescendantsEnabled(final Component component, final boolean enabled) {
     if (component != null) {
       component.setEnabled(enabled);
       if (component instanceof Container) {
@@ -816,10 +798,9 @@ public class SwingUtil {
       }
     } else {
       try {
-        final Method method = SwingUtil.class.getMethod("setFieldValue",
-          JComponent.class, Object.class);
-        final MethodInvoker runnable = new MethodInvoker(method,
-          SwingUtil.class, field, value);
+        final Method method = SwingUtil.class.getMethod("setFieldValue", JComponent.class,
+          Object.class);
+        final MethodInvoker runnable = new MethodInvoker(method, SwingUtil.class, field, value);
         Invoke.later(runnable);
       } catch (final Throwable t) {
         ExceptionUtil.throwUncheckedException(t);
@@ -827,8 +808,7 @@ public class SwingUtil {
     }
   }
 
-  public static void setLocationCentre(final Rectangle bounds,
-    final Window window) {
+  public static void setLocationCentre(final Rectangle bounds, final Window window) {
     final int width = window.getWidth();
     final int height = window.getHeight();
 
@@ -849,23 +829,19 @@ public class SwingUtil {
     component.setMaximumSize(size);
   }
 
-  public static void setSize(final Window window, final int minusX,
-    final int minusY) {
+  public static void setSize(final Window window, final int minusX, final int minusY) {
     final Toolkit toolkit = Toolkit.getDefaultToolkit();
     final Dimension screenSize = toolkit.getScreenSize();
     final double screenWidth = screenSize.getWidth();
     final double screenHeight = screenSize.getHeight();
-    final Dimension size = new Dimension((int)(screenWidth - minusX),
-      (int)(screenHeight - minusY));
+    final Dimension size = new Dimension((int)(screenWidth - minusX), (int)(screenHeight - minusY));
     window.setBounds(minusX / 2, minusY / 2, size.width, size.height);
     window.setPreferredSize(size);
   }
 
-  public static void setSizeAndMaximize(final JFrame frame, final int minusX,
-    final int minusY) {
+  public static void setSizeAndMaximize(final JFrame frame, final int minusX, final int minusY) {
     final Rectangle bounds = getScreenBounds((Point)null);
-    final Dimension size = new Dimension(bounds.width - minusX, bounds.height
-      - minusY);
+    final Dimension size = new Dimension(bounds.width - minusX, bounds.height - minusY);
     frame.setPreferredSize(size);
     frame.pack();
     frame.setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -888,8 +864,7 @@ public class SwingUtil {
     }
   }
 
-  public static void setTitledBorder(final JComponent component,
-    final String title) {
+  public static void setTitledBorder(final JComponent component, final String title) {
     if (component != null) {
       final TitledBorder border = new TitledBorder(title);
       component.setBorder(border);
@@ -907,11 +882,11 @@ public class SwingUtil {
     }
   }
 
-  public static void showErrorDialog(final Window window, final String title,
-    final String message, final Throwable e) {
+  public static void showErrorDialog(final Window window, final String title, final String message,
+    final Throwable e) {
     final String exceptionMessage = e.getMessage().replaceAll("\n", "<br />");
-    final String errorMessage = "<html><body><p style=\"margin-bottom: 10px\"><strong>"
-        + message + "</strong></p><pre>" + exceptionMessage + "</pre></body></p>";
+    final String errorMessage = "<html><body><p style=\"margin-bottom: 10px\"><strong>" + message
+      + "</strong></p><pre>" + exceptionMessage + "</pre></body></p>";
 
     final JScrollPane scrollPane = new JScrollPane(new JLabel(errorMessage));
     final Dimension preferredSize = scrollPane.getPreferredSize();
@@ -921,8 +896,7 @@ public class SwingUtil {
 
     scrollPane.setPreferredSize(new Dimension(width, height));
 
-    JOptionPane.showMessageDialog(window, scrollPane, title,
-      JOptionPane.ERROR_MESSAGE);
+    JOptionPane.showMessageDialog(window, scrollPane, title, JOptionPane.ERROR_MESSAGE);
   }
 
   public static final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 11);

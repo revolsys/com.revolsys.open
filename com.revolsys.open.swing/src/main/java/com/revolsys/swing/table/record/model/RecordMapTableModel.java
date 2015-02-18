@@ -10,8 +10,7 @@ public class RecordMapTableModel extends AbstractSingleRecordTableModel {
 
   public static JComponent create(final RecordDefinition recordDefinition,
     final Map<String, Object> values, final boolean editable) {
-    final RecordMapTableModel model = new RecordMapTableModel(recordDefinition,
-      values, editable);
+    final RecordMapTableModel model = new RecordMapTableModel(recordDefinition, values, editable);
     return createTable(model);
   }
 
@@ -46,10 +45,9 @@ public class RecordMapTableModel extends AbstractSingleRecordTableModel {
   }
 
   @Override
-  protected Object setObjectValue(final int rowIndex, final Object value) {
-    final String name = getFieldName(rowIndex);
-    final Object oldValue = this.values.get(name);
-    this.values.put(name, value);
+  protected Object setObjectValue(final String fieldName, final Object value) {
+    final Object oldValue = this.values.get(fieldName);
+    this.values.put(fieldName, value);
     return oldValue;
   }
 

@@ -10,8 +10,7 @@ import com.revolsys.swing.table.BaseJTable;
 
 public class SingleRecordTableModel extends AbstractSingleRecordTableModel {
   public static JComponent create(final Record object, final boolean editable) {
-    final SingleRecordTableModel model = new SingleRecordTableModel(object,
-      editable);
+    final SingleRecordTableModel model = new SingleRecordTableModel(object, editable);
     final BaseJTable table = createTable(model);
     final JTableHeader tableHeader = table.getTableHeader();
     tableHeader.setReorderingAllowed(false);
@@ -61,9 +60,9 @@ public class SingleRecordTableModel extends AbstractSingleRecordTableModel {
   }
 
   @Override
-  protected Object setObjectValue(final int rowIndex, final Object value) {
-    final Object oldValue = this.record.getValue(rowIndex);
-    this.record.setValue(rowIndex, value);
+  protected Object setObjectValue(final String fieldName, final Object value) {
+    final Object oldValue = this.record.getValue(fieldName);
+    this.record.setValue(fieldName, value);
     return oldValue;
   }
 

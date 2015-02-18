@@ -21,9 +21,8 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecordTableModel extends
-com.revolsys.swing.table.AbstractTableModel implements
-PropertyChangeSupportProxy {
+public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.AbstractTableModel
+  implements PropertyChangeSupportProxy {
 
   private static final long serialVersionUID = 1L;
 
@@ -33,8 +32,7 @@ PropertyChangeSupportProxy {
 
   private boolean editable;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   public AbstractRecordTableModel() {
     this(null);
@@ -44,8 +42,7 @@ PropertyChangeSupportProxy {
     this.recordDefinition = recordDefinition;
   }
 
-  public void addPropertyChangeListener(
-    final PropertyChangeListener propertyChangeListener) {
+  public void addPropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
     Property.addListener(this.propertyChangeSupport, propertyChangeListener);
   }
 
@@ -73,14 +70,12 @@ PropertyChangeSupportProxy {
 
   protected void firePropertyChange(final String propertyName, final int index,
     final Object oldValue, final Object newValue) {
-    this.propertyChangeSupport.fireIndexedPropertyChange(propertyName, index,
-      oldValue, newValue);
+    this.propertyChangeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
   }
 
-  protected void firePropertyChange(final String propertyName,
-    final Object oldValue, final Object newValue) {
-    this.propertyChangeSupport.firePropertyChange(propertyName, oldValue,
-      newValue);
+  protected void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
+    this.propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
   }
 
   public String getFieldName(final int attributeIndex) {
@@ -111,11 +106,9 @@ PropertyChangeSupportProxy {
     return this.readOnlyFieldNames.contains(fieldName);
   }
 
-  public abstract boolean isSelected(boolean selected, int rowIndex,
-    int columnIndex);
+  public abstract boolean isSelected(boolean selected, int rowIndex, int columnIndex);
 
-  public void removePropertyChangeListener(
-    final PropertyChangeListener propertyChangeListener) {
+  public void removePropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
     Property.removeListener(this.propertyChangeSupport, propertyChangeListener);
   }
 
@@ -176,18 +169,15 @@ PropertyChangeSupportProxy {
     return text;
   }
 
-  public Object toObjectValue(final int attributeIndex,
-    final Object displayValue) {
+  public Object toObjectValue(final String fieldName, final Object displayValue) {
     if (!Property.hasValue(displayValue)) {
       return null;
     }
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final String name = getFieldName(attributeIndex);
-    final CodeTable codeTable = recordDefinition.getCodeTableByColumn(name);
+    final CodeTable codeTable = recordDefinition.getCodeTableByColumn(fieldName);
     if (codeTable == null) {
-      final Class<?> fieldClass = recordDefinition.getFieldClass(name);
-      final Object objectValue = StringConverterRegistry.toObject(fieldClass,
-        displayValue);
+      final Class<?> fieldClass = recordDefinition.getFieldClass(fieldName);
+      final Object objectValue = StringConverterRegistry.toObject(fieldClass, displayValue);
       return objectValue;
     } else {
       if (displayValue instanceof Identifier) {

@@ -21,6 +21,7 @@ import org.jdesktop.swingx.autocomplete.ObjectToStringConverter;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.ExceptionUtil;
 
 public class ComboBox extends JComboBox implements Field {
   public static <V> DefaultComboBoxModel<V> model(final Collection<V> items) {
@@ -52,8 +53,8 @@ public class ComboBox extends JComboBox implements Field {
     this(false, items);
   }
 
-  public ComboBox(final ObjectToStringConverter converter,
-    final boolean editable, final Collection<?> items) {
+  public ComboBox(final ObjectToStringConverter converter, final boolean editable,
+    final Collection<?> items) {
     super(new Vector<Object>(items));
     setEditable(editable);
     AutoCompleteDecorator.decorate(this, converter);
@@ -65,8 +66,8 @@ public class ComboBox extends JComboBox implements Field {
     this.support = new FieldSupport(this, editorComponent, "fieldValue", null);
   }
 
-  public ComboBox(final ObjectToStringConverter converter,
-    final boolean editable, final Object... items) {
+  public ComboBox(final ObjectToStringConverter converter, final boolean editable,
+    final Object... items) {
     this(converter, editable, Arrays.asList(items));
   }
 
@@ -102,6 +103,15 @@ public class ComboBox extends JComboBox implements Field {
   }
 
   @Override
+  public Field clone() {
+    try {
+      return (Field)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
+  @Override
   protected void finalize() throws Throwable {
     final ComboBoxModel model = getModel();
     if (model instanceof Closeable) {
@@ -111,8 +121,8 @@ public class ComboBox extends JComboBox implements Field {
   }
 
   @Override
-  public void firePropertyChange(final String propertyName,
-    final Object oldValue, final Object newValue) {
+  public void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
     super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
@@ -158,8 +168,8 @@ public class ComboBox extends JComboBox implements Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message,
-    final Color foregroundColor, final Color backgroundColor) {
+  public void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
     this.support.setFieldInvalid(message, foregroundColor, backgroundColor);
   }
 

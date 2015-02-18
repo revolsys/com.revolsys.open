@@ -18,12 +18,12 @@ import com.revolsys.swing.listener.InvokeMethodActionListener;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class TextField extends JXTextField implements Field, FocusListener {
   public static final CompoundBorder READ_ONLY_BORDER = BorderFactory.createCompoundBorder(
-    BorderFactory.createEmptyBorder(0, 3, 0, 3),
-    BorderFactory.createCompoundBorder(
+    BorderFactory.createEmptyBorder(0, 3, 0, 3), BorderFactory.createCompoundBorder(
       BorderFactory.createLineBorder(new Color(224, 224, 224), 1),
       BorderFactory.createEmptyBorder(1, 2, 1, 2)));
 
@@ -65,15 +65,23 @@ public class TextField extends JXTextField implements Field, FocusListener {
     addActionListener(new InvokeMethodActionListener(this, "updateFieldValue"));
   }
 
-  public TextField(final String fieldName, final Object fieldValue,
-    final int columns) {
+  public TextField(final String fieldName, final Object fieldValue, final int columns) {
     this(fieldName, fieldValue);
     setColumns(columns);
   }
 
   @Override
-  public void firePropertyChange(final String propertyName,
-    final Object oldValue, final Object newValue) {
+  public Field clone() {
+    try {
+      return (Field)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
+  @Override
+  public void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
     super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
@@ -148,8 +156,8 @@ public class TextField extends JXTextField implements Field, FocusListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message,
-    final Color foregroundColor, final Color backgroundColor) {
+  public void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
     this.support.setFieldInvalid(message, foregroundColor, backgroundColor);
   }
 

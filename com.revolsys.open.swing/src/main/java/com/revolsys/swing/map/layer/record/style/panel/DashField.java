@@ -56,8 +56,7 @@ public class DashField extends ValueField implements ItemListener {
   @SuppressWarnings("unchecked")
   @Override
   public void itemStateChanged(final ItemEvent event) {
-    if (event.getSource() == this.dashField
-        && event.getStateChange() == ItemEvent.SELECTED) {
+    if (event.getSource() == this.dashField && event.getStateChange() == ItemEvent.SELECTED) {
       final List<Measure<Length>> dash = (List<Measure<Length>>)this.dashField.getSelectedItem();
       setFieldValue(dash);
     }

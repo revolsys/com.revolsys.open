@@ -33,8 +33,8 @@ import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.record.model.AbstractRecordTableModel;
 
-public class RecordTableCellEditor extends AbstractCellEditor implements
-TableCellEditor, KeyListener, MouseListener, TableModelListener {
+public class RecordTableCellEditor extends AbstractCellEditor implements TableCellEditor,
+  KeyListener, MouseListener, TableModelListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -94,8 +94,8 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
   }
 
   @Override
-  public Component getTableCellEditorComponent(final JTable table,
-    final Object value, final boolean isSelected, int rowIndex, int columnIndex) {
+  public Component getTableCellEditorComponent(final JTable table, final Object value,
+    final boolean isSelected, int rowIndex, int columnIndex) {
     if (table instanceof JXTable) {
       final JXTable jxTable = (JXTable)table;
       rowIndex = jxTable.convertRowIndexToModel(rowIndex);
@@ -106,8 +106,7 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
     this.fieldName = model.getFieldName(rowIndex, columnIndex);
     final RecordDefinition recordDefinition = model.getRecordDefinition();
     this.dataType = recordDefinition.getFieldType(this.fieldName);
-    this.editorComponent = (JComponent)SwingUtil.createField(recordDefinition,
-      this.fieldName, true);
+    this.editorComponent = (JComponent)SwingUtil.createField(recordDefinition, this.fieldName, true);
     if (this.editorComponent instanceof JTextField) {
       final JTextField textField = (JTextField)this.editorComponent;
       textField.setBorder(BorderFactory.createCompoundBorder(
@@ -153,6 +152,7 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
   public void keyPressed(final KeyEvent event) {
     final int keyCode = event.getKeyCode();
     if (keyCode == KeyEvent.VK_ENTER) {
+      stopCellEditing();
       if (SwingUtil.isShiftDown(event)) {
         this.table.editCell(this.rowIndex - 1, this.columnIndex);
       } else {
@@ -160,6 +160,7 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
       }
       event.consume();
     } else if (keyCode == KeyEvent.VK_TAB) {
+      stopCellEditing();
       if (SwingUtil.isShiftDown(event)) {
         this.table.editCell(this.rowIndex, this.columnIndex - 1);
       } else {
@@ -229,11 +230,11 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
     } catch (final IndexOutOfBoundsException e) {
       return true;
     } catch (final Throwable t) {
-      final int result = JOptionPane.showConfirmDialog(this.editorComponent,
-        "<html><p><b>'" + getCellEditorValue() + "' is not a valid "
-            + this.dataType.getValidationName()
-            + ".</b></p><p>Discard changes (Yes) or edit field (No).</p></html>",
-            "Invalid value", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+      t.printStackTrace();
+      final int result = JOptionPane.showConfirmDialog(this.editorComponent, "<html><p><b>'"
+        + getCellEditorValue() + "' is not a valid " + this.dataType.getValidationName()
+        + ".</b></p><p>Discard changes (Yes) or edit field (No).</p></html>", "Invalid value",
+        JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
       if (result == JOptionPane.YES_OPTION) {
         cancelCellEditing();
         return true;

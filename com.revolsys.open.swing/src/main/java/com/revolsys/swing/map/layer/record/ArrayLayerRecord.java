@@ -73,8 +73,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     final Object newValue) {
     final AbstractLayer layer = getLayer();
     if (layer.isEventsEnabled()) {
-      final PropertyChangeEvent event = new PropertyChangeEvent(this,
-        fieldName, oldValue, newValue);
+      final PropertyChangeEvent event = new PropertyChangeEvent(this, fieldName, oldValue, newValue);
       layer.propertyChange(event);
     }
   }
@@ -201,8 +200,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
       final FieldDefinition attribute = getRecordDefinition().getField(name);
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
-        if (value == null || value instanceof String
-            && !Property.hasValue((String)value)) {
+        if (value == null || value instanceof String && !Property.hasValue((String)value)) {
           return false;
         }
       }
@@ -269,12 +267,10 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         // Allow modification on initialization
       } else if (RecordState.New.equals(state)) {
         if (!layer.isCanAddRecords()) {
-          throw new IllegalStateException(
-            "Adding new objects is not supported for layer " + layer);
+          throw new IllegalStateException("Adding new objects is not supported for layer " + layer);
         }
       } else if (RecordState.Deleted.equals(state)) {
-        throw new IllegalStateException(
-          "Cannot edit a deleted object for layer " + layer);
+        throw new IllegalStateException("Cannot edit a deleted object for layer " + layer);
       } else {
         if (layer.isCanEditRecords()) {
           final Object originalValue = getOriginalValue(fieldName);
@@ -293,8 +289,7 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
             this.originalValues.put(fieldName, originalValue);
           }
         } else {
-          throw new IllegalStateException(
-            "Editing objects is not supported for layer " + layer);
+          throw new IllegalStateException("Editing objects is not supported for layer " + layer);
         }
       }
       super.setValue(index, value);
@@ -303,5 +298,9 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
         layer.updateRecordState(this);
       }
     }
+  }
+
+  @Override
+  public void validate() {
   }
 }

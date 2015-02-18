@@ -44,6 +44,8 @@ public abstract class AbstractCodeTable implements Closeable, PropertyChangeSupp
 
   private boolean caseSensitive = false;
 
+  private List<Identifier> identifiers = new ArrayList<>();
+
   public AbstractCodeTable() {
   }
 
@@ -59,6 +61,7 @@ public abstract class AbstractCodeTable implements Closeable, PropertyChangeSupp
         this.maxId = longValue;
       }
     }
+    this.identifiers.add(id);
     this.idValueCache.put(id, values);
     this.idIdCache.put(id, id);
     this.valueIdCache.put(values, id);
@@ -89,6 +92,7 @@ public abstract class AbstractCodeTable implements Closeable, PropertyChangeSupp
   public AbstractCodeTable clone() {
     try {
       final AbstractCodeTable clone = (AbstractCodeTable)super.clone();
+      clone.identifiers = new ArrayList<>(this.identifiers);
       clone.idValueCache = new LinkedHashMap<>(this.idValueCache);
       clone.idIdCache = new LinkedHashMap<>(this.idIdCache);
       clone.valueIdCache = new LinkedHashMap<>(this.valueIdCache);
@@ -102,6 +106,7 @@ public abstract class AbstractCodeTable implements Closeable, PropertyChangeSupp
   @PreDestroy
   public void close() {
     this.propertyChangeSupport = null;
+    this.identifiers.clear();
     this.idValueCache.clear();
     this.idIdCache.clear();
     this.stringIdMap.clear();
@@ -183,6 +188,10 @@ public abstract class AbstractCodeTable implements Closeable, PropertyChangeSupp
       id = this.valueIdCache.get(normalizedValues);
     }
     return id;
+  }
+
+  public List<Identifier> getIdentifiers() {
+    return Collections.unmodifiableList(this.identifiers);
   }
 
   public Identifier getIdExact(final List<Object> values) {
@@ -360,6 +369,7 @@ public abstract class AbstractCodeTable implements Closeable, PropertyChangeSupp
 
   @Override
   public synchronized void refresh() {
+    this.identifiers.clear();
     this.idValueCache.clear();
     this.stringIdMap.clear();
     this.valueIdCache.clear();

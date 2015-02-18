@@ -1140,7 +1140,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
             }
             final Object value = event.getNewValue();
             final RecordDefinition recordDefinition = getRecordDefinition();
-            if ("errorsUpdated".equals(propertyName)) {
+            if ("qaMessagesUpdated".equals(propertyName)) {
               updateErrors();
             } else if (recordDefinition.hasField(propertyName)) {
               setFieldValue(propertyName, value, isFieldValidationEnabled());

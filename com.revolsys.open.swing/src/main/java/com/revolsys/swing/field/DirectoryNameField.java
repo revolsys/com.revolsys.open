@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
 import com.revolsys.swing.layout.SpringLayoutUtil;
 import com.revolsys.swing.listener.InvokeMethodActionListener;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
 public class DirectoryNameField extends JPanel implements Field {
@@ -33,8 +34,7 @@ public class DirectoryNameField extends JPanel implements Field {
 
     add(this.directoryName);
     this.browseButton.setText("Browse...");
-    this.browseButton.addActionListener(new InvokeMethodActionListener(this,
-        "browseClick"));
+    this.browseButton.addActionListener(new InvokeMethodActionListener(this, "browseClick"));
     add(this.browseButton);
     SpringLayoutUtil.makeCompactGrid(this, 1, 2, 5, 5, 5, 5);
   }
@@ -48,8 +48,7 @@ public class DirectoryNameField extends JPanel implements Field {
       final String directoryPath = getDirectoryPath();
       final File initialFile = new File(directoryPath);
 
-      if (initialFile.getParentFile() != null
-          && initialFile.getParentFile().exists()) {
+      if (initialFile.getParentFile() != null && initialFile.getParentFile().exists()) {
         fileChooser.setCurrentDirectory(initialFile.getParentFile());
       }
 
@@ -62,14 +61,22 @@ public class DirectoryNameField extends JPanel implements Field {
         }
       }
     } catch (final Throwable t) {
-      JOptionPane.showMessageDialog(this, t.getMessage(), "Error",
-        JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(this, t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
   }
 
   @Override
-  public void firePropertyChange(final String propertyName,
-    final Object oldValue, final Object newValue) {
+  public Field clone() {
+    try {
+      return (Field)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
+  @Override
+  public void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
     super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
@@ -151,8 +158,8 @@ public class DirectoryNameField extends JPanel implements Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message,
-    final Color foregroundColor, final Color backgroundColor) {
+  public void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
     this.directoryName.setForeground(foregroundColor);
     this.directoryName.setSelectedTextColor(foregroundColor);
     this.directoryName.setBackground(backgroundColor);

@@ -1,5 +1,6 @@
 package com.revolsys.gis.esri.gdb.file.capi;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -81,6 +82,11 @@ public class FileGdbDomainCodeTable implements CodeTable {
       return createValue((String)values[0]);
     }
     return id;
+  }
+
+  @Override
+  public List<Identifier> getIdentifiers() {
+    return new ArrayList<>(getCodes().keySet());
   }
 
   @Override

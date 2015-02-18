@@ -14,10 +14,10 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public class Slider extends JSlider implements Field, FocusListener,
-ChangeListener {
+public class Slider extends JSlider implements Field, FocusListener, ChangeListener {
 
   /**
    *
@@ -64,16 +64,15 @@ ChangeListener {
     addChangeListener(this);
   }
 
-  public Slider(final String fieldName, final int min, final int max,
-    final int value) {
+  public Slider(final String fieldName, final int min, final int max, final int value) {
     super(min, max, value);
     setFieldName(fieldName);
     addChangeListener(this);
     this.fieldValue = value;
   }
 
-  public Slider(final String fieldName, final int orientation, final int min,
-    final int max, final int value) {
+  public Slider(final String fieldName, final int orientation, final int min, final int max,
+    final int value) {
     super(orientation, min, max, value);
     setFieldName(fieldName);
     addChangeListener(this);
@@ -81,8 +80,17 @@ ChangeListener {
   }
 
   @Override
-  public void firePropertyChange(final String propertyName,
-    final Object oldValue, final Object newValue) {
+  public Field clone() {
+    try {
+      return (Field)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
+  @Override
+  public void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
     super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
@@ -144,8 +152,8 @@ ChangeListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message,
-    final Color foregroundColor, final Color backgroundColor) {
+  public void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
     setForeground(foregroundColor);
     setBackground(backgroundColor);
     this.errorMessage = message;
@@ -187,8 +195,7 @@ ChangeListener {
       if (oldValue != newValue) {
         this.fieldValue = newValue;
         firePropertyChange(this.getFieldName(), oldValue, newValue);
-        SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
-          oldValue, newValue);
+        SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this, oldValue, newValue);
       }
     }
 

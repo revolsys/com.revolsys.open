@@ -10,6 +10,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.undo.CascadingUndoManager;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
@@ -36,8 +37,17 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   }
 
   @Override
-  public void firePropertyChange(final String propertyName,
-    final Object oldValue, final Object newValue) {
+  public Field clone() {
+    try {
+      return (Field)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
+  @Override
+  public void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
     super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
@@ -89,8 +99,8 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   }
 
   @Override
-  public void setFieldInvalid(final String message,
-    final Color foregroundColor, final Color backgroundColor) {
+  public void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
     setForeground(foregroundColor);
     setSelectedTextColor(foregroundColor);
     setBackground(backgroundColor);
@@ -122,8 +132,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
     if (!EqualsRegistry.equal(oldValue, value)) {
       this.fieldValue = (String)value;
       firePropertyChange(this.fieldName, oldValue, value);
-      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this,
-        oldValue, value);
+      SetFieldValueUndoableEdit.create(this.undoManager.getParent(), this, oldValue, value);
     }
   }
 
@@ -141,8 +150,7 @@ public class SearchField extends JXSearchField implements FocusListener, Field {
   }
 
   @Override
-  public void setUseNativeSearchFieldIfPossible(
-    boolean useNativeSearchFieldIfPossible) {
+  public void setUseNativeSearchFieldIfPossible(boolean useNativeSearchFieldIfPossible) {
     if (OS.isMac()) {
       useNativeSearchFieldIfPossible = false;
     }

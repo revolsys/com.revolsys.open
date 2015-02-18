@@ -32,6 +32,7 @@ import com.revolsys.swing.action.enablecheck.OrEnableCheck;
 import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
+import com.revolsys.swing.map.layer.record.BatchUpdate;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.component.FieldFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
@@ -240,19 +241,28 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
 
   public void flipFields() {
     final LayerRecord record = getEventRowObject();
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
-    property.reverseAttributes(record);
+    try (
+      BatchUpdate batchUpdate = new BatchUpdate(record)) {
+      final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
+      property.reverseAttributes(record);
+    }
   }
 
   public void flipLineOrientation() {
     final LayerRecord record = getEventRowObject();
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
-    property.reverseGeometry(record);
+    try (
+      BatchUpdate batchUpdate = new BatchUpdate(record)) {
+      final DirectionalAttributes property = DirectionalAttributes.getProperty(record);
+      property.reverseGeometry(record);
+    }
   }
 
   public void flipRecordOrientation() {
     final LayerRecord record = getEventRowObject();
-    DirectionalAttributes.reverse(record);
+    try (
+      BatchUpdate batchUpdate = new BatchUpdate(record)) {
+      DirectionalAttributes.reverse(record);
+    }
   }
 
   public Collection<? extends String> getColumnNames() {

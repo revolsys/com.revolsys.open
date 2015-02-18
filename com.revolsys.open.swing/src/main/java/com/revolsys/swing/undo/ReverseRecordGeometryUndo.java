@@ -1,9 +1,10 @@
 package com.revolsys.swing.undo;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.swing.map.layer.record.BatchUpdate;
+import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class ReverseRecordGeometryUndo extends AbstractUndoableEdit {
 
@@ -12,19 +13,19 @@ public class ReverseRecordGeometryUndo extends AbstractUndoableEdit {
    */
   private static final long serialVersionUID = 1L;
 
-  private final Record object;
+  private final LayerRecord record;
 
   private final Geometry oldValue;
 
-  public ReverseRecordGeometryUndo(final Record object) {
-    this.object = object;
-    this.oldValue = object.getGeometryValue();
+  public ReverseRecordGeometryUndo(final LayerRecord record) {
+    this.record = record;
+    this.oldValue = record.getGeometryValue();
   }
 
   @Override
   public boolean canRedo() {
     if (super.canRedo()) {
-      final Geometry value = this.object.getGeometryValue();
+      final Geometry value = this.record.getGeometryValue();
       if (EqualsRegistry.equal(value, this.oldValue)) {
         return true;
       }
@@ -35,7 +36,7 @@ public class ReverseRecordGeometryUndo extends AbstractUndoableEdit {
   @Override
   public boolean canUndo() {
     if (super.canUndo()) {
-      final Geometry value = this.object.getGeometryValue();
+      final Geometry value = this.record.getGeometryValue();
       if (EqualsRegistry.equal(value.reverse(), this.oldValue)) {
         return true;
       }
@@ -45,14 +46,20 @@ public class ReverseRecordGeometryUndo extends AbstractUndoableEdit {
 
   @Override
   protected void doRedo() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(this.object);
-    property.reverseGeometry(this.object);
+    try (
+      BatchUpdate batchUpdate = new BatchUpdate(this.record)) {
+      final DirectionalAttributes property = DirectionalAttributes.getProperty(this.record);
+      property.reverseGeometry(this.record);
+    }
   }
 
   @Override
   protected void doUndo() {
-    final DirectionalAttributes property = DirectionalAttributes.getProperty(this.object);
-    property.reverseGeometry(this.object);
+    try (
+      BatchUpdate batchUpdate = new BatchUpdate(this.record)) {
+      final DirectionalAttributes property = DirectionalAttributes.getProperty(this.record);
+      property.reverseGeometry(this.record);
+    }
   }
 
   @Override

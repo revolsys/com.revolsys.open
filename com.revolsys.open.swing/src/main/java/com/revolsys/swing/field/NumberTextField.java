@@ -21,14 +21,12 @@ import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.undo.UndoManager;
+import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
-public class NumberTextField extends JXTextField implements Field,
-DocumentListener, FocusListener {
-
-  public static Number createMaximumValue(final DataType dataType,
-    final int length, final int scale) {
+public class NumberTextField extends JXTextField implements Field, DocumentListener, FocusListener {
+  public static Number createMaximumValue(final DataType dataType, final int length, final int scale) {
     final Class<?> javaClass = dataType.getJavaClass();
     final StringBuilder text = new StringBuilder(length);
     for (int i = length - scale + 1; i > 1; i--) {
@@ -97,8 +95,8 @@ DocumentListener, FocusListener {
     }
   }
 
-  private static int getLength(final DataType dataType, int length,
-    final int scale, final BigDecimal minimumValue) {
+  private static int getLength(final DataType dataType, int length, final int scale,
+    final BigDecimal minimumValue) {
     if (length == 0) {
       final Class<?> javaClass = dataType.getJavaClass();
       if (javaClass == Byte.class) {
@@ -146,26 +144,22 @@ DocumentListener, FocusListener {
     this(dataType, length, 0);
   }
 
-  public NumberTextField(final DataType dataType, final int length,
-    final int scale) {
-    this(dataType, length, scale, null, createMaximumValue(dataType, length,
-      scale));
+  public NumberTextField(final DataType dataType, final int length, final int scale) {
+    this(dataType, length, scale, null, createMaximumValue(dataType, length, scale));
   }
 
-  public NumberTextField(final DataType dataType, final int length,
-    final int scale, final Number minimumValue, final Number maximumValue) {
+  public NumberTextField(final DataType dataType, final int length, final int scale,
+    final Number minimumValue, final Number maximumValue) {
     this(null, dataType, length, scale, minimumValue, maximumValue);
   }
 
-  public NumberTextField(final String fieldName, final DataType dataType,
-    final int length, final int scale) {
-    this(fieldName, dataType, length, scale, null, createMaximumValue(dataType,
-      length, scale));
+  public NumberTextField(final String fieldName, final DataType dataType, final int length,
+    final int scale) {
+    this(fieldName, dataType, length, scale, null, createMaximumValue(dataType, length, scale));
   }
 
-  public NumberTextField(String fieldName, final DataType dataType,
-    final int length, final int scale, final Number minimumValue,
-    final Number maximumValue) {
+  public NumberTextField(String fieldName, final DataType dataType, final int length,
+    final int scale, final Number minimumValue, final Number maximumValue) {
     if (!Property.hasValue(fieldName)) {
       fieldName = "fieldValue";
     }
@@ -189,8 +183,17 @@ DocumentListener, FocusListener {
   }
 
   @Override
-  public void firePropertyChange(final String propertyName,
-    final Object oldValue, final Object newValue) {
+  public Field clone() {
+    try {
+      return (Field)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
+  @Override
+  public void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
     super.firePropertyChange(propertyName, oldValue, newValue);
   }
 
@@ -288,8 +291,8 @@ DocumentListener, FocusListener {
   }
 
   @Override
-  public void setFieldInvalid(final String message,
-    final Color foregroundColor, final Color backgroundColor) {
+  public void setFieldInvalid(final String message, final Color foregroundColor,
+    final Color backgroundColor) {
     this.support.setFieldInvalid(message, foregroundColor, backgroundColor);
   }
 
@@ -389,22 +392,19 @@ DocumentListener, FocusListener {
         if (this.dataType.equals(DataTypes.DOUBLE)) {
         } else if (this.dataType.equals(DataTypes.FLOAT)) {
         } else {
-          message = "'" + text + "' is not a valid "
-              + this.dataType.getValidationName() + ".";
+          message = "'" + text + "' is not a valid " + this.dataType.getValidationName() + ".";
         }
       } else if ("Infinity".equalsIgnoreCase(text)) {
         if (this.dataType.equals(DataTypes.DOUBLE)) {
         } else if (this.dataType.equals(DataTypes.FLOAT)) {
         } else {
-          message = "'" + text + "' is not a valid "
-              + this.dataType.getValidationName() + ".";
+          message = "'" + text + "' is not a valid " + this.dataType.getValidationName() + ".";
         }
       } else if ("-Infinity".equalsIgnoreCase(text)) {
         if (this.dataType.equals(DataTypes.DOUBLE)) {
         } else if (this.dataType.equals(DataTypes.FLOAT)) {
         } else {
-          message = "'" + text + "' is not a valid "
-              + this.dataType.getValidationName() + ".";
+          message = "'" + text + "' is not a valid " + this.dataType.getValidationName() + ".";
         }
       } else {
         try {
@@ -414,14 +414,12 @@ DocumentListener, FocusListener {
           }
           if (number.scale() > this.scale) {
             message = "Number of decimal places must be < " + this.scale;
-          } else if (this.minimumValue != null
-              && this.minimumValue.compareTo(number) > 0) {
-            message = MathUtil.toString(number) + " < "
-                + MathUtil.toString(this.minimumValue) + " (minimum)";
-          } else if (this.maximumValue != null
-              && this.maximumValue.compareTo(number) < 0) {
-            message = MathUtil.toString(number) + " > "
-                + MathUtil.toString(this.maximumValue) + " (maximum)";
+          } else if (this.minimumValue != null && this.minimumValue.compareTo(number) > 0) {
+            message = MathUtil.toString(number) + " < " + MathUtil.toString(this.minimumValue)
+              + " (minimum)";
+          } else if (this.maximumValue != null && this.maximumValue.compareTo(number) < 0) {
+            message = MathUtil.toString(number) + " > " + MathUtil.toString(this.maximumValue)
+              + " (maximum)";
           } else {
             // number = number.setScale(scale);
             // final String newText = number.toPlainString();
@@ -431,8 +429,7 @@ DocumentListener, FocusListener {
             message = null;
           }
         } catch (final Throwable t) {
-          message = "'" + text + "' is not a valid "
-              + this.dataType.getValidationName() + ".";
+          message = "'" + text + "' is not a valid " + this.dataType.getValidationName() + ".";
         }
       }
     }

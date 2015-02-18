@@ -12,8 +12,7 @@ import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.util.Property;
 
-public abstract class AbstractLayerRecord extends AbstractRecord implements
-LayerRecord {
+public abstract class AbstractLayerRecord extends AbstractRecord implements LayerRecord {
 
   private final AbstractRecordLayer layer;
 
@@ -37,8 +36,7 @@ LayerRecord {
     final Object newValue) {
     final AbstractLayer layer = getLayer();
     if (layer.isEventsEnabled()) {
-      final PropertyChangeEvent event = new PropertyChangeEvent(this,
-        fieldName, oldValue, newValue);
+      final PropertyChangeEvent event = new PropertyChangeEvent(this, fieldName, oldValue, newValue);
       layer.propertyChange(event);
     }
   }
@@ -146,8 +144,7 @@ LayerRecord {
       final FieldDefinition attribute = getRecordDefinition().getField(name);
       if (attribute != null && attribute.isRequired()) {
         final Object value = getValue(name);
-        if (value == null || value instanceof String
-            && !Property.hasValue((String)value)) {
+        if (value == null || value instanceof String && !Property.hasValue((String)value)) {
           return false;
         }
       }
@@ -193,6 +190,9 @@ LayerRecord {
   @Override
   public boolean setEventsEnabled(final boolean eventsEnabled) {
     return this.layer.setEventsEnabled(eventsEnabled);
+  }
+
+  public void validate() {
   }
 
 }

@@ -26,8 +26,8 @@ import com.revolsys.swing.table.record.row.RecordRowTable;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public abstract class RecordRowTableModel extends AbstractRecordTableModel
-implements SortableTableModel, CellEditorListener {
+public abstract class RecordRowTableModel extends AbstractRecordTableModel implements
+  SortableTableModel, CellEditorListener {
 
   public static final String LOADING_VALUE = "\u2026";
 
@@ -230,8 +230,7 @@ implements SortableTableModel, CellEditorListener {
   }
 
   @Override
-  public boolean isSelected(boolean selected, final int rowIndex,
-    final int columnIndex) {
+  public boolean isSelected(boolean selected, final int rowIndex, final int columnIndex) {
     final int[] selectedRows = this.table.getSelectedRows();
     selected = false;
     for (final int selectedRow : selectedRows) {
@@ -329,16 +328,15 @@ implements SortableTableModel, CellEditorListener {
   }
 
   @Override
-  public void setValueAt(final Object value, final int rowIndex,
-    final int columnIndex) {
+  public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     if (isCellEditable(rowIndex, columnIndex)) {
 
       if (columnIndex >= this.fieldsOffset) {
         final Record record = getRecord(rowIndex);
         if (record != null) {
-          final String name = getFieldName(columnIndex);
-          final Object objectValue = toObjectValue(columnIndex, value);
-          record.setValue(name, objectValue);
+          final String fieldName = getFieldName(columnIndex);
+          final Object objectValue = toObjectValue(fieldName, value);
+          record.setValue(fieldName, objectValue);
         }
       }
     }
@@ -346,8 +344,7 @@ implements SortableTableModel, CellEditorListener {
   }
 
   @Override
-  public String toCopyValue(final int rowIndex, int attributeIndex,
-    final Object objectValue) {
+  public String toCopyValue(final int rowIndex, int attributeIndex, final Object objectValue) {
     if (attributeIndex < this.fieldsOffset) {
       return StringConverterRegistry.toString(objectValue);
     } else {
@@ -386,8 +383,8 @@ implements SortableTableModel, CellEditorListener {
   }
 
   @Override
-  public final String toDisplayValue(final int rowIndex,
-    final int attributeIndex, final Object objectValue) {
+  public final String toDisplayValue(final int rowIndex, final int attributeIndex,
+    final Object objectValue) {
     int rowHeight = this.table.getRowHeight();
     String displayValue;
     final Record record = getRecord(rowIndex);
@@ -398,8 +395,7 @@ implements SortableTableModel, CellEditorListener {
       if (record.getState() == RecordState.Initalizing) {
         displayValue = LOADING_VALUE;
       } else {
-        displayValue = toDisplayValueInternal(rowIndex, attributeIndex,
-          objectValue);
+        displayValue = toDisplayValueInternal(rowIndex, attributeIndex, objectValue);
       }
     }
     if (rowHeight != this.table.getRowHeight(rowIndex)) {
@@ -408,8 +404,8 @@ implements SortableTableModel, CellEditorListener {
     return displayValue;
   }
 
-  protected String toDisplayValueInternal(final int rowIndex,
-    final int attributeIndex, final Object objectValue) {
+  protected String toDisplayValueInternal(final int rowIndex, final int attributeIndex,
+    final Object objectValue) {
     return super.toDisplayValue(rowIndex, attributeIndex, objectValue);
   }
 }

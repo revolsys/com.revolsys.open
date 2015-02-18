@@ -33,8 +33,8 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractRecord extends AbstractMap<String, Object>
-implements Record, Cloneable {
+public abstract class AbstractRecord extends AbstractMap<String, Object> implements Record,
+  Cloneable {
 
   /**
    * Create a clone of the object.
@@ -346,8 +346,7 @@ implements Record, Cloneable {
       return (T)getValue(index);
     } catch (final NullPointerException e) {
       LoggerFactory.getLogger(getClass()).warn(
-        "Attribute " + recordDefinition.getPath() + "." + name
-        + " does not exist");
+        "Attribute " + recordDefinition.getPath() + "." + name + " does not exist");
       return null;
     }
   }
@@ -367,8 +366,8 @@ implements Record, Cloneable {
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
-            final CodeTable codeTable = this.getRecordDefinition()
-                .getCodeTableByColumn(propertyName);
+            final CodeTable codeTable = this.getRecordDefinition().getCodeTableByColumn(
+              propertyName);
             if (codeTable != null) {
               propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
             }
@@ -378,16 +377,14 @@ implements Record, Cloneable {
         }
       } else if (propertyValue instanceof Geometry) {
         final Geometry geometry = (Geometry)propertyValue;
-        propertyValue = GeometryProperties.getGeometryProperty(geometry,
-          propertyName);
+        propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
       } else if (propertyValue instanceof Map) {
         final Map<String, Object> map = (Map<String, Object>)propertyValue;
         propertyValue = map.get(propertyName);
         if (propertyValue == null) {
           return null;
         } else if (i + 1 < propertyPath.length) {
-          final CodeTable codeTable = this.getRecordDefinition()
-              .getCodeTableByColumn(propertyName);
+          final CodeTable codeTable = this.getRecordDefinition().getCodeTableByColumn(propertyName);
           if (codeTable != null) {
             propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
           }
@@ -396,8 +393,7 @@ implements Record, Cloneable {
         try {
           propertyValue = JavaBeanUtil.getProperty(propertyValue, propertyName);
         } catch (final IllegalArgumentException e) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Path does not exist " + path, e);
+          LoggerFactory.getLogger(getClass()).error("Path does not exist " + path, e);
           return null;
         }
       }
@@ -406,8 +402,7 @@ implements Record, Cloneable {
   }
 
   @Override
-  public Map<String, Object> getValueMap(
-    final Collection<? extends CharSequence> fieldNames) {
+  public Map<String, Object> getValueMap(final Collection<? extends CharSequence> fieldNames) {
     final Map<String, Object> values = new HashMap<String, Object>();
     for (final CharSequence name : fieldNames) {
       final Object value = getValue(name);
@@ -444,6 +439,16 @@ implements Record, Cloneable {
   public boolean hasValue(final CharSequence name) {
     final Object value = getValue(name);
     return Property.hasValue(value);
+  }
+
+  @Override
+  public boolean hasValuesAny(final String... fieldNames) {
+    for (final String fieldName : fieldNames) {
+      if (hasValue(fieldName)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -501,14 +506,12 @@ implements Record, Cloneable {
   @Override
   public void setIdValue(final Object id) {
     final int index = this.getRecordDefinition().getIdFieldIndex();
-    if (this.getState() == RecordState.New
-        || this.getState() == RecordState.Initalizing) {
+    if (this.getState() == RecordState.New || this.getState() == RecordState.Initalizing) {
       setValue(index, id);
     } else {
       final Object oldId = getValue(index);
       if (oldId != null && !EqualsRegistry.equal(id, oldId)) {
-        throw new IllegalStateException(
-            "Cannot change the ID on a persisted object");
+        throw new IllegalStateException("Cannot change the ID on a persisted object");
       }
     }
   }
@@ -531,17 +534,15 @@ implements Record, Cloneable {
 
       } else {
         final CharSequence key = name.subSequence(0, dotIndex);
-        final CharSequence subKey = name.subSequence(dotIndex + 1,
-          name.length());
+        final CharSequence subKey = name.subSequence(dotIndex + 1, name.length());
         final Object objectValue = getValue(key);
         if (objectValue == null) {
-          final DataType attributeType = this.getRecordDefinition()
-              .getFieldType(key);
+          final DataType attributeType = this.getRecordDefinition().getFieldType(key);
           if (attributeType != null) {
             if (attributeType.getJavaClass() == Record.class) {
               final String typePath = attributeType.getName();
               final RecordDefinitionFactory recordDefinitionFactory = this.getRecordDefinition()
-                  .getRecordDefinitionFactory();
+                .getRecordDefinitionFactory();
               final RecordDefinition subRecordDefinition = recordDefinitionFactory.getRecordDefinition(typePath);
               final RecordFactory recordFactory = subRecordDefinition.getRecordFactory();
               final Record subRecord = recordFactory.createRecord(subRecordDefinition);
@@ -581,13 +582,11 @@ implements Record, Cloneable {
       codeTableFieldName = name.substring(0, dotIndex);
       codeTableValueName = name.substring(dotIndex + 1);
     }
-    final CodeTable codeTable = this.getRecordDefinition()
-        .getCodeTableByColumn(codeTableFieldName);
+    final CodeTable codeTable = this.getRecordDefinition().getCodeTableByColumn(codeTableFieldName);
     if (codeTable == null) {
       if (dotIndex != -1) {
         LoggerFactory.getLogger(getClass()).debug(
-          "Cannot get code table for " + this.getRecordDefinition().getPath()
-          + "." + name);
+          "Cannot get code table for " + this.getRecordDefinition().getPath() + "." + name);
         return;
       }
       setValue(name, value);
@@ -609,8 +608,7 @@ implements Record, Cloneable {
           targetValue = Value.getValue(id);
         }
       } else {
-        targetValue = codeTable.getId(Collections.singletonMap(
-          codeTableValueName, value));
+        targetValue = codeTable.getId(Collections.singletonMap(codeTableValueName, value));
       }
       if (targetValue == null) {
         targetValue = value;
@@ -620,8 +618,8 @@ implements Record, Cloneable {
   }
 
   @Override
-  public <T> T setValueByPath(final CharSequence attributePath,
-    final Record source, final String sourceAttributePath) {
+  public <T> T setValueByPath(final CharSequence attributePath, final Record source,
+    final String sourceAttributePath) {
     @SuppressWarnings("unchecked")
     final T value = (T)source.getValueByPath(sourceAttributePath);
     setValueByPath(attributePath, value);
@@ -631,8 +629,7 @@ implements Record, Cloneable {
   @Override
   public void setValues(final Map<String, ? extends Object> values) {
     if (values != null) {
-      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
-          values).entrySet()) {
+      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(values).entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValue(name, value);
@@ -641,8 +638,7 @@ implements Record, Cloneable {
   }
 
   @Override
-  public void setValues(final Map<String, Object> record,
-    final Collection<String> attributesNames) {
+  public void setValues(final Map<String, Object> record, final Collection<String> attributesNames) {
     for (final String fieldName : attributesNames) {
       final Object oldValue = getValue(fieldName);
       Object newValue = record.get(fieldName);
@@ -654,8 +650,7 @@ implements Record, Cloneable {
   }
 
   @Override
-  public void setValues(final Map<String, Object> record,
-    final String... fieldNames) {
+  public void setValues(final Map<String, Object> record, final String... fieldNames) {
     setValues(record, Arrays.asList(fieldNames));
   }
 
@@ -671,8 +666,7 @@ implements Record, Cloneable {
   @Override
   public void setValuesByPath(final Map<String, ? extends Object> values) {
     if (values != null) {
-      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(
-          values).entrySet()) {
+      for (final Entry<String, Object> defaultValue : new LinkedHashMap<String, Object>(values).entrySet()) {
         final String name = defaultValue.getKey();
         final Object value = defaultValue.getValue();
         setValueByPath(name, value);
@@ -693,10 +687,7 @@ implements Record, Cloneable {
     for (int i = 0; i < this.getRecordDefinition().getFieldCount(); i++) {
       final Object value = getValue(i);
       if (value != null) {
-        s.append(this.getRecordDefinition().getFieldName(i))
-        .append('=')
-        .append(value)
-        .append('\n');
+        s.append(this.getRecordDefinition().getFieldName(i)).append('=').append(value).append('\n');
       }
     }
     s.append(')');
@@ -708,10 +699,9 @@ implements Record, Cloneable {
     switch (this.getState()) {
       case Persisted:
         this.setState(RecordState.Modified);
-        break;
+      break;
       case Deleted:
-        throw new IllegalStateException(
-            "Cannot modify an object which has been deleted");
+        throw new IllegalStateException("Cannot modify an object which has been deleted");
     }
   }
 

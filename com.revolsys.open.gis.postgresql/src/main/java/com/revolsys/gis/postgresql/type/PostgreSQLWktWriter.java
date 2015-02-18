@@ -381,7 +381,11 @@ public class PostgreSQLWktWriter {
       out.print(0);
     } else {
       final double ordinate = coordinates.getCoordinate(ordinateIndex);
-      out.print(MathUtil.toString(ordinate));
+      if (Double.isNaN(ordinate)) {
+        out.print(0);
+      } else {
+        out.print(MathUtil.toString(ordinate));
+      }
     }
   }
 

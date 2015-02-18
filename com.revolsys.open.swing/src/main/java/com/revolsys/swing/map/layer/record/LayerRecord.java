@@ -35,4 +35,6 @@ public interface LayerRecord extends Record, EventsEnabler {
   LayerRecord revertChanges();
 
   void revertEmptyFields();
+
+  void validate();
 }

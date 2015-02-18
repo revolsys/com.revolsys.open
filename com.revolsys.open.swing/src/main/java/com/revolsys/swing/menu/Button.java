@@ -7,8 +7,10 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public class Button extends JButton implements PropertyChangeListener {
@@ -33,9 +35,13 @@ public class Button extends JButton implements PropertyChangeListener {
   }
 
   @Override
-  public void propertyChange(final PropertyChangeEvent evt) {
-    final boolean enabled = this.enableCheck.isEnabled();
-    setEnabled(enabled);
+  public void propertyChange(final PropertyChangeEvent event) {
+    if (SwingUtil.isEventDispatchThread()) {
+      final boolean enabled = this.enableCheck.isEnabled();
+      setEnabled(enabled);
+    } else {
+      Invoke.later(this, "propertyChange", event);
+    }
   }
 
   public void setEnableCheck(final EnableCheck enableCheck) {

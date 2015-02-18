@@ -47,14 +47,13 @@ public class CodedValueDomain extends Domain implements CodeTable {
     switch (getFieldType()) {
       case esriFieldTypeInteger:
         id = (int)++this.maxId;
-        break;
+      break;
       case esriFieldTypeSmallInteger:
         id = (short)++this.maxId;
-        break;
+      break;
 
       default:
-        throw new RuntimeException("Cannot generate code for field type "
-            + getFieldType());
+        throw new RuntimeException("Cannot generate code for field type " + getFieldType());
     }
     addCodedValue(id, name);
     return SingleIdentifier.create(id);
@@ -109,9 +108,13 @@ public class CodedValueDomain extends Domain implements CodeTable {
         return id;
       }
     } else {
-      throw new IllegalArgumentException("Expecting only a single value "
-          + values);
+      throw new IllegalArgumentException("Expecting only a single value " + values);
     }
+  }
+
+  @Override
+  public List<Identifier> getIdentifiers() {
+    return new ArrayList<>(this.idValueMap.keySet());
   }
 
   @Override

@@ -1927,7 +1927,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     if (isExists()) {
       final Object source = event.getSource();
       final String propertyName = event.getPropertyName();
-      if (!"errorsUpdated".equals(propertyName)) {
+      if (!"qaMessagesUpdated".equals(propertyName)) {
         if (source instanceof LayerRecord) {
           final LayerRecord record = (LayerRecord)source;
           if (record.getLayer() == this) {

@@ -4,8 +4,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Closeable;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
@@ -14,22 +12,18 @@ import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
 public class CodeTableComboBoxModel extends AbstractListModel<Object> implements
-ComboBoxModel<Object>, PropertyChangeListener, Closeable {
-  public static ComboBox create(final String fieldName,
-    final CodeTable codeTable, final boolean allowNull) {
-    final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable,
-      allowNull);
+  ComboBoxModel<Object>, PropertyChangeListener, Closeable {
+  public static ComboBox create(final String fieldName, final CodeTable codeTable,
+    final boolean allowNull) {
+    final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable, allowNull);
     final CodeTableObjectToStringConverter stringConverter = new CodeTableObjectToStringConverter(
       codeTable);
 
-    final CodeTableListCellRenderer renderer = new CodeTableListCellRenderer(
-      codeTable);
-    final ComboBox comboBox = new ComboBox(fieldName, model, stringConverter,
-      renderer);
+    final CodeTableListCellRenderer renderer = new CodeTableListCellRenderer(codeTable);
+    final ComboBox comboBox = new ComboBox(fieldName, model, stringConverter, renderer);
     return comboBox;
   }
 
@@ -47,8 +41,7 @@ ComboBoxModel<Object>, PropertyChangeListener, Closeable {
     this(codeTable, true);
   }
 
-  public CodeTableComboBoxModel(final CodeTable codeTable,
-    final boolean allowNull) {
+  public CodeTableComboBoxModel(final CodeTable codeTable, final boolean allowNull) {
     this.codeTable = codeTable;
     this.allowNull = allowNull;
     Property.addListener(codeTable, "valuesChanged", this);
@@ -62,8 +55,7 @@ ComboBoxModel<Object>, PropertyChangeListener, Closeable {
   }
 
   @Override
-  public void fireContentsChanged(final Object source, final int index0,
-    final int index1) {
+  public void fireContentsChanged(final Object source, final int index0, final int index1) {
     super.fireContentsChanged(source, index0, index1);
   }
 
@@ -76,9 +68,8 @@ ComboBoxModel<Object>, PropertyChangeListener, Closeable {
       index--;
     }
     if (index >= 0 && index < getSize()) {
-      final Map<Identifier, List<Object>> codes = this.codeTable.getCodes();
-      final Set<Identifier> keys = codes.keySet();
-      return CollectionUtil.get(keys, index);
+      final List<Identifier> identifiers = this.codeTable.getIdentifiers();
+      return identifiers.get(index);
     } else {
       return null;
     }
@@ -98,7 +89,7 @@ ComboBoxModel<Object>, PropertyChangeListener, Closeable {
     if (this.codeTable == null) {
       return 0;
     } else {
-      int size = this.codeTable.getCodes().size();
+      int size = this.codeTable.getIdentifiers().size();
       if (this.allowNull) {
         size++;
       }
@@ -120,8 +111,8 @@ ComboBoxModel<Object>, PropertyChangeListener, Closeable {
 
   @Override
   public void setSelectedItem(final Object item) {
-    if (this.selectedItem != null && !this.selectedItem.equals(item)
-        || this.selectedItem == null && item != null) {
+    if (this.selectedItem != null && !this.selectedItem.equals(item) || this.selectedItem == null
+      && item != null) {
       this.selectedItem = item;
       fireContentsChanged(this, -1, -1);
     }

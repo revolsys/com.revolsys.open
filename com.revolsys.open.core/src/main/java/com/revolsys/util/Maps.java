@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -397,6 +398,25 @@ public class Maps {
       return false;
     } else {
       return true;
+    }
+  }
+
+  public static <K, V> void mergeCollection(final Map<K, Collection<V>> map,
+    final Map<K, Collection<V>> otherMap) {
+    for (final Entry<K, Collection<V>> entry : otherMap.entrySet()) {
+      final K key = entry.getKey();
+      Collection<V> collection = map.get(key);
+      final Collection<V> otherCollection = otherMap.get(key);
+      if (collection == null) {
+        collection = JavaBeanUtil.clone(otherCollection);
+        map.put(key, collection);
+      } else {
+        for (final V value : otherCollection) {
+          if (!collection.contains(value)) {
+            collection.add(value);
+          }
+        }
+      }
     }
   }
 

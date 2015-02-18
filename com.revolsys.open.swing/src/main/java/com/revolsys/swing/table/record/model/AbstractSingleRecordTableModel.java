@@ -19,10 +19,8 @@ import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.renderer.SingleRecordTableCellRenderer;
 import com.revolsys.util.CollectionUtil;
 
-public abstract class AbstractSingleRecordTableModel extends
-AbstractRecordTableModel {
-  public static BaseJTable createTable(
-    final AbstractSingleRecordTableModel model) {
+public abstract class AbstractSingleRecordTableModel extends AbstractRecordTableModel {
+  public static BaseJTable createTable(final AbstractSingleRecordTableModel model) {
     final BaseJTable table = new BaseJTable(model);
     table.setModel(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -82,8 +80,8 @@ AbstractRecordTableModel {
 
   private List<String> fieldNames;
 
-  public AbstractSingleRecordTableModel(
-    final RecordDefinition recordDefinition, final boolean editable) {
+  public AbstractSingleRecordTableModel(final RecordDefinition recordDefinition,
+    final boolean editable) {
     super(recordDefinition);
     setEditable(editable);
     setFieldNames(recordDefinition.getFieldNames());
@@ -129,8 +127,7 @@ AbstractRecordTableModel {
     }
   }
 
-  public abstract Object getObjectValue(final int attributeIndex,
-    int columnIndex);
+  public abstract Object getObjectValue(final int attributeIndex, int columnIndex);
 
   @Override
   public int getRowCount() {
@@ -164,8 +161,7 @@ AbstractRecordTableModel {
           final String fieldName = getFieldName(rowIndex);
           if (recordDefinition.getIdFieldNames().contains(fieldName)) {
             return false;
-          } else if (recordDefinition.getGeometryFieldNames().contains(
-            fieldName)) {
+          } else if (recordDefinition.getGeometryFieldNames().contains(fieldName)) {
             return false;
           } else {
             return !isReadOnly(fieldName);
@@ -180,27 +176,23 @@ AbstractRecordTableModel {
   }
 
   @Override
-  public boolean isSelected(final boolean selected, final int rowIndex,
-    final int columnIndex) {
+  public boolean isSelected(final boolean selected, final int rowIndex, final int columnIndex) {
     return selected;
   }
 
-  protected Object setDisplayValue(final int attributeIndex,
-    final Object displayValue) {
-    final Object objectValue = toObjectValue(attributeIndex, displayValue);
-    return setObjectValue(attributeIndex, objectValue);
+  protected Object setDisplayValue(final String fieldName, final Object displayValue) {
+    final Object objectValue = toObjectValue(fieldName, displayValue);
+    return setObjectValue(fieldName, objectValue);
   }
 
   public void setFieldNames(final List<String> fieldNames) {
-    if (fieldNames != null
-        && (this.fieldNames == null || !this.fieldNames.equals(fieldNames))) {
+    if (fieldNames != null && (this.fieldNames == null || !this.fieldNames.equals(fieldNames))) {
       this.fieldNames = fieldNames;
       fireTableDataChanged();
     }
   }
 
-  protected abstract Object setObjectValue(final int attributeIndex,
-    final Object value);
+  protected abstract Object setObjectValue(final String fieldName, final Object value);
 
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
@@ -208,19 +200,17 @@ AbstractRecordTableModel {
   }
 
   @Override
-  public void setValueAt(final Object value, final int rowIndex,
-    final int columnIndex) {
+  public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     if (isCellEditable(rowIndex, columnIndex)) {
+      final String fieldName = getFieldName(rowIndex);
 
-      final Object oldValue = setDisplayValue(rowIndex, value);
-      final String propertyName = getFieldName(rowIndex);
-      firePropertyChange(propertyName, oldValue, value);
+      final Object oldValue = setDisplayValue(fieldName, value);
+      firePropertyChange(fieldName, oldValue, value);
     }
   }
 
   @Override
-  public String toCopyValue(final int rowIndex, final int columnIndex,
-    final Object objectValue) {
+  public String toCopyValue(final int rowIndex, final int columnIndex, final Object objectValue) {
     if (objectValue == null) {
       return null;
     } else if (columnIndex < 2) {

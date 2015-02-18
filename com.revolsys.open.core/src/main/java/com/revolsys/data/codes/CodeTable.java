@@ -16,6 +16,8 @@ public interface CodeTable extends Cloneable {
 
   Identifier getId(final Object... values);
 
+  List<Identifier> getIdentifiers();
+
   Identifier getIdExact(final Object... values);
 
   String getIdFieldName();

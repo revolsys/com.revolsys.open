@@ -7,9 +7,11 @@ import javax.swing.ImageIcon;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.undo.UndoManager;
 
-public interface Field {
+public interface Field extends Cloneable {
 
-  public static final ImageIcon ERROR_ICON = Icons.getIcon("exclamation");
+  ImageIcon ERROR_ICON = Icons.getIcon("exclamation");
+
+  Field clone();
 
   void firePropertyChange(String propertyName, Object oldValue, Object newValue);
 
@@ -27,8 +29,7 @@ public interface Field {
 
   void setFieldForegroundColor(Color color);
 
-  void setFieldInvalid(String message, Color foregroundColor,
-    Color backgroundColor);
+  void setFieldInvalid(String message, Color foregroundColor, Color backgroundColor);
 
   void setFieldToolTip(String toolTip);
 

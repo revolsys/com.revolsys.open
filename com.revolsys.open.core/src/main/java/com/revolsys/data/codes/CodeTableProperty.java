@@ -41,7 +41,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   private String modificationTimestampFieldName;
 
-  private List<String> fieldAliases = new ArrayList<String>();
+  private List<String> fieldAliases = new ArrayList<>();
 
   private RecordStore recordStore;
 
@@ -99,8 +99,8 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   public CodeTableProperty clone() {
     final CodeTableProperty clone = (CodeTableProperty)super.clone();
     clone.recordDefinition = null;
-    clone.fieldAliases = new ArrayList<String>(this.fieldAliases);
-    clone.valueFieldNames = new ArrayList<String>(this.valueFieldNames);
+    clone.fieldAliases = new ArrayList<>(this.fieldAliases);
+    clone.valueFieldNames = new ArrayList<>(this.valueFieldNames);
     return clone;
   }
 
@@ -294,7 +294,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       return null;
     }
     Identifier id = null;
-    if (createId && this.loadAll) {
+    if (createId && this.loadAll && !this.loaded) {
       loadAll();
       id = getId(values, false);
     } else {
@@ -362,8 +362,8 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     this.creationTimestampFieldName = creationTimestampFieldName;
   }
 
-  public void setFieldAliases(final List<String> columnAliases) {
-    this.fieldAliases = columnAliases;
+  public void setFieldAliases(final List<String> fieldAliases) {
+    this.fieldAliases = new ArrayList<>(fieldAliases);
   }
 
   public void setIdFieldName(final String idFieldName) {
