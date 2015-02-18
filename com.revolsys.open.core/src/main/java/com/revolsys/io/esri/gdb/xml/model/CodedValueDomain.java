@@ -188,6 +188,16 @@ public class CodedValueDomain extends Domain implements CodeTable {
   }
 
   @Override
+  public boolean isLoaded() {
+    return true;
+  }
+
+  @Override
+  public boolean isLoading() {
+    return false;
+  }
+
+  @Override
   public void refresh() {
   }
 

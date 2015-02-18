@@ -18,6 +18,7 @@ import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
@@ -108,6 +109,13 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
 
   public abstract boolean isSelected(boolean selected, int rowIndex, int columnIndex);
 
+  public void loadCodeTable(final CodeTable codeTable) {
+    if (!codeTable.isLoaded()) {
+      codeTable.getCodes();
+      fireTableDataChanged();
+    }
+  }
+
   public void removePropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
     Property.removeListener(this.propertyChangeSupport, propertyChangeListener);
   }
@@ -155,11 +163,18 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
       } else {
-        final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
-        if (values == null || values.isEmpty()) {
-          text = StringConverterRegistry.toString(objectValue);
+        if (codeTable.isLoaded()) {
+          final List<Object> values = codeTable.getValues(SingleIdentifier.create(objectValue));
+          if (values == null || values.isEmpty()) {
+            text = StringConverterRegistry.toString(objectValue);
+          } else {
+            text = CollectionUtil.toString(values);
+          }
         } else {
-          text = CollectionUtil.toString(values);
+          if (!codeTable.isLoading()) {
+            Invoke.background("Load " + codeTable, this, "loadCodeTable", codeTable);
+          }
+          text = "...";
         }
       }
       if (text.length() == 0) {

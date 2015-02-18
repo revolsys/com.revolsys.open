@@ -36,5 +36,9 @@ public interface CodeTable extends Cloneable {
 
   List<Object> getValues(final Identifier id);
 
+  boolean isLoaded();
+
+  boolean isLoading();
+
   void refresh();
 }

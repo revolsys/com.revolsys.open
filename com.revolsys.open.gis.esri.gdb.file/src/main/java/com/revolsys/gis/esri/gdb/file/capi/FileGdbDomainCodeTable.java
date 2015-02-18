@@ -136,6 +136,16 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
+  public boolean isLoaded() {
+    return true;
+  }
+
+  @Override
+  public boolean isLoading() {
+    return false;
+  }
+
+  @Override
   public void refresh() {
   }
 

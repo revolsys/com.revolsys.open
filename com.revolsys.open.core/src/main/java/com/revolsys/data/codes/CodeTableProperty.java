@@ -245,8 +245,14 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     return this.loadAll;
   }
 
+  @Override
   public boolean isLoaded() {
     return this.loaded;
+  }
+
+  @Override
+  public boolean isLoading() {
+    return this.loading;
   }
 
   protected synchronized void loadAll() {

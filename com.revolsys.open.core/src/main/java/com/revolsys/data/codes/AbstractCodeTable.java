@@ -190,6 +190,7 @@ public abstract class AbstractCodeTable implements Closeable, PropertyChangeSupp
     return id;
   }
 
+  @Override
   public List<Identifier> getIdentifiers() {
     return Collections.unmodifiableList(this.identifiers);
   }
@@ -345,6 +346,16 @@ public abstract class AbstractCodeTable implements Closeable, PropertyChangeSupp
 
   public boolean isEmpty() {
     return this.idIdCache.isEmpty();
+  }
+
+  @Override
+  public boolean isLoaded() {
+    return true;
+  }
+
+  @Override
+  public boolean isLoading() {
+    return false;
   }
 
   protected Identifier loadId(final List<Object> values, final boolean createId) {
