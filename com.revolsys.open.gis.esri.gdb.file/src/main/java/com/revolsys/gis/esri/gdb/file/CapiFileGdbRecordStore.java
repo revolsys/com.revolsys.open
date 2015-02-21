@@ -236,7 +236,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
         buffer.append("'");
         if (value != null) {
           final String string = StringConverterRegistry.toString(value);
-          buffer.append(string.toUpperCase());
+          buffer.append(string.toUpperCase().replaceAll("'", "''"));
         }
         buffer.append("'");
       } else {
@@ -684,7 +684,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
           }
           for (final Field field : deTable.getFields()) {
             final String fieldName = field.getName();
-            final CodeTable codeTable = getCodeTableByColumn(fieldName);
+            final CodeTable codeTable = getCodeTableByFieldName(fieldName);
             if (codeTable instanceof FileGdbDomainCodeTable) {
               final FileGdbDomainCodeTable domainCodeTable = (FileGdbDomainCodeTable)codeTable;
               field.setDomain(domainCodeTable.getDomain());

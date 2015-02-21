@@ -492,7 +492,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null || listenerReference == propertyChangeListener) {
-              propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
+              propertyChangeSupport.removePropertyChangeListener(weakListener);
             }
           }
         }
@@ -506,7 +506,7 @@ public final class Property {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
             if (listenerReference == null || listenerReference == propertyChangeListener) {
-              component.removePropertyChangeListener(propertyChangeListener);
+              component.removePropertyChangeListener(weakListener);
             }
           }
         }

@@ -7,13 +7,9 @@ import com.revolsys.gis.cs.Authority;
 public class EpsgAuthority implements Authority, Serializable {
   private static final long serialVersionUID = 6255702398027894174L;
 
-  private final String code;
+  private final int code;
 
   public EpsgAuthority(final int code) {
-    this(String.valueOf(code));
-  }
-
-  public EpsgAuthority(final String code) {
     this.code = code;
   }
 
@@ -39,7 +35,7 @@ public class EpsgAuthority implements Authority, Serializable {
 
   @Override
   public String getCode() {
-    return this.code;
+    return String.valueOf(this.code);
   }
 
   @Override
@@ -52,12 +48,12 @@ public class EpsgAuthority implements Authority, Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + getName().hashCode();
-    result = prime * result + getCode().hashCode();
+    result = prime * result + this.code;
     return result;
   }
 
   @Override
   public String toString() {
-    return getName() + ":" + getCode();
+    return getName() + ":" + this.code;
   }
 }

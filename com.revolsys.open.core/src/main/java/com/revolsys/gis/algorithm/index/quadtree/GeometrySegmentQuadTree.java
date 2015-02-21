@@ -14,13 +14,7 @@ import com.revolsys.jts.geom.segment.Segment;
 
 public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
-
-  public static GeometrySegmentQuadTree getGeometrySegmentIndex(
-    final Geometry geometry) {
+  public static GeometrySegmentQuadTree get(final Geometry geometry) {
     if (geometry != null && !geometry.isEmpty()) {
       final Reference<GeometrySegmentQuadTree> reference = GeometryProperties.getGeometryProperty(
         geometry, GEOMETRY_SEGMENT_INDEX);
@@ -32,9 +26,8 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
       }
       if (index == null) {
         index = new GeometrySegmentQuadTree(geometry);
-        GeometryProperties.setGeometryProperty(geometry,
-          GEOMETRY_SEGMENT_INDEX, new SoftReference<GeometrySegmentQuadTree>(
-              index));
+        GeometryProperties.setGeometryProperty(geometry, GEOMETRY_SEGMENT_INDEX,
+          new SoftReference<GeometrySegmentQuadTree>(index));
       }
       return index;
     }
@@ -42,6 +35,8 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
   }
 
   private static final String GEOMETRY_SEGMENT_INDEX = "GeometrySegmentQuadTree";
+
+  private static final long serialVersionUID = 1L;
 
   static {
     GeometryEqualsExact3d.addExclude(GEOMETRY_SEGMENT_INDEX);
@@ -78,8 +73,7 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
     return this.geometry.getSegment(segmentId);
   }
 
-  public List<Segment> getWithinDistance(final Point point,
-    final double maxDistance) {
+  public List<Segment> getWithinDistance(final Point point, final double maxDistance) {
     BoundingBox boundingBox = point.getBoundingBox();
     boundingBox = boundingBox.expand(maxDistance);
     final LineSegmentCoordinateDistanceFilter filter = new LineSegmentCoordinateDistanceFilter(

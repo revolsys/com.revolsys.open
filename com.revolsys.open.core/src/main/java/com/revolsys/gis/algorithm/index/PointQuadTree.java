@@ -20,7 +20,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
 
 public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
-  public static PointQuadTree<int[]> getInstance(final Geometry geometry) {
+  public static PointQuadTree<int[]> get(final Geometry geometry) {
     if (geometry == null || geometry.isEmpty()) {
       return new PointQuadTree<int[]>();
     } else {
@@ -42,8 +42,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
           final int[] vertexId = vertex.getVertexId();
           index.put(x, y, vertexId);
         }
-        GeometryProperties.setGeometryProperty(geometry,
-          PointQuadTree.POINT_QUAD_TREE,
+        GeometryProperties.setGeometryProperty(geometry, PointQuadTree.POINT_QUAD_TREE,
           new SoftReference<PointQuadTree<int[]>>(index));
       }
       return index;
@@ -75,17 +74,15 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     }
   }
 
-  public List<Entry<Point, T>> findEntriesWithinDistance(final Point from,
-    final Point to, final double maxDistance) {
-    final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(
-      this.geometryFactory, from, to);
+  public List<Entry<Point, T>> findEntriesWithinDistance(final Point from, final Point to,
+    final double maxDistance) {
+    final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(this.geometryFactory, from, to);
     final List<Entry<Point, T>> entries = new ArrayList<Entry<Point, T>>();
     this.root.findEntriesWithin(entries, boundingBox);
     for (final Iterator<Entry<Point, T>> iterator = entries.iterator(); iterator.hasNext();) {
       final Entry<Point, T> entry = iterator.next();
       final Point coordinates = entry.getKey();
-      final double distance = LineSegmentUtil.distanceLinePoint(from, to,
-        coordinates);
+      final double distance = LineSegmentUtil.distanceLinePoint(from, to, coordinates);
       if (distance >= maxDistance) {
         iterator.remove();
       }
@@ -116,10 +113,8 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
     return results;
   }
 
-  public List<T> findWithinDistance(final Point from, final Point to,
-    final double maxDistance) {
-    final List<Entry<Point, T>> entries = findEntriesWithinDistance(from, to,
-      maxDistance);
+  public List<T> findWithinDistance(final Point from, final Point to, final double maxDistance) {
+    final List<Entry<Point, T>> entries = findEntriesWithinDistance(from, to, maxDistance);
     final List<T> results = new ArrayList<T>();
     for (final Entry<Point, T> entry : entries) {
       final T value = entry.getValue();
@@ -164,8 +159,7 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   }
 
   @Override
-  public void visit(final com.revolsys.jts.geom.BoundingBox envelope,
-    final Visitor<T> visitor) {
+  public void visit(final com.revolsys.jts.geom.BoundingBox envelope, final Visitor<T> visitor) {
     if (this.root != null) {
       this.root.visit(envelope, visitor);
     }

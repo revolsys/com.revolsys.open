@@ -46,8 +46,7 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   <T> T createPrimaryIdValue(String typePath);
 
-  Query createQuery(final String typePath, String whereClause,
-    final BoundingBoxDoubleGf boundingBox);
+  Query createQuery(final String typePath, String whereClause, final BoundingBoxDoubleGf boundingBox);
 
   Transaction createTransaction(Propagation propagation);
 
@@ -63,9 +62,9 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   <V extends CodeTable> V getCodeTable(String typePath);
 
-  CodeTable getCodeTableByColumn(String columnName);
+  CodeTable getCodeTableByFieldName(String fieldName);
 
-  Map<String, CodeTable> getCodeTableByColumnMap();
+  Map<String, CodeTable> getCodeTableByFieldNameMap();
 
   GeometryFactory getGeometryFactory();
 

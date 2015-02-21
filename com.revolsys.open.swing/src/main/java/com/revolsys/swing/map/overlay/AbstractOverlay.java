@@ -62,23 +62,17 @@ import com.revolsys.util.Maps;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
-public class AbstractOverlay extends JComponent implements
-PropertyChangeListener, MouseListener, MouseMotionListener,
-MouseWheelListener, KeyListener, FocusListener {
-  public static final Cursor CURSOR_LINE_ADD_NODE = Icons.getCursor(
-    "cursor_line_node_add", 8, 6);
+public class AbstractOverlay extends JComponent implements PropertyChangeListener, MouseListener,
+  MouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
+  public static final Cursor CURSOR_LINE_ADD_NODE = Icons.getCursor("cursor_line_node_add", 8, 6);
 
-  public static final Cursor CURSOR_LINE_SNAP = Icons.getCursor(
-    "cursor_line_snap", 8, 4);
+  public static final Cursor CURSOR_LINE_SNAP = Icons.getCursor("cursor_line_snap", 8, 4);
 
-  public static final Cursor CURSOR_NODE_ADD = Icons.getCursor(
-    "cursor_node_add", 8, 8);
+  public static final Cursor CURSOR_NODE_ADD = Icons.getCursor("cursor_node_add", 8, 8);
 
-  public static final Cursor CURSOR_NODE_EDIT = Icons.getCursor(
-    "cursor_node_edit", 8, 7);
+  public static final Cursor CURSOR_NODE_EDIT = Icons.getCursor("cursor_node_edit", 8, 7);
 
-  public static final Cursor CURSOR_NODE_SNAP = Icons.getCursor(
-    "cursor_node_snap", 8, 7);
+  public static final Cursor CURSOR_NODE_SNAP = Icons.getCursor("cursor_node_snap", 8, 7);
 
   public static final Cursor DEFAULT_CURSOR = Cursor.getDefaultCursor();
 
@@ -86,8 +80,7 @@ MouseWheelListener, KeyListener, FocusListener {
 
   private static final VertexIndexComparator VERTEX_INDEX_COMPARATOR = new VertexIndexComparator();
 
-  public static final GeometryStyle XOR_LINE_STYLE = GeometryStyle.line(
-    new Color(0, 0, 255), 1);
+  public static final GeometryStyle XOR_LINE_STYLE = GeometryStyle.line(new Color(0, 0, 255), 1);
 
   private GeometryFactory geometryFactory;
 
@@ -224,23 +217,21 @@ MouseWheelListener, KeyListener, FocusListener {
     getMap().getUndoManager().discardAllEdits();
   }
 
-  protected void createPropertyUndo(final Object object,
-    final String propertyName, final Object oldValue, final Object newValue) {
-    final SetObjectProperty edit = new SetObjectProperty(object, propertyName,
-      oldValue, newValue);
+  protected void createPropertyUndo(final Object object, final String propertyName,
+    final Object oldValue, final Object newValue) {
+    final SetObjectProperty edit = new SetObjectProperty(object, propertyName, oldValue, newValue);
     addUndo(edit);
   }
 
-  protected LineString createXorLine(final GeometryFactory geometryFactory,
-    final Point c0, final Point p1) {
+  protected LineString createXorLine(final GeometryFactory geometryFactory, final Point c0,
+    final Point p1) {
     final Viewport2D viewport = getViewport();
     final GeometryFactory viewportGeometryFactory = viewport.getGeometryFactory();
     final LineSegment line = viewportGeometryFactory.lineSegment(c0, p1);
     final double length = line.getLength();
     if (length > 0) {
       final double cursorRadius = viewport.getModelUnitsPerViewUnit() * 6;
-      final Point newC1 = line.pointAlongOffset((length - cursorRadius)
-        / length, 0);
+      final Point newC1 = line.pointAlongOffset((length - cursorRadius) / length, 0);
       return geometryFactory.lineString(c0, newC1);
     } else {
       return null;
@@ -276,8 +267,7 @@ MouseWheelListener, KeyListener, FocusListener {
           graphics.fill(shape);
         } else {
           XOR_LINE_STYLE.setLineCapEnum(LineCap.BUTT);
-          GeometryStyleRenderer.renderGeometry(this.viewport, graphics,
-            geometry, XOR_LINE_STYLE);
+          GeometryStyleRenderer.renderGeometry(this.viewport, graphics, geometry, XOR_LINE_STYLE);
         }
       } finally {
         graphics.setPaint(paint);
@@ -286,19 +276,15 @@ MouseWheelListener, KeyListener, FocusListener {
   }
 
   protected CloseLocation findCloseLocation(final AbstractRecordLayer layer,
-    final LayerRecord record, final Geometry geometry,
-    final BoundingBox boundingBox) {
-    CloseLocation closeLocation = findCloseVertexLocation(layer, record,
-      geometry, boundingBox);
+    final LayerRecord record, final Geometry geometry, final BoundingBox boundingBox) {
+    CloseLocation closeLocation = findCloseVertexLocation(layer, record, geometry, boundingBox);
     if (closeLocation == null) {
-      closeLocation = findCloseSegmentLocation(layer, record, geometry,
-        boundingBox);
+      closeLocation = findCloseSegmentLocation(layer, record, geometry, boundingBox);
     }
     return closeLocation;
   }
 
-  protected CloseLocation findCloseLocation(final LayerRecord record,
-    final BoundingBox boundingBox) {
+  protected CloseLocation findCloseLocation(final LayerRecord record, final BoundingBox boundingBox) {
     if (record.isGeometryEditable()) {
       final AbstractRecordLayer layer = record.getLayer();
       final Geometry geometry = record.getGeometryValue();
@@ -308,19 +294,18 @@ MouseWheelListener, KeyListener, FocusListener {
     return null;
   }
 
-  private CloseLocation findCloseSegmentLocation(
-    final AbstractRecordLayer layer, final LayerRecord record,
-    final Geometry geometry, final BoundingBox boundingBox) {
+  private CloseLocation findCloseSegmentLocation(final AbstractRecordLayer layer,
+    final LayerRecord record, final Geometry geometry, final BoundingBox boundingBox) {
 
     final GeometryFactory viewportGeometryFactory = getViewport().getGeometryFactory();
     final Geometry convertedGeometry = geometry.copy(viewportGeometryFactory);
 
     final double maxDistance = getMaxDistance(boundingBox);
-    final GeometrySegmentQuadTree lineSegments = GeometrySegmentQuadTree.getGeometrySegmentIndex(convertedGeometry);
+    final GeometrySegmentQuadTree lineSegments = GeometrySegmentQuadTree.get(convertedGeometry);
     final Point point = boundingBox.getCentre();
     double closestDistance = Double.MAX_VALUE;
-    final List<Segment> segments = lineSegments.query(boundingBox,
-      "isWithinDistance", point, maxDistance);
+    final List<Segment> segments = lineSegments.query(boundingBox, "isWithinDistance", point,
+      maxDistance);
     Segment closestSegment = null;
     for (final Segment segment : segments) {
       final double distance = segment.distance(point);
@@ -343,9 +328,8 @@ MouseWheelListener, KeyListener, FocusListener {
     return null;
   }
 
-  protected CloseLocation findCloseVertexLocation(
-    final AbstractRecordLayer layer, final LayerRecord record,
-    final Geometry geometry, final BoundingBox boundingBox) {
+  protected CloseLocation findCloseVertexLocation(final AbstractRecordLayer layer,
+    final LayerRecord record, final Geometry geometry, final BoundingBox boundingBox) {
     final GeometryVertexQuadTree index = GeometryVertexQuadTree.getGeometryVertexIndex(geometry);
     if (index != null) {
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
@@ -383,10 +367,9 @@ MouseWheelListener, KeyListener, FocusListener {
     final int x = event.getX();
     final int y = event.getY();
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final Point p1 = this.viewport.toModelPoint(x, y).convert(geometryFactory,
-      2);
-    final Point p2 = this.viewport.toModelPoint(x + getHotspotPixels(),
-      y + getHotspotPixels()).convert(geometryFactory, 2);
+    final Point p1 = this.viewport.toModelPoint(x, y).convert(geometryFactory, 2);
+    final Point p2 = this.viewport.toModelPoint(x + getHotspotPixels(), y + getHotspotPixels())
+      .convert(geometryFactory, 2);
 
     return p1.distance(p2);
   }
@@ -436,8 +419,7 @@ MouseWheelListener, KeyListener, FocusListener {
     final BoundingBox boundingBox;
     if (geometryFactory != null) {
       final int hotspotPixels = getHotspotPixels();
-      boundingBox = viewport.getBoundingBox(geometryFactory, event,
-        hotspotPixels);
+      boundingBox = viewport.getBoundingBox(geometryFactory, event, hotspotPixels);
     } else {
       boundingBox = new BoundingBoxDoubleGf();
     }
@@ -486,11 +468,9 @@ MouseWheelListener, KeyListener, FocusListener {
     return getPoint(x, y);
   }
 
-  protected Point getPoint(final GeometryFactory geometryFactory,
-    final MouseEvent event) {
+  protected Point getPoint(final GeometryFactory geometryFactory, final MouseEvent event) {
     final Viewport2D viewport = getViewport();
-    final Point point = viewport.toModelPointRounded(geometryFactory,
-      event.getX(), event.getY());
+    final Point point = viewport.toModelPointRounded(geometryFactory, event.getX(), event.getY());
     return point;
   }
 
@@ -561,8 +541,7 @@ MouseWheelListener, KeyListener, FocusListener {
     return hasSnapPoint(eventPoint, boundingBox);
   }
 
-  protected boolean hasSnapPoint(final java.awt.Point eventPoint,
-    final BoundingBox boundingBox) {
+  protected boolean hasSnapPoint(final java.awt.Point eventPoint, final BoundingBox boundingBox) {
     this.snapEventPoint = eventPoint;
     new TreeMap<Point, List<CloseLocation>>();
     this.snapCentre = boundingBox.getCentre();
@@ -573,8 +552,7 @@ MouseWheelListener, KeyListener, FocusListener {
       final List<LayerRecord> records = layer.queryBackground(boundingBox);
       for (final LayerRecord record : records) {
         if (layer.isVisible(record)) {
-          final CloseLocation closeLocation = findCloseLocation(record,
-            boundingBox);
+          final CloseLocation closeLocation = findCloseLocation(record, boundingBox);
           if (closeLocation != null) {
             final Point closePoint = closeLocation.getPoint();
             Maps.addToSet(snapLocations, closePoint, closeLocation);
@@ -586,8 +564,7 @@ MouseWheelListener, KeyListener, FocusListener {
     return setSnapLocations(snapLocations);
   }
 
-  protected boolean hasSnapPoint(final MouseEvent event,
-    final BoundingBox boundingBox) {
+  protected boolean hasSnapPoint(final MouseEvent event, final BoundingBox boundingBox) {
     final java.awt.Point eventPoint = event.getPoint();
     return hasSnapPoint(eventPoint, boundingBox);
   }
@@ -690,8 +667,7 @@ MouseWheelListener, KeyListener, FocusListener {
     }
   }
 
-  protected boolean setSnapLocations(
-    final Map<Point, Set<CloseLocation>> snapLocations) {
+  protected boolean setSnapLocations(final Map<Point, Set<CloseLocation>> snapLocations) {
     if (snapLocations.isEmpty()) {
       if (!this.snapPointLocationMap.isEmpty()) {
         this.snapCentre = null;
@@ -752,7 +728,7 @@ MouseWheelListener, KeyListener, FocusListener {
 
       boolean nodeSnap = false;
       final StringBuilder text = new StringBuilder(
-          "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
+        "<html><ol start=\"0\" style=\"margin: 2px 2px 2px 15px\">");
       text.append("<li style=\"padding: 2px; margin:1px;");
       if (0 == this.snapPointIndex) {
         text.append("border: 2px solid maroon");
@@ -789,9 +765,8 @@ MouseWheelListener, KeyListener, FocusListener {
           if ("Point".equals(locationType) || "End-Vertex".equals(locationType)) {
             nodeSnap = true;
           }
-          Maps.addToSet(typeLocationsMap, typePath
-            + " (<b style=\"color:red\">" + locationType + "</b>)",
-            snapLocation);
+          Maps.addToSet(typeLocationsMap, typePath + " (<b style=\"color:red\">" + locationType
+            + "</b>)", snapLocation);
         }
 
         for (final Entry<String, Set<CloseLocation>> typeLocations : typeLocationsMap.entrySet()) {

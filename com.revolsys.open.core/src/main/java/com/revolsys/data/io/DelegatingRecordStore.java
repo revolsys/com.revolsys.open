@@ -127,13 +127,13 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public CodeTable getCodeTableByColumn(final String columnName) {
-    return this.recordStore.getCodeTableByColumn(columnName);
+  public CodeTable getCodeTableByFieldName(final String columnName) {
+    return this.recordStore.getCodeTableByFieldName(columnName);
   }
 
   @Override
-  public Map<String, CodeTable> getCodeTableByColumnMap() {
-    return this.recordStore.getCodeTableByColumnMap();
+  public Map<String, CodeTable> getCodeTableByFieldNameMap() {
+    return this.recordStore.getCodeTableByFieldNameMap();
   }
 
   @Override

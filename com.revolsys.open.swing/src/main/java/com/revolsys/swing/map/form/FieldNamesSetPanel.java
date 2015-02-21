@@ -45,7 +45,7 @@ import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class FieldNamesSetPanel extends ValueField implements ActionListener,
-ListSelectionListener, PropertyChangeListener {
+  ListSelectionListener, PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -98,19 +98,17 @@ ListSelectionListener, PropertyChangeListener {
     for (final String name : fieldNamesSetNames) {
       maxLength = Math.max(maxLength, name.length());
     }
-    fieldNameSetNamesField.setMaximumSize(new Dimension(Math.max(300,
-      maxLength * 11 + 40), 22));
-    fieldNameSetNamesField.addPropertyChangeListener("fieldNamesSetName", this);
+    fieldNameSetNamesField.setMaximumSize(new Dimension(Math.max(300, maxLength * 11 + 40), 22));
+    Property.addListener(fieldNameSetNamesField, "fieldNamesSetName", this);
 
     final ToolBar toolBar = new ToolBar();
     toolBar.setOpaque(false);
     toolBar.addComponent("default", fieldNameSetNamesField);
-    this.renameButton = toolBar.addButtonTitleIcon("default",
-      "Rename Field Set", "fields_filter_edit", this, "actionRename");
-    this.deleteButton = toolBar.addButtonTitleIcon("default",
-      "Delete Field Set", "fields_filter_delete", this, "actionDelete");
-    toolBar.addButtonTitleIcon("default", "Add Field Set", "fields_filter_add",
-      this, "actionAdd");
+    this.renameButton = toolBar.addButtonTitleIcon("default", "Rename Field Set",
+      "fields_filter_edit", this, "actionRename");
+    this.deleteButton = toolBar.addButtonTitleIcon("default", "Delete Field Set",
+      "fields_filter_delete", this, "actionDelete");
+    toolBar.addButtonTitleIcon("default", "Add Field Set", "fields_filter_add", this, "actionAdd");
 
     add(toolBar);
 
@@ -118,8 +116,7 @@ ListSelectionListener, PropertyChangeListener {
     this.filterPanel.setOpaque(false);
     add(this.filterPanel);
 
-    final SearchField allFieldNamesFilterField = new SearchField(
-        "allFieldNamesFilter");
+    final SearchField allFieldNamesFilterField = new SearchField("allFieldNamesFilter");
     allFieldNamesFilterField.setPreferredSize(new Dimension(350, 25));
     allFieldNamesFilterField.addActionListener(this);
     this.filterPanel.add(allFieldNamesFilterField);
@@ -142,15 +139,15 @@ ListSelectionListener, PropertyChangeListener {
     fieldsToolBar.setMinimumSize(new Dimension(25, 25));
     this.fieldsPanel.add(fieldsToolBar);
 
-    this.addButton = fieldsToolBar.addButtonTitleIcon("default", "Add", "add",
-      this, "actionAddSelected");
-    this.removeButton = fieldsToolBar.addButtonTitleIcon("default", "Remove",
-      "delete", this, "actionRemoveSelected");
+    this.addButton = fieldsToolBar.addButtonTitleIcon("default", "Add", "add", this,
+      "actionAddSelected");
+    this.removeButton = fieldsToolBar.addButtonTitleIcon("default", "Remove", "delete", this,
+      "actionRemoveSelected");
 
-    this.moveUpButton = fieldsToolBar.addButtonTitleIcon("default", "Move Up",
-      "arrow_up", this, "actionMoveSelectedUp");
-    this.moveDownButton = fieldsToolBar.addButtonTitleIcon("default",
-      "Move Down", "arrow_down", this, "actionMoveSelectedDown");
+    this.moveUpButton = fieldsToolBar.addButtonTitleIcon("default", "Move Up", "arrow_up", this,
+      "actionMoveSelectedUp");
+    this.moveDownButton = fieldsToolBar.addButtonTitleIcon("default", "Move Down", "arrow_down",
+      this, "actionMoveSelectedDown");
 
     this.selectedFieldNamesModel = new BaseListModel<String>();
 
@@ -170,8 +167,7 @@ ListSelectionListener, PropertyChangeListener {
 
     this.allFieldNamesTextFilter = new StringContainsRowFilter();
     final RowFilter<ListModel<?>, Integer> allFieldNamesFilter = RowFilter.andFilter(Arrays.asList(
-      new CollectionRowFilter(this.selectedFieldNamesModel, false),
-      this.allFieldNamesTextFilter));
+      new CollectionRowFilter(this.selectedFieldNamesModel, false), this.allFieldNamesTextFilter));
     this.allFieldNames.setRowFilter(allFieldNamesFilter);
 
     setFieldNamesSetName("All");
@@ -179,9 +175,8 @@ ListSelectionListener, PropertyChangeListener {
   }
 
   public void actionAdd() {
-    final String name = JOptionPane.showInputDialog(
-      SwingUtil.getActiveWindow(), "Enter the name of the new field set.",
-      "Add Field Set", JOptionPane.PLAIN_MESSAGE);
+    final String name = JOptionPane.showInputDialog(SwingUtil.getActiveWindow(),
+      "Enter the name of the new field set.", "Add Field Set", JOptionPane.PLAIN_MESSAGE);
     if (Property.hasValue(name)) {
       boolean found = false;
       for (int i = 0; i < this.fieldNamesSetNames.size(); i++) {
@@ -220,9 +215,8 @@ ListSelectionListener, PropertyChangeListener {
     if ("All".equalsIgnoreCase(fieldSetName)) {
       Toolkit.getDefaultToolkit().beep();
     } else {
-      final int result = JOptionPane.showConfirmDialog(
-        SwingUtil.getActiveWindow(), "Delete field set " + fieldSetName + ".",
-        "Delete Field Set", JOptionPane.YES_NO_OPTION);
+      final int result = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
+        "Delete field set " + fieldSetName + ".", "Delete Field Set", JOptionPane.YES_NO_OPTION);
       if (result == JOptionPane.OK_OPTION) {
         for (int i = 0; i < this.fieldNamesSetNames.size(); i++) {
           final String name2 = this.fieldNamesSetNames.get(i);
@@ -300,23 +294,21 @@ ListSelectionListener, PropertyChangeListener {
     if ("All".equalsIgnoreCase(fieldSetName)) {
       Toolkit.getDefaultToolkit().beep();
     } else {
-      final String name = (String)JOptionPane.showInputDialog(
-        SwingUtil.getActiveWindow(), "Enter the new name for the field set.",
-        "Rename Field Set", JOptionPane.PLAIN_MESSAGE, null, null, fieldSetName);
+      final String name = (String)JOptionPane.showInputDialog(SwingUtil.getActiveWindow(),
+        "Enter the new name for the field set.", "Rename Field Set", JOptionPane.PLAIN_MESSAGE,
+        null, null, fieldSetName);
       if (Property.hasValue(name)) {
         for (int i = 0; i < this.fieldNamesSetNames.size(); i++) {
           final String name2 = this.fieldNamesSetNames.get(i);
           if (fieldSetName.equalsIgnoreCase(name2)) {
             this.fieldNamesSetNames.set(i, name);
-            this.fieldNamesSets.put(name, new ArrayList<>(
-                this.selectedFieldNamesModel));
+            this.fieldNamesSets.put(name, new ArrayList<>(this.selectedFieldNamesModel));
             this.fieldNamesSetNamesModel.removeElement(name2);
             this.fieldNamesSetNamesModel.insertElementAt(name, i);
             this.fieldNamesSetNamesModel.setSelectedItem(name);
           } else if (name2.equalsIgnoreCase(name)) {
-            JOptionPane.showMessageDialog(SwingUtil.getActiveWindow(),
-              "New name already in use: " + name2, "Rename Field Set",
-              JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(SwingUtil.getActiveWindow(), "New name already in use: "
+              + name2, "Rename Field Set", JOptionPane.ERROR_MESSAGE);
             return;
           }
         }
@@ -330,8 +322,7 @@ ListSelectionListener, PropertyChangeListener {
     if (propertyName.equals("fieldNamesSetName")) {
       final String oldFieldNamesSetName = (String)event.getOldValue();
       if (oldFieldNamesSetName != null) {
-        this.fieldNamesSets.put(oldFieldNamesSetName, new ArrayList<>(
-            this.selectedFieldNamesModel));
+        this.fieldNamesSets.put(oldFieldNamesSetName, new ArrayList<>(this.selectedFieldNamesModel));
       }
       final String newFieldNamesSetName = (String)event.getNewValue();
       setFieldNamesSetName(newFieldNamesSetName);
@@ -393,7 +384,7 @@ ListSelectionListener, PropertyChangeListener {
     this.addButton.setEnabled(this.allFieldNames.getSelectedIndex() > -1);
     final int selectedFieldIndex = this.selectedFieldNames.getSelectedIndex();
     final int lastSelectedFieldIndex = this.selectedFieldNames.getSelectionModel()
-        .getMaxSelectionIndex();
+      .getMaxSelectionIndex();
     this.removeButton.setEnabled(selectedFieldIndex > -1);
     this.moveUpButton.setEnabled(selectedFieldIndex > 0);
     this.moveDownButton.setEnabled(selectedFieldIndex > -1

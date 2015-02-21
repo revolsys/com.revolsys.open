@@ -106,8 +106,8 @@ import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
-public class LayerRecordForm extends JPanel implements PropertyChangeListener,
-CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
+public class LayerRecordForm extends JPanel implements PropertyChangeListener, CellEditorListener,
+  FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public static final String FLIP_FIELDS_ICON = "flip_fields";
 
@@ -123,8 +123,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   private static final long serialVersionUID = 1L;
 
-  private JButton addOkButton = InvokeMethodAction.createButton("OK", this,
-      "actionAddOk");
+  private JButton addOkButton = InvokeMethodAction.createButton("OK", this, "actionAddOk");
 
   private LayerRecordTableModel allAttributes;
 
@@ -156,8 +155,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   private AbstractRecordLayer layer;
 
-  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private Set<String> readOnlyFieldNames = new HashSet<String>();
 
@@ -196,8 +194,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     map.put("copy", TransferHandler.getCopyAction());
     map.put("paste", TransferHandler.getPasteAction());
 
-    final RecordLayerFormTransferHandler transferHandler = new RecordLayerFormTransferHandler(
-      this);
+    final RecordLayerFormTransferHandler transferHandler = new RecordLayerFormTransferHandler(this);
     setTransferHandler(transferHandler);
     setFont(SwingUtil.FONT);
 
@@ -213,8 +210,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     this.undoManager.addKeyMap(this);
   }
 
-  public LayerRecordForm(final AbstractRecordLayer layer,
-    final LayerRecord object) {
+  public LayerRecordForm(final AbstractRecordLayer layer, final LayerRecord object) {
     this(layer);
     setRecord(object);
   }
@@ -244,18 +240,18 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   protected ObjectLabelField addCodeTableLabelField(final String fieldName) {
     final RecordStore recordStore = getRecordStore();
-    final CodeTable codeTable = recordStore.getCodeTableByColumn(fieldName);
+    final CodeTable codeTable = recordStore.getCodeTableByFieldName(fieldName);
     final ObjectLabelField field = new ObjectLabelField(fieldName, codeTable);
     field.setFont(SwingUtil.FONT);
     addField(fieldName, field);
     return field;
   }
 
-  protected void addDoubleField(final String fieldName, final int length,
-    final int scale, final Double minimumValie, final Double maximumValue) {
+  protected void addDoubleField(final String fieldName, final int length, final int scale,
+    final Double minimumValie, final Double maximumValue) {
     final DataType dataType = DataTypes.DOUBLE;
-    final NumberTextField field = new NumberTextField(fieldName, dataType,
-      length, scale, minimumValie, maximumValue);
+    final NumberTextField field = new NumberTextField(fieldName, dataType, length, scale,
+      minimumValie, maximumValue);
     addField(fieldName, field);
   }
 
@@ -289,9 +285,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     field.setUndoManager(this.undoManager);
     if (field instanceof ComboBox) {
       final ComboBox comboBox = (ComboBox)field;
-      comboBox.getEditor()
-      .getEditorComponent()
-      .addFocusListener(new WeakFocusListener(this));
+      comboBox.getEditor().getEditorComponent().addFocusListener(new WeakFocusListener(this));
     } else {
       ((JComponent)field).addFocusListener(new WeakFocusListener(this));
     }
@@ -318,23 +312,20 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T addLabelledField(final Container container,
-    final String fieldName) {
+  public <T> T addLabelledField(final Container container, final String fieldName) {
     final Field field = getField(fieldName);
     addLabelledField(container, field);
     return (T)field;
   }
 
-  protected void addNumberField(final String fieldName,
-    final DataType dataType, final int length, final Number minimumValue,
-    final Number maximumValue) {
-    final NumberTextField field = new NumberTextField(fieldName, dataType,
-      length, 0, minimumValue, maximumValue);
+  protected void addNumberField(final String fieldName, final DataType dataType, final int length,
+    final Number minimumValue, final Number maximumValue) {
+    final NumberTextField field = new NumberTextField(fieldName, dataType, length, 0, minimumValue,
+      maximumValue);
     addField(fieldName, field);
   }
 
-  protected void addPanel(final JPanel container, final String title,
-    final List<String> fieldNames) {
+  protected void addPanel(final JPanel container, final String title, final List<String> fieldNames) {
     final JPanel panel = createPanel(container, title);
 
     for (final String fieldName : fieldNames) {
@@ -376,8 +367,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     return panel;
   }
 
-  public JScrollPane addTab(final int index, final String name,
-    final Component component) {
+  public JScrollPane addTab(final int index, final String name, final Component component) {
     boolean init = false;
     final Container parent = this.tabs.getParent();
     if (parent != this) {
@@ -423,21 +413,18 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
     final List<String> fieldNamesSetNames = this.layer.getFieldNamesSetNames();
     final DefaultComboBoxModel<String> fieldNamesSetNamesModel = ComboBox.model(fieldNamesSetNames);
-    this.fieldNameSetNamesField = new ComboBox("fieldNamesSetName",
-      fieldNamesSetNamesModel);
+    this.fieldNameSetNamesField = new ComboBox("fieldNamesSetName", fieldNamesSetNamesModel);
     int maxLength = 3;
     for (final String name : fieldNamesSetNames) {
       maxLength = Math.max(maxLength, name.length());
     }
-    this.fieldNameSetNamesField.setMaximumSize(new Dimension(Math.max(300,
-      maxLength * 11 + 40), 22));
-    this.fieldNameSetNamesField.addPropertyChangeListener("fieldNamesSetName",
-      this);
+    this.fieldNameSetNamesField.setMaximumSize(new Dimension(Math.max(300, maxLength * 11 + 40), 22));
+    Property.addListener(this.fieldNameSetNamesField, "fieldNamesSetName", this);
 
     final ToolBar toolBar = new ToolBar();
     toolBar.addComponent("default", this.fieldNameSetNamesField);
-    toolBar.addButtonTitleIcon("default", "Edit Field Sets",
-      "fields_filter_edit", this.layer, "showProperties", "Field Sets");
+    toolBar.addButtonTitleIcon("default", "Edit Field Sets", "fields_filter_edit", this.layer,
+      "showProperties", "Field Sets");
 
     final JPanel panel = new JPanel(new BorderLayout());
     panel.add(toolBar, BorderLayout.NORTH);
@@ -446,14 +433,13 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
     int maxHeight = 500;
     for (final GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
-        .getScreenDevices()) {
+      .getScreenDevices()) {
       final GraphicsConfiguration graphicsConfiguration = device.getDefaultConfiguration();
       final Rectangle bounds = graphicsConfiguration.getBounds();
 
       maxHeight = Math.min(bounds.height, maxHeight);
     }
-    final int preferredHeight = Math.min(maxHeight,
-      (this.allAttributes.getRowCount() + 1) * 20);
+    final int preferredHeight = Math.min(maxHeight, (this.allAttributes.getRowCount() + 1) * 20);
     scrollPane.setMinimumSize(new Dimension(100, preferredHeight));
     scrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, maxHeight));
     scrollPane.setPreferredSize(new Dimension(800, preferredHeight));
@@ -462,8 +448,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   protected void addTabGeometry() {
     final String geometryFieldName = this.recordDefinition.getGeometryFieldName();
     if (this.geometryCoordinatesPanel == null && geometryFieldName != null) {
-      this.geometryCoordinatesPanel = new GeometryCoordinatesPanel(this,
-        geometryFieldName);
+      this.geometryCoordinatesPanel = new GeometryCoordinatesPanel(this, geometryFieldName);
       addField(geometryFieldName, this.geometryCoordinatesPanel);
       final JPanel panel = new JPanel(new GridLayout(1, 1));
 
@@ -485,75 +470,68 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     if (layer != null) {
       final MenuFactory menuFactory = MenuFactory.findMenu(layer);
       if (menuFactory != null) {
-        this.toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
-          menuFactory, "show", layer, this, 10, 10);
+        this.toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu", menuFactory, "show", layer,
+          this, 10, 10);
       }
     }
-    final EnableCheck deletableEnableCheck = new ObjectPropertyEnableCheck(
-      this, "deletable");
-    this.toolBar.addButton("record", "Delete Record", "table_row_delete",
-      deletableEnableCheck, this, "deleteRecord");
+    final EnableCheck deletableEnableCheck = new ObjectPropertyEnableCheck(this, "deletable");
+    this.toolBar.addButton("record", "Delete Record", "table_row_delete", deletableEnableCheck,
+      this, "deleteRecord");
 
     // Cut, Copy Paste
 
-    this.toolBar.addButton("dnd", "Copy Record", "page_copy",
-      (EnableCheck)null, this, "dataTransferCopy");
+    this.toolBar.addButton("dnd", "Copy Record", "page_copy", (EnableCheck)null, this,
+      "dataTransferCopy");
 
     if (hasGeometry) {
-      this.toolBar.addButton("dnd", "Copy Geometry", "geometry_copy",
-        (EnableCheck)null, this, "copyGeometry");
+      this.toolBar.addButton("dnd", "Copy Geometry", "geometry_copy", (EnableCheck)null, this,
+        "copyGeometry");
     }
 
-    this.toolBar.addButton("dnd", "Paste Record", "paste_plain", editable,
-      this, "dataTransferPaste");
+    this.toolBar.addButton("dnd", "Paste Record", "paste_plain", editable, this,
+      "dataTransferPaste");
 
     if (hasGeometry) {
-      this.toolBar.addButton("dnd", "Paste Geometry", "geometry_paste",
-        editable, this, "pasteGeometry");
+      this.toolBar.addButton("dnd", "Paste Geometry", "geometry_paste", editable, this,
+        "pasteGeometry");
     }
 
-    final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canUndo");
-    final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager,
-        "canRedo");
+    final EnableCheck canUndo = new ObjectPropertyEnableCheck(this.undoManager, "canUndo");
+    final EnableCheck canRedo = new ObjectPropertyEnableCheck(this.undoManager, "canRedo");
 
-    final EnableCheck modifiedOrDeleted = new ObjectPropertyEnableCheck(this,
-        "modifiedOrDeleted");
+    final EnableCheck modifiedOrDeleted = new ObjectPropertyEnableCheck(this, "modifiedOrDeleted");
 
-    this.toolBar.addButton("changes", "Revert Record", "arrow_revert",
-      modifiedOrDeleted, this, "revertChanges");
+    this.toolBar.addButton("changes", "Revert Record", "arrow_revert", modifiedOrDeleted, this,
+      "revertChanges");
 
-    this.toolBar.addButton("changes", "Revert Empty Fields",
-      "field_empty_revert", modifiedOrDeleted, this, "revertEmptyFields");
+    this.toolBar.addButton("changes", "Revert Empty Fields", "field_empty_revert",
+      modifiedOrDeleted, this, "revertEmptyFields");
 
-    this.toolBar.addButton("changes", "Undo", "arrow_undo", canUndo,
-      this.undoManager, "undo");
-    this.toolBar.addButton("changes", "Redo", "arrow_redo", canRedo,
-      this.undoManager, "redo");
+    this.toolBar.addButton("changes", "Undo", "arrow_undo", canUndo, this.undoManager, "undo");
+    this.toolBar.addButton("changes", "Redo", "arrow_redo", canRedo, this.undoManager, "redo");
 
     // Zoom
 
     if (hasGeometry) {
-      this.toolBar.addButtonTitleIcon("zoom", "Zoom to Record", "magnifier",
-        this, "actionZoomToRecord");
+      this.toolBar.addButtonTitleIcon("zoom", "Zoom to Record", "magnifier", this,
+        "actionZoomToRecord");
     }
 
     // Geometry manipulation
     if (hasGeometry) {
       final DataType geometryDataType = geometryField.getType();
       if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
-        if (DirectionalAttributes.getProperty(recordDefinition)
-            .hasDirectionalAttributes()) {
-          this.toolBar.addButton("geometry", FLIP_RECORD_NAME,
-            FLIP_RECORD_ICON, editable, this, "flipRecordOrientation");
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        if (DirectionalAttributes.getProperty(recordDefinition).hasDirectionalAttributes()) {
+          this.toolBar.addButton("geometry", FLIP_RECORD_NAME, FLIP_RECORD_ICON, editable, this,
+            "flipRecordOrientation");
           this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME,
             FLIP_LINE_ORIENTATION_ICON, editable, this, "flipLineOrientation");
-          this.toolBar.addButton("geometry", FLIP_FIELDS_NAME,
-            FLIP_FIELDS_ICON, editable, this, "flipFields");
+          this.toolBar.addButton("geometry", FLIP_FIELDS_NAME, FLIP_FIELDS_ICON, editable, this,
+            "flipFields");
         } else {
-          this.toolBar.addButton("geometry", "Flip Line Orientation",
-            "flip_line", editable, this, "flipLineOrientation");
+          this.toolBar.addButton("geometry", "Flip Line Orientation", "flip_line", editable, this,
+            "flipLineOrientation");
         }
       }
     }
@@ -777,8 +755,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
       if (field == null) {
         final boolean editable = !this.readOnlyFieldNames.contains(fieldName);
         try {
-          field = SwingUtil.createField(this.recordDefinition, fieldName,
-            editable);
+          field = SwingUtil.createField(this.recordDefinition, fieldName, editable);
           addField(fieldName, field);
         } catch (final IllegalArgumentException e) {
         }
@@ -963,8 +940,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   protected void invokeAction(final String actionName) {
     final Action action = getActionMap().get(actionName);
     if (action != null) {
-      final ActionEvent event = new ActionEvent(this,
-        ActionEvent.ACTION_PERFORMED, null);
+      final ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null);
       action.actionPerformed(event);
     }
   }
@@ -1055,8 +1031,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   public void pasteValues(final Map<String, Object> map) {
     final AbstractLayer layer = getLayer();
     if (layer != null) {
-      final Map<String, Object> newValues = new LinkedHashMap<String, Object>(
-          map);
+      final Map<String, Object> newValues = new LinkedHashMap<String, Object>(map);
       final Collection<String> ignorePasteFields = layer.getProperty("ignorePasteFields");
       final Set<String> keySet = newValues.keySet();
       if (ignorePasteFields != null) {
@@ -1080,11 +1055,11 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     final AbstractRecordLayer layer = getLayer();
     if (layer != null) {
       final LayerRecord record = getRecord();
-      if (record != null) {
+      if (record != null && !record.getState().equals(RecordState.Deleted)) {
         final Object source = event.getSource();
 
         if (this.geometryCoordinatesPanel != null
-            && source == this.geometryCoordinatesPanel.getTable().getModel()) {
+          && source == this.geometryCoordinatesPanel.getTable().getModel()) {
           if (propertyName.equals("geometry")) {
             record.setGeometryValue((Geometry)event.getNewValue());
           }
@@ -1126,9 +1101,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
               }
             }
             if (!equal
-                && layer.isEditable()
-                && (record.getState() == RecordState.New
-                && layer.isCanAddRecords() || layer.isCanEditRecords())) {
+              && layer.isEditable()
+              && (record.getState() == RecordState.New && layer.isCanAddRecords() || layer.isCanEditRecords())) {
               record.setValueByPath(fieldName, fieldValue);
             }
           }
@@ -1147,11 +1121,10 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
             }
             final boolean modifiedOrDeleted = isModifiedOrDeleted();
             if (this.propertyChangeSupport != null) {
-              this.propertyChangeSupport.firePropertyChange(
-                "modifiedOrDeleted", !modifiedOrDeleted, modifiedOrDeleted);
+              this.propertyChangeSupport.firePropertyChange("modifiedOrDeleted",
+                !modifiedOrDeleted, modifiedOrDeleted);
               final boolean deletable = isDeletable();
-              this.propertyChangeSupport.firePropertyChange("deletable",
-                !deletable, deletable);
+              this.propertyChangeSupport.firePropertyChange("deletable", !deletable, deletable);
             }
             repaint();
           }
@@ -1232,8 +1205,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     }
   }
 
-  public void setFieldInvalidToolTip(final String fieldName,
-    final JComponent field) {
+  public void setFieldInvalidToolTip(final String fieldName, final JComponent field) {
     final String message = this.fieldInValidMessage.get(fieldName);
     if (Property.hasValue(message)) {
       field.setToolTipText(message);
@@ -1262,8 +1234,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
         this.invalidFieldNames.remove(fieldName);
         this.fieldInValidMessage.remove(fieldName);
         final int tabIndex = getTabIndex(fieldName);
-        Maps.removeFromSet(this.tabInvalidFieldMap, tabIndex,
-          fieldName);
+        Maps.removeFromSet(this.tabInvalidFieldMap, tabIndex, fieldName);
         updateTabValid(tabIndex);
         updateInvalidFields();
         return true;
@@ -1276,8 +1247,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     return false;
   }
 
-  protected boolean setFieldValidationEnabled(
-    final boolean fieldValidationEnabled) {
+  protected boolean setFieldValidationEnabled(final boolean fieldValidationEnabled) {
     final boolean oldValue = isFieldValidationEnabled();
     if (fieldValidationEnabled) {
       this.fieldsToValidate.remove();
@@ -1288,8 +1258,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
     return oldValue;
   }
 
-  public void setFieldValue(final String fieldName, Object value,
-    final boolean validate) {
+  public void setFieldValue(final String fieldName, Object value, final boolean validate) {
     final Object oldValue = getFieldValue(fieldName);
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition != null) {
@@ -1421,8 +1390,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
   public boolean showAddDialog() {
     final String title = "Add New " + getName();
     final Window window = SwingUtil.getActiveWindow();
-    final JDialog dialog = new JDialog(window, title,
-      ModalityType.APPLICATION_MODAL);
+    final JDialog dialog = new JDialog(window, title, ModalityType.APPLICATION_MODAL);
     dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
 
@@ -1430,8 +1398,8 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     dialog.add(buttons, BorderLayout.SOUTH);
-    final JButton addCancelButton = InvokeMethodAction.createButton("Cancel",
-      this, "actionAddCancel");
+    final JButton addCancelButton = InvokeMethodAction.createButton("Cancel", this,
+      "actionAddCancel");
     buttons.add(addCancelButton);
     buttons.add(this.addOkButton);
 
@@ -1489,8 +1457,7 @@ CellEditorListener, FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public boolean validateField(final String fieldName) {
     if (SwingUtilities.isEventDispatchThread()) {
-      Invoke.background("Validate Field " + fieldName, this, "validateField",
-        fieldName);
+      Invoke.background("Validate Field " + fieldName, this, "validateField", fieldName);
       return false;
     } else {
       return doValidateField(fieldName);

@@ -371,7 +371,7 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
   }
 
   @Override
-  public CodeTable getCodeTableByColumn(final String columnName) {
+  public CodeTable getCodeTableByFieldName(final String columnName) {
     final CodeTable codeTable = this.columnToTableMap.get(columnName);
 
     return codeTable;
@@ -379,7 +379,7 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
   }
 
   @Override
-  public Map<String, CodeTable> getCodeTableByColumnMap() {
+  public Map<String, CodeTable> getCodeTableByFieldNameMap() {
     return new HashMap<String, CodeTable>(this.columnToTableMap);
   }
 

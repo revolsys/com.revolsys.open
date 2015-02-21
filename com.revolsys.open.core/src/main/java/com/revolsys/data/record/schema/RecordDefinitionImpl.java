@@ -324,7 +324,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     } else {
       CodeTable codeTable = this.codeTableByColumnMap.get(column);
       if (codeTable == null && recordStore != null) {
-        codeTable = recordStore.getCodeTableByColumn(column);
+        codeTable = recordStore.getCodeTableByFieldName(column);
       }
       if (codeTable instanceof CodeTableProperty) {
         final CodeTableProperty property = (CodeTableProperty)codeTable;
