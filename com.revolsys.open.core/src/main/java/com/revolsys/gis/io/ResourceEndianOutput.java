@@ -15,7 +15,7 @@ import com.revolsys.spring.SpringUtil;
 public class ResourceEndianOutput implements EndianOutput {
   private final Resource resource;
 
-  private final OutputStream resourceOut;
+  private OutputStream resourceOut;
 
   private final File file;
 
@@ -23,7 +23,9 @@ public class ResourceEndianOutput implements EndianOutput {
 
   public ResourceEndianOutput(final Resource resource) throws IOException {
     this.resource = resource;
-    this.resourceOut = SpringUtil.getOutputStream(resource);
+    if (!(resource instanceof FileSystemResource)) {
+      this.resourceOut = SpringUtil.getOutputStream(resource);
+    }
     this.file = SpringUtil.getFileOrCreateTempFile(resource);
     final OutputStream out = new FileOutputStream(this.file);
     final BufferedOutputStream bufferedOut = new BufferedOutputStream(out);
@@ -84,8 +86,7 @@ public class ResourceEndianOutput implements EndianOutput {
   }
 
   @Override
-  public void write(final byte[] bytes, final int offset, final int length)
-      throws IOException {
+  public void write(final byte[] bytes, final int offset, final int length) throws IOException {
     this.out.write(bytes, offset, length);
   }
 

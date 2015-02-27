@@ -36,6 +36,14 @@ public class Strings {
     }
   }
 
+  public static String lowerCase(final String text) {
+    if (text == null) {
+      return null;
+    } else {
+      return text.toLowerCase();
+    }
+  }
+
   public static boolean matches(final String text, final String regex) {
     if (text == null || regex == null) {
       return false;
@@ -99,6 +107,14 @@ public class Strings {
       return null;
     } else {
       return text.trim();
+    }
+  }
+
+  public static String upperCase(final String text) {
+    if (text == null) {
+      return null;
+    } else {
+      return text.toUpperCase();
     }
   }
 }

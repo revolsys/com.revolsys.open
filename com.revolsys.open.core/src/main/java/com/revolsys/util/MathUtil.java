@@ -864,4 +864,18 @@ public final class MathUtil {
   private MathUtil() {
   }
 
+  public final static int toInt(final byte[] bytes, final int offset) {
+    final byte b1 = bytes[offset];
+    final byte b2 = bytes[offset + 1];
+    final byte b3 = bytes[offset + 2];
+    final byte b4 = bytes[offset + 3];
+    return b1 << 24 | (b2 & 0xFF) << 16 | (b3 & 0xFF) << 8 | b4 & 0xFF;
+  }
+
+  public static final long toLong(final byte[] bytes, final int offset) {
+    final long high = (long)toInt(bytes, offset) << 32;
+    final long low = (long)toInt(bytes, offset + 4) << 32 >>> 32;
+    return high | low;
+  }
+
 }

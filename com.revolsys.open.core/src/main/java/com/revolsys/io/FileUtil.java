@@ -84,8 +84,7 @@ public final class FileUtil {
    *
    * @param closeables The closables to close.
    */
-  public static void closeSilent(
-    final Collection<? extends AutoCloseable> closeables) {
+  public static void closeSilent(final Collection<? extends AutoCloseable> closeables) {
     for (final AutoCloseable closeable : closeables) {
       if (closeable != null) {
         try {
@@ -112,8 +111,8 @@ public final class FileUtil {
     } else if (separator == UNIX_FILE_SEPARATOR) {
       return path.replace(WINDOWS_FILE_SEPARATOR, separator);
     } else {
-      return path.replace(UNIX_FILE_SEPARATOR, separator).replace(
-        WINDOWS_FILE_SEPARATOR, separator);
+      return path.replace(UNIX_FILE_SEPARATOR, separator)
+        .replace(WINDOWS_FILE_SEPARATOR, separator);
     }
   }
 
@@ -153,8 +152,7 @@ public final class FileUtil {
    * @param out The output stream to write the contents to.
    * @throws IOException If an I/O error occurs.
    */
-  public static long copy(final File file, final OutputStream out)
-      throws IOException {
+  public static long copy(final File file, final OutputStream out) throws IOException {
     final FileInputStream in = new FileInputStream(file);
     try {
       return copy(in, out);
@@ -210,8 +208,7 @@ public final class FileUtil {
    * @param sz file size
    * @throws IOException if an i/o error
    */
-  public static void copy(final InputStream zin, final File file, final long sz)
-      throws IOException {
+  public static void copy(final InputStream zin, final File file, final long sz) throws IOException {
 
     ReadableByteChannel rc = null;
     FileOutputStream out = null;
@@ -331,8 +328,7 @@ public final class FileUtil {
    * @return The temportary directory.
    * @throws IOException If there was an exception creating the directory.
    */
-  public static File createTempDirectory(final String prefix,
-    final String suffix) {
+  public static File createTempDirectory(final String prefix, final String suffix) {
     try {
       final File file = File.createTempFile(prefix, suffix);
       if (!file.delete()) {
@@ -383,8 +379,7 @@ public final class FileUtil {
    * @param deleteRoot Flag indicating if the directory should also be deleted.
    * @throws IOException If a file or directory could not be deleted.
    */
-  public static boolean deleteDirectory(final File directory,
-    final boolean deleteRoot) {
+  public static boolean deleteDirectory(final File directory, final boolean deleteRoot) {
     boolean deleted = true;
     final File[] files = directory.listFiles();
     if (files != null) {
@@ -413,8 +408,7 @@ public final class FileUtil {
     return deleted;
   }
 
-  public static void deleteDirectory(final File directory,
-    final FilenameFilter filter) {
+  public static void deleteDirectory(final File directory, final FilenameFilter filter) {
     final File[] files = directory.listFiles();
     if (files != null) {
       for (final File file2 : files) {
@@ -639,7 +633,7 @@ public final class FileUtil {
 
       File file = null;
       for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
-          .getConnectionRegistries()) {
+        .getConnectionRegistries()) {
         final FolderConnection connection = registry.getConnection(connectionName);
         if (connection != null) {
           final File directory = connection.getFile();
@@ -758,8 +752,7 @@ public final class FileUtil {
     return getBaseName(fileName);
   }
 
-  public static List<String> getFileNames(final File directory,
-    final FilenameFilter filter) {
+  public static List<String> getFileNames(final File directory, final FilenameFilter filter) {
     final List<String> names = new ArrayList<String>();
     final File[] files = directory.listFiles(filter);
     if (files != null) {
@@ -771,14 +764,12 @@ public final class FileUtil {
     return names;
   }
 
-  public static List<String> getFileNamesByExtension(final File directory,
-    final String extension) {
+  public static List<String> getFileNamesByExtension(final File directory, final String extension) {
     final FilenameFilter filter = new ExtensionFilenameFilter(extension);
     return getFileNames(directory, filter);
   }
 
-  public static List<File> getFiles(final File directory,
-    final FilenameFilter filter) {
+  public static List<File> getFiles(final File directory, final FilenameFilter filter) {
     if (directory.isDirectory()) {
       final File[] files = directory.listFiles(filter);
       if (files == null) {
@@ -791,15 +782,19 @@ public final class FileUtil {
     }
   }
 
-  public static List<File> getFilesByExtension(final File directory,
-    final String... extensions) {
-    final ExtensionFilenameFilter filter = new ExtensionFilenameFilter(
-      extensions);
+  public static List<File> getFilesByExtension(final File directory, final String... extensions) {
+    final ExtensionFilenameFilter filter = new ExtensionFilenameFilter(extensions);
     return getFiles(directory, filter);
   }
 
-  public static File getFileWithExtension(final File file,
-    final String extension) {
+  /**
+   * Get a new file object with the current extension replaced with the new extension.
+   *
+   * @param file
+   * @param extension
+   * @return
+   */
+  public static File getFileWithExtension(final File file, final String extension) {
     final File parentFile = getFile(file).getParentFile();
     final String baseName = FileUtil.getFileNamePrefix(file);
     final String newFileName = baseName + "." + extension;
@@ -836,8 +831,7 @@ public final class FileUtil {
    * @return The relative path.
    * @throws IOException If an I/O error occurs.
    */
-  public static String getRelativePath(final File parentDirectory,
-    final File file) {
+  public static String getRelativePath(final File parentDirectory, final File file) {
     final String parentPath = getCanonicalPath(parentDirectory);
     final String filePath = getCanonicalPath(file);
     if (filePath.startsWith(parentPath)) {
@@ -925,8 +919,7 @@ public final class FileUtil {
     return Collections.emptyList();
   }
 
-  public static List<File> listVisibleFiles(final File file,
-    final FileFilter filter) {
+  public static List<File> listVisibleFiles(final File file, final FileFilter filter) {
     if (file != null && file.isDirectory()) {
       final List<File> visibleFiles = new ArrayList<File>();
       final File[] files = file.listFiles(filter);
@@ -947,9 +940,8 @@ public final class FileUtil {
     final StringBuilder encoded = new StringBuilder(len);
     for (int i = 0; i < len; i++) {
       final char ch = host.charAt(i);
-      if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0'
-          && ch <= '9' || ch == '-' || ch == ',' || ch == '.' || ch == '_'
-          || ch == '~' || ch == ' ') {
+      if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '-'
+        || ch == ',' || ch == '.' || ch == '_' || ch == '~' || ch == ' ') {
         encoded.append(ch);
       } else {
         encoded.append('%');
