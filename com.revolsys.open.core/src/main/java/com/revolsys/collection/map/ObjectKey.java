@@ -1,4 +1,4 @@
-package com.revolsys.collection;
+package com.revolsys.collection.map;
 
 public class ObjectKey {
   private Object value;

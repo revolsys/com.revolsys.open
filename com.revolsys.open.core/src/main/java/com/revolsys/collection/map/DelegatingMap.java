@@ -1,4 +1,4 @@
-package com.revolsys.io.map;
+package com.revolsys.collection.map;
 
 import java.util.AbstractMap;
 import java.util.Map;

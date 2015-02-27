@@ -1,4 +1,4 @@
-package com.revolsys.collection;
+package com.revolsys.collection.map;
 
 import java.util.Iterator;
 import java.util.Map;

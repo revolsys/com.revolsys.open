@@ -20,9 +20,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.collection.IntHashMap;
 import com.revolsys.collection.Visitor;
 import com.revolsys.collection.bplus.BPlusTreeMap;
+import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.comparator.ComparatorProxy;
 import com.revolsys.data.record.Record;
 import com.revolsys.filter.Filter;

@@ -13,7 +13,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import com.revolsys.collection.IntHashMap;
+import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.gis.cs.AngularUnit;
 import com.revolsys.gis.cs.Area;
 import com.revolsys.gis.cs.Authority;

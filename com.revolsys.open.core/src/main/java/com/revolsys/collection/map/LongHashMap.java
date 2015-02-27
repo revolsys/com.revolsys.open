@@ -1,4 +1,4 @@
-package com.revolsys.collection;
+package com.revolsys.collection.map;
 
 /*
  * $Id: ArrayListStack.java 4448 2006-02-14 20:54:57Z jonathanlocke $ $Revision:
@@ -28,6 +28,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import com.revolsys.collection.ArrayUtil;
 
 /**
  * This is a long hashmap that has the exact same features and interface as a

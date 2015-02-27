@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.collection.IntHashMap;
+import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;

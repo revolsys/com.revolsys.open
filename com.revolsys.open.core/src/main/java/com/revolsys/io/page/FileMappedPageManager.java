@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.collection.LruMap;
+import com.revolsys.collection.map.LruMap;
 import com.revolsys.io.FileUtil;
 
 public class FileMappedPageManager implements PageManager {

@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.revolsys.collection.map.DelegatingMap;
+
 public class MapBackedSerializer extends DelegatingMap<String, Object> implements MapSerializer {
   public static MapBackedSerializer hash() {
     return new MapBackedSerializer(new HashMap<String, Object>());

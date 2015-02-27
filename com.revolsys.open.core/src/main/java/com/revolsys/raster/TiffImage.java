@@ -15,7 +15,7 @@ import org.libtiff.jai.codecimpl.XTIFFCodec;
 import org.libtiff.jai.operator.XTIFFDescriptor;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.collection.IntHashMap;
+import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.gis.cs.Area;
 import com.revolsys.gis.cs.Authority;
 import com.revolsys.gis.cs.Axis;

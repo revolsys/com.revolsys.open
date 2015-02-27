@@ -10,7 +10,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.collection.LongHashMap;
+import com.revolsys.collection.map.LongHashMap;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.io.file.UrlResource;
 import com.revolsys.io.xml.StaxUtils;

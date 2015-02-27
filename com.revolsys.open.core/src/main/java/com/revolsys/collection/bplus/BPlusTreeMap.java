@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.springframework.util.comparator.ComparableComparator;
 
-import com.revolsys.collection.MapKeySetEntrySet;
+import com.revolsys.collection.map.MapKeySetEntrySet;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.page.FileMappedPageManager;
 import com.revolsys.io.page.FilePageManager;

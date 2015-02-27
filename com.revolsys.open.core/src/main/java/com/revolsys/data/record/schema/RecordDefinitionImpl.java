@@ -17,7 +17,7 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.collection.WeakCache;
+import com.revolsys.collection.map.WeakCache;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.codes.CodeTableProperty;
 import com.revolsys.data.record.ArrayRecordFactory;

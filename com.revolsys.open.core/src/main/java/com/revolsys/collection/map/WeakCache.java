@@ -1,4 +1,4 @@
-package com.revolsys.collection;
+package com.revolsys.collection.map;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+
+import com.revolsys.collection.ReferenceEntrySet;
+import com.revolsys.collection.ReferenceSet;
 
 public class WeakCache<K, V> implements Map<K, V> {
   private final Map<K, Reference<V>> cache = new WeakHashMap<>();

@@ -42,7 +42,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 import com.revolsys.awt.WebColors;
-import com.revolsys.collection.LruMap;
+import com.revolsys.collection.map.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.query.Equal;

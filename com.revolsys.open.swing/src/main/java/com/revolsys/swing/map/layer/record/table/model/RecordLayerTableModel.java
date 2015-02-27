@@ -22,7 +22,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
-import com.revolsys.collection.LruMap;
+import com.revolsys.collection.map.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.query.BinaryCondition;

@@ -6,8 +6,8 @@ import java.util.Map;
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 
-import com.revolsys.collection.LruMap;
 import com.revolsys.collection.ResultPager;
+import com.revolsys.collection.map.LruMap;
 import com.revolsys.swing.list.ResultPagerListCellRenderer;
 
 @SuppressWarnings("serial")

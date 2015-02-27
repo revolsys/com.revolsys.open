@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.collection.WeakCache;
+import com.revolsys.collection.map.WeakCache;
 import com.revolsys.io.FileUtil;
 
 public class FilePageManager implements PageManager {

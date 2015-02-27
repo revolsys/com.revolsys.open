@@ -17,7 +17,7 @@ import org.springframework.core.io.Resource;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.revolsys.collection.AbstractIterator;
-import com.revolsys.collection.LongHashMap;
+import com.revolsys.collection.map.LongHashMap;
 import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
