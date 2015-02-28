@@ -17,7 +17,7 @@ public class TableRowCount extends JLabel implements TableModelListener {
    */
   private static final long serialVersionUID = 1L;
 
-  private final TableModel model;
+  private TableModel model;
 
   public TableRowCount(final TableModel model) {
     setToolTipText("Record Count");
@@ -28,6 +28,15 @@ public class TableRowCount extends JLabel implements TableModelListener {
     this.model = model;
     model.addTableModelListener(this);
     tableChanged(null);
+  }
+
+  @Override
+  public void removeNotify() {
+    if (this.model != null) {
+      this.model.removeTableModelListener(this);
+      this.model = null;
+    }
+    super.removeNotify();
   }
 
   @Override

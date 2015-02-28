@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
@@ -40,8 +41,10 @@ import com.revolsys.data.query.Q;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.query.RightUnaryCondition;
 import com.revolsys.data.query.Value;
+import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.filter.Filter;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.DateField;
@@ -52,6 +55,8 @@ import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
+import com.revolsys.swing.map.layer.record.SqlLayerFilter;
+import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
@@ -94,7 +99,7 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
 
   private ComboBox operatorField;
 
-  private final RecordLayerTableModel tableModel;
+  private RecordLayerTableModel tableModel;
 
   private final boolean eventsEnabled = true;
 
@@ -139,6 +144,19 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
     add(this.searchFieldPanel);
     GroupLayoutUtil.makeColumns(this, 4, false);
     clear();
+  }
+
+  public FieldFilterPanel(final TablePanel tablePanel, final RecordLayerTableModel tableModel,
+    final Map<String, Object> config) {
+    this(tablePanel, tableModel);
+
+    setSearchFieldName((String)config.get("searchField"));
+    final Filter<Record> filter = AbstractRecordLayerRenderer.getFilter(this.layer, config);
+    if (filter instanceof SqlLayerFilter) {
+      final SqlLayerFilter sqlFilter = (SqlLayerFilter)filter;
+      final Condition condition = sqlFilter.getCondition();
+      setFilter(condition);
+    }
   }
 
   @Override
@@ -188,16 +206,17 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
       this.settingFilter = true;
       String searchField = this.previousSearchFieldName;
       if (!Property.hasValue(searchField)) {
-        searchField = this.layer.getProperty("searchField");
-        if (!Property.hasValue(searchField)) {
-          searchField = this.recordDefinition.getFieldNames().get(0);
-        }
+        searchField = this.recordDefinition.getFieldNames().get(0);
       }
       setSearchFieldName(searchField);
       setFilter(null);
     } finally {
       this.settingFilter = false;
     }
+  }
+
+  public void close() {
+    this.tableModel = null;
   }
 
   public void fireSearchChanged(final String propertyName, final Object oldValue,
@@ -226,7 +245,12 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
   }
 
   public String getSearchFieldName() {
-    return (String)this.nameField.getSelectedItem();
+    final String searchFieldName = (String)this.nameField.getSelectedItem();
+    if (Property.hasValue(searchFieldName)) {
+      return searchFieldName;
+    } else {
+      return this.previousSearchFieldName;
+    }
   }
 
   public final String getSearchOperator() {
@@ -469,10 +493,10 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
   }
 
   private void setSearchFieldName(final String searchFieldName) {
-    if (!EqualsRegistry.equal(searchFieldName, this.previousSearchFieldName)) {
+    if (Property.hasValue(searchFieldName)
+      && !EqualsRegistry.equal(searchFieldName, this.previousSearchFieldName)) {
       this.lastValue = null;
       this.previousSearchFieldName = searchFieldName;
-      this.layer.setProperty("searchField", searchFieldName);
       final RecordDefinition recordDefinition = this.tableModel.getRecordDefinition();
       this.attribute = recordDefinition.getField(searchFieldName);
       final Class<?> attributeClass = this.attribute.getTypeClass();
@@ -503,7 +527,7 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
     }
   }
 
-  private boolean setSearchFilter(final Condition filter) {
+  public boolean setSearchFilter(final Condition filter) {
     return this.tableModel.setFilter(filter);
   }
 

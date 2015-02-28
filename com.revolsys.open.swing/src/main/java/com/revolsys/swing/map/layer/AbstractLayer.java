@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.Icon;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.beans.EventsEnabler;
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.collection.map.MapSerializerMap;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsInstance;
@@ -44,6 +46,7 @@ import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.io.AbstractObjectWithProperties;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -110,6 +113,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
   private boolean querySupported = true;
 
   private boolean readOnly = false;
+
+  private Map<String, Map<String, Object>> pluginConfigByName = new TreeMap<>();
 
   private LayerRenderer<AbstractLayer> renderer;
 
@@ -507,6 +512,15 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
     return path;
   }
 
+  public Map<String, Object> getPluginConfig(final String pluginName) {
+    final Map<String, Object> pluginConfig = this.pluginConfigByName.get(pluginName);
+    if (pluginConfig == null) {
+      return Collections.emptyMap();
+    } else {
+      return new LinkedHashMap<>(pluginConfig);
+    }
+  }
+
   @Override
   public Project getProject() {
     final LayerGroup layerGroup = getLayerGroup();
@@ -829,6 +843,18 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
     firePropertyChange("name", oldValue, this.name);
   }
 
+  public void setPluginConfig(final Map<String, Map<String, Object>> pluginConfig) {
+    this.pluginConfigByName = pluginConfig;
+  }
+
+  public void setPluginConfig(final String pluginName, final Map<String, Object> config) {
+    this.pluginConfigByName.put(pluginName, config);
+  }
+
+  public void setPluginConfig(final String pluginName, final MapSerializer serializer) {
+    setPluginConfig(pluginName, new MapSerializerMap(serializer));
+  }
+
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     if (properties == null || !this.getProperties().equals(properties)) {
@@ -965,7 +991,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
     }
   }
 
-  protected <C extends Component> C showTableView() {
+  public <C extends Component> C showTableView() {
     final ProjectFrame projectFrame = ProjectFrame.get(this);
     return projectFrame.addBottomTab(this);
   }
@@ -997,6 +1023,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
     MapSerializerUtil.add(map, "maximumScale", this.maximumScale);
     MapSerializerUtil.add(map, "minimumScale", this.minimumScale);
     MapSerializerUtil.add(map, "style", this.renderer);
+    MapSerializerUtil.add(map, "pluginConfig", this.pluginConfigByName);
     final Map<String, Object> properties = (Map<String, Object>)MapSerializerUtil.getValue(getProperties());
     if (properties != null) {
       for (final Entry<String, Object> entry : properties.entrySet()) {

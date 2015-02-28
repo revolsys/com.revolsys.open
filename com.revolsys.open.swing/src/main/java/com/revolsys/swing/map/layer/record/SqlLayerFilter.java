@@ -44,7 +44,7 @@ public class SqlLayerFilter implements Filter<Record>, MapSerializer {
     }
   }
 
-  private synchronized Condition getCondition() {
+  public synchronized Condition getCondition() {
     if (this.condition == null) {
       if (!this.initialized) {
         final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
@@ -64,8 +64,7 @@ public class SqlLayerFilter implements Filter<Record>, MapSerializer {
             final String query = new UriTemplate(this.query).expandString(uriVariables);
             this.condition = QueryValue.parseWhere(recordDefinition, query);
           } catch (final Throwable e) {
-            LoggerFactory.getLogger(getClass()).error(
-              "Invalid query: " + this.query, e);
+            LoggerFactory.getLogger(getClass()).error("Invalid query: " + this.query, e);
           }
         }
       }

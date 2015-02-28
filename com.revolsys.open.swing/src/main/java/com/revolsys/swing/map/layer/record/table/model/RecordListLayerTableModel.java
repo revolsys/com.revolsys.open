@@ -1,11 +1,8 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
@@ -19,7 +16,7 @@ import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.util.Property;
 
 public class RecordListLayerTableModel extends RecordLayerTableModel implements
-PropertyChangeListener {
+  PropertyChangeListener {
   public static RecordLayerTable createTable(final ListRecordLayer layer) {
     final RecordLayerTableModel model = new RecordListLayerTableModel(layer);
     final RecordLayerTable table = new RecordLayerTable(model);
@@ -32,33 +29,12 @@ PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
-  private final Set<PropertyChangeListener> propertyChangeListeners = new LinkedHashSet<PropertyChangeListener>();
-
   private List<LayerRecord> records = Collections.emptyList();
 
   public RecordListLayerTableModel(final ListRecordLayer layer) {
     super(layer);
     setEditable(false);
     setSortableModes(MODE_SELECTED, MODE_ALL);
-  }
-
-  @Override
-  public void addPropertyChangeListener(
-    final PropertyChangeListener propertyChangeListener) {
-    this.propertyChangeListeners.add(propertyChangeListener);
-  }
-
-  private void firePropertyChange(final Record object, final String name,
-    final Object oldValue, final Object newValue) {
-    final PropertyChangeEvent event = new PropertyChangeEvent(object, name,
-      oldValue, newValue);
-    for (final PropertyChangeListener listener : this.propertyChangeListeners) {
-      listener.propertyChange(event);
-    }
-  }
-
-  public Set<PropertyChangeListener> getPropertyChangeListeners() {
-    return Collections.unmodifiableSet(this.propertyChangeListeners);
   }
 
   @Override
@@ -99,14 +75,7 @@ PropertyChangeListener {
   }
 
   @Override
-  public void removePropertyChangeListener(
-    final PropertyChangeListener propertyChangeListener) {
-    this.propertyChangeListeners.remove(propertyChangeListener);
-  }
-
-  @Override
-  public void setValueAt(final Object value, final int rowIndex,
-    final int columnIndex) {
+  public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     final Record record = getRecord(rowIndex);
     if (record != null) {
       final String name = getColumnName(columnIndex);

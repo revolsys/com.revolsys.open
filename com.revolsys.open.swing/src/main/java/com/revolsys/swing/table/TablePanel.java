@@ -67,16 +67,15 @@ public class TablePanel extends JPanel implements MouseListener {
 
   private static Reference<JTable> eventTable = new WeakReference<JTable>(null);
 
-  private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(
-      null);
+  private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(null);
 
   private static final long serialVersionUID = 1L;
 
-  private final JTable table;
+  private JTable table;
 
-  private final ToolBar toolBar = new ToolBar();
+  private ToolBar toolBar = new ToolBar();
 
-  private final JScrollPane scrollPane;
+  private JScrollPane scrollPane;
 
   public TablePanel(final JTable table) {
     super(new BorderLayout());
@@ -100,9 +99,8 @@ public class TablePanel extends JPanel implements MouseListener {
     menu.addMenuItemTitleIcon("dataTransfer", "Cut Field Value", "cut",
       new ObjectPropertyEnableCheck(this, "canCut"), this, "cutFieldValue");
 
-    menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value",
-      "paste_plain", new ObjectPropertyEnableCheck(this, "canPaste"), this,
-        "pasteFieldValue");
+    menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value", "paste_plain",
+      new ObjectPropertyEnableCheck(this, "canPaste"), this, "pasteFieldValue");
   }
 
   private void copyCurrentCell() {
@@ -185,8 +183,7 @@ public class TablePanel extends JPanel implements MouseListener {
   }
 
   public boolean isCanCut() {
-    return isEditingCurrentCell() || isCurrentCellHasValue()
-        && isCurrentCellEditable();
+    return isEditingCurrentCell() || isCurrentCellHasValue() && isCurrentCellEditable();
   }
 
   public boolean isCanPaste() {
@@ -268,6 +265,25 @@ public class TablePanel extends JPanel implements MouseListener {
         tableModel.setValueAt(value, eventRow, eventColumn);
       }
     }
+  }
+
+  @Override
+  public void removeNotify() {
+    if (this.scrollPane != null) {
+      remove(this.scrollPane);
+      this.scrollPane = null;
+    }
+    if (this.table != null) {
+      this.table.removeMouseListener(this);
+      final AbstractTableModel model = getTableModel();
+      model.dispose();
+    }
+    this.table = null;
+    if (this.toolBar != null) {
+      remove(this.toolBar);
+      this.toolBar = null;
+    }
+    super.removeNotify();
   }
 
 }

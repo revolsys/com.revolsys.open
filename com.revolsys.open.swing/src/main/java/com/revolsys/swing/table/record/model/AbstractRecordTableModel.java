@@ -1,8 +1,5 @@
 package com.revolsys.swing.table.record.model;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -33,18 +30,12 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
 
   private boolean editable;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
   public AbstractRecordTableModel() {
     this(null);
   }
 
   public AbstractRecordTableModel(final RecordDefinition recordDefinition) {
     this.recordDefinition = recordDefinition;
-  }
-
-  public void addPropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
-    Property.addListener(this.propertyChangeSupport, propertyChangeListener);
   }
 
   public void addReadOnlyFieldNames(final Collection<String> fieldNames) {
@@ -60,23 +51,11 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
     }
   }
 
+  @Override
   @PreDestroy
   public void dispose() {
+    super.dispose();
     this.recordDefinition = null;
-  }
-
-  protected void firePropertyChange(final PropertyChangeEvent event) {
-    this.propertyChangeSupport.firePropertyChange(event);
-  }
-
-  protected void firePropertyChange(final String propertyName, final int index,
-    final Object oldValue, final Object newValue) {
-    this.propertyChangeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-  }
-
-  protected void firePropertyChange(final String propertyName, final Object oldValue,
-    final Object newValue) {
-    this.propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
   }
 
   public String getFieldName(final int attributeIndex) {
@@ -85,11 +64,6 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
   }
 
   public abstract String getFieldName(int rowIndex, int columnIndex);
-
-  @Override
-  public PropertyChangeSupport getPropertyChangeSupport() {
-    return this.propertyChangeSupport;
-  }
 
   public Set<String> getReadOnlyFieldNames() {
     return this.readOnlyFieldNames;
@@ -114,10 +88,6 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
       codeTable.getCodes();
       fireTableDataChanged();
     }
-  }
-
-  public void removePropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
-    Property.removeListener(this.propertyChangeSupport, propertyChangeListener);
   }
 
   public void setEditable(final boolean editable) {

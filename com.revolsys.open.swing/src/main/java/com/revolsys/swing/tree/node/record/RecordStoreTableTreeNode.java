@@ -35,28 +35,25 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
   private static final MenuFactory MENU = new MenuFactory("Record Store Table");
 
   static {
-    for (final String geometryType : Arrays.asList("Geometry", "Point",
-      "MultiPoint", "LineString", "MultiLineString", "Polygon", "MultiPolygon")) {
-      ICONS_GEOMETRY.put(geometryType,
-        Icons.getIcon("table_" + geometryType.toLowerCase()));
+    for (final String geometryType : Arrays.asList("Geometry", "Point", "MultiPoint", "LineString",
+      "MultiLineString", "Polygon", "MultiPolygon")) {
+      ICONS_GEOMETRY.put(geometryType, Icons.getIcon("table_" + geometryType.toLowerCase()));
     }
     ICONS_GEOMETRY.put("GeometryCollection", Icons.getIcon("table_geometry"));
 
-    MENU.addMenuItem("default",
-      TreeNodeRunnable.createAction("Add Layer", "map_add", "addLayer"));
+    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Add Layer", "map_add", "addLayer"));
   }
 
   private final Map<String, Object> connectionMap;
 
-  public RecordStoreTableTreeNode(final Map<String, Object> connectionMap,
-    final String typePath, final String geometryType) {
+  public RecordStoreTableTreeNode(final Map<String, Object> connectionMap, final String typePath,
+    final String geometryType) {
     super(typePath);
     this.connectionMap = connectionMap;
     if (geometryType == null) {
       setType("Data Table");
     } else {
-      setType("Data Table (" + CaseConverter.toCapitalizedWords(geometryType)
-        + ")");
+      setType("Data Table (" + CaseConverter.toCapitalizedWords(geometryType) + ")");
     }
 
     final String name = Path.getName(typePath);
@@ -76,6 +73,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     layerConfig.put("typePath", typePath);
     final AbstractLayer layer = RecordStoreLayer.create(layerConfig);
     Project.get().addLayer(layer);
+    layer.showTableView();
     // TODO different layer groups?
   }
 

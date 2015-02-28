@@ -37,7 +37,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayerRenderer extends
-AbstractLayerRenderer<AbstractRecordLayer> {
+  AbstractLayerRenderer<AbstractRecordLayer> {
 
   public static void addRendererClass(final String name,
     final Class<? extends AbstractRecordLayerRenderer> clazz) {
@@ -53,7 +53,7 @@ AbstractLayerRenderer<AbstractRecordLayer> {
   }
 
   public static Filter<Record> getFilter(final AbstractRecordLayer layer,
-    final Map<String, Object> style) {
+    final Map<String, ? extends Object> style) {
     @SuppressWarnings("unchecked")
     Map<String, Object> filterDefinition = (Map<String, Object>)style.get("filter");
     if (filterDefinition != null) {
@@ -68,13 +68,10 @@ AbstractLayerRenderer<AbstractRecordLayer> {
           query = query.replaceAll("== null", "IS NULL");
           query = query.replaceAll("==", "=");
           query = query.replaceAll("!=", "<>");
-          query = query.replaceAll("\\{(.*)\\}.contains\\((.*)\\)",
-              "$2 IN ($1)");
+          query = query.replaceAll("\\{(.*)\\}.contains\\((.*)\\)", "$2 IN ($1)");
           query = query.replaceAll("\\[(.*)\\]", "$1");
-          query = query.replaceAll("(.*).startsWith\\('(.*)'\\)",
-              "$1 LIKE '$2%'");
-          query = query.replaceAll("#systemProperties\\['user.name'\\]",
-              "'{gbaUsername}'");
+          query = query.replaceAll("(.*).startsWith\\('(.*)'\\)", "$1 LIKE '$2%'");
+          query = query.replaceAll("#systemProperties\\['user.name'\\]", "'{gbaUsername}'");
           return new SqlLayerFilter(layer, query);
         }
       } else if ("sqlFilter".equals(type)) {
@@ -90,9 +87,8 @@ AbstractLayerRenderer<AbstractRecordLayer> {
     return DEFAULT_FILTER;
   }
 
-  public static AbstractRecordLayerRenderer getRenderer(
-    final AbstractLayer layer, final LayerRenderer<?> parent,
-    final Map<String, Object> style) {
+  public static AbstractRecordLayerRenderer getRenderer(final AbstractLayer layer,
+    final LayerRenderer<?> parent, final Map<String, Object> style) {
     final String type = (String)style.remove("type");
     final Constructor<? extends AbstractRecordLayerRenderer> constructor = RENDERER_CONSTRUCTORS.get(type);
     if (constructor == null) {
@@ -103,15 +99,14 @@ AbstractLayerRenderer<AbstractRecordLayer> {
       try {
         return constructor.newInstance(layer, parent, style);
       } catch (final Throwable e) {
-        ExceptionUtil.log(AbstractRecordLayerRenderer.class,
-          "Unable to create renderer", e);
+        ExceptionUtil.log(AbstractRecordLayerRenderer.class, "Unable to create renderer", e);
         return null;
       }
     }
   }
 
-  public static LayerRenderer<AbstractRecordLayer> getRenderer(
-    final AbstractLayer layer, final Map<String, Object> style) {
+  public static LayerRenderer<AbstractRecordLayer> getRenderer(final AbstractLayer layer,
+    final Map<String, Object> style) {
     return getRenderer(layer, null, style);
   }
 
@@ -128,12 +123,10 @@ AbstractLayerRenderer<AbstractRecordLayer> {
     addRendererClass("filterStyle", FilterMultipleRenderer.class);
 
     final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayerRenderer.class);
-    menu.addMenuItem("layer", MenuSourceRunnable.createAction(
-      "View/Edit Style", "palette", new MenuSourcePropertyEnableCheck(
-        "editing", false), "showProperties"));
-    menu.addMenuItem("layer", MenuSourceRunnable.createAction("Delete",
-      "delete", new MenuSourcePropertyEnableCheck("parent", null, true),
-        "delete"));
+    menu.addMenuItem("layer", MenuSourceRunnable.createAction("View/Edit Style", "palette",
+      new MenuSourcePropertyEnableCheck("editing", false), "showProperties"));
+    menu.addMenuItem("layer", MenuSourceRunnable.createAction("Delete", "delete",
+      new MenuSourcePropertyEnableCheck("parent", null, true), "delete"));
 
     menu.addComponentFactory("scale", new TreeItemScaleMenu(true, null));
     menu.addComponentFactory("scale", new TreeItemScaleMenu(false, null));
@@ -141,8 +134,8 @@ AbstractLayerRenderer<AbstractRecordLayer> {
     for (final String type : Arrays.asList("Multiple", "Filter", "Scale")) {
       final String iconName = ("style_" + type + "_wrap").toLowerCase();
       final ImageIcon icon = Icons.getIcon(iconName);
-      final InvokeMethodAction action = MenuSourceRunnable.createAction(
-        "Wrap With " + type + " Style", icon, null, "wrapWith" + type + "Style");
+      final InvokeMethodAction action = MenuSourceRunnable.createAction("Wrap With " + type
+        + " Style", icon, null, "wrapWith" + type + "Style");
       menu.addMenuItem("wrap", action);
     }
 
@@ -156,8 +149,7 @@ AbstractLayerRenderer<AbstractRecordLayer> {
   }
 
   public AbstractRecordLayerRenderer(final String type, final String name,
-    final AbstractRecordLayer layer, final LayerRenderer<?> parent,
-    final Map<String, Object> style) {
+    final AbstractRecordLayer layer, final LayerRenderer<?> parent, final Map<String, Object> style) {
     super(type, name, layer, parent, style);
     this.filter = getFilter(layer, style);
   }
@@ -212,13 +204,12 @@ AbstractLayerRenderer<AbstractRecordLayer> {
     }
   }
 
-  public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractLayer layer,
-    final LayerRecord record) {
+  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
+    final AbstractLayer layer, final LayerRecord record) {
   }
 
-  protected void renderRecords(final Viewport2D viewport,
-    final AbstractRecordLayer layer, final List<LayerRecord> records) {
+  protected void renderRecords(final Viewport2D viewport, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
     final BoundingBox visibleArea = viewport.getBoundingBox();
     for (final LayerRecord record : records) {
       if (record != null) {
@@ -227,18 +218,16 @@ AbstractLayerRenderer<AbstractRecordLayer> {
             renderRecord(viewport, visibleArea, layer, record);
           } catch (final TopologyException e) {
           } catch (final Throwable e) {
-            ExceptionUtil.log(
-              getClass(),
-              "Unabled to render " + layer.getName() + " #"
-                  + record.getIdentifier(), e);
+            ExceptionUtil.log(getClass(),
+              "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
           }
         }
       }
     }
   }
 
-  public void renderSelectedRecord(final Viewport2D viewport,
-    final AbstractLayer layer, final LayerRecord record) {
+  public void renderSelectedRecord(final Viewport2D viewport, final AbstractLayer layer,
+    final LayerRecord record) {
     final BoundingBox boundingBox = viewport.getBoundingBox();
     if (isVisible(record)) {
       try {
@@ -248,8 +237,7 @@ AbstractLayerRenderer<AbstractRecordLayer> {
     }
   }
 
-  protected void replace(final AbstractLayer layer,
-    final AbstractMultipleRenderer parent,
+  protected void replace(final AbstractLayer layer, final AbstractMultipleRenderer parent,
     final AbstractMultipleRenderer newRenderer) {
     if (parent == null) {
       if (isEditing()) {
@@ -279,8 +267,7 @@ AbstractLayerRenderer<AbstractRecordLayer> {
   }
 
   public void setQueryFilter(final String query) {
-    if (this.filter instanceof SqlLayerFilter
-        || this.filter instanceof AcceptAllFilter) {
+    if (this.filter instanceof SqlLayerFilter || this.filter instanceof AcceptAllFilter) {
       if (Property.hasValue(query)) {
         final AbstractRecordLayer layer = getLayer();
         this.filter = new SqlLayerFilter(layer, query);
@@ -299,8 +286,7 @@ AbstractLayerRenderer<AbstractRecordLayer> {
     return map;
   }
 
-  protected void wrap(final AbstractLayer layer,
-    final AbstractMultipleRenderer parent,
+  protected void wrap(final AbstractLayer layer, final AbstractMultipleRenderer parent,
     final AbstractMultipleRenderer newRenderer) {
     newRenderer.addRenderer(this.clone());
     replace(layer, parent, newRenderer);
@@ -309,8 +295,7 @@ AbstractLayerRenderer<AbstractRecordLayer> {
   public FilterMultipleRenderer wrapWithFilterStyle() {
     final AbstractRecordLayer layer = getLayer();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
-    final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(
-      layer, parent);
+    final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(layer, parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;
   }
@@ -326,8 +311,7 @@ AbstractLayerRenderer<AbstractRecordLayer> {
   public ScaleMultipleRenderer wrapWithScaleStyle() {
     final AbstractRecordLayer layer = getLayer();
     final AbstractMultipleRenderer parent = (AbstractMultipleRenderer)getParent();
-    final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer,
-      parent);
+    final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer, parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;
   }

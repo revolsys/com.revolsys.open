@@ -4,6 +4,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionListener;
 
 public class NullSelectionModel implements ListSelectionModel {
+
+  public static final NullSelectionModel INSTANCE = new NullSelectionModel();
+
   @Override
   public void addListSelectionListener(final ListSelectionListener lsl) {
   }
@@ -47,8 +50,7 @@ public class NullSelectionModel implements ListSelectionModel {
   }
 
   @Override
-  public void insertIndexInterval(final int index, final int length,
-    final boolean before) {
+  public void insertIndexInterval(final int index, final int length, final boolean before) {
   }
 
   @Override

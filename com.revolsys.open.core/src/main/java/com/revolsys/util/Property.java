@@ -521,14 +521,32 @@ public final class Property {
       final PropertyChangeSupport propertyChangeSupport = propertyChangeSupport(source);
       if (propertyChangeSupport != null) {
         for (final PropertyChangeListener otherListener : propertyChangeSupport.getPropertyChangeListeners()) {
-          if (otherListener == propertyChangeListener) {
-            propertyChangeSupport.removePropertyChangeListener(propertyName, propertyChangeListener);
+          if (otherListener instanceof PropertyChangeListenerProxy) {
+            final PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy)otherListener;
+            final PropertyChangeListener proxyListener = proxy.getListener();
+
+            final String proxyPropertyName = proxy.getPropertyName();
+            if (proxyListener instanceof WeakPropertyChangeListener) {
+              final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)proxyListener;
+              final PropertyChangeListener listenerReference = weakListener.getListener();
+              if (listenerReference == null) {
+                propertyChangeSupport.removePropertyChangeListener(proxyPropertyName, weakListener);
+              } else if (proxyPropertyName.equals(propertyName)) {
+                if (listenerReference == propertyChangeListener) {
+                  propertyChangeSupport.removePropertyChangeListener(propertyName, weakListener);
+                }
+              }
+            } else if (propertyChangeListener == proxyListener) {
+              if (proxyPropertyName.equals(propertyName)) {
+                propertyChangeSupport.removePropertyChangeListener(propertyName,
+                  propertyChangeListener);
+              }
+            }
           } else if (otherListener instanceof WeakPropertyChangeListener) {
             final WeakPropertyChangeListener weakListener = (WeakPropertyChangeListener)otherListener;
             final PropertyChangeListener listenerReference = weakListener.getListener();
-            if (listenerReference == null || listenerReference == propertyChangeListener) {
-              propertyChangeSupport.removePropertyChangeListener(propertyName,
-                propertyChangeListener);
+            if (listenerReference == null) {
+              propertyChangeSupport.removePropertyChangeListener(weakListener);
             }
           }
         }

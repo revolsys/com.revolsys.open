@@ -1,7 +1,9 @@
 package com.revolsys.swing.table;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
 
+import javax.annotation.PreDestroy;
 import javax.swing.JComponent;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -9,24 +11,60 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 
-public abstract class AbstractTableModel extends
-javax.swing.table.AbstractTableModel implements PropertyChangeSupportProxy {
+public abstract class AbstractTableModel extends javax.swing.table.AbstractTableModel implements
+  PropertyChangeSupportProxy {
 
   /**
    *
    */
   private static final long serialVersionUID = 1L;
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
   private MenuFactory menu = new MenuFactory(getClass().getName());
 
   public AbstractTableModel() {
   }
 
-  public JComponent getEditorField(final int rowIndex, final int columnIndex,
-    final Object value) {
+  @PreDestroy
+  public void dispose() {
+    this.propertyChangeSupport = null;
+    this.menu = null;
+  }
+
+  protected void firePropertyChange(final Object source, final String name, final Object oldValue,
+    final Object newValue) {
+    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+    if (propertyChangeSupport != null) {
+      final PropertyChangeEvent event = new PropertyChangeEvent(source, name, oldValue, newValue);
+      propertyChangeSupport.firePropertyChange(event);
+    }
+  }
+
+  protected void firePropertyChange(final PropertyChangeEvent event) {
+    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.firePropertyChange(event);
+    }
+  }
+
+  protected void firePropertyChange(final String propertyName, final int index,
+    final Object oldValue, final Object newValue) {
+    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+    }
+  }
+
+  protected void firePropertyChange(final String propertyName, final Object oldValue,
+    final Object newValue) {
+    final PropertyChangeSupport propertyChangeSupport = getPropertyChangeSupport();
+    if (propertyChangeSupport != null) {
+      propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
+  }
+
+  public JComponent getEditorField(final int rowIndex, final int columnIndex, final Object value) {
     final Class<?> clazz = getColumnClass(columnIndex);
     return SwingUtil.createField(clazz, "field", value);
   }

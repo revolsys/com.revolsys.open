@@ -1,10 +1,13 @@
 package com.revolsys.collection.map;
 
-import java.util.AbstractMap;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class DelegatingMap<K, V> extends AbstractMap<K, V> {
+import com.revolsys.util.JavaBeanUtil;
+
+public class DelegatingMap<K, V> implements Map<K, V>, Cloneable {
 
   public static <K2, V2> Map<K2, V2> create(final Map<K2, V2> map) {
     return new DelegatingMap<>(map);
@@ -12,24 +15,57 @@ public class DelegatingMap<K, V> extends AbstractMap<K, V> {
 
   private Map<K, V> map;
 
+  public DelegatingMap() {
+    this(new LinkedHashMap<K, V>());
+  }
+
   public DelegatingMap(final Map<K, V> map) {
-    super();
+    if (map == null) {
+      throw new IllegalArgumentException("Map cannot be null");
+    }
     this.map = map;
   }
 
   @Override
   public void clear() {
-    this.map.clear();
+    getMap().clear();
+  }
+
+  @Override
+  protected DelegatingMap<K, V> clone() {
+    try {
+      @SuppressWarnings("unchecked")
+      final DelegatingMap<K, V> clone = (DelegatingMap<K, V>)super.clone();
+      clone.map = JavaBeanUtil.clone(getMap());
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      return this;
+    }
+  }
+
+  @Override
+  public boolean containsKey(final Object key) {
+    return getMap().containsKey(key);
+  }
+
+  @Override
+  public boolean containsValue(final Object value) {
+    return getMap().containsValue(value);
   }
 
   @Override
   public Set<Entry<K, V>> entrySet() {
-    return this.map.entrySet();
+    return getMap().entrySet();
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    return getMap().equals(o);
   }
 
   @Override
   public V get(final Object key) {
-    return this.map.get(key);
+    return getMap().get(key);
   }
 
   public Map<K, V> getMap() {
@@ -37,21 +73,54 @@ public class DelegatingMap<K, V> extends AbstractMap<K, V> {
   }
 
   @Override
+  public int hashCode() {
+    return getMap().hashCode();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return getMap().isEmpty();
+  }
+
+  @Override
+  public Set<K> keySet() {
+    return getMap().keySet();
+  }
+
+  @Override
   public V put(final K key, final V value) {
-    return this.map.put(key, value);
+    return getMap().put(key, value);
   }
 
   @Override
   public void putAll(final Map<? extends K, ? extends V> m) {
-    this.map.putAll(m);
+    getMap().putAll(m);
   }
 
   @Override
   public V remove(final Object key) {
-    return this.map.remove(key);
+    return getMap().remove(key);
   }
 
   public void setMap(final Map<K, V> map) {
+    if (map == null) {
+      throw new IllegalArgumentException("Map cannot be null");
+    }
     this.map = map;
+  }
+
+  @Override
+  public int size() {
+    return getMap().size();
+  }
+
+  @Override
+  public String toString() {
+    return getMap().toString();
+  }
+
+  @Override
+  public Collection<V> values() {
+    return getMap().values();
   }
 }

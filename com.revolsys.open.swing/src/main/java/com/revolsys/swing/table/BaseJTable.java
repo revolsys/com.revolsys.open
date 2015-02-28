@@ -16,6 +16,7 @@ import javax.swing.table.TableModel;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.table.TableColumnExt;
 
@@ -33,10 +34,10 @@ public class BaseJTable extends JXTable {
     super(model);
     setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-    addHighlighter(new ColorHighlighter(HighlightPredicate.ODD, new Color(223,
-      223, 223), WebColors.Black, WebColors.Navy, WebColors.White));
-    addHighlighter(new ColorHighlighter(HighlightPredicate.EVEN,
-      WebColors.White, WebColors.Black, WebColors.Blue, WebColors.White));
+    addHighlighter(new ColorHighlighter(HighlightPredicate.ODD, new Color(223, 223, 223),
+      WebColors.Black, WebColors.Navy, WebColors.White));
+    addHighlighter(new ColorHighlighter(HighlightPredicate.EVEN, WebColors.White, WebColors.Black,
+      WebColors.Blue, WebColors.White));
 
     final TableCellRenderer headerRenderer = new SortableTableCellHeaderRenderer();
     final JTableHeader tableHeader = getTableHeader();
@@ -44,16 +45,15 @@ public class BaseJTable extends JXTable {
     tableHeader.setReorderingAllowed(true);
     setFont(SwingUtil.FONT);
 
-    SwingUtil.addAction(this,
-      KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK),
+    SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK),
       "selectPreviousColumnCell", this, "editRelativeCell", 0, -1);
-    SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0),
-      "selectNextColumnCell", this, "editRelativeCell", 0, 1);
+    SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), "selectNextColumnCell",
+      this, "editRelativeCell", 0, 1);
     SwingUtil.addAction(this,
       KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK),
       "selectPreviousRowCell", this, "editRelativeCell", -1, 0);
-    SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
-      "enterPressed", this, "editRelativeCell", 1, 0);
+    SwingUtil.addAction(this, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "enterPressed", this,
+      "editRelativeCell", 1, 0);
 
     putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
   }
@@ -97,8 +97,7 @@ public class BaseJTable extends JXTable {
   @Override
   protected void createDefaultRenderers() {
     super.createDefaultRenderers();
-    setDefaultRenderer(Object.class, new DefaultTableRenderer(
-      new StringConverterValue()));
+    setDefaultRenderer(Object.class, new DefaultTableRenderer(new StringConverterValue()));
 
   }
 
@@ -107,10 +106,16 @@ public class BaseJTable extends JXTable {
     return new BaseRowSorter(getModel());
   }
 
+  public void dispose() {
+    for (final Highlighter highlighter : getHighlighters()) {
+      removeHighlighter(highlighter);
+    }
+  }
+
   public void editCell(final int rowIndex, final int columnIndex) {
 
     if (rowIndex >= 0 && rowIndex < getRowCount() && columnIndex >= 0
-        && columnIndex < getColumnCount()) {
+      && columnIndex < getColumnCount()) {
       requestFocusInWindow();
       changeSelection(rowIndex, columnIndex, false, false);
       editCellAt(rowIndex, columnIndex);
@@ -127,13 +132,12 @@ public class BaseJTable extends JXTable {
     editCell(rowIndex, columnIndex);
   }
 
-  public int getPreferedSize(TableCellRenderer renderer,
-    final Class<?> columnClass, final Object value) {
+  public int getPreferedSize(TableCellRenderer renderer, final Class<?> columnClass,
+    final Object value) {
     if (renderer == null) {
       renderer = getDefaultRenderer(columnClass);
     }
-    final Component comp = renderer.getTableCellRendererComponent(this, value,
-      false, false, 0, -1);
+    final Component comp = renderer.getTableCellRendererComponent(this, value, false, false, 0, -1);
     final int width = comp.getPreferredSize().width;
     return width;
   }
@@ -183,8 +187,7 @@ public class BaseJTable extends JXTable {
   }
 
   @Override
-  public Component prepareRenderer(final TableCellRenderer renderer,
-    final int row, final int column) {
+  public Component prepareRenderer(final TableCellRenderer renderer, final int row, final int column) {
     try {
       return super.prepareRenderer(renderer, row, column);
     } catch (final IndexOutOfBoundsException e) {
@@ -200,8 +203,7 @@ public class BaseJTable extends JXTable {
 
       final TableCellRenderer headerRenderer = column.getHeaderRenderer();
       final String columnName = model.getColumnName(columnIndex);
-      int maxPreferedWidth = getPreferedSize(headerRenderer, String.class,
-        columnName);
+      int maxPreferedWidth = getPreferedSize(headerRenderer, String.class, columnName);
 
       for (int rowIndex = 0; rowIndex < model.getRowCount(); rowIndex++) {
         final Object value = model.getValueAt(rowIndex, columnIndex);

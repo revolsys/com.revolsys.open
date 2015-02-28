@@ -18,8 +18,8 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
 
-public class ObjectListTableModel<T> extends AbstractTableModel implements
-Reorderable, PropertyChangeListener {
+public class ObjectListTableModel<T> extends AbstractTableModel implements Reorderable,
+  PropertyChangeListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -31,8 +31,7 @@ Reorderable, PropertyChangeListener {
 
   private PropertyChangeArrayList<T> objects;
 
-  public ObjectListTableModel(final Collection<? extends T> objects,
-    final List<String> columnNames) {
+  public ObjectListTableModel(final Collection<? extends T> objects, final List<String> columnNames) {
     this(objects, columnNames, columnNames);
   }
 
@@ -63,8 +62,7 @@ Reorderable, PropertyChangeListener {
     setEditable(true);
   }
 
-  public ObjectListTableModel(final List<String> columnNames,
-    final List<String> columnTitles) {
+  public ObjectListTableModel(final List<String> columnNames, final List<String> columnTitles) {
     this(Collections.<T> emptyList(), columnNames, columnTitles);
   }
 
@@ -89,16 +87,17 @@ Reorderable, PropertyChangeListener {
     this.objects.clear();
   }
 
+  @Override
   @PreDestroy
   public void dispose() {
     Property.removeListener(this.objects, this);
     this.objects = null;
   }
 
-  private void firePropertyChange(final Object object, final String name,
-    final Object oldValue, final Object newValue) {
-    final PropertyChangeEvent event = new PropertyChangeEvent(object, name,
-      oldValue, newValue);
+  @Override
+  protected void firePropertyChange(final Object object, final String name, final Object oldValue,
+    final Object newValue) {
+    final PropertyChangeEvent event = new PropertyChangeEvent(object, name, oldValue, newValue);
     this.objects.getPropertyChangeSupport().firePropertyChange(event);
   }
 
@@ -235,8 +234,7 @@ Reorderable, PropertyChangeListener {
   }
 
   @Override
-  public void setValueAt(final Object value, final int rowIndex,
-    final int columnIndex) {
+  public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
     final Object object = getObject(rowIndex);
     if (object != null) {
       final String name = getColumnName(columnIndex);

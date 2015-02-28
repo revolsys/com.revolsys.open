@@ -283,6 +283,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
 
   private String fieldNamesSetName = ALL;
 
+  private String where;
+
   public AbstractRecordLayer() {
     this("");
   }
@@ -297,6 +299,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
       renderer.setStyle(GeometryStyle.createStyle());
     }
     setProperties(properties);
+    final Filter<Record> filter = AbstractRecordLayerRenderer.getFilter(this, properties);
+    if (filter instanceof SqlLayerFilter) {
+      final SqlLayerFilter sqlFilter = (SqlLayerFilter)filter;
+      setWhere(sqlFilter.getQuery());
+    }
     if (this.fieldNamesSets.isEmpty()) {
       setFieldNamesSets(null);
     }
@@ -2406,6 +2413,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
       }
       this.fieldNamesSets.put(ALL.toUpperCase(), allFieldNames);
       this.query.setRecordDefinition(recordDefinition);
+      setWhere(this.where);
     }
 
   }
@@ -2490,9 +2498,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
   }
 
   public void setWhere(final String where) {
-    final Query query = this.query.clone();
-    query.setWhere(where);
-    setQuery(query);
+    this.where = where;
+    if (this.query.getRecordDefinition() != null) {
+      final Query query = this.query.clone();
+      query.setWhere(where);
+      setQuery(query);
+    }
   }
 
   public void setWhereCondition(final Condition whereCondition) {
@@ -2705,6 +2716,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     MapSerializerUtil.add(map, "fieldNamesSetName", this.fieldNamesSetName, ALL);
     MapSerializerUtil.add(map, "fieldNamesSets", getFieldNamesSets());
     MapSerializerUtil.add(map, "useFieldTitles", this.useFieldTitles);
+    map.remove("filter");
+    if (this.query != null) {
+      final String where = this.query.getWhere();
+      if (Property.hasValue(where)) {
+        final SqlLayerFilter filter = new SqlLayerFilter(this, where);
+        MapSerializerUtil.add(map, "filter", filter);
+      }
+    }
     return map;
   }
 

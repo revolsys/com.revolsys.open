@@ -2,16 +2,17 @@ package com.revolsys.swing.map.layer.record.table.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.swing.ListSelectionModel;
@@ -54,10 +55,11 @@ import com.revolsys.swing.table.filter.ContainsFilter;
 import com.revolsys.swing.table.filter.EqualFilter;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.row.RecordRowTable;
+import com.revolsys.swing.table.selection.NullSelectionModel;
 import com.revolsys.util.Property;
 
-public class RecordLayerTableModel extends RecordRowTableModel implements
-SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
+public class RecordLayerTableModel extends RecordRowTableModel implements SortableTableModel,
+  PropertyChangeListener, PropertyChangeSupportProxy {
 
   public static RecordLayerTable createTable(final AbstractRecordLayer layer) {
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
@@ -71,9 +73,9 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
       NewPredicate.add(table);
       DeletedPredicate.add(table);
 
-      Property.addListener(layer, "hasSelectedRecords",
-        new InvokeMethodListener(RecordLayerTableModel.class,
-          "selectionChanged", table, model));
+      model.selectionChangedListener = new InvokeMethodListener(RecordLayerTableModel.class,
+        "selectionChanged", table, model);
+      Property.addListener(layer, "hasSelectedRecords", model.selectionChangedListener);
       return table;
     }
   }
@@ -88,6 +90,8 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
     }
   }
 
+  private InvokeMethodListener selectionChangedListener;
+
   private static final long serialVersionUID = 1L;
 
   public static final String MODE_ALL = "all";
@@ -96,28 +100,21 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
 
   public static final String MODE_EDITS = "edits";
 
-  private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-    this);
+  private ListSelectionModel selectionModel = new RecordLayerListSelectionModel(this);
 
-  private final RecordLayerListSelectionModel selectionModel = new RecordLayerListSelectionModel(
-    this);
-
-  private final RecordLayerHighlightedListSelectionModel highlightedModel = new RecordLayerHighlightedListSelectionModel(
-    this);
+  private ListSelectionModel highlightedModel = new RecordLayerHighlightedListSelectionModel(this);
 
   private Condition filter;
 
   private boolean filterByBoundingBox;
 
-  private List<String> fieldFilterModes = Arrays.asList(MODE_ALL,
-    MODE_SELECTED, MODE_EDITS);
+  private List<String> fieldFilterModes = Arrays.asList(MODE_ALL, MODE_SELECTED, MODE_EDITS);
 
   private List<String> sortableModes = Arrays.asList(MODE_SELECTED, MODE_EDITS);
 
   private SwingWorker<?, ?> loadObjectsWorker;
 
-  private Map<Integer, List<LayerRecord>> pageCache = new LruMap<Integer, List<LayerRecord>>(
-      5);
+  private Map<Integer, List<LayerRecord>> pageCache = new LruMap<Integer, List<LayerRecord>>(5);
 
   private String fieldFilterMode = MODE_ALL;
 
@@ -155,6 +152,17 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
     setEditable(true);
     setReadOnlyFieldNames(layer.getUserReadOnlyFieldNames());
     this.loadingRecord = new LoadingRecord(layer);
+  }
+
+  @Override
+  public void dispose() {
+    this.highlightedModel = NullSelectionModel.INSTANCE;
+    this.selectionModel = NullSelectionModel.INSTANCE;
+    getTable().setSelectionModel(this.selectionModel);
+    Property.removeListener(this.layer, this);
+    Property.removeListener(this.layer, "hasSelectedRecords", this.selectionChangedListener);
+    this.selectionChangedListener = null;
+    super.dispose();
   }
 
   @Override
@@ -251,8 +259,7 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
     return this.orderBy;
   }
 
-  protected LayerRecord getPageRecord(final int pageNumber,
-    final int recordNumber) {
+  protected LayerRecord getPageRecord(final int pageNumber, final int recordNumber) {
     synchronized (getSync()) {
       final List<LayerRecord> page = this.pageCache.get(pageNumber);
       if (page == null) {
@@ -260,8 +267,8 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
           this.loadingPageNumbers.add(pageNumber);
           this.loadingPageNumbersToProcess.add(pageNumber);
           if (this.loadObjectsWorker == null) {
-            this.loadObjectsWorker = Invoke.background("Loading records "
-                + getTypeName(), this, "loadPages", this.refreshIndex);
+            this.loadObjectsWorker = Invoke.background("Loading records " + getTypeName(), this,
+              "loadPages", this.refreshIndex);
           }
         }
         return this.loadingRecord;
@@ -278,11 +285,6 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
 
   public int getPageSize() {
     return this.pageSize;
-  }
-
-  @Override
-  public PropertyChangeSupport getPropertyChangeSupport() {
-    return this.propertyChangeSupport;
   }
 
   @SuppressWarnings("unchecked")
@@ -312,7 +314,7 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
         if (this.countLoaded) {
           int count = this.rowCount;
           if (!this.fieldFilterMode.equals(MODE_SELECTED)
-              && !this.fieldFilterMode.equals(MODE_EDITS)) {
+            && !this.fieldFilterMode.equals(MODE_EDITS)) {
             final AbstractRecordLayer layer = getLayer();
             final int newRecordCount = layer.getNewRecordCount();
             count += newRecordCount;
@@ -321,8 +323,8 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
 
         } else {
           if (this.rowCountWorker == null) {
-            this.rowCountWorker = Invoke.background("Query row count "
-                + this.layer.getName(), this, "loadRowCount", this.refreshIndex);
+            this.rowCountWorker = Invoke.background("Query row count " + this.layer.getName(),
+              this, "loadRowCount", this.refreshIndex);
           }
           return 0;
         }
@@ -381,8 +383,7 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
 
   @Override
   public boolean isEditable() {
-    return super.isEditable() && this.layer.isEditable()
-        && this.layer.isCanEditRecords();
+    return super.isEditable() && this.layer.isEditable() && this.layer.isCanEditRecords();
   }
 
   public boolean isFilterByBoundingBox() {
@@ -394,8 +395,7 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
   }
 
   @Override
-  public boolean isSelected(final boolean selected, final int rowIndex,
-    final int columnIndex) {
+  public boolean isSelected(final boolean selected, final int rowIndex, final int columnIndex) {
     final LayerRecord object = getRecord(rowIndex);
     return this.layer.isSelected(object);
   }
@@ -453,9 +453,8 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
       final List<String> fieldNamesSet = layer.getFieldNamesSet();
       setFieldNames(fieldNamesSet);
     } else if (e.getSource() == this.layer) {
-      if (Arrays.asList("query", "editable", "recordInserted",
-        "recordsInserted", "recordDeleted", "recordsChanged").contains(
-          propertyName)) {
+      if (Arrays.asList("query", "editable", "recordInserted", "recordsInserted", "recordDeleted",
+        "recordsChanged").contains(propertyName)) {
         refresh();
       } else if ("recordUpdated".equals(propertyName)) {
         repaint();
@@ -496,8 +495,7 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
     getTable().repaint();
   }
 
-  protected void replaceCachedObject(final LayerRecord oldObject,
-    final LayerRecord newObject) {
+  protected void replaceCachedObject(final LayerRecord oldObject, final LayerRecord newObject) {
     synchronized (this.pageCache) {
       for (final List<LayerRecord> objects : this.pageCache.values()) {
         for (final ListIterator<LayerRecord> iterator = objects.listIterator(); iterator.hasNext();) {
@@ -548,11 +546,9 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
       } else {
         refresh();
       }
-      this.propertyChangeSupport.firePropertyChange("filter", oldValue,
-        this.filter);
+      firePropertyChange("filter", oldValue, this.filter);
       final boolean hasFilter = isHasFilter();
-      this.propertyChangeSupport.firePropertyChange("hasFilter", !hasFilter,
-        hasFilter);
+      firePropertyChange("hasFilter", !hasFilter, hasFilter);
       return true;
     }
   }
@@ -566,6 +562,28 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
 
   protected void setModes(final String... modes) {
     this.fieldFilterModes = Arrays.asList(modes);
+  }
+
+  public void setOrderBy(final Map<String, Boolean> orderBy) {
+    this.orderBy = orderBy;
+    final Map<Integer, SortOrder> sortedColumns = new LinkedHashMap<>();
+    for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+      if (orderBy != null) {
+        final String fieldName = entry.getKey();
+        final Boolean order = entry.getValue();
+        final int index = getFieldIndex(fieldName);
+        if (index != -1) {
+          SortOrder sortOrder;
+          if (order) {
+            sortOrder = SortOrder.ASCENDING;
+          } else {
+            sortOrder = SortOrder.DESCENDING;
+          }
+          sortedColumns.put(index, sortOrder);
+        }
+      }
+    }
+    setSortedColumns(sortedColumns);
   }
 
   public void setRecords(final int refreshIndex, final Integer pageNumber,
@@ -633,11 +651,9 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
             RowFilter<Object, Object> rowFilter;
             if (value instanceof Number) {
               final Number number = (Number)value;
-              rowFilter = RowFilter.numberFilter(ComparisonType.EQUAL, number,
-                columnIndex);
+              rowFilter = RowFilter.numberFilter(ComparisonType.EQUAL, number, columnIndex);
             } else {
-              rowFilter = new EqualFilter(
-                StringConverterRegistry.toString(value), columnIndex);
+              rowFilter = new EqualFilter(StringConverterRegistry.toString(value), columnIndex);
             }
             table.setRowFilter(rowFilter);
           } else if (operator.equals("LIKE")) {
@@ -685,8 +701,8 @@ SortableTableModel, PropertyChangeListener, PropertyChangeSupportProxy {
   }
 
   @Override
-  public String toDisplayValueInternal(final int rowIndex,
-    final int attributeIndex, final Object objectValue) {
+  public String toDisplayValueInternal(final int rowIndex, final int attributeIndex,
+    final Object objectValue) {
     if (objectValue == null) {
       final String fieldName = getFieldName(attributeIndex);
       if (getRecordDefinition().getIdFieldNames().contains(fieldName)) {

@@ -30,16 +30,15 @@ import com.revolsys.swing.table.record.renderer.RecordRowTableCellRenderer;
 public class RecordRowTable extends BaseJTable implements MouseListener {
   private static final long serialVersionUID = 1L;
 
-  private final RecordTableCellEditor tableCellEditor;
+  private RecordTableCellEditor tableCellEditor;
 
-  private final TableCellRenderer cellRenderer;
+  private TableCellRenderer cellRenderer;
 
   public RecordRowTable(final RecordRowTableModel model) {
     this(model, new RecordRowTableCellRenderer());
   }
 
-  public RecordRowTable(final RecordRowTableModel model,
-    final TableCellRenderer cellRenderer) {
+  public RecordRowTable(final RecordRowTableModel model, final TableCellRenderer cellRenderer) {
     super(model);
     this.cellRenderer = cellRenderer;
     setSortable(false);
@@ -63,6 +62,13 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
     ErrorPredicate.add(this);
   }
 
+  @Override
+  public void dispose() {
+    super.dispose();
+    this.tableCellEditor = null;
+    this.cellRenderer = null;
+  }
+
   public RecordDefinition getRecordDefinition() {
     final RecordRowTableModel model = (RecordRowTableModel)getModel();
     return model.getRecordDefinition();
@@ -82,8 +88,7 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
   public ListSelectionModel getSelectionModel() {
     if (getTableModel() instanceof RecordLayerTableModel) {
       final RecordLayerTableModel layerTableModel = (RecordLayerTableModel)getTableModel();
-      if (layerTableModel.getFieldFilterMode().equals(
-        RecordLayerTableModel.MODE_SELECTED)) {
+      if (layerTableModel.getFieldFilterMode().equals(RecordLayerTableModel.MODE_SELECTED)) {
         return layerTableModel.getHighlightedModel();
       }
     }
@@ -175,9 +180,8 @@ public class RecordRowTable extends BaseJTable implements MouseListener {
       final int type = event.getType();
       final int eventColumn = event.getColumn();
       final int row = event.getFirstRow();
-      if (type == TableModelEvent.UPDATE
-          && eventColumn == TableModelEvent.ALL_COLUMNS
-          && row == TableModelEvent.HEADER_ROW) {
+      if (type == TableModelEvent.UPDATE && eventColumn == TableModelEvent.ALL_COLUMNS
+        && row == TableModelEvent.HEADER_ROW) {
         createDefaultColumnsFromModel();
         final TableColumnModel columnModel = getColumnModel();
         for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {

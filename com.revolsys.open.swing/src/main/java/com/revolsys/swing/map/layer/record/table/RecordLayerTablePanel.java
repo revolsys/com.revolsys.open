@@ -5,6 +5,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -15,11 +17,14 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellEditor;
 
+import com.revolsys.data.query.Condition;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.io.map.MapSerializer;
+import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -34,6 +39,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.BatchUpdate;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.SqlLayerFilter;
 import com.revolsys.swing.map.layer.record.component.FieldFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.MenuFactory;
@@ -45,27 +51,36 @@ import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.row.RecordRowPropertyEnableCheck;
 import com.revolsys.swing.table.record.row.RecordRowRunnable;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
-public class RecordLayerTablePanel extends TablePanel implements PropertyChangeListener {
+public class RecordLayerTablePanel extends TablePanel implements PropertyChangeListener,
+  MapSerializer {
+  private static final String PLUGIN_NAME = "tableView";
+
   private static final long serialVersionUID = 1L;
 
   public static final String FILTER_GEOMETRY = "filter_geometry";
 
   public static final String FILTER_ATTRIBUTE = "filter_attribute";
 
-  private final AbstractRecordLayer layer;
+  private AbstractRecordLayer layer;
 
-  private final RecordLayerTableModel tableModel;
+  private RecordLayerTableModel tableModel;
 
   private final JToggleButton selectedButton;
 
   private final JButton fieldSetsButton;
 
+  private FieldFilterPanel fieldFilterPanel;
+
   public RecordLayerTablePanel(final AbstractRecordLayer layer, final RecordLayerTable table) {
     super(table);
     this.layer = layer;
     this.tableModel = getTableModel();
+    final Map<String, Object> config = layer.getPluginConfig(PLUGIN_NAME);
+    setPluginConfig(config);
+    layer.setPluginConfig(PLUGIN_NAME, this);
 
     // Right click Menu
     final MenuFactory menu = this.tableModel.getMenu();
@@ -160,15 +175,15 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
     this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets", "fields_filter", this,
       "actionShowFieldSetsMenu");
 
-    final FieldFilterPanel attributeFilterPanel = new FieldFilterPanel(this, this.tableModel);
-    toolBar.addComponent("search", attributeFilterPanel);
+    this.fieldFilterPanel = new FieldFilterPanel(this, this.tableModel, config);
+    toolBar.addComponent("search", this.fieldFilterPanel);
 
-    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits", attributeFilterPanel,
+    toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits", this.fieldFilterPanel,
       "showAdvancedFilter");
 
     final EnableCheck hasFilter = new ObjectPropertyEnableCheck(this.tableModel, "hasFilter");
 
-    toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter, attributeFilterPanel,
+    toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter, this.fieldFilterPanel,
       "clear");
 
     // Filter buttons
@@ -291,6 +306,12 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
 
   @SuppressWarnings("unchecked")
   @Override
+  public RecordLayerTable getTable() {
+    return (RecordLayerTable)super.getTable();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
   public RecordLayerTableModel getTableModel() {
     final JTable table = getTable();
     return (RecordLayerTableModel)table.getModel();
@@ -348,8 +369,23 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
 
   @Override
   public void removeNotify() {
+    final RecordLayerTable table = getTable();
+    if (table != null) {
+      final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
+      tableCellEditor.close();
+      table.dispose();
+    }
+    if (this.layer != null) {
+      Property.removeListener(this.layer, this);
+      this.layer.setPluginConfig(PLUGIN_NAME, toMap());
+    }
+    this.tableModel = null;
+    this.layer = null;
+    if (this.fieldFilterPanel != null) {
+      this.fieldFilterPanel.close();
+      this.fieldFilterPanel = null;
+    }
     super.removeNotify();
-    Property.removeListener(this.layer, this);
   }
 
   public void setFieldFilterMode(final String mode) {
@@ -357,6 +393,35 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
       this.selectedButton.setSelected(true);
       this.selectedButton.doClick();
     }
+  }
+
+  protected void setPluginConfig(final Map<String, Object> config) {
+    final Object orderBy = config.get("orderBy");
+    if (orderBy instanceof Map) {
+      @SuppressWarnings("unchecked")
+      final Map<String, Boolean> order = (Map<String, Boolean>)orderBy;
+      this.tableModel.setOrderBy(order);
+    }
+    final String fieldFilterMode = Maps.getString(config, "fieldFilterMode",
+      RecordLayerTableModel.MODE_ALL);
+    this.tableModel.setFieldFilterMode(fieldFilterMode);
+  }
+
+  @Override
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new LinkedHashMap<>();
+    MapSerializerUtil.add(map, "fieldFilterMode", this.tableModel.getFieldFilterMode());
+    final Condition condition = this.tableModel.getFilter();
+    if (this.fieldFilterPanel != null) {
+      MapSerializerUtil.add(map, "searchField", this.fieldFilterPanel.getSearchFieldName());
+    }
+    if (condition != null) {
+      final String sql = condition.toFormattedString();
+      final SqlLayerFilter filter = new SqlLayerFilter(this.layer, sql);
+      MapSerializerUtil.add(map, "filter", filter);
+    }
+    MapSerializerUtil.add(map, "orderBy", this.tableModel.getOrderBy());
+    return map;
   }
 
   public void zoomToRecord() {

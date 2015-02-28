@@ -68,6 +68,10 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel imple
   @Override
   @PreDestroy
   public void dispose() {
+    if (this.table != null) {
+      removeTableModelListener(this.table);
+      this.table = null;
+    }
     super.dispose();
     this.sortedColumns = null;
   }
@@ -121,6 +125,10 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel imple
       }
     }
     return null;
+  }
+
+  public int getFieldIndex(final String fieldName) {
+    return this.fieldNames.indexOf(fieldName);
   }
 
   @Override
@@ -294,6 +302,14 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel imple
       this.fieldTitles.add(title);
     }
     fireTableStructureChanged();
+  }
+
+  public void setSortedColumns(final Map<Integer, SortOrder> sortedColumns) {
+    this.sortedColumns = new LinkedHashMap<>();
+    if (sortedColumns != null) {
+      this.sortedColumns.putAll(sortedColumns);
+    }
+
   }
 
   @Override

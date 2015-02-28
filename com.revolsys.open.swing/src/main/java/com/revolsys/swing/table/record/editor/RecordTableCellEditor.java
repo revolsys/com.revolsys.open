@@ -16,6 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.CellEditorListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
@@ -42,7 +43,7 @@ public class RecordTableCellEditor extends AbstractCellEditor implements TableCe
 
   private String fieldName;
 
-  private final BaseJTable table;
+  private BaseJTable table;
 
   private int rowIndex;
 
@@ -64,6 +65,16 @@ public class RecordTableCellEditor extends AbstractCellEditor implements TableCe
   public synchronized void addMouseListener(final MouseListener l) {
     if (l != null) {
       this.mouseListener = AWTEventMulticaster.add(this.mouseListener, l);
+    }
+  }
+
+  public void close() {
+    this.editorComponent = null;
+    this.mouseListener = null;
+    this.popupMenu = null;
+    this.table = null;
+    for (final CellEditorListener listener : getCellEditorListeners()) {
+      removeCellEditorListener(listener);
     }
   }
 
