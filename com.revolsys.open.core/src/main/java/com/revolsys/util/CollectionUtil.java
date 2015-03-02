@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -208,10 +209,12 @@ public final class CollectionUtil {
     return value;
   }
 
-  public static <V> List<V> list(final Collection<? extends V> collection) {
-    final List<V> list = new ArrayList<>();
-    if (collection != null) {
-      list.addAll(collection);
+  public static <V> List<V> list(final Iterable<? extends V> values) {
+    final ArrayList<V> list = new ArrayList<V>();
+    if (values != null) {
+      for (final V value : values) {
+        list.add(value);
+      }
     }
     return list;
   }
@@ -371,6 +374,37 @@ public final class CollectionUtil {
       return Collections.emptyList();
     } else {
       return Arrays.asList(values);
+    }
+  }
+
+  /**
+   * Create a string using the same style as java.util.List.toString.
+   * @param iterator
+   * @return
+   */
+  public static String toListString(final Iterable<? extends Object> iterable) {
+    if (iterable == null) {
+      return "[]";
+    } else {
+      final Iterator<? extends Object> iterator = iterable.iterator();
+      return toListString(iterator);
+    }
+  }
+
+  public static String toListString(final Iterator<? extends Object> iterator) {
+    if (iterator == null) {
+      return "[]";
+    } else {
+      final StringBuilder string = new StringBuilder("[");
+      if (iterator.hasNext()) {
+        string.append(iterator.next());
+        while (iterator.hasNext()) {
+          string.append(", ");
+          string.append(iterator.next());
+        }
+      }
+      string.append("]");
+      return string.toString();
     }
   }
 
