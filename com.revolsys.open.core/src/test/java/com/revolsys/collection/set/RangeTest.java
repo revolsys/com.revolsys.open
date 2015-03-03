@@ -6,7 +6,35 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class IntRangeTest {
+public class RangeTest {
+
+  private static void assertCharRange(final char from, final char to, final char... characters) {
+    final CharRange range = new CharRange(from, to);
+    final List<Character> list = new ArrayList<>();
+    for (final char character : characters) {
+      list.add(character);
+    }
+    Assert.assertEquals(list.size(), range.size());
+    if (from == to) {
+      Assert.assertEquals(Character.toString(from), range.toString());
+    } else {
+      if (from <= to) {
+        Assert.assertEquals((from + "-" + to).toUpperCase(), range.toString());
+      } else {
+        Assert.assertEquals((to + "-" + from).toUpperCase(), range.toString());
+      }
+    }
+    Assert.assertEquals(list, range.toList());
+    int i = 0;
+    for (final char character : range) {
+      final int expectedValue = list.get(i);
+      if (character != expectedValue) {
+        Assert.fail("range(" + i + ") " + character + "!=" + expectedValue);
+      }
+      i++;
+    }
+
+  }
 
   private static void assertRange(final int from, final int to, final int... numbers) {
     final IntRange range = new IntRange(from, to);
@@ -77,6 +105,19 @@ public class IntRangeTest {
   }
 
   @Test
+  public void testCharRange() {
+    Assert.assertEquals("A", new CharRange('A').toString());
+    Assert.assertEquals("A-E", new CharRange('A', 'E').toString());
+
+    assertCharRange('A', 'A', 'A');
+    assertCharRange('Z', 'Z', 'Z');
+    assertCharRange('A', 'C', 'A', 'B', 'C');
+    assertCharRange('C', 'A', 'A', 'B', 'C');
+    assertCharRange('a', 'c', 'A', 'B', 'C');
+    assertCharRange('z', 'x', 'X', 'Y', 'Z');
+  }
+
+  @Test
   public void testExpand() {
     final IntRange range1 = new IntRange(100, 110);
     Assert.assertEquals("Same", range1, range1.expand(range1));
@@ -113,7 +154,7 @@ public class IntRangeTest {
   }
 
   @Test
-  public void testRange() {
+  public void testIntRange() {
     Assert.assertEquals("1", new IntRange(1).toString());
     Assert.assertEquals("1-10", new IntRange(1, 10).toString());
     Assert.assertEquals("-10--1", new IntRange(-10, -1).toString());
