@@ -4,16 +4,14 @@ import java.math.BigDecimal;
 
 import com.revolsys.util.Property;
 
-public class BigDecimalStringConverter extends
-AbstractNumberStringConverter<BigDecimal> {
+public class BigDecimalStringConverter extends AbstractNumberStringConverter<BigDecimal> {
 
   public static boolean isNumber(final Object value) {
     if (value instanceof Number) {
       return true;
     } else {
       try {
-        final Object number = StringConverterRegistry.toObject(
-          BigDecimal.class, value);
+        final Object number = StringConverterRegistry.toObject(BigDecimal.class, value);
         if (number instanceof Number) {
           return true;
         } else {
@@ -23,6 +21,25 @@ AbstractNumberStringConverter<BigDecimal> {
       } catch (final Throwable t) {
         return false;
       }
+    }
+  }
+
+  public static BigDecimal toBigDecimal(final Object value) {
+    if (value instanceof BigDecimal) {
+      final BigDecimal number = (BigDecimal)value;
+      return number;
+    } else if (value == null) {
+      return null;
+    } else {
+      return toBigDecimal(value.toString());
+    }
+  }
+
+  public static BigDecimal toBigDecimal(final String string) {
+    if (Property.hasValue(string)) {
+      return new BigDecimal(string);
+    } else {
+      return null;
     }
   }
 
@@ -60,5 +77,4 @@ AbstractNumberStringConverter<BigDecimal> {
       return null;
     }
   }
-
 }

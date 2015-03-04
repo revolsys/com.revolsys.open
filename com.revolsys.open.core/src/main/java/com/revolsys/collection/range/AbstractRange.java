@@ -1,31 +1,64 @@
-package com.revolsys.collection.set;
+package com.revolsys.collection.range;
 
 import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.Numbers;
 
-public abstract class AbstractRange<V> implements Iterable<V>, Comparable<AbstractRange<V>> {
+public abstract class AbstractRange<V> implements Iterable<V>,
+  Comparable<AbstractRange<? extends Object>> {
 
-  public abstract int compareFromValue(V value);
+  public static int compare(final Object value1, final Object value2) {
+    if (value1 == null) {
+      if (value2 == null) {
+        return 0;
+      } else {
+        return -1;
+      }
+    } else if (value2 == null) {
+      return 1;
+    } else {
+      final Long longValue1 = Numbers.toLong(value1);
+      final Long longValue2 = Numbers.toLong(value2);
+      if (longValue1 == null) {
+        if (longValue2 == null) {
+          return value1.toString().compareTo(value2.toString());
+        } else {
+          return 1;
+        }
+      } else if (longValue2 == null) {
+        return -1;
+      } else {
+        return Long.compare(longValue1, longValue2);
+      }
+    }
+  }
+
+  public int compareFromValue(final Object value) {
+    final V from = getFrom();
+    return compare(from, value);
+  }
 
   @Override
-  public int compareTo(final AbstractRange<V> range) {
-
-    final V rangeFrom = range.getFrom();
+  public int compareTo(final AbstractRange<? extends Object> range) {
+    final Object rangeFrom = range.getFrom();
     final int fromCompare = compareFromValue(rangeFrom);
     if (fromCompare == 0) {
-      final V rangeTo = range.getTo();
+      final Object rangeTo = range.getTo();
       final int toCompare = compareToValue(rangeTo);
       return toCompare;
     }
     return fromCompare;
   }
 
-  public abstract int compareToValue(final V value);
+  public int compareToValue(final Object value) {
+    final V to = getTo();
+    return compare(to, value);
+  }
 
-  public boolean contains(final V value) {
+  public boolean contains(final Object value) {
     final int fromCompare = compareFromValue(value);
     if (fromCompare <= 0) {
       final int toCompare = compareToValue(value);
@@ -36,7 +69,9 @@ public abstract class AbstractRange<V> implements Iterable<V>, Comparable<Abstra
     return false;
   }
 
-  public abstract AbstractRange<V> createNew(V from, V to);
+  protected AbstractRange<?> createNew(final Object from, final Object to) {
+    throw new UnsupportedOperationException();
+  }
 
   @Override
   public boolean equals(final Object other) {
@@ -61,11 +96,11 @@ public abstract class AbstractRange<V> implements Iterable<V>, Comparable<Abstra
     }
   }
 
-  public AbstractRange<V> expand(final AbstractRange<V> range) {
+  public AbstractRange<?> expand(final AbstractRange<?> range) {
     final V from = getFrom();
     final V to = getTo();
-    final V rangeFrom = range.getFrom();
-    final V rangeTo = range.getTo();
+    final Object rangeFrom = range.getFrom();
+    final Object rangeTo = range.getTo();
 
     final int fromCompare = compareFromValue(rangeFrom);
     final int toCompare = compareToValue(rangeTo);
@@ -113,7 +148,7 @@ public abstract class AbstractRange<V> implements Iterable<V>, Comparable<Abstra
    * @param value
    * @return
    */
-  public AbstractRange<V> expand(final V value) {
+  public AbstractRange<?> expand(final Object value) {
     if (value == null || contains(value)) {
       return this;
     } else {
@@ -155,11 +190,17 @@ public abstract class AbstractRange<V> implements Iterable<V>, Comparable<Abstra
     return new RangeIterator<V>(this);
   }
 
-  public abstract V next(final V value);
+  public V next(final Object value) {
+    return null;
+  }
 
-  public abstract V previous(final V value);
+  public V previous(final Object value) {
+    return null;
+  }
 
-  public abstract int size();
+  public long size() {
+    return 1;
+  }
 
   public List<V> toList() {
     return CollectionUtil.list(this);

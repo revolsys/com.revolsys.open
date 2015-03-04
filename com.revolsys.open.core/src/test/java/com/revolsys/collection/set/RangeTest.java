@@ -6,11 +6,16 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.revolsys.collection.range.AbstractRange;
+import com.revolsys.collection.range.LongRange;
+import com.revolsys.collection.range.RangeSet;
+import com.revolsys.collection.range.Ranges;
+
 public class RangeTest {
 
   private static void assertCharRange(final char from, final char to, final char... characters) {
-    final CharRange range = new CharRange(from, to);
-    final List<Character> list = new ArrayList<>();
+    final AbstractRange<?> range = Ranges.create(from, to);
+    final List<Object> list = new ArrayList<>();
     for (final char character : characters) {
       list.add(character);
     }
@@ -26,20 +31,18 @@ public class RangeTest {
     }
     Assert.assertEquals(list, range.toList());
     int i = 0;
-    for (final char character : range) {
-      final int expectedValue = list.get(i);
-      if (character != expectedValue) {
-        Assert.fail("range(" + i + ") " + character + "!=" + expectedValue);
-      }
+    for (final Object character : range) {
+      final Object expectedValue = list.get(i);
+      Assert.assertEquals("element " + i, character, expectedValue);
       i++;
     }
 
   }
 
-  private static void assertRange(final int from, final int to, final int... numbers) {
-    final IntRange range = new IntRange(from, to);
-    final List<Integer> list = new ArrayList<>();
-    for (final int i : numbers) {
+  private static void assertRange(final int from, final int to, final long... numbers) {
+    final LongRange range = new LongRange(from, to);
+    final List<Long> list = new ArrayList<>();
+    for (final long i : numbers) {
       list.add(i);
     }
     Assert.assertEquals(list.size(), range.size());
@@ -54,8 +57,8 @@ public class RangeTest {
     }
     Assert.assertEquals(list, range.toList());
     int i = 0;
-    for (final int value : range) {
-      final int expectedValue = list.get(i);
+    for (final long value : range) {
+      final long expectedValue = list.get(i);
       if (value != expectedValue) {
         Assert.fail("range(" + i + ") " + value + "!=" + expectedValue);
       }
@@ -64,50 +67,50 @@ public class RangeTest {
 
   }
 
-  private static void assertRangeSetAdd(final IntRangeSet set, final int value,
+  private static void assertRangeSetAdd(final RangeSet set, final Object value,
     final String expected) {
     set.add(value);
     Assert.assertEquals(expected, set.toString());
   }
 
-  private static void assertRangeSetAddRange(final IntRangeSet set, final int from, final int to,
+  private static void assertRangeSetAddRange(final RangeSet set, final int from, final int to,
     final String expected) {
     set.addRange(from, to);
     Assert.assertEquals(expected, set.toString());
   }
 
   private static void assertRangeSetCreate(final String range, final String expected) {
-    final IntRangeSet set = IntRangeSet.create(range);
+    final RangeSet set = RangeSet.create(range);
     Assert.assertEquals(expected, set.toString());
 
-    final IntRangeSet expectedSet = IntRangeSet.create(expected);
+    final RangeSet expectedSet = RangeSet.create(expected);
     Assert.assertEquals(expectedSet, set);
 
     final int size = set.size();
     final int expectedSize = expectedSet.size();
     Assert.assertEquals(expectedSize, size);
 
-    final List<Integer> list = set.toList();
-    final List<Integer> expectedList = expectedSet.toList();
+    final List<Object> list = set.toList();
+    final List<Object> expectedList = expectedSet.toList();
     Assert.assertEquals(expectedList, list);
   }
 
-  private static void assertRangeSetRemove(final IntRangeSet set, final int value,
+  private static void assertRangeSetRemove(final RangeSet set, final int value,
     final String expected) {
     set.remove(value);
     Assert.assertEquals(expected, set.toString());
   }
 
-  private static void assertRangeSetRemoveRange(final IntRangeSet set, final int from,
-    final int to, final String expected) {
+  private static void assertRangeSetRemoveRange(final RangeSet set, final int from, final int to,
+    final String expected) {
     set.removeRange(from, to);
     Assert.assertEquals(expected, set.toString());
   }
 
   @Test
   public void testCharRange() {
-    Assert.assertEquals("A", new CharRange('A').toString());
-    Assert.assertEquals("A-E", new CharRange('A', 'E').toString());
+    Assert.assertEquals("A", Ranges.create('A').toString());
+    Assert.assertEquals("A-E", Ranges.create('A', 'E').toString());
 
     assertCharRange('A', 'A', 'A');
     assertCharRange('Z', 'Z', 'Z');
@@ -118,46 +121,111 @@ public class RangeTest {
   }
 
   @Test
+  public void testCompare() {
+    Assert.assertEquals(0, AbstractRange.compare((byte)0, 0));
+    Assert.assertEquals(-1, AbstractRange.compare((byte)0, 1));
+    Assert.assertEquals(1, AbstractRange.compare((byte)1, 0));
+
+    Assert.assertEquals(0, AbstractRange.compare(0, (byte)0));
+    Assert.assertEquals(-1, AbstractRange.compare(0, (byte)1));
+    Assert.assertEquals(1, AbstractRange.compare(1, (byte)0));
+
+    Assert.assertEquals(0, AbstractRange.compare((short)0, 0));
+    Assert.assertEquals(-1, AbstractRange.compare((short)0, 1));
+    Assert.assertEquals(1, AbstractRange.compare((short)1, 0));
+
+    Assert.assertEquals(0, AbstractRange.compare(0, (short)0));
+    Assert.assertEquals(-1, AbstractRange.compare(0, (short)1));
+    Assert.assertEquals(1, AbstractRange.compare(1, (short)0));
+
+    // int
+    Assert.assertEquals(0, AbstractRange.compare(0, 0));
+    Assert.assertEquals(-1, AbstractRange.compare(0, 1));
+    Assert.assertEquals(1, AbstractRange.compare(1, 0));
+
+    Assert.assertEquals(0, AbstractRange.compare((long)0, 0));
+    Assert.assertEquals(-1, AbstractRange.compare((long)0, 1));
+    Assert.assertEquals(1, AbstractRange.compare((long)1, 0));
+
+    Assert.assertEquals(0, AbstractRange.compare(0, (long)0));
+    Assert.assertEquals(-1, AbstractRange.compare(0, (long)1));
+    Assert.assertEquals(1, AbstractRange.compare(1, (long)0));
+
+    Assert.assertEquals(0, AbstractRange.compare((float)0, 0));
+    Assert.assertEquals(-1, AbstractRange.compare((float)0, 1));
+    Assert.assertEquals(1, AbstractRange.compare((float)1, 0));
+
+    Assert.assertEquals(0, AbstractRange.compare(0, (float)0));
+    Assert.assertEquals(-1, AbstractRange.compare(0, (float)1));
+    Assert.assertEquals(1, AbstractRange.compare(1, (float)0));
+
+    Assert.assertEquals(0, AbstractRange.compare((double)0, 0));
+    Assert.assertEquals(-1, AbstractRange.compare((double)0, 1));
+    Assert.assertEquals(1, AbstractRange.compare((double)1, 0));
+
+    Assert.assertEquals(0, AbstractRange.compare(0, (double)0));
+    Assert.assertEquals(-1, AbstractRange.compare(0, (double)1));
+    Assert.assertEquals(1, AbstractRange.compare(1, (double)0));
+
+    Assert.assertEquals(0, AbstractRange.compare(0, "0"));
+    Assert.assertEquals(-1, AbstractRange.compare(0, "1"));
+    Assert.assertEquals(1, AbstractRange.compare(1, "0"));
+
+    Assert.assertEquals(0, AbstractRange.compare("0", 0));
+    Assert.assertEquals(-1, AbstractRange.compare("0", 1));
+    Assert.assertEquals(1, AbstractRange.compare("1", 0));
+
+    Assert.assertEquals(0, AbstractRange.compare(0, '0'));
+    Assert.assertEquals(-1, AbstractRange.compare(0, '1'));
+    Assert.assertEquals(1, AbstractRange.compare(1, '0'));
+
+    Assert.assertEquals(0, AbstractRange.compare('0', 0));
+    Assert.assertEquals(-1, AbstractRange.compare('0', 1));
+    Assert.assertEquals(1, AbstractRange.compare('1', 0));
+
+  }
+
+  @Test
   public void testExpand() {
-    final IntRange range1 = new IntRange(100, 110);
+    final LongRange range1 = new LongRange(100, 110);
     Assert.assertEquals("Same", range1, range1.expand(range1));
 
-    final IntRange range2 = new IntRange(100, 105);
-    final IntRange range3 = new IntRange(100, 115);
+    final LongRange range2 = new LongRange(100, 105);
+    final LongRange range3 = new LongRange(100, 115);
     Assert.assertEquals("From 2nd Subset", range1, range1.expand(range2));
     Assert.assertEquals("From 2nd Subset Switched", range1, range2.expand(range1));
     Assert.assertEquals("From 2nd Superset", range3, range1.expand(range3));
     Assert.assertEquals("From 2nd Superset Switched", range3, range3.expand(range1));
 
-    final IntRange range4 = new IntRange(105, 110);
-    final IntRange range5 = new IntRange(-5, 110);
+    final LongRange range4 = new LongRange(105, 110);
+    final LongRange range5 = new LongRange(-5, 110);
     Assert.assertEquals("To 2nd Subset", range1, range1.expand(range4));
     Assert.assertEquals("To 2nd Subset Switched", range1, range4.expand(range1));
     Assert.assertEquals("To 2nd Superset", range5, range1.expand(range5));
     Assert.assertEquals("To 2nd Superset Switched", range5, range5.expand(range1));
 
-    final IntRange range6 = new IntRange(101, 109);
+    final LongRange range6 = new LongRange(101, 109);
     Assert.assertEquals("Subset Middle", range1, range1.expand(range6));
     Assert.assertEquals("Subset Middle Switched", range1, range6.expand(range1));
 
-    final IntRange range7 = new IntRange(98, 101);
-    Assert.assertEquals("Overlap From", new IntRange(98, 110), range1.expand(range7));
-    Assert.assertEquals("Overlap To", new IntRange(98, 110), range7.expand(range1));
+    final LongRange range7 = new LongRange(98, 101);
+    Assert.assertEquals("Overlap From", new LongRange(98, 110), range1.expand(range7));
+    Assert.assertEquals("Overlap To", new LongRange(98, 110), range7.expand(range1));
 
-    final IntRange range8 = new IntRange(98, 99);
-    Assert.assertEquals("Touching From", new IntRange(98, 110), range1.expand(range8));
-    Assert.assertEquals("Touching To", new IntRange(98, 110), range8.expand(range1));
+    final LongRange range8 = new LongRange(98, 99);
+    Assert.assertEquals("Touching From", new LongRange(98, 110), range1.expand(range8));
+    Assert.assertEquals("Touching To", new LongRange(98, 110), range8.expand(range1));
 
-    final IntRange range9 = new IntRange(0, 98);
+    final LongRange range9 = new LongRange(0, 98);
     Assert.assertNull("Disjoint Before ", range1.expand(range9));
     Assert.assertNull("Disjoint After", range9.expand(range1));
   }
 
   @Test
   public void testIntRange() {
-    Assert.assertEquals("1", new IntRange(1).toString());
-    Assert.assertEquals("1-10", new IntRange(1, 10).toString());
-    Assert.assertEquals("-10--1", new IntRange(-10, -1).toString());
+    Assert.assertEquals("1", new LongRange(1).toString());
+    Assert.assertEquals("1-10", new LongRange(1, 10).toString());
+    Assert.assertEquals("-10--1", new LongRange(-10, -1).toString());
 
     assertRange(0, 0, 0);
     assertRange(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
@@ -170,7 +238,7 @@ public class RangeTest {
 
   @Test
   public void testRangeSet() {
-    final IntRangeSet rangeSet = new IntRangeSet();
+    final RangeSet rangeSet = new RangeSet();
     assertRangeSetAdd(rangeSet, 1, "1");
     assertRangeSetAdd(rangeSet, 1, "1");
     assertRangeSetAdd(rangeSet, 2, "1-2");
@@ -235,5 +303,20 @@ public class RangeTest {
     assertRangeSetCreate("1-2,2-11", "1-11");
     assertRangeSetCreate("1-2,3-5,6-7", "1-7");
     assertRangeSetCreate("1-2,6-7,3-5,0-9", "0-9");
+
+    final RangeSet rangeSet2 = new RangeSet();
+    assertRangeSetAdd(rangeSet2, 1, "1");
+    assertRangeSetAdd(rangeSet2, "1", "1");
+    assertRangeSetAdd(rangeSet2, "a", "1,a");
+    assertRangeSetAdd(rangeSet2, "a", "1,a");
+    assertRangeSetAdd(rangeSet2, "e", "1,a,e");
+    assertRangeSetAdd(rangeSet2, "b", "1,a,b,e");
+    assertRangeSetAdd(rangeSet2, "A", "1,A,a,b,e");
+    assertRangeSetAdd(rangeSet2, "C", "1,A,C,a,b,e");
+    assertRangeSetAdd(rangeSet2, "B", "1,A-C,a,b,e");
+
+    assertRangeSetCreate("A,B", "A-B");
+    assertRangeSetCreate("1,B", "1,B");
+    assertRangeSetCreate("01,B", "1,B");
   }
 }

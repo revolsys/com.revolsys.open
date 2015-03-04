@@ -121,8 +121,7 @@ public final class MathUtil {
    * @param y2 The second y coordinate.
    * @return The distance.
    */
-  public static double distance(final double x1, final double y1,
-    final double x2, final double y2) {
+  public static double distance(final double x1, final double y1, final double x2, final double y2) {
     final double dx = x2 - x1;
     final double dy = y2 - y1;
 
@@ -138,8 +137,7 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal divideCurrency(final BigDecimal left,
-    final BigDecimal right) {
+  public static BigDecimal divideCurrency(final BigDecimal left, final BigDecimal right) {
     return left.divide(right, CURRENCY_SCALE, BigDecimal.ROUND_HALF_UP);
   }
 
@@ -151,8 +149,7 @@ public final class MathUtil {
    * @param right The right operand.
    * @return The new amount.
    */
-  public static BigDecimal dividePercent(final BigDecimal left,
-    final BigDecimal right) {
+  public static BigDecimal dividePercent(final BigDecimal left, final BigDecimal right) {
     return left.divide(right, PERCENT_SCALE, BigDecimal.ROUND_HALF_UP);
   }
 
@@ -192,8 +189,8 @@ public final class MathUtil {
    * @param i2
    * @return
    */
-  public static double getAngle(final LineString points, final int i1,
-    final int i2, final boolean start) {
+  public static double getAngle(final LineString points, final int i1, final int i2,
+    final boolean start) {
     final double x1 = points.getX(i1);
     final double y1 = points.getY(i1);
     final double x2 = points.getX(i2);
@@ -358,8 +355,8 @@ public final class MathUtil {
     return getInteger(integer).toString();
   }
 
-  public static boolean isAcute(final double x1, final double y1,
-    final double x2, final double y2, final double x3, final double y3) {
+  public static boolean isAcute(final double x1, final double y1, final double x2, final double y2,
+    final double x3, final double y3) {
     final double dx0 = x1 - x2;
     final double dy0 = y1 - y2;
     final double dx1 = x3 - x2;
@@ -527,14 +524,13 @@ public final class MathUtil {
    * @param scale The number of decimal places to show.
    * @return The percent String
    */
-  public static String percentToString(final BigDecimal decimalPercent,
-    final int scale) {
+  public static String percentToString(final BigDecimal decimalPercent, final int scale) {
     if (decimalPercent != null) {
       final DecimalFormat format = new DecimalFormat();
       format.setMinimumFractionDigits(0);
       format.setMaximumFractionDigits(scale);
-      final String string = format.format(decimalPercent.multiply(
-        new BigDecimal(100)).setScale(scale, BigDecimal.ROUND_HALF_UP))
+      final String string = format.format(decimalPercent.multiply(new BigDecimal(100)).setScale(
+        scale, BigDecimal.ROUND_HALF_UP))
         + "%";
 
       return string;
@@ -543,8 +539,8 @@ public final class MathUtil {
     }
   }
 
-  public static double pointLineDistance(final double x, final double y,
-    final double x1, final double y1, final double x2, final double y2) {
+  public static double pointLineDistance(final double x, final double y, final double x1,
+    final double y1, final double x2, final double y2) {
     // if start==end, then use pt distance
     if (x1 == x2 && y1 == y2) {
       return distance(x, y, x1, y1);
@@ -558,7 +554,7 @@ public final class MathUtil {
      */
 
     final double r = ((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1))
-        / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+      / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 
     if (r <= 0.0) {
       return distance(x, y, x1, y1);
@@ -573,14 +569,12 @@ public final class MathUtil {
      */
 
     final double s = ((y1 - y) * (x2 - x1) - (x1 - x) * (y2 - y1))
-        / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+      / ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 
-    return Math.abs(s)
-        * Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    return Math.abs(s) * Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   }
 
-  public static boolean precisionEqual(final double value1,
-    final double value2, final double scale) {
+  public static boolean precisionEqual(final double value1, final double value2, final double scale) {
     if (Double.isNaN(value1) && Double.isNaN(value2)) {
       return true;
     } else if (Double.isInfinite(value1) || Double.isInfinite(value2)) {
@@ -668,8 +662,8 @@ public final class MathUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <V extends Number> V subtract(final Number left,
-    final Number right, final Class<V> resultClass) {
+  public static <V extends Number> V subtract(final Number left, final Number right,
+    final Class<V> resultClass) {
     if (left == null) {
       return null;
     } else if (right == null) {
@@ -720,8 +714,7 @@ public final class MathUtil {
     return toDoubleArray(value.split(","));
   }
 
-  public static double[] toDoubleArraySplit(final String value,
-    final String regex) {
+  public static double[] toDoubleArraySplit(final String value, final String regex) {
     return toDoubleArray(value.split(regex));
   }
 
@@ -740,6 +733,20 @@ public final class MathUtil {
         return Double.valueOf(string);
       }
     }
+  }
+
+  public final static int toInt(final byte[] bytes, final int offset) {
+    final byte b1 = bytes[offset];
+    final byte b2 = bytes[offset + 1];
+    final byte b3 = bytes[offset + 2];
+    final byte b4 = bytes[offset + 3];
+    return b1 << 24 | (b2 & 0xFF) << 16 | (b3 & 0xFF) << 8 | b4 & 0xFF;
+  }
+
+  public static final long toLong(final byte[] bytes, final int offset) {
+    final long high = (long)toInt(bytes, offset) << 32;
+    final long low = (long)toInt(bytes, offset + 4) << 32 >>> 32;
+    return high | low;
   }
 
   public static String toString(final BigDecimal number) {
@@ -862,20 +869,6 @@ public final class MathUtil {
    * Construct a new MathUtil.
    */
   private MathUtil() {
-  }
-
-  public final static int toInt(final byte[] bytes, final int offset) {
-    final byte b1 = bytes[offset];
-    final byte b2 = bytes[offset + 1];
-    final byte b3 = bytes[offset + 2];
-    final byte b4 = bytes[offset + 3];
-    return b1 << 24 | (b2 & 0xFF) << 16 | (b3 & 0xFF) << 8 | b4 & 0xFF;
-  }
-
-  public static final long toLong(final byte[] bytes, final int offset) {
-    final long high = (long)toInt(bytes, offset) << 32;
-    final long low = (long)toInt(bytes, offset + 4) << 32 >>> 32;
-    return high | low;
   }
 
 }

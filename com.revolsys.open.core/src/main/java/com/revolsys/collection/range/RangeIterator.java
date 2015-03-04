@@ -1,4 +1,4 @@
-package com.revolsys.collection.set;
+package com.revolsys.collection.range;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

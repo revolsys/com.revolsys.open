@@ -6,13 +6,4 @@ public class NumberUtil {
     return Math.abs(x1 - x2) <= tolerance;
   }
 
-  public static boolean isInteger(final String part) {
-    try {
-      Integer.parseInt(part);
-      return true;
-    } catch (final NumberFormatException e) {
-      return false;
-    }
-  }
-
 }
