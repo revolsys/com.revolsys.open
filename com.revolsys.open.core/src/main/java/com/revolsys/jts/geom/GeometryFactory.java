@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.collection.map.IntHashMap;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -72,7 +73,6 @@ import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDoubleGF;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.util.Maps;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 

@@ -7,12 +7,12 @@ import java.util.TreeMap;
 
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.Projection;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.util.Maps;
 
 public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
   private final List<GeographicCoordinateSystem> geographicCoordinateSystems;

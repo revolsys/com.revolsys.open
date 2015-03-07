@@ -317,6 +317,17 @@
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
+        <artifactId>spring-context-support</artifactId>
+        <version>${org.springframework.version}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>commons-logging</artifactId>
+            <groupId>commons-logging</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
         <version>${org.springframework.version}</version>
         <exclusions>
@@ -430,8 +441,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <org.slf4j.version>1.7.7</org.slf4j.version>
-    <org.springframework.version>3.0.7.RELEASE</org.springframework.version>
-    <org.springframework.security.version>3.0.7.RELEASE</org.springframework.security.version>
+    <org.springframework.version>3.2.8.RELEASE</org.springframework.version>
+    <org.springframework.security.version>3.2.6.RELEASE</org.springframework.security.version>
     <gpg.skip>true</gpg.skip>
+    <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
   </properties>
 </project>

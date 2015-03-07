@@ -32,6 +32,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.Record;
 import com.revolsys.gis.cs.CoordinateSystem;
@@ -74,7 +75,6 @@ import com.revolsys.swing.parallel.SwingWorkerProgressBar;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.Maps;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 

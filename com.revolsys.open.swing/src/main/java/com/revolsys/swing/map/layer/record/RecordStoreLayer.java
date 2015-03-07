@@ -18,6 +18,7 @@ import javax.swing.SwingWorker;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
 import com.revolsys.data.identifier.Identifier;
@@ -57,7 +58,6 @@ import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Label;
-import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public class RecordStoreLayer extends AbstractRecordLayer {

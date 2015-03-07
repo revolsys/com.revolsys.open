@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import javax.swing.JComponent;
 import javax.swing.undo.UndoableEdit;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.gis.algorithm.index.quadtree.GeometrySegmentQuadTree;
@@ -58,7 +59,6 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.LineCap;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.util.Maps;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 

@@ -9,6 +9,7 @@ import junit.framework.TestSuite;
 import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.io.AbstractMapReaderFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.jts.geom.Geometry;
@@ -18,7 +19,6 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.operation.buffer.Buffer;
 import com.revolsys.jts.operation.buffer.BufferParameters;
 import com.revolsys.jts.test.geometry.TestUtil;
-import com.revolsys.util.Maps;
 
 public class BufferTest extends TestCase {
 

@@ -19,6 +19,7 @@ import javax.measure.Measure;
 import javax.measure.unit.NonSI;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
@@ -34,7 +35,6 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
-import com.revolsys.util.Maps;
 import com.revolsys.util.MathUtil;
 
 public class MeasureOverlay extends AbstractOverlay {

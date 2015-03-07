@@ -10,8 +10,8 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.util.Maps;
 import com.revolsys.util.PasswordUtil;
 
 public abstract class AbstractJdbcDatabaseFactory implements

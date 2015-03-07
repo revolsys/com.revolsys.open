@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import javax.swing.Icon;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.TopologyException;
 import com.revolsys.swing.Icons;
@@ -18,7 +19,6 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.util.Maps;
 
 /**
  * For each object render using the first renderer that matches the filter.

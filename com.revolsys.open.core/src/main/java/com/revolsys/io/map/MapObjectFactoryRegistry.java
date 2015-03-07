@@ -12,11 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.json.JsonParser;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 @SuppressWarnings("unchecked")

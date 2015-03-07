@@ -9,6 +9,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.SwingConstants;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -19,7 +20,6 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.util.Maps;
 
 public class TreeItemScaleMenu implements ComponentFactory<JMenu> {
 

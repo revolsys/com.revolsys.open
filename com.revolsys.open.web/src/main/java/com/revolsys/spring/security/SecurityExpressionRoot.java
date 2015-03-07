@@ -14,7 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 
 public class SecurityExpressionRoot extends
-org.springframework.security.access.expression.SecurityExpressionRoot {
+  org.springframework.security.access.expression.SecurityExpressionRoot {
   private PermissionEvaluator permissionEvaluator;
 
   private RoleHierarchy roleHierarchy;
@@ -28,7 +28,7 @@ org.springframework.security.access.expression.SecurityExpressionRoot {
   public Set<String> getAuthoritySet() {
     if (this.roles == null) {
       this.roles = new HashSet<String>();
-      Collection<GrantedAuthority> userAuthorities = this.authentication.getAuthorities();
+      Collection<? extends GrantedAuthority> userAuthorities = this.authentication.getAuthorities();
 
       if (this.roleHierarchy != null) {
         userAuthorities = this.roleHierarchy.getReachableGrantedAuthorities(userAuthorities);
@@ -40,16 +40,16 @@ org.springframework.security.access.expression.SecurityExpressionRoot {
     return this.roles;
   }
 
+  @Override
   public boolean hasPermission(final Object target, final Object permission) {
     return this.permissionEvaluator.hasPermission(this.authentication, target, permission);
   }
 
-  public boolean hasPermission(
-    final Object targetId,
-    final String targetType,
+  @Override
+  public boolean hasPermission(final Object targetId, final String targetType,
     final Object permission) {
-    return this.permissionEvaluator.hasPermission(this.authentication,
-      (Serializable)targetId, targetType, permission);
+    return this.permissionEvaluator.hasPermission(this.authentication, (Serializable)targetId,
+      targetType, permission);
   }
 
   public boolean hasRoleRegex(final String regex) {
@@ -64,8 +64,8 @@ org.springframework.security.access.expression.SecurityExpressionRoot {
     return false;
   }
 
-  public void setPermissionEvaluator(
-    final PermissionEvaluator permissionEvaluator) {
+  @Override
+  public void setPermissionEvaluator(final PermissionEvaluator permissionEvaluator) {
     this.permissionEvaluator = permissionEvaluator;
   }
 

@@ -12,7 +12,7 @@ import java.util.prefs.Preferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.util.Maps;
+import com.revolsys.collection.map.Maps;
 
 public class WmsConnectionManager {
 

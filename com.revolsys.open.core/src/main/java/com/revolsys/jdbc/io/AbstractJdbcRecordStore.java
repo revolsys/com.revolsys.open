@@ -30,6 +30,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.data.codes.AbstractCodeTable;
 import com.revolsys.data.io.RecordStoreExtension;
@@ -54,7 +55,6 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.attribute.JdbcFieldAdder;
 import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 import com.revolsys.transaction.Transaction;
-import com.revolsys.util.Maps;
 
 public abstract class AbstractJdbcRecordStore extends AbstractRecordStore implements
   JdbcRecordStore, RecordStoreExtension {

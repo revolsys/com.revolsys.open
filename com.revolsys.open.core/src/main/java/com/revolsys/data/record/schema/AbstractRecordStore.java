@@ -22,6 +22,7 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.codes.CodeTableProperty;
 import com.revolsys.data.identifier.Identifier;
@@ -46,7 +47,6 @@ import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordStore extends AbstractObjectWithProperties implements

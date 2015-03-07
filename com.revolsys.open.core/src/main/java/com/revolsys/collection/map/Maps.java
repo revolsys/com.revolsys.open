@@ -1,4 +1,4 @@
-package com.revolsys.util;
+package com.revolsys.collection.map;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +17,9 @@ import java.util.prefs.Preferences;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.factory.Factory;
+import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.Property;
 
 public class Maps {
 

@@ -3,11 +3,11 @@ package com.revolsys.io.esri.map.rest.map;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.io.esri.map.rest.AbstractMapWrapper;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.util.Maps;
 
 public class TileInfo extends AbstractMapWrapper {
   private double originX = Double.NaN;

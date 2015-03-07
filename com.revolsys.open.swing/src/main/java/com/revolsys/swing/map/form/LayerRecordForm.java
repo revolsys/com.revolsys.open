@@ -59,6 +59,7 @@ import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.awt.WebColors;
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsRegistry;
@@ -103,7 +104,6 @@ import com.revolsys.swing.undo.ReverseRecordGeometryUndo;
 import com.revolsys.swing.undo.ReverseRecordUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public class LayerRecordForm extends JPanel implements PropertyChangeListener, CellEditorListener,

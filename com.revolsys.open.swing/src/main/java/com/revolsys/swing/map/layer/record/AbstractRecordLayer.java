@@ -44,6 +44,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.revolsys.beans.EventsEnabledState;
 import com.revolsys.beans.InvokeMethodCallable;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.filter.RecordGeometryBoundingBoxIntersectsFilter;
@@ -125,7 +126,6 @@ import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.CompareUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Label;
-import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayer extends AbstractLayer implements RecordFactory,

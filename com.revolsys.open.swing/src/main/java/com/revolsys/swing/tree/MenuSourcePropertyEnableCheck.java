@@ -4,10 +4,10 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.action.enablecheck.AbstractEnableCheck;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public class MenuSourcePropertyEnableCheck extends AbstractEnableCheck {

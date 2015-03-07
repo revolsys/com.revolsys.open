@@ -5,13 +5,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.revolsys.beans.AbstractPropertyChangeObject;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
-import com.revolsys.util.Maps;
 
 public class MappedLocation extends AbstractPropertyChangeObject implements
 MapSerializer {

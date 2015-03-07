@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.ArrayRecordFactory;
@@ -26,7 +27,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.ExceptionUtil;
-import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public class CsvRecordIterator extends AbstractIterator<Record> implements

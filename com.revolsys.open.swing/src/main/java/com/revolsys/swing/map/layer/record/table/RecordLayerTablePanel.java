@@ -17,6 +17,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellEditor;
 
+import com.revolsys.collection.map.Maps;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.DirectionalAttributes;
@@ -51,7 +52,6 @@ import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.row.RecordRowPropertyEnableCheck;
 import com.revolsys.swing.table.record.row.RecordRowRunnable;
 import com.revolsys.swing.toolbar.ToolBar;
-import com.revolsys.util.Maps;
 import com.revolsys.util.Property;
 
 public class RecordLayerTablePanel extends TablePanel implements PropertyChangeListener,

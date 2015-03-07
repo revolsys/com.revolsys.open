@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.undo.UndoableEdit;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.data.equals.GeometryEqualsExact3d;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -58,7 +59,6 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
-import com.revolsys.util.Maps;
 
 public class EditGeometryOverlay extends AbstractOverlay implements
 PropertyChangeListener, MouseListener, MouseMotionListener {
