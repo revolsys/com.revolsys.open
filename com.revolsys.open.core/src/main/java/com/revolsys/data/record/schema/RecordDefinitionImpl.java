@@ -38,6 +38,10 @@ import com.revolsys.util.JavaBeanUtil;
 
 public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement implements
   RecordDefinition {
+  private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
+
+  private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakCache<Integer, RecordDefinitionImpl>();
+
   public static RecordDefinitionImpl create(final Map<String, Object> properties) {
     return new RecordDefinitionImpl(properties);
   }
@@ -51,10 +55,6 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
   public static RecordDefinition getRecordDefinition(final int instanceId) {
     return RECORD_DEFINITION_CACHE.get(instanceId);
   }
-
-  private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
-
-  private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakCache<Integer, RecordDefinitionImpl>();
 
   private final Map<String, Integer> fieldIdMap = new HashMap<String, Integer>();
 
@@ -575,8 +575,12 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
 
   @Override
   public boolean hasField(final CharSequence name) {
-    final String lowerName = name.toString().toLowerCase();
-    return this.fieldMap.containsKey(lowerName);
+    if (name == null) {
+      return false;
+    } else {
+      final String lowerName = name.toString().toLowerCase();
+      return this.fieldMap.containsKey(lowerName);
+    }
   }
 
   @Override

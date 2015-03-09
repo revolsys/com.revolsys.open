@@ -23,6 +23,7 @@ import com.revolsys.data.record.property.ShortNameProperty;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcConnection;
@@ -35,13 +36,13 @@ import com.revolsys.util.Property;
 
 public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
+  public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList(
+    "information_schema", "pg_catalog", "pg_toast_temp_1");
+
   public static final AbstractIterator<Record> createPostgreSQLIterator(
     final PostgreSQLRecordStore recordStore, final Query query, final Map<String, Object> properties) {
     return new PostgreSQLJdbcQueryIterator(recordStore, query, properties);
   }
-
-  public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList(
-    "information_schema", "pg_catalog", "pg_toast_temp_1");
 
   private boolean useSchemaSequencePrefix = true;
 
@@ -126,6 +127,8 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     try {
       final AbstractJdbc2Connection pgConnection = connection.unwrap(AbstractJdbc2Connection.class);
       pgConnection.addDataType("geometry", PostgreSQLGeometryWrapper.class);
+      pgConnection.addDataType("box2d", PostgreSQLBoundingBoxWrapper.class);
+      pgConnection.addDataType("box3d", PostgreSQLBoundingBoxWrapper.class);
     } catch (final SQLException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

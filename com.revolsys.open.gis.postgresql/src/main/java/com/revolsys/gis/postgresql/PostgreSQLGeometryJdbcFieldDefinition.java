@@ -5,12 +5,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.postgresql.geometric.PGbox;
-
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
 import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
 import com.revolsys.jts.geom.BoundingBox;
@@ -94,6 +93,10 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         }
         return new PostgreSQLGeometryWrapper(geometry);
       }
+    } else if (object instanceof BoundingBox) {
+      BoundingBox boundingBox = (BoundingBox)object;
+      boundingBox = boundingBox.convert(this.geometryFactory);
+      return new PostgreSQLBoundingBoxWrapper(boundingBox);
     } else {
       return object;
     }
@@ -141,12 +144,8 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       return new PostgreSQLGeometryWrapper(geometry);
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;
-      boundingBox = boundingBox.convert(this.geometryFactory, 2);
-      final double minX = boundingBox.getMinX();
-      final double minY = boundingBox.getMinY();
-      final double maxX = boundingBox.getMaxX();
-      final double maxY = boundingBox.getMaxY();
-      return new PGbox(minX, minY, maxX, maxY);
+      boundingBox = boundingBox.convert(this.geometryFactory);
+      return new PostgreSQLBoundingBoxWrapper(boundingBox);
     } else {
       return object;
     }

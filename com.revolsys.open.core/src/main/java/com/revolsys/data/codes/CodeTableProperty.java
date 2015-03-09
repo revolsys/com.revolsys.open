@@ -27,15 +27,15 @@ import com.revolsys.util.Property;
 
 public class CodeTableProperty extends AbstractCodeTable implements RecordDefinitionProperty {
 
-  public static final CodeTableProperty getProperty(final RecordDefinition recordDefinition) {
-    final CodeTableProperty property = recordDefinition.getProperty(PROPERTY_NAME);
-    return property;
-  }
-
   private static final ArrayList<String> DEFAULT_FIELD_NAMES = new ArrayList<String>(
     Arrays.asList("VALUE"));
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
+
+  public static final CodeTableProperty getProperty(final RecordDefinition recordDefinition) {
+    final CodeTableProperty property = recordDefinition.getProperty(PROPERTY_NAME);
+    return property;
+  }
 
   private String creationTimestampFieldName;
 
@@ -255,7 +255,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     return this.loading;
   }
 
-  protected synchronized void loadAll() {
+  public synchronized void loadAll() {
     if (this.threadLoading.get() != Boolean.TRUE) {
       if (this.loading) {
         while (this.loading) {

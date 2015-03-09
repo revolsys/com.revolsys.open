@@ -55,6 +55,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.undo.UndoableEdit;
 
+import org.apache.log4j.Logger;
 import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.awt.WebColors;
@@ -314,7 +315,12 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   @SuppressWarnings("unchecked")
   public <T> T addLabelledField(final Container container, final String fieldName) {
     final Field field = getField(fieldName);
-    addLabelledField(container, field);
+    if (field == null) {
+      Logger.getLogger(getClass()).error(
+        "Cannot find field " + this.recordDefinition.getPath() + " " + fieldName);
+    } else {
+      addLabelledField(container, field);
+    }
     return (T)field;
   }
 
