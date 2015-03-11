@@ -9,32 +9,70 @@ import java.util.ListIterator;
 
 import com.revolsys.collection.MultiIterator;
 import com.revolsys.util.CollectionUtil;
-import com.revolsys.util.Numbers;
-import com.revolsys.util.Property;
 
-public class RangeSet extends AbstractSet<Object> {
+public class RangeSet extends AbstractSet<Object> implements Iterable<Object> {
+
+  private static void addPart(final RangeSet set, final List<AbstractRange<?>> crossProductRanges,
+    final String fromValue, final String rangeSpec, final int partStart, final int partEnd) {
+    final String toValue = rangeSpec.substring(partStart, partEnd);
+    final AbstractRange<?> partRange = Ranges.create(fromValue, toValue);
+    if (crossProductRanges == null) {
+      set.addRange(partRange);
+    } else {
+      crossProductRanges.add(partRange);
+    }
+  }
 
   public static RangeSet create(final String rangeSpec) {
     final RangeSet set = new RangeSet();
-    if (Property.hasValue(rangeSpec)) {
-      for (String part : rangeSpec.split(",+")) {
-        part = part.trim();
-        final Long longValue = Numbers.toLong(part);
-        if (longValue != null) {
-          set.add(longValue);
-        } else if (part.matches("^\\d+-\\d+$")) {
-          final int dashIndex = part.indexOf('-');
-          final int from = Integer.valueOf(part.substring(0, dashIndex));
-          final int to = Integer.valueOf(part.substring(dashIndex + 1));
-          set.addRange(from, to);
-        } else if (part.matches("^[A-Z]-[A-Z]$")) {
-          final char from = part.charAt(0);
-          final char to = part.charAt(2);
-          set.addRange(from, to);
-        } else {
-          set.add(part);
+    int partStart = 0;
+    int partEnd = 0;
+    boolean inRange = false;
+    String rangeFirstPart = null;
+    List<AbstractRange<?>> crossProductRanges = null;
+    final int charCount = rangeSpec.length();
+    for (int i = 0; i < charCount; i++) {
+      final char character = rangeSpec.charAt(i);
+      if (!Character.isWhitespace(character)) {
+        switch (character) {
+          case '+':
+            if (crossProductRanges == null) {
+              crossProductRanges = new ArrayList<>();
+            }
+            addPart(set, crossProductRanges, rangeFirstPart, rangeSpec, partStart, partEnd);
+            partStart = i + 1;
+            inRange = false;
+          break;
+          case '~':
+            if (inRange) {
+              throw new RangeInvalidException(
+                "The ~ character cannot be used twice in a range, see *~* in "
+                  + rangeSpec.substring(0, i) + "*~*" + rangeSpec.substring(i + 1));
+            } else {
+              rangeFirstPart = rangeSpec.substring(partStart, partEnd);
+              partStart = i + 1;
+              inRange = true;
+            }
+          break;
+          case ',':
+            addPart(set, crossProductRanges, rangeFirstPart, rangeSpec, partStart, partEnd);
+            if (crossProductRanges != null) {
+              set.add(new CrossProductRange(crossProductRanges));
+            }
+            partStart = i + 1;
+            inRange = false;
+            rangeFirstPart = null;
+            crossProductRanges.clear();
+          break;
         }
       }
+      partEnd = i + 1;
+    }
+    if (partStart < charCount) {
+      addPart(set, crossProductRanges, rangeFirstPart, rangeSpec, partStart, partEnd);
+    }
+    if (crossProductRanges != null) {
+      set.addRange(new CrossProductRange(crossProductRanges));
     }
     return set;
   }
@@ -146,6 +184,11 @@ public class RangeSet extends AbstractSet<Object> {
 
   public boolean addRange(final int from, final int to) {
     final LongRange addRange = new LongRange(from, to);
+    return addRange(addRange);
+  }
+
+  public boolean addRange(final Object from, final Object to) {
+    final AbstractRange<?> addRange = Ranges.create(from, to);
     return addRange(addRange);
   }
 

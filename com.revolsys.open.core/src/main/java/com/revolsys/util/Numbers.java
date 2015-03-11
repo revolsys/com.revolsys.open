@@ -2,6 +2,53 @@ package com.revolsys.util;
 
 public class Numbers {
 
+  public static byte digitCount(long value) {
+    if (value == 0) {
+      return 1;
+    } else if (value < 0) {
+      value = -value;
+    }
+    if (value < 10) {
+      return 1;
+    } else if (value < 100) {
+      return 2;
+    } else if (value < 1000) {
+      return 3;
+    } else if (value < 10000) {
+      return 4;
+    } else if (value < 100000) {
+      return 5;
+    } else if (value < 1000000) {
+      return 6;
+    } else if (value < 10000000) {
+      return 7;
+    } else if (value < 100000000) {
+      return 8;
+    } else if (value < 1000000000) {
+      return 9;
+    } else if (value < 10000000000L) {
+      return 10;
+    } else if (value < 100000000000L) {
+      return 11;
+    } else if (value < 1000000000000L) {
+      return 12;
+    } else if (value < 10000000000000L) {
+      return 13;
+    } else if (value < 100000000000000L) {
+      return 14;
+    } else if (value < 1000000000000000L) {
+      return 15;
+    } else if (value < 10000000000000000L) {
+      return 16;
+    } else if (value < 100000000000000000L) {
+      return 17;
+    } else if (value < 1000000000000000000L) {
+      return 18;
+    } else {
+      return 19;
+    }
+  }
+
   public static boolean isDigit(final char character) {
     if (character >= '0' && character <= '9') {
       return true;
@@ -393,6 +440,20 @@ public class Numbers {
           return (short)-result;
         }
       }
+    }
+  }
+
+  public static String toStringPadded(final long value, final int digitCount) {
+    final String string = Long.toString(value);
+    if (string.length() < digitCount) {
+      final StringBuilder builder = new StringBuilder(digitCount);
+      for (int i = string.length(); i < digitCount; i++) {
+        builder.append('0');
+      }
+      builder.append(string);
+      return builder.toString();
+    } else {
+      return string;
     }
   }
 }

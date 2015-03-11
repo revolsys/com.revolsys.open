@@ -96,6 +96,12 @@ public abstract class AbstractRange<V> implements Iterable<V>,
     }
   }
 
+  /**
+   * Create an expanded range if the this range and the other overlap or touch
+   *
+   * @param range
+   * @return
+   */
   public AbstractRange<?> expand(final AbstractRange<?> range) {
     final V from = getFrom();
     final V to = getTo();
@@ -213,7 +219,7 @@ public abstract class AbstractRange<V> implements Iterable<V>,
     if (from.equals(to)) {
       return from.toString();
     } else {
-      return from + "-" + to;
+      return from + "~" + to;
     }
   }
 }

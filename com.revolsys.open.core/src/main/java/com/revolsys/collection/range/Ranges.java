@@ -1,13 +1,17 @@
 package com.revolsys.collection.range;
 
+import com.revolsys.beans.Classes;
 import com.revolsys.util.Numbers;
+import com.revolsys.util.Property;
 
 public class Ranges {
   public static AbstractRange<?> create(final char value) {
     if (Numbers.isDigit(value)) {
       return new LongRange(value - '0');
-    } else {
+    } else if (CharRange.isLowerOrUpper(value)) {
       return new CharRange(value);
+    } else {
+      return new StringSingletonRange(value);
     }
   }
 
@@ -27,36 +31,85 @@ public class Ranges {
     return new LongRange(from, to);
   }
 
-  public static AbstractRange<?> create(final Object value) {
+  public static AbstractRange<?> create(Object value) {
+    value = toValue(value);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Long) {
+      return create(((Long)value).longValue());
+    } else if (value instanceof Character) {
+      final Character character = (Character)value;
+      return create(character.charValue());
+    } else {
+      return new StringSingletonRange(value.toString());
+    }
+  }
+
+  public static AbstractRange<?> create(final Object from, final Object to) {
+    final Object fromValue = toValue(from);
+    final Object toValue = toValue(to);
+    if (fromValue == null) {
+      return create(toValue);
+    }
+    if (fromValue instanceof Long) {
+      final long fromLong = (Long)fromValue;
+      if (toValue instanceof Long) {
+        final long toLong = (Long)toValue;
+        if (fromLong != 0 && from.toString().charAt(0) == '0' || toLong != 0
+          && to.toString().charAt(0) == '0') {
+          return new LongPaddedRange(fromLong, toLong);
+        } else {
+          return create(fromLong, toLong);
+        }
+      } else {
+        throw new RangeInvalidException("Cannot create range from " + fromValue + " (Long) and "
+          + toValue + " (" + Classes.className(toValue.getClass()) + ")");
+      }
+    } else if (fromValue instanceof Character) {
+      final char fromChar = (Character)fromValue;
+      if (toValue instanceof Character) {
+        final char toChar = (Character)toValue;
+        return create(fromChar, toChar);
+      } else {
+        throw new RangeInvalidException("Cannot create range from " + fromValue
+          + " (Character) and " + toValue + " (" + Classes.className(toValue.getClass()) + ")");
+      }
+    } else {
+      throw new RangeInvalidException("Cannot create range from " + fromValue + " (String) and "
+        + toValue + " (" + Classes.className(toValue.getClass()) + ")");
+    }
+  }
+
+  public static Object toValue(final Object value) {
     if (value == null) {
       return null;
     } else if (Numbers.isPrimitiveIntegral(value)) {
       final Number number = (Number)value;
-      return create(number.longValue());
+      return number.longValue();
     } else if (value instanceof Character) {
       final Character character = (Character)value;
-      return create(character);
+      return character.charValue();
     } else {
-      return create(value.toString());
+      return toValue(value.toString());
     }
   }
 
-  public static AbstractRange<?> create(final String value) {
-    if (value == null) {
-      return null;
-    } else {
+  public static Object toValue(final String value) {
+    if (Property.hasValue(value)) {
       final Long longValue = Numbers.toLong(value);
       if (longValue == null) {
         if (value.length() == 1) {
           final char character = value.charAt(0);
-          if (character >= 'A' && character <= 'Z') {
-            return create(character);
+          if (CharRange.isLowerOrUpper(character)) {
+            return character;
           }
         }
-        return new StringSingletonRange(value);
+        return value;
       } else {
-        return create(longValue);
+        return longValue;
       }
+    } else {
+      return null;
     }
   }
 }

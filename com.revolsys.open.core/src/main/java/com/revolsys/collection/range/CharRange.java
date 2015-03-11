@@ -5,6 +5,18 @@ package com.revolsys.collection.range;
  * Ranges are immutable
  */
 public class CharRange extends AbstractRange<Character> {
+  public static boolean isLower(final char character) {
+    return character >= 'a' && character <= 'z';
+  }
+
+  public static boolean isLowerOrUpper(final char character) {
+    return isLower(character) || isUpper(character);
+  }
+
+  public static boolean isUpper(final char character) {
+    return character >= 'A' && character <= 'Z';
+  }
+
   private char from;
 
   private char to;
@@ -13,14 +25,25 @@ public class CharRange extends AbstractRange<Character> {
     this(value, value);
   }
 
-  protected CharRange(char from, char to) {
-    from = Character.toUpperCase(from);
-    if (!isValid(from)) {
-      throw new IllegalArgumentException(from + " is not [A-Z]");
-    }
-    to = Character.toUpperCase(to);
-    if (!isValid(to)) {
-      throw new IllegalArgumentException(to + " is not [A-Z]");
+  protected CharRange(final char from, final char to) {
+    if (isLower(from)) {
+      if (isLower(to)) {
+      } else if (isUpper(to)) {
+        throw new RangeInvalidException("Cannot mix lower and upper case " + from + "~" + to
+          + "  must both between either a~z or A~Z");
+      } else {
+        throw new RangeInvalidException(from + "~" + to + " are not both between a~z or A~Z");
+      }
+    } else if (isUpper(from)) {
+      if (isUpper(to)) {
+      } else if (isLower(to)) {
+        throw new RangeInvalidException("Cannot mix lower and upper case " + from + "~" + to
+          + "  must both between either a~z or A~Z");
+      } else {
+        throw new IllegalArgumentException(from + "~" + to + " are not both between a~z or A~Z");
+      }
+    } else {
+      throw new RangeInvalidException(from + "~" + to + " are not both between a~z or A~Z");
     }
     if (from < to) {
       this.from = from;
@@ -33,7 +56,7 @@ public class CharRange extends AbstractRange<Character> {
 
   @Override
   protected AbstractRange<?> createNew(final Object from, final Object to) {
-    return Ranges.create((Character)from, (Character)to);
+    return Ranges.create(((Character)from).charValue(), ((Character)to).charValue());
   }
 
   @Override
@@ -44,7 +67,7 @@ public class CharRange extends AbstractRange<Character> {
     } else if (value instanceof String) {
       final String string = (String)value;
       if (string.length() == 1) {
-        char character = string.charAt(0);
+        final char character = string.charAt(0);
         return super.expand(character);
       }
     }
@@ -61,17 +84,13 @@ public class CharRange extends AbstractRange<Character> {
     return this.to;
   }
 
-  public boolean isValid(final char character) {
-    return character >= 'A' && character <= 'Z';
-  }
-
   @Override
   public Character next(final Object value) {
     if (value == null) {
       return null;
     } else if (value instanceof Character) {
-      final char character = Character.toUpperCase((Character)value);
-      if ('Z' == character || !isValid(character)) {
+      final char character = (Character)value;
+      if ('Z' == character || 'z' == character || !isLowerOrUpper(character)) {
         return null;
       } else {
         return (char)(character + 1);
@@ -86,8 +105,8 @@ public class CharRange extends AbstractRange<Character> {
     if (value == null) {
       return null;
     } else if (value instanceof Character) {
-      final char character = Character.toUpperCase((Character)value);
-      if ('A' == character || !isValid(character)) {
+      final char character = (Character)value;
+      if ('A' == character || 'a' == character || !isLowerOrUpper(character)) {
         return null;
       } else {
         return (char)(character - 1);

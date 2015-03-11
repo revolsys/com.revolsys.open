@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import com.revolsys.collection.range.AbstractRange;
 import com.revolsys.collection.range.LongRange;
+import com.revolsys.collection.range.RangeInvalidException;
 import com.revolsys.collection.range.RangeSet;
 import com.revolsys.collection.range.Ranges;
 
@@ -24,9 +25,9 @@ public class RangeTest {
       Assert.assertEquals(Character.toString(from), range.toString());
     } else {
       if (from <= to) {
-        Assert.assertEquals((from + "-" + to).toUpperCase(), range.toString());
+        Assert.assertEquals(from + "~" + to, range.toString());
       } else {
-        Assert.assertEquals((to + "-" + from).toUpperCase(), range.toString());
+        Assert.assertEquals(to + "~" + from, range.toString());
       }
     }
     Assert.assertEquals(list, range.toList());
@@ -50,9 +51,9 @@ public class RangeTest {
       Assert.assertEquals(Integer.toString(from), range.toString());
     } else {
       if (from <= to) {
-        Assert.assertEquals(from + "-" + to, range.toString());
+        Assert.assertEquals(from + "~" + to, range.toString());
       } else {
-        Assert.assertEquals(to + "-" + from, range.toString());
+        Assert.assertEquals(to + "~" + from, range.toString());
       }
     }
     Assert.assertEquals(list, range.toList());
@@ -95,6 +96,14 @@ public class RangeTest {
     Assert.assertEquals(expectedList, list);
   }
 
+  private static void assertRangeSetException(final String range) {
+    try {
+      final RangeSet set = RangeSet.create(range);
+      Assert.fail("Range is not supposed to be valid " + range + ", created " + set);
+    } catch (final RangeInvalidException e) {
+    }
+  }
+
   private static void assertRangeSetRemove(final RangeSet set, final int value,
     final String expected) {
     set.remove(value);
@@ -110,14 +119,29 @@ public class RangeTest {
   @Test
   public void testCharRange() {
     Assert.assertEquals("A", Ranges.create('A').toString());
-    Assert.assertEquals("A-E", Ranges.create('A', 'E').toString());
+    Assert.assertEquals("A~E", Ranges.create('A', 'E').toString());
+    Assert.assertEquals("A~E", Ranges.create('E', 'A').toString());
+    Assert.assertEquals("0~9", Ranges.create('0', '9').toString());
+    Assert.assertEquals("0~9", Ranges.create('9', '0').toString());
 
     assertCharRange('A', 'A', 'A');
     assertCharRange('Z', 'Z', 'Z');
     assertCharRange('A', 'C', 'A', 'B', 'C');
     assertCharRange('C', 'A', 'A', 'B', 'C');
-    assertCharRange('a', 'c', 'A', 'B', 'C');
-    assertCharRange('z', 'x', 'X', 'Y', 'Z');
+    assertCharRange('Z', 'X', 'X', 'Y', 'Z');
+
+    Assert.assertEquals("a", Ranges.create('a').toString());
+    Assert.assertEquals("a~e", Ranges.create('a', 'e').toString());
+
+    assertCharRange('a', 'a', 'a');
+    assertCharRange('z', 'z', 'z');
+    assertCharRange('a', 'c', 'a', 'b', 'c');
+    assertCharRange('c', 'a', 'a', 'b', 'c');
+    assertCharRange('a', 'c', 'a', 'b', 'c');
+    assertCharRange('z', 'x', 'x', 'y', 'z');
+
+    assertRangeSetException("a~Z");
+    assertRangeSetException("Z~a");
   }
 
   @Test
@@ -224,8 +248,8 @@ public class RangeTest {
   @Test
   public void testIntRange() {
     Assert.assertEquals("1", new LongRange(1).toString());
-    Assert.assertEquals("1-10", new LongRange(1, 10).toString());
-    Assert.assertEquals("-10--1", new LongRange(-10, -1).toString());
+    Assert.assertEquals("1~10", new LongRange(1, 10).toString());
+    Assert.assertEquals("-10~-1", new LongRange(-10, -1).toString());
 
     assertRange(0, 0, 0);
     assertRange(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
@@ -241,68 +265,68 @@ public class RangeTest {
     final RangeSet rangeSet = new RangeSet();
     assertRangeSetAdd(rangeSet, 1, "1");
     assertRangeSetAdd(rangeSet, 1, "1");
-    assertRangeSetAdd(rangeSet, 2, "1-2");
-    assertRangeSetAdd(rangeSet, 3, "1-3");
-    assertRangeSetAdd(rangeSet, 0, "0-3");
-    assertRangeSetAdd(rangeSet, 9, "0-3,9");
-    assertRangeSetAdd(rangeSet, 8, "0-3,8-9");
-    assertRangeSetAdd(rangeSet, 5, "0-3,5,8-9");
-    assertRangeSetAdd(rangeSet, 6, "0-3,5-6,8-9");
-    assertRangeSetAdd(rangeSet, 3, "0-3,5-6,8-9");
-    assertRangeSetAdd(rangeSet, 4, "0-6,8-9");
-    assertRangeSetAdd(rangeSet, 7, "0-9");
+    assertRangeSetAdd(rangeSet, 2, "1~2");
+    assertRangeSetAdd(rangeSet, 3, "1~3");
+    assertRangeSetAdd(rangeSet, 0, "0~3");
+    assertRangeSetAdd(rangeSet, 9, "0~3,9");
+    assertRangeSetAdd(rangeSet, 8, "0~3,8~9");
+    assertRangeSetAdd(rangeSet, 5, "0~3,5,8~9");
+    assertRangeSetAdd(rangeSet, 6, "0~3,5~6,8~9");
+    assertRangeSetAdd(rangeSet, 3, "0~3,5~6,8~9");
+    assertRangeSetAdd(rangeSet, 4, "0~6,8~9");
+    assertRangeSetAdd(rangeSet, 7, "0~9");
 
-    assertRangeSetRemove(rangeSet, 0, "1-9");
-    assertRangeSetRemove(rangeSet, 1, "2-9");
-    assertRangeSetRemove(rangeSet, 0, "2-9");
-    assertRangeSetRemove(rangeSet, 1, "2-9");
-    assertRangeSetRemove(rangeSet, 9, "2-8");
-    assertRangeSetRemove(rangeSet, 9, "2-8");
-    assertRangeSetRemove(rangeSet, 5, "2-4,6-8");
+    assertRangeSetRemove(rangeSet, 0, "1~9");
+    assertRangeSetRemove(rangeSet, 1, "2~9");
+    assertRangeSetRemove(rangeSet, 0, "2~9");
+    assertRangeSetRemove(rangeSet, 1, "2~9");
+    assertRangeSetRemove(rangeSet, 9, "2~8");
+    assertRangeSetRemove(rangeSet, 9, "2~8");
+    assertRangeSetRemove(rangeSet, 5, "2~4,6~8");
 
-    assertRangeSetAddRange(rangeSet, 1, 2, "1-4,6-8");
-    assertRangeSetAddRange(rangeSet, 4, 5, "1-8");
-    assertRangeSetAddRange(rangeSet, 0, 9, "0-9");
-    assertRangeSetAddRange(rangeSet, -10, -2, "-10--2,0-9");
-    assertRangeSetAddRange(rangeSet, 11, 20, "-10--2,0-9,11-20");
+    assertRangeSetAddRange(rangeSet, 1, 2, "1~4,6~8");
+    assertRangeSetAddRange(rangeSet, 4, 5, "1~8");
+    assertRangeSetAddRange(rangeSet, 0, 9, "0~9");
+    assertRangeSetAddRange(rangeSet, -10, -2, "-10~-2,0~9");
+    assertRangeSetAddRange(rangeSet, 11, 20, "-10~-2,0~9,11~20");
 
     // From <
-    assertRangeSetRemoveRange(rangeSet, -12, -11, "-10--2,0-9,11-20");
-    assertRangeSetRemoveRange(rangeSet, -12, -10, "-9--2,0-9,11-20");
-    assertRangeSetRemoveRange(rangeSet, -12, -8, "-7--2,0-9,11-20");
-    assertRangeSetRemoveRange(rangeSet, -12, -2, "0-9,11-20");
-    assertRangeSetRemoveRange(rangeSet, -1, 11, "12-20");
+    assertRangeSetRemoveRange(rangeSet, -12, -11, "-10~-2,0~9,11~20");
+    assertRangeSetRemoveRange(rangeSet, -12, -10, "-9~-2,0~9,11~20");
+    assertRangeSetRemoveRange(rangeSet, -12, -8, "-7~-2,0~9,11~20");
+    assertRangeSetRemoveRange(rangeSet, -12, -2, "0~9,11~20");
+    assertRangeSetRemoveRange(rangeSet, -1, 11, "12~20");
 
     // Reset Range
-    assertRangeSetAddRange(rangeSet, -10, -2, "-10--2,12-20");
-    assertRangeSetAddRange(rangeSet, 0, 9, "-10--2,0-9,12-20");
-    assertRangeSetAddRange(rangeSet, 11, 20, "-10--2,0-9,11-20");
+    assertRangeSetAddRange(rangeSet, -10, -2, "-10~-2,12~20");
+    assertRangeSetAddRange(rangeSet, 0, 9, "-10~-2,0~9,12~20");
+    assertRangeSetAddRange(rangeSet, 11, 20, "-10~-2,0~9,11~20");
 
     // From =
-    assertRangeSetRemoveRange(rangeSet, -10, -10, "-9--2,0-9,11-20");
-    assertRangeSetRemoveRange(rangeSet, -9, -7, "-6--2,0-9,11-20");
-    assertRangeSetRemoveRange(rangeSet, -6, -2, "0-9,11-20");
-    assertRangeSetRemoveRange(rangeSet, 0, 11, "12-20");
+    assertRangeSetRemoveRange(rangeSet, -10, -10, "-9~-2,0~9,11~20");
+    assertRangeSetRemoveRange(rangeSet, -9, -7, "-6~-2,0~9,11~20");
+    assertRangeSetRemoveRange(rangeSet, -6, -2, "0~9,11~20");
+    assertRangeSetRemoveRange(rangeSet, 0, 11, "12~20");
 
     // Reset Range
-    assertRangeSetAddRange(rangeSet, -10, -2, "-10--2,12-20");
-    assertRangeSetAddRange(rangeSet, 0, 9, "-10--2,0-9,12-20");
-    assertRangeSetAddRange(rangeSet, 11, 20, "-10--2,0-9,11-20");
+    assertRangeSetAddRange(rangeSet, -10, -2, "-10~-2,12~20");
+    assertRangeSetAddRange(rangeSet, 0, 9, "-10~-2,0~9,12~20");
+    assertRangeSetAddRange(rangeSet, 11, 20, "-10~-2,0~9,11~20");
 
     // From >
-    assertRangeSetRemoveRange(rangeSet, -9, -9, "-10,-8--2,0-9,11-20");
-    assertRangeSetRemoveRange(rangeSet, -4, -2, "-10,-8--5,0-9,11-20");
-    assertRangeSetRemoveRange(rangeSet, -7, 0, "-10,-8,1-9,11-20");
-    assertRangeSetRemoveRange(rangeSet, 9, 11, "-10,-8,1-8,12-20");
-    assertRangeSetRemoveRange(rangeSet, 9, 12, "-10,-8,1-8,13-20");
-    assertRangeSetRemoveRange(rangeSet, -10, 14, "15-20");
+    assertRangeSetRemoveRange(rangeSet, -9, -9, "-10,-8~-2,0~9,11~20");
+    assertRangeSetRemoveRange(rangeSet, -4, -2, "-10,-8~-5,0~9,11~20");
+    assertRangeSetRemoveRange(rangeSet, -7, 0, "-10,-8,1~9,11~20");
+    assertRangeSetRemoveRange(rangeSet, 9, 11, "-10,-8,1~8,12~20");
+    assertRangeSetRemoveRange(rangeSet, 9, 12, "-10,-8,1~8,13~20");
+    assertRangeSetRemoveRange(rangeSet, -10, 14, "15~20");
 
     assertRangeSetCreate("1", "1");
-    assertRangeSetCreate("1-10", "1-10");
-    assertRangeSetCreate("1,2-11", "1-11");
-    assertRangeSetCreate("1-2,2-11", "1-11");
-    assertRangeSetCreate("1-2,3-5,6-7", "1-7");
-    assertRangeSetCreate("1-2,6-7,3-5,0-9", "0-9");
+    assertRangeSetCreate("1~10", "1~10");
+    assertRangeSetCreate("1,2~11", "1~11");
+    assertRangeSetCreate("1~2,2~11", "1~11");
+    assertRangeSetCreate("1~2,3~5,6~7", "1~7");
+    assertRangeSetCreate("1~2,6~7,3~5,0~9", "0~9");
 
     final RangeSet rangeSet2 = new RangeSet();
     assertRangeSetAdd(rangeSet2, 1, "1");
@@ -313,9 +337,9 @@ public class RangeTest {
     assertRangeSetAdd(rangeSet2, "b", "1,a,b,e");
     assertRangeSetAdd(rangeSet2, "A", "1,A,a,b,e");
     assertRangeSetAdd(rangeSet2, "C", "1,A,C,a,b,e");
-    assertRangeSetAdd(rangeSet2, "B", "1,A-C,a,b,e");
+    assertRangeSetAdd(rangeSet2, "B", "1,A~C,a,b,e");
 
-    assertRangeSetCreate("A,B", "A-B");
+    assertRangeSetCreate("A,B", "A~B");
     assertRangeSetCreate("1,B", "1,B");
     assertRangeSetCreate("01,B", "1,B");
   }

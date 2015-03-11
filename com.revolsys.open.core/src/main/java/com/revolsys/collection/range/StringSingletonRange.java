@@ -9,6 +9,10 @@ import com.revolsys.util.Property;
 public class StringSingletonRange extends AbstractRange<String> {
   private final String value;
 
+  public StringSingletonRange(final char character) {
+    this(Character.toString(character));
+  }
+
   public StringSingletonRange(final String value) {
     if (!Property.hasValue(value)) {
       throw new IllegalArgumentException("Value must not be empty for " + getClass());
