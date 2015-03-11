@@ -334,13 +334,15 @@ public class RangeTest {
     assertRangeSetAdd(rangeSet2, "a", "1,a");
     assertRangeSetAdd(rangeSet2, "a", "1,a");
     assertRangeSetAdd(rangeSet2, "e", "1,a,e");
-    assertRangeSetAdd(rangeSet2, "b", "1,a,b,e");
-    assertRangeSetAdd(rangeSet2, "A", "1,A,a,b,e");
-    assertRangeSetAdd(rangeSet2, "C", "1,A,C,a,b,e");
-    assertRangeSetAdd(rangeSet2, "B", "1,A~C,a,b,e");
+    assertRangeSetAdd(rangeSet2, "b", "1,a~b,e");
+    assertRangeSetAdd(rangeSet2, "A", "1,A,a~b,e");
+    assertRangeSetAdd(rangeSet2, "C", "1,A,C,a~b,e");
+    assertRangeSetAdd(rangeSet2, "B", "1,A~C,a~b,e");
 
     assertRangeSetCreate("A,B", "A~B");
     assertRangeSetCreate("1,B", "1,B");
     assertRangeSetCreate("01,B", "1,B");
+
+    assertRangeSetCreate("A~D+01~10", "A~D+01~10");
   }
 }

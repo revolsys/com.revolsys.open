@@ -62,7 +62,7 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object> {
             partStart = i + 1;
             inRange = false;
             rangeFirstPart = null;
-            crossProductRanges.clear();
+            crossProductRanges = null;
           break;
         }
       }
