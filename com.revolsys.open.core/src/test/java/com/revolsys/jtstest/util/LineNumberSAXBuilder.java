@@ -45,8 +45,7 @@ public class LineNumberSAXBuilder extends SAXBuilder {
     }
 
     @Override
-    public Element element(final String name, final String prefix,
-      final String uri) {
+    public Element element(final String name, final String prefix, final String uri) {
       return new LineNumberElement(name, prefix, uri);
     }
 
@@ -60,8 +59,8 @@ public class LineNumberSAXBuilder extends SAXBuilder {
 
     /** override */
     @Override
-    public void endElement(final String arg0, final String arg1,
-      final String arg2) throws SAXException {
+    public void endElement(final String arg0, final String arg1, final String arg2)
+      throws SAXException {
       final Locator l = getDocumentLocator();
       if (l != null) {
         ((LineNumberElement)getCurrentElement()).setEndLine(l.getLineNumber());
@@ -72,8 +71,8 @@ public class LineNumberSAXBuilder extends SAXBuilder {
 
     /** override */
     @Override
-    public void startElement(final String arg0, final String arg1,
-      final String arg2, final Attributes arg3) throws SAXException {
+    public void startElement(final String arg0, final String arg1, final String arg2,
+      final Attributes arg3) throws SAXException {
       super.startElement(arg0, arg1, arg2, arg3);
       final Locator l = getDocumentLocator();
       if (l != null) {

@@ -39,8 +39,7 @@ public class LineNumberElement extends Element {
     super(name, uri);
   }
 
-  public LineNumberElement(final String name, final String prefix,
-    final String uri) {
+  public LineNumberElement(final String name, final String prefix, final String uri) {
     super(name, prefix, uri);
   }
 

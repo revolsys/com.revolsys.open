@@ -4,25 +4,27 @@ import java.awt.geom.AffineTransform;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 
-import javax.vecmath.GMatrix;
+import com.revolsys.math.matrix.Matrix;
 
-public class GeneralMatrix extends GMatrix
+public class GeneralMatrix extends Matrix
 
 {
+  private static final long serialVersionUID = 8447482612423035360L;
+
   static boolean epsilonEquals(final GeneralMatrix m1, final GeneralMatrix m2,
     final double tolerance) {
-    final int numRow = m1.getNumRow();
-    if (numRow != m2.getNumRow()) {
+    final int numRow = m1.getRowCount();
+    if (numRow != m2.getRowCount()) {
       return false;
     }
-    final int numCol = m1.getNumCol();
-    if (numCol != m2.getNumCol()) {
+    final int numCol = m1.getColumnCount();
+    if (numCol != m2.getColumnCount()) {
       return false;
     }
     for (int j = 0; j < numRow; ++j) {
       for (int i = 0; i < numCol; ++i) {
-        final double v1 = m1.getElement(j, i);
-        final double v2 = m2.getElement(j, i);
+        final double v1 = m1.get(j, i);
+        final double v2 = m2.get(j, i);
         if (Math.abs(v1 - v2) > tolerance) {
           if (Double.doubleToLongBits(v1) != Double.doubleToLongBits(v2)) {
             return false;
@@ -35,14 +37,14 @@ public class GeneralMatrix extends GMatrix
 
   static boolean isIdentity(final GeneralMatrix matrix, double tolerance) {
     tolerance = Math.abs(tolerance);
-    final int numRow = matrix.getNumRow();
-    final int numCol = matrix.getNumCol();
+    final int numRow = matrix.getRowCount();
+    final int numCol = matrix.getColumnCount();
     if (numRow != numCol) {
       return false;
     }
     for (int j = 0; j < numRow; ++j) {
       for (int i = 0; i < numCol; ++i) {
-        double e = matrix.getElement(j, i);
+        double e = matrix.get(j, i);
         if (i == j) {
           e -= 1.0D;
         }
@@ -56,8 +58,8 @@ public class GeneralMatrix extends GMatrix
   }
 
   static String toString(final GeneralMatrix matrix) {
-    final int numRow = matrix.getNumRow();
-    final int numCol = matrix.getNumCol();
+    final int numRow = matrix.getRowCount();
+    final int numCol = matrix.getColumnCount();
     StringBuffer buffer = new StringBuffer();
     final int columnWidth = 12;
     final String lineSeparator = "\n";
@@ -69,7 +71,7 @@ public class GeneralMatrix extends GMatrix
     for (int j = 0; j < numRow; ++j) {
       for (int i = 0; i < numCol; ++i) {
         final int position = buffer.length();
-        buffer = format.format(matrix.getElement(j, i), buffer, dummy);
+        buffer = format.format(matrix.get(j, i), buffer, dummy);
         final int spaces = Math.max(12 - (buffer.length() - position), 1);
         buffer.insert(position, "");
       }
@@ -78,15 +80,13 @@ public class GeneralMatrix extends GMatrix
     return buffer.toString();
   }
 
-  private static final long serialVersionUID = 8447482612423035360L;
-
   public GeneralMatrix(final GeneralMatrix matrix) {
-    this(matrix.getNumRow(), matrix.getNumCol());
-    final int height = getNumRow();
-    final int width = getNumCol();
+    this(matrix.getRowCount(), matrix.getColumnCount());
+    final int height = getRowCount();
+    final int width = getColumnCount();
     for (int j = 0; j < height; ++j) {
       for (int i = 0; i < width; ++i) {
-        setElement(j, i, matrix.getElement(j, i));
+        set(j, i, matrix.get(j, i));
       }
     }
   }
@@ -104,25 +104,23 @@ public class GeneralMatrix extends GMatrix
     return epsilonEquals(this, matrix, tolerance);
   }
 
-  public final double[][] getElements() {
-    final int numCol = getNumCol();
-    final double[][] rows = new double[getNumRow()][];
-    for (int j = 0; j < rows.length; ++j) {
-      final double[] row = new double[numCol];
-      getRow(j, row);
-      rows[j] = row;
+  public final double[][] gets() {
+    final double[][] rows = new double[getRowCount()][];
+    for (int rowIndex = 0; rowIndex < rows.length; ++rowIndex) {
+      final double[] row = getRow(rowIndex);
+      rows[rowIndex] = row;
     }
     return rows;
   }
 
   public final boolean isAffine() {
-    int dimension = getNumRow();
-    if (dimension != getNumCol()) {
+    int dimension = getRowCount();
+    if (dimension != getColumnCount()) {
       return false;
     }
     --dimension;
     for (int i = 0; i <= dimension; ++i) {
-      if (getElement(dimension, i) != (i == dimension ? 1 : 0)) {
+      if (get(dimension, i) != (i == dimension ? 1 : 0)) {
         return false;
       }
     }
@@ -130,14 +128,14 @@ public class GeneralMatrix extends GMatrix
   }
 
   public final boolean isIdentity() {
-    final int numRow = getNumRow();
-    final int numCol = getNumCol();
+    final int numRow = getRowCount();
+    final int numCol = getColumnCount();
     if (numRow != numCol) {
       return false;
     }
     for (int j = 0; j < numRow; ++j) {
       for (int i = 0; i < numCol; ++i) {
-        if (getElement(j, i) != (i == j ? 1 : 0)) {
+        if (get(j, i) != (i == j ? 1 : 0)) {
           return false;
         }
       }
@@ -152,32 +150,31 @@ public class GeneralMatrix extends GMatrix
   }
 
   public final void multiply(final GeneralMatrix matrix) {
-    GMatrix m;
-    if (matrix instanceof GMatrix) {
+    Matrix m;
+    if (matrix instanceof Matrix) {
       m = matrix;
     } else {
       m = new GeneralMatrix(matrix);
     }
-    mul(m);
+    times(m);
   }
 
   public void setRowValues(final int i, final double... row) {
     super.setRow(i, row);
   }
 
-  public final AffineTransform toAffineTransform2D()
-      throws IllegalStateException {
-    if (getNumRow() != 3 || getNumCol() != 3) {
+  public final AffineTransform toAffineTransform2D() throws IllegalStateException {
+    if (getRowCount() != 3 || getColumnCount() != 3) {
       throw new IllegalStateException("Must be a 3x3 matrix");
     }
 
     if (isAffine()) {
-      final double m00 = getElement(0, 0);
-      final double m10 = getElement(1, 0);
-      final double m01 = getElement(0, 1);
-      final double m11 = getElement(1, 1);
-      final double m02 = getElement(0, 2);
-      final double m12 = getElement(1, 2);
+      final double m00 = get(0, 0);
+      final double m10 = get(1, 0);
+      final double m01 = get(0, 1);
+      final double m11 = get(1, 1);
+      final double m02 = get(0, 2);
+      final double m12 = get(1, 2);
       return new AffineTransform(m00, m10, m01, m11, m02, m12);
     }
 
@@ -188,4 +185,5 @@ public class GeneralMatrix extends GMatrix
   public String toString() {
     return toString(this);
   }
+
 }

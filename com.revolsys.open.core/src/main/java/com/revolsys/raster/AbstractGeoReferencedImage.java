@@ -51,41 +51,38 @@ import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
 
-public abstract class AbstractGeoReferencedImage extends
-AbstractPropertyChangeObject implements GeoReferencedImage {
+public abstract class AbstractGeoReferencedImage extends AbstractPropertyChangeObject implements
+  GeoReferencedImage {
 
-  private static double[] calculateLSM(final BoundingBox boundingBox,
-    final int imageWidth, final int imageHeight,
-    final List<MappedLocation> mappings) {
+  private static double[] calculateLSM(final BoundingBox boundingBox, final int imageWidth,
+    final int imageHeight, final List<MappedLocation> mappings) {
 
     final GeneralMatrix A = getAMatrix(mappings, imageHeight);
 
-    final GeneralMatrix X = getXMatrix(boundingBox, imageWidth, imageHeight,
-      mappings);
+    final GeneralMatrix X = getXMatrix(boundingBox, imageWidth, imageHeight, mappings);
 
     final GeneralMatrix P = getWeights(mappings.size());
 
     final GeneralMatrix AT = A.clone();
     AT.transpose();
 
-    final GeneralMatrix ATP = new GeneralMatrix(AT.getNumRow(), P.getNumCol());
-    final GeneralMatrix ATPA = new GeneralMatrix(AT.getNumRow(), A.getNumCol());
-    final GeneralMatrix ATPX = new GeneralMatrix(AT.getNumRow(), 1);
-    final GeneralMatrix x = new GeneralMatrix(A.getNumCol(), 1);
-    ATP.mul(AT, P);
-    ATPA.mul(ATP, A);
-    ATPX.mul(ATP, X);
+    final GeneralMatrix ATP = new GeneralMatrix(AT.getRowCount(), P.getColumnCount());
+    final GeneralMatrix ATPA = new GeneralMatrix(AT.getRowCount(), A.getColumnCount());
+    final GeneralMatrix ATPX = new GeneralMatrix(AT.getRowCount(), 1);
+    final GeneralMatrix x = new GeneralMatrix(A.getColumnCount(), 1);
+    ATP.times(AT, P);
+    ATPA.times(ATP, A);
+    ATPX.times(ATP, X);
     ATPA.invert();
-    x.mul(ATPA, ATPX);
+    x.times(ATPA, ATPX);
     ATPA.invert();
 
     x.transpose();
 
-    return x.getElements()[0];
+    return x.getRow(0);
   }
 
-  public static GeneralMatrix getAMatrix(final List<MappedLocation> mappings,
-    final int imageHeight) {
+  public static GeneralMatrix getAMatrix(final List<MappedLocation> mappings, final int imageHeight) {
     final GeneralMatrix A = new GeneralMatrix(2 * mappings.size(), 6);
 
     final int numRow = mappings.size() * 2;
@@ -113,8 +110,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
     final double mm2inch = 25.4;
 
     NodeList lst;
-    final Element node = (Element)r.getImageMetadata(0).getAsTree(
-      "javax_imageio_1.0");
+    final Element node = (Element)r.getImageMetadata(0).getAsTree("javax_imageio_1.0");
     lst = node.getElementsByTagName("HorizontalPixelSize");
     if (lst != null && lst.getLength() == 1) {
       hdpi = (int)(mm2inch / Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
@@ -134,32 +130,29 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
     final GeneralMatrix P = new GeneralMatrix(size * 2, size * 2);
 
     for (int j = 0; j < size; ++j) {
-      P.setElement(j, j, 1.0D);
+      P.set(j, j, 1.0D);
     }
     return P;
   }
 
-  private static GeneralMatrix getXMatrix(final BoundingBox boundingBox,
-    final int imageWidth, final int imageHeight,
-    final List<MappedLocation> mappings) {
+  private static GeneralMatrix getXMatrix(final BoundingBox boundingBox, final int imageWidth,
+    final int imageHeight, final List<MappedLocation> mappings) {
     final GeneralMatrix X = new GeneralMatrix(2 * mappings.size(), 1);
 
-    final int numRow = X.getNumRow();
+    final int numRow = X.getRowCount();
 
     for (int j = 0; j < numRow / 2; ++j) {
       final MappedLocation mappedLocation = mappings.get(j);
-      final Point targetPixel = mappedLocation.getTargetPixel(boundingBox,
-        imageWidth, imageHeight);
+      final Point targetPixel = mappedLocation.getTargetPixel(boundingBox, imageWidth, imageHeight);
       final double x = targetPixel.getX();
-      X.setElement(j, 0, x);
+      X.set(j, 0, x);
     }
 
     for (int j = numRow / 2; j < numRow; ++j) {
       final MappedLocation mappedLocation = mappings.get(j - numRow / 2);
-      final Point targetPixel = mappedLocation.getTargetPixel(boundingBox,
-        imageWidth, imageHeight);
+      final Point targetPixel = mappedLocation.getTargetPixel(boundingBox, imageWidth, imageHeight);
       final double y = imageHeight - targetPixel.getY();
-      X.setElement(j, 0, y);
+      X.set(j, 0, y);
     }
     return X;
   }
@@ -210,21 +203,18 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
   }
 
   @Override
-  public void drawImage(final Graphics2D graphics,
-    final BoundingBox viewBoundingBox, final int viewWidth,
-    final int viewHeight, final boolean useTransform) {
+  public void drawImage(final Graphics2D graphics, final BoundingBox viewBoundingBox,
+    final int viewWidth, final int viewHeight, final boolean useTransform) {
     final BoundingBox imageBoundingBox = getBoundingBox();
-    if (viewBoundingBox.intersects(imageBoundingBox) && viewWidth > 0
-        && viewHeight > 0) {
+    if (viewBoundingBox.intersects(imageBoundingBox) && viewWidth > 0 && viewHeight > 0) {
       final RenderedImage renderedImage = getRenderedImage();
-      drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth,
-        viewHeight, useTransform);
+      drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth, viewHeight,
+        useTransform);
     }
   }
 
-  public void drawRenderedImage(final RenderedImage renderedImage,
-    BoundingBox imageBoundingBox, final Graphics2D graphics,
-    final BoundingBox viewBoundingBox, final int viewWidth,
+  public void drawRenderedImage(final RenderedImage renderedImage, BoundingBox imageBoundingBox,
+    final Graphics2D graphics, final BoundingBox viewBoundingBox, final int viewWidth,
     final boolean useTransform) {
     if (renderedImage != null) {
       final int imageWidth = renderedImage.getWidth();
@@ -245,15 +235,13 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
           final double screenY = -(imageMaxY - viewMaxY) * scaleFactor;
 
           final double imageModelWidth = imageBoundingBox.getWidth();
-          final int imageScreenWidth = (int)Math.ceil(imageModelWidth
-            * scaleFactor);
+          final int imageScreenWidth = (int)Math.ceil(imageModelWidth * scaleFactor);
 
           final double imageModelHeight = imageBoundingBox.getHeight();
-          final int imageScreenHeight = (int)Math.ceil(imageModelHeight
-            * scaleFactor);
+          final int imageScreenHeight = (int)Math.ceil(imageModelHeight * scaleFactor);
 
-          if (imageScreenWidth > 0 && imageScreenWidth < 10000
-              && imageScreenHeight > 0 && imageScreenHeight < 10000) {
+          if (imageScreenWidth > 0 && imageScreenWidth < 10000 && imageScreenHeight > 0
+            && imageScreenHeight < 10000) {
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
               RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             if (imageScreenWidth > 0 && imageScreenHeight > 0) {
@@ -262,8 +250,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
               if (renderedImage instanceof BufferedImage && !useTransform) {
                 final BufferedImage bufferedImage = (BufferedImage)renderedImage;
                 try {
-                  graphics.drawImage(bufferedImage, 0, 0, imageScreenWidth,
-                    imageScreenHeight, null);
+                  graphics.drawImage(bufferedImage, 0, 0, imageScreenWidth, imageScreenHeight, null);
                 } catch (final Throwable e) {
                   LoggerFactory.getLogger(getClass()).error(
                     imageScreenWidth + "x" + imageScreenHeight, e);
@@ -271,8 +258,8 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
               } else {
                 final double scaleX = (double)imageScreenWidth / imageWidth;
                 final double scaleY = (double)imageScreenHeight / imageHeight;
-                final AffineTransform imageTransform = new AffineTransform(
-                  scaleX, 0, 0, scaleY, 0, 0);
+                final AffineTransform imageTransform = new AffineTransform(scaleX, 0, 0, scaleY, 0,
+                  0);
                 if (useTransform) {
                   final AffineTransform geoTransform = getAffineTransformation(imageBoundingBox);
                   imageTransform.concatenate(geoTransform);
@@ -289,12 +276,12 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
     }
   }
 
-  protected void drawRenderedImage(final RenderedImage renderedImage,
-    final Graphics2D graphics, final BoundingBox viewBoundingBox,
-    final int viewWidth, final int viewHeight, final boolean useTransform) {
+  protected void drawRenderedImage(final RenderedImage renderedImage, final Graphics2D graphics,
+    final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
+    final boolean useTransform) {
     final BoundingBox imageBoundingBox = getBoundingBox();
-    drawRenderedImage(renderedImage, imageBoundingBox, graphics,
-      viewBoundingBox, viewWidth, useTransform);
+    drawRenderedImage(renderedImage, imageBoundingBox, graphics, viewBoundingBox, viewWidth,
+      useTransform);
   }
 
   @Override
@@ -306,24 +293,22 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
     if (count == 1) {
       final MappedLocation tiePoint = mappings.get(0);
       final Point sourcePixel = tiePoint.getSourcePixel();
-      final Point targetPixel = tiePoint.getTargetPixel(boundingBox,
-        imageWidth, imageHeight);
+      final Point targetPixel = tiePoint.getTargetPixel(boundingBox, imageWidth, imageHeight);
       final double translateX = targetPixel.getX() - sourcePixel.getX();
       final double translateY = sourcePixel.getY() - targetPixel.getY();
       return new AffineTransform(1, 0, 0, 1, translateX, translateY);
     } else if (count < 3) {
       return new AffineTransform();
     }
-    final double[] affineTransformMatrix = calculateLSM(boundingBox,
-      imageWidth, imageHeight, mappings);
+    final double[] affineTransformMatrix = calculateLSM(boundingBox, imageWidth, imageHeight,
+      mappings);
     final double translateX = affineTransformMatrix[2];
     final double translateY = affineTransformMatrix[5];
     final double scaleX = affineTransformMatrix[0];
     final double scaleY = affineTransformMatrix[4];
     final double shearX = affineTransformMatrix[1];
     final double shearY = affineTransformMatrix[3];
-    return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX,
-      translateY);
+    return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX, translateY);
   }
 
   @Override
@@ -400,8 +385,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
   }
 
   @Override
-  public AbstractGeoReferencedImage getImage(
-    final CoordinateSystem coordinateSystem) {
+  public AbstractGeoReferencedImage getImage(final CoordinateSystem coordinateSystem) {
     synchronized (this.projectedImages) {
       if (coordinateSystem.equals(getCoordinateSystem())) {
         return this;
@@ -417,13 +401,13 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
   }
 
   @Override
-  public AbstractGeoReferencedImage getImage(
-    final CoordinateSystem coordinateSystem, final double resolution) {
+  public AbstractGeoReferencedImage getImage(final CoordinateSystem coordinateSystem,
+    final double resolution) {
     final int imageSrid = getGeometryFactory().getSrid();
     if (imageSrid > 0 && imageSrid != coordinateSystem.getId()) {
       final BoundingBox boundingBox = getBoundingBox();
-      final ProjectionImageFilter filter = new ProjectionImageFilter(
-        boundingBox, coordinateSystem, resolution);
+      final ProjectionImageFilter filter = new ProjectionImageFilter(boundingBox, coordinateSystem,
+        resolution);
 
       final BufferedImage newImage = filter.filter(getBufferedImage());
 
@@ -434,8 +418,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
   }
 
   @Override
-  public AbstractGeoReferencedImage getImage(
-    final GeometryFactory geometryFactory) {
+  public AbstractGeoReferencedImage getImage(final GeometryFactory geometryFactory) {
     final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
     return getImage(coordinateSystem);
   }
@@ -535,8 +518,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
     final Resource resource = getImageResource();
 
     final String extension = SpringUtil.getFileNameExtension(resource);
-    final Resource auxFile = SpringUtil.getResourceWithExtension(resource,
-      extension + ".aux.xml");
+    final Resource auxFile = SpringUtil.getResourceWithExtension(resource, extension + ".aux.xml");
     if (auxFile.exists() && SpringUtil.getLastModified(auxFile) > modifiedTime) {
       loadWorldFileX();
       final int[] dpi = getDpi();
@@ -552,11 +534,9 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
           final NodeList spatialReferences = doc.getElementsByTagName("SpatialReference");
           for (int i = 0; i < spatialReferences.getLength() && srid == 0; i++) {
             final Node spatialReference = spatialReferences.item(i);
-            Element sridElement = DomUtil.getFirstChildElement(
-              spatialReference, "LatestWKID");
+            Element sridElement = DomUtil.getFirstChildElement(spatialReference, "LatestWKID");
             if (sridElement == null) {
-              sridElement = DomUtil.getFirstChildElement(spatialReference,
-                  "WKID");
+              sridElement = DomUtil.getFirstChildElement(spatialReference, "WKID");
             }
             if (sridElement != null) {
               srid = DomUtil.getInteger(sridElement);
@@ -573,18 +553,14 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
               }
             }
           }
-          final GeometryFactory geometryFactory = GeometryFactory.floating(
-            srid, 2);
+          final GeometryFactory geometryFactory = GeometryFactory.floating(srid, 2);
           setGeometryFactory(geometryFactory);
 
-          final List<Double> sourceControlPoints = DomUtil.getDoubleList(doc,
-              "SourceGCPs");
-          final List<Double> targetControlPoints = DomUtil.getDoubleList(doc,
-              "TargetGCPs");
+          final List<Double> sourceControlPoints = DomUtil.getDoubleList(doc, "SourceGCPs");
+          final List<Double> targetControlPoints = DomUtil.getDoubleList(doc, "TargetGCPs");
           if (sourceControlPoints.size() > 0 && targetControlPoints.size() > 0) {
             final List<MappedLocation> tiePoints = new ArrayList<MappedLocation>();
-            for (int i = 0; i < sourceControlPoints.size()
-                && i < targetControlPoints.size(); i += 2) {
+            for (int i = 0; i < sourceControlPoints.size() && i < targetControlPoints.size(); i += 2) {
               final double imageX = sourceControlPoints.get(i) * dpi[0];
               final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
               final Point sourcePixel = new PointDouble(imageX, imageY);
@@ -592,8 +568,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
               final double x = targetControlPoints.get(i);
               final double y = targetControlPoints.get(i + 1);
               final Point targetPoint = geometryFactory.point(x, y);
-              final MappedLocation tiePoint = new MappedLocation(sourcePixel,
-                targetPoint);
+              final MappedLocation tiePoint = new MappedLocation(sourcePixel, targetPoint);
               tiePoints.add(tiePoint);
             }
             setTiePoints(tiePoints);
@@ -603,8 +578,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
         }
 
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error("Unable to read: " + auxFile,
-          e);
+        LoggerFactory.getLogger(getClass()).error("Unable to read: " + auxFile, e);
       }
 
     }
@@ -684,7 +658,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
     if (worldFile.exists()) {
       try {
         try (
-            final BufferedReader reader = SpringUtil.getBufferedReader(worldFile)) {
+          final BufferedReader reader = SpringUtil.getBufferedReader(worldFile)) {
           final double pixelWidth = Double.parseDouble(reader.readLine());
           final double yRotation = Double.parseDouble(reader.readLine());
           final double xRotation = Double.parseDouble(reader.readLine());
@@ -701,8 +675,7 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
           // yRotation);
         }
       } catch (final IOException e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Error reading world file " + worldFile, e);
+        LoggerFactory.getLogger(getClass()).error("Error reading world file " + worldFile, e);
       }
     }
   }
@@ -748,14 +721,12 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
   @Override
   public boolean saveChanges() {
     try {
-      final Resource rgResource = SpringUtil.addExtension(this.imageResource,
-          "rgobject");
+      final Resource rgResource = SpringUtil.addExtension(this.imageResource, "rgobject");
       MapObjectFactoryRegistry.write(rgResource, this);
       setHasChanges(false);
       return true;
     } catch (final Throwable e) {
-      ExceptionUtil.log(getClass(), "Unable to save: " + this.imageResource
-        + ".rgobject", e);
+      ExceptionUtil.log(getClass(), "Unable to save: " + this.imageResource + ".rgobject", e);
       return false;
     }
   }
@@ -770,8 +741,8 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
   }
 
   @Override
-  public void setBoundingBox(final double minX, final double maxY,
-    final double pixelWidth, final double pixelHeight) {
+  public void setBoundingBox(final double minX, final double maxY, final double pixelWidth,
+    final double pixelHeight) {
     final GeometryFactory geometryFactory = getGeometryFactory();
 
     final int imageWidth = getImageWidth();
@@ -779,8 +750,8 @@ AbstractPropertyChangeObject implements GeoReferencedImage {
 
     final int imageHeight = getImageHeight();
     final double minY = maxY + pixelHeight * imageHeight;
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2,
-      minX, maxY, maxX, minY);
+    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, 2, minX, maxY, maxX,
+      minY);
     setBoundingBox(boundingBox);
   }
 
