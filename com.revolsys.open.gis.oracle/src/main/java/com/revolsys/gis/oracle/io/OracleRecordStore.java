@@ -29,7 +29,6 @@ import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.WktCsParser;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.gis.oracle.esri.ArcSdeBinaryGeometryRecordStoreExtension;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryRecordStoreExtension;
 import com.revolsys.io.Path;
@@ -43,14 +42,13 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
 
 public class OracleRecordStore extends AbstractJdbcRecordStore {
-  private boolean initialized;
+  public static final List<String> ORACLE_INTERNAL_SCHEMAS = Arrays.asList("ANONYMOUS",
+    "APEX_030200", "AURORA$JIS$UTILITY$", "AURORA$ORB$UNAUTHENTICATED", "AWR_STAGE", "CSMIG",
+    "CTXSYS", "DBSNMP", "DEMO", "DIP", "DMSYS", "DSSYS", "EXFSYS", "LBACSYS", "MDSYS", "OLAPSYS",
+    "ORACLE_OCM", "ORDDATA", "ORDPLUGINS", "ORDSYS", "OSE$HTTP$ADMIN", "OUTLN", "PERFSTAT", "SDE",
+    "SYS", "SYSTEM", "TRACESVR", "TSMSYS", "WMSYS", "XDB");
 
-  public static final List<String> ORACLE_INTERNAL_SCHEMAS = Arrays.asList(
-    "ANONYMOUS", "APEX_030200", "AURORA$JIS$UTILITY$",
-    "AURORA$ORB$UNAUTHENTICATED", "AWR_STAGE", "CSMIG", "CTXSYS", "DBSNMP",
-    "DEMO", "DIP", "DMSYS", "DSSYS", "EXFSYS", "LBACSYS", "MDSYS", "OLAPSYS",
-    "ORACLE_OCM", "ORDDATA", "ORDPLUGINS", "ORDSYS", "OSE$HTTP$ADMIN", "OUTLN",
-    "PERFSTAT", "SDE", "SYS", "SYSTEM", "TRACESVR", "TSMSYS", "WMSYS", "XDB");
+  private boolean initialized;
 
   private boolean useSchemaSequencePrefix = true;
 
@@ -80,14 +78,13 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     initSettings();
   }
 
-  public OracleRecordStore(final RecordFactory recordFactory,
-    final DataSource dataSource) {
+  public OracleRecordStore(final RecordFactory recordFactory, final DataSource dataSource) {
     this(recordFactory);
     setDataSource(dataSource);
   }
 
-  private void appendEnvelopeIntersects(final Query query,
-    final StringBuilder sql, final EnvelopeIntersects envelopeIntersects) {
+  private void appendEnvelopeIntersects(final Query query, final StringBuilder sql,
+    final EnvelopeIntersects envelopeIntersects) {
     final FieldDefinition geometryField = query.getGeometryField();
 
     if (geometryField instanceof OracleSdoGeometryJdbcFieldDefinition) {
@@ -124,7 +121,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(") = 1");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-          + geometryField.getClass());
+        + geometryField.getClass());
     }
   }
 
@@ -166,7 +163,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(") = 1");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-          + geometryField.getClass());
+        + geometryField.getClass());
     }
   }
 
@@ -213,8 +210,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     } else if (geometryField instanceof ArcSdeStGeometryFieldDefinition) {
       final Column column = (Column)withinDistance.getGeometry1Value();
       final GeometryFactory geometryFactory = column.getField()
-          .getRecordDefinition()
-          .getGeometryFactory();
+        .getRecordDefinition()
+        .getGeometryFactory();
       final Value geometry2Value = (Value)withinDistance.getGeometry2Value();
       final Value distanceValue = (Value)withinDistance.getDistanceValue();
       final Number distance = (Number)distanceValue.getValue();
@@ -249,13 +246,12 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(")");
     } else {
       throw new IllegalArgumentException("Unknown geometry attribute type "
-          + geometryField.getClass());
+        + geometryField.getClass());
     }
   }
 
-  public AbstractIterator<Record> createOracleIterator(
-    final OracleRecordStore recordStore, final Query query,
-    final Map<String, Object> properties) {
+  public AbstractIterator<Record> createOracleIterator(final OracleRecordStore recordStore,
+    final Query query, final Map<String, Object> properties) {
     return new OracleJdbcQueryIterator(recordStore, query, properties);
   }
 
@@ -288,8 +284,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     return sequenceName + ".NEXTVAL";
   }
 
-  public GeometryFactory getGeometryFactory(final int oracleSrid,
-    final int axisCount, final double... scales) {
+  public GeometryFactory getGeometryFactory(final int oracleSrid, final int axisCount,
+    final double... scales) {
     final CoordinateSystem coordinateSystem = getCoordinateSystem(oracleSrid);
     if (coordinateSystem == null) {
       return GeometryFactory.fixed(0, axisCount, scales);
@@ -375,16 +371,14 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       setPrimaryKeySql("SELECT distinct cols.table_name, cols.column_name FROM all_constraints cons, all_cons_columns cols WHERE cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner AND cons.owner =?");
 
       setSchemaPermissionsSql("select distinct p.owner \"SCHEMA_NAME\" "
-          + "from ALL_TAB_PRIVS_RECD P "
-          + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
+        + "from ALL_TAB_PRIVS_RECD P "
+        + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
       setTablePermissionsSql("select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\" "
-          + "from ALL_TAB_PRIVS_RECD P "
-          + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
-          + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') ");
+        + "from ALL_TAB_PRIVS_RECD P "
+        + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
+        + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') ");
 
       addRecordStoreExtension(new ArcSdeStGeometryRecordStoreExtension());
-      addRecordStoreExtension(new ArcSdeBinaryGeometryRecordStoreExtension());
-
     }
   }
 
@@ -392,8 +386,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     setExcludeTablePatterns(".*\\$");
     setSqlPrefix("BEGIN ");
     setSqlSuffix(";END;");
-    setIteratorFactory(new RecordStoreIteratorFactory(this,
-        "createOracleIterator"));
+    setIteratorFactory(new RecordStoreIteratorFactory(this, "createOracleIterator"));
   }
 
   @Override

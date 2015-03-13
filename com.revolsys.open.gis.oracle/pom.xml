@@ -29,12 +29,5 @@
       <artifactId>sdoapi</artifactId>
       <version>11.2.0.3</version>
     </dependency>
-
-    <dependency>
-      <groupId>com.esri.sde</groupId>
-      <artifactId>jsde_sdk</artifactId>
-      <version>10.1</version>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
 </project>
