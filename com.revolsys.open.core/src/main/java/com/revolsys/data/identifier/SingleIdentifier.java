@@ -6,16 +6,18 @@ import java.util.List;
 
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.util.Numbers;
 
 public class SingleIdentifier extends AbstractIdentifier {
 
   public static Identifier create(final Object value) {
     if (value == null) {
       return null;
-    } else if (value instanceof Integer) {
-      return new IntegerIdentifier((Integer)value);
     } else if (value instanceof Long) {
       return new LongIdentifier((Long)value);
+    } else if (Numbers.isPrimitiveIntegral(value)) {
+      final Number number = (Number)value;
+      return new IntegerIdentifier(number.intValue());
     } else if (value instanceof Identifier) {
       return (Identifier)value;
     } else if (value instanceof Collection) {

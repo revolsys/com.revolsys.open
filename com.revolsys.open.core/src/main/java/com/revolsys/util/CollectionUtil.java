@@ -126,6 +126,15 @@ public final class CollectionUtil {
     }
   }
 
+  public static boolean containsAny(final Collection<?> collection1, final Collection<?> collection2) {
+    for (final Object value : collection1) {
+      if (collection2.contains(value)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public static <T> boolean containsReference(final List<WeakReference<T>> list, final T object) {
     for (int i = 0; i < list.size(); i++) {
       final WeakReference<T> reference = list.get(i);

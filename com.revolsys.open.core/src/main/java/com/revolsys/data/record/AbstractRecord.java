@@ -327,7 +327,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object> impleme
   }
 
   @Override
-  public String getTypeName() {
+  public String getTypePath() {
     return getRecordDefinition().getPath();
   }
 

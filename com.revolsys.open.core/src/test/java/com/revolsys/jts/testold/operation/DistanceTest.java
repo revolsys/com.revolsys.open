@@ -32,6 +32,8 @@
  */
 package com.revolsys.jts.testold.operation;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
@@ -53,8 +55,7 @@ public class DistanceTest extends TestCase {
     TestRunner.run(DistanceTest.class);
   }
 
-  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0,
-    1.0);
+  private final GeometryFactory geometryFactory = GeometryFactory.fixed(0, 1.0);
 
   WKTReader reader = new WKTReader(this.geometryFactory);
 
@@ -62,16 +63,15 @@ public class DistanceTest extends TestCase {
     super(name);
   }
 
-  private void doNearestPointsTest(final String wkt0, final String wkt1,
-    final double distance, final Point p0, final Point p1)
-        throws ParseException {
+  private void doNearestPointsTest(final String wkt0, final String wkt1, final double distance,
+    final Point p0, final Point p1) throws ParseException {
     final Geometry geometry1 = new WKTReader().read(wkt0);
     final Geometry geometry2 = new WKTReader().read(wkt1);
     final DistanceOp op = new DistanceOp(geometry1, geometry2);
     final double tolerance = 1E-10;
-    final Point[] nearestPoints = op.nearestPoints();
-    final Point nearestPoint1 = nearestPoints[0];
-    final Point nearestPoint2 = nearestPoints[1];
+    final List<Point> nearestPoints = op.nearestPoints();
+    final Point nearestPoint1 = nearestPoints.get(0);
+    final Point nearestPoint2 = nearestPoints.get(1);
     final double p1p2Distance = nearestPoint1.distance(nearestPoint2);
     assertEquals(distance, p1p2Distance, tolerance);
     assertEquals(p0.getX(), nearestPoint1.getX(), tolerance);
@@ -83,44 +83,37 @@ public class DistanceTest extends TestCase {
   public void testClosestPoints1() throws Exception {
     final String wkt1 = "POLYGON ((200 180, 60 140, 60 260, 200 180))";
     final String wkt2 = "POINT (140 280)";
-    final Point p1 = new PointDouble(111.6923076923077,
-      230.46153846153845);
+    final Point p1 = new PointDouble(111.6923076923077, 230.46153846153845);
     final Point p2 = new PointDouble(140.0, 280);
     doNearestPointsTest(wkt1, wkt2, 57.05597791103589, p1, p2);
   }
 
   public void testClosestPoints2() throws Exception {
     doNearestPointsTest("POLYGON ((200 180, 60 140, 60 260, 200 180))",
-      "MULTIPOINT ((140 280), (140 320))", 57.05597791103589,
-      new PointDouble(111.6923076923077, 230.46153846153845,
-        Point.NULL_ORDINATE), new PointDouble((double)140, 280,
-          Point.NULL_ORDINATE));
+      "MULTIPOINT ((140 280), (140 320))", 57.05597791103589, new PointDouble(111.6923076923077,
+        230.46153846153845, Point.NULL_ORDINATE), new PointDouble((double)140, 280,
+        Point.NULL_ORDINATE));
   }
 
   public void testClosestPoints3() throws Exception {
-    doNearestPointsTest(
-      "LINESTRING (100 100, 200 100, 200 200, 100 200, 100 100)",
-      "POINT (10 10)", 127.27922061357856, new PointDouble((double)100,
-        100, Point.NULL_ORDINATE), new PointDouble((double)10, 10,
-          Point.NULL_ORDINATE));
+    doNearestPointsTest("LINESTRING (100 100, 200 100, 200 200, 100 200, 100 100)",
+      "POINT (10 10)", 127.27922061357856, new PointDouble((double)100, 100, Point.NULL_ORDINATE),
+      new PointDouble((double)10, 10, Point.NULL_ORDINATE));
   }
 
   public void testClosestPoints4() throws Exception {
-    doNearestPointsTest("LINESTRING (100 100, 200 200)",
-      "LINESTRING (100 200, 200 100)", 0.0,
+    doNearestPointsTest("LINESTRING (100 100, 200 200)", "LINESTRING (100 200, 200 100)", 0.0,
       new PointDouble(150.0, 150.0), new PointDouble(150.0, 150.0));
   }
 
   public void testClosestPoints5() throws Exception {
-    doNearestPointsTest("LINESTRING (100 100, 200 200)",
-      "LINESTRING (150 121, 200 0)", 20.506096654409877, new PointDouble(
-        135.5, 135.5, Point.NULL_ORDINATE), new PointDouble((double)150,
-          121, Point.NULL_ORDINATE));
+    doNearestPointsTest("LINESTRING (100 100, 200 200)", "LINESTRING (150 121, 200 0)",
+      20.506096654409877, new PointDouble(135.5, 135.5, Point.NULL_ORDINATE), new PointDouble(
+        (double)150, 121, Point.NULL_ORDINATE));
   }
 
   public void testClosestPoints6() throws Exception {
-    final PointDouble p1 = new PointDouble(139.4956500724988,
-      206.78661188980183);
+    final PointDouble p1 = new PointDouble(139.4956500724988, 206.78661188980183);
     final PointDouble p2 = new PointDouble(153.0, 204);
     final String wkt1 = "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))";
     final String wkt2 = "LINESTRING (153 204, 185 224, 209 207, 238 222, 254 186)";
@@ -130,9 +123,8 @@ public class DistanceTest extends TestCase {
   public void testClosestPoints7() throws Exception {
     doNearestPointsTest(
       "POLYGON ((76 185, 125 283, 331 276, 324 122, 177 70, 184 155, 69 123, 76 185), (267 237, 148 248, 135 185, 223 189, 251 151, 286 183, 267 237))",
-      "LINESTRING (120 215, 185 224, 209 207, 238 222, 254 186)", 0.0,
-      new PointDouble((double)120, 215, Point.NULL_ORDINATE),
-      new PointDouble((double)120, 215, Point.NULL_ORDINATE));
+      "LINESTRING (120 215, 185 224, 209 207, 238 222, 254 186)", 0.0, new PointDouble((double)120,
+        215, Point.NULL_ORDINATE), new PointDouble((double)120, 215, Point.NULL_ORDINATE));
   }
 
   public void testDisjointCollinearSegments() throws Exception {

@@ -32,6 +32,7 @@
  */
 package com.revolsys.jts.operation.distance;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.jts.algorithm.PointLocator;
@@ -61,20 +62,6 @@ import com.revolsys.jts.geom.segment.Segment;
  * @version 1.7
  */
 public class DistanceOp {
-  /**
-   * Compute the the closest points of two geometries.
-   * The points are presented in the same order as the input Geometries.
-   *
-   * @param g0 a {@link Geometry}
-   * @param g1 another {@link Geometry}
-   * @return the closest points in the geometries
-   * @deprecated renamed to nearestPoints
-   */
-  @Deprecated
-  public static Point[] closestPoints(final Geometry g0, final Geometry g1) {
-    final DistanceOp distOp = new DistanceOp(g0, g1);
-    return distOp.nearestPoints();
-  }
 
   /**
    * Compute the distance between the nearest points of two geometries.
@@ -94,8 +81,7 @@ public class DistanceOp {
    * @param distance the distance to test
    * @return true if g0.distance(g1) <= distance
    */
-  public static boolean isWithinDistance(final Geometry g0, final Geometry g1,
-    final double distance) {
+  public static boolean isWithinDistance(final Geometry g0, final Geometry g1, final double distance) {
     final DistanceOp distOp = new DistanceOp(g0, g1, distance);
     return distOp.distance() <= distance;
   }
@@ -108,7 +94,7 @@ public class DistanceOp {
    * @param g1 another {@link Geometry}
    * @return the nearest points in the geometries
    */
-  public static Point[] nearestPoints(final Geometry g0, final Geometry g1) {
+  public static List<Point> nearestPoints(final Geometry g0, final Geometry g1) {
     final DistanceOp distOp = new DistanceOp(g0, g1);
     return distOp.nearestPoints();
   }
@@ -142,8 +128,7 @@ public class DistanceOp {
    * @param g1 a Geometry
    * @param terminateDistance the distance on which to terminate the search
    */
-  public DistanceOp(final Geometry g0, final Geometry g1,
-    final double terminateDistance) {
+  public DistanceOp(final Geometry g0, final Geometry g1, final double terminateDistance) {
     this.geom = new Geometry[2];
     this.geom[0] = g0;
     this.geom[1] = g1;
@@ -159,8 +144,8 @@ public class DistanceOp {
     }
   }
 
-  private void computeContainmentDistance(final GeometryLocation ptLoc,
-    final Polygon poly, final GeometryLocation[] locPtPoly) {
+  private void computeContainmentDistance(final GeometryLocation ptLoc, final Polygon poly,
+    final GeometryLocation[] locPtPoly) {
     final Point pt = ptLoc.getCoordinate();
     // if pt is not in exterior, distance to geom is 0
     if (Location.EXTERIOR != this.ptLocator.locate(pt, poly)) {
@@ -187,9 +172,8 @@ public class DistanceOp {
     }
   }
 
-  private void computeContainmentDistance(
-    final List<GeometryLocation> locations, final List<Polygon> polygons,
-    final GeometryLocation[] locPtPoly) {
+  private void computeContainmentDistance(final List<GeometryLocation> locations,
+    final List<Polygon> polygons, final GeometryLocation[] locPtPoly) {
     for (final GeometryLocation loc : locations) {
       for (final Polygon polygon : polygons) {
         computeContainmentDistance(loc, polygon, locPtPoly);
@@ -261,8 +245,8 @@ public class DistanceOp {
     computeFacetDistance();
   }
 
-  private void computeMinDistance(final LineString line1,
-    final LineString line2, final GeometryLocation[] locGeom) {
+  private void computeMinDistance(final LineString line1, final LineString line2,
+    final GeometryLocation[] locGeom) {
     if (line1.getBoundingBox().distance(line2.getBoundingBox()) <= this.minDistance) {
       // brute force approach!
       int i = 0;
@@ -273,10 +257,8 @@ public class DistanceOp {
           if (dist < this.minDistance) {
             this.minDistance = dist;
             final Point[] closestPt = segment1.closestPoints(segment2);
-            locGeom[0] = new GeometryLocation(line1, i,
-              closestPt[0].clonePoint());
-            locGeom[1] = new GeometryLocation(line2, j,
-              closestPt[1].clonePoint());
+            locGeom[0] = new GeometryLocation(line1, i, closestPt[0].clonePoint());
+            locGeom[1] = new GeometryLocation(line2, j, closestPt[1].clonePoint());
           }
           if (this.minDistance <= this.terminateDistance) {
             return;
@@ -300,8 +282,7 @@ public class DistanceOp {
       if (distance < this.minDistance) {
         this.minDistance = distance;
         final Point segClosestPoint = segment.closestPoint(point);
-        locGeom[0] = new GeometryLocation(line, i,
-          segClosestPoint.clonePoint());
+        locGeom[0] = new GeometryLocation(line, i, segClosestPoint.clonePoint());
         locGeom[1] = new GeometryLocation(point, 0, point);
       }
       if (this.minDistance <= this.terminateDistance) {
@@ -335,8 +316,8 @@ public class DistanceOp {
     }
   }
 
-  private void computeMinDistancePoints(final List<Point> points0,
-    final List<Point> points1, final GeometryLocation[] locGeom) {
+  private void computeMinDistancePoints(final List<Point> points0, final List<Point> points1,
+    final GeometryLocation[] locGeom) {
     for (final Point pt0 : points0) {
       for (final Point pt1 : points1) {
         final double dist = pt0.distance(pt1);
@@ -388,17 +369,14 @@ public class DistanceOp {
    *
    * @return a pair of {@link Coordinates}s of the nearest points
    */
-  public Point[] nearestPoints() {
+  public List<Point> nearestPoints() {
     computeMinDistance();
-    final Point[] nearestPts = new Point[] {
-      this.minDistanceLocation[0].getCoordinate(),
-      this.minDistanceLocation[1].getCoordinate()
-    };
-    return nearestPts;
+    final Point point1 = this.minDistanceLocation[0].getCoordinate();
+    final Point point2 = this.minDistanceLocation[1].getCoordinate();
+    return Arrays.asList(point1, point2);
   }
 
-  private void updateMinDistance(final GeometryLocation[] locGeom,
-    final boolean flip) {
+  private void updateMinDistance(final GeometryLocation[] locGeom, final boolean flip) {
     // if not set then don't update
     if (locGeom[0] == null) {
       return;

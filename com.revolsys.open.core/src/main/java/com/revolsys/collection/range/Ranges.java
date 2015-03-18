@@ -80,6 +80,36 @@ public class Ranges {
     }
   }
 
+  private static boolean isNumeric(final RangeSet rangeSet) {
+    if (rangeSet == null) {
+      return false;
+    } else {
+      for (final AbstractRange<?> range : rangeSet.getRanges()) {
+        if (range instanceof LongRange) {
+        } else if (range instanceof LongPaddedRange) {
+        } else if (range instanceof CrossProductRange) {
+          final CrossProductRange crossProduct = (CrossProductRange)range;
+          for (final AbstractRange<?> subRange : crossProduct.getRanges()) {
+            if (subRange instanceof LongRange) {
+            } else if (subRange instanceof LongPaddedRange) {
+            } else {
+              return false;
+            }
+          }
+        } else {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  public static boolean isNumeric(final String rangeSpec) {
+    final RangeSet rangeSet = RangeSet.create(rangeSpec);
+
+    return isNumeric(rangeSet);
+  }
+
   public static Object toValue(final Object value) {
     if (value == null) {
       return null;

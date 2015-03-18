@@ -1,6 +1,7 @@
 package com.revolsys.data.record;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -254,11 +255,27 @@ public final class RecordUtil {
     return identifiers;
   }
 
-  public static Integer getInteger(final Record object, final String fieldName) {
-    if (object == null) {
+  public static List<Identifier> getIdentifiers(final Record record,
+    final Collection<String> fieldNames) {
+    final List<Identifier> identifiers = new ArrayList<>();
+    for (final String fieldName : fieldNames) {
+      final Identifier identifier = record.getIdentifier(fieldName);
+      if (Property.hasValue(identifier)) {
+        identifiers.add(identifier);
+      }
+    }
+    return identifiers;
+  }
+
+  public static List<Identifier> getIdentifiers(final Record record, final String... fieldNames) {
+    return getIdentifiers(record, Arrays.asList(fieldNames));
+  }
+
+  public static Integer getInteger(final Record record, final String fieldName) {
+    if (record == null) {
       return null;
     } else {
-      final Number value = object.getValue(fieldName);
+      final Number value = record.getValue(fieldName);
       if (value == null) {
         return null;
       } else if (value instanceof Integer) {

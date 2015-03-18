@@ -69,7 +69,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   String getString(final CharSequence name);
 
-  String getTypeName();
+  String getTypePath();
 
   /**
    * Get the value of the attribute with the specified name.

@@ -92,8 +92,8 @@ public class BufferDistanceValidator {
 
   private Geometry errorIndicator = null;
 
-  public BufferDistanceValidator(final Geometry input,
-    final double bufDistance, final Geometry result) {
+  public BufferDistanceValidator(final Geometry input, final double bufDistance,
+    final Geometry result) {
     this.input = input;
     this.bufDistance = bufDistance;
     this.result = result;
@@ -110,14 +110,13 @@ public class BufferDistanceValidator {
    * @param bufCurve a geometry
    * @param maxDist the maximum distance that a buffer result can be from the input
    */
-  private void checkMaximumDistance(final Geometry input,
-    final Geometry bufCurve, final double maxDist) {
+  private void checkMaximumDistance(final Geometry input, final Geometry bufCurve,
+    final double maxDist) {
     // BufferCurveMaximumDistanceFinder maxDistFinder = new
     // BufferCurveMaximumDistanceFinder(input);
     // maxDistanceFound = maxDistFinder.findDistance(bufCurve);
 
-    final DiscreteHausdorffDistance haus = new DiscreteHausdorffDistance(
-      bufCurve, input);
+    final DiscreteHausdorffDistance haus = new DiscreteHausdorffDistance(bufCurve, input);
     haus.setDensifyFraction(0.25);
     this.maxDistanceFound = haus.orientedDistance();
 
@@ -127,8 +126,7 @@ public class BufferDistanceValidator {
       this.errorLocation = pts[1];
       this.errorIndicator = input.getGeometryFactory().lineString(pts);
       this.errMsg = "Distance between buffer curve and input is too large " + "("
-          + this.maxDistanceFound + " at " + EWktWriter.lineString(pts[0], pts[1])
-          + ")";
+        + this.maxDistanceFound + " at " + EWktWriter.lineString(pts[0], pts[1]) + ")";
     }
   }
 
@@ -139,19 +137,18 @@ public class BufferDistanceValidator {
    * @param g2 a geometry
    * @param minDist the minimum distance the geometries should be separated by
    */
-  private void checkMinimumDistance(final Geometry g1, final Geometry g2,
-    final double minDist) {
+  private void checkMinimumDistance(final Geometry g1, final Geometry g2, final double minDist) {
     final DistanceOp distOp = new DistanceOp(g1, g2, minDist);
     this.minDistanceFound = distOp.distance();
 
     if (this.minDistanceFound < minDist) {
       this.isValid = false;
-      final Point[] pts = distOp.nearestPoints();
-      this.errorLocation = distOp.nearestPoints()[1];
+      final List<Point> pts = distOp.nearestPoints();
+      this.errorLocation = pts.get(1);
       this.errorIndicator = g1.getGeometryFactory().lineString(pts);
       this.errMsg = "Distance between buffer curve and input is too small " + "("
-          + this.minDistanceFound + " at " + EWktWriter.lineString(pts[0], pts[1])
-          + " )";
+        + this.minDistanceFound + " at " + EWktWriter.lineString(pts.get(0), this.errorLocation)
+        + " )";
     }
   }
 
@@ -229,8 +226,8 @@ public class BufferDistanceValidator {
     }
     if (VERBOSE) {
       System.out.println("Min Dist= " + this.minDistanceFound + "  err= "
-          + (1.0 - this.minDistanceFound / this.bufDistance) + "  Max Dist= "
-          + this.maxDistanceFound + "  err= " + (this.maxDistanceFound / this.bufDistance - 1.0));
+        + (1.0 - this.minDistanceFound / this.bufDistance) + "  Max Dist= " + this.maxDistanceFound
+        + "  err= " + (this.maxDistanceFound / this.bufDistance - 1.0));
     }
     return this.isValid;
   }
