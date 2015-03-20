@@ -1,18 +1,19 @@
 package com.revolsys.io.json;
 
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
+import com.revolsys.util.WrappedException;
 
 public class JsonMapWriter extends AbstractMapWriter {
   /** The writer */
-  private PrintWriter out;
+  private Writer out;
 
-  boolean written = false;
+  private boolean written = false;
 
   private boolean singleObject;
 
@@ -25,7 +26,7 @@ public class JsonMapWriter extends AbstractMapWriter {
   }
 
   public JsonMapWriter(final Writer out, final boolean indent) {
-    this.out = new PrintWriter(out);
+    this.out = out;
     this.indent = indent;
   }
 
@@ -35,22 +36,23 @@ public class JsonMapWriter extends AbstractMapWriter {
   @Override
   public void close() {
     if (this.out != null) {
-      if (!this.written) {
-        writeHeader();
-      }
       try {
+        if (!this.written) {
+          writeHeader();
+        }
         if (!this.singleObject) {
           newLine();
           if (this.listRoot) {
-            this.out.print("]");
+            this.out.write("]");
           } else {
-            this.out.print("]}");
+            this.out.write("]}");
           }
         }
         final String callback = getProperty(IoConstants.JSONP_PROPERTY);
         if (callback != null) {
-          this.out.print(");");
+          this.out.write(");");
         }
+      } catch (final IOException e) {
       } finally {
         FileUtil.closeSilent(this.out);
         this.out = null;
@@ -60,16 +62,19 @@ public class JsonMapWriter extends AbstractMapWriter {
 
   @Override
   public void flush() {
-    this.out.flush();
+    try {
+      this.out.flush();
+    } catch (final IOException e) {
+    }
   }
 
   public boolean isListRoot() {
     return this.listRoot;
   }
 
-  private void newLine() {
+  private void newLine() throws IOException {
     if (this.indent) {
-      this.out.print('\n');
+      this.out.write('\n');
     }
   }
 
@@ -83,40 +88,44 @@ public class JsonMapWriter extends AbstractMapWriter {
 
   @Override
   public void write(final Map<String, ? extends Object> values) {
-    if (this.written) {
-      this.out.print(",");
-      newLine();
-    } else {
-      writeHeader();
-    }
-    String indentString = null;
-    if (this.indent) {
-      if (this.singleObject) {
-        indentString = "";
+    try {
+      if (this.written) {
+        this.out.write(',');
+        newLine();
       } else {
-        indentString = "  ";
-        this.out.print(indentString);
+        writeHeader();
       }
+      String indentString = null;
+      if (this.indent) {
+        if (this.singleObject) {
+          indentString = "";
+        } else {
+          indentString = "  ";
+          this.out.write(indentString);
+        }
+      }
+      JsonWriterUtil.write(this.out, values, indentString, isWriteNulls());
+      newLine();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
-    JsonWriterUtil.write(this.out, values, indentString, isWriteNulls());
-    newLine();
   }
 
-  private void writeHeader() {
+  private void writeHeader() throws IOException {
     final String callback = getProperty(IoConstants.JSONP_PROPERTY);
     if (callback != null) {
-      this.out.print(callback);
-      this.out.print('(');
+      this.out.write(callback);
+      this.out.write('(');
     }
     this.listRoot = Boolean.TRUE.equals(getProperty(IoConstants.JSON_LIST_ROOT_PROPERTY));
     this.singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
 
     if (!this.singleObject) {
       if (this.listRoot) {
-        this.out.print("[");
+        this.out.write('[');
         newLine();
       } else {
-        this.out.print("{\"items\": [");
+        this.out.write("{\"items\": [");
         newLine();
       }
     }

@@ -1,6 +1,6 @@
 package com.revolsys.io.csv;
 
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,12 +10,13 @@ import java.util.Map;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.WrappedException;
 
 public class CsvMapWriter extends AbstractMapWriter {
   private List<String> fieldNames;
 
   /** The writer */
-  private final PrintWriter out;
+  private final Writer out;
 
   private final boolean useQuotes;
 
@@ -25,9 +26,8 @@ public class CsvMapWriter extends AbstractMapWriter {
     this(out, CsvConstants.FIELD_SEPARATOR, true);
   }
 
-  public CsvMapWriter(final Writer out, final char fieldSeparator,
-    final boolean useQuotes) {
-    this.out = new PrintWriter(out);
+  public CsvMapWriter(final Writer out, final char fieldSeparator, final boolean useQuotes) {
+    this.out = out;
     this.fieldSeparator = fieldSeparator;
     this.useQuotes = useQuotes;
   }
@@ -42,7 +42,10 @@ public class CsvMapWriter extends AbstractMapWriter {
 
   @Override
   public void flush() {
-    this.out.flush();
+    try {
+      this.out.flush();
+    } catch (final IOException e) {
+    }
   }
 
   public List<String> getFieldNames() {
@@ -73,23 +76,32 @@ public class CsvMapWriter extends AbstractMapWriter {
   }
 
   public void write(final Object... values) {
-    for (int i = 0; i < values.length; i++) {
-      if (i > 0) {
-        this.out.write(this.fieldSeparator);
-      }
-      final Object value = values[i];
-      if (value != null) {
-        String string = StringConverterRegistry.toString(value);
-        if (this.useQuotes) {
-          string = string.replaceAll("\"", "\"\"");
-          this.out.write('"');
-          this.out.write(string);
-          this.out.write('"');
-        } else {
-          this.out.write(string);
+    try {
+      for (int i = 0; i < values.length; i++) {
+        if (i > 0) {
+          this.out.write(this.fieldSeparator);
+        }
+        final Object value = values[i];
+        if (value != null) {
+          final String string = StringConverterRegistry.toString(value);
+          if (this.useQuotes) {
+            this.out.write('"');
+            for (int j = 0; j < string.length(); j++) {
+              final char c = string.charAt(j);
+              if (c == '"') {
+                this.out.write('"');
+              }
+              this.out.write(c);
+            }
+            this.out.write('"');
+          } else {
+            this.out.write(string, 0, string.length());
+          }
         }
       }
+      this.out.write('\n');
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
-    this.out.println();
   }
 }

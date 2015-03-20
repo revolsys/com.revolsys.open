@@ -1,7 +1,7 @@
 package com.revolsys.io.wkt;
 
 import java.io.BufferedWriter;
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.io.Writer;
 
 import com.revolsys.data.record.Record;
@@ -9,22 +9,23 @@ import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.AbstractRecordWriter;
+import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.util.WrappedException;
 
 public class WktRecordWriter extends AbstractRecordWriter {
 
   private final RecordDefinition recordDefinition;
 
-  private final PrintWriter out;
+  private final Writer out;
 
   private boolean open;
 
-  public WktRecordWriter(final RecordDefinition recordDefinition,
-    final Writer out) {
+  public WktRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
     this.recordDefinition = recordDefinition;
-    this.out = new PrintWriter(new BufferedWriter(out));
+    this.out = new BufferedWriter(out);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
       final GeometryFactory geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
@@ -35,12 +36,15 @@ public class WktRecordWriter extends AbstractRecordWriter {
 
   @Override
   public void close() {
-    this.out.close();
+    FileUtil.closeSilent(this.out);
   }
 
   @Override
   public void flush() {
-    this.out.flush();
+    try {
+      this.out.flush();
+    } catch (final IOException e) {
+    }
   }
 
   @Override
@@ -50,18 +54,22 @@ public class WktRecordWriter extends AbstractRecordWriter {
 
   @Override
   public void write(final Record object) {
-    if (!this.open) {
-      this.open = true;
+    try {
+      if (!this.open) {
+        this.open = true;
+      }
+      final Geometry geometry = object.getGeometryValue();
+      final int srid = geometry.getSrid();
+      if (srid > 0) {
+        this.out.write("SRID=");
+        this.out.write(Integer.toString(srid));
+        this.out.write(';');
+      }
+      EWktWriter.write(this.out, geometry);
+      this.out.write('\n');
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
-    final Geometry geometry = object.getGeometryValue();
-    final int srid = geometry.getSrid();
-    if (srid > 0) {
-      this.out.print("SRID=");
-      this.out.print(srid);
-      this.out.print(';');
-    }
-    EWktWriter.write(this.out, geometry);
-    this.out.println();
   }
 
 }

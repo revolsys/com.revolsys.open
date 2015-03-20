@@ -1,7 +1,7 @@
 package com.revolsys.io.xbase;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -72,8 +72,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
   private Charset charset = FileUtil.UTF8;
 
-  public XbaseRecordWriter(final RecordDefinition recordDefinition,
-    final Resource resource) {
+  public XbaseRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
     this.recordDefinition = recordDefinition;
     this.resource = resource;
   }
@@ -101,13 +100,12 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
     } else {
       type = XBaseFieldDefinition.CHARACTER_TYPE;
     }
-    final XBaseFieldDefinition field = addFieldDefinition(fullName, type,
-      length, scale);
+    final XBaseFieldDefinition field = addFieldDefinition(fullName, type, length, scale);
     return field.getLength();
   }
 
-  protected XBaseFieldDefinition addFieldDefinition(final String fullName,
-    final char type, int length, int scale) {
+  protected XBaseFieldDefinition addFieldDefinition(final String fullName, final char type,
+    int length, int scale) {
     if (type == XBaseFieldDefinition.NUMBER_TYPE) {
       if (length < 1) {
         length = 18;
@@ -148,8 +146,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
       i++;
     }
 
-    final XBaseFieldDefinition field = new XBaseFieldDefinition(name, fullName,
-      type, length, scale);
+    final XBaseFieldDefinition field = new XBaseFieldDefinition(name, fullName, type, length, scale);
     this.fieldNames.add(name);
     this.fields.add(field);
     return field;
@@ -219,14 +216,12 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         this.out = new ResourceEndianOutput(this.resource);
         writeHeader();
       }
-      final Resource codePageResource = SpringUtil.getResourceWithExtension(
-        this.resource, "cpg");
+      final Resource codePageResource = SpringUtil.getResourceWithExtension(this.resource, "cpg");
       if (!(codePageResource instanceof NonExistingResource)) {
-        final PrintWriter writer = SpringUtil.getPrintWriter(codePageResource);
-        try {
-          writer.print(this.charset.name());
-        } finally {
-          writer.close();
+
+        try (
+          final Writer writer = SpringUtil.getWriter(codePageResource)) {
+          writer.write(this.charset.name());
         }
       }
     }
@@ -270,7 +265,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         if (!writeField(object, field)) {
           final String fieldName = field.getFullName();
           log.warn("Unable to write attribute '" + fieldName + "' with value "
-              + object.getValue(fieldName));
+            + object.getValue(fieldName));
         }
       }
       this.numRecords++;
@@ -279,8 +274,8 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
     }
   }
 
-  protected boolean writeField(final Record object,
-    final XBaseFieldDefinition field) throws IOException {
+  protected boolean writeField(final Record object, final XBaseFieldDefinition field)
+    throws IOException {
     if (this.out == null) {
       return true;
     } else {
@@ -301,8 +296,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
             if (decimalPlaces >= 0) {
               if (number instanceof BigDecimal) {
                 final BigDecimal bigDecimal = new BigDecimal(number.toString());
-                number = bigDecimal.setScale(decimalPlaces,
-                  RoundingMode.HALF_UP);
+                number = bigDecimal.setScale(decimalPlaces, RoundingMode.HALF_UP);
               } else if (number instanceof Double || number instanceof Float) {
                 final double doubleValue = number.doubleValue();
                 final double precisionScale = field.getPrecisionScale();
@@ -311,8 +305,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
             }
             numString = numberFormat.format(number);
           } else {
-            throw new IllegalArgumentException("Not a number " + fieldName
-              + "=" + value);
+            throw new IllegalArgumentException("Not a number " + fieldName + "=" + value);
           }
           final int numLength = numString.length();
           if (numLength > fieldLength) {
@@ -407,8 +400,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         final int scale = this.recordDefinition.getFieldScale(index);
         final DataType attributeType = this.recordDefinition.getFieldType(index);
         final Class<?> typeJavaClass = attributeType.getJavaClass();
-        final int fieldLength = addDbaseField(name, attributeType,
-          typeJavaClass, length, scale);
+        final int fieldLength = addDbaseField(name, attributeType, typeJavaClass, length, scale);
         if (fieldLength > 0) {
           recordLength += fieldLength;
           numFields++;

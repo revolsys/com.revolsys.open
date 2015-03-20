@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.revolsys.collection.MultiIterator;
+import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.ExceptionUtil;
+import com.revolsys.util.Property;
 
-public class RangeSet extends AbstractSet<Object> implements Iterable<Object> {
+public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, Cloneable {
 
   private static void addPart(final RangeSet set, final List<AbstractRange<?>> crossProductRanges,
     final String fromValue, final String rangeSpec, final int partStart, final int partEnd) {
@@ -23,63 +26,71 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object> {
     }
   }
 
+  public static RangeSet create(final int from, final int to) {
+    final RangeSet range = new RangeSet();
+    range.addRange(from, to);
+    return range;
+  }
+
   public static RangeSet create(final String rangeSpec) {
     final RangeSet set = new RangeSet();
-    int partStart = 0;
-    int partEnd = 0;
-    boolean inRange = false;
-    String rangeFirstPart = null;
-    List<AbstractRange<?>> crossProductRanges = null;
-    final int charCount = rangeSpec.length();
-    for (int i = 0; i < charCount; i++) {
-      final char character = rangeSpec.charAt(i);
-      if (!Character.isWhitespace(character)) {
-        switch (character) {
-          case '+':
-            if (crossProductRanges == null) {
-              crossProductRanges = new ArrayList<>();
-            }
-            addPart(set, crossProductRanges, rangeFirstPart, rangeSpec, partStart, partEnd);
-            partStart = i + 1;
-            inRange = false;
-          break;
-          case '~':
-            if (inRange) {
-              throw new RangeInvalidException(
-                "The ~ character cannot be used twice in a range, see *~* in "
-                  + rangeSpec.substring(0, i) + "*~*" + rangeSpec.substring(i + 1));
-            } else {
-              rangeFirstPart = rangeSpec.substring(partStart, partEnd);
+    if (Property.hasValue(rangeSpec)) {
+      int partStart = 0;
+      int partEnd = 0;
+      boolean inRange = false;
+      String rangeFirstPart = null;
+      List<AbstractRange<?>> crossProductRanges = null;
+      final int charCount = rangeSpec.length();
+      for (int i = 0; i < charCount; i++) {
+        final char character = rangeSpec.charAt(i);
+        if (!Character.isWhitespace(character)) {
+          switch (character) {
+            case '+':
+              if (crossProductRanges == null) {
+                crossProductRanges = new ArrayList<>();
+              }
+              addPart(set, crossProductRanges, rangeFirstPart, rangeSpec, partStart, partEnd);
               partStart = i + 1;
-              inRange = true;
-            }
-          break;
-          case ',':
-            addPart(set, crossProductRanges, rangeFirstPart, rangeSpec, partStart, partEnd);
-            if (crossProductRanges != null) {
-              set.add(new CrossProductRange(crossProductRanges));
-            }
-            partStart = i + 1;
-            inRange = false;
-            rangeFirstPart = null;
-            crossProductRanges = null;
-          break;
+              inRange = false;
+            break;
+            case '~':
+              if (inRange) {
+                throw new RangeInvalidException(
+                  "The ~ character cannot be used twice in a range, see *~* in "
+                    + rangeSpec.substring(0, i) + "*~*" + rangeSpec.substring(i + 1));
+              } else {
+                rangeFirstPart = rangeSpec.substring(partStart, partEnd);
+                partStart = i + 1;
+                inRange = true;
+              }
+            break;
+            case ',':
+              addPart(set, crossProductRanges, rangeFirstPart, rangeSpec, partStart, partEnd);
+              if (crossProductRanges != null) {
+                set.add(new CrossProductRange(crossProductRanges));
+              }
+              partStart = i + 1;
+              inRange = false;
+              rangeFirstPart = null;
+              crossProductRanges = null;
+            break;
+          }
         }
+        partEnd = i + 1;
       }
-      partEnd = i + 1;
-    }
-    if (partStart < charCount) {
-      addPart(set, crossProductRanges, rangeFirstPart, rangeSpec, partStart, partEnd);
-    }
-    if (crossProductRanges != null) {
-      set.addRange(new CrossProductRange(crossProductRanges));
+      if (partStart < charCount) {
+        addPart(set, crossProductRanges, rangeFirstPart, rangeSpec, partStart, partEnd);
+      }
+      if (crossProductRanges != null) {
+        set.addRange(new CrossProductRange(crossProductRanges));
+      }
     }
     return set;
   }
 
   private int size;
 
-  private final List<AbstractRange<?>> ranges = new LinkedList<>();
+  private List<AbstractRange<?>> ranges = new LinkedList<>();
 
   public RangeSet() {
   }
@@ -192,6 +203,17 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object> {
     return addRange(addRange);
   }
 
+  @Override
+  public RangeSet clone() {
+    try {
+      final RangeSet clone = (RangeSet)super.clone();
+      clone.ranges = new ArrayList<>(this.ranges);
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
   public List<AbstractRange<?>> getRanges() {
     return new ArrayList<>(this.ranges);
   }
@@ -208,95 +230,106 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object> {
 
   @Override
   public boolean remove(final Object value) {
-    if (value instanceof Integer) {
-      final Integer intValue = (Integer)value;
-      for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator.hasNext();) {
-        final AbstractRange<?> range = iterator.next();
-        if (range instanceof LongRange) {
-          final LongRange longRange = (LongRange)range;
-
-          if (longRange.contains(intValue)) {
-            final long from = longRange.getFrom();
-            final long to = longRange.getTo();
-            if (from == intValue) {
-              if (to != intValue) {
-                final AbstractRange<?> newRange = new LongRange(intValue + 1, to);
-                iterator.set(newRange);
-              } else {
-                iterator.remove();
-              }
-              this.size--;
-              return true;
-            } else if (to == intValue) {
-              final LongRange newRange = new LongRange(from, intValue - 1);
-              iterator.set(newRange);
-              this.size--;
-              return true;
-            } else {
-              final LongRange newRange1 = new LongRange(from, intValue - 1);
-              iterator.set(newRange1);
-              final LongRange newRange2 = new LongRange(intValue + 1, to);
-              iterator.add(newRange2);
-              this.size--;
-              return true;
-            }
+    for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator.hasNext();) {
+      final AbstractRange<?> range = iterator.next();
+      if (range.contains(value)) {
+        final Object from = range.getFrom();
+        final Object to = range.getTo();
+        if (EqualsRegistry.equal(from, value)) {
+          if (EqualsRegistry.equal(to, value)) {
+            iterator.remove();
+          } else {
+            final Object next = range.next(value);
+            final AbstractRange<?> newRange = range.createNew(next, to);
+            iterator.set(newRange);
           }
-        }
+          this.size--;
+          return true;
+        } else if (EqualsRegistry.equal(to, value)) {
+          final Object previous = range.previous(value);
+          final AbstractRange<?> newRange = range.createNew(from, previous);
+          iterator.set(newRange);
+          this.size--;
+          return true;
+        } else {
+          final Object previous = range.previous(value);
+          final AbstractRange<?> newRange1 = range.createNew(from, previous);
+          iterator.set(newRange1);
 
+          final Object next = range.next(value);
+          final AbstractRange<?> newRange2 = range.createNew(next, to);
+          iterator.add(newRange2);
+          this.size--;
+          return true;
+        }
       }
     }
 
     return false;
   }
 
-  public boolean removeAll(final Iterable<Integer> values) {
+  public boolean removeAll(final Iterable<Object> values) {
     boolean removed = false;
-    for (final Integer value : values) {
+    for (final Object value : values) {
       removed |= remove(value);
     }
     return removed;
   }
 
-  public boolean removeRange(final int from, final int to) {
+  @SuppressWarnings("unchecked")
+  public <V> V removeFirst() {
+    if (size() == 0) {
+      return null;
+    } else {
+      final AbstractRange<?> range = this.ranges.get(0);
+      final Object value = range.getFrom();
+      remove(value);
+      return (V)value;
+    }
+  }
+
+  public boolean removeRange(final Object from, final Object to) {
     boolean removed = false;
     for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator.hasNext();) {
       final AbstractRange<?> range = iterator.next();
-      if (range instanceof LongRange) {
-        final LongRange longRange = (LongRange)range;
 
-        final long rangeFrom = longRange.getFrom();
-        final long rangeTo = longRange.getTo();
-        if (from <= rangeFrom) {
-          if (to < rangeFrom) {
-            return removed;
-          } else if (to >= rangeTo) {
-            iterator.remove();
-          } else {
-            final AbstractRange<?> newRange = new LongRange(to + 1, rangeTo);
-            this.size -= range.size();
-            this.size += newRange.size();
-            iterator.set(newRange);
-          }
-        } else if (from <= rangeTo) {
-          if (to < rangeTo) {
-            final AbstractRange<?> newRange1 = new LongRange(rangeFrom, from - 1);
-            iterator.set(newRange1);
-            final AbstractRange<?> newRange2 = new LongRange(to + 1, rangeTo);
-            iterator.add(newRange2);
-            this.size -= range.size();
-            this.size += newRange1.size();
-            this.size += newRange2.size();
+      final Object rangeFrom = range.getFrom();
+      final Object rangeTo = range.getTo();
+      if (range.compareFromValue(from) >= 0) {
 
-          } else {
-            final AbstractRange<?> newRange = new LongRange(rangeFrom, from - 1);
-            this.size -= range.size();
-            this.size += newRange.size();
-            iterator.set(newRange);
-            if (to == rangeTo) {
-              return true;
-            }
-            removed = true;
+        if (range.compareFromValue(to) > 0) {
+          return removed;
+        } else if (range.compareToValue(to) <= 0) {
+          iterator.remove();
+        } else {
+          final Object next = range.next(to);
+          final AbstractRange<?> newRange = range.createNew(next, rangeTo);
+          this.size -= range.size();
+          this.size += newRange.size();
+          iterator.set(newRange);
+        }
+      } else if (range.compareToValue(from) >= 0) {
+        if (range.compareToValue(to) > 0) {
+          final Object next = range.next(to);
+          final Object previous = range.previous(from);
+          final AbstractRange<?> newRange1 = range.createNew(rangeFrom, previous);
+          iterator.set(newRange1);
+          final AbstractRange<?> newRange2 = range.createNew(next, rangeTo);
+          iterator.add(newRange2);
+          this.size -= range.size();
+          this.size += newRange1.size();
+          this.size += newRange2.size();
+
+        } else {
+          final Object previous = range.previous(from);
+          final AbstractRange<?> newRange = range.createNew(rangeFrom, previous);
+          this.size -= range.size();
+          this.size += newRange.size();
+          iterator.set(newRange);
+          if (to == rangeTo) {
+            return true;
           }
+          removed = true;
         }
       }
     }

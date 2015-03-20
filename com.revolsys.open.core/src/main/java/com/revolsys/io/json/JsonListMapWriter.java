@@ -1,22 +1,27 @@
 package com.revolsys.io.json;
 
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.WrappedException;
 
 public class JsonListMapWriter extends AbstractMapWriter {
 
   /** The writer */
-  private PrintWriter out;
+  private Writer out;
 
   boolean written = false;
 
   public JsonListMapWriter(final Writer out) {
-    this.out = new PrintWriter(out);
-    this.out.print("[");
+    this.out = out;
+    try {
+      this.out.write('[');
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
@@ -26,7 +31,8 @@ public class JsonListMapWriter extends AbstractMapWriter {
   public void close() {
     if (this.out != null) {
       try {
-        this.out.print("\n]\n");
+        this.out.write("\n]\n");
+      } catch (final IOException e) {
       } finally {
         FileUtil.closeSilent(this.out);
         this.out = null;
@@ -36,17 +42,24 @@ public class JsonListMapWriter extends AbstractMapWriter {
 
   @Override
   public void flush() {
-    this.out.flush();
+    try {
+      this.out.flush();
+    } catch (final IOException e) {
+    }
   }
 
   @Override
   public void write(final Map<String, ? extends Object> values) {
-    if (this.written) {
-      this.out.print(",\n");
-    } else {
-      this.out.print("\n");
-      this.written = true;
+    try {
+      if (this.written) {
+        this.out.write(',');
+      } else {
+        this.written = true;
+      }
+      this.out.write('\n');
+      JsonWriterUtil.write(this.out, values, null, isWriteNulls());
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
-    JsonWriterUtil.write(this.out, values, null, isWriteNulls());
   }
 }

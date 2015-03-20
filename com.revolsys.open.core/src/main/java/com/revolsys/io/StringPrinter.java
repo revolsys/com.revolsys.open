@@ -1,6 +1,6 @@
 package com.revolsys.io;
 
-import java.io.PrintWriter;
+import java.io.IOException;
 
 public class StringPrinter {
 
@@ -10,7 +10,10 @@ public class StringPrinter {
     this.string = string;
   }
 
-  public void write(final PrintWriter out) {
-    out.print(this.string);
+  public void write(final java.io.Writer out) {
+    try {
+      out.write(this.string);
+    } catch (final IOException e) {
+    }
   }
 }

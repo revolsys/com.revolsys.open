@@ -1,6 +1,7 @@
 package com.revolsys.io.json;
 
-import java.io.PrintWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -10,86 +11,85 @@ import java.util.Set;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.StringPrinter;
 import com.revolsys.util.CollectionUtil;
+import com.revolsys.util.MathUtil;
 
 public final class JsonWriterUtil {
-  public static void charSequence(final PrintWriter out,
-    final CharSequence string) {
+  public static void charSequence(final Writer out, final CharSequence string) throws IOException {
     for (int i = 0; i < string.length(); i++) {
       final char c = string.charAt(i);
       switch (c) {
         case '"':
-          out.print("\\\"");
-          break;
+          out.write("\\\"");
+        break;
         case '\\':
-          out.print("\\\\");
-          break;
+          out.write("\\\\");
+        break;
         case '/':
-          out.print("\\/");
-          break;
+          out.write("\\/");
+        break;
         case '\b':
-          out.print("\\b");
-          break;
+          out.write("\\b");
+        break;
         case '\f':
-          out.print("\\f");
-          break;
+          out.write("\\f");
+        break;
         case '\n':
-          out.print("\\n");
-          break;
+          out.write("\\n");
+        break;
         case '\r':
-          out.print("\\r");
-          break;
+          out.write("\\r");
+        break;
         case '\t':
-          out.print("\\t");
-          break;
+          out.write("\\t");
+        break;
         default:
-          out.print(c);
-          break;
+          out.write(c);
+        break;
       }
     }
   }
 
-  public static void endAttribute(final PrintWriter out, final String indent) {
-    out.print(",");
+  public static void endAttribute(final Writer out, final String indent) throws IOException {
+    out.write(',');
     newLine(out, indent);
   }
 
-  public static void endList(final PrintWriter out) {
-    out.print("]");
+  public static void endList(final Writer out) throws IOException {
+    out.write(']');
   }
 
-  public static void endObject(final PrintWriter out) {
-    out.print("}");
+  public static void endObject(final Writer out) throws IOException {
+    out.write('}');
   }
 
-  public static void label(final PrintWriter out, final String key,
-    final String indent) {
+  public static void label(final Writer out, final String key, final String indent)
+    throws IOException {
     writeIndent(out, indent);
     out.write('"');
     charSequence(out, key);
     out.write('"');
 
-    out.print(":");
+    out.write(":");
   }
 
-  public static void newLine(final PrintWriter out, final String indent) {
+  public static void newLine(final Writer out, final String indent) throws IOException {
     if (indent != null) {
-      out.print("\n");
+      out.write('\n');
     }
   }
 
-  public static void startList(final PrintWriter out, final String indent) {
-    out.print("[");
+  public static void startList(final Writer out, final String indent) throws IOException {
+    out.write('[');
     newLine(out, indent);
   }
 
-  public static void startObject(final PrintWriter out, final String indent) {
-    out.print("{");
+  public static void startObject(final Writer out, final String indent) throws IOException {
+    out.write('{');
     newLine(out, indent);
   }
 
-  public static void write(final PrintWriter out,
-    final Collection<? extends Object> values, final String indent,
-    final boolean writeNulls) {
+  public static void write(final Writer out, final Collection<? extends Object> values,
+    final String indent, final boolean writeNulls) throws IOException {
     startList(out, indent);
     String newIndent = indent;
     if (newIndent != null) {
@@ -117,9 +117,8 @@ public final class JsonWriterUtil {
     endList(out);
   }
 
-  public static void write(final PrintWriter out,
-    final Map<String, ? extends Object> values, final String indent,
-    final boolean writeNulls) {
+  public static void write(final Writer out, final Map<String, ? extends Object> values,
+    final String indent, final boolean writeNulls) throws IOException {
 
     startObject(out, indent);
     if (values != null) {
@@ -148,24 +147,28 @@ public final class JsonWriterUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static void write(final PrintWriter out, final Object value,
-    final String indent, final boolean writeNulls) {
+  public static void write(final Writer out, final Object value, final String indent,
+    final boolean writeNulls) throws IOException {
     if (value == null) {
-      out.print("null");
+      out.write("null");
     } else if (value instanceof StringPrinter) {
       final StringPrinter printer = (StringPrinter)value;
       printer.write(out);
     } else if (value instanceof Boolean) {
-      out.print(value);
+      if ((Boolean)value) {
+        out.write("true");
+      } else {
+        out.write("false");
+      }
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final double doubleValue = number.doubleValue();
       if (Double.isInfinite(doubleValue)) {
-        out.print(-Double.MAX_VALUE);
+        out.write(MathUtil.toString(-Double.MAX_VALUE));
       } else if (Double.isInfinite(doubleValue)) {
-        out.print("null");
+        out.write("null");
       } else {
-        out.print(value);
+        out.write(MathUtil.toString(doubleValue));
       }
     } else if (value instanceof Collection) {
       final Collection<? extends Object> list = (Collection<? extends Object>)value;
@@ -187,9 +190,9 @@ public final class JsonWriterUtil {
 
   }
 
-  protected static void writeIndent(final PrintWriter out, final String indent) {
+  protected static void writeIndent(final Writer out, final String indent) throws IOException {
     if (indent != null) {
-      out.print(indent);
+      out.write(indent);
     }
   }
 

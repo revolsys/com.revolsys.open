@@ -7,22 +7,20 @@ import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.LoggerFactory;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
 
-public abstract class AbstractJdbcDatabaseFactory implements
-JdbcDatabaseFactory {
+public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory {
 
   private boolean useCommonsDbcp = true;
 
   @Override
   public void closeDataSource(final DataSource dataSource) {
-    if (dataSource instanceof BasicDataSource) {
-      final BasicDataSource basicDataSource = (BasicDataSource)dataSource;
+    if (dataSource instanceof DataSourceImpl) {
+      final DataSourceImpl basicDataSource = (DataSourceImpl)dataSource;
       try {
         basicDataSource.close();
       } catch (final SQLException e) {
@@ -38,36 +36,31 @@ JdbcDatabaseFactory {
       final String username = (String)newConfig.remove("username");
       String password = (String)newConfig.remove("password");
       password = PasswordUtil.decrypt(password);
-      final BasicDataSource dataSource = new BasicDataSource();
+      final DataSourceImpl dataSource = new DataSourceImpl();
       dataSource.setDriverClassName(getDriverClassName());
       dataSource.setUsername(username);
       dataSource.setPassword(password);
       dataSource.setUrl(url);
       dataSource.setValidationQuery(getConnectionValidationQuery());
 
-      final int minPoolSize = Maps.getInteger(config, "minPoolSize",
-        -1);
+      final int minPoolSize = Maps.getInteger(config, "minPoolSize", -1);
       newConfig.remove("minPoolSize");
       dataSource.setMinIdle(minPoolSize);
       dataSource.setMaxIdle(-1);
 
-      final int maxPoolSize = Maps.getInteger(config, "maxPoolSize",
-        10);
+      final int maxPoolSize = Maps.getInteger(config, "maxPoolSize", 10);
       newConfig.remove("maxPoolSize");
       dataSource.setMaxTotal(maxPoolSize);
 
-      final int maxWaitMillis = Maps.getInteger(config,
-        "waitTimeout", 1);
+      final int maxWaitMillis = Maps.getInteger(config, "waitTimeout", 10);
       newConfig.remove("waitTimeout");
       dataSource.setMaxWaitMillis(maxWaitMillis);
 
-      final boolean validateConnection = Maps.getBool(config,
-        "validateConnection", true);
+      final boolean validateConnection = Maps.getBool(config, "validateConnection", true);
       newConfig.remove("validateConnection");
-      dataSource.setTestOnBorrow(validateConnection);
+      // dataSource.setTestOnBorrow(validateConnection);
 
-      final int inactivityTimeout = Maps.getInteger(config,
-        "inactivityTimeout", 60);
+      final int inactivityTimeout = Maps.getInteger(config, "inactivityTimeout", 60);
       newConfig.remove("inactivityTimeout");
       dataSource.setMinEvictableIdleTimeMillis(inactivityTimeout * 1000);
       dataSource.setTimeBetweenEvictionRunsMillis(inactivityTimeout * 1000);
@@ -79,14 +72,12 @@ JdbcDatabaseFactory {
           JavaBeanUtil.setProperty(dataSource, name, value);
         } catch (final Throwable t) {
           LoggerFactory.getLogger(getClass()).debug(
-            "Unable to set data source property " + name + " = " + value
-            + " for " + url, t);
+            "Unable to set data source property " + name + " = " + value + " for " + url, t);
         }
       }
       return dataSource;
     } catch (final Throwable e) {
-      throw new IllegalArgumentException("Unable to create data source for "
-          + config, e);
+      throw new IllegalArgumentException("Unable to create data source for " + config, e);
     }
   }
 

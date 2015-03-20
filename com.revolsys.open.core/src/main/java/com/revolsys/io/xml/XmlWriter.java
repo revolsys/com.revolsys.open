@@ -17,7 +17,6 @@ package com.revolsys.io.xml;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +33,7 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
+import com.revolsys.util.WrappedException;
 
 /**
  * <p>
@@ -149,7 +149,7 @@ public class XmlWriter extends Writer {
   private final String newLine = "\n";
 
   /** The underlying writer to write to. */
-  private final PrintWriter out;
+  private final Writer out;
 
   /** Flag indicating that XML namespaces should be written to the output. */
   private final boolean useNamespaces;
@@ -199,7 +199,7 @@ public class XmlWriter extends Writer {
    *          should be ignored.
    */
   public XmlWriter(final Writer out, final boolean useNamespaces) {
-    this.out = new PrintWriter(out);
+    this.out = out;
     this.useNamespaces = useNamespaces;
   }
 
@@ -299,28 +299,31 @@ public class XmlWriter extends Writer {
    * @throws IllegalStateException If a start tag is not open.
    */
   public void attribute(final QName attribute, final String value) {
-    if (value != null) {
-      checkWriteAttribute();
+    try {
+      if (value != null) {
+        checkWriteAttribute();
 
-      final String namespaceUri = attribute.getNamespaceURI();
-      if (namespaceUri.length() > 0) {
-        String prefix = this.namespacePrefixMap.get(namespaceUri);
-        if (prefix == null) {
-          prefix = attribute.getPrefix();
-          if (prefix == null || this.namespacePrefixMap.containsValue(prefix)) {
-            prefix = "p" + ++this.prefixNum;
+        final String namespaceUri = attribute.getNamespaceURI();
+        if (namespaceUri.length() > 0) {
+          String prefix = this.namespacePrefixMap.get(namespaceUri);
+          if (prefix == null) {
+            prefix = attribute.getPrefix();
+            if (prefix == null || this.namespacePrefixMap.containsValue(prefix)) {
+              prefix = "p" + ++this.prefixNum;
+            }
+            this.namespacePrefixMap.put(namespaceUri, prefix);
+            this.elementStack.getFirst().addFieldDefinedNamespace(namespaceUri);
+            writeNamespaceAttribute(namespaceUri, prefix);
           }
-          this.namespacePrefixMap.put(namespaceUri, prefix);
-          this.elementStack.getFirst().addFieldDefinedNamespace(
-            namespaceUri);
-          writeNamespaceAttribute(namespaceUri, prefix);
         }
+        this.out.write(' ');
+        writeName(attribute, true);
+        this.out.write("=\"");
+        writeAttributeValue(value);
+        this.out.write('"');
       }
-      this.out.write(' ');
-      writeName(attribute, true);
-      this.out.write("=\"");
-      writeAttributeValue(value);
-      this.out.write('"');
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
   }
 
@@ -333,13 +336,17 @@ public class XmlWriter extends Writer {
   }
 
   public void attribute(final String name, final String value) {
-    if (Property.hasValue(value)) {
-      checkWriteAttribute();
-      this.out.write(' ');
-      this.out.write(name);
-      this.out.write("=\"");
-      writeAttributeValue(value);
-      this.out.write('"');
+    try {
+      if (Property.hasValue(value)) {
+        checkWriteAttribute();
+        this.out.write(' ');
+        this.out.write(name);
+        this.out.write("=\"");
+        writeAttributeValue(value);
+        this.out.write('"');
+      }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
   }
 
@@ -351,11 +358,15 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the text
    */
   public void cdata(final String text) {
-    closeStartTag();
-    this.out.write("<![CDATA[");
-    this.out.write(text);
-    this.out.write("]]>");
-    setElementHasContent();
+    try {
+      closeStartTag();
+      this.out.write("<![CDATA[");
+      this.out.write(text);
+      this.out.write("]]>");
+      setElementHasContent();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
@@ -363,8 +374,7 @@ public class XmlWriter extends Writer {
    */
   private void checkNotFinished() {
     if (this.documentFinished) {
-      throw new IllegalStateException(
-          "Cannot write to a document after it has been finished");
+      throw new IllegalStateException("Cannot write to a document after it has been finished");
     }
   }
 
@@ -377,8 +387,7 @@ public class XmlWriter extends Writer {
   private void checkWriteAttribute() {
     checkNotFinished();
     if (!this.writingStartTag) {
-      throw new IllegalStateException(
-          "A start tag must be open to write an attribute");
+      throw new IllegalStateException("A start tag must be open to write an attribute");
     }
   }
 
@@ -392,12 +401,10 @@ public class XmlWriter extends Writer {
   private void checkWriteDocType() {
     checkNotFinished();
     if (this.elementsStarted) {
-      throw new IllegalStateException(
-          "Cannot create doc type after elements have been created");
+      throw new IllegalStateException("Cannot create doc type after elements have been created");
     }
     if (this.docTypeWritten) {
-      throw new IllegalStateException(
-          "A document can only have one DOCTYPE declaration");
+      throw new IllegalStateException("A document can only have one DOCTYPE declaration");
     }
   }
 
@@ -411,12 +418,10 @@ public class XmlWriter extends Writer {
   private void checkWriteXmlDeclaration() {
     checkNotFinished();
     if (!this.canWriteXmlDeclaration) {
-      throw new IllegalStateException(
-          "An XML declaration must be the first item in a document");
+      throw new IllegalStateException("An XML declaration must be the first item in a document");
     }
     if (this.xmlDeclarationWritten) {
-      throw new IllegalStateException(
-          "A document can only have one XML declaration");
+      throw new IllegalStateException("A document can only have one XML declaration");
     }
   }
 
@@ -427,8 +432,12 @@ public class XmlWriter extends Writer {
    */
   @Override
   public void close() {
-    this.out.flush();
-    this.out.close();
+    try {
+      this.out.flush();
+      this.out.close();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
@@ -438,11 +447,15 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was an error writing.
    */
   public void closeStartTag() {
-    if (this.writingStartTag) {
-      checkNotFinished();
-      writeNamespaces();
-      this.out.write('>');
-      this.writingStartTag = false;
+    try {
+      if (this.writingStartTag) {
+        checkNotFinished();
+        writeNamespaces();
+        this.out.write('>');
+        this.writingStartTag = false;
+      }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
   }
 
@@ -453,14 +466,18 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the comment
    */
   public void comment(final String comment) {
-    closeStartTag();
-    this.out.write("<!--");
-    writeIndent();
-    this.out.write(comment);
-    writeEndIndent();
-    this.out.write("-->");
-    this.canWriteXmlDeclaration = false;
-    setElementHasContent();
+    try {
+      closeStartTag();
+      this.out.write("<!--");
+      writeIndent();
+      this.out.write(comment);
+      writeEndIndent();
+      this.out.write("-->");
+      this.canWriteXmlDeclaration = false;
+      setElementHasContent();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
@@ -471,10 +488,14 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the declaration
    */
   public void docType(final String dtd) {
-    checkWriteDocType();
-    this.out.write(dtd);
-    this.canWriteXmlDeclaration = false;
-    this.docTypeWritten = true;
+    try {
+      checkWriteDocType();
+      this.out.write(dtd);
+      this.canWriteXmlDeclaration = false;
+      this.docTypeWritten = true;
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
@@ -485,18 +506,22 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the declaration
    */
   public void docType(final String name, final String systemId) {
-    checkWriteDocType();
-    this.out.write("<!DOCTYPE ");
-    this.out.write(name);
-    if (systemId != null) {
-      this.out.write(" SYSTEM \"");
-      this.out.write(systemId);
-      this.out.write("\"");
+    try {
+      checkWriteDocType();
+      this.out.write("<!DOCTYPE ");
+      this.out.write(name);
+      if (systemId != null) {
+        this.out.write(" SYSTEM \"");
+        this.out.write(systemId);
+        this.out.write('"');
+      }
+      this.out.write(">");
+      newLine();
+      this.canWriteXmlDeclaration = false;
+      this.docTypeWritten = true;
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
-    this.out.write(">");
-    newLine();
-    this.canWriteXmlDeclaration = false;
-    this.docTypeWritten = true;
   }
 
   /**
@@ -507,18 +532,21 @@ public class XmlWriter extends Writer {
    * @param systemId The system id.
    * @throws IOException If there was a problem writing the declaration.
    */
-  public void docType(final String name, final String publicId,
-    final String systemId) {
-    checkWriteDocType();
-    this.out.write("<!DOCTYPE ");
-    this.out.write(name);
-    this.out.write(" PUBLIC \"");
-    this.out.write(publicId);
-    this.out.write("\" \"");
-    this.out.write(systemId);
-    this.out.write("\">");
-    this.canWriteXmlDeclaration = false;
-    this.docTypeWritten = true;
+  public void docType(final String name, final String publicId, final String systemId) {
+    try {
+      checkWriteDocType();
+      this.out.write("<!DOCTYPE ");
+      this.out.write(name);
+      this.out.write(" PUBLIC \"");
+      this.out.write(publicId);
+      this.out.write("\" \"");
+      this.out.write(systemId);
+      this.out.write("\">");
+      this.canWriteXmlDeclaration = false;
+      this.docTypeWritten = true;
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
@@ -586,29 +614,32 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the element.
    */
   public void endTag(final QName element) {
-    checkNotFinished();
-    final TagConfiguration currentTag = getCurrentTag();
-    if (currentTag == null) {
-      throw new IllegalArgumentException("Cannot end tag " + element
-        + " no open tag");
-    } else {
-      final QName currentElement = currentTag.getElement();
-      if (!element.equals(currentElement)) {
-        throw new IllegalArgumentException("Cannot end tag " + element
-          + " expecting " + currentElement);
-      }
-      if (this.writingStartTag) {
-        writeNamespaces();
-        this.out.write(" />");
-        this.writingStartTag = false;
+    try {
+      checkNotFinished();
+      final TagConfiguration currentTag = getCurrentTag();
+      if (currentTag == null) {
+        throw new IllegalArgumentException("Cannot end tag " + element + " no open tag");
       } else {
-        writeEndIndent();
-        this.out.write("</");
-        writeName(element, false);
-        this.out.write('>');
+        final QName currentElement = currentTag.getElement();
+        if (!element.equals(currentElement)) {
+          throw new IllegalArgumentException("Cannot end tag " + element + " expecting "
+            + currentElement);
+        }
+        if (this.writingStartTag) {
+          writeNamespaces();
+          this.out.write(" />");
+          this.writingStartTag = false;
+        } else {
+          writeEndIndent();
+          this.out.write("</");
+          writeName(element, false);
+          this.out.write('>');
+        }
+        removeCurrentTag();
+        this.elementHasContent = false;
       }
-      removeCurrentTag();
-      this.elementHasContent = false;
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
   }
 
@@ -628,11 +659,15 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the entity
    */
   public void entityRef(final char ch) {
-    closeStartTag();
-    this.out.write("&#");
-    this.out.write(ch);
-    this.out.write(';');
-    setElementHasContent();
+    try {
+      closeStartTag();
+      this.out.write("&#");
+      this.out.write(ch);
+      this.out.write(';');
+      setElementHasContent();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
@@ -642,11 +677,15 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the entity
    */
   public void entityRef(final String name) {
-    closeStartTag();
-    this.out.write('&');
-    this.out.write(name);
-    this.out.write(';');
-    setElementHasContent();
+    try {
+      closeStartTag();
+      this.out.write('&');
+      this.out.write(name);
+      this.out.write(';');
+      setElementHasContent();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
@@ -656,10 +695,14 @@ public class XmlWriter extends Writer {
    */
   @Override
   public void flush() {
-    if (!this.documentFinished) {
-      closeStartTag();
+    try {
+      if (!this.documentFinished) {
+        closeStartTag();
+      }
+      this.out.flush();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
-    this.out.flush();
   }
 
   /**
@@ -739,8 +782,12 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was an exception writing the new line.
    */
   public void newLine() {
-    closeStartTag();
-    this.out.write(this.newLine);
+    try {
+      closeStartTag();
+      this.out.write(this.newLine);
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
@@ -769,14 +816,18 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the comment
    */
   public void processingInstruction(final String target, final String value) {
-    closeStartTag();
-    this.out.write("<?");
-    this.out.write(target);
-    if (value != null) {
-      this.out.write(" ");
-      this.out.write(value);
+    try {
+      closeStartTag();
+      this.out.write("<?");
+      this.out.write(target);
+      if (value != null) {
+        this.out.write(" ");
+        this.out.write(value);
+      }
+      this.out.write("?>");
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
-    this.out.write("?>");
   }
 
   /**
@@ -785,8 +836,7 @@ public class XmlWriter extends Writer {
   private void removeCurrentTag() {
     if (!this.endingDocument) {
       final TagConfiguration tag = this.elementStack.removeFirst();
-      final Iterator<String> namespaceUris = tag.getFieldDefinedNamespaces()
-          .iterator();
+      final Iterator<String> namespaceUris = tag.getFieldDefinedNamespaces().iterator();
       while (namespaceUris.hasNext()) {
         final String namespaceUri = namespaceUris.next();
         this.namespacePrefixMap.remove(namespaceUri);
@@ -904,30 +954,33 @@ public class XmlWriter extends Writer {
    * @param standalone The standalone flag
    * @throws IOException If there was a problem writing the XML Declaration.
    */
-  public void startDocument(final String encoding, final String version,
-    final Boolean standalone) {
-    checkWriteXmlDeclaration();
-    if (version == null) {
-      this.out.write("<?xml version=\"1.0\"");
-    } else {
-      this.out.write("<?xml version=\"" + version + "\"");
-
-    }
-    if (encoding != null) {
-      this.out.write(" encoding=\"");
-      this.out.write(encoding);
-      this.out.write('"');
-    }
-    if (standalone != null) {
-      if (standalone.booleanValue()) {
-        this.out.write(" standalone=\"yes\"");
+  public void startDocument(final String encoding, final String version, final Boolean standalone) {
+    try {
+      checkWriteXmlDeclaration();
+      if (version == null) {
+        this.out.write("<?xml version=\"1.0\"");
       } else {
-        this.out.write(" standalone=\"no\"");
+        this.out.write("<?xml version=\"" + version + '"');
+
       }
+      if (encoding != null) {
+        this.out.write(" encoding=\"");
+        this.out.write(encoding);
+        this.out.write('"');
+      }
+      if (standalone != null) {
+        if (standalone.booleanValue()) {
+          this.out.write(" standalone=\"yes\"");
+        } else {
+          this.out.write(" standalone=\"no\"");
+        }
+      }
+      this.out.write("?>\n");
+      this.xmlDeclarationWritten = true;
+      this.canWriteXmlDeclaration = false;
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
-    this.out.write("?>\n");
-    this.xmlDeclarationWritten = true;
-    this.canWriteXmlDeclaration = false;
   }
 
   /**
@@ -937,14 +990,18 @@ public class XmlWriter extends Writer {
    * @throws IOException If there was a problem writing the element.
    */
   public void startTag(final QName element) {
-    checkNotFinished();
-    closeStartTag();
-    writeIndent();
-    this.writingStartTag = true;
-    setCurrentTag(element);
-    this.out.write('<');
-    writeName(element, false);
-    this.elementHasContent = false;
+    try {
+      checkNotFinished();
+      closeStartTag();
+      writeIndent();
+      this.writingStartTag = true;
+      setCurrentTag(element);
+      this.out.write('<');
+      writeName(element, false);
+      this.elementHasContent = false;
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   public void startTag(final String localPart) {
@@ -1091,9 +1148,13 @@ public class XmlWriter extends Writer {
    */
   @Override
   public void write(final char[] buffer, final int offset, final int length) {
-    closeStartTag();
-    this.out.write(buffer, offset, length);
-    setElementHasContent();
+    try {
+      closeStartTag();
+      this.out.write(buffer, offset, length);
+      setElementHasContent();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
@@ -1104,9 +1165,13 @@ public class XmlWriter extends Writer {
    */
   @Override
   public void write(final int character) {
-    closeStartTag();
-    this.out.write(character);
-    setElementHasContent();
+    try {
+      closeStartTag();
+      this.out.write(character);
+      setElementHasContent();
+    } catch (final IOException e) {
+      throw new WrappedException(e);
+    }
   }
 
   /**
@@ -1145,54 +1210,57 @@ public class XmlWriter extends Writer {
    * @param length The number of characters to write.
    * @throws IOException If an I/O exception occurs.
    */
-  protected void writeAttributeContent(final char[] buffer, final int offset,
-    final int length) {
-    final int lastIndex = offset + length;
-    int index = offset;
-    String escapeString = null;
-    for (int i = offset; i < lastIndex; i++) {
-      final char ch = buffer[i];
-      switch (ch) {
-        case '&':
-          escapeString = "&amp;";
+  protected void writeAttributeContent(final char[] buffer, final int offset, final int length) {
+    try {
+      final int lastIndex = offset + length;
+      int index = offset;
+      String escapeString = null;
+      for (int i = offset; i < lastIndex; i++) {
+        final char ch = buffer[i];
+        switch (ch) {
+          case '&':
+            escapeString = "&amp;";
           break;
-        case '<':
-          escapeString = "&lt;";
+          case '<':
+            escapeString = "&lt;";
           break;
-        case '>':
-          escapeString = "&gt;";
+          case '>':
+            escapeString = "&gt;";
           break;
-        case '"':
-          escapeString = "&quot;";
+          case '"':
+            escapeString = "&quot;";
           break;
-        case 9:
-          escapeString = "&#9;";
+          case 9:
+            escapeString = "&#9;";
           break;
-        case 10:
-          escapeString = "&#10;";
+          case 10:
+            escapeString = "&#10;";
           break;
-        case 13:
-          escapeString = "&#13;";
+          case 13:
+            escapeString = "&#13;";
           break;
-        default:
-          // Reject all other control characters
-          if (ch < 32) {
-            throw new IllegalStateException("character " + Integer.toString(ch)
-              + " is not allowed in output");
-          }
+          default:
+            // Reject all other control characters
+            if (ch < 32) {
+              throw new IllegalStateException("character " + Integer.toString(ch)
+                + " is not allowed in output");
+            }
           break;
-      }
-      if (escapeString != null) {
-        if (i > index) {
-          this.out.write(buffer, index, i - index);
         }
-        this.out.write(escapeString);
-        escapeString = null;
-        index = i + 1;
+        if (escapeString != null) {
+          if (i > index) {
+            this.out.write(buffer, index, i - index);
+          }
+          this.out.write(escapeString);
+          escapeString = null;
+          index = i + 1;
+        }
       }
-    }
-    if (lastIndex > index) {
-      this.out.write(buffer, index, lastIndex - index);
+      if (lastIndex > index) {
+        this.out.write(buffer, index, lastIndex - index);
+      }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
   }
 
@@ -1217,47 +1285,50 @@ public class XmlWriter extends Writer {
    * @param length The number of characters to write.
    * @throws IOException If an I/O exception occurs.
    */
-  protected void writeElementContent(final char[] buffer, final int offest,
-    final int length) {
-    int index = offest;
-    final int lastIndex = index + length;
-    String escapeString = null;
-    for (int i = index; i < lastIndex; i++) {
-      final char ch = buffer[i];
-      switch (ch) {
-        case '&':
-          escapeString = "&amp;";
+  protected void writeElementContent(final char[] buffer, final int offest, final int length) {
+    try {
+      int index = offest;
+      final int lastIndex = index + length;
+      String escapeString = null;
+      for (int i = index; i < lastIndex; i++) {
+        final char ch = buffer[i];
+        switch (ch) {
+          case '&':
+            escapeString = "&amp;";
           break;
-        case '<':
-          escapeString = "&lt;";
+          case '<':
+            escapeString = "&lt;";
           break;
-        case '>':
-          escapeString = "&gt;";
+          case '>':
+            escapeString = "&gt;";
           break;
-        case 9:
-        case 10:
-        case 13:
+          case 9:
+          case 10:
+          case 13:
           // Accept these control characters
           break;
-        default:
-          // Reject all other control characters
-          if (ch < 32) {
-            throw new IllegalStateException("character " + Integer.toString(ch)
-              + " is not allowed in output");
-          }
+          default:
+            // Reject all other control characters
+            if (ch < 32) {
+              throw new IllegalStateException("character " + Integer.toString(ch)
+                + " is not allowed in output");
+            }
           break;
-      }
-      if (escapeString != null) {
-        if (i > index) {
-          this.out.write(buffer, index, i - index);
         }
-        this.out.write(escapeString);
-        escapeString = null;
-        index = i + 1;
+        if (escapeString != null) {
+          if (i > index) {
+            this.out.write(buffer, index, i - index);
+          }
+          this.out.write(escapeString);
+          escapeString = null;
+          index = i + 1;
+        }
       }
-    }
-    if (lastIndex > index) {
-      this.out.write(buffer, index, lastIndex - index);
+      if (lastIndex > index) {
+        this.out.write(buffer, index, lastIndex - index);
+      }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
   }
 
@@ -1267,16 +1338,20 @@ public class XmlWriter extends Writer {
    * @throws IOException If an I/O exception occurs.
    */
   private void writeEndIndent() {
-    if (!this.elementHasContent) {
-      if (this.writeNewLine) {
-        this.out.write(this.newLine);
-      }
-      if (this.indent) {
-        final int depth = this.elementStack.size() - 1;
-        for (int i = 0; i < depth; i++) {
-          this.out.write("  ");
+    try {
+      if (!this.elementHasContent) {
+        if (this.writeNewLine) {
+          this.out.write(this.newLine);
+        }
+        if (this.indent) {
+          final int depth = this.elementStack.size() - 1;
+          for (int i = 0; i < depth; i++) {
+            this.out.write("  ");
+          }
         }
       }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
   }
 
@@ -1286,18 +1361,22 @@ public class XmlWriter extends Writer {
    * @throws IOException If an I/O exception occurs.
    */
   private void writeIndent() {
-    if (this.elementsStarted) {
-      if (this.writeNewLine) {
-        this.out.write(this.newLine);
-      }
-      if (this.indent) {
-        final int depth = this.elementStack.size();
-        for (int i = 0; i < depth; i++) {
-          this.out.write("  ");
+    try {
+      if (this.elementsStarted) {
+        if (this.writeNewLine) {
+          this.out.write(this.newLine);
         }
+        if (this.indent) {
+          final int depth = this.elementStack.size();
+          for (int i = 0; i < depth; i++) {
+            this.out.write("  ");
+          }
+        }
+      } else {
+        this.elementsStarted = true;
       }
-    } else {
-      this.elementsStarted = true;
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
   }
 
@@ -1310,32 +1389,39 @@ public class XmlWriter extends Writer {
    * @throws IOException If an I/O exception occurs.
    */
   private void writeName(final QName qName, final boolean attribute) {
-    if (this.useNamespaces) {
-      final String namespaceUri = qName.getNamespaceURI();
-      String prefix = this.namespacePrefixMap.get(namespaceUri);
-      final QName prefixedQName = getQNameWithPrefix(qName, attribute);
-      prefix = prefixedQName.getPrefix();
-      if (prefix.length() != 0) {
-        this.out.write(prefix);
-        this.out.write(':');
+    try {
+      if (this.useNamespaces) {
+        final String namespaceUri = qName.getNamespaceURI();
+        String prefix = this.namespacePrefixMap.get(namespaceUri);
+        final QName prefixedQName = getQNameWithPrefix(qName, attribute);
+        prefix = prefixedQName.getPrefix();
+        if (prefix.length() != 0) {
+          this.out.write(prefix);
+          this.out.write(':');
+        }
+        final String name = qName.getLocalPart();
+        this.out.write(name);
       }
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
-    final String name = qName.getLocalPart();
-    this.out.write(name);
   }
 
-  public void writeNamespaceAttribute(final String namespaceUri,
-    final String prefix) {
-    if (prefix.length() == 0) {
-      this.out.write(" xmlns");
+  public void writeNamespaceAttribute(final String namespaceUri, final String prefix) {
+    try {
+      if (prefix.length() == 0) {
+        this.out.write(" xmlns");
 
-    } else {
-      this.out.write(" xmlns:");
-      this.out.write(prefix);
+      } else {
+        this.out.write(" xmlns:");
+        this.out.write(prefix);
+      }
+      this.out.write("=\"");
+      writeAttributeValue(namespaceUri);
+      this.out.write('"');
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
-    this.out.write("=\"");
-    writeAttributeValue(namespaceUri);
-    this.out.write("\"");
   }
 
   /**

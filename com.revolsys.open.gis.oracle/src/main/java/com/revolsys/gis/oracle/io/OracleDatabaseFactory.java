@@ -39,17 +39,20 @@ jdbc:oracle:oci:@<host>:<port>:<sid>
 jdbc:oracle:oci:@<host>:<port>/<service>
  */
 public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
+  public static final String URL_REGEX = "jdbc:oracle:thin:(.+)";
+
+  public static final List<String> URL_PATTERNS = Arrays.asList(URL_REGEX);
+
+  private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
+
   public static List<String> getTnsConnectionNames() {
-    File tnsFile = new File(System.getProperty("oracle.net.tns_admin"),
-        "tnsnames.ora");
+    File tnsFile = new File(System.getProperty("oracle.net.tns_admin"), "tnsnames.ora");
     if (!tnsFile.exists()) {
       tnsFile = new File(System.getenv("TNS_ADMIN"), "tnsnames.ora");
       if (!tnsFile.exists()) {
-        tnsFile = new File(System.getenv("ORACLE_HOME") + "/network/admin",
-            "tnsnames.ora");
+        tnsFile = new File(System.getenv("ORACLE_HOME") + "/network/admin", "tnsnames.ora");
         if (!tnsFile.exists()) {
-          tnsFile = new File(System.getenv("ORACLE_HOME") + "/NETWORK/ADMIN",
-              "tnsnames.ora");
+          tnsFile = new File(System.getenv("ORACLE_HOME") + "/NETWORK/ADMIN", "tnsnames.ora");
 
         }
       }
@@ -59,22 +62,14 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
         final NLParamParser parser = new NLParamParser(new FileReader(tnsFile));
         return Arrays.asList(parser.getNLPAllNames());
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(OracleDatabaseFactory.class).error(
-          "Error reading: " + tnsFile, e);
+        LoggerFactory.getLogger(OracleDatabaseFactory.class).error("Error reading: " + tnsFile, e);
       }
     }
     return Collections.emptyList();
   }
 
-  public static final String URL_REGEX = "jdbc:oracle:thin:(.+)";
-
-  public static final List<String> URL_PATTERNS = Arrays.asList(URL_REGEX);
-
-  private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
-
-  protected void addCacheProperty(final Map<String, Object> config,
-    final String key, final Properties cacheProperties,
-    final String propertyName, final Object defaultValue,
+  protected void addCacheProperty(final Map<String, Object> config, final String key,
+    final Properties cacheProperties, final String propertyName, final Object defaultValue,
     final DataType dataType) {
     Object value = config.remove(key);
     if (value == null) {
@@ -83,8 +78,7 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
     cacheProperties.put(propertyName, String.valueOf(defaultValue));
     if (value != null) {
       try {
-        final Object propertyValue = StringConverterRegistry.toObject(dataType,
-          value);
+        final Object propertyValue = StringConverterRegistry.toObject(dataType, value);
         final String stringValue = String.valueOf(propertyValue);
         cacheProperties.put(propertyName, stringValue);
       } catch (final Throwable e) {
@@ -105,8 +99,7 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
       try {
         oracleDataSource.close();
       } catch (final SQLException e) {
-        LoggerFactory.getLogger(OracleDatabaseFactory.class).warn(
-          "Unable to close data source", e);
+        LoggerFactory.getLogger(OracleDatabaseFactory.class).warn("Unable to close data source", e);
       }
     }
     super.closeDataSource(dataSource);
@@ -118,23 +111,20 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
       return super.createDataSource(config);
     } else {
       try {
-        final Map<String, Object> newConfig = new HashMap<String, Object>(
-            config);
+        final Map<String, Object> newConfig = new HashMap<String, Object>(config);
         final Properties cacheProperties = new Properties();
         final String url = (String)newConfig.remove("url");
         final String username = (String)newConfig.remove("username");
         String password = (String)newConfig.remove("password");
         password = PasswordUtil.decrypt(password);
-        addCacheProperty(newConfig, "minPoolSize", cacheProperties, "MinLimit",
-          0, DataTypes.INT);
-        addCacheProperty(newConfig, "maxPoolSize", cacheProperties, "MaxLimit",
-          10, DataTypes.INT);
-        addCacheProperty(newConfig, "inactivityTimeout", cacheProperties,
-          "InactivityTimeout", 300, DataTypes.INT);
-        addCacheProperty(newConfig, "waitTimeout", cacheProperties,
-          "ConnectionWaitTimeout", 1, DataTypes.INT);
-        addCacheProperty(newConfig, "validateConnection", cacheProperties,
-          "ValidateConnection", Boolean.TRUE, DataTypes.BOOLEAN);
+        addCacheProperty(newConfig, "minPoolSize", cacheProperties, "MinLimit", 0, DataTypes.INT);
+        addCacheProperty(newConfig, "maxPoolSize", cacheProperties, "MaxLimit", 10, DataTypes.INT);
+        addCacheProperty(newConfig, "inactivityTimeout", cacheProperties, "InactivityTimeout", 300,
+          DataTypes.INT);
+        addCacheProperty(newConfig, "waitTimeout", cacheProperties, "ConnectionWaitTimeout", 10,
+          DataTypes.INT);
+        addCacheProperty(newConfig, "validateConnection", cacheProperties, "ValidateConnection",
+          Boolean.TRUE, DataTypes.BOOLEAN);
 
         final OracleDataSource dataSource = new OracleDataSource();
 
@@ -157,8 +147,7 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
 
         return dataSource;
       } catch (final Throwable e) {
-        throw new IllegalArgumentException("Unable to create data source for "
-            + config, e);
+        throw new IllegalArgumentException("Unable to create data source for " + config, e);
       }
     }
   }
@@ -169,8 +158,7 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
   }
 
   @Override
-  public JdbcRecordStore createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
+  public JdbcRecordStore createRecordStore(final Map<String, ? extends Object> connectionProperties) {
     return new OracleRecordStore(this, connectionProperties);
   }
 

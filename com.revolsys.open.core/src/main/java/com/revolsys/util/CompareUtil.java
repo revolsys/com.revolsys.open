@@ -22,8 +22,7 @@ public class CompareUtil {
     }
   }
 
-  public static <T> int compare(final Comparable<T> object1, T object2,
-    final boolean nullsFirst) {
+  public static <T> int compare(final Comparable<T> object1, T object2, final boolean nullsFirst) {
     if (object1 == null) {
       if (object2 == null) {
         return 0;
@@ -48,8 +47,7 @@ public class CompareUtil {
     }
   }
 
-  public static <T> int compare(final Comparator<T> comparator,
-    final T object1, final T object2) {
+  public static <T> int compare(final Comparator<T> comparator, final T object1, final T object2) {
     if (object1 == null) {
       if (object2 == null) {
         return 0;
@@ -75,6 +73,8 @@ public class CompareUtil {
     } else if (object1 instanceof Comparable) {
       if (object1 instanceof Number) {
         object2 = StringConverterRegistry.toObject(object1.getClass(), object2);
+      } else if (object2 instanceof Number) {
+        object2 = StringConverterRegistry.toString(object2);
       }
       @SuppressWarnings("unchecked")
       final Comparable<Object> comparable = (Comparable<Object>)object1;

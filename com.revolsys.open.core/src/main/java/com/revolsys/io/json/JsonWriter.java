@@ -1,6 +1,5 @@
 package com.revolsys.io.json;
 
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,8 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.converter.string.StringConverterRegistry;
+import com.revolsys.io.FileUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
+import com.revolsys.util.WrappedException;
 
 public final class JsonWriter implements AutoCloseable {
 
@@ -19,7 +20,7 @@ public final class JsonWriter implements AutoCloseable {
 
   private boolean indent;
 
-  private PrintWriter out;
+  private Writer out;
 
   private boolean startAttribute;
 
@@ -28,88 +29,112 @@ public final class JsonWriter implements AutoCloseable {
   }
 
   public JsonWriter(final Writer out, final boolean indent) {
-    if (out instanceof PrintWriter) {
-      this.out = (PrintWriter)out;
-    } else {
-      this.out = new PrintWriter(out);
-    }
+    this.out = out;
     this.indent = indent;
   }
 
   public void charSequence(final CharSequence string) {
-    for (int i = 0; i < string.length(); i++) {
-      final char c = string.charAt(i);
-      switch (c) {
-        case '"':
-          this.out.print("\\\"");
+    try {
+      for (int i = 0; i < string.length(); i++) {
+        final char c = string.charAt(i);
+        switch (c) {
+          case '"':
+            this.out.write("\\\"");
           break;
-        case '\\':
-          this.out.print("\\\\");
+          case '\\':
+            this.out.write("\\\\");
           break;
-        case '\b':
-          this.out.print("\\b");
+          case '\b':
+            this.out.write("\\b");
           break;
-        case '\f':
-          this.out.print("\\f");
+          case '\f':
+            this.out.write("\\f");
           break;
-        case '\n':
-          this.out.print("\\n");
+          case '\n':
+            this.out.write("\\n");
           break;
-        case '\r':
-          this.out.print("\\r");
+          case '\r':
+            this.out.write("\\r");
           break;
-        case '\t':
-          this.out.print("\\t");
+          case '\t':
+            this.out.write("\\t");
           break;
-        default:
-          this.out.print(c);
+          default:
+            this.out.write(c);
           break;
+        }
       }
+    } catch (final Exception e) {
+      throw new WrappedException(e);
     }
   }
 
   @Override
   public void close() {
-    this.out.close();
+    FileUtil.closeSilent(this.out);
+    this.out = null;
   }
 
   public void endAttribute() {
-    this.out.print(",");
-    newLine();
-    this.startAttribute = false;
+    try {
+      this.out.write(",");
+      newLine();
+      this.startAttribute = false;
+    } catch (final Exception e) {
+      throw new WrappedException(e);
+    }
   }
 
   public void endList() {
-    this.depth--;
-    newLine();
-    indent();
-    this.out.print("]");
+    try {
+      this.depth--;
+      newLine();
+      indent();
+      this.out.write("]");
+    } catch (final Exception e) {
+      throw new WrappedException(e);
+    }
   }
 
   public void endObject() {
-    this.depth--;
-    newLine();
-    indent();
-    this.out.print("}");
+    try {
+      this.depth--;
+      newLine();
+      indent();
+      this.out.write("}");
+    } catch (final Exception e) {
+      throw new WrappedException(e);
+    }
   }
 
   public void flush() {
-    this.out.flush();
+    try {
+      this.out.flush();
+    } catch (final Exception e) {
+    }
   }
 
   public void indent() {
-    if (this.indent) {
-      for (int i = 0; i < this.depth; i++) {
-        this.out.write("  ");
+    try {
+      if (this.indent) {
+        for (int i = 0; i < this.depth; i++) {
+          this.out.write("  ");
+        }
       }
+    } catch (final Exception e) {
+      throw new WrappedException(e);
     }
   }
 
   public void label(final String key) {
-    indent();
-    value(key);
-    this.out.print(": ");
-    this.startAttribute = true;
+    try {
+      indent();
+      value(key);
+      this.out.write(": ");
+      this.startAttribute = true;
+    } catch (final Exception e) {
+      throw new WrappedException(e);
+    }
   }
 
   public void list(final Object... values) {
@@ -117,17 +142,31 @@ public final class JsonWriter implements AutoCloseable {
   }
 
   public void newLine() {
-    if (this.indent) {
-      this.out.print('\n');
+    try {
+      if (this.indent) {
+        this.out.write('\n');
+      }
+    } catch (final Exception e) {
+      throw new WrappedException(e);
     }
   }
 
   public void print(final char value) {
-    this.out.print(value);
+    try {
+      this.out.write(value);
+    } catch (final Exception e) {
+      throw new WrappedException(e);
+    }
   }
 
   public void print(final Object value) {
-    this.out.print(value);
+    if (value != null) {
+      try {
+        this.out.write(value.toString());
+      } catch (final Exception e) {
+        throw new WrappedException(e);
+      }
+    }
   }
 
   public void setIndent(final boolean indent) {
@@ -140,55 +179,71 @@ public final class JsonWriter implements AutoCloseable {
   }
 
   public void startList(final boolean indent) {
-    if (indent && !this.startAttribute) {
-      indent();
+    try {
+      if (indent && !this.startAttribute) {
+        indent();
+      }
+      this.out.write('[');
+      newLine();
+      this.depth++;
+      this.startAttribute = false;
+    } catch (final Exception e) {
+      throw new WrappedException(e);
     }
-    this.out.print("[");
-    newLine();
-    this.depth++;
-    this.startAttribute = false;
   }
 
   public void startObject() {
-    if (!this.startAttribute) {
-      indent();
+    try {
+      if (!this.startAttribute) {
+        indent();
+      }
+      this.out.write('{');
+      newLine();
+      this.depth++;
+      this.startAttribute = false;
+    } catch (final Exception e) {
+      throw new WrappedException(e);
     }
-    this.out.print("{");
-    newLine();
-    this.depth++;
-    this.startAttribute = false;
   }
 
   @SuppressWarnings("unchecked")
   public void value(final Object value) {
-    if (value == null) {
-      this.out.print("null");
-    } else if (value instanceof Boolean) {
-      this.out.print(value);
-    } else if (value instanceof Number) {
-      final Number number = (Number)value;
-      final double doubleValue = number.doubleValue();
-      if (Double.isInfinite(doubleValue) || Double.isNaN(doubleValue)) {
-        this.out.print("null");
+    try {
+      if (value == null) {
+        this.out.write("null");
+      } else if (value instanceof Boolean) {
+        if ((Boolean)value) {
+          this.out.write("true");
+        } else {
+          this.out.write("true");
+        }
+      } else if (value instanceof Number) {
+        final Number number = (Number)value;
+        final double doubleValue = number.doubleValue();
+        if (Double.isInfinite(doubleValue) || Double.isNaN(doubleValue)) {
+          this.out.write("null");
+        } else {
+          this.out.write(MathUtil.toString(doubleValue));
+        }
+      } else if (value instanceof Collection) {
+        final Collection<? extends Object> list = (Collection<? extends Object>)value;
+        write(list);
+      } else if (value instanceof Map) {
+        final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
+        write(map);
+      } else if (value instanceof CharSequence) {
+        final CharSequence string = (CharSequence)value;
+        this.out.write('"');
+        charSequence(string);
+        this.out.write('"');
+      } else if (value.getClass().isArray()) {
+        final List<? extends Object> list = CollectionUtil.arrayToList(value);
+        write(list);
       } else {
-        this.out.print(MathUtil.toString(doubleValue));
+        value(StringConverterRegistry.toString(value));
       }
-    } else if (value instanceof Collection) {
-      final Collection<? extends Object> list = (Collection<? extends Object>)value;
-      write(list);
-    } else if (value instanceof Map) {
-      final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
-      write(map);
-    } else if (value instanceof CharSequence) {
-      final CharSequence string = (CharSequence)value;
-      this.out.print('"');
-      charSequence(string);
-      this.out.print('"');
-    } else if (value.getClass().isArray()) {
-      final List<? extends Object> list = CollectionUtil.arrayToList(value);
-      write(list);
-    } else {
-      value(StringConverterRegistry.toString(value));
+    } catch (final Exception e) {
+      throw new WrappedException(e);
     }
   }
 

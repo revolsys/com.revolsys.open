@@ -42,9 +42,9 @@ public abstract class AbstractRecord extends AbstractMap<String, Object> impleme
    * @return The cloned object.
    */
   @Override
-  public BaseRecord clone() {
+  public AbstractRecord clone() {
     try {
-      final BaseRecord newObject = (BaseRecord)super.clone();
+      final AbstractRecord newObject = (AbstractRecord)super.clone();
       newObject.setState(RecordState.New);
       return newObject;
     } catch (final CloneNotSupportedException e) {

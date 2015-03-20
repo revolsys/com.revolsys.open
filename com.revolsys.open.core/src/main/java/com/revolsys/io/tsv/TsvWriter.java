@@ -2,23 +2,23 @@ package com.revolsys.io.tsv;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Collection;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.WrappedException;
 
 public class TsvWriter implements AutoCloseable {
 
   /** The writer */
-  private final PrintWriter out;
+  private final Writer out;
 
   public TsvWriter(final File file) {
     this(FileUtil.getWriter(file));
   }
 
   public TsvWriter(final Writer out) {
-    this.out = new PrintWriter(out);
+    this.out = out;
   }
 
   /**
@@ -32,7 +32,10 @@ public class TsvWriter implements AutoCloseable {
   }
 
   public void flush() {
-    this.out.flush();
+    try {
+      this.out.flush();
+    } catch (final IOException e) {
+    }
   }
 
   public void write(final Collection<? extends Object> values) {
@@ -40,18 +43,28 @@ public class TsvWriter implements AutoCloseable {
   }
 
   public void write(final Object... values) {
-    for (int i = 0; i < values.length; i++) {
-      final Object value = values[i];
-      if (value != null) {
-        final String string = value.toString().replaceAll("\"", "\"\"");
-        this.out.write('"');
-        this.out.write(string);
-        this.out.write('"');
+    try {
+      for (int i = 0; i < values.length; i++) {
+        final Object value = values[i];
+        if (value != null) {
+          final String string = value.toString();
+          this.out.write('"');
+          for (int j = 0; j < string.length(); j++) {
+            final char c = string.charAt(j);
+            if (c == '"') {
+              this.out.write('"');
+            }
+            this.out.write(c);
+          }
+          this.out.write('"');
+        }
+        if (i < values.length - 1) {
+          this.out.write('\t');
+        }
       }
-      if (i < values.length - 1) {
-        this.out.write('\t');
-      }
+      this.out.write('\n');
+    } catch (final IOException e) {
+      throw new WrappedException(e);
     }
-    this.out.println();
   }
 }

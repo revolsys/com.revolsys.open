@@ -558,7 +558,7 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
   @Override
   public Record load(final String typePath, final Identifier id) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null) {
+    if (recordDefinition == null || id == null) {
       return null;
     } else {
       final List<Object> values = id.getValues();
