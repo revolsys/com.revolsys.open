@@ -514,7 +514,7 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
   void setGeometry(char* byteArray, size_t length) {
     FileGDBAPI::ShapeBuffer shape;
     shape.Allocate(length);
-    for (int i = 0; i < length; i++) {
+    for (size_t i = 0; i < length; i++) {
       char c = byteArray[i];
       shape.shapeBuffer[i] = (byte)c;
     }
@@ -577,6 +577,8 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
 }
 
 
+%ignore FileGDBAPI::FieldDef::GetGeometryDef;
+%ignore FileGDBAPI::FieldDef::SetGeometryDef;
 %ignore FileGDBAPI::FieldDef::GetAlias;
 %ignore FileGDBAPI::FieldDef::GetName;
 %ignore FileGDBAPI::FieldDef::GetLength;
@@ -631,86 +633,9 @@ import com.revolsys.jar.ClasspathNativeLibraryUtil;
   }
 }
 
-%ignore FileGDBAPI::SpatialReference::GetSpatialReferenceID;
-%ignore FileGDBAPI::SpatialReference::GetSpatialReferenceText;
-%ignore FileGDBAPI::SpatialReference::GetFalseOriginAndUnits;
-%ignore FileGDBAPI::SpatialReference::GetMFalseOriginAndUnits;
-%ignore FileGDBAPI::SpatialReference::GetMTolerance;
-%ignore FileGDBAPI::SpatialReference::GetXYTolerance;
-%ignore FileGDBAPI::SpatialReference::GetZFalseOriginAndUnits;
-%ignore FileGDBAPI::SpatialReference::GetZTolerance;
-%extend FileGDBAPI::SpatialReference {
-  int getId() {
-    int result;
-    checkResult(self->GetSpatialReferenceID(result));
-    return result;
-  }
-  std::wstring getText() {
-    std::wstring value;
-    checkResult(self->GetSpatialReferenceText(value));
-    return value;
-  }
-  double getXFalseOrigin() {
-    double falseX;
-    double falseY;
-    double xyUnits;
-    checkResult(self->GetFalseOriginAndUnits(falseX, falseY, xyUnits));
-    return falseX;
-  }
-  double getYFalseOrigin() {
-    double falseX;
-    double falseY;
-    double xyUnits;
-    checkResult(self->GetFalseOriginAndUnits(falseX, falseY, xyUnits));
-    return falseY;
-  }
-  double getXYUnits() {
-    double falseX;
-    double falseY;
-    double xyUnits;
-    checkResult(self->GetFalseOriginAndUnits(falseX, falseY, xyUnits));
-    return xyUnits;
-  }
-  double getMFalseOrigin() {
-    double falseM;
-    double mUnits;
-    checkResult(self->GetMFalseOriginAndUnits(falseM, mUnits));
-    return falseM;
-  }
-  double getMUnits() {
-    double falseM;
-    double mUnits;
-    checkResult(self->GetMFalseOriginAndUnits(falseM, mUnits));
-    return mUnits;
-  }
-  double getMTolerance() {
-    double result;
-    checkResult(self->GetMTolerance(result));
-    return result;
-  }
-  double getXYTolerance() {
-    double result;
-    checkResult(self->GetXYTolerance(result));
-    return result;
-  }
-  double getXFalseOrigin() {
-    double falseZ;
-    double zUnits;
-    checkResult(self->GetMFalseOriginAndUnits(falseZ, zUnits));
-    return falseZ;
-  }
-  double getXUnits() {
-    double falseZ;
-    double zUnits;
-    checkResult(self->GetMFalseOriginAndUnits(falseZ, zUnits));
-    return zUnits;
-  }
-  double getZTolerance() {
-    double result;
-    checkResult(self->GetZTolerance(result));
-    return result;
-  }
-}
+%ignore FileGDBAPI::SpatialReference;
+%ignore FileGDBAPI::GeometryDef;
+
 %ignore FileGDBAPI::IndexDef::GetIsUnique;
 %ignore FileGDBAPI::IndexDef::GetName;
 %ignore FileGDBAPI::IndexDef::GetFields;

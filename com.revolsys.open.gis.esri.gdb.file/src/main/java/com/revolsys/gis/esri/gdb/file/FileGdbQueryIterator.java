@@ -50,19 +50,17 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private Statistics statistics;
 
-  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore,
-    final String typePath) {
+  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore, final String typePath) {
     this(recordStore, typePath, "*", "", null, 0, -1);
   }
 
-  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore,
-    final String typePath, final String whereClause) {
+  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore, final String typePath,
+    final String whereClause) {
     this(recordStore, typePath, "*", whereClause, null, 0, -1);
   }
 
-  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore,
-    final String typePath, final String whereClause,
-    final BoundingBox boundingBox, final Query query, final int offset,
+  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore, final String typePath,
+    final String whereClause, final BoundingBox boundingBox, final Query query, final int offset,
     final int limit) {
     this(recordStore, typePath, "*", whereClause, boundingBox, offset, limit);
     final RecordFactory factory = query.getProperty("recordFactory");
@@ -71,9 +69,9 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     }
   }
 
-  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore,
-    final String typePath, final String fields, final String sql,
-    final BoundingBox boundingBox, final int offset, final int limit) {
+  FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore, final String typePath,
+    final String fields, final String sql, final BoundingBox boundingBox, final int offset,
+    final int limit) {
     this.recordStore = recordStore;
     this.typePath = typePath;
     this.recordDefinition = recordStore.getRecordDefinition(typePath);
@@ -97,8 +95,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
         this.recordStore.closeEnumRows(this.rows);
         this.recordStore.closeTable(this.typePath);
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Error closing query: " + this.typePath);
+        LoggerFactory.getLogger(getClass()).error("Error closing query: " + this.typePath);
       } finally {
         this.boundingBox = null;
         this.recordStore = null;
@@ -119,8 +116,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
           if (this.sql.startsWith("SELECT")) {
             this.rows = this.recordStore.query(this.sql, true);
           } else {
-            this.rows = this.recordStore.search(this.table, this.fields,
-              this.sql, true);
+            this.rows = this.recordStore.search(this.table, this.fields, this.sql, true);
           }
         } else {
           BoundingBox boundingBox = this.boundingBox;
@@ -131,8 +127,11 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
             boundingBox = boundingBox.expand(0, 1);
           }
           final com.revolsys.gis.esri.gdb.file.capi.swig.Envelope envelope = GeometryConverter.toEsri(boundingBox);
-          this.rows = this.recordStore.search(this.table, this.fields,
-            this.sql, envelope, true);
+          String sql = this.sql;
+          if ("1 = 1".equals(sql)) {
+            sql = "";
+          }
+          this.rows = this.recordStore.search(this.table, this.fields, sql, envelope, true);
         }
       }
     }

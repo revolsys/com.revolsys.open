@@ -103,6 +103,31 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileGdbRecordStore {
+  private static final Object API_SYNC = new Object();
+
+  private static final Logger LOG = LoggerFactory.getLogger(CapiFileGdbRecordStore.class);
+
+  private static final Map<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>> ESRI_FIELD_TYPE_ATTRIBUTE_MAP = new HashMap<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>>();
+
+  static {
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeInteger, IntegerFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeSmallInteger,
+      ShortFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeDouble, DoubleFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeSingle, FloatFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeString, StringFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeDate, DateFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGeometry, GeometryFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeOID, OidFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeBlob, BinaryFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGlobalID, GlobalIdFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGUID, GuidFieldDefinition.class);
+    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeXML, XmlFieldDefinition.class);
+
+  }
+
+  private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
+
   private static void addFieldTypeAttributeConstructor(final FieldType fieldType,
     final Class<? extends AbstractFileGdbFieldDefinition> attributeClass) {
     try {
@@ -129,19 +154,13 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
     }
   }
 
-  private static final Object API_SYNC = new Object();
-
   private final Object apiSync = new Object();
-
-  private final Set<String> loadOnlyByPath = new HashSet<String>();
 
   private final Map<String, AtomicLong> idGenerators = new HashMap<String, AtomicLong>();
 
   private Map<String, List<String>> domainColumNames = new HashMap<String, List<String>>();
 
   private String defaultSchemaPath = "/";
-
-  private static final Logger LOG = LoggerFactory.getLogger(CapiFileGdbRecordStore.class);
 
   private Geodatabase geodatabase;
 
@@ -151,40 +170,17 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
 
   private boolean createMissingTables = true;
 
-  private static final Map<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>> ESRI_FIELD_TYPE_ATTRIBUTE_MAP = new HashMap<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>>();
-
-  static {
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeInteger, IntegerFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeSmallInteger,
-      ShortFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeDouble, DoubleFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeSingle, FloatFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeString, StringFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeDate, DateFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGeometry, GeometryFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeOID, OidFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeBlob, BinaryFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGlobalID, GlobalIdFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeGUID, GuidFieldDefinition.class);
-    addFieldTypeAttributeConstructor(FieldType.esriFieldTypeXML, XmlFieldDefinition.class);
-
-  }
-
-  private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
-
   private Resource template;
 
   private final Map<String, Table> tablesToClose = new HashMap<>();
 
-  private final Set<String> lockedTables = new HashSet<>();
+  private final Map<String, Integer> lockedTables = new HashMap<>();
 
   private final Map<String, Integer> tableReferenceCounts = new HashMap<>();
 
   private final Set<EnumRows> enumRowsToClose = new HashSet<>();
 
   private boolean initialized;
-
-  private boolean loadOnly;
 
   private boolean closed;
 
@@ -417,7 +413,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
     }
   }
 
-  public void closeTable(final String typePath) {
+  public boolean closeTable(final String typePath) {
     synchronized (this.apiSync) {
       int count = Maps.getInteger(this.tableReferenceCounts, typePath, 0);
       count--;
@@ -425,8 +421,10 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
         this.tableReferenceCounts.remove(typePath);
         final Table table = this.tablesToClose.remove(typePath);
         closeTable(typePath, table);
+        return true;
       } else {
         this.tableReferenceCounts.put(typePath, count);
+        return false;
       }
     }
   }
@@ -436,10 +434,6 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
       if (table != null) {
         try {
           if (!isClosed()) {
-            table.setLoadOnlyMode(false);
-            if (this.lockedTables.remove(typePath)) {
-              table.freeWriteLock();
-            }
             getGeodatabase().closeTable(table);
           }
         } catch (final Throwable e) {
@@ -547,8 +541,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
       for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
         final String column = entry.getKey();
         final DataType dataType = recordDefinition.getFieldType(column);
-        // TODO at the moment only numbers are supported
-        if (dataType != null && Number.class.isAssignableFrom(dataType.getJavaClass())) {
+        if (dataType != null && !Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
           if (first) {
             sql.append(" ORDER BY ");
             first = false;
@@ -745,12 +738,16 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
     }
   }
 
-  protected void deletedRow(final Table table, final Row row) {
+  protected void deletedRow(final String typePath, final Table table, final Row row) {
     synchronized (this.apiSync) {
       if (isOpen(table)) {
-        table.setLoadOnlyMode(false);
-        table.deleteRow(row);
-        table.setLoadOnlyMode(true);
+        if (isLoadOnly(typePath)) {
+          table.setLoadOnlyMode(false);
+          table.deleteRow(row);
+          table.setLoadOnlyMode(true);
+        } else {
+          table.deleteRow(row);
+        }
       }
     }
   }
@@ -804,6 +801,18 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
   @Override
   protected void finalize() throws Throwable {
     super.finalize();
+  }
+
+  protected void freeWriteLock(final String typePath) {
+    synchronized (this.apiSync) {
+      final Table table = this.tablesToClose.get(typePath);
+      if (table != null) {
+        if (Maps.decrementCount(this.lockedTables, typePath) <= 0) {
+          table.freeWriteLock();
+          table.setLoadOnlyMode(false);
+        }
+      }
+    }
   }
 
   protected String getCatalogPath(final RecordStoreSchemaElement element) {
@@ -1031,7 +1040,6 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
             Table table = this.tablesToClose.get(typePath);
             if (table == null) {
               table = getGeodatabase().openTable(tableName);
-              table.setLoadOnlyMode(this.loadOnly);
               this.tablesToClose.put(typePath, table);
             }
             if (table != null) {
@@ -1206,7 +1214,9 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
   }
 
   public boolean isLoadOnly(final String typePath) {
-    return this.loadOnlyByPath.contains(typePath);
+    synchronized (this.apiSync) {
+      return this.lockedTables.containsKey(typePath);
+    }
   }
 
   public boolean isNull(final Row row, final String name) {
@@ -1451,36 +1461,6 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
     this.fileName = fileName;
   }
 
-  public void setLoadOnly(final boolean loadOnly) {
-    synchronized (this.apiSync) {
-      this.loadOnly = loadOnly;
-      for (final Table table : this.tablesToClose.values()) {
-        table.setLoadOnlyMode(loadOnly);
-      }
-    }
-  }
-
-  public void setLoadOnly(final String typePath, final boolean loadOnly) {
-    synchronized (this.apiSync) {
-      final boolean oldLoadOnly = isLoadOnly(typePath);
-      if (oldLoadOnly != loadOnly) {
-        final Table table = this.tablesToClose.get(typePath);
-        if (table != null) {
-          table.setLoadOnlyMode(loadOnly);
-        }
-      }
-      if (loadOnly) {
-        if (!oldLoadOnly) {
-          this.loadOnlyByPath.add(typePath);
-        }
-      } else {
-        if (oldLoadOnly) {
-          this.loadOnlyByPath.remove(typePath);
-        }
-      }
-    }
-  }
-
   public void setNull(final Row row, final String name) {
     synchronized (this.apiSync) {
       row.setNull(name);
@@ -1496,7 +1476,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
       final Table table = this.tablesToClose.get(typePath);
       if (table != null) {
         table.setLoadOnlyMode(true);
-        this.lockedTables.add(typePath);
+        Maps.addCount(this.lockedTables, typePath);
         table.setWriteLock();
       }
     }
@@ -1518,12 +1498,16 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
     getWriter().write(object);
   }
 
-  protected void updateRow(final Table table, final Row row) {
+  protected void updateRow(final String typePath, final Table table, final Row row) {
     synchronized (this.apiSync) {
       if (isOpen(table)) {
-        table.setLoadOnlyMode(false);
-        table.updateRow(row);
-        table.setLoadOnlyMode(true);
+        if (isLoadOnly(typePath)) {
+          table.setLoadOnlyMode(false);
+          table.updateRow(row);
+          table.setLoadOnlyMode(true);
+        } else {
+          table.deleteRow(row);
+        }
       }
     }
   }

@@ -23,14 +23,14 @@ import com.revolsys.util.Property;
 
 public class Maps {
 
-  public static <T> Integer addCount(final Map<T, Integer> counts, final T object) {
-    Integer count = counts.get(object);
+  public static <T> Integer addCount(final Map<T, Integer> counts, final T key) {
+    Integer count = counts.get(key);
     if (count == null) {
       count = 1;
     } else {
       count++;
     }
-    counts.put(object, count);
+    counts.put(key, count);
     return count;
   }
 
@@ -102,6 +102,21 @@ public class Maps {
       map.put(sourceValue, targetValue);
     }
     return map;
+  }
+
+  public static <T> Integer decrementCount(final Map<T, Integer> counts, final T key) {
+    Integer count = counts.get(key);
+    if (count == null) {
+      return 0;
+    } else {
+      count--;
+      if (count <= 0) {
+        counts.remove(key);
+      } else {
+        counts.put(key, count);
+      }
+      return count;
+    }
   }
 
   /**

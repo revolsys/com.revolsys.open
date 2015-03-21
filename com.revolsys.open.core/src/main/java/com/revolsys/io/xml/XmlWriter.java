@@ -1399,9 +1399,9 @@ public class XmlWriter extends Writer {
           this.out.write(prefix);
           this.out.write(':');
         }
-        final String name = qName.getLocalPart();
-        this.out.write(name);
       }
+      final String name = qName.getLocalPart();
+      this.out.write(name);
     } catch (final IOException e) {
       throw new WrappedException(e);
     }
