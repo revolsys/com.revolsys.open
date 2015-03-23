@@ -9,34 +9,36 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class Raster {
+  protected static long getCPtr(final Raster obj) {
+    return obj == null ? 0 : obj.swigCPtr;
+  }
+
   private long swigCPtr;
+
   protected boolean swigCMemOwn;
-
-  protected Raster(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
-  }
-
-  protected static long getCPtr(Raster obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
-
-  protected void finalize() {
-    delete();
-  }
-
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        EsriFileGdbJNI.delete_Raster(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
-  }
 
   public Raster() {
     this(EsriFileGdbJNI.new_Raster(), true);
+  }
+
+  protected Raster(final long cPtr, final boolean cMemoryOwn) {
+    this.swigCMemOwn = cMemoryOwn;
+    this.swigCPtr = cPtr;
+  }
+
+  public synchronized void delete() {
+    if (this.swigCPtr != 0) {
+      if (this.swigCMemOwn) {
+        this.swigCMemOwn = false;
+        EsriFileGdbJNI.delete_Raster(this.swigCPtr);
+      }
+      this.swigCPtr = 0;
+    }
+  }
+
+  @Override
+  protected void finalize() {
+    delete();
   }
 
 }

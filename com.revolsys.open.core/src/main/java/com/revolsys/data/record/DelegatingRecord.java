@@ -106,6 +106,10 @@ public class DelegatingRecord extends AbstractRecord {
     return this.record.getLong(name);
   }
 
+  public Record getRecord() {
+    return this.record;
+  }
+
   @Override
   public RecordDefinition getRecordDefinition() {
     return this.record.getRecordDefinition();
