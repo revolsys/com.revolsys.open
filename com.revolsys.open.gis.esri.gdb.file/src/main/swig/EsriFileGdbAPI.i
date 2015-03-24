@@ -54,12 +54,17 @@ import com.revolsys.util.OS;
 
 %pragma(java) jniclasscode=%{
   static {
-    if (OS.isUnix()) {
+    if (OS.isUnix() || OS.isMac()) {
       ClasspathNativeLibraryUtil.loadLibrary("fgdbunixrtl");
+    } else if (OS.isWindows()) {
+      ClasspathNativeLibraryUtil.loadLibrary("Esri.FILEGDBAPI");
     }
+
     ClasspathNativeLibraryUtil.loadLibrary("FileGDBAPI");
     ClasspathNativeLibraryUtil.loadLibrary("EsriFileGdbJni");
-    EsriFileGdb.setMaxOpenFiles(2048);
+    if (OS.isWindows()) {
+      EsriFileGdb.setMaxOpenFiles(2048);
+    }
   }
 %}
 %define EXT_FILEGDB_API

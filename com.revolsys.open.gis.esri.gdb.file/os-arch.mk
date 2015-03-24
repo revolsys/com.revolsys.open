@@ -15,7 +15,7 @@ TARGET_LIB=${TARGET_DIR}/libEsriFileGdbJni.${EXT}
 
 CXXFLAGS+=-W -fexceptions $(CXXDEF) -I$(ESRI_FILE_GBD_INCLUDE) $(CXXOTHER)
 LD=$(CXX) $(CXXFLAGS)
-LDFLAGS+= -L${ESRI_FILE_GBD_HOME}/lib/
+LDFLAGS+= -L$(ESRI_FILE_GBD_HOME)/lib/
 LIBS+= -lFileGDBAPI
 
 all: clean ${TARGET_LIB}
@@ -39,7 +39,7 @@ ${TARGET_OBJ}: src/main/cxx/EsriFileGdb_wrap.cxx
 ${TARGET_LIB}: target/o/libEsriFileGdbJni-${ARCH}-${OS}.o
 	mkdir -p ${TARGET_DIR}
 	$(LD) \
-	$(LDFLAGS}) \
+	$(LDFLAGS) \
 	-shared \
 	-o ${TARGET_LIB} \
 	${TARGET_OBJ} $(LIBS)
