@@ -10,8 +10,7 @@ import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.Point;
 
 public class Debug {
-  public static boolean equals(final Geometry geometry, final double x,
-    final double y) {
+  public static boolean equals(final Geometry geometry, final double x, final double y) {
     final Point firstPoint = geometry.getPoint();
     if (firstPoint.equals(x, y)) {
       noOp();
@@ -21,11 +20,11 @@ public class Debug {
     }
   }
 
-  public static boolean equals(final LineString line, final double x1,
-    final double y1, final double x2, final double y2) {
+  public static boolean equals(final LineString line, final double x1, final double y1,
+    final double x2, final double y2) {
     final LineString points = line;
     if (points.getPoint(0).equals(x1, y1)
-        && points.getPoint(points.getVertexCount() - 1).equals(x2, y2)) {
+      && points.getPoint(points.getVertexCount() - 1).equals(x2, y2)) {
       noOp();
       return true;
     } else {
@@ -39,8 +38,7 @@ public class Debug {
     }
   }
 
-  public static boolean equals(final Point coordinates1End,
-    final double... coordinates) {
+  public static boolean equals(final Point coordinates1End, final double... coordinates) {
     if (coordinates1End.equals(coordinates)) {
       noOp();
       return true;
@@ -50,11 +48,13 @@ public class Debug {
   }
 
   public static void equals(final Record object, final double x, final double y) {
-    equals(object.getGeometryValue(), x, y);
+    final Geometry geometry = object.getGeometryValue();
+    equals(geometry, x, y);
   }
 
   public static void equals(final Record object, final Double x, final Double y) {
-    equals(object.getGeometryValue(), x, y);
+    final Geometry geometry = object.getGeometryValue();
+    equals(geometry, x, y);
   }
 
   public static void idNull(final Record object) {

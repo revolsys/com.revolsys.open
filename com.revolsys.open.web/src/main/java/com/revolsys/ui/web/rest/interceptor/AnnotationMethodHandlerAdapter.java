@@ -153,8 +153,8 @@ import com.revolsys.util.Property;
  * @see #setSessionAttributeStore
  * @since 2.5
  */
-public class AnnotationMethodHandlerAdapter extends WebContentGenerator
-implements HandlerAdapter, Ordered, BeanFactoryAware {
+public class AnnotationMethodHandlerAdapter extends WebContentGenerator implements HandlerAdapter,
+  Ordered, BeanFactoryAware {
 
   /**
    * Holder for request mapping metadata. Allows for finding a best matching
@@ -179,22 +179,18 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
     @Override
     public boolean equals(final Object obj) {
       final RequestMappingInfo other = (RequestMappingInfo)obj;
-      return Arrays.equals(this.paths, other.paths)
-          && Arrays.equals(this.methods, other.methods)
-          && Arrays.equals(this.params, other.params)
-          && Arrays.equals(this.headers, other.headers);
+      return Arrays.equals(this.paths, other.paths) && Arrays.equals(this.methods, other.methods)
+        && Arrays.equals(this.params, other.params) && Arrays.equals(this.headers, other.headers);
     }
 
     @Override
     public int hashCode() {
-      return Arrays.hashCode(this.paths) * 23 + Arrays.hashCode(this.methods)
-          * 29 + Arrays.hashCode(this.params) * 31
-          + Arrays.hashCode(this.headers);
+      return Arrays.hashCode(this.paths) * 23 + Arrays.hashCode(this.methods) * 29
+        + Arrays.hashCode(this.params) * 31 + Arrays.hashCode(this.headers);
     }
 
     public boolean matches(final HttpServletRequest request) {
-      return ServletAnnotationMappingUtils.checkRequestMethod(this.methods,
-        request)
+      return ServletAnnotationMappingUtils.checkRequestMethod(this.methods, request)
         && ServletAnnotationMappingUtils.checkParameters(this.params, request)
         && ServletAnnotationMappingUtils.checkHeaders(this.headers, request);
     }
@@ -215,8 +211,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
    * <li>RHIs with more {@linkplain RequestMappingInfo#params request
    * parameters} will be ordered before those with less parameters</li> </ol>
    */
-  static class RequestMappingInfoComparator implements
-  Comparator<RequestMappingInfo> {
+  static class RequestMappingInfoComparator implements Comparator<RequestMappingInfo> {
 
     private final Comparator<String> pathComparator;
 
@@ -225,8 +220,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
     }
 
     @Override
-    public int compare(final RequestMappingInfo info1,
-      final RequestMappingInfo info2) {
+    public int compare(final RequestMappingInfo info1, final RequestMappingInfo info2) {
       final String path1 = info1.bestMatchedPath();
       final String path2 = info2.bestMatchedPath();
       if (path1.startsWith(path2)) {
@@ -272,8 +266,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
     private boolean responseArgumentUsed = false;
 
     private ServletHandlerMethodInvoker(final HandlerMethodResolver resolver) {
-      super(resolver,
-        AnnotationMethodHandlerAdapter.this.webBindingInitializer,
+      super(resolver, AnnotationMethodHandlerAdapter.this.webBindingInitializer,
         AnnotationMethodHandlerAdapter.this.sessionAttributeStore,
         AnnotationMethodHandlerAdapter.this.parameterNameDiscoverer,
         AnnotationMethodHandlerAdapter.this.customArgumentResolvers,
@@ -281,23 +274,23 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
     }
 
     @Override
-    protected WebDataBinder createBinder(final NativeWebRequest webRequest,
-      final Object target, final String objectName) throws Exception {
+    protected WebDataBinder createBinder(final NativeWebRequest webRequest, final Object target,
+      final String objectName) throws Exception {
 
       return AnnotationMethodHandlerAdapter.this.createBinder(
         (HttpServletRequest)webRequest.getNativeRequest(), target, objectName);
     }
 
     @Override
-    protected HttpInputMessage createHttpInputMessage(
-      final NativeWebRequest webRequest) throws Exception {
+    protected HttpInputMessage createHttpInputMessage(final NativeWebRequest webRequest)
+      throws Exception {
       final HttpServletRequest servletRequest = (HttpServletRequest)webRequest.getNativeRequest();
       return new ServletServerHttpRequest(servletRequest);
     }
 
     @Override
-    protected void doBind(final WebDataBinder binder,
-      final NativeWebRequest webRequest) throws Exception {
+    protected void doBind(final WebDataBinder binder, final NativeWebRequest webRequest)
+      throws Exception {
       final ServletRequestDataBinder servletBinder = (ServletRequestDataBinder)binder;
       servletBinder.bind((ServletRequest)webRequest.getNativeRequest());
     }
@@ -310,8 +303,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
         }
       }
       for (final MediaType mediaType : supportedMediaTypes) {
-        if (acceptedMediaType.isWildcardType()
-            || mediaType.includes(acceptedMediaType)) {
+        if (acceptedMediaType.isWildcardType() || mediaType.includes(acceptedMediaType)) {
           return mediaType;
         }
       }
@@ -319,18 +311,16 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
     }
 
     @SuppressWarnings("unchecked")
-    public ModelAndView getModelAndView(final Method handlerMethod,
-      final Class handlerType, final Object returnValue,
-      final ExtendedModelMap implicitModel, final ServletWebRequest webRequest)
-          throws Exception {
+    public ModelAndView getModelAndView(final Method handlerMethod, final Class handlerType,
+      final Object returnValue, final ExtendedModelMap implicitModel,
+      final ServletWebRequest webRequest) throws Exception {
 
-      final ResponseStatus responseStatusAnn = AnnotationUtils.findAnnotation(
-        handlerMethod, ResponseStatus.class);
+      final ResponseStatus responseStatusAnn = AnnotationUtils.findAnnotation(handlerMethod,
+        ResponseStatus.class);
       if (responseStatusAnn != null) {
         final HttpStatus responseStatus = responseStatusAnn.value();
         // to be picked up by the RedirectView
-        webRequest.getRequest().setAttribute(View.RESPONSE_STATUS_ATTRIBUTE,
-          responseStatus);
+        webRequest.getRequest().setAttribute(View.RESPONSE_STATUS_ATTRIBUTE, responseStatus);
         webRequest.getResponse().setStatus(responseStatus.value());
         this.responseArgumentUsed = true;
       }
@@ -338,8 +328,8 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
       // Invoke custom resolvers if present...
       if (AnnotationMethodHandlerAdapter.this.customModelAndViewResolvers != null) {
         for (final ModelAndViewResolver mavResolver : AnnotationMethodHandlerAdapter.this.customModelAndViewResolvers) {
-          final ModelAndView mav = mavResolver.resolveModelAndView(
-            handlerMethod, handlerType, returnValue, implicitModel, webRequest);
+          final ModelAndView mav = mavResolver.resolveModelAndView(handlerMethod, handlerType,
+            returnValue, implicitModel, webRequest);
           if (mav != ModelAndViewResolver.UNRESOLVED) {
             return mav;
           }
@@ -347,7 +337,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
       }
 
       if (returnValue != null
-          && AnnotationUtils.findAnnotation(handlerMethod, ResponseBody.class) != null) {
+        && AnnotationUtils.findAnnotation(handlerMethod, ResponseBody.class) != null) {
         final View view = handleResponseBody(returnValue, webRequest);
         return new ModelAndView(view).addAllObjects(implicitModel);
       }
@@ -361,14 +351,11 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
           ((Model)returnValue).asMap());
       } else if (returnValue instanceof View) {
         return new ModelAndView((View)returnValue).addAllObjects(implicitModel);
-      } else if (AnnotationUtils.findAnnotation(handlerMethod,
-        ModelAttribute.class) != null) {
-        addReturnValueAsModelAttribute(handlerMethod, handlerType, returnValue,
-          implicitModel);
+      } else if (AnnotationUtils.findAnnotation(handlerMethod, ModelAttribute.class) != null) {
+        addReturnValueAsModelAttribute(handlerMethod, handlerType, returnValue, implicitModel);
         return new ModelAndView().addAllObjects(implicitModel);
       } else if (returnValue instanceof Map) {
-        return new ModelAndView().addAllObjects(implicitModel).addAllObjects(
-          (Map)returnValue);
+        return new ModelAndView().addAllObjects(implicitModel).addAllObjects((Map)returnValue);
       } else if (returnValue instanceof String) {
         return new ModelAndView((String)returnValue).addAllObjects(implicitModel);
       } else if (returnValue == null) {
@@ -381,17 +368,15 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
         }
       } else if (!BeanUtils.isSimpleProperty(returnValue.getClass())) {
         // Assume a single model attribute...
-        addReturnValueAsModelAttribute(handlerMethod, handlerType, returnValue,
-          implicitModel);
+        addReturnValueAsModelAttribute(handlerMethod, handlerType, returnValue, implicitModel);
         return new ModelAndView().addAllObjects(implicitModel);
       } else {
-        throw new IllegalArgumentException(
-          "Invalid handler method return value: " + returnValue);
+        throw new IllegalArgumentException("Invalid handler method return value: " + returnValue);
       }
     }
 
-    private View handleResponseBody(final Object returnValue,
-      final ServletWebRequest webRequest) throws ServletException, IOException {
+    private View handleResponseBody(final Object returnValue, final ServletWebRequest webRequest)
+      throws ServletException, IOException {
 
       final HttpServletRequest request = webRequest.getRequest();
       String jsonp = request.getParameter("jsonp");
@@ -399,8 +384,8 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
         jsonp = request.getParameter("callback");
       }
       request.setAttribute(IoConstants.JSONP_PROPERTY, jsonp);
-      List<MediaType> acceptedMediaTypes = MediaTypeUtil.getAcceptedMediaTypes(
-        request, AnnotationMethodHandlerAdapter.this.mediaTypes,
+      List<MediaType> acceptedMediaTypes = MediaTypeUtil.getAcceptedMediaTypes(request,
+        AnnotationMethodHandlerAdapter.this.mediaTypes,
         AnnotationMethodHandlerAdapter.this.mediaTypeOrder,
         AnnotationMethodHandlerAdapter.this.urlPathHelper,
         AnnotationMethodHandlerAdapter.this.parameterName,
@@ -415,36 +400,32 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
           for (final HttpMessageConverter<?> messageConverter : AnnotationMethodHandlerAdapter.this.messageConverters) {
             allSupportedMediaTypes.addAll(messageConverter.getSupportedMediaTypes());
             if (messageConverter.canWrite(returnValueType, acceptedMediaType)) {
-              final MediaType mediaType = getMediaType(
-                messageConverter.getSupportedMediaTypes(), acceptedMediaType);
+              final MediaType mediaType = getMediaType(messageConverter.getSupportedMediaTypes(),
+                acceptedMediaType);
               this.responseArgumentUsed = true;
-              return new HttpMessageConverterView(messageConverter, mediaType,
-                returnValue);
+              return new HttpMessageConverterView(messageConverter, mediaType, returnValue);
             }
           }
         }
       }
-      throw new HttpMediaTypeNotAcceptableException(new ArrayList<MediaType>(
-          allSupportedMediaTypes));
+      throw new HttpMediaTypeNotAcceptableException(
+        new ArrayList<MediaType>(allSupportedMediaTypes));
     }
 
     @Override
-    protected void raiseMissingParameterException(final String paramName,
-      final Class paramType) throws Exception {
-      throw new MissingServletRequestParameterException(paramName,
-        paramType.getName());
+    protected void raiseMissingParameterException(final String paramName, final Class paramType)
+      throws Exception {
+      throw new MissingServletRequestParameterException(paramName, paramType.getName());
     }
 
     @Override
-    protected void raiseSessionRequiredException(final String message)
-        throws Exception {
+    protected void raiseSessionRequiredException(final String message) throws Exception {
       throw new HttpSessionRequiredException(message);
     }
 
     @Override
-    protected Object resolveCookieValue(final String cookieName,
-      final Class paramType, final NativeWebRequest webRequest)
-          throws Exception {
+    protected Object resolveCookieValue(final String cookieName, final Class paramType,
+      final NativeWebRequest webRequest) throws Exception {
 
       final HttpServletRequest servletRequest = (HttpServletRequest)webRequest.getNativeRequest();
       final Cookie cookieValue = WebUtils.getCookie(servletRequest, cookieName);
@@ -475,16 +456,14 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
     @SuppressWarnings({
       "unchecked"
     })
-    protected String resolvePathVariable(final String pathVarName,
-      final Class paramType, final NativeWebRequest webRequest)
-          throws Exception {
+    protected String resolvePathVariable(final String pathVarName, final Class paramType,
+      final NativeWebRequest webRequest) throws Exception {
 
       final HttpServletRequest servletRequest = (HttpServletRequest)webRequest.getNativeRequest();
       final Map<String, String> uriTemplateVariables = (Map<String, String>)servletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-      if (uriTemplateVariables == null
-          || !uriTemplateVariables.containsKey(pathVarName)) {
-        throw new IllegalStateException("Could not find @PathVariable ["
-            + pathVarName + "] in @RequestMapping");
+      if (uriTemplateVariables == null || !uriTemplateVariables.containsKey(pathVarName)) {
+        throw new IllegalStateException("Could not find @PathVariable [" + pathVarName
+          + "] in @RequestMapping");
       }
       return uriTemplateVariables.get(pathVarName);
     }
@@ -506,7 +485,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
         contentType = MediaType.APPLICATION_FORM_URLENCODED;
       }
       if (!MediaType.APPLICATION_FORM_URLENCODED.includes(contentType)
-          && !MediaType.MULTIPART_FORM_DATA.includes(contentType)) {
+        && !MediaType.MULTIPART_FORM_DATA.includes(contentType)) {
         contentType = MediaTypeUtil.getRequestMediaType(httpRequest,
           AnnotationMethodHandlerAdapter.this.mediaTypes,
           AnnotationMethodHandlerAdapter.this.mediaTypeOrder,
@@ -524,9 +503,8 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
           builder.append(' ');
           builder.append(paramName);
         }
-        throw new HttpMediaTypeNotSupportedException(
-          "Cannot extract @RequestBody parameter (" + builder.toString()
-          + "): no Content-Type found");
+        throw new HttpMediaTypeNotSupportedException("Cannot extract @RequestBody parameter ("
+          + builder.toString() + "): no Content-Type found");
       } else {
         HttpServletUtils.setContentTypeWithCharset(headers, contentType);
       }
@@ -550,17 +528,15 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
           final String[] pairs = StringUtils.tokenizeToStringArray(urlBody, "&");
 
           final MultiValueMap<String, String> values = new LinkedMultiValueMap<String, String>(
-              pairs.length);
+            pairs.length);
 
           for (final String pair : pairs) {
             final int idx = pair.indexOf('=');
             if (idx == -1) {
               values.add(URLDecoder.decode(pair, charset.name()), null);
             } else {
-              final String name = URLDecoder.decode(pair.substring(0, idx),
-                charset.name());
-              final String value = URLDecoder.decode(pair.substring(idx + 1),
-                charset.name());
+              final String name = URLDecoder.decode(pair.substring(0, idx), charset.name());
+              final String value = URLDecoder.decode(pair.substring(idx + 1), charset.name());
               values.add(name, value);
             }
           }
@@ -573,8 +549,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
             AnnotationMethodHandlerAdapter.this.mediaTypeOrder,
             AnnotationMethodHandlerAdapter.this.urlPathHelper,
             AnnotationMethodHandlerAdapter.this.parameterName,
-            AnnotationMethodHandlerAdapter.this.defaultMediaType,
-            bodyFile.getOriginalFilename());
+            AnnotationMethodHandlerAdapter.this.defaultMediaType, bodyFile.getOriginalFilename());
           HttpServletUtils.setContentTypeWithCharset(headers, contentType);
 
           final HttpInputMessage newInputMessage = new HttpInputMessage() {
@@ -629,8 +604,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
           }
         }
       }
-      throw new HttpMediaTypeNotSupportedException(contentType,
-        allSupportedMediaTypes);
+      throw new HttpMediaTypeNotSupportedException(contentType, allSupportedMediaTypes);
     }
 
     @Override
@@ -675,30 +649,26 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
     }
 
     @SuppressWarnings("unchecked")
-    private void extractHandlerMethodUriTemplates(final String mappedPath,
-      final String lookupPath, final HttpServletRequest request) {
+    private void extractHandlerMethodUriTemplates(final String mappedPath, final String lookupPath,
+      final HttpServletRequest request) {
       Map<String, String> variables = null;
       final boolean hasSuffix = mappedPath.indexOf('.') != -1;
       if (!hasSuffix
-          && AnnotationMethodHandlerAdapter.this.pathMatcher.match(mappedPath
-            + ".*", lookupPath)) {
+        && AnnotationMethodHandlerAdapter.this.pathMatcher.match(mappedPath + ".*", lookupPath)) {
         final String realPath = mappedPath + ".*";
-        if (AnnotationMethodHandlerAdapter.this.pathMatcher.match(realPath,
-          lookupPath)) {
+        if (AnnotationMethodHandlerAdapter.this.pathMatcher.match(realPath, lookupPath)) {
           variables = AnnotationMethodHandlerAdapter.this.pathMatcher.extractUriTemplateVariables(
             realPath, lookupPath);
         }
       }
       if (variables == null && !mappedPath.startsWith("/")) {
         String realPath = "/**/" + mappedPath;
-        if (AnnotationMethodHandlerAdapter.this.pathMatcher.match(realPath,
-          lookupPath)) {
+        if (AnnotationMethodHandlerAdapter.this.pathMatcher.match(realPath, lookupPath)) {
           variables = AnnotationMethodHandlerAdapter.this.pathMatcher.extractUriTemplateVariables(
             realPath, lookupPath);
         } else {
           realPath = realPath + ".*";
-          if (AnnotationMethodHandlerAdapter.this.pathMatcher.match(realPath,
-            lookupPath)) {
+          if (AnnotationMethodHandlerAdapter.this.pathMatcher.match(realPath, lookupPath)) {
             variables = AnnotationMethodHandlerAdapter.this.pathMatcher.extractUriTemplateVariables(
               realPath, lookupPath);
           }
@@ -709,8 +679,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
         if (typeVariables != null) {
           variables.putAll(typeVariables);
         }
-        request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
-          variables);
+        request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE, variables);
       }
     }
 
@@ -727,10 +696,9 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
      * pattern} in the request, it is combined with the method-level pattern.
      * <li>Otherwise,
      */
-    private String getMatchedPattern(final String methodLevelPattern,
-      final String lookupPath, final HttpServletRequest request) {
-      if (hasTypeLevelMapping()
-          && !ObjectUtils.isEmpty(getTypeLevelMapping().value())) {
+    private String getMatchedPattern(final String methodLevelPattern, final String lookupPath,
+      final HttpServletRequest request) {
+      if (hasTypeLevelMapping() && !ObjectUtils.isEmpty(getTypeLevelMapping().value())) {
         final String[] typeLevelPatterns = getTypeLevelMapping().value();
         for (String typeLevelPattern : typeLevelPatterns) {
           if (!typeLevelPattern.startsWith("/")) {
@@ -749,7 +717,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
         final String combinedPattern = AnnotationMethodHandlerAdapter.this.pathMatcher.combine(
           bestMatchingPattern, methodLevelPattern);
         if (!combinedPattern.equals(bestMatchingPattern)
-            && isPathMatchInternal(combinedPattern, lookupPath)) {
+          && isPathMatchInternal(combinedPattern, lookupPath)) {
           return combinedPattern;
         }
       }
@@ -759,30 +727,25 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
       return null;
     }
 
-    private boolean isPathMatchInternal(final String pattern,
-      final String lookupPath) {
+    private boolean isPathMatchInternal(final String pattern, final String lookupPath) {
       if (pattern.equals(lookupPath)
-          || AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern,
-            lookupPath)) {
+        || AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern, lookupPath)) {
         return true;
       }
       final boolean hasSuffix = pattern.indexOf('.') != -1;
       if (!hasSuffix
-          && AnnotationMethodHandlerAdapter.this.pathMatcher.match(
-            pattern + ".*", lookupPath)) {
+        && AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern + ".*", lookupPath)) {
         return true;
       }
       final boolean endsWithSlash = pattern.endsWith("/");
       if (!endsWithSlash
-          && AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern + "/",
-            lookupPath)) {
+        && AnnotationMethodHandlerAdapter.this.pathMatcher.match(pattern + "/", lookupPath)) {
         return true;
       }
       return false;
     }
 
-    public Method resolveHandlerMethod(final HttpServletRequest request)
-        throws ServletException {
+    public Method resolveHandlerMethod(final HttpServletRequest request) throws ServletException {
       final String lookupPath = AnnotationMethodHandlerAdapter.this.urlPathHelper.getLookupPathForRequest(request);
       final Comparator<String> pathComparator = AnnotationMethodHandlerAdapter.this.pathMatcher.getPatternComparator(lookupPath);
       final Map<RequestMappingInfo, Method> targetHandlerMethods = new LinkedHashMap<RequestMappingInfo, Method>();
@@ -790,28 +753,26 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
       String resolvedMethodName = null;
       for (final Method handlerMethod : getHandlerMethods()) {
         final RequestMappingInfo mappingInfo = new RequestMappingInfo();
-        final RequestMapping mapping = AnnotationUtils.findAnnotation(
-          handlerMethod, RequestMapping.class);
+        final RequestMapping mapping = AnnotationUtils.findAnnotation(handlerMethod,
+          RequestMapping.class);
         mappingInfo.paths = mapping.value();
         if (!hasTypeLevelMapping()
-            || !Arrays.equals(mapping.method(), getTypeLevelMapping().method())) {
+          || !Arrays.equals(mapping.method(), getTypeLevelMapping().method())) {
           mappingInfo.methods = mapping.method();
         }
         if (!hasTypeLevelMapping()
-            || !Arrays.equals(mapping.params(), getTypeLevelMapping().params())) {
+          || !Arrays.equals(mapping.params(), getTypeLevelMapping().params())) {
           mappingInfo.params = mapping.params();
         }
         if (!hasTypeLevelMapping()
-            || !Arrays.equals(mapping.headers(), getTypeLevelMapping().headers())) {
+          || !Arrays.equals(mapping.headers(), getTypeLevelMapping().headers())) {
           mappingInfo.headers = mapping.headers();
         }
         boolean match = false;
         if (mappingInfo.paths.length > 0) {
-          final List<String> matchedPaths = new ArrayList<String>(
-              mappingInfo.paths.length);
+          final List<String> matchedPaths = new ArrayList<String>(mappingInfo.paths.length);
           for (final String methodLevelPattern : mappingInfo.paths) {
-            final String matchedPattern = getMatchedPattern(methodLevelPattern,
-              lookupPath, request);
+            final String matchedPattern = getMatchedPattern(methodLevelPattern, lookupPath, request);
             if (matchedPattern != null) {
               if (mappingInfo.matches(request)) {
                 match = true;
@@ -829,9 +790,8 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
         } else {
           // No paths specified: parameter match sufficient.
           match = mappingInfo.matches(request);
-          if (match && mappingInfo.methods.length == 0
-              && mappingInfo.params.length == 0 && resolvedMethodName != null
-              && !resolvedMethodName.equals(handlerMethod.getName())) {
+          if (match && mappingInfo.methods.length == 0 && mappingInfo.params.length == 0
+            && resolvedMethodName != null && !resolvedMethodName.equals(handlerMethod.getName())) {
             match = false;
           } else {
             for (final RequestMethod requestMethod : mappingInfo.methods) {
@@ -840,11 +800,10 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
           }
         }
         if (match) {
-          Method oldMappedMethod = targetHandlerMethods.put(mappingInfo,
-            handlerMethod);
+          Method oldMappedMethod = targetHandlerMethods.put(mappingInfo, handlerMethod);
           if (oldMappedMethod != null && oldMappedMethod != handlerMethod) {
             if (AnnotationMethodHandlerAdapter.this.methodNameResolver != null
-                && mappingInfo.paths.length == 0) {
+              && mappingInfo.paths.length == 0) {
               if (!oldMappedMethod.getName().equals(handlerMethod.getName())) {
                 if (resolvedMethodName == null) {
                   resolvedMethodName = AnnotationMethodHandlerAdapter.this.methodNameResolver.getHandlerMethodName(request);
@@ -865,20 +824,20 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
             if (oldMappedMethod != null) {
               throw new IllegalStateException(
                 "Ambiguous handler methods mapped for HTTP path '"
-                    + lookupPath
-                    + "': {"
-                    + oldMappedMethod
-                    + ", "
-                    + handlerMethod
-                    + "}. If you intend to handle the same path in multiple methods, then factor "
-                    + "them out into a dedicated handler class with that path mapped at the type level!");
+                  + lookupPath
+                  + "': {"
+                  + oldMappedMethod
+                  + ", "
+                  + handlerMethod
+                  + "}. If you intend to handle the same path in multiple methods, then factor "
+                  + "them out into a dedicated handler class with that path mapped at the type level!");
             }
           }
         }
       }
       if (!targetHandlerMethods.isEmpty()) {
         final List<RequestMappingInfo> matches = new ArrayList<RequestMappingInfo>(
-            targetHandlerMethods.keySet());
+          targetHandlerMethods.keySet());
         final RequestMappingInfoComparator requestMappingInfoComparator = new RequestMappingInfoComparator(
           pathComparator);
         Collections.sort(matches, requestMappingInfoComparator);
@@ -893,8 +852,8 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
           throw new HttpRequestMethodNotSupportedException(request.getMethod(),
             StringUtils.toStringArray(allowedMethods));
         } else {
-          throw new NoSuchRequestHandlingMethodException(lookupPath,
-            request.getMethod(), request.getParameterMap());
+          throw new NoSuchRequestHandlingMethodException(lookupPath, request.getMethod(),
+            request.getParameterMap());
         }
       }
     }
@@ -914,8 +873,6 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
    */
   protected static final Log pageNotFoundLogger = LogFactory.getLog(PAGE_NOT_FOUND_LOG_CATEGORY);
 
-  private UrlPathHelper urlPathHelper = new UrlPathHelper();
-
   private ConfigurableBeanFactory beanFactory;
 
   private int cacheSecondsForSessionAttributeHandlers = 0;
@@ -927,6 +884,9 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
   private MediaType defaultMediaType;
 
   private BeanExpressionContext expressionContext;
+
+  private List<String> mediaTypeOrder = Arrays.asList("attribute", "parameter", "fileName",
+    "pathExtension", "acceptHeader", "defaultMediaType");
 
   private final ConcurrentMap<String, MediaType> mediaTypes = new ConcurrentHashMap<String, MediaType>();
 
@@ -951,10 +911,9 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
 
   private boolean synchronizeOnSession = false;
 
-  private WebBindingInitializer webBindingInitializer;
+  private UrlPathHelper urlPathHelper = new UrlPathHelper();
 
-  private List<String> mediaTypeOrder = Arrays.asList("attribute", "parameter",
-    "fileName", "pathExtension", "acceptHeader", "defaultMediaType");
+  private WebBindingInitializer webBindingInitializer;
 
   public AnnotationMethodHandlerAdapter() {
     // no restriction of HTTP methods by default
@@ -977,16 +936,14 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
    * @see ServletRequestDataBinder#convertIfNecessary(Object, Class,
    *      MethodParameter)
    */
-  protected ServletRequestDataBinder createBinder(
-    final HttpServletRequest request, final Object target,
-    final String objectName) throws Exception {
+  protected ServletRequestDataBinder createBinder(final HttpServletRequest request,
+    final Object target, final String objectName) throws Exception {
 
     return new ServletRequestDataBinder(target, objectName);
   }
 
   @Override
-  public long getLastModified(final HttpServletRequest request,
-    final Object handler) {
+  public long getLastModified(final HttpServletRequest request, final Object handler) {
     return -1;
   }
 
@@ -1021,17 +978,15 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
   }
 
   @Override
-  public ModelAndView handle(final HttpServletRequest request,
-    final HttpServletResponse response, final Object handler) throws Exception {
+  public ModelAndView handle(final HttpServletRequest request, final HttpServletResponse response,
+    final Object handler) throws Exception {
     final HttpServletRequest savedRequest = HttpServletUtils.getRequest();
     final HttpServletResponse savedResponse = HttpServletUtils.getResponse();
     try {
       HttpServletUtils.setRequestAndResponse(request, response);
-      if (AnnotationUtils.findAnnotation(handler.getClass(),
-        SessionAttributes.class) != null) {
+      if (AnnotationUtils.findAnnotation(handler.getClass(), SessionAttributes.class) != null) {
         // Always prevent caching in case of session attribute management.
-        checkAndPrepare(request, response,
-          this.cacheSecondsForSessionAttributeHandlers, true);
+        checkAndPrepare(request, response, this.cacheSecondsForSessionAttributeHandlers, true);
         // Prepare cached set of session attributes names.
       } else {
         // Uses configured default cacheSeconds setting.
@@ -1066,22 +1021,21 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
     final Method handlerMethod = methodResolver.resolveHandlerMethod(request);
     final ServletHandlerMethodInvoker methodInvoker = new ServletHandlerMethodInvoker(
       methodResolver);
-    final ServletWebRequest webRequest = new ServletWebRequest(request,
-      response);
+    final ServletWebRequest webRequest = new ServletWebRequest(request, response);
     final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
     try {
       RequestContextHolder.setRequestAttributes(webRequest);
       final ExtendedModelMap implicitModel = new BindingAwareModelMap();
 
-      final Object result = methodInvoker.invokeHandlerMethod(handlerMethod,
-        handler, webRequest, implicitModel);
+      final Object result = methodInvoker.invokeHandlerMethod(handlerMethod, handler, webRequest,
+        implicitModel);
       if (result == null) {
         return null;
       } else {
-        final ModelAndView mav = methodInvoker.getModelAndView(handlerMethod,
-          handler.getClass(), result, implicitModel, webRequest);
-        methodInvoker.updateModelAttributes(handler,
-          mav != null ? mav.getModel() : null, implicitModel, webRequest);
+        final ModelAndView mav = methodInvoker.getModelAndView(handlerMethod, handler.getClass(),
+          result, implicitModel, webRequest);
+        methodInvoker.updateModelAttributes(handler, mav != null ? mav.getModel() : null,
+          implicitModel, webRequest);
         return mav;
       }
     } finally {
@@ -1107,8 +1061,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
   public void setBeanFactory(final BeanFactory beanFactory) {
     if (beanFactory instanceof ConfigurableBeanFactory) {
       this.beanFactory = (ConfigurableBeanFactory)beanFactory;
-      this.expressionContext = new BeanExpressionContext(this.beanFactory,
-        new RequestScope());
+      this.expressionContext = new BeanExpressionContext(this.beanFactory, new RequestScope());
     }
   }
 
@@ -1137,8 +1090,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
    * Such a custom WebArgumentResolver will kick in first, having a chance to
    * resolve an argument value before the standard argument handling kicks in.
    */
-  public void setCustomArgumentResolver(
-    final WebArgumentResolver argumentResolver) {
+  public void setCustomArgumentResolver(final WebArgumentResolver argumentResolver) {
     this.customArgumentResolvers = new WebArgumentResolver[] {
       argumentResolver
     };
@@ -1151,8 +1103,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
    * Any such custom WebArgumentResolver will kick in first, having a chance to
    * resolve an argument value before the standard argument handling kicks in.
    */
-  public void setCustomArgumentResolvers(
-    final WebArgumentResolver[] argumentResolvers) {
+  public void setCustomArgumentResolvers(final WebArgumentResolver[] argumentResolvers) {
     this.customArgumentResolvers = argumentResolvers;
   }
 
@@ -1162,8 +1113,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
    * Such a custom ModelAndViewResolver will kick in first, having a chance to
    * resolve a return value before the standard ModelAndView handling kicks in.
    */
-  public void setCustomModelAndViewResolver(
-    final ModelAndViewResolver customModelAndViewResolver) {
+  public void setCustomModelAndViewResolver(final ModelAndViewResolver customModelAndViewResolver) {
     this.customModelAndViewResolvers = new ModelAndViewResolver[] {
       customModelAndViewResolver
     };
@@ -1214,8 +1164,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
    * These converters are used to convert from and to HTTP requests and
    * responses.
    */
-  public void setMessageConverters(
-    final HttpMessageConverter<?>[] messageConverters) {
+  public void setMessageConverters(final HttpMessageConverter<?>[] messageConverters) {
     this.messageConverters = messageConverters;
   }
 
@@ -1258,8 +1207,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
    * Default is a
    * {@link org.springframework.core.LocalVariableTableParameterNameDiscoverer}.
    */
-  public void setParameterNameDiscoverer(
-    final ParameterNameDiscoverer parameterNameDiscoverer) {
+  public void setParameterNameDiscoverer(final ParameterNameDiscoverer parameterNameDiscoverer) {
     this.parameterNameDiscoverer = parameterNameDiscoverer;
   }
 
@@ -1282,10 +1230,8 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
    * storing session attributes in the HttpSession, using the same attribute
    * name as in the model.
    */
-  public void setSessionAttributeStore(
-    final SessionAttributeStore sessionAttributeStore) {
-    Assert.notNull(sessionAttributeStore,
-        "SessionAttributeStore must not be null");
+  public void setSessionAttributeStore(final SessionAttributeStore sessionAttributeStore) {
+    Assert.notNull(sessionAttributeStore, "SessionAttributeStore must not be null");
     this.sessionAttributeStore = sessionAttributeStore;
   }
 
@@ -1345,8 +1291,7 @@ implements HandlerAdapter, Ordered, BeanFactoryAware {
    * Specify a WebBindingInitializer which will apply pre-configured
    * configuration to every DataBinder that this controller uses.
    */
-  public void setWebBindingInitializer(
-    final WebBindingInitializer webBindingInitializer) {
+  public void setWebBindingInitializer(final WebBindingInitializer webBindingInitializer) {
     this.webBindingInitializer = webBindingInitializer;
   }
 

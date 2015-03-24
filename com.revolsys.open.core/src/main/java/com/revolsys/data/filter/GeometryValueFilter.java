@@ -11,8 +11,8 @@ public class GeometryValueFilter implements Filter<Record> {
     this.geometry = geometry;
   }
 
-  public GeometryValueFilter(final Record object) {
-    this(object.getGeometryValue());
+  public GeometryValueFilter(final Record record) {
+    this(record.<Geometry> getGeometryValue());
   }
 
   @Override

@@ -17,9 +17,8 @@ import com.revolsys.ui.model.Menu;
 public class MenuViewController {
 
   @RequestMapping("/view/menu/{menuName}")
-  public void getMenu(final HttpServletRequest request,
-    final HttpServletResponse response, @PathVariable final String menuName)
-        throws IOException {
+  public void getMenu(final HttpServletRequest request, final HttpServletResponse response,
+    @PathVariable("menuName") final String menuName) throws IOException {
     final Menu menu = (Menu)request.getAttribute(menuName);
     if (menu != null) {
       final MenuElement menuElement = new MenuElement(menu, menuName);

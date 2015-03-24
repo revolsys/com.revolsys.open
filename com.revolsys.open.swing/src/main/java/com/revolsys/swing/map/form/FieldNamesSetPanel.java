@@ -166,7 +166,7 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
     add(this.fieldsPanel);
 
     this.allFieldNamesTextFilter = new StringContainsRowFilter();
-    final RowFilter<ListModel<?>, Integer> allFieldNamesFilter = RowFilter.andFilter(Arrays.asList(
+    final RowFilter<ListModel, Integer> allFieldNamesFilter = RowFilter.andFilter(Arrays.asList(
       new CollectionRowFilter(this.selectedFieldNamesModel, false), this.allFieldNamesTextFilter));
     this.allFieldNames.setRowFilter(allFieldNamesFilter);
 
