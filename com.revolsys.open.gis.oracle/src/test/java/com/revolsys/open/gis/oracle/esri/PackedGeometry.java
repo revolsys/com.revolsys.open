@@ -45,7 +45,8 @@ public class PackedGeometry {
   }
 
   public static void checkGeometry(final String wkt) {
-    checkGeometry(GEOMETRY_FACTORY.geometry(wkt));
+    Geometry geometry = GEOMETRY_FACTORY.geometry(wkt);
+    checkGeometry(geometry);
   }
 
   public static void main(final String[] args) {

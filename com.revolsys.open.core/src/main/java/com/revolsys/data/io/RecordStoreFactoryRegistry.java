@@ -1,8 +1,11 @@
 package com.revolsys.data.io;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +14,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -140,8 +145,21 @@ public class RecordStoreFactoryRegistry {
   private static Set<String> fileExtensions = new TreeSet<String>();
 
   static {
-    new ClassPathXmlApplicationContext(
-        "classpath*:META-INF/com.revolsys.gis.recordStore.sf.xml");
+   try {
+    Enumeration<URL> resources= RecordStoreFactoryRegistry.class.getClassLoader().getResources("META-INF/com.revolsys.gis.recordStore.sf.xml");
+     while (resources.hasMoreElements()) {
+      URL url = (URL)resources.nextElement();
+      try {
+          new ClassPathXmlApplicationContext(
+          url.toString());
+      } catch (Throwable e) {
+        LoggerFactory.getLogger(RecordStoreFactoryRegistry.class).error("Unable to initialize plugin: " + url, e);
+      }
+    
+    }
+   } catch (IOException e) {
+     LoggerFactory.getLogger(RecordStoreFactoryRegistry.class).error("Unable to initialize plugins", e);
+  }
     IoFactoryRegistry.getInstance();
   }
 }
