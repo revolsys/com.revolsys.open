@@ -151,29 +151,6 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.0</version>
-        <configuration>
-          <reportPlugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-project-info-reports-plugin</artifactId>
-              <version>2.4</version>
-              <configuration>
-                <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-                <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-              </configuration>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <version>2.9.1</version>
-            </plugin>
-          </reportPlugins>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
         <version>2.8.1</version>
       </plugin>
@@ -192,10 +169,11 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <version>1.8</version>
-        <executions>
+    <!--   <executions>
           <execution>
             <id>aggregate-add-third-party</id>
             <inherited>true</inherited>
+            <phase>install</phase>
             <configuration>
               <force>true</force>
               <outputDirectory>src/license/</outputDirectory>
@@ -226,12 +204,30 @@
               <goal>aggregate-add-third-party</goal>
             </goals>
           </execution>
-        </executions>
+        </executions> -->  
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>3.4</version>
+        <configuration>
+         <reportPlugins>
+           <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-project-info-reports-plugin</artifactId>
+             <version>2.4</version>
+             <configuration>
+               <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+               <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+             </configuration>
+           </plugin>
+           <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-javadoc-plugin</artifactId>
+             <version>2.9.1</version>
+           </plugin>
+         </reportPlugins>
+        </configuration>
         <executions>
           <execution>
             <id>attach-descriptor</id>
