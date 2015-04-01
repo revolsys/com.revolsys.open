@@ -13,8 +13,8 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.Reader;
 
-public class MapReaderRecordReader extends AbstractReader<Record> implements
-RecordReader, Iterator<Record> {
+public class MapReaderRecordReader extends AbstractReader<Record> implements RecordReader,
+  Iterator<Record> {
 
   private final RecordDefinition recordDefinition;
 
@@ -58,13 +58,12 @@ RecordReader, Iterator<Record> {
     if (hasNext()) {
       final Map<String, Object> source = this.mapIterator.next();
       final Record target = new ArrayRecord(this.recordDefinition);
-      for (final FieldDefinition attribute : this.recordDefinition.getFields()) {
-        final String name = attribute.getName();
+      for (final FieldDefinition field : this.recordDefinition.getFields()) {
+        final String name = field.getName();
         final Object value = source.get(name);
         if (value != null) {
           final DataType dataType = this.recordDefinition.getFieldType(name);
-          final Object convertedValue = StringConverterRegistry.toObject(
-            dataType, value);
+          final Object convertedValue = StringConverterRegistry.toObject(dataType, value);
           target.setValue(name, convertedValue);
         }
       }

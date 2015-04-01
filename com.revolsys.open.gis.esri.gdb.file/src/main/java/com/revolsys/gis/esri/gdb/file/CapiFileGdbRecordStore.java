@@ -27,6 +27,7 @@ import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.query.AbstractMultiCondition;
 import com.revolsys.data.query.BinaryCondition;
 import com.revolsys.data.query.CollectionValue;
@@ -584,9 +585,10 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
           if (idGenerator == null) {
             long maxId = 0;
             for (final Record object : query(typePath)) {
-              final Object id = object.getIdValue();
-              if (id instanceof Number) {
-                final Number number = (Number)id;
+              final Identifier id = object.getIdentifier();
+              final Object firstId = id.getValue(0);
+              if (firstId instanceof Number) {
+                final Number number = (Number)firstId;
                 if (number.longValue() > maxId) {
                   maxId = number.longValue();
                 }

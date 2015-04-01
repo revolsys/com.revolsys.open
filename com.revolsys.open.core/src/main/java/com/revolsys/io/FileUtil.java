@@ -68,6 +68,33 @@ import com.revolsys.util.UrlUtil;
  * @author Paul Austin
  */
 public final class FileUtil {
+  /** Files or directories to be deleted on exit. */
+  private static final List<File> deleteFilesOnExit = new ArrayList<File>();
+
+  /** The thread that deletes files on exit. */
+  private static Thread deleteFilesOnExitThread;
+
+  /** The logger to record errors to. */
+  private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
+
+  /** The file path separator for UNIX based systems. */
+  public static final char UNIX_FILE_SEPARATOR = '/';
+
+  public static final Charset UTF8 = Charset.forName("UTF-8");
+
+  /** The file path separator for Windows based systems. */
+  public static final char WINDOWS_FILE_SEPARATOR = '\\';
+
+  public static final FilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
+    Arrays.asList(new String[] {
+      "gif", "jpg", "png", "tif", "tiff", "bmp"
+    }));
+
+  public static final FilenameFilter VIDEO_FILENAME_FILTER = new ExtensionFilenameFilter(
+    Arrays.asList(new String[] {
+      "avi", "wmv", "flv", "mpg"
+    }));
+
   /**
    * Close the writer without throwing an I/O exception if the close failed. The
    * error will be logged instead.
@@ -257,7 +284,7 @@ public final class FileUtil {
       return 0;
     } else {
       try {
-        final byte[] buffer = new byte[4906];
+        final byte[] buffer = new byte[4096];
         long numBytes = 0;
         int count;
         while ((count = in.read(buffer)) > -1) {
@@ -357,8 +384,24 @@ public final class FileUtil {
     return new InputStreamReader(in, UTF8);
   }
 
+  public static OutputStreamWriter createUtf8Writer(final File file) {
+    try {
+      return new OutputStreamWriter(new FileOutputStream(file), UTF8);
+    } catch (final FileNotFoundException e) {
+      return ExceptionUtil.throwUncheckedException(e);
+    }
+  }
+
   public static OutputStreamWriter createUtf8Writer(final OutputStream out) {
     return new OutputStreamWriter(out, UTF8);
+  }
+
+  public static boolean delete(final File file) {
+    if (file == null) {
+      return false;
+    } else {
+      return file.delete();
+    }
   }
 
   /**
@@ -966,33 +1009,6 @@ public final class FileUtil {
   public static String toUrlString(final File file) {
     return toUrl(file).toString();
   }
-
-  /** Files or directories to be deleted on exit. */
-  private static final List<File> deleteFilesOnExit = new ArrayList<File>();
-
-  /** The thread that deletes files on exit. */
-  private static Thread deleteFilesOnExitThread;
-
-  /** The logger to record errors to. */
-  private static final Logger LOG = LoggerFactory.getLogger(FileUtil.class);
-
-  /** The file path separator for UNIX based systems. */
-  public static final char UNIX_FILE_SEPARATOR = '/';
-
-  public static final Charset UTF8 = Charset.forName("UTF-8");
-
-  /** The file path separator for Windows based systems. */
-  public static final char WINDOWS_FILE_SEPARATOR = '\\';
-
-  public static final FilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
-    Arrays.asList(new String[] {
-      "gif", "jpg", "png", "tif", "tiff", "bmp"
-    }));
-
-  public static final FilenameFilter VIDEO_FILENAME_FILTER = new ExtensionFilenameFilter(
-    Arrays.asList(new String[] {
-      "avi", "wmv", "flv", "mpg"
-    }));
 
   /**
    * Construct a new FileUtil.

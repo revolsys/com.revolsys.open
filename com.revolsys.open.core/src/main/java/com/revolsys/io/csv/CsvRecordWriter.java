@@ -1,5 +1,6 @@
 package com.revolsys.io.csv;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -36,7 +37,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     try {
       this.recordDefinition = recordDefinition;
-      this.out = out;
+      this.out = new BufferedWriter(out);
       this.fieldSeparator = fieldSeparator;
       this.useQuotes = useQuotes;
       this.ewkt = ewkt;

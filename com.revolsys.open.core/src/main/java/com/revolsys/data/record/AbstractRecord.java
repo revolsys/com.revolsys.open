@@ -262,18 +262,6 @@ public abstract class AbstractRecord extends AbstractMap<String, Object> impleme
     return getIdentifier(Arrays.asList(fieldNames));
   }
 
-  /**
-   * Get the value of the unique identifier attribute.
-   *
-   * @return The unique identifier.
-   */
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T extends Object> T getIdValue() {
-    final int index = this.getRecordDefinition().getIdFieldIndex();
-    return (T)getValue(index);
-  }
-
   @Override
   public Integer getInteger(final CharSequence name) {
     final Object value = getValue(name);

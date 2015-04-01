@@ -45,13 +45,6 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   Identifier getIdentifier(String... fieldNames);
 
-  /**
-   * Get the value of the unique identifier attribute.
-   *
-   * @return The unique identifier.
-   */
-  <T extends Object> T getIdValue();
-
   Integer getInteger(CharSequence name);
 
   Long getLong(final CharSequence name);

@@ -4,8 +4,8 @@ import java.util.Map;
 
 import org.springframework.core.io.Resource;
 
-public abstract class AbstractMapReaderFactory extends AbstractIoFactory
-implements MapReaderFactory {
+public abstract class AbstractMapReaderFactory extends AbstractIoFactory implements
+  MapReaderFactory {
   public static MapReaderFactory getMapReaderFactory(final Resource resource) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
     final MapReaderFactory readerFactory = ioFactoryRegistry.getFactoryByResource(
@@ -41,8 +41,7 @@ implements MapReaderFactory {
     return this.singleFile;
   }
 
-  protected void setCustomAttributionSupported(
-    final boolean customAttributionSupported) {
+  protected void setCustomAttributionSupported(final boolean customAttributionSupported) {
     this.customAttributionSupported = customAttributionSupported;
   }
 
