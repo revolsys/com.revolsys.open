@@ -3,6 +3,7 @@ package com.revolsys.gis.web.rest.converter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
@@ -13,7 +14,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 
 import com.revolsys.data.io.GeometryReader;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.jts.geom.GeometryFactory;
@@ -45,7 +45,7 @@ AbstractHttpMessageConverter<GeometryReader> {
       final MediaType mediaType = headers.getContentType();
       Charset charset = mediaType.getCharSet();
       if (charset == null) {
-        charset = FileUtil.UTF8;
+        charset = StandardCharsets.UTF_8;
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"

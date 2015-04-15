@@ -28,7 +28,7 @@ src/main/cxx/EsriFileGdb_wrap.cxx:
 ${TARGET_OBJ}: src/main/cxx/EsriFileGdb_wrap.cxx
 	mkdir -p target/o
 	cp $(ESRI_FILE_GBD_HOME)/lib/* src/main/resources/native/$(OS)/$(ARCH)
-	${CXX} \
+	echo ${CXX} \
 	${CXXFLAGS} ${CPPFLAGS)}\
 	-I${JAVA_HOME}/include/ \
 	-I${JAVA_HOME}/include/darwin \

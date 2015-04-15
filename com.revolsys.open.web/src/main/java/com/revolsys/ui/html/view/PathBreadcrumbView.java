@@ -34,8 +34,7 @@ public class PathBreadcrumbView extends Element {
     this.path = path;
   }
 
-  public PathBreadcrumbView(final String contextPath, final String path,
-    final boolean addSlash) {
+  public PathBreadcrumbView(final String contextPath, final String path, final boolean addSlash) {
     this.contextPath = contextPath;
     this.path = path;
     this.addSlash = addSlash;
@@ -67,9 +66,8 @@ public class PathBreadcrumbView extends Element {
     path = path.replaceAll("//+", "/");
     path = path.replaceAll("/?index/?$", "");
 
-    out.startTag(HtmlUtil.DIV);
+    out.startTag(HtmlUtil.OL);
     out.attribute(HtmlUtil.ATTR_CLASS, "breadcrumb");
-    out.startTag(HtmlUtil.UL);
     if (path.length() == 0 || path.equals("index")) {
       out.startTag(HtmlUtil.LI);
       out.text("HOME");
@@ -90,17 +88,16 @@ public class PathBreadcrumbView extends Element {
           crumbPath += "/" + segment;
         }
         out.startTag(HtmlUtil.LI);
-        HtmlUtil.serializeA(out, null, crumbPath,
-          CaseConverter.toCapitalizedWords(segment));
+        HtmlUtil.serializeA(out, null, crumbPath, CaseConverter.toCapitalizedWords(segment));
         out.endTag(HtmlUtil.LI);
       }
       final String segment = segments[segments.length - 1];
       out.startTag(HtmlUtil.LI);
+      out.attribute(HtmlUtil.ATTR_CLASS, "active");
       out.text(CaseConverter.toCapitalizedWords(segment));
       out.endTag(HtmlUtil.LI);
     }
 
-    out.endTag(HtmlUtil.UL);
-    out.endTag(HtmlUtil.DIV);
+    out.endTag(HtmlUtil.OL);
   }
 }

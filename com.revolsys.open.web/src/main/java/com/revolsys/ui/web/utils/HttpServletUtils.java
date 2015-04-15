@@ -2,6 +2,7 @@ package com.revolsys.ui.web.utils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -20,7 +21,6 @@ import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.io.FileUtil;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.util.Property;
 
@@ -261,7 +261,7 @@ public final class HttpServletUtils {
     MediaType mediaType) {
     Charset charset = mediaType.getCharSet();
     if (charset == null) {
-      charset = FileUtil.UTF8;
+      charset = StandardCharsets.UTF_8;
       final Map<String, String> params = Collections.singletonMap("charset",
           "utf-8");
       mediaType = new MediaType(mediaType, params);

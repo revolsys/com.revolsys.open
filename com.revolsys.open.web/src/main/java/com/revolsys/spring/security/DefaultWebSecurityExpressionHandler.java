@@ -1,54 +1,65 @@
 package com.revolsys.spring.security;
 
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.security.access.expression.SecurityExpressionRoot;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.expression.AbstractSecurityExpressionHandler;
+import org.springframework.security.access.expression.SecurityExpressionHandler;
+import org.springframework.security.access.expression.SecurityExpressionOperations;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
-import org.springframework.security.web.access.expression.WebSecurityExpressionHandler;
+import org.springframework.util.Assert;
 
 /**
- * Facade which isolates Spring Security's requirements for evaluating
- * web-security expressions from the implementation of the underlying expression
- * objects.
  *
  * @author Luke Taylor
  * @since 3.0
  */
-public class DefaultWebSecurityExpressionHandler implements
-WebSecurityExpressionHandler {
+public class DefaultWebSecurityExpressionHandler extends
+  AbstractSecurityExpressionHandler<FilterInvocation> implements
+  SecurityExpressionHandler<FilterInvocation> {
 
-  private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
+  private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
-  private final ExpressionParser expressionParser = new SpelExpressionParser();
-
-  private RoleHierarchy roleHierarchy;
+  private String defaultRolePrefix = "ROLE_";
 
   @Override
-  public EvaluationContext createEvaluationContext(
-    final Authentication authentication,
-    final FilterInvocation fi) {
-    final StandardEvaluationContext ctx = new StandardEvaluationContext();
-    final SecurityExpressionRoot root = new WebSecurityExpressionRoot(
-      authentication, fi);
+  protected SecurityExpressionOperations createSecurityExpressionRoot(
+    final Authentication authentication, final FilterInvocation fi) {
+    final WebSecurityExpressionRoot root = new WebSecurityExpressionRoot(authentication, fi);
+    root.setPermissionEvaluator(getPermissionEvaluator());
     root.setTrustResolver(this.trustResolver);
-    root.setRoleHierarchy(this.roleHierarchy);
-    ctx.setRootObject(root);
-
-    return ctx;
+    root.setRoleHierarchy(getRoleHierarchy());
+    root.setDefaultRolePrefix(this.defaultRolePrefix);
+    return root;
   }
 
-  @Override
-  public ExpressionParser getExpressionParser() {
-    return this.expressionParser;
+  /**
+   * <p>
+   * Sets the default prefix to be added to {@link #hasAnyRole(String...)} or
+   * {@link #hasRole(String)}. For example, if hasRole("ADMIN") or hasRole("ROLE_ADMIN")
+   * is passed in, then the role ROLE_ADMIN will be used when the defaultRolePrefix is
+   * "ROLE_" (default).
+   * </p>
+   *
+   * <p>
+   * If null or empty, then no default role prefix is used.
+   * </p>
+   *
+   * @param defaultRolePrefix the default prefix to add to roles. Default "ROLE_".
+   */
+  public void setDefaultRolePrefix(final String defaultRolePrefix) {
+    this.defaultRolePrefix = defaultRolePrefix;
   }
 
-  public void setRoleHierarchy(final RoleHierarchy roleHierarchy) {
-    this.roleHierarchy = roleHierarchy;
+  /**
+   * Sets the {@link AuthenticationTrustResolver} to be used. The default is
+   * {@link AuthenticationTrustResolverImpl}.
+   *
+   * @param trustResolver the {@link AuthenticationTrustResolver} to use. Cannot be
+   * null.
+   */
+  public void setTrustResolver(final AuthenticationTrustResolver trustResolver) {
+    Assert.notNull(trustResolver, "trustResolver cannot be null");
+    this.trustResolver = trustResolver;
   }
 }

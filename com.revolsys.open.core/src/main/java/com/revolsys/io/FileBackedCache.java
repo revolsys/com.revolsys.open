@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 public class FileBackedCache implements AutoCloseable {
 
@@ -77,7 +78,7 @@ public class FileBackedCache implements AutoCloseable {
 
   @Override
   public String toString() {
-    return new String(this.buffer, 0, this.size, FileUtil.UTF8);
+    return new String(this.buffer, 0, this.size, StandardCharsets.UTF_8);
   }
 
   public synchronized void write(final byte[] data, final int offset, final int length) {

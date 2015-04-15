@@ -109,6 +109,7 @@ public class CsvIterator implements Iterator<List<String>>, Iterable<List<String
           final char nextChar = previewNextChar();
           if (inQuotes && nextChar == '"') {
             sb.append('"');
+            this.index++;
           } else {
             inQuotes = !inQuotes;
             if (sb.length() > 0 && nextChar != ',' && nextChar != '\n' && nextChar != 0) {

@@ -26,6 +26,7 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,7 +126,6 @@ import org.springframework.web.servlet.support.WebContentGenerator;
 import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.WebUtils;
 
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Property;
@@ -520,7 +520,7 @@ public class AnnotationMethodHandlerAdapter extends WebContentGenerator implemen
         if (MediaType.APPLICATION_FORM_URLENCODED.includes(contentType)) {
           Charset charset = contentType.getCharSet();
           if (charset == null) {
-            charset = FileUtil.UTF8;
+            charset = StandardCharsets.UTF_8;
           }
           final String urlBody = FileCopyUtils.copyToString(new InputStreamReader(
             inputMessage.getBody(), charset));

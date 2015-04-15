@@ -1,4 +1,3 @@
-
 function resizeHeight(iframe) {
   var body = $(iframe, window.top.document).contents().find('body');
   var newHeight = body.height() + 5;
@@ -150,7 +149,7 @@ function tableShowEvents(table, heightPercent) {
       if ($(ui.panel).find(table).length > 0) {
         tableDraw(table, heightPercent);
       } else {
-        
+
       }
     });
 
@@ -169,24 +168,24 @@ function tableShowEvents(table, heightPercent) {
 
 function validateIntegerNumber(element, value, optional, min, max) {
   return new function(value, element) {
-  var text = $.trim(value);
-  if (!text) {
-    if (optional) {
-      return true;
-    } else {
-      return false;
+    var text = $.trim(value);
+    if (!text) {
+      if (optional) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (/^-?\d+$/.test(text)) {
+      var number = parseInt(text);
+      if (min && number < min) {
+        return false;
+      } else if (max && number > max) {
+        return false;
+      } else {
+        return true;
+      }
     }
-  } else if (/^-?\d+$/.test(text)) {
-    var number = parseInt(text);
-    if (min && number < min) {
-      return false;
-    } else if (max && number > max) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-  return false;
+    return false;
   }
 }
 
@@ -234,13 +233,14 @@ function showParentsAClick(element) {
 }
 
 function showParentsHash(hash) {
-  if (hash && hash.substr(0,1) == '#') {
+  if (hash && hash.substr(0, 1) == '#') {
     showParents('[id="' + hash.substr(1) + '"]');
     showParents('a[name="' + hash.substr(1) + '"]');
   }
 }
 
 function showElement(element) {
+  element.tab('show');
   element.removeClass('closed');
   element.show();
 }
@@ -256,10 +256,11 @@ function showParents(element) {
     if (element.hasClass('ui-accordion-header')) {
       accordionTitle = element;
       showElement(element.next());
-    } else if (element.hasClass('ui-accordion-content')){
+    } else if (element.hasClass('ui-accordion-content')) {
       accordionTitle = element.prev();
     }
-    if (accordionTitle && !accordionTitle.hasClass('ui-accordion-header-active')) {
+    if (accordionTitle
+        && !accordionTitle.hasClass('ui-accordion-header-active')) {
       accordionTitle.click();
     }
     element.parents('.ui-accordion-content').each(function() {
@@ -270,9 +271,9 @@ function showParents(element) {
 
 function setPageId(pageId) {
   if (pageId) {
-    var sideMenu =  $('.sideMenu');
+    var sideMenu = $('.sideMenu');
     $('li > ul', sideMenu).hide(0);
-    var menuLi =  $('#' + pageId + 'Menu');
+    var menuLi = $('#' + pageId + 'Menu');
     if (menuLi.length > 0) {
       menuLi.parent('.sideMenu ul').show(0);
       menuLi.addClass('selected');
@@ -282,52 +283,56 @@ function setPageId(pageId) {
 }
 
 function createToc() {
-  var tocDiv =  $('<div class="tocMenu"/>');
+  var tocDiv = $('<div class="tocMenu"/>');
 
   $('.sideMenu').after(tocDiv);
   tocDiv.append('<div class="title">Table of Contents</div>');
   var tocMenu = $('<ol />');
   tocDiv.append(tocMenu);
-  var indices = [0];
-  $(':header').each( function() {
-    var menuDepth = tocMenu.parents('.tocMenu ol').length + 1;
-    var headingType = $(this).get(0).tagName;
-    var headingDepth = headingType.substr(1,2);
-    while (headingDepth > menuDepth) {
-      var li = tocMenu.last();
-      if (li.length == 0) {
-        li = $('<li/>');
+  var indices = [ 0 ];
+  $(':header').each(
+    function() {
+      var menuDepth = tocMenu.parents('.tocMenu ol').length + 1;
+      var headingType = $(this).get(0).tagName;
+      var headingDepth = headingType.substr(1, 2);
+      while (headingDepth > menuDepth) {
+        var li = tocMenu.last();
+        if (li.length == 0) {
+          li = $('<li/>');
+        }
+        tocMenu.append(li);
+        tocMenu = $('<ol/>');
+        li.append(tocMenu);
+        indices.push(0);
+        menuDepth++;
       }
-      tocMenu.append(li);
-      tocMenu = $('<ol/>');
-      li.append(tocMenu);
-      indices.push(0);
-      menuDepth++;
-    }
-    while(headingDepth < menuDepth) {
-      tocMenu = tocMenu.parent();
-      menuDepth--;
-      indices.pop();
-    }
-    var count = indices[indices.length - 1] + 1;
-    indices[indices.length - 1] = count;
-    var id = $(this).attr('id');
-    if (!id) {
-      id = 'heading_' + indices.join('_');
-      $(this).attr('id', id);
-    }
-    var title = $(this).attr('title');
-    if (!title) {
-      title = $(this).text();
-    }
-    var link = $('<a href="#' + id + '" onclick="showParentsAClick(this)"/>').text(title);
-    $(this).prepend(indices.join('.') + '. ');
-    var cssClass='';
-    if (menuDepth > 3) {
-      cssClass = 'class="closed"';
-    }
-    tocMenu.append($('<li id="tocMenu_' + indices.join('_') + '" ' + cssClass +' />').append(link));
-  });
+      while (headingDepth < menuDepth) {
+        tocMenu = tocMenu.parent();
+        menuDepth--;
+        indices.pop();
+      }
+      var count = indices[indices.length - 1] + 1;
+      indices[indices.length - 1] = count;
+      var id = $(this).attr('id');
+      if (!id) {
+        id = 'heading_' + indices.join('_');
+        $(this).attr('id', id);
+      }
+      var title = $(this).attr('title');
+      if (!title) {
+        title = $(this).text();
+      }
+      var link = $('<a href="#' + id + '" onclick="showParentsAClick(this)"/>')
+          .text(title);
+      $(this).prepend(indices.join('.') + '. ');
+      var cssClass = '';
+      if (menuDepth > 3) {
+        cssClass = 'class="closed"';
+      }
+      tocMenu.append($(
+        '<li id="tocMenu_' + indices.join('_') + '" ' + cssClass + ' />')
+          .append(link));
+    });
   var top = tocDiv.offset().top;
   var tocHeight = tocDiv.height();
   var resize = function() {
@@ -337,193 +342,265 @@ function createToc() {
     } else {
       height = tocHeight;
     }
-    tocDiv.height( height);
+    tocDiv.height(height);
     if ($(window).scrollTop() >= top) {
       var marginTop = ($(window).scrollTop() - top);
       tocDiv.css('margin-top', marginTop);
     } else {
       tocDiv.css('margin-top', 0);
-    }  
+    }
   };
   $(document).resize(resize);
   $(document).scroll(resize);
   resize();
 }
 
-$(document).ready(function() {
-    $('html.lt-ie9').each(function() {
-      document.createElement('section');
-    });
-    addConfirmButton({
-      selector : 'button.delete',
-      icon : 'trash',
-      title : 'Confirm Delete',
-      message : 'Are you sure you want to delete this record?'
-    });
-    if (jQuery().jfilestyle) {
-      $(':file').jfilestyle({});
-      $(':file').each(function() {
-        var jfile = $(this);
-        var button = $('<label/>', {
-          click: function() {
-            jfile.jfilestyle('clear');
-            return false;
-          }
+$(document)
+    .ready(
+      function() {
+        $('html.lt-ie9').each(function() {
+          document.createElement('section');
         });
-        button.append('<i class="icon-remove-sign" />');
-        button.append('<span>Clear</span>');
-        $(this).next('div.jquery-filestyle').append(button);
-      });
-      $('div.jquery-filestyle label').button();
-    }
-    refreshButtons($(document));
-    $('div.collapsibleBox').each(function() {
-      var active;
-      if ($(this).hasClass('closed')) {
-        active = false;
-      } else {
-        active = 0;
-      }
-      $(this).accordion({
-        icons : {
-          header : "ui-icon-triangle-1-e",
-          headerSelected : "ui-icon-triangle-1-s"
-        },
-        collapsible : true,
-        active : active,
-        autoHeight : false,
-        change : function(event, ui) {
-          $('iframe.autoHeight', ui.newContent).iframeAutoHeight();
-        }
-      });
-    });
-    $('div.jqueryTabs').tabs({
-      create : function(event, ui) {
-        var tables = $.fn.dataTable.tables();
-        if (tables.length > 0) {
-          $(tables).DataTable().columns.adjust();
-        }
-        $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
-      },
-      activate : function(event, ui) {
-        var tables = $.fn.dataTable.tables();
-        if (tables.length > 0) {
-          $(tables).DataTable().scroller().measure();
-          $(tables).DataTable().columns.adjust();
-        }
-        $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
-      },
-      load: function (event, ui) {
-        var tables = $.fn.dataTable.tables();
-        if (tables.length > 0) {
-          $(tables).DataTable().columns.adjust();
-        }
-      },
-      beforeActivate: function (event, ui) {
-        window.location.hash = ui.newPanel.selector;
-      },
-      heightStyle: "content"
-    });
- 
-    $(window).bind('hashchange', function() {
-      var hash = window.location.hash;
-      if (hash) {
-        var anchor = $('a.ui-tabs-anchor[href="' + hash + '"]');
-        anchor.click();
-        showParentsHash(hash);
-      }
-      window.location.hash = hash;
-    });
-     
-    $('div.objectList table').addClass('display cell-border');
-    $('div.objectList table').dataTable({
-      "dom": "t",
-      "ordering" : false,
-      "paging": false
-    });
-
-    $('div.simpleDataTable table').addClass('display cell-border');
-    $('div.simpleDataTable table').dataTable({
-      "dom": "t",
-      "ordering" : false,
-      "autoWidth": false,
-      "paging": false
-    });
-    
-    if (typeof jQuery.validator != "undefined") {
-      $('div.form').each(
-        function() {
-          var formWrapper = this;
-          var form = $('form', this);
-          var validator = form.bind("invalid-form.validate", function() {
-            $('div.errorContainer div.title ', formWrapper).html("The form contains errors. Update the highlighted fields to fix the errors.");
-          }).validate({
-            errorElement: "div",
-            errorContainer : $('div.errorContainer', formWrapper),
-            errorPlacement: function(error, element) {
-              error.insertBefore(element);
-              error.addClass('errorMessage');
-            },
-            highlight : function(element, errorClass, validClass) {
-              $(element).closest('div.fieldComponent').addClass('invalid');
-              $(element).addClass(errorClass).removeClass(validClass);
-              if (element.id) {
-                var label = $(element.form).find("label[for=" + element.id + "]");
-                if (label) {
-                  addClass(errorClass);
-                }
+        addConfirmButton({
+          selector : 'button.delete',
+          icon : 'trash',
+          title : 'Confirm Delete',
+          message : 'Are you sure you want to delete this record?'
+        });
+        if (jQuery().jfilestyle) {
+          $(':file').jfilestyle({});
+          $(':file').each(function() {
+            var jfile = $(this);
+            var button = $('<label/>', {
+              click : function() {
+                jfile.jfilestyle('clear');
+                return false;
               }
-              $('.tempError').hide();
+            });
+            button.append('<i class="icon-remove-sign" />');
+            button.append('<span>Clear</span>');
+            $(this).next('div.jquery-filestyle').append(button);
+          });
+          $('div.jquery-filestyle label').button();
+        }
+        refreshButtons($(document));
+        $('div.collapsibleBox').each(function() {
+          var active;
+          if ($(this).hasClass('closed')) {
+            active = false;
+          } else {
+            active = 0;
+          }
+          $(this).accordion({
+            icons : {
+              header : "ui-icon-triangle-1-e",
+              headerSelected : "ui-icon-triangle-1-s"
             },
-            unhighlight : function(element, errorClass, validClass) {
-              $(element).closest('div.fieldComponent').removeClass('invalid');
-              $(element).removeClass(errorClass).addClass(validClass);
-              if (element.id) {
-                var label = $(element.form).find("label[for=" + element.id + "]");
-                if (label) {
-                  removeClass(errorClass);
-                }
-              }
-              $('.tempError').hide();
+            collapsible : true,
+            active : active,
+            autoHeight : false,
+            change : function(event, ui) {
+              $('iframe.autoHeight', ui.newContent).iframeAutoHeight();
             }
           });
-          if ($(formWrapper).hasClass('formInvalid')) {
-            validator.form();
-          }
-        }
-      );
+        });
+        /*     $('div.jqueryTabs').tabs({
+               create : function(event, ui) {
+                 var tables = $.fn.dataTable.tables();
+                 if (tables.length > 0) {
+                   $(tables).DataTable().columns.adjust();
+                 }
+                 $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
+               },
+               activate : function(event, ui) {
+                 var tables = $.fn.dataTable.tables();
+                 if (tables.length > 0) {
+                   $(tables).DataTable().scroller().measure();
+                   $(tables).DataTable().columns.adjust();
+                 }
+                 $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
+               },
+               load : function(event, ui) {
+                 var tables = $.fn.dataTable.tables();
+                 if (tables.length > 0) {
+                   $(tables).DataTable().columns.adjust();
+                 }
+               },
+               beforeActivate : function(event, ui) {
+                 window.location.hash = ui.newPanel.selector;
+               },
+               heightStyle : "content"
+             });*/
 
-      jQuery.validator.addMethod("integer", function(value, element) {
-        return validateIntegerNumber(element, value, this.optional(element));
-      }, "Please enter a valid integer number.");
-  
-      jQuery.validator.addMethod("byte", function(value, element) {
-        return validateIntegerNumber(element, value, this.optional(element), -128, 127);
-      }, "Please enter a valid integer number -128 >=< 127.");
-  
-      jQuery.validator.addMethod("short", function(value, element) {
-        return validateIntegerNumber(element, value, this.optional(element), -32768, 32767);
-      }, "Please enter a valid integer number -32768 >=< 32767.");
-  
-      jQuery.validator.addMethod("int", function(value, element) {
-        return validateIntegerNumber(element, value, this.optional(element), -2147483648, 2147483647);
-      }, "Please enter a valid integer number -2147483648 >=< 2147483647.");
-  
-      jQuery.validator.addMethod("long", function(value, element) {
-        return validateIntegerNumber(element, value, this.optional(element), -9223372036854775808, 9223372036854775807);
-      }, "Please enter a valid integer number -9223372036854775808 >=< 9223372036854775807.");
-  
-      jQuery.validator.addMethod("number", function(value, element) {
-        return validateDecimalNumber(element, value, this.optional(element));
-      }, "Please enter a valid number.");
-  
-      jQuery.validator.addMethod("float", function(value, element) {
-        return validateDecimalNumber(element, value, this.optional(element));
-      }, "Please enter a valid float number.");
-  
-      jQuery.validator.addMethod("double", function(value, element) {
-        return validateDecimalNumber(element, value, this.optional(element));
-      }, "Please enter a valid double number.");
-    }
-    showParentsHash(window.location.hash);
-});
+        $("div[role='tabpanel']").on('shown.bs.tab', function(e) {
+          var tables = $.fn.dataTable.tables();
+          if (tables.length > 0) {
+            $(tables).DataTable().scroller().measure();
+            $(tables).DataTable().columns.adjust();
+          }
+          var hash = $(e.target).attr("href");
+          if (hash && hash.substr(0, 1) == "#") {
+            var position = $(window).scrollTop();
+            location.replace("#" + hash.substr(1));
+            $(window).scrollTop(position);
+          }
+        });
+
+        $(window).bind('hashchange', function() {
+          var hash = window.location.hash;
+          if (hash) {
+            var anchor = $('a.ui-tabs-anchor[href="' + hash + '"]');
+            anchor.click();
+            showParentsHash(hash);
+          }
+          window.location.hash = hash;
+        });
+
+        $('div.objectList table').addClass('display cell-border');
+        $('div.objectList table').dataTable({
+          "dom" : "t",
+          "ordering" : false,
+          "paging" : false
+        });
+
+        $('div.simpleDataTable table').addClass('display cell-border');
+        $('div.simpleDataTable table').dataTable({
+          "dom" : "t",
+          "ordering" : false,
+          "autoWidth" : false,
+          "paging" : false
+        });
+
+        if (typeof jQuery.validator != "undefined") {
+          $('div.form')
+              .each(
+                function() {
+                  var formWrapper = this;
+                  var form = $('form', this);
+                  var validator = form
+                      .bind(
+                        "invalid-form.validate",
+                        function() {
+                          $('div.errorContainer div.title ', formWrapper)
+                              .html(
+                                "The form contains errors. Update the highlighted fields to fix the errors.");
+                        })
+                      .validate(
+                        {
+                          errorElement : "div",
+                          errorContainer : $('div.errorContainer', formWrapper),
+                          errorPlacement : function(error, element) {
+                            error.insertBefore(element);
+                            error.addClass('errorMessage');
+                          },
+                          highlight : function(element, errorClass, validClass) {
+                            $(element).closest('div.fieldComponent').addClass(
+                              'invalid');
+                            $(element).addClass(errorClass).removeClass(
+                              validClass);
+                            if (element.id) {
+                              var label = $(element.form).find(
+                                "label[for=" + element.id + "]");
+                              if (label) {
+                                addClass(errorClass);
+                              }
+                            }
+                            $('.tempError').hide();
+                          },
+                          unhighlight : function(
+                              element,
+                              errorClass,
+                              validClass) {
+                            $(element).closest('div.fieldComponent')
+                                .removeClass('invalid');
+                            $(element).removeClass(errorClass).addClass(
+                              validClass);
+                            if (element.id) {
+                              var label = $(element.form).find(
+                                "label[for=" + element.id + "]");
+                              if (label) {
+                                removeClass(errorClass);
+                              }
+                            }
+                            $('.tempError').hide();
+                          }
+                        });
+                  if ($(formWrapper).hasClass('formInvalid')) {
+                    validator.form();
+                  }
+                });
+
+          jQuery.validator.addMethod(
+            "integer",
+            function(value, element) {
+              return validateIntegerNumber(element, value, this
+                  .optional(element));
+            },
+            "Please enter a valid integer number.");
+
+          jQuery.validator.addMethod("byte", function(value, element) {
+            return validateIntegerNumber(
+              element,
+              value,
+              this.optional(element),
+              -128,
+              127);
+          }, "Please enter a valid integer number -128 >=< 127.");
+
+          jQuery.validator.addMethod("short", function(value, element) {
+            return validateIntegerNumber(
+              element,
+              value,
+              this.optional(element),
+              -32768,
+              32767);
+          }, "Please enter a valid integer number -32768 >=< 32767.");
+
+          jQuery.validator.addMethod("int", function(value, element) {
+            return validateIntegerNumber(
+              element,
+              value,
+              this.optional(element),
+              -2147483648,
+              2147483647);
+          }, "Please enter a valid integer number -2147483648 >=< 2147483647.");
+
+          jQuery.validator
+              .addMethod(
+                "long",
+                function(value, element) {
+                  return validateIntegerNumber(
+                    element,
+                    value,
+                    this.optional(element),
+                    -9223372036854775808,
+                    9223372036854775807);
+                },
+                "Please enter a valid integer number -9223372036854775808 >=< 9223372036854775807.");
+
+          jQuery.validator.addMethod(
+            "number",
+            function(value, element) {
+              return validateDecimalNumber(element, value, this
+                  .optional(element));
+            },
+            "Please enter a valid number.");
+
+          jQuery.validator.addMethod(
+            "float",
+            function(value, element) {
+              return validateDecimalNumber(element, value, this
+                  .optional(element));
+            },
+            "Please enter a valid float number.");
+
+          jQuery.validator.addMethod(
+            "double",
+            function(value, element) {
+              return validateDecimalNumber(element, value, this
+                  .optional(element));
+            },
+            "Please enter a valid double number.");
+        }
+        showParentsHash(window.location.hash);
+      });

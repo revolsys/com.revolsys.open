@@ -68,11 +68,11 @@ import com.revolsys.ui.html.serializer.type.DateSerializer;
 import com.revolsys.ui.html.serializer.type.DateTimeSerializer;
 import com.revolsys.ui.html.serializer.type.TimestampSerializer;
 import com.revolsys.ui.html.serializer.type.TypeSerializer;
+import com.revolsys.ui.html.view.ButtonsToolbarElement;
 import com.revolsys.ui.html.view.DetailView;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.ui.html.view.ElementLabel;
-import com.revolsys.ui.html.view.MenuElement;
 import com.revolsys.ui.html.view.RawContent;
 import com.revolsys.ui.html.view.Script;
 import com.revolsys.ui.html.view.TabElementContainer;
@@ -224,7 +224,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
 
   public void addMenuElement(final ElementContainer container, final Menu menu) {
     if (menu.getMenus().size() > 0) {
-      final MenuElement actionMenuElement = new MenuElement(menu, "actionMenu");
+      final ButtonsToolbarElement actionMenuElement = new ButtonsToolbarElement(menu);
       container.add(actionMenuElement);
     }
   }
@@ -703,7 +703,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String name = form.getName();
     actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name + "').submit()"));
 
-    final MenuElement actionMenuElement = new MenuElement(actionMenu, "actionMenu");
+    final ButtonsToolbarElement actionMenuElement = new ButtonsToolbarElement(actionMenu);
     final ElementContainer view = new ElementContainer(form, actionMenuElement);
     final TabElementContainer tabs = new TabElementContainer();
     tabs.add(title, view);
@@ -757,7 +757,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       final String name = form.getName();
       actionMenu.addMenuItem(new Menu("Save", "javascript:$('#" + name + "').submit()"));
 
-      final MenuElement actionMenuElement = new MenuElement(actionMenu, "actionMenu");
+      final ButtonsToolbarElement actionMenuElement = new ButtonsToolbarElement(actionMenu);
       final ElementContainer view = new ElementContainer(form, actionMenuElement);
       final TabElementContainer tabs = new TabElementContainer();
       tabs.add(title, view);

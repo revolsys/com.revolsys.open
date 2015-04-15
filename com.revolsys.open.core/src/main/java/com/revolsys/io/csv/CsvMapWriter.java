@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +29,7 @@ public class CsvMapWriter extends AbstractMapWriter {
   private final char fieldSeparator;
 
   public CsvMapWriter(final File file) throws FileNotFoundException {
-    this(new OutputStreamWriter(new FileOutputStream(file), FileUtil.UTF8));
+    this(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
   }
 
   public CsvMapWriter(final Writer out) {

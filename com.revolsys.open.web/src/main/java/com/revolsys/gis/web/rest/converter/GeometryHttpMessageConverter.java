@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.gis.geometry.io.GeometryWriterFactory;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
@@ -56,7 +56,7 @@ AbstractHttpMessageConverter<Geometry> {
     try {
       Charset charset = mediaType.getCharSet();
       if (charset == null) {
-        charset = FileUtil.UTF8;
+        charset = StandardCharsets.UTF_8;
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"

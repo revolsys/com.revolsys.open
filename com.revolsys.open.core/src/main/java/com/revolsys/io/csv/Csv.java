@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.springframework.core.io.Resource;
@@ -42,7 +43,7 @@ public class Csv extends AbstractRecordAndGeometryIoFactory implements MapWriter
   }
 
   public static Reader<Map<String, Object>> mapReader(final InputStream in) {
-    final InputStreamReader reader = new InputStreamReader(in, FileUtil.UTF8);
+    final InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
     return mapReader(reader);
   }
 

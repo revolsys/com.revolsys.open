@@ -6,7 +6,7 @@ import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
 public class TableView extends Element {
-  private String cssClass = "table";
+  private String cssClass;
 
   private String id;
 
@@ -29,8 +29,8 @@ public class TableView extends Element {
     }
   }
 
-  public TableView(final TableSerializer model, final String cssClass,
-    final String title, final String noRecordsMessgae) {
+  public TableView(final TableSerializer model, final String cssClass, final String title,
+    final String noRecordsMessgae) {
     this.model = model;
     if (cssClass != null && cssClass.trim().length() > 0) {
       this.cssClass += " " + cssClass;
@@ -64,7 +64,11 @@ public class TableView extends Element {
     final int rowCount = this.model.getBodyRowCount();
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_ID, this.id);
-    out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass);
+    if (Property.hasValue(this.cssClass)) {
+      out.attribute(HtmlUtil.ATTR_CLASS, this.cssClass + " table-responsive");
+    } else {
+      out.attribute(HtmlUtil.ATTR_CLASS, "table-responsive");
+    }
     if (this.title != null && this.title.length() > 0) {
       out.startTag(HtmlUtil.DIV);
       out.attribute(HtmlUtil.ATTR_CLASS, "title");
@@ -75,8 +79,11 @@ public class TableView extends Element {
       out.startTag(HtmlUtil.TABLE);
       out.attribute(HtmlUtil.ATTR_CELL_SPACING, "0");
       out.attribute(HtmlUtil.ATTR_CELL_PADDING, "0");
-      out.attribute(HtmlUtil.ATTR_CLASS, "data display cell-border");
-      out.attribute(HtmlUtil.ATTR_WIDTH, this.width);
+      out.attribute(HtmlUtil.ATTR_CLASS,
+        "table table-striped table-bordered table-condensed dataTable no-footer");
+      if (Property.hasValue(this.width)) {
+        out.attribute(HtmlUtil.ATTR_STYLE, "width:" + this.width);
+      }
 
       serializeHeadings(out);
       serializeFooter(out);
@@ -102,8 +109,7 @@ public class TableView extends Element {
     }
   }
 
-  protected void serializeFooterRow(final XmlWriter out, final int row,
-    final int rowCount) {
+  protected void serializeFooterRow(final XmlWriter out, final int row, final int rowCount) {
     final int colCount = this.model.getColumnCount();
     out.startTag(HtmlUtil.TR);
     String rowCss = "";
@@ -160,8 +166,7 @@ public class TableView extends Element {
     out.endTag(HtmlUtil.THEAD);
   }
 
-  protected void serializeRow(final XmlWriter out, final int row,
-    final int rowCount) {
+  protected void serializeRow(final XmlWriter out, final int row, final int rowCount) {
     final int colCount = this.model.getColumnCount();
     out.startTag(HtmlUtil.TR);
     String rowCss = "";

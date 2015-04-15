@@ -39,7 +39,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -79,8 +79,6 @@ public final class FileUtil {
 
   /** The file path separator for UNIX based systems. */
   public static final char UNIX_FILE_SEPARATOR = '/';
-
-  public static final Charset UTF8 = Charset.forName("UTF-8");
 
   /** The file path separator for Windows based systems. */
   public static final char WINDOWS_FILE_SEPARATOR = '\\';
@@ -381,19 +379,19 @@ public final class FileUtil {
   }
 
   public static InputStreamReader createUtf8Reader(final InputStream in) {
-    return new InputStreamReader(in, UTF8);
+    return new InputStreamReader(in, StandardCharsets.UTF_8);
   }
 
   public static OutputStreamWriter createUtf8Writer(final File file) {
     try {
-      return new OutputStreamWriter(new FileOutputStream(file), UTF8);
+      return new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
     } catch (final FileNotFoundException e) {
       return ExceptionUtil.throwUncheckedException(e);
     }
   }
 
   public static OutputStreamWriter createUtf8Writer(final OutputStream out) {
-    return new OutputStreamWriter(out, UTF8);
+    return new OutputStreamWriter(out, StandardCharsets.UTF_8);
   }
 
   public static boolean delete(final File file) {

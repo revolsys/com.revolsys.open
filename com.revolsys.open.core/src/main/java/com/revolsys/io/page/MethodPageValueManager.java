@@ -1,8 +1,8 @@
 package com.revolsys.io.page;
 
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 
-import com.revolsys.io.FileUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 public class MethodPageValueManager<T> implements PageValueManager<T> {
@@ -86,7 +86,7 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
     final int size = getIntValue(bytes);
     final byte[] stringBytes = new byte[size];
     System.arraycopy(bytes, 4, stringBytes, 0, size);
-    return new String(stringBytes, FileUtil.UTF8);
+    return new String(stringBytes, StandardCharsets.UTF_8);
   }
 
   public static byte[] getValueByteBytes(final Byte b) {
@@ -138,7 +138,7 @@ public class MethodPageValueManager<T> implements PageValueManager<T> {
   }
 
   public static byte[] getValueStringBytes(final String s) {
-    final byte[] stringBytes = s.getBytes(FileUtil.UTF8);
+    final byte[] stringBytes = s.getBytes(StandardCharsets.UTF_8);
     final int size = stringBytes.length;
     final byte[] sizeBytes = getValueIntBytes(size);
     final byte[] bytes = new byte[stringBytes.length + sizeBytes.length];

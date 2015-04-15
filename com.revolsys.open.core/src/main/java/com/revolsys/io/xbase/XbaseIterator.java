@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,7 +89,7 @@ RecordIterator {
 
   private Resource resource;
 
-  private Charset charset = FileUtil.UTF8;
+  private Charset charset = StandardCharsets.UTF_8;
 
   private String typeName;
 

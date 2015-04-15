@@ -1,6 +1,7 @@
 package com.revolsys.data.io;
 
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -49,7 +50,7 @@ AbstractRecordReaderFactory implements RecordWriterFactory {
   public Writer<Record> createRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream) {
     return createRecordWriter(baseName, recordDefinition, outputStream,
-      FileUtil.UTF8);
+      StandardCharsets.UTF_8);
   }
 
   @Override

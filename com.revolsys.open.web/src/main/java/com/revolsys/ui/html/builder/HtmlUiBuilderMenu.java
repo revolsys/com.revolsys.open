@@ -7,6 +7,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 
 import com.revolsys.ui.model.Menu;
 import com.revolsys.ui.web.config.Page;
+import com.revolsys.util.Property;
 
 public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
   private BeanFactory beanFactory;
@@ -17,8 +18,8 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
 
   @Override
   public String getLink(final JexlContext context) {
-    final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
-      this.beanFactory, this.typePath);
+    final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(this.beanFactory,
+      this.typePath);
     if (htmlUiBuilder == null) {
       return null;
     } else {
@@ -38,16 +39,21 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
 
   @Override
   public String getLinkTitle(final JexlContext context) {
-    final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
-      this.beanFactory, this.typePath);
-    if (htmlUiBuilder == null) {
-      return null;
+    final String title = getTitle();
+    if (Property.hasValue(title)) {
+      return title;
     } else {
-      Page page = htmlUiBuilder.getPage(this.pageName);
-      if (page == null) {
-        page = new Page(null, htmlUiBuilder.getPluralTitle(), this.pageName, false);
+      final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(this.beanFactory,
+        this.typePath);
+      if (htmlUiBuilder == null) {
+        return null;
+      } else {
+        Page page = htmlUiBuilder.getPage(this.pageName);
+        if (page == null) {
+          page = new Page(null, htmlUiBuilder.getPluralTitle(), this.pageName, false);
+        }
+        return page.getExpandedTitle();
       }
-      return page.getExpandedTitle();
     }
   }
 
@@ -61,8 +67,8 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
 
   @Override
   public boolean isVisible() {
-    final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(
-      this.beanFactory, this.typePath);
+    final HtmlUiBuilder<Object> htmlUiBuilder = HtmlUiBuilderFactory.get(this.beanFactory,
+      this.typePath);
     if (htmlUiBuilder == null) {
       return false;
     } else {
@@ -71,8 +77,7 @@ public class HtmlUiBuilderMenu extends Menu implements BeanFactoryAware {
   }
 
   @Override
-  public void setBeanFactory(final BeanFactory beanFactory)
-      throws BeansException {
+  public void setBeanFactory(final BeanFactory beanFactory) throws BeansException {
     this.beanFactory = beanFactory;
   }
 

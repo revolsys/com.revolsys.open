@@ -2,7 +2,6 @@ package com.revolsys.gdal.record;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,6 +16,10 @@ import com.revolsys.io.FileUtil;
 
 public class OgrRecordStoreFactory implements RecordStoreFactory {
 
+  private static final Map<String, AtomicInteger> COUNTS = new HashMap<>();
+
+  private static final Map<String, OgrRecordStore> DATA_STORES = new HashMap<>();
+
   public static OgrRecordStore create(File file) {
     if (file == null) {
       return null;
@@ -24,8 +27,7 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
       synchronized (COUNTS) {
         final String fileName = FileUtil.getCanonicalPath(file);
         file = new File(fileName);
-        final AtomicInteger count = Maps.get(COUNTS, fileName,
-          new AtomicInteger());
+        final AtomicInteger count = Maps.get(COUNTS, fileName, new AtomicInteger());
         count.incrementAndGet();
         OgrRecordStore recordStore = DATA_STORES.get(fileName);
         if (recordStore == null) {
@@ -44,8 +46,7 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
     } else {
       synchronized (COUNTS) {
         final String fileName = FileUtil.getCanonicalPath(file);
-        final AtomicInteger countHolder = Maps.get(COUNTS, fileName,
-          new AtomicInteger());
+        final AtomicInteger countHolder = Maps.get(COUNTS, fileName, new AtomicInteger());
         final int count = countHolder.decrementAndGet();
         if (count <= 0) {
           COUNTS.remove(fileName);
@@ -64,18 +65,13 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
     }
   }
 
-  private static final Map<String, AtomicInteger> COUNTS = new HashMap<>();
-
-  private static final Map<String, OgrRecordStore> DATA_STORES = new HashMap<>();
-
   private final List<String> urlPatterns = new ArrayList<>();
 
   private final List<String> fileNameExtensions;
 
   private final String name;
 
-  public OgrRecordStoreFactory(final String name,
-    final List<String> fileNameExtensions) {
+  public OgrRecordStoreFactory(final String name, final List<String> fileNameExtensions) {
     this.name = name;
     this.fileNameExtensions = fileNameExtensions;
     for (final String extension : fileNameExtensions) {
@@ -85,19 +81,13 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
     }
   }
 
-  public OgrRecordStoreFactory(final String name, final String fileNameExtension) {
-    this(name, Arrays.asList(fileNameExtension));
-  }
-
   @Override
-  public OgrRecordStore createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
-    final Map<String, Object> properties = new LinkedHashMap<String, Object>(
-        connectionProperties);
+  public OgrRecordStore createRecordStore(final Map<String, ? extends Object> connectionProperties) {
+    final Map<String, Object> properties = new LinkedHashMap<String, Object>(connectionProperties);
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);
 
-    final OgrRecordStore recordStore = OgrRecordStoreFactory.create(file);
+    final OgrRecordStore recordStore = create(file);
     RecordStoreFactoryRegistry.setConnectionProperties(recordStore, properties);
     return recordStore;
   }
