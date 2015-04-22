@@ -8,7 +8,7 @@
     http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
   "
->
+><!-- 
   <bean
     class="com.revolsys.data.io.RecordStoreFactoryRegistry"
     factory-method="register"
@@ -17,9 +17,11 @@
       <bean class="com.revolsys.gdal.record.OgrRecordStoreFactory">
         <constructor-arg
           name="name"
+          type="java.lang.String"
           value="SQLite/SpatiaLite" />
         <constructor-arg
           name="fileNameExtension"
+          type="java.lang.String"
           value="sqlite" />
       </bean>
     </constructor-arg>
@@ -32,11 +34,13 @@
       <bean class="com.revolsys.gdal.record.OgrRecordStoreFactory">
         <constructor-arg
           name="name"
+          type="java.lang.String"
           value="GeoPackage" />
         <constructor-arg
           name="fileNameExtension"
+          type="java.lang.String"
           value="gpkg" />
       </bean>
     </constructor-arg>
-  </bean>
+  </bean> -->
 </beans>

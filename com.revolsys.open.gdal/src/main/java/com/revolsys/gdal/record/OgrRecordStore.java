@@ -69,10 +69,6 @@ public class OgrRecordStore extends AbstractRecordStore {
 
   public static final String GEO_PAKCAGE = "GPKG";
 
-  static {
-    Gdal.init();
-  }
-
   private final File file;
 
   private DataSource dataSource;
@@ -93,6 +89,7 @@ public class OgrRecordStore extends AbstractRecordStore {
 
   protected OgrRecordStore(final File file) {
     this.file = file;
+    Gdal.init();
   }
 
   synchronized void addLayerToClose(final Layer layer) {
