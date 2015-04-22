@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.fields;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
@@ -22,13 +22,14 @@ public abstract class NumberField extends TextField {
   }
 
   public NumberField(final String name, final int size, final int maxLength,
-    final Object defaultValue, final boolean required,
-    final Number minimumValue, final Number maximumValue) {
+    final Object defaultValue, final boolean required, final Number minimumValue,
+    final Number maximumValue) {
     super(name, size, maxLength, defaultValue, required);
     setValue(defaultValue);
     setMinimumValue(minimumValue);
     setMaximumValue(maximumValue);
     setCssClass("number");
+    setType("number");
   }
 
   /**
@@ -49,6 +50,16 @@ public abstract class NumberField extends TextField {
 
   public String getUnits() {
     return this.units;
+  }
+
+  @Override
+  protected void serializeAttributes(final XmlWriter out) {
+    if (this.minimumValue != null) {
+      out.attribute("min", this.minimumValue);
+    }
+    if (this.maximumValue != null) {
+      out.attribute("max", this.maximumValue);
+    }
   }
 
   @Override
@@ -107,10 +118,10 @@ public abstract class NumberField extends TextField {
       try {
         final Number number = getNumber(value);
         if (this.minimumValue != null
-            && ((Comparable<Number>)this.minimumValue).compareTo(number) > 0) {
+          && ((Comparable<Number>)this.minimumValue).compareTo(number) > 0) {
           throw new IllegalArgumentException("Must be >= " + this.minimumValue);
         } else if (this.maximumValue != null
-            && ((Comparable<Number>)this.maximumValue).compareTo(number) < 0) {
+          && ((Comparable<Number>)this.maximumValue).compareTo(number) < 0) {
           throw new IllegalArgumentException("Must be <= " + this.maximumValue);
         } else {
           setValue(number);

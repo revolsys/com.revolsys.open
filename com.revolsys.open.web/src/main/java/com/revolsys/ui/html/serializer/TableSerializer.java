@@ -15,7 +15,7 @@
  */
 package com.revolsys.ui.html.serializer;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 
 public interface TableSerializer {
   String getBodyCssClass(int row, int col);

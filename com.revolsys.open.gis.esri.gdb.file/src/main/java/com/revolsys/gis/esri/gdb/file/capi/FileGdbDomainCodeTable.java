@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.format.esri.gdb.xml.model.CodedValueDomain;
+import com.revolsys.format.esri.gdb.xml.model.Domain;
 import com.revolsys.gis.esri.gdb.file.CapiFileGdbRecordStore;
-import com.revolsys.io.esri.gdb.xml.model.CodedValueDomain;
-import com.revolsys.io.esri.gdb.xml.model.Domain;
 
 public class FileGdbDomainCodeTable implements CodeTable {
   private final CodedValueDomain domain;

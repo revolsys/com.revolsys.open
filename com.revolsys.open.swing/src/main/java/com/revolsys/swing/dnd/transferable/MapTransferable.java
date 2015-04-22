@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import com.revolsys.io.csv.CsvUtil;
+import com.revolsys.format.csv.CsvUtil;
 
 public class MapTransferable implements Transferable {
 

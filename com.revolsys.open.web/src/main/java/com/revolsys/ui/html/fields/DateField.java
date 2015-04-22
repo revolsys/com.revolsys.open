@@ -5,7 +5,7 @@ import java.sql.Date;
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.HtmlUtil;
@@ -24,8 +24,7 @@ public class DateField extends Field {
     setDefaultInstructions("Enter/select date in format yyyy-MM-dd");
   }
 
-  public DateField(final String name, final boolean required,
-    final Object defaultValue) {
+  public DateField(final String name, final boolean required, final Object defaultValue) {
     super(name, required);
     setInitialValue(defaultValue);
     setValue(defaultValue);
@@ -37,8 +36,7 @@ public class DateField extends Field {
     if (this.inputValue == null) {
       setValue(getInitialValue(request));
       if (getValue() != null) {
-        this.inputValue = StringConverterRegistry.toString(Date.class,
-          getValue());
+        this.inputValue = StringConverterRegistry.toString(Date.class, getValue());
       }
     }
   }
@@ -52,8 +50,7 @@ public class DateField extends Field {
 
       if (valid) {
         try {
-          final Date date = new Date(DateUtil.getDate("yyyy-MM-dd",
-            this.inputValue).getTime());
+          final Date date = new Date(DateUtil.getDate("yyyy-MM-dd", this.inputValue).getTime());
           setValue(date);
         } catch (final Throwable e) {
           addValidationError("Invalid Date");
@@ -69,20 +66,20 @@ public class DateField extends Field {
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.SCRIPT);
     out.attribute(HtmlUtil.ATTR_TYPE, "text/javascript");
-    out.text("$(function() {$(\"#" + getForm().getName() + " input[name='"
-        + getName() + "']\").datepicker("
-        + "{changeMonth: true,changeYear: true, dateFormat:'" + "yy-mm-dd"
-        + "'});});");
+    out.text("$(function() {$(\"#" + getForm().getName() + " input[name='" + getName()
+      + "']\").datepicker(" + "{changeMonth: true,changeYear: true, dateFormat:'" + "yy-mm-dd"
+      + "'});});");
     out.endTag(HtmlUtil.SCRIPT);
 
     out.startTag(HtmlUtil.INPUT);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_TYPE, "text");
+    out.attribute(HtmlUtil.ATTR_TYPE, "date");
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
     if (Property.hasValue(this.inputValue)) {
       out.attribute(HtmlUtil.ATTR_VALUE, this.inputValue);
     }
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_CLASS, "required");
+      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
     }
 
     out.endTag(HtmlUtil.INPUT);

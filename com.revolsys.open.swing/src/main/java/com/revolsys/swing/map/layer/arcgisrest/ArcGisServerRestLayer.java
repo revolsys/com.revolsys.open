@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.io.esri.map.rest.ArcGisServerRestClient;
-import com.revolsys.io.esri.map.rest.MapServer;
-import com.revolsys.io.esri.map.rest.map.TileInfo;
+import com.revolsys.format.esri.map.rest.ArcGisServerRestClient;
+import com.revolsys.format.esri.map.rest.MapServer;
+import com.revolsys.format.esri.map.rest.map.TileInfo;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;

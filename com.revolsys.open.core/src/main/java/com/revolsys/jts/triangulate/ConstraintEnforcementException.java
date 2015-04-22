@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.triangulate;
 
-import com.revolsys.io.wkt.EWktWriter;
+import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 

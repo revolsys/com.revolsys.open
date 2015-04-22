@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StreamTokenizer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -390,6 +391,27 @@ public class Matrix implements Cloneable, java.io.Serializable {
     final double[][] A = new double[m][];
     v.copyInto(A); // copy the rows out of the vector
     return new Matrix(A);
+  }
+
+  static String toString(final Matrix matrix) {
+    final int numRow = matrix.getRowCount();
+    final int numCol = matrix.getColumnCount();
+    StringBuffer buffer = new StringBuffer();
+    final String lineSeparator = "\n";
+    final FieldPosition dummy = new FieldPosition(0);
+    final NumberFormat format = NumberFormat.getNumberInstance();
+    format.setGroupingUsed(false);
+    format.setMinimumFractionDigits(6);
+    format.setMaximumFractionDigits(6);
+    for (int j = 0; j < numRow; ++j) {
+      for (int i = 0; i < numCol; ++i) {
+        final int position = buffer.length();
+        buffer = format.format(matrix.get(j, i), buffer, dummy);
+        buffer.insert(position, " ");
+      }
+      buffer.append(lineSeparator);
+    }
+    return buffer.toString();
   }
 
   /** Array for internal storage of elements.
@@ -1194,7 +1216,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     }
   }
 
-  public final void setRow(final int rowIndex, final double[] values) {
+  public final void setRow(final int rowIndex, final double... values) {
     for (int i = 0; i < this.columnCount; i++) {
       this.values[rowIndex][i] = values[i];
     }
@@ -1283,11 +1305,12 @@ public class Matrix implements Cloneable, java.io.Serializable {
       new IllegalArgumentException("Matrix must be the same size");
     }
 
-    for (int i = 0; i < matrix1.rowCount; i++) {
-      for (int j = 0; j < matrix2.columnCount; j++) {
-        this.values[i][j] = 0.0;
-        for (int k = 0; k < matrix1.columnCount; k++) {
-          this.values[i][j] += matrix1.values[i][k] * matrix2.values[k][j];
+    for (int rowIndex1 = 0; rowIndex1 < matrix1.rowCount; rowIndex1++) {
+      for (int columnIndex2 = 0; columnIndex2 < matrix2.columnCount; columnIndex2++) {
+        this.values[rowIndex1][columnIndex2] = 0.0;
+        for (int columnIndex1 = 0; columnIndex1 < matrix1.columnCount; columnIndex1++) {
+          this.values[rowIndex1][columnIndex2] += matrix1.values[rowIndex1][columnIndex1]
+            * matrix2.values[columnIndex1][columnIndex2];
         }
       }
     }
@@ -1312,6 +1335,15 @@ public class Matrix implements Cloneable, java.io.Serializable {
     return this;
   }
 
+  @Override
+  public String toString() {
+    return toString(this);
+  }
+
+  /*
+   * ------------------------ Private Methods ------------------------
+   */
+
   /** Matrix trace.
   @return     sum of the diagonal elements.
   */
@@ -1323,10 +1355,6 @@ public class Matrix implements Cloneable, java.io.Serializable {
     }
     return t;
   }
-
-  /*
-   * ------------------------ Private Methods ------------------------
-   */
 
   /** Matrix transpose.
   @return    A'

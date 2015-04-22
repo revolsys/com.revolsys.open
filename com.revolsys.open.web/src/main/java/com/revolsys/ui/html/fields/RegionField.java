@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.domain.Region;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
@@ -40,8 +40,7 @@ public class RegionField extends Field {
       valid = false;
     } else if (hasValue()) {
       if (this.regions.size() > 0) {
-        final Region region = Region.getRegionByName(this.countryCode,
-          this.stringValue);
+        final Region region = Region.getRegionByName(this.countryCode, this.stringValue);
         if (region == null) {
           addValidationError("Invalid Value");
           valid = false;
@@ -57,8 +56,7 @@ public class RegionField extends Field {
 
   @Override
   public void postInit(final HttpServletRequest request) {
-    final CountryField countryField = (CountryField)getForm().getField(
-        "country");
+    final CountryField countryField = (CountryField)getForm().getField("country");
     this.countryCode = countryField.getCountryCode();
     if (this.countryCode != null) {
       this.regions = Region.getRegions(this.countryCode);
@@ -103,6 +101,7 @@ public class RegionField extends Field {
     out.startTag(HtmlUtil.INPUT);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_TYPE, "text");
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
     out.attribute(HtmlUtil.ATTR_SIZE, "30");
     out.attribute(HtmlUtil.ATTR_MAX_LENGTH, "30");
     if (this.stringValue != null) {

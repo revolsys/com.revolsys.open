@@ -15,7 +15,7 @@
  */
 package com.revolsys.ui.html.view;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.util.HtmlUtil;
 

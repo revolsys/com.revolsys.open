@@ -2,7 +2,7 @@ package com.revolsys.ui.html.serializer.type;
 
 import java.io.IOException;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 
 /**
  * The ObjectSerializer interface defines a method to serailize an object of a

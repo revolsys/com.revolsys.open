@@ -13,7 +13,7 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.io.tsv.TsvWriter;
+import com.revolsys.format.tsv.TsvWriter;
 import com.revolsys.util.CollectionUtil;
 
 public class StatisticsMap {

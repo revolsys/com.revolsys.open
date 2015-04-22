@@ -11,7 +11,7 @@ import java.util.Collection;
 import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.io.csv.CsvUtil;
+import com.revolsys.format.csv.CsvUtil;
 
 public class RecordReaderTransferable implements Transferable {
 

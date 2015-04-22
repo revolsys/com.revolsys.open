@@ -24,10 +24,10 @@ public class EmailAddressField extends TextField {
     this(name, null, required);
   }
 
-  public EmailAddressField(final String name, final String defaultValue,
-    final boolean required) {
+  public EmailAddressField(final String name, final String defaultValue, final boolean required) {
     super(name, 50, 150, defaultValue, required);
     setCssClass("email");
+    setType("email");
   }
 
   @Override

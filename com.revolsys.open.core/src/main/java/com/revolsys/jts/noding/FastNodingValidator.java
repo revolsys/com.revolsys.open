@@ -35,7 +35,7 @@ package com.revolsys.jts.noding;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.io.wkt.EWktWriter;
+import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.jts.algorithm.LineIntersector;
 import com.revolsys.jts.algorithm.RobustLineIntersector;
 import com.revolsys.jts.geom.Point;

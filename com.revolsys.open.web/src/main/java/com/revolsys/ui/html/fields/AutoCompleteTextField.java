@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.fields;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 
 public class AutoCompleteTextField extends TextField {

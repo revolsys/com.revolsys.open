@@ -35,7 +35,7 @@ package com.revolsys.jts.operation.buffer.validate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.io.wkt.EWktWriter;
+import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.jts.algorithm.distance.DiscreteHausdorffDistance;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;

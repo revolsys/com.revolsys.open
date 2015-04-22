@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.data.equals.GeometryEqualsExact3d;
+import com.revolsys.format.wkt.WktWriter;
 import com.revolsys.gis.oracle.esri.ArcSdeConstants;
 import com.revolsys.gis.oracle.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.gis.oracle.esri.PackedCoordinateUtil;
-import com.revolsys.io.wkt.WktWriter;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 

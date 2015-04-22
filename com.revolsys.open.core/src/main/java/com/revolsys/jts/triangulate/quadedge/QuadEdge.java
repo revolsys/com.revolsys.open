@@ -33,7 +33,7 @@
 
 package com.revolsys.jts.triangulate.quadedge;
 
-import com.revolsys.io.wkt.EWktWriter;
+import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.LineSegment;
 import com.revolsys.jts.geom.segment.LineSegmentDouble;

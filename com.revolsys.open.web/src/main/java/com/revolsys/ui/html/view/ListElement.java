@@ -5,7 +5,7 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 
 public class ListElement extends Element {
   private final Collection<? extends Object> objects;

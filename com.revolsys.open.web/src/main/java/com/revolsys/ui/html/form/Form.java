@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.util.UrlPathHelper;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.util.HtmlUtil;
@@ -42,6 +42,10 @@ public class Form extends ElementContainer {
   public static final String GET_METHOD = "get";
 
   public static final String POST_METHOD = "post";
+
+  private static final UrlPathHelper URL_HELPER = new UrlPathHelper();
+
+  public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
   private String action = "";
 
@@ -63,11 +67,7 @@ public class Form extends ElementContainer {
 
   private String title;
 
-  private static final UrlPathHelper URL_HELPER = new UrlPathHelper();
-
   private String encType = "application/x-www-form-urlencoded";
-
-  public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
   private boolean valid = true;
 
@@ -142,8 +142,7 @@ public class Form extends ElementContainer {
   }
 
   @Override
-  public Object getInitialValue(final Field field,
-    final HttpServletRequest request) {
+  public Object getInitialValue(final Field field, final HttpServletRequest request) {
     return null;
   }
 
@@ -253,7 +252,6 @@ public class Form extends ElementContainer {
    * @throws IOException
    */
   public void serializeEndTag(final XmlWriter out) {
-    out.endTag(HtmlUtil.DIV);
     out.endTag(HtmlUtil.FORM);
     out.endTag(HtmlUtil.DIV);
   }
@@ -300,11 +298,12 @@ public class Form extends ElementContainer {
     }
     out.attribute(HtmlUtil.ATTR_ID, getName());
     out.attribute(HtmlUtil.ATTR_NAME, getName());
+    out.attribute(HtmlUtil.ATTR_ROLE, "form");
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-horizontal");
     out.attribute(HtmlUtil.ATTR_ACTION, getAction());
     out.attribute(HtmlUtil.ATTR_METHOD, getMethod());
     out.attribute(HtmlUtil.ATTR_ENCTYPE, getEncType());
     out.attribute(HtmlUtil.ATTR_ACCEPT_CHARSET, getAcceptCharset());
-    out.startTag(HtmlUtil.DIV);
   }
 
   public void setAcceptCharset(final String acceptCharset) {

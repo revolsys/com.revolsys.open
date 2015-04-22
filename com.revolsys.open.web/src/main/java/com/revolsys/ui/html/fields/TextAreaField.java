@@ -17,7 +17,7 @@ package com.revolsys.ui.html.fields;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
@@ -44,32 +44,30 @@ public class TextAreaField extends Field {
     super(name, required);
   }
 
-  public TextAreaField(final String name, final int cols, final int rows,
-    final boolean required) {
+  public TextAreaField(final String name, final int cols, final int rows, final boolean required) {
     super(name, required);
     this.cols = cols;
     this.rows = rows;
   }
 
-  public TextAreaField(final String name, final int cols, final int rows,
-    final int maxLength, final boolean required) {
+  public TextAreaField(final String name, final int cols, final int rows, final int maxLength,
+    final boolean required) {
     this(name, cols, rows, required);
     this.maxLength = maxLength;
   }
 
-  public TextAreaField(final String name, final int cols, final int rows,
-    final int minLength, final int maxLength, final String defaultValue,
-    final boolean required) {
+  public TextAreaField(final String name, final int cols, final int rows, final int minLength,
+    final int maxLength, final String defaultValue, final boolean required) {
     this(name, cols, rows, maxLength, defaultValue, required);
     if (minLength <= maxLength) {
-      throw new IllegalArgumentException("minLength (" + minLength
-        + ") must be <= maxLength (" + minLength + ")");
+      throw new IllegalArgumentException("minLength (" + minLength + ") must be <= maxLength ("
+        + minLength + ")");
     }
     this.minLength = minLength;
   }
 
-  public TextAreaField(final String name, final int cols, final int rows,
-    final int maxLength, final String defaultValue, final boolean required) {
+  public TextAreaField(final String name, final int cols, final int rows, final int maxLength,
+    final String defaultValue, final boolean required) {
     this(name, cols, rows, defaultValue, required);
     this.maxLength = maxLength;
   }
@@ -143,10 +141,11 @@ public class TextAreaField extends Field {
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.TEXT_AREA);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
     out.attribute(HtmlUtil.ATTR_COLS, Integer.toString(this.cols));
     out.attribute(HtmlUtil.ATTR_ROWS, Integer.toString(this.rows));
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_CLASS, "required");
+      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
     }
     if (Property.hasValue(this.inputValue)) {
       out.text(this.inputValue);

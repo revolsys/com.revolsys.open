@@ -17,7 +17,7 @@ package com.revolsys.ui.html.serializer;
 
 import java.util.List;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 
 public class HtmlUiBuilderDetailSerializer implements LabelValueListSerializer {

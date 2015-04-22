@@ -1,6 +1,6 @@
 package com.revolsys.ui.html.fields;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
@@ -14,8 +14,8 @@ public class PasswordField extends TextField {
     super(name, required);
   }
 
-  public PasswordField(final String name, final int minLength,
-    final int maxLength, final boolean required) {
+  public PasswordField(final String name, final int minLength, final int maxLength,
+    final boolean required) {
     super(name, maxLength, minLength, maxLength, "", required);
   }
 
@@ -33,8 +33,10 @@ public class PasswordField extends TextField {
     if (Property.hasValue(getStyle())) {
       out.attribute(HtmlUtil.ATTR_STYLE, getStyle());
     }
+    final String cssClass = getCssClass();
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm " + cssClass);
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_CLASS, "required");
+      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
     }
 
     out.endTag(HtmlUtil.INPUT);

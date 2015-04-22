@@ -33,6 +33,49 @@ import com.revolsys.math.Angle;
  */
 public final class MathUtil {
 
+  public static final int BYTES_IN_DOUBLE = 8;
+
+  public static final int BYTES_IN_INT = 4;
+
+  public static final int BYTES_IN_LONG = 8;
+
+  public static final int BYTES_IN_SHORT = 2;
+
+  /** The number of cents in a dollar. */
+  public static final BigDecimal CURRENCY_CENTS_PER_DOLLAR = getInteger(100);
+
+  private static final Random RANDOM = new Random();
+
+  /** The scale for currency numbers. */
+  public static final int CURRENCY_SCALE = 2;
+
+  /** A 0 currency. */
+  public static final BigDecimal CURRENCY0 = getCurrency(0);
+
+  /** The scale for integer numbers. */
+  public static final int INTEGER_SCALE = 0;
+
+  /** A 0 integer. */
+  public static final BigDecimal INTEGER0 = getInteger(0);
+
+  /** A 1 integer. */
+  public static final BigDecimal INTEGER1 = getInteger(1);
+
+  /** The scale for percent numbers. */
+  public static final int PERCENT_SCALE = 4;
+
+  /** A 0 percent. */
+  public static final BigDecimal PERCENT0 = getPercent(0);
+
+  /** A 1000 percent. */
+  public static final BigDecimal PERCENT100 = getPercent(1);
+
+  public static final double PI_OVER_2 = Math.PI / 2.0;
+
+  public static final double PI_OVER_4 = Math.PI / 4.0;
+
+  public static final double PI_TIMES_2 = 2.0 * Math.PI;
+
   /**
    *
    * @param left The left operand.
@@ -56,7 +99,7 @@ public final class MathUtil {
     if (Double.isNaN(number)) {
       string.append("NaN");
     } else {
-      DoubleFormatUtil.formatDoublePrecise(number, 15, 15, string);
+      DoubleFormatUtil.formatDoublePrecise(number, 19, 19, string);
     }
   }
 
@@ -343,6 +386,22 @@ public final class MathUtil {
   public static int hashCode(final double d) {
     final long f = Double.doubleToLongBits(d);
     return (int)(f ^ f >>> 32);
+  }
+
+  /** sqrt(a^2 + b^2) without under/overflow. **/
+
+  public static double hypot(final double a, final double b) {
+    double r;
+    if (Math.abs(a) > Math.abs(b)) {
+      r = b / a;
+      r = Math.abs(a) * Math.sqrt(1 + r * r);
+    } else if (b != 0) {
+      r = a / b;
+      r = Math.abs(b) * Math.sqrt(1 + r * r);
+    } else {
+      r = 0.0;
+    }
+    return r;
   }
 
   /**
@@ -822,69 +881,10 @@ public final class MathUtil {
     return String.valueOf(number);
   }
 
-  public static final int BYTES_IN_DOUBLE = 8;
-
-  public static final int BYTES_IN_INT = 4;
-
-  public static final int BYTES_IN_LONG = 8;
-
-  public static final int BYTES_IN_SHORT = 2;
-
-  /** The number of cents in a dollar. */
-  public static final BigDecimal CURRENCY_CENTS_PER_DOLLAR = getInteger(100);
-
-  private static final Random RANDOM = new Random();
-
-  /** The scale for currency numbers. */
-  public static final int CURRENCY_SCALE = 2;
-
-  /** A 0 currency. */
-  public static final BigDecimal CURRENCY0 = getCurrency(0);
-
-  /** The scale for integer numbers. */
-  public static final int INTEGER_SCALE = 0;
-
-  /** A 0 integer. */
-  public static final BigDecimal INTEGER0 = getInteger(0);
-
-  /** A 1 integer. */
-  public static final BigDecimal INTEGER1 = getInteger(1);
-
-  /** The scale for percent numbers. */
-  public static final int PERCENT_SCALE = 4;
-
-  /** A 0 percent. */
-  public static final BigDecimal PERCENT0 = getPercent(0);
-
-  /** A 1000 percent. */
-  public static final BigDecimal PERCENT100 = getPercent(1);
-
-  public static final double PI_OVER_2 = Math.PI / 2.0;
-
-  public static final double PI_OVER_4 = Math.PI / 4.0;
-
-  public static final double PI_TIMES_2 = 2.0 * Math.PI;
-
   /**
    * Construct a new MathUtil.
    */
   private MathUtil() {
-  }
-
-  /** sqrt(a^2 + b^2) without under/overflow. **/
-  
-  public static double hypot(final double a, final double b) {
-    double r;
-    if (Math.abs(a) > Math.abs(b)) {
-      r = b / a;
-      r = Math.abs(a) * Math.sqrt(1 + r * r);
-    } else if (b != 0) {
-      r = a / b;
-      r = Math.abs(b) * Math.sqrt(1 + r * r);
-    } else {
-      r = 0.0;
-    }
-    return r;
   }
 
 }

@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 
 /**

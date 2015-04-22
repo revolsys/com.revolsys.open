@@ -19,7 +19,7 @@ import javax.imageio.ImageIO;
 import org.springframework.core.io.UrlResource;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.io.json.JsonMapIoFactory;
+import com.revolsys.format.json.JsonMapIoFactory;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;

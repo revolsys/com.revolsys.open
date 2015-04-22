@@ -17,7 +17,7 @@ package com.revolsys.ui.html.fields;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.domain.PhoneNumber;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
@@ -74,8 +74,7 @@ public class PhoneNumberField extends Field {
         addValidationError("Cannot exceed " + VALUE_MAX_LENGTH + " characters");
         valid = false;
       } else if (length < VALUE_MIN_LENGTH) {
-        addValidationError("Must be at least " + VALUE_MIN_LENGTH
-          + " characters");
+        addValidationError("Must be at least " + VALUE_MIN_LENGTH + " characters");
         valid = false;
       } else if (!PhoneNumber.isValid(phoneValue)) {
         addValidationError("Phone number must only contain characters [0-9()+- ]");
@@ -94,7 +93,8 @@ public class PhoneNumberField extends Field {
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.INPUT);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_TYPE, "text");
+    out.attribute(HtmlUtil.ATTR_TYPE, "tel");
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
     out.attribute(HtmlUtil.ATTR_SIZE, Integer.toString(FIELD_SIZE));
     out.attribute(HtmlUtil.ATTR_MAX_LENGTH, Integer.toString(FIELD_MAX_LENGTH));
     if (this.inputValue != null) {

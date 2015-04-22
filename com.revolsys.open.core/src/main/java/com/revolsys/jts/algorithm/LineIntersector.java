@@ -35,7 +35,7 @@ package com.revolsys.jts.algorithm;
 /**
  * @version 1.7
  */
-import com.revolsys.io.wkt.EWktWriter;
+import com.revolsys.format.wkt.EWktWriter;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.util.Assert;

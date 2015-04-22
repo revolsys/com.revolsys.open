@@ -15,7 +15,7 @@
  */
 package com.revolsys.ui.html.layout;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.view.Element;
 import com.revolsys.ui.html.view.ElementContainer;
 import com.revolsys.util.HtmlUtil;

@@ -5,7 +5,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.HtmlUtil;
@@ -15,8 +15,7 @@ public class TimestampField extends Field {
 
   private String inputValue;
 
-  public TimestampField(final String name, final boolean required,
-    final Object defaultValue) {
+  public TimestampField(final String name, final boolean required, final Object defaultValue) {
     super(name, required);
     setInitialValue(defaultValue);
     setValue(defaultValue);
@@ -29,8 +28,7 @@ public class TimestampField extends Field {
     if (this.inputValue == null) {
       setValue(getInitialValue(request));
       if (getValue() != null) {
-        this.inputValue = StringConverterRegistry.toString(Date.class,
-          getValue());
+        this.inputValue = StringConverterRegistry.toString(Date.class, getValue());
       }
     }
   }
@@ -61,12 +59,13 @@ public class TimestampField extends Field {
     out.startTag(HtmlUtil.INPUT);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_TYPE, "text");
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
     if (Property.hasValue(this.inputValue)) {
       out.attribute(HtmlUtil.ATTR_VALUE, this.inputValue);
     }
     out.attribute(HtmlUtil.ATTR_SIZE, 34);
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_CLASS, "required");
+      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
     }
 
     out.endTag(HtmlUtil.INPUT);

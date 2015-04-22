@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.Date;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.util.JavaBeanUtil;
 
 /**

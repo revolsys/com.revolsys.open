@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import com.revolsys.format.json.JsonMapIoFactory;
 import com.revolsys.gdal.raster.GdalImageFactory;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;
@@ -38,7 +39,6 @@ import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.gis.cs.esri.EsriCsWktWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
-import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
@@ -48,8 +48,38 @@ import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
 public class Gdal {
-  private static void addGeoreferencedImageFactory(
-    final GdalImageFactory georeferencedImageFactory) {
+  private static boolean available = false;
+
+  static {
+    try {
+
+      gdal.SetConfigOption("CPL_TMPDIR", System.getProperty("java.io.tmpdir"));
+
+      osr.UseExceptions();
+      ogr.UseExceptions();
+
+      String defaultDriverPath = null;
+      if (OS.isMac()) {
+        defaultDriverPath = "/usr/local/lib/gdalplugins";
+      }
+      setGdalProperty("GDAL_DRIVER_PATH", defaultDriverPath);
+      setGdalProperty("GDAL_DATA", null);
+
+      gdal.SetConfigOption("GDAL_PAM", "Yes");
+
+      gdal.AllRegister();
+
+      ogr.RegisterAll();
+
+      available = true;
+      addGeoReferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
+      addGeoReferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
+    } catch (final Throwable e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static void addGeoReferencedImageFactory(final GdalImageFactory georeferencedImageFactory) {
     if (georeferencedImageFactory.isAvailable()) {
 
       final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
@@ -57,11 +87,11 @@ public class Gdal {
     }
   }
 
-  private static void addGeoreferencedImageFactory(final String driverName,
+  private static void addGeoReferencedImageFactory(final String driverName,
     final String formatName, final String fileExtension, final String mimeType) {
-    final GdalImageFactory readerSpi = new GdalImageFactory(driverName,
-      formatName, fileExtension, mimeType);
-    addGeoreferencedImageFactory(readerSpi);
+    final GdalImageFactory readerSpi = new GdalImageFactory(driverName, formatName, fileExtension,
+      mimeType);
+    addGeoReferencedImageFactory(readerSpi);
   }
 
   public static Dataset closeDataSet(final Dataset dataSet) {
@@ -92,8 +122,7 @@ public class Gdal {
    *            image.
    * @return The buffered image
    */
-  public static BufferedImage getBufferedImage(final Dataset dataset,
-    final int overviewIndex) {
+  public static BufferedImage getBufferedImage(final Dataset dataset, final int overviewIndex) {
     return getBufferedImage(dataset, overviewIndex, 0, 0, -1, -1, -1, -1);
   }
 
@@ -122,11 +151,10 @@ public class Gdal {
    *            The height of the clip rectangle. Use -1 to auto calculate.
    * @return The buffered image.
    */
-  public static BufferedImage getBufferedImage(final Dataset dataset,
-    final int overviewIndex, final int sourceOffsetX, final int sourceOffsetY,
-    final int sourceWidth, final int sourceHeight) {
-    return getBufferedImage(dataset, overviewIndex, sourceOffsetX,
-      sourceOffsetY, sourceWidth, sourceHeight, -1, -1);
+  public static BufferedImage getBufferedImage(final Dataset dataset, final int overviewIndex,
+    final int sourceOffsetX, final int sourceOffsetY, final int sourceWidth, final int sourceHeight) {
+    return getBufferedImage(dataset, overviewIndex, sourceOffsetX, sourceOffsetY, sourceWidth,
+      sourceHeight, -1, -1);
   }
 
   /**
@@ -158,9 +186,9 @@ public class Gdal {
    *            The height of the result image. Use -1 to auto calculate.
    * @return The buffered image.
    */
-  public static BufferedImage getBufferedImage(final Dataset dataset,
-    final int overviewIndex, int sourceOffsetX, int sourceOffsetY,
-    int sourceWidth, int sourceHeight, int targetWidth, int targetHeight) {
+  public static BufferedImage getBufferedImage(final Dataset dataset, final int overviewIndex,
+    int sourceOffsetX, int sourceOffsetY, int sourceWidth, int sourceHeight, int targetWidth,
+    int targetHeight) {
     synchronized (dataset) {
 
       final int bandCount = dataset.getRasterCount();
@@ -195,8 +223,7 @@ public class Gdal {
               if (sourceOffsetY < 0) {
                 sourceOffsetY = 0;
               }
-              if (sourceOffsetX >= overviewWidth
-                  || sourceOffsetY >= overviewHeight) {
+              if (sourceOffsetX >= overviewWidth || sourceOffsetY >= overviewHeight) {
                 return new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
               }
 
@@ -223,15 +250,13 @@ public class Gdal {
               pixels = targetWidth * targetHeight;
             }
             if (pixels > 0 && sourceHeight > 0 && sourceWidth > 0) {
-              final int bufferSize = pixels
-                  * gdal.GetDataTypeSize(bandDataType) / 8;
+              final int bufferSize = pixels * gdal.GetDataTypeSize(bandDataType) / 8;
 
               final ByteBuffer data = ByteBuffer.allocateDirect(bufferSize);
               data.order(ByteOrder.nativeOrder());
 
-              final int result = overviewBand.ReadRaster_Direct(sourceOffsetX,
-                sourceOffsetY, sourceWidth, sourceHeight, targetWidth,
-                targetHeight, bandDataType, data);
+              final int result = overviewBand.ReadRaster_Direct(sourceOffsetX, sourceOffsetY,
+                sourceWidth, sourceHeight, targetWidth, targetHeight, bandDataType, data);
               if (result == gdalconstConstants.CE_None) {
                 bandData[bandIndex] = data;
               } else {
@@ -263,8 +288,8 @@ public class Gdal {
         }
         imageBuffer = new DataBufferByte(bytes, pixels);
         dataBufferType = DataBuffer.TYPE_BYTE;
-        sampleModel = new BandedSampleModel(dataBufferType, targetWidth,
-          targetHeight, targetWidth, banks, offsets);
+        sampleModel = new BandedSampleModel(dataBufferType, targetWidth, targetHeight, targetWidth,
+          banks, offsets);
         dataType = rasterColorInterpretation == gdalconstConstants.GCI_PaletteIndex ? BufferedImage.TYPE_BYTE_INDEXED
           : BufferedImage.TYPE_BYTE_GRAY;
       } else if (bandDataType == gdalconstConstants.GDT_Int16) {
@@ -275,8 +300,8 @@ public class Gdal {
         }
         imageBuffer = new DataBufferShort(shorts, pixels);
         dataBufferType = DataBuffer.TYPE_USHORT;
-        sampleModel = new BandedSampleModel(dataBufferType, targetWidth,
-          targetHeight, targetWidth, banks, offsets);
+        sampleModel = new BandedSampleModel(dataBufferType, targetWidth, targetHeight, targetWidth,
+          banks, offsets);
         dataType = BufferedImage.TYPE_USHORT_GRAY;
       } else if (bandDataType == gdalconstConstants.GDT_Int32) {
         final int[][] ints = new int[bandCount][];
@@ -286,13 +311,12 @@ public class Gdal {
         }
         imageBuffer = new DataBufferInt(ints, pixels);
         dataBufferType = DataBuffer.TYPE_INT;
-        sampleModel = new BandedSampleModel(dataBufferType, targetWidth,
-          targetHeight, targetWidth, banks, offsets);
+        sampleModel = new BandedSampleModel(dataBufferType, targetWidth, targetHeight, targetWidth,
+          banks, offsets);
         dataType = BufferedImage.TYPE_CUSTOM;
       }
 
-      final WritableRaster raster = Raster.createWritableRaster(sampleModel,
-        imageBuffer, null);
+      final WritableRaster raster = Raster.createWritableRaster(sampleModel, imageBuffer, null);
       BufferedImage image = null;
       ColorModel colorModel = null;
 
@@ -304,8 +328,8 @@ public class Gdal {
         ColorSpace colorSpace = null;
         if (bandCount > 2) {
           colorSpace = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-          colorModel = new ComponentColorModel(colorSpace, false, false,
-            Transparency.OPAQUE, dataBufferType);
+          colorModel = new ComponentColorModel(colorSpace, false, false, Transparency.OPAQUE,
+            dataBufferType);
           image = new BufferedImage(colorModel, raster, true, null);
         } else {
           image = new BufferedImage(targetWidth, targetHeight, dataType);
@@ -326,8 +350,7 @@ public class Gdal {
     return getBufferedImage(file);
   }
 
-  public static CoordinateSystem getCoordinateSystem(
-    final SpatialReference spatialReference) {
+  public static CoordinateSystem getCoordinateSystem(final SpatialReference spatialReference) {
     if (spatialReference == null) {
       return null;
     } else {
@@ -379,8 +402,7 @@ public class Gdal {
     }
   }
 
-  public static SpatialReference getSpatialReference(
-    CoordinateSystem coordinateSystem) {
+  public static SpatialReference getSpatialReference(CoordinateSystem coordinateSystem) {
     if (coordinateSystem == null) {
       return null;
     } else {
@@ -442,8 +464,7 @@ public class Gdal {
           return true;
         }
       } catch (final UnsatisfiedLinkError e) {
-        LoggerFactory.getLogger(Gdal.class).debug(
-          "Error loading driver: " + driverName, e);
+        LoggerFactory.getLogger(Gdal.class).debug("Error loading driver: " + driverName, e);
         return false;
       }
     } else {
@@ -485,8 +506,7 @@ public class Gdal {
     }
   }
 
-  private static void setGdalProperty(final String name,
-    final String defaultValue) {
+  private static void setGdalProperty(final String name, final String defaultValue) {
     String value = System.getProperty(name);
     if (!Property.hasValue(value)) {
       value = System.getenv(name);
@@ -499,8 +519,7 @@ public class Gdal {
     }
   }
 
-  public static void setProjectionFromPrjFile(final Dataset dataset,
-    final Resource resource) {
+  public static void setProjectionFromPrjFile(final Dataset dataset, final Resource resource) {
     final GeometryFactory geometryFactory = EsriCoordinateSystems.getGeometryFactory(resource);
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
@@ -513,37 +532,6 @@ public class Gdal {
     final SpatialReference spatialReference = getSpatialReference(coordinateSystem);
     if (spatialReference != null) {
       dataset.SetProjection(spatialReference.ExportToWkt());
-    }
-  }
-
-  private static boolean available = false;
-
-  static {
-    try {
-
-      gdal.SetConfigOption("CPL_TMPDIR", System.getProperty("java.io.tmpdir"));
-
-      osr.UseExceptions();
-      ogr.UseExceptions();
-
-      String defaultDriverPath = null;
-      if (OS.isMac()) {
-        defaultDriverPath = "/usr/local/lib/gdalplugins";
-      }
-      setGdalProperty("GDAL_DRIVER_PATH", defaultDriverPath);
-      setGdalProperty("GDAL_DATA", null);
-
-      gdal.SetConfigOption("GDAL_PAM", "Yes");
-
-      gdal.AllRegister();
-
-      ogr.RegisterAll();
-
-      available = true;
-      addGeoreferencedImageFactory("ECW", "ECW", "ecw", "image/ecw");
-      addGeoreferencedImageFactory("JP2ECW", "JPEG 2000", "jp2", "image/jp2");
-    } catch (final Throwable e) {
-      e.printStackTrace();
     }
   }
 }

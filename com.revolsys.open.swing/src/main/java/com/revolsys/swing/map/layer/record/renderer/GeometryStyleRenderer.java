@@ -33,6 +33,8 @@ import com.revolsys.swing.map.util.GeometryShapeUtil;
 
 public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
 
+  private static final Icon ICON = Icons.getIcon("style_geometry");
+
   public static GeneralPath getLineShape() {
     final GeneralPath path = new GeneralPath();
     path.moveTo(0, 0);
@@ -55,8 +57,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     return path;
   }
 
-  public static Shape getShape(final Viewport2D viewport,
-    final GeometryStyle style, final Geometry geometry) {
+  public static Shape getShape(final Viewport2D viewport, final GeometryStyle style,
+    final Geometry geometry) {
     final BoundingBox viewExtent = viewport.getBoundingBox();
     if (geometry != null) {
       if (!viewExtent.isEmpty()) {
@@ -72,9 +74,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     return null;
   }
 
-  public static final void renderGeometry(final Viewport2D viewport,
-    final Graphics2D graphics, final Geometry geometry,
-    final GeometryStyle style) {
+  public static final void renderGeometry(final Viewport2D viewport, final Graphics2D graphics,
+    final Geometry geometry, final GeometryStyle style) {
     if (geometry != null) {
       for (int i = 0; i < geometry.getGeometryCount(); i++) {
         final Geometry part = geometry.getGeometry(i);
@@ -92,9 +93,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  public static final void renderLineString(final Viewport2D viewport,
-    final Graphics2D graphics, final LineString lineString,
-    final GeometryStyle style) {
+  public static final void renderLineString(final Viewport2D viewport, final Graphics2D graphics,
+    final LineString lineString, final GeometryStyle style) {
     final Shape shape = getShape(viewport, style, lineString);
     if (shape != null) {
       final Paint paint = graphics.getPaint();
@@ -107,9 +107,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  public static final void renderOutline(final Viewport2D viewport,
-    final Graphics2D graphics, final Geometry geometry,
-    final GeometryStyle style) {
+  public static final void renderOutline(final Viewport2D viewport, final Graphics2D graphics,
+    final Geometry geometry, final GeometryStyle style) {
     if (geometry != null) {
       for (int i = 0; i < geometry.getGeometryCount(); i++) {
         final Geometry part = geometry.getGeometry(i);
@@ -131,8 +130,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  public static final void renderPolygon(final Viewport2D viewport,
-    final Graphics2D graphics, final Polygon polygon, final GeometryStyle style) {
+  public static final void renderPolygon(final Viewport2D viewport, final Graphics2D graphics,
+    final Polygon polygon, final GeometryStyle style) {
     final Shape shape = getShape(viewport, style, polygon);
     if (shape != null) {
       final Paint paint = graphics.getPaint();
@@ -147,33 +146,29 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
     }
   }
 
-  private static final Icon ICON = Icons.getIcon("style_geometry");
-
   private GeometryStyle style;
 
   public GeometryStyleRenderer(final AbstractRecordLayer layer) {
     this(layer, new GeometryStyle());
   }
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer,
-    final GeometryStyle style) {
+  public GeometryStyleRenderer(final AbstractRecordLayer layer, final GeometryStyle style) {
     this(layer, null, style);
   }
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent) {
+  public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
     this(layer, parent, new GeometryStyle());
   }
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent, final GeometryStyle style) {
+  public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
+    final GeometryStyle style) {
     super("geometryStyle", "Geometry Style", layer, parent);
     this.style = style;
     setIcon(ICON);
   }
 
-  public GeometryStyleRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent, final Map<String, Object> geometryStyle) {
+  public GeometryStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
+    final Map<String, Object> geometryStyle) {
     super("geometryStyle", "Geometry Style", layer, parent, geometryStyle);
     this.style = new GeometryStyle(geometryStyle);
     setIcon(ICON);
@@ -201,23 +196,21 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
       Shape shape = null;
       final DataType geometryDataType = layer.getGeometryType();
       if (DataTypes.POINT.equals(geometryDataType)
-          || DataTypes.MULTI_POINT.equals(geometryDataType)) {
+        || DataTypes.MULTI_POINT.equals(geometryDataType)) {
         return this.style.getMarker().getIcon(geometryStyle);
       } else if (DataTypes.LINE_STRING.equals(geometryDataType)
-          || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+        || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
         shape = GeometryStylePreview.getLineShape(16);
       } else if (DataTypes.POLYGON.equals(geometryDataType)
-          || DataTypes.POLYGON.equals(geometryDataType)) {
+        || DataTypes.POLYGON.equals(geometryDataType)) {
         shape = getPolygonShape();
       } else {
         return super.getIcon();
       }
 
-      final BufferedImage image = new BufferedImage(16, 16,
-        BufferedImage.TYPE_INT_ARGB);
+      final BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
       final Graphics2D graphics = image.createGraphics();
-      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
+      graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
       if (DataTypes.POLYGON.equals(geometryDataType)) {
         graphics.setPaint(geometryStyle.getPolygonFill());
@@ -238,9 +231,8 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
   }
 
   @Override
-  public void renderRecord(final Viewport2D viewport,
-    final BoundingBox visibleArea, final AbstractLayer layer,
-    final LayerRecord record) {
+  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
+    final AbstractLayer layer, final LayerRecord record) {
     final Geometry geometry = record.getGeometryValue();
     viewport.drawGeometry(geometry, this.style);
   }

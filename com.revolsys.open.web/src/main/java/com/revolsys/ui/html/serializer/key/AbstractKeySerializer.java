@@ -2,8 +2,8 @@ package com.revolsys.ui.html.serializer.key;
 
 import java.io.StringWriter;
 
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.io.AbstractObjectWithProperties;
-import com.revolsys.io.xml.XmlWriter;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 

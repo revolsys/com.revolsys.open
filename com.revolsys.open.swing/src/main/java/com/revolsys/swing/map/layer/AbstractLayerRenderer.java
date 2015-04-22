@@ -20,9 +20,8 @@ import com.revolsys.swing.map.layer.record.style.panel.BaseStylePanel;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
-public abstract class AbstractLayerRenderer<T extends Layer> extends
-AbstractPropertyChangeObject implements LayerRenderer<T>,
-PropertyChangeListener, Cloneable {
+public abstract class AbstractLayerRenderer<T extends Layer> extends AbstractPropertyChangeObject
+  implements LayerRenderer<T>, PropertyChangeListener, Cloneable {
 
   private static final Icon ICON = Icons.getIcon("palette");
 
@@ -49,11 +48,11 @@ PropertyChangeListener, Cloneable {
     this(type, layer);
     final Number minimumScale = getValue(style, "minimumScale");
     if (minimumScale != null) {
-      this.minimumScale = minimumScale.longValue();
+      setMinimumScale(minimumScale.longValue());
     }
     final Number maximumScale = getValue(style, "maximumScale");
     if (maximumScale != null) {
-      this.maximumScale = maximumScale.longValue();
+      setMaximumScale(maximumScale.longValue());
     }
     final Boolean visible = getValue(style, "visible");
     if (visible != null) {
@@ -237,9 +236,11 @@ PropertyChangeListener, Cloneable {
   }
 
   public void setMaximumScale(final long maximumScale) {
-    final double oldValue = this.maximumScale;
-    this.maximumScale = maximumScale;
-    firePropertyChange("maximumScale", oldValue, maximumScale);
+    if (maximumScale >= 0) {
+      final double oldValue = this.maximumScale;
+      this.maximumScale = maximumScale;
+      firePropertyChange("maximumScale", oldValue, maximumScale);
+    }
   }
 
   public void setMinimumScale(final long minimumScale) {

@@ -8,7 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.fields.Field;
 import com.revolsys.ui.html.layout.ElementContainerLayout;
@@ -120,8 +120,7 @@ public class ElementContainer extends Element {
     return allFields;
   }
 
-  public <T> T getInitialValue(final Field field,
-    final HttpServletRequest request) {
+  public <T> T getInitialValue(final Field field, final HttpServletRequest request) {
     return (T)getContainer().getInitialValue(field, request);
   }
 
@@ -137,6 +136,10 @@ public class ElementContainer extends Element {
     for (final Element element : this.elements) {
       element.initialize(request);
     }
+  }
+
+  public boolean isEmpty() {
+    return this.elements.size() == 0;
   }
 
   @Override

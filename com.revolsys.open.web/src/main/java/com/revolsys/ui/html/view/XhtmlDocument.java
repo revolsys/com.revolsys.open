@@ -2,7 +2,7 @@ package com.revolsys.ui.html.view;
 
 import java.io.IOException;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.util.HtmlUtil;
 
 public class XhtmlDocument {

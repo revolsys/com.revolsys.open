@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.io.csv.CsvUtil;
+import com.revolsys.format.csv.CsvUtil;
 
 public class RecordTransferable implements Transferable {
 

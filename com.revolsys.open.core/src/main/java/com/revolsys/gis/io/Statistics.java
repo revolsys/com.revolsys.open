@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.io.tsv.TsvWriter;
+import com.revolsys.format.tsv.TsvWriter;
 import com.revolsys.util.Counter;
 import com.revolsys.util.LongCounter;
 

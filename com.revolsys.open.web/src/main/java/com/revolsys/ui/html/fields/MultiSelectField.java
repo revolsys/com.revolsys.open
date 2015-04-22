@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
 
@@ -55,10 +55,7 @@ public class MultiSelectField extends Field {
     super(name, required);
   }
 
-  public void addOption(
-    final Object value,
-    final Object stringValue,
-    final String label) {
+  public void addOption(final Object value, final Object stringValue, final String label) {
     addOption(value, stringValue.toString(), label);
   }
 
@@ -70,10 +67,7 @@ public class MultiSelectField extends Field {
     addOption(value, stringValue, label);
   }
 
-  public void addOption(
-    final Object value,
-    final String stringValue,
-    final String label) {
+  public void addOption(final Object value, final String stringValue, final String label) {
     final FieldValue option = new FieldValue(value, stringValue, label);
     this.options.add(option);
     this.optionMap.put(stringValue, option);
@@ -142,6 +136,7 @@ public class MultiSelectField extends Field {
     out.startTag(HtmlUtil.SELECT);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_MULTIPLE, "multiple");
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
     out.attribute(HtmlUtil.ATTR_SIZE, String.valueOf(this.size));
     if (this.onChange != null) {
       out.attribute(HtmlUtil.ATTR_ON_CHANGE, this.onChange);
@@ -151,8 +146,8 @@ public class MultiSelectField extends Field {
 
     out.startTag(HtmlUtil.DIV);
     out.attribute(HtmlUtil.ATTR_CLASS, "fieldActions");
-    final String baseUrl = "javascript:setMutliSelectAllSelected('"
-        + getForm().getName() + "','" + getName() + "'";
+    final String baseUrl = "javascript:setMutliSelectAllSelected('" + getForm().getName() + "','"
+      + getName() + "'";
     HtmlUtil.serializeA(out, null, baseUrl + ",true)", "select all");
     HtmlUtil.serializeA(out, null, baseUrl + ",false)", "select none");
     out.endTag(HtmlUtil.DIV);

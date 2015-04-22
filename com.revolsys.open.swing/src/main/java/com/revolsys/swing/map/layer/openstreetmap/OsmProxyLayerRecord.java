@@ -1,8 +1,8 @@
 package com.revolsys.swing.map.layer.openstreetmap;
 
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.io.openstreetmap.model.OsmDocument;
-import com.revolsys.io.openstreetmap.model.OsmElement;
+import com.revolsys.format.openstreetmap.model.OsmDocument;
+import com.revolsys.format.openstreetmap.model.OsmElement;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.ArrayLayerRecord;
 import com.revolsys.swing.map.layer.record.IdentifierProxyLayerRecord;

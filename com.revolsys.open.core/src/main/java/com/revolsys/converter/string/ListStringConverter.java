@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.io.json.JsonParser;
+import com.revolsys.format.json.JsonParser;
 
 public class ListStringConverter implements StringConverter<List<String>> {
   @Override

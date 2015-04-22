@@ -3,12 +3,14 @@ package com.revolsys.ui.html.fields;
 import javax.servlet.http.HttpServletRequest;
 
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
 
 public class TextField extends Field {
+  private String type = "text";
+
   private int size = 25;
 
   private String style = null;
@@ -19,7 +21,7 @@ public class TextField extends Field {
 
   private String inputValue = "";
 
-  private String cssClass;
+  private String cssClass = "";
 
   public TextField() {
   }
@@ -34,25 +36,24 @@ public class TextField extends Field {
     this.size = size;
   }
 
-  public TextField(final String name, final int size, final int maxLength,
-    final boolean required) {
+  public TextField(final String name, final int size, final int maxLength, final boolean required) {
     this(name, size, required);
     this.maxLength = maxLength;
   }
 
-  public TextField(final String name, final int size, final int minLength,
-    final int maxLength, final boolean required) {
+  public TextField(final String name, final int size, final int minLength, final int maxLength,
+    final boolean required) {
     this(name, size, required);
     this.minLength = minLength;
     this.maxLength = maxLength;
   }
 
-  public TextField(final String name, final int size, final int minLength,
-    final int maxLength, final String defaultValue, final boolean required) {
+  public TextField(final String name, final int size, final int minLength, final int maxLength,
+    final String defaultValue, final boolean required) {
     this(name, size, maxLength, defaultValue, required);
     if (minLength > maxLength) {
-      throw new IllegalArgumentException("minLength (" + minLength
-        + ") must be <= maxLength (" + minLength + ")");
+      throw new IllegalArgumentException("minLength (" + minLength + ") must be <= maxLength ("
+        + minLength + ")");
     }
     this.minLength = minLength;
   }
@@ -69,8 +70,8 @@ public class TextField extends Field {
     this.maxLength = maxLength;
   }
 
-  public TextField(final String name, final int size,
-    final Object defaultValue, final boolean required) {
+  public TextField(final String name, final int size, final Object defaultValue,
+    final boolean required) {
     super(name, required);
     this.size = size;
     if (defaultValue != null) {
@@ -79,8 +80,8 @@ public class TextField extends Field {
     }
   }
 
-  public TextField(final String name, final int size,
-    final String defaultValue, final boolean required) {
+  public TextField(final String name, final int size, final String defaultValue,
+    final boolean required) {
     super(name, required);
     this.size = size;
     setValue(defaultValue);
@@ -119,6 +120,10 @@ public class TextField extends Field {
 
   public String getStyle() {
     return this.style;
+  }
+
+  public String getType() {
+    return this.type;
   }
 
   @Override
@@ -167,11 +172,14 @@ public class TextField extends Field {
     return valid;
   }
 
+  protected void serializeAttributes(final XmlWriter out) {
+  }
+
   @Override
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.INPUT);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
-    out.attribute(HtmlUtil.ATTR_TYPE, "text");
+    out.attribute(HtmlUtil.ATTR_TYPE, this.type);
     if (this.size > 0) {
       out.attribute(HtmlUtil.ATTR_SIZE, Integer.toString(this.size));
     }
@@ -184,21 +192,21 @@ public class TextField extends Field {
     if (Property.hasValue(this.style)) {
       out.attribute(HtmlUtil.ATTR_STYLE, this.style);
     }
-    String cssClass = getCssClass();
+    final String cssClass = getCssClass();
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm " + cssClass);
     if (isRequired()) {
-      if (Property.hasValue(cssClass)) {
-        cssClass += " required";
-      } else {
-        cssClass = "required";
-      }
+      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
     }
-    out.attribute(HtmlUtil.ATTR_CLASS, cssClass);
-
+    serializeAttributes(out);
     out.endTag(HtmlUtil.INPUT);
   }
 
   public void setCssClass(final String cssClass) {
-    this.cssClass = cssClass;
+    if (Property.hasValue(cssClass)) {
+      this.cssClass = cssClass;
+    } else {
+      this.cssClass = "";
+    }
   }
 
   protected void setInputValue(final String inputValue) {
@@ -228,6 +236,10 @@ public class TextField extends Field {
     } else {
       this.inputValue = null;
     }
+  }
+
+  public void setType(final String type) {
+    this.type = type;
   }
 
   @Override

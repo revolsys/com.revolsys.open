@@ -19,8 +19,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
-
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.decorator.Decorator;
 import com.revolsys.ui.html.fields.Field;
@@ -30,7 +28,6 @@ import com.revolsys.ui.html.view.SetObject;
 import com.revolsys.util.Property;
 
 public class HtmlUiBuilderObjectForm extends Form {
-  private static final Logger log = Logger.getLogger(HtmlUiBuilderObjectForm.class);
 
   private final HtmlUiBuilder builder;
 
@@ -40,8 +37,8 @@ public class HtmlUiBuilderObjectForm extends Form {
 
   private final Object object;
 
-  public HtmlUiBuilderObjectForm(final Object object,
-    final HtmlUiBuilder uiBuilder, final List<String> fieldKeys) {
+  public HtmlUiBuilderObjectForm(final Object object, final HtmlUiBuilder uiBuilder,
+    final List<String> fieldKeys) {
     super(uiBuilder.getTypeName());
     this.object = object;
     this.builder = uiBuilder;
@@ -49,9 +46,8 @@ public class HtmlUiBuilderObjectForm extends Form {
     this.fieldKeys = fieldKeys;
   }
 
-  public HtmlUiBuilderObjectForm(final Object object,
-    final HtmlUiBuilder uiBuilder, final String formName,
-    final List<String> fieldKeys) {
+  public HtmlUiBuilderObjectForm(final Object object, final HtmlUiBuilder uiBuilder,
+    final String formName, final List<String> fieldKeys) {
     super(formName);
     this.object = object;
     this.builder = uiBuilder;
@@ -62,8 +58,7 @@ public class HtmlUiBuilderObjectForm extends Form {
   }
 
   @Override
-  public Object getInitialValue(final Field field,
-    final HttpServletRequest request) {
+  public Object getInitialValue(final Field field, final HttpServletRequest request) {
     if (this.object != null) {
       final String propertyName = field.getName();
       if (propertyName != Form.FORM_TASK_PARAM) {
@@ -113,8 +108,7 @@ public class HtmlUiBuilderObjectForm extends Form {
       for (final Field field : getFields().values()) {
         if (!field.hasValidationErrors() && !field.isReadOnly()) {
           final String propertyName = field.getName();
-          if (propertyName != Form.FORM_TASK_PARAM
-              && this.fieldKeys.contains(propertyName)) {
+          if (propertyName != Form.FORM_TASK_PARAM && this.fieldKeys.contains(propertyName)) {
             final Object value = field.getValue();
             try {
               this.builder.setValue(this.object, propertyName, value);

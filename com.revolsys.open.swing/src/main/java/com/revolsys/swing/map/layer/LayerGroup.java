@@ -18,9 +18,9 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.data.io.RecordIo;
+import com.revolsys.format.json.JsonMapIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;
-import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;

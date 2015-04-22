@@ -5,10 +5,10 @@ public class UrlField extends TextField {
     this(name, required, null);
   }
 
-  public UrlField(final String name, final boolean required,
-    final Object defaultValue) {
+  public UrlField(final String name, final boolean required, final Object defaultValue) {
     super(name, 60, 1000, defaultValue, required);
     setCssClass("url");
+    setType("url");
   }
 
 }

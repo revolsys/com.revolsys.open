@@ -2,7 +2,7 @@ package com.revolsys.ui.html.serializer;
 
 import java.io.IOException;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.builder.HtmlUiBuilder;
 import com.revolsys.ui.html.builder.HtmlUiBuilderAware;
 import com.revolsys.ui.html.serializer.key.AbstractKeySerializer;

@@ -234,6 +234,7 @@ function showParentsAClick(element) {
 
 function showParentsHash(hash) {
   if (hash && hash.substr(0, 1) == '#') {
+    $('a[href=' + location.hash + ']').tab('show');
     showParents('[id="' + hash.substr(1) + '"]');
     showParents('a[name="' + hash.substr(1) + '"]');
   }
@@ -404,33 +405,6 @@ $(document)
             }
           });
         });
-        /*     $('div.jqueryTabs').tabs({
-               create : function(event, ui) {
-                 var tables = $.fn.dataTable.tables();
-                 if (tables.length > 0) {
-                   $(tables).DataTable().columns.adjust();
-                 }
-                 $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
-               },
-               activate : function(event, ui) {
-                 var tables = $.fn.dataTable.tables();
-                 if (tables.length > 0) {
-                   $(tables).DataTable().scroller().measure();
-                   $(tables).DataTable().columns.adjust();
-                 }
-                 $('> iframe.autoHeight', ui.panel).iframeAutoHeight();
-               },
-               load : function(event, ui) {
-                 var tables = $.fn.dataTable.tables();
-                 if (tables.length > 0) {
-                   $(tables).DataTable().columns.adjust();
-                 }
-               },
-               beforeActivate : function(event, ui) {
-                 window.location.hash = ui.newPanel.selector;
-               },
-               heightStyle : "content"
-             });*/
 
         $("div[role='tabpanel']").on('shown.bs.tab', function(e) {
           var tables = $.fn.dataTable.tables();
@@ -445,7 +419,6 @@ $(document)
             $(window).scrollTop(position);
           }
         });
-
         $(window).bind('hashchange', function() {
           var hash = window.location.hash;
           if (hash) {

@@ -35,18 +35,19 @@ import org.w3c.dom.NodeList;
 import com.revolsys.beans.AbstractPropertyChangeObject;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.format.json.JsonMapIoFactory;
+import com.revolsys.format.xml.DomUtil;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.esri.EsriCoordinateSystems;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.json.JsonMapIoFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.io.map.MapSerializerUtil;
-import com.revolsys.io.xml.DomUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 import com.revolsys.jts.geom.impl.PointDouble;
+import com.revolsys.math.matrix.Matrix;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
@@ -57,19 +58,18 @@ public abstract class AbstractGeoReferencedImage extends AbstractPropertyChangeO
   private static double[] calculateLSM(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight, final List<MappedLocation> mappings) {
 
-    final GeneralMatrix A = getAMatrix(mappings, imageHeight);
+    final Matrix A = getAMatrix(mappings, imageHeight);
 
-    final GeneralMatrix X = getXMatrix(boundingBox, imageWidth, imageHeight, mappings);
+    final Matrix X = getXMatrix(boundingBox, imageWidth, imageHeight, mappings);
 
-    final GeneralMatrix P = getWeights(mappings.size());
+    final Matrix P = getWeights(mappings.size());
 
-    final GeneralMatrix AT = A.clone();
-    AT.transpose();
+    final Matrix AT = A.transpose();
 
-    final GeneralMatrix ATP = new GeneralMatrix(AT.getRowCount(), P.getColumnCount());
-    final GeneralMatrix ATPA = new GeneralMatrix(AT.getRowCount(), A.getColumnCount());
-    final GeneralMatrix ATPX = new GeneralMatrix(AT.getRowCount(), 1);
-    final GeneralMatrix x = new GeneralMatrix(A.getColumnCount(), 1);
+    final Matrix ATP = new Matrix(AT.getRowCount(), P.getColumnCount());
+    final Matrix ATPA = new Matrix(AT.getRowCount(), A.getColumnCount());
+    final Matrix ATPX = new Matrix(AT.getRowCount(), 1);
+    final Matrix x = new Matrix(A.getColumnCount(), 1);
     ATP.times(AT, P);
     ATPA.times(ATP, A);
     ATPX.times(ATP, X);
@@ -77,32 +77,30 @@ public abstract class AbstractGeoReferencedImage extends AbstractPropertyChangeO
     x.times(ATPA, ATPX);
     ATPA.invert();
 
-    x.transpose();
-
-    return x.getRow(0);
+    return x.transpose().getRow(0);
   }
 
-  public static GeneralMatrix getAMatrix(final List<MappedLocation> mappings, final int imageHeight) {
-    final GeneralMatrix A = new GeneralMatrix(2 * mappings.size(), 6);
+  public static Matrix getAMatrix(final List<MappedLocation> mappings, final int imageHeight) {
+    final int mappingCount = mappings.size();
+    final int rowCount = mappingCount * 2;
+    final Matrix aMatrix = new Matrix(rowCount, 6);
 
-    final int numRow = mappings.size() * 2;
-
-    for (int j = 0; j < numRow / 2; ++j) {
+    for (int j = 0; j < mappingCount; ++j) {
       final MappedLocation mappedLocation = mappings.get(j);
       final Point sourcePoint = mappedLocation.getSourcePixel();
       final double x = sourcePoint.getX();
       final double y = imageHeight - sourcePoint.getY();
-      A.setRowValues(j, x, y, 1.0D, 0.0D, 0.0D, 0.0D);
+      aMatrix.setRow(j, x, y, 1.0D, 0.0D, 0.0D, 0.0D);
     }
 
-    for (int j = numRow / 2; j < numRow; ++j) {
-      final MappedLocation mappedLocation = mappings.get(j - numRow / 2);
+    for (int j = mappingCount; j < rowCount; ++j) {
+      final MappedLocation mappedLocation = mappings.get(j - mappingCount);
       final Point sourcePoint = mappedLocation.getSourcePixel();
       final double x = sourcePoint.getX();
       final double y = imageHeight - sourcePoint.getY();
-      A.setRowValues(j, 0.0D, 0.0D, 0.0D, x, y, 1.0D);
+      aMatrix.setRow(j, 0.0D, 0.0D, 0.0D, x, y, 1.0D);
     }
-    return A;
+    return aMatrix;
   }
 
   public static int[] getResolution(final ImageReader r) throws IOException {
@@ -126,35 +124,36 @@ public abstract class AbstractGeoReferencedImage extends AbstractPropertyChangeO
     };
   }
 
-  public static GeneralMatrix getWeights(final int size) {
-    final GeneralMatrix P = new GeneralMatrix(size * 2, size * 2);
+  public static Matrix getWeights(final int size) {
+    final int matrixSize = size * 2;
+    final Matrix P = new Matrix(matrixSize, matrixSize);
 
-    for (int j = 0; j < size; ++j) {
+    for (int j = 0; j < matrixSize; ++j) {
       P.set(j, j, 1.0D);
     }
     return P;
   }
 
-  private static GeneralMatrix getXMatrix(final BoundingBox boundingBox, final int imageWidth,
+  private static Matrix getXMatrix(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight, final List<MappedLocation> mappings) {
-    final GeneralMatrix X = new GeneralMatrix(2 * mappings.size(), 1);
+    final int mappingCount = mappings.size();
+    final int rowCount = mappingCount * 2;
+    final Matrix xMatrix = new Matrix(rowCount, 1);
 
-    final int numRow = X.getRowCount();
-
-    for (int j = 0; j < numRow / 2; ++j) {
+    for (int j = 0; j < mappingCount; ++j) {
       final MappedLocation mappedLocation = mappings.get(j);
       final Point targetPixel = mappedLocation.getTargetPixel(boundingBox, imageWidth, imageHeight);
       final double x = targetPixel.getX();
-      X.set(j, 0, x);
+      xMatrix.set(j, 0, x);
     }
 
-    for (int j = numRow / 2; j < numRow; ++j) {
-      final MappedLocation mappedLocation = mappings.get(j - numRow / 2);
+    for (int j = mappingCount; j < rowCount; ++j) {
+      final MappedLocation mappedLocation = mappings.get(j - mappingCount);
       final Point targetPixel = mappedLocation.getTargetPixel(boundingBox, imageWidth, imageHeight);
       final double y = imageHeight - targetPixel.getY();
-      X.set(j, 0, y);
+      xMatrix.set(j, 0, y);
     }
-    return X;
+    return xMatrix;
   }
 
   private List<Dimension> overviewSizes = new ArrayList<>();

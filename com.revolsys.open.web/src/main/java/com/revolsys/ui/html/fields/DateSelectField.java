@@ -26,17 +26,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
 
 public class DateSelectField extends Field {
-
-  private static int getYear(final int offset) {
-    final Calendar date = new GregorianCalendar();
-    date.add(Calendar.YEAR, offset);
-    return date.get(Calendar.YEAR);
-  }
 
   private static final String YEAR_KEY = "Year";
 
@@ -44,15 +38,12 @@ public class DateSelectField extends Field {
 
   private static final String MONTH_KEY = "Month";
 
-  private final Logger log = Logger.getLogger(DateSelectField.class);
-
   private static final List<FieldValue> DAY_OPTIONS;
 
   private static final List<FieldValue> MONTH_OPTIONS;
 
   private static final String[] MONTHS = {
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
-    "Nov", "Dec"
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   };
 
   static {
@@ -69,6 +60,14 @@ public class DateSelectField extends Field {
     }
     MONTH_OPTIONS = Collections.unmodifiableList(monthOptions);
   }
+
+  private static int getYear(final int offset) {
+    final Calendar date = new GregorianCalendar();
+    date.add(Calendar.YEAR, offset);
+    return date.get(Calendar.YEAR);
+  }
+
+  private final Logger log = Logger.getLogger(DateSelectField.class);
 
   private final List<FieldValue> yearOptions = new ArrayList<FieldValue>();
 
@@ -94,8 +93,8 @@ public class DateSelectField extends Field {
    * @param name
    * @param required
    */
-  public DateSelectField(final String name, final boolean required,
-    final int startYear, final int endYear) {
+  public DateSelectField(final String name, final boolean required, final int startYear,
+    final int endYear) {
     super(name, required);
     for (int i = startYear; i <= endYear; i++) {
       final String val = String.valueOf(i);
@@ -108,8 +107,8 @@ public class DateSelectField extends Field {
   @Override
   public boolean hasValue() {
     return this.dayStringValue != null && !this.dayStringValue.equals("")
-        && this.monthStringValue != null && !this.monthStringValue.equals("")
-        && this.yearStringValue != null && !this.yearStringValue.equals("");
+      && this.monthStringValue != null && !this.monthStringValue.equals("")
+      && this.yearStringValue != null && !this.yearStringValue.equals("");
   }
 
   @Override
@@ -158,8 +157,7 @@ public class DateSelectField extends Field {
       try {
         year = Integer.parseInt(this.yearStringValue);
         if (year < this.startYear || year > this.endYear) {
-          addValidationError("Year must be between " + this.startYear + " and "
-              + this.endYear);
+          addValidationError("Year must be between " + this.startYear + " and " + this.endYear);
           valid = false;
         }
       } catch (final NumberFormatException e) {
@@ -194,9 +192,7 @@ public class DateSelectField extends Field {
     serializeSelect(out, YEAR_KEY, this.yearOptions);
   }
 
-  private void serializeOptions(
-    final XmlWriter out,
-    final String part,
+  private void serializeOptions(final XmlWriter out, final String part,
     final List<FieldValue> options) {
     String stringValue = "";
     if (part.equals(DAY_KEY)) {
@@ -219,13 +215,12 @@ public class DateSelectField extends Field {
     }
   }
 
-  private void serializeSelect(
-    final XmlWriter out,
-    final String part,
+  private void serializeSelect(final XmlWriter out, final String part,
     final List<FieldValue> options) {
     final String name = getName() + part;
     out.startTag(HtmlUtil.SELECT);
     out.attribute(HtmlUtil.ATTR_NAME, name);
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
     serializeOptions(out, part, options);
     out.endTag(HtmlUtil.SELECT);
   }

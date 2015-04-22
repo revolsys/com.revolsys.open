@@ -3,8 +3,8 @@ package com.revolsys.gis.esri.gdb.file.capi.type;
 import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.format.esri.gdb.xml.model.Field;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
-import com.revolsys.io.esri.gdb.xml.model.Field;
 
 public class BinaryFieldDefinition extends AbstractFileGdbFieldDefinition {
 

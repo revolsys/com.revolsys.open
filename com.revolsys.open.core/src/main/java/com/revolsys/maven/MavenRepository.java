@@ -17,7 +17,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.io.xml.XmlMapIoFactory;
+import com.revolsys.format.xml.XmlMapIoFactory;
 import com.revolsys.spring.SpringUtil;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;

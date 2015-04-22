@@ -13,10 +13,10 @@ import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.format.directory.DirectoryRecordStore;
 import com.revolsys.gis.geometry.io.AbstractGeometryReaderFactory;
 import com.revolsys.io.MapReaderFactory;
 import com.revolsys.io.Reader;
-import com.revolsys.io.directory.DirectoryRecordStore;
 import com.revolsys.spring.SpringUtil;
 
 public abstract class AbstractRecordAndGeometryReaderFactory extends

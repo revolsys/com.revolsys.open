@@ -2,6 +2,11 @@ body {
   padding-top:70px;
   padding-bottom:70px;
 }
+
+ol.breadcrumb {
+  margin-bottom: 8px;
+  padding: 5px 10px;
+}
 footer.footer {
   position: absolute;
   bottom: 0;
@@ -9,8 +14,29 @@ footer.footer {
   height:60px;
 }
 
+footer div.version {
+  bottom: 0;
+  color: white;
+  position: fixed;
+  text-align: center;
+  width: 100%;
+  z-index:1100;
+}
+
 div.btn-toolbar {
   padding: 0.5em;
+}
+
+div.form-group {
+  margin-bottom: 2px;
+}
+
+div.panel-body {
+  padding: 5px;
+}
+
+div.panel {
+  margin-bottom: 5px;
 }
 
 div.header div.title, h1, div.bodyContent>div.title {

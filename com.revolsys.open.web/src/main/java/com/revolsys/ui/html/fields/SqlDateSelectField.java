@@ -27,17 +27,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
 
 public class SqlDateSelectField extends Field {
-
-  public static int getYear(final int offset) {
-    final Calendar date = new GregorianCalendar();
-    date.add(Calendar.YEAR, offset);
-    return date.get(Calendar.YEAR);
-  }
 
   private static final String YEAR_KEY = "Year";
 
@@ -45,15 +39,12 @@ public class SqlDateSelectField extends Field {
 
   private static final String MONTH_KEY = "Month";
 
-  private final Logger log = Logger.getLogger(SqlDateSelectField.class);
-
   private static final List DAY_OPTIONS;
 
   private static final List MONTH_OPTIONS;
 
   private static final String[] MONTHS = {
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
-    "Nov", "Dec"
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   };
 
   static {
@@ -70,6 +61,14 @@ public class SqlDateSelectField extends Field {
     }
     MONTH_OPTIONS = Collections.unmodifiableList(monthOptions);
   }
+
+  public static int getYear(final int offset) {
+    final Calendar date = new GregorianCalendar();
+    date.add(Calendar.YEAR, offset);
+    return date.get(Calendar.YEAR);
+  }
+
+  private final Logger log = Logger.getLogger(SqlDateSelectField.class);
 
   private final List yearOptions = new ArrayList();
 
@@ -95,8 +94,8 @@ public class SqlDateSelectField extends Field {
    * @param name
    * @param required
    */
-  public SqlDateSelectField(final String name, final boolean required,
-    final int startYear, final int endYear) {
+  public SqlDateSelectField(final String name, final boolean required, final int startYear,
+    final int endYear) {
     super(name, required);
     for (int i = startYear; i <= endYear; i++) {
       final String val = String.valueOf(i);
@@ -109,8 +108,8 @@ public class SqlDateSelectField extends Field {
   @Override
   public boolean hasValue() {
     return this.dayStringValue != null && !this.dayStringValue.equals("")
-        && this.monthStringValue != null && !this.monthStringValue.equals("")
-        && this.yearStringValue != null && !this.yearStringValue.equals("");
+      && this.monthStringValue != null && !this.monthStringValue.equals("")
+      && this.yearStringValue != null && !this.yearStringValue.equals("");
   }
 
   @Override
@@ -159,8 +158,7 @@ public class SqlDateSelectField extends Field {
       try {
         year = Integer.parseInt(this.yearStringValue);
         if (year < this.startYear || year > this.endYear) {
-          addValidationError("Year must be between " + this.startYear + " and "
-              + this.endYear);
+          addValidationError("Year must be between " + this.startYear + " and " + this.endYear);
           valid = false;
         }
       } catch (final NumberFormatException e) {
@@ -195,8 +193,7 @@ public class SqlDateSelectField extends Field {
     serializeSelect(out, YEAR_KEY, this.yearOptions);
   }
 
-  private void serializeOptions(final XmlWriter out, final String part,
-    final List options) {
+  private void serializeOptions(final XmlWriter out, final String part, final List options) {
     String stringValue = "";
     if (part.equals(DAY_KEY)) {
       stringValue = this.dayStringValue;
@@ -225,11 +222,11 @@ public class SqlDateSelectField extends Field {
     }
   }
 
-  private void serializeSelect(final XmlWriter out, final String part,
-    final List options) {
+  private void serializeSelect(final XmlWriter out, final String part, final List options) {
     final String name = getName() + part;
     out.startTag(HtmlUtil.SELECT);
     out.attribute(HtmlUtil.ATTR_NAME, name);
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
     serializeOptions(out, part, options);
     out.endTag(HtmlUtil.SELECT);
   }

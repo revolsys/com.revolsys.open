@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 
 public final class HtmlUtil {
   public static final String HTML_NS_PREFIX = "";
@@ -199,6 +199,8 @@ public final class HtmlUtil {
 
   public static final QName NAV = new QName(HTML_NS_URI, "nav", HTML_NS_PREFIX);
 
+  public static final String ATTR_REQUIRED = "required";
+
   public static void elementWithId(final XmlWriter writer, final QName tag, final String id,
     final Object content) {
     writer.startTag(tag);
@@ -260,6 +262,7 @@ public final class HtmlUtil {
     out.attribute(ATTR_ID, name);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "checkbox");
+    out.attribute(ATTR_CLASS, "form-control input-sm");
     if (selected) {
       out.attribute(HtmlUtil.ATTR_CHECKED, "checked");
     }
@@ -298,6 +301,7 @@ public final class HtmlUtil {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "file");
+    out.attribute(ATTR_CLASS, "form-control input-sm");
 
     out.endTag(INPUT);
   }
@@ -306,6 +310,7 @@ public final class HtmlUtil {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "file");
+    out.attribute(ATTR_CLASS, "form-control input-sm");
 
     if (value != null) {
       out.attribute(ATTR_VALUE, value);
@@ -359,6 +364,7 @@ public final class HtmlUtil {
     final Object selectedValue, final boolean optional, final List<? extends Object> values) {
     out.startTag(SELECT);
     out.attribute(ATTR_NAME, name);
+    out.attribute(ATTR_CLASS, "form-control input-sm");
     if (optional) {
       out.startTag(OPTION);
       out.attribute(ATTR_VALUE, "");
@@ -386,6 +392,7 @@ public final class HtmlUtil {
     final Object selectedValue, final boolean optional, final Map<?, ?> values) {
     out.startTag(SELECT);
     out.attribute(ATTR_NAME, name);
+    out.attribute(ATTR_CLASS, "form-control input-sm");
     if (optional) {
       out.startTag(OPTION);
       out.attribute(ATTR_VALUE, "");
@@ -461,6 +468,7 @@ public final class HtmlUtil {
     out.startTag(INPUT);
     out.attribute(ATTR_NAME, name);
     out.attribute(ATTR_TYPE, "text");
+    out.attribute(ATTR_CLASS, "form-control input-sm");
     out.attribute(ATTR_SIZE, size);
     out.attribute(ATTR_MAX_LENGTH, maxLength);
     if (value != null) {
@@ -474,13 +482,5 @@ public final class HtmlUtil {
    * Construct a new HtmlUtil.
    */
   private HtmlUtil() {
-  }
-
-  public void addTableRow(final StringBuilder text, final String... cells) {
-    text.append("<tr>");
-    for (final String string : cells) {
-
-    }
-    text.append("</tr>");
   }
 }

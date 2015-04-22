@@ -47,12 +47,12 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.data.equals.NumberEquals;
 import com.revolsys.data.record.Record;
+import com.revolsys.format.wkt.WktParser;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.gis.cs.projection.CoordinatesOperation;
 import com.revolsys.gis.cs.projection.ProjectionFactory;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.io.wkt.WktParser;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;

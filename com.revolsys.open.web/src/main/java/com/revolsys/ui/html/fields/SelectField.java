@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
 
@@ -34,14 +34,12 @@ public class SelectField extends Field {
     this(name, required, "(None)");
   }
 
-  public SelectField(final String name, final boolean required,
-    final String nullValueLabel) {
+  public SelectField(final String name, final boolean required, final String nullValueLabel) {
     super(name, required);
     this.nullValueLabel = nullValueLabel;
   }
 
-  public SelectField(final String name, final Object defaultValue,
-    final boolean required,
+  public SelectField(final String name, final Object defaultValue, final boolean required,
     final Map<? extends Object, ? extends Object> options) {
     this(name, required);
     this.defaultValue = defaultValue;
@@ -55,15 +53,14 @@ public class SelectField extends Field {
     }
   }
 
-  public SelectField(final String name, final String defaultValue,
-    final boolean required) {
+  public SelectField(final String name, final String defaultValue, final boolean required) {
     this(name, required);
     this.defaultValue = defaultValue;
     this.stringValue = defaultValue;
   }
 
-  public void addOption(final int index, final Object value,
-    final String stringValue, final String label) {
+  public void addOption(final int index, final Object value, final String stringValue,
+    final String label) {
     final FieldValue option = new FieldValue(value, stringValue, label);
     this.options.add(index, option);
     this.optionMap.put(stringValue, option);
@@ -74,8 +71,7 @@ public class SelectField extends Field {
     addOption(value, label.toString());
   }
 
-  public void addOption(final Object value, final Object stringValue,
-    final String label) {
+  public void addOption(final Object value, final Object stringValue, final String label) {
     addOption(value, stringValue.toString(), label);
   }
 
@@ -87,8 +83,7 @@ public class SelectField extends Field {
     addOption(value, stringValue, label);
   }
 
-  public void addOption(final Object value, final String stringValue,
-    final String label) {
+  public void addOption(final Object value, final String stringValue, final String label) {
     final FieldValue option = new FieldValue(value, stringValue, label);
     this.options.add(option);
     this.optionMap.put(stringValue, option);
@@ -183,11 +178,12 @@ public class SelectField extends Field {
   public void serializeElement(final XmlWriter out) {
     out.startTag(HtmlUtil.SELECT);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
     if (this.onChange != null) {
       out.attribute(HtmlUtil.ATTR_ON_CHANGE, this.onChange);
     }
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_CLASS, "required");
+      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
     }
     serializeOptions(out);
     out.endTag(HtmlUtil.SELECT);

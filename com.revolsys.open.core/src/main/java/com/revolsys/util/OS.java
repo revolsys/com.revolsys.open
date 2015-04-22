@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.revolsys.format.json.JsonMapIoFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.json.JsonMapIoFactory;
 
 public class OS {
 

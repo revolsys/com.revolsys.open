@@ -11,9 +11,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
 
-import com.revolsys.io.xml.StaxUtils;
-import com.revolsys.io.xml.XmlProcessor;
-import com.revolsys.io.xml.XmlProcessorContext;
+import com.revolsys.format.xml.StaxUtils;
+import com.revolsys.format.xml.XmlProcessor;
+import com.revolsys.format.xml.XmlProcessorContext;
 import com.revolsys.jts.geom.impl.BoundingBoxDoubleGf;
 
 public class Parser extends XmlProcessor {

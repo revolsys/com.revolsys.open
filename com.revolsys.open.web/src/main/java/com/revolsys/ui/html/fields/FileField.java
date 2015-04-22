@@ -2,7 +2,7 @@ package com.revolsys.ui.html.fields;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.revolsys.io.xml.XmlWriter;
+import com.revolsys.format.xml.XmlWriter;
 import com.revolsys.ui.html.form.Form;
 import com.revolsys.util.HtmlUtil;
 import com.revolsys.util.Property;
@@ -76,11 +76,12 @@ public class FileField extends Field {
     out.startTag(HtmlUtil.INPUT);
     out.attribute(HtmlUtil.ATTR_NAME, getName());
     out.attribute(HtmlUtil.ATTR_TYPE, "file");
+    out.attribute(HtmlUtil.ATTR_CLASS, "form-control input-sm");
     if (Property.hasValue(this.style)) {
       out.attribute(HtmlUtil.ATTR_STYLE, this.style);
     }
     if (isRequired()) {
-      out.attribute(HtmlUtil.ATTR_CLASS, "required");
+      out.attribute(HtmlUtil.ATTR_REQUIRED, true);
     }
     out.endTag(HtmlUtil.INPUT);
   }
