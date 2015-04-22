@@ -64,8 +64,7 @@ public class MenuElement extends Element {
     return this.showRoot;
   }
 
-  private void menu(final XmlWriter out, final Collection<Menu> items,
-    final int level) {
+  private void menu(final XmlWriter out, final Collection<Menu> items, final int level) {
     if (items.size() > 0) {
       out.startTag(HtmlUtil.UL);
       for (final Menu menu : items) {

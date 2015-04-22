@@ -10,13 +10,14 @@ import java.util.Map.Entry;
 import org.apache.commons.jexl.Expression;
 import org.apache.commons.jexl.JexlContext;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.BeanNameAware;
 
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.JexlUtil;
 import com.revolsys.util.UrlUtil;
 
-public class Menu implements Cloneable {
+public class Menu implements Cloneable, BeanNameAware {
   private static final Logger LOG = Logger.getLogger(Menu.class);
 
   private String anchor;
@@ -44,6 +45,10 @@ public class Menu implements Cloneable {
   private boolean visible = true;
 
   private String target;
+
+  private String id;
+
+  private String iconName;
 
   public Menu() {
   }
@@ -97,8 +102,7 @@ public class Menu implements Cloneable {
       try {
         expression = JexlUtil.createExpression(value.toString());
       } catch (final Exception e) {
-        LOG.error("Invalid Jexl Expression '" + value + "': " + e.getMessage(),
-          e);
+        LOG.error("Invalid Jexl Expression '" + value + "': " + e.getMessage(), e);
       }
       if (expression != null) {
         this.dynamicParameters.put(name, expression);
@@ -140,6 +144,14 @@ public class Menu implements Cloneable {
   public String getCssClass() {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  public String getIconName() {
+    return this.iconName;
+  }
+
+  public String getId() {
+    return this.id;
   }
 
   public String getLink() {
@@ -259,6 +271,19 @@ public class Menu implements Cloneable {
     this.anchor = anchor;
   }
 
+  @Override
+  public void setBeanName(final String name) {
+    this.id = name;
+  }
+
+  public void setIconName(final String iconName) {
+    this.iconName = iconName;
+  }
+
+  public void setId(final String id) {
+    this.id = id;
+  }
+
   /**
    * @param menus The menus to set.
    */
@@ -301,9 +326,7 @@ public class Menu implements Cloneable {
       try {
         this.titleExpression = JexlUtil.createExpression(this.title);
       } catch (final Exception e) {
-        LOG.error(
-          "Error creating expression '" + this.title + "': " + e.getMessage(),
-          e);
+        LOG.error("Error creating expression '" + this.title + "': " + e.getMessage(), e);
         this.titleExpression = null;
       }
     } else {
@@ -321,8 +344,7 @@ public class Menu implements Cloneable {
       try {
         this.uriExpression = JexlUtil.createExpression(this.uri);
       } catch (final Exception e) {
-        LOG.error(
-          "Error creating expression '" + this.uri + "': " + e.getMessage(), e);
+        LOG.error("Error creating expression '" + this.uri + "': " + e.getMessage(), e);
         this.uriExpression = null;
       }
     } else {

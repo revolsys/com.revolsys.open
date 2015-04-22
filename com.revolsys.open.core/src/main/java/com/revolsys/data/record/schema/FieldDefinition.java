@@ -32,8 +32,8 @@ import com.revolsys.util.Property;
  * @see Record
  * @see RecordDefinition
  */
-public class FieldDefinition extends AbstractObjectWithProperties implements
-Cloneable, MapSerializer {
+public class FieldDefinition extends AbstractObjectWithProperties implements Cloneable,
+  MapSerializer {
 
   public static FieldDefinition create(final Map<String, Object> properties) {
     return new FieldDefinition(properties);
@@ -101,8 +101,7 @@ Cloneable, MapSerializer {
       this.title = CaseConverter.toCapitalizedWords(this.name);
     }
     this.description = Maps.getString(properties, "description");
-    this.type = DataTypes.getType(Maps.getString(properties,
-        "dataType"));
+    this.type = DataTypes.getType(Maps.getString(properties, "dataType"));
     this.required = Maps.getBool(properties, "required");
     this.length = Maps.getInteger(properties, "length", 0);
     this.scale = Maps.getInteger(properties, "scale", 0);
@@ -127,8 +126,7 @@ Cloneable, MapSerializer {
    * @param required The flag indicating if a value is required for the
    *          attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final boolean required) {
+  public FieldDefinition(final String name, final DataType type, final boolean required) {
     this(name, type, 0, 0, required, null, null);
   }
 
@@ -142,13 +140,13 @@ Cloneable, MapSerializer {
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final boolean required, final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type, final boolean required,
+    final Map<String, Object> properties) {
     this(name, type, 0, 0, required, properties);
   }
 
-  public FieldDefinition(final String name, final DataType dataType,
-    final boolean required, final String description) {
+  public FieldDefinition(final String name, final DataType dataType, final boolean required,
+    final String description) {
     this(name, dataType, 0, 0, required, description, null);
   }
 
@@ -161,8 +159,8 @@ Cloneable, MapSerializer {
    * @param required The flag indicating if a value is required for the
    *          attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final int length, final boolean required) {
+  public FieldDefinition(final String name, final DataType type, final int length,
+    final boolean required) {
     this(name, type, length, 0, required, null, null);
   }
 
@@ -177,14 +175,13 @@ Cloneable, MapSerializer {
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final int length, final boolean required,
-    final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type, final int length,
+    final boolean required, final Map<String, Object> properties) {
     this(name, type, length, 0, required, properties);
   }
 
-  public FieldDefinition(final String name, final DataType type,
-    final int length, final boolean required, final String description) {
+  public FieldDefinition(final String name, final DataType type, final int length,
+    final boolean required, final String description) {
     this(name, type, length, 0, required, description, null);
   }
 
@@ -197,8 +194,8 @@ Cloneable, MapSerializer {
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final Integer length, final Integer scale, final Boolean required) {
+  public FieldDefinition(final String name, final DataType type, final Integer length,
+    final Integer scale, final Boolean required) {
     this(name, type, length, scale, required, "");
   }
 
@@ -213,9 +210,8 @@ Cloneable, MapSerializer {
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final Integer length, final Integer scale, final Boolean required,
-    final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type, final Integer length,
+    final Integer scale, final Boolean required, final Map<String, Object> properties) {
     this(name, type, length, scale, required, null, properties);
 
   }
@@ -231,9 +227,8 @@ Cloneable, MapSerializer {
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final Integer length, final Integer scale, final Boolean required,
-    final String description) {
+  public FieldDefinition(final String name, final DataType type, final Integer length,
+    final Integer scale, final Boolean required, final String description) {
     this.name = name;
     this.title = CaseConverter.toCapitalizedWords(name);
     this.description = description;
@@ -263,9 +258,9 @@ Cloneable, MapSerializer {
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type,
-    final Integer length, final Integer scale, final Boolean required,
-    final String description, final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type, final Integer length,
+    final Integer scale, final Boolean required, final String description,
+    final Map<String, Object> properties) {
     this.name = name;
     this.title = CaseConverter.toCapitalizedWords(name);
     this.type = type;
@@ -520,8 +515,7 @@ Cloneable, MapSerializer {
   }
 
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.recordDefinition = new WeakReference<RecordDefinition>(
-        recordDefinition);
+    this.recordDefinition = new WeakReference<RecordDefinition>(recordDefinition);
   }
 
   public void setRequired(final boolean required) {
@@ -568,8 +562,7 @@ Cloneable, MapSerializer {
     MapSerializerUtil.add(map, "minValue", getMinValue(), null);
     MapSerializerUtil.add(map, "maxValue", getMaxValue(), null);
     MapSerializerUtil.add(map, "defaultValue", getDefaultValue(), null);
-    MapSerializerUtil.add(map, "allowedValues", getAllowedValues(),
-      Collections.emptyMap());
+    MapSerializerUtil.add(map, "allowedValues", getAllowedValues(), Collections.emptyMap());
     return map;
   }
 
@@ -581,12 +574,11 @@ Cloneable, MapSerializer {
     return string.toString();
   }
 
-  public void validate(Object value) {
+  public Object validate(Object value) {
     final String fieldName = getName();
 
     if (isRequired()) {
-      if (value == null || value instanceof String
-          && !Property.hasValue((String)value)) {
+      if (value == null || value instanceof String && !Property.hasValue((String)value)) {
         throw new IllegalArgumentException(fieldName + " is required");
       }
     }
@@ -598,12 +590,12 @@ Cloneable, MapSerializer {
         try {
           value = StringConverterRegistry.toObject(fieldType, value);
         } catch (final Throwable t) {
-          throw new IllegalArgumentException(fieldName + "='" + value
-            + "' is not a valid " + fieldType.getValidationName());
+          throw new IllegalArgumentException(fieldName + "='" + value + "' is not a valid "
+            + fieldType.getValidationName());
         }
         if (value == null) {
-          throw new IllegalArgumentException(fieldName + "='" + value
-            + "' is not a valid " + fieldType.getValidationName());
+          throw new IllegalArgumentException(fieldName + "='" + value + "' is not a valid "
+            + fieldType.getValidationName());
         }
       }
       if (value != null) {
@@ -614,8 +606,8 @@ Cloneable, MapSerializer {
           final int length = bigNumber.precision();
           if (maxLength > 0) {
             if (length > maxLength) {
-              throw new IllegalArgumentException(fieldName + "=" + value
-                + " length " + length + " > " + maxLength);
+              throw new IllegalArgumentException(fieldName + "=" + value + " length " + length
+                + " > " + maxLength);
             }
           }
 
@@ -623,22 +615,20 @@ Cloneable, MapSerializer {
           final int maxScale = getScale();
           if (maxScale > 0) {
             if (scale > maxScale) {
-              throw new IllegalArgumentException(fieldName + "=" + value
-                + " scale " + scale + " > " + maxScale);
+              throw new IllegalArgumentException(fieldName + "=" + value + " scale " + scale
+                + " > " + maxScale);
             }
           }
           final Number minValue = getMinValue();
           if (minValue != null) {
             if (NumericComparator.numericCompare(number, minValue) < 0) {
-              throw new IllegalArgumentException(fieldName + "=" + value
-                + " > " + minValue);
+              throw new IllegalArgumentException(fieldName + "=" + value + " > " + minValue);
             }
           }
           final Number maxValue = getMaxValue();
           if (maxValue != null) {
             if (NumericComparator.numericCompare(number, maxValue) > 0) {
-              throw new IllegalArgumentException(fieldName + "=" + value
-                + " < " + maxValue);
+              throw new IllegalArgumentException(fieldName + "=" + value + " < " + maxValue);
             }
           }
         } else if (value instanceof String) {
@@ -646,20 +636,19 @@ Cloneable, MapSerializer {
           final int length = string.length();
           if (maxLength > 0) {
             if (length > maxLength) {
-              throw new IllegalArgumentException(fieldName + "=" + value
-                + " length " + length + " > " + maxLength);
+              throw new IllegalArgumentException(fieldName + "=" + value + " length " + length
+                + " > " + maxLength);
             }
           }
         }
         if (!this.allowedValues.isEmpty()) {
           if (!this.allowedValues.containsKey(value)) {
-            throw new IllegalArgumentException(fieldName + "=" + value
-              + " not in (" + CollectionUtil.toString(",", this.allowedValues)
-              + ")");
+            throw new IllegalArgumentException(fieldName + "=" + value + " not in ("
+              + CollectionUtil.toString(",", this.allowedValues) + ")");
           }
         }
       }
     }
-
+    return value;
   }
 }

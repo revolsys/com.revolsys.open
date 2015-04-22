@@ -1,7 +1,13 @@
 package com.revolsys.io.csv;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,12 +28,16 @@ public class CsvMapWriter extends AbstractMapWriter {
 
   private final char fieldSeparator;
 
+  public CsvMapWriter(final File file) throws FileNotFoundException {
+    this(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
+  }
+
   public CsvMapWriter(final Writer out) {
     this(out, CsvConstants.FIELD_SEPARATOR, true);
   }
 
   public CsvMapWriter(final Writer out, final char fieldSeparator, final boolean useQuotes) {
-    this.out = out;
+    this.out = new BufferedWriter(out);
     this.fieldSeparator = fieldSeparator;
     this.useQuotes = useQuotes;
   }

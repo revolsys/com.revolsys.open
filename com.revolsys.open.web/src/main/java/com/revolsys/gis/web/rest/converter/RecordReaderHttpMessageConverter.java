@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +26,6 @@ import com.revolsys.data.io.RecordReaderFactory;
 import com.revolsys.data.io.RecordWriterFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.Reader;
@@ -75,7 +75,7 @@ AbstractHttpMessageConverter<RecordReader> {
       final MediaType mediaType = headers.getContentType();
       Charset charset = mediaType.getCharSet();
       if (charset == null) {
-        charset = FileUtil.UTF8;
+        charset = StandardCharsets.UTF_8;
       }
       final InputStream body = inputMessage.getBody();
       final String mediaTypeString = mediaType.getType() + "/"

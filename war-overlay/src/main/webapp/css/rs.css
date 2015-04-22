@@ -1,11 +1,19 @@
 body {
-  color: black;
-  font-size: 12px;
-  font-family: sans-serif;
-  border: 0px;
+  padding-top:70px;
+  padding-bottom:70px;
+}
+footer.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height:60px;
 }
 
-div.header div.title,h1,div.bodyContent > div.title {
+div.btn-toolbar {
+  padding: 0.5em;
+}
+
+div.header div.title, h1, div.bodyContent>div.title {
   color: #003399;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   font-weight: bold;
@@ -27,7 +35,7 @@ h2 {
 }
 
 section {
-  display:block;
+  display: block;
 }
 
 h3 {
@@ -68,7 +76,7 @@ h6 {
   margin-bottom: 0.5em;
 }
 
-th,td {
+th, td {
   vertical-align: top;
   word-wrap: break-word;
 }
@@ -151,8 +159,8 @@ div.bodyContent {
 
 div.header {
   background: #d7ebf9
-  url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
-  50% 50% repeat-x;
+    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
+    50% 50% repeat-x;
   border: 2px solid #aed0ea;
   border-radius: 0.5em;
   color: #0046a0;
@@ -208,8 +216,8 @@ div.breadcrumb ul li a:hover {
 div.footer {
   clear: both;
   background: #d7ebf9
-  url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
-  50% 50% repeat-x;
+    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_80_d7ebf9_1x400.png)
+    50% 50% repeat-x;
   border: 2px solid #aed0ea;
   border-radius: 0.5em;
   color: #0046a0;
@@ -340,7 +348,7 @@ div.objectView>table.data>tbody>tr:nth-of-type(even)>td {
   background-color: #eeeeee;
 }
 
-div.objectView>table.data>tbody>tr:last-child>th,div.objectView>table.data>tbody>tr:last-child>td
+div.objectView>table.data>tbody>tr:last-child>th, div.objectView>table.data>tbody>tr:last-child>td
   {
   border-bottom-width: 0px;
 }
@@ -360,8 +368,8 @@ div.sideMenu div.title {
   border-top-left-radius: 0.4em;
   border-top-right-radius: 0.4em;
   background: #3baae3
-  url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png)
-  50% 50% repeat-x;
+    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png)
+    50% 50% repeat-x;
   color: #ffffff;
   font-weight: bold;
   padding: 0.2em 0.4em 0.2em 0.4em;
@@ -396,8 +404,8 @@ div.sideMenu ul li {
   margin-left: 0px;
 }
 
-div.sideMenu ul li.selected > a {
-  display:block;
+div.sideMenu ul li.selected>a {
+  display: block;
   font-weight: bold;
   background-color: #d7ebf9;
   border: 1px solid #aed0ea;
@@ -464,7 +472,7 @@ div.form div.field div.label {
   vertical-align: top;
 }
 
-div.form div:nth-of-type(1).field>div.label,div.form div:nth-of-type(1).field>div.contents
+div.form div:nth-of-type(1).field>div.label, div.form div:nth-of-type(1).field>div.contents
   {
   border-top-width: 0px;
 }
@@ -589,13 +597,12 @@ button.ui-button-icon-only {
   line-height: 1.2em;
 }
 
-input.ui-button,.ui-button-text-only span.ui-button-text {
+input.ui-button, .ui-button-text-only span.ui-button-text {
   line-height: 1.2em;
   padding: 0.2em 0.4em;
 }
 
-table.dataTable tbody th,
-table.dataTable tbody td {
+table.dataTable tbody th, table.dataTable tbody td {
   padding: 1px 2px 1px 2px;
   vertical-align: middle;
 }
@@ -604,11 +611,8 @@ div.dataTables_wrapper td {
   white-space: nowrap;
 }
 
-div.dataTables_wrapper td div,
-div.dataTables_wrapper td figure,
-div.dataTables_wrapper td ol,
-div.dataTables_wrapper td ul,
-div.dataTables_wrapper td p {
+div.dataTables_wrapper td div, div.dataTables_wrapper td figure, div.dataTables_wrapper td ol,
+  div.dataTables_wrapper td ul, div.dataTables_wrapper td p {
   white-space: normal;
 }
 
@@ -625,12 +629,14 @@ div.simpleDataTable>div>table {
   margin-left: 0px;
   width: auto;
 }
+
 div.simpleDataTable>div>table>thead>tr>th:first-child {
-  border-left:1px solid #ddd;
+  border-left: 1px solid #ddd;
 }
+
 div.simpleDataTable>div>table>thead>tr>th {
   text-align: left;
-  border-right:1px solid #ddd;
+  border-right: 1px solid #ddd;
 }
 
 div.ui-accordion {
@@ -647,11 +653,13 @@ div.ui-accordion {
   padding: 0.3em;
   background-color: white;
 }
+
 div.ui-accordion>div.ui-accordion-content {
   padding: 0.3em;
   background-color: white;
 }
-div.ui-accordion > .ui-widget-content {
+
+div.ui-accordion>.ui-widget-content {
   background: white;
 }
 
@@ -728,7 +736,7 @@ div.pageNavigation {
   padding-top: 0.5em;
 }
 
-div.pageNavigation > table  {
+div.pageNavigation>table {
   width: 100%;
 }
 
@@ -750,20 +758,21 @@ pre.prettyprint {
   background-color: white;
 }
 
-
 div.tocMenu {
-  overflow:auto;
+  overflow: auto;
 }
 
 div.tocMenu div.title {
-  background: #3baae3 url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png) 50% 50% repeat-x;
+  background: #3baae3
+    url(https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/cupertino/images/ui-bg_glass_50_3baae3_1x400.png)
+    50% 50% repeat-x;
   color: #ffffff;
   font-weight: bold;
   padding: 0.2em 0.4em 0.2em 0.4em;
 }
 
 div.tocMenu ol {
-  margin:0px;
+  margin: 0px;
   margin-bottom: 3px;
   padding: 3px 5px 3px 2em;
 }
@@ -790,10 +799,21 @@ div.tocMenu ol li a:hover {
 }
 
 div.sticky {
-  position:fixed;
-  top:0px;
+  position: fixed;
+  top: 0px;
 }
 
 .ui-widget {
   font-size: 1em;
+}
+
+.nav-tabs {
+  margin-bottom: 0;
+}
+
+.tab-content {
+  border-left: 1px solid #ecf0f1;
+  border-right: 1px solid #ecf0f1;
+  border-bottom: 1px solid #ecf0f1;
+  padding: 10px;
 }

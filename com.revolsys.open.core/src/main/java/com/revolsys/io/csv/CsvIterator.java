@@ -1,18 +1,18 @@
 package com.revolsys.io.csv;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.util.ExceptionUtil;
 
-public class CsvIterator implements Iterator<List<String>>,
-Iterable<List<String>> {
+public class CsvIterator implements Iterator<List<String>>, Iterable<List<String>> {
+
+  private static final int BUFFER_SIZE = 8096;
 
   /** The current record. */
   private List<String> currentRecord;
@@ -21,7 +21,15 @@ Iterable<List<String>> {
   private boolean hasNext = true;
 
   /** The reader to */
-  private final BufferedReader in;
+  private final Reader in;
+
+  private final char[] buffer = new char[BUFFER_SIZE];
+
+  private int readCount;
+
+  private int index = 0;
+
+  private final StringBuilder sb = new StringBuilder();
 
   /**
    * Constructs CSVReader with supplied separator and quote char.
@@ -30,8 +38,7 @@ Iterable<List<String>> {
    * @throws IOException
    */
   public CsvIterator(final Reader in) {
-    this.in = new BufferedReader(in);
-
+    this.in = in;
     readNextRecord();
   }
 
@@ -42,27 +49,6 @@ Iterable<List<String>> {
    */
   public void close() {
     FileUtil.closeSilent(this.in);
-  }
-
-  /**
-   * Reads the next line from the file.
-   *
-   * @return the next line from the file without trailing newline
-   * @throws IOException if bad things happen during the read
-   */
-  private String getNextLine() {
-    try {
-      final String nextLine = this.in.readLine();
-      if (nextLine == null) {
-        this.hasNext = false;
-        close();
-      }
-      return nextLine;
-    } catch (final IOException e) {
-      this.hasNext = false;
-      close();
-      return null;
-    }
   }
 
   /**
@@ -96,63 +82,104 @@ Iterable<List<String>> {
     }
   }
 
-  /**
-   * Parses an incoming String and returns an array of elements.
-   *
-   * @param nextLine the string to parse
-   * @return the comma-tokenized list of elements, or null if nextLine is null
-   * @throws IOException if bad things happen during the read
-   */
-  private List<String> parseLine(String nextLine) {
-    if (nextLine.length() == 0) {
-      return Collections.emptyList();
-    } else {
-
-      final List<String> fields = new ArrayList<String>();
-      StringBuilder sb = new StringBuilder();
-      boolean inQuotes = false;
-      boolean hadQuotes = false;
-      do {
-        if (inQuotes) {
-          sb.append("\n");
-          nextLine = getNextLine();
-          if (nextLine == null) {
-            break;
+  private List<String> parseRecord() throws IOException {
+    final StringBuilder sb = this.sb;
+    final Reader in = this.in;
+    sb.delete(0, sb.length());
+    final List<String> fields = new ArrayList<>();
+    boolean inQuotes = false;
+    boolean hadQuotes = false;
+    while (this.readCount != -1) {
+      if (this.index >= this.readCount) {
+        this.index = 0;
+        this.readCount = in.read(this.buffer, 0, BUFFER_SIZE);
+        if (this.readCount < 0) {
+          if (fields.isEmpty()) {
+            this.hasNext = false;
+            return null;
+          } else {
+            return fields;
           }
         }
-        for (int i = 0; i < nextLine.length(); i++) {
-          final char c = nextLine.charAt(i);
-          if (c == '"') {
-            hadQuotes = true;
-            if (inQuotes && nextLine.length() > i + 1
-                && nextLine.charAt(i + 1) == '"') {
-              sb.append(nextLine.charAt(i + 1));
-              i++;
-            } else {
-              inQuotes = !inQuotes;
-              if (i > 2 && nextLine.charAt(i - 1) != ','
-                  && nextLine.length() > i + 1 && nextLine.charAt(i + 1) != ',') {
-                sb.append(c);
-              }
+      }
+      final char c = this.buffer[this.index++];
+      switch (c) {
+        case '"':
+          hadQuotes = true;
+          final char nextChar = previewNextChar();
+          if (inQuotes && nextChar == '"') {
+            sb.append('"');
+            this.index++;
+          } else {
+            inQuotes = !inQuotes;
+            if (sb.length() > 0 && nextChar != ',' && nextChar != '\n' && nextChar != 0) {
+              sb.append(c);
             }
-          } else if (c == ',' && !inQuotes) {
-            hadQuotes = false;
+          }
+        break;
+        case ',':
+          if (inQuotes) {
+            sb.append(c);
+          } else {
             if (hadQuotes || sb.length() > 0) {
               fields.add(sb.toString());
+              sb.delete(0, sb.length());
             } else {
               fields.add(null);
             }
-            sb = new StringBuilder();
-          } else {
-            sb.append(c);
+            hadQuotes = false;
           }
-        }
-      } while (inQuotes);
-      if (sb.length() > 0 || fields.size() > 0) {
-        fields.add(sb.toString());
+        break;
+        case '\r':
+          if (previewNextChar() == '\n') {
+          } else {
+            if (inQuotes) {
+              sb.append('\n');
+            } else {
+              if (hadQuotes || sb.length() > 0) {
+                fields.add(sb.toString());
+                sb.delete(0, sb.length());
+              } else {
+                fields.add(null);
+              }
+              return fields;
+            }
+          }
+        break;
+        case '\n':
+          if (previewNextChar() == '\r') {
+            this.index++;
+          }
+          if (inQuotes) {
+            sb.append(c);
+          } else {
+            if (hadQuotes || sb.length() > 0) {
+              fields.add(sb.toString());
+              sb.delete(0, sb.length());
+            } else {
+              fields.add(null);
+            }
+            return fields;
+          }
+        break;
+        default:
+          sb.append(c);
+        break;
       }
-      return fields;
     }
+    this.hasNext = false;
+    return null;
+  }
+
+  private char previewNextChar() throws IOException {
+    if (this.index >= this.readCount) {
+      this.index = 0;
+      this.readCount = this.in.read(this.buffer, 0, BUFFER_SIZE);
+      if (this.readCount < 0) {
+        return 0;
+      }
+    }
+    return this.buffer[this.index];
   }
 
   /**
@@ -163,9 +190,12 @@ Iterable<List<String>> {
    * @throws IOException if bad things happen during the read
    */
   private List<String> readNextRecord() {
-    final String nextLine = getNextLine();
     if (this.hasNext) {
-      this.currentRecord = parseLine(nextLine);
+      try {
+        this.currentRecord = parseRecord();
+      } catch (final IOException e) {
+        ExceptionUtil.throwUncheckedException(e);
+      }
       return this.currentRecord;
     } else {
       return null;

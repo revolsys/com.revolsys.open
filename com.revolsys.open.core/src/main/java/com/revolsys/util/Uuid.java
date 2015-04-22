@@ -1,6 +1,6 @@
 package com.revolsys.util;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
@@ -32,7 +32,7 @@ public class Uuid {
         throw new IllegalArgumentException("Unknown namespace UUID type " + type);
       }
       if (namespace != null) {
-        final byte[] bytes = namespace.getBytes(UTF_8);
+        final byte[] bytes = namespace.getBytes(StandardCharsets.UTF_8);
         digester.update(bytes);
       }
       if (name != null) {
@@ -56,15 +56,15 @@ public class Uuid {
         throw new IllegalArgumentException("Unknown namespace UUID type " + type);
       }
       if (namespace != null) {
-        final byte[] bytes = namespace.getBytes(UTF_8);
+        final byte[] bytes = namespace.getBytes(StandardCharsets.UTF_8);
         digester.update(bytes);
       }
       if (name instanceof String) {
-        final byte[] bytes = ((String)name).getBytes(UTF_8);
+        final byte[] bytes = ((String)name).getBytes(StandardCharsets.UTF_8);
         digester.update(bytes);
       } else if (name != null) {
         final String string = StringConverterRegistry.toString(name);
-        final byte[] bytes = string.getBytes(UTF_8);
+        final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
         digester.update(bytes);
       }
       final byte[] digest = digester.digest();
@@ -99,7 +99,5 @@ public class Uuid {
     bytes[8] |= 0x80; // set to IETF variant
     return toUuid(bytes);
   }
-
-  private static final Charset UTF_8 = Charset.forName("UTF-8");
 
 }

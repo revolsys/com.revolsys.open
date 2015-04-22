@@ -103,6 +103,12 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
   public boolean add(final Object value) {
     if (value == null) {
       return false;
+    } else if (value instanceof AbstractRange<?>) {
+      final AbstractRange<?> range = (AbstractRange<?>)value;
+      return addRange(range);
+    } else if (value instanceof RangeSet) {
+      final RangeSet ranges = (RangeSet)value;
+      return addRanges(ranges);
     } else {
       for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator.hasNext();) {
         final AbstractRange<?> range = iterator.next();
@@ -203,6 +209,14 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
     return addRange(addRange);
   }
 
+  public boolean addRanges(final RangeSet ranges) {
+    boolean added = false;
+    for (final AbstractRange<?> range : ranges.getRanges()) {
+      added |= addRange(range);
+    }
+    return added;
+  }
+
   @Override
   public RangeSet clone() {
     try {
@@ -212,6 +226,19 @@ public class RangeSet extends AbstractSet<Object> implements Iterable<Object>, C
     } catch (final CloneNotSupportedException e) {
       return ExceptionUtil.throwUncheckedException(e);
     }
+  }
+
+  @Override
+  public boolean contains(final Object object) {
+    if (object != null) {
+      for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator.hasNext();) {
+        final AbstractRange<?> range = iterator.next();
+        if (range.contains(object)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public List<AbstractRange<?>> getRanges() {

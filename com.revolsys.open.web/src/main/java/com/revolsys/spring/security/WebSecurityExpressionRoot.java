@@ -4,15 +4,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
-import org.springframework.security.web.util.IpAddressMatcher;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
 public class WebSecurityExpressionRoot extends SecurityExpressionRoot {
   // private FilterInvocation filterInvocation;
   /** Allows direct access to the request object */
   public final HttpServletRequest request;
 
-  public WebSecurityExpressionRoot(final Authentication a,
-    final FilterInvocation fi) {
+  public WebSecurityExpressionRoot(final Authentication a, final FilterInvocation fi) {
     super(a);
     // this.filterInvocation = fi;
     this.request = fi.getRequest();

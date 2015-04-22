@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -410,7 +411,7 @@ AbstractHttpMessageConverter<PageInfo> implements WadlConstants {
   public void writeResourceList(final MediaType mediaType, Charset charset,
     final OutputStream out, final String url, final PageInfo pageInfo) {
     if (charset == null) {
-      charset = FileUtil.UTF8;
+      charset = StandardCharsets.UTF_8;
     }
     final String mediaTypeString = mediaType.getType() + "/"
         + mediaType.getSubtype();

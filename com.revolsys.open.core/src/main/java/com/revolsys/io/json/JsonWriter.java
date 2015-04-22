@@ -215,7 +215,7 @@ public final class JsonWriter implements AutoCloseable {
         if ((Boolean)value) {
           this.out.write("true");
         } else {
-          this.out.write("true");
+          this.out.write("false");
         }
       } else if (value instanceof Number) {
         final Number number = (Number)value;

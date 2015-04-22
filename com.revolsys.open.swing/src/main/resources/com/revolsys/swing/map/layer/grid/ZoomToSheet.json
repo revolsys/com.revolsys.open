@@ -3,5 +3,5 @@
   "name": "Zoom to Mapsheet",
   "icon": "magnifier_zoom_grid",
   "type": "menuSourceRunnable",
-  "methodName": "zoomTosheet"
+  "methodName": "zoomToSheet"
 }

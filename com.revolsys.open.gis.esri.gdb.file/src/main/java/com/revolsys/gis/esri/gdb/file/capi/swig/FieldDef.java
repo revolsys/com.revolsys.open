@@ -9,76 +9,74 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class FieldDef {
-  protected static long getCPtr(final FieldDef obj) {
-    return obj == null ? 0 : obj.swigCPtr;
+  private long swigCPtr;
+  protected boolean swigCMemOwn;
+
+  protected FieldDef(long cPtr, boolean cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = cPtr;
   }
 
-  private long swigCPtr;
+  protected static long getCPtr(FieldDef obj) {
+    return (obj == null) ? 0 : obj.swigCPtr;
+  }
 
-  protected boolean swigCMemOwn;
+  protected void finalize() {
+    delete();
+  }
+
+  public synchronized void delete() {
+    if (swigCPtr != 0) {
+      if (swigCMemOwn) {
+        swigCMemOwn = false;
+        EsriFileGdbJNI.delete_FieldDef(swigCPtr);
+      }
+      swigCPtr = 0;
+    }
+  }
 
   public FieldDef() {
     this(EsriFileGdbJNI.new_FieldDef(), true);
   }
 
-  protected FieldDef(final long cPtr, final boolean cMemoryOwn) {
-    this.swigCMemOwn = cMemoryOwn;
-    this.swigCPtr = cPtr;
+  public int SetName(String name) {
+    return EsriFileGdbJNI.FieldDef_SetName(swigCPtr, this, name);
   }
 
-  public synchronized void delete() {
-    if (this.swigCPtr != 0) {
-      if (this.swigCMemOwn) {
-        this.swigCMemOwn = false;
-        EsriFileGdbJNI.delete_FieldDef(this.swigCPtr);
-      }
-      this.swigCPtr = 0;
-    }
+  public int SetAlias(String alias) {
+    return EsriFileGdbJNI.FieldDef_SetAlias(swigCPtr, this, alias);
   }
 
-  @Override
-  protected void finalize() {
-    delete();
+  public int SetType(FieldType type) {
+    return EsriFileGdbJNI.FieldDef_SetType(swigCPtr, this, type.swigValue());
+  }
+
+  public int SetLength(int length) {
+    return EsriFileGdbJNI.FieldDef_SetLength(swigCPtr, this, length);
+  }
+
+  public int SetIsNullable(boolean isNullable) {
+    return EsriFileGdbJNI.FieldDef_SetIsNullable(swigCPtr, this, isNullable);
   }
 
   public String getAlias() {
-    return EsriFileGdbJNI.FieldDef_getAlias(this.swigCPtr, this);
-  }
-
-  public int getLength() {
-    return EsriFileGdbJNI.FieldDef_getLength(this.swigCPtr, this);
+    return EsriFileGdbJNI.FieldDef_getAlias(swigCPtr, this);
   }
 
   public String getName() {
-    return EsriFileGdbJNI.FieldDef_getName(this.swigCPtr, this);
-  }
-
-  public FieldType getType() {
-    return FieldType.swigToEnum(EsriFileGdbJNI.FieldDef_getType(this.swigCPtr, this));
+    return EsriFileGdbJNI.FieldDef_getName(swigCPtr, this);
   }
 
   public boolean isNullable() {
-    return EsriFileGdbJNI.FieldDef_isNullable(this.swigCPtr, this);
+    return EsriFileGdbJNI.FieldDef_isNullable(swigCPtr, this);
   }
 
-  public int SetAlias(final String alias) {
-    return EsriFileGdbJNI.FieldDef_SetAlias(this.swigCPtr, this, alias);
+  public int getLength() {
+    return EsriFileGdbJNI.FieldDef_getLength(swigCPtr, this);
   }
 
-  public int SetIsNullable(final boolean isNullable) {
-    return EsriFileGdbJNI.FieldDef_SetIsNullable(this.swigCPtr, this, isNullable);
-  }
-
-  public int SetLength(final int length) {
-    return EsriFileGdbJNI.FieldDef_SetLength(this.swigCPtr, this, length);
-  }
-
-  public int SetName(final String name) {
-    return EsriFileGdbJNI.FieldDef_SetName(this.swigCPtr, this, name);
-  }
-
-  public int SetType(final FieldType type) {
-    return EsriFileGdbJNI.FieldDef_SetType(this.swigCPtr, this, type.swigValue());
+  public FieldType getType() {
+    return FieldType.swigToEnum(EsriFileGdbJNI.FieldDef_getType(swigCPtr, this));
   }
 
 }

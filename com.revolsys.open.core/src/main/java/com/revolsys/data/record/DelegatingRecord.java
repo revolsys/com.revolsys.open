@@ -92,11 +92,6 @@ public class DelegatingRecord extends AbstractRecord {
   }
 
   @Override
-  public <T> T getIdValue() {
-    return this.record.getIdValue();
-  }
-
-  @Override
   public Integer getInteger(final CharSequence name) {
     return this.record.getInteger(name);
   }

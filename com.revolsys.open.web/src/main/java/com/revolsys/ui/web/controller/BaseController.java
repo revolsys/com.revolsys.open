@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.servlet.mvc.AbstractController;
 
-import com.revolsys.ui.html.view.MenuElement;
+import com.revolsys.ui.html.view.ButtonsToolbarElement;
 import com.revolsys.ui.model.Menu;
 
 public abstract class BaseController extends AbstractController {
@@ -32,9 +32,9 @@ public abstract class BaseController extends AbstractController {
     }
   }
 
-  public MenuElement getActionMenuElement(final HttpServletRequest request) {
+  public ButtonsToolbarElement getActionMenuElement(final HttpServletRequest request) {
     final Menu menu = getActionMenu(request);
-    final MenuElement menuElement = new MenuElement(menu, "actionMenu");
+    final ButtonsToolbarElement menuElement = new ButtonsToolbarElement(menu);
     menuElement.initialize(request);
     return menuElement;
   }
