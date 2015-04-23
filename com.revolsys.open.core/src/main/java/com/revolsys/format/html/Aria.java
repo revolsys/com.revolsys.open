@@ -11,6 +11,10 @@ public class Aria {
     out.attribute("aria-expanded", expanded);
   }
 
+  public static void label(final XmlWriter out, final String label) {
+    out.attribute("aria-label", label);
+  }
+
   public static void labelledby(final XmlWriter out, final String value) {
     out.attribute("aria-labelledby", value);
   }
