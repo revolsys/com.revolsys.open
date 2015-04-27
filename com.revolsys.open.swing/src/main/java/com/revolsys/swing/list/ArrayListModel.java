@@ -3,26 +3,26 @@ package com.revolsys.swing.list;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EventListener;
+import java.util.List;
 
 import javax.swing.ListModel;
-import javax.swing.event.EventListenerList;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 import com.revolsys.util.Reorderable;
 
-public class BaseListModel<T> extends ArrayList<T> implements ListModel,
-Serializable, Reorderable {
+public class ArrayListModel<T> extends ArrayList<T> implements ListModel<T>, Serializable,
+  Reorderable {
   private static final long serialVersionUID = 1L;
 
-  protected EventListenerList listenerList = new EventListenerList();
+  private final List<ListDataListener> listeners = new ArrayList<>();
 
-  public BaseListModel() {
+  public ArrayListModel() {
   }
 
-  public BaseListModel(final Collection<? extends T> values) {
+  public ArrayListModel(final Collection<? extends T> values) {
     addAll(values);
   }
 
@@ -62,8 +62,8 @@ Serializable, Reorderable {
   }
 
   @Override
-  public void addListDataListener(final ListDataListener l) {
-    this.listenerList.add(ListDataListener.class, l);
+  public void addListDataListener(final ListDataListener listener) {
+    this.listeners.add(listener);
   }
 
   @Override
@@ -77,65 +77,45 @@ Serializable, Reorderable {
     }
   }
 
-  protected void fireContentsChanged(final Object source, final int index0,
-    final int index1) {
-    final Object[] listeners = this.listenerList.getListenerList();
-    ListDataEvent e = null;
-
-    for (int i = listeners.length - 2; i >= 0; i -= 2) {
-      if (listeners[i] == ListDataListener.class) {
-        if (e == null) {
-          e = new ListDataEvent(source, ListDataEvent.CONTENTS_CHANGED, index0,
-            index1);
+  protected void fireContentsChanged(final Object source, final int index0, final int index1) {
+    if (!this.listeners.isEmpty()) {
+      Invoke.later(() -> {
+        final ListDataEvent e = new ListDataEvent(source, ListDataEvent.CONTENTS_CHANGED, index0,
+          index1);
+        for (final ListDataListener listener : this.listeners) {
+          listener.contentsChanged(e);
         }
-        ((ListDataListener)listeners[i + 1]).contentsChanged(e);
-      }
+      });
     }
   }
 
-  protected void fireIntervalAdded(final Object source, final int index0,
-    final int index1) {
-    final Object[] listeners = this.listenerList.getListenerList();
-    ListDataEvent e = null;
-
-    for (int i = listeners.length - 2; i >= 0; i -= 2) {
-      if (listeners[i] == ListDataListener.class) {
-        if (e == null) {
-          e = new ListDataEvent(source, ListDataEvent.INTERVAL_ADDED, index0,
-            index1);
+  protected void fireIntervalAdded(final Object source, final int index0, final int index1) {
+    if (!this.listeners.isEmpty()) {
+      Invoke.later(() -> {
+        final ListDataEvent e = new ListDataEvent(source, ListDataEvent.INTERVAL_ADDED, index0,
+          index1);
+        for (final ListDataListener listener : this.listeners) {
+          listener.intervalAdded(e);
         }
-        ((ListDataListener)listeners[i + 1]).intervalAdded(e);
-      }
+      });
     }
   }
 
-  protected void fireIntervalRemoved(final Object source, final int index0,
-    final int index1) {
-    final Object[] listeners = this.listenerList.getListenerList();
-    ListDataEvent e = null;
-
-    for (int i = listeners.length - 2; i >= 0; i -= 2) {
-      if (listeners[i] == ListDataListener.class) {
-        if (e == null) {
-          e = new ListDataEvent(source, ListDataEvent.INTERVAL_REMOVED, index0,
-            index1);
+  protected void fireIntervalRemoved(final Object source, final int index0, final int index1) {
+    if (!this.listeners.isEmpty()) {
+      Invoke.later(() -> {
+        final ListDataEvent e = new ListDataEvent(source, ListDataEvent.INTERVAL_REMOVED, index0,
+          index1);
+        for (final ListDataListener listener : this.listeners) {
+          listener.intervalRemoved(e);
         }
-        ((ListDataListener)listeners[i + 1]).intervalRemoved(e);
-      }
+      });
     }
   }
 
   @Override
   public T getElementAt(final int index) {
     return super.get(index);
-  }
-
-  public ListDataListener[] getListDataListeners() {
-    return this.listenerList.getListeners(ListDataListener.class);
-  }
-
-  public <V extends EventListener> V[] getListeners(final Class<V> listenerType) {
-    return this.listenerList.getListeners(listenerType);
   }
 
   @Override
@@ -179,8 +159,8 @@ Serializable, Reorderable {
   }
 
   @Override
-  public void removeListDataListener(final ListDataListener l) {
-    this.listenerList.remove(ListDataListener.class, l);
+  public void removeListDataListener(final ListDataListener listener) {
+    this.listeners.remove(listener);
   }
 
   @Override

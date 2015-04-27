@@ -1,6 +1,5 @@
 package com.revolsys.swing.parallel;
 
-
 public class RunnableSwingWorker extends AbstractSwingWorker<Void, Void> {
   private final String description;
 
@@ -10,9 +9,13 @@ public class RunnableSwingWorker extends AbstractSwingWorker<Void, Void> {
     this(backgroundTask.toString(), backgroundTask);
   }
 
-  public RunnableSwingWorker(final String description,
-    final Runnable backgroundTask) {
-    this.description = description;
+  public RunnableSwingWorker(final String description, final Runnable backgroundTask) {
+    if (description == null) {
+      this.description = backgroundTask.toString();
+    } else {
+      this.description = description;
+
+    }
     this.backgroundTask = backgroundTask;
   }
 

@@ -46,11 +46,11 @@ import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.filter.Filter;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.field.AbstractRecordQueryField;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.DateField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.QueryWhereConditionField;
-import com.revolsys.swing.field.RecordStoreQueryTextField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -176,8 +176,8 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
   }
 
   private void addListeners(final JComponent component) {
-    if (component instanceof RecordStoreQueryTextField) {
-      final RecordStoreQueryTextField queryField = (RecordStoreQueryTextField)component;
+    if (component instanceof AbstractRecordQueryField) {
+      final AbstractRecordQueryField queryField = (AbstractRecordQueryField)component;
       queryField.addItemListener(this);
     } else if (component instanceof JXSearchField) {
       final JXSearchField searchTextField = (JXSearchField)component;
@@ -307,8 +307,8 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
 
   @SuppressWarnings("rawtypes")
   private void removeListeners(final JComponent component) {
-    if (component instanceof RecordStoreQueryTextField) {
-      final RecordStoreQueryTextField queryField = (RecordStoreQueryTextField)component;
+    if (component instanceof AbstractRecordQueryField) {
+      final AbstractRecordQueryField queryField = (AbstractRecordQueryField)component;
       queryField.removeItemListener(this);
     } else if (component instanceof JXSearchField) {
       final JXSearchField searchTextField = (JXSearchField)component;
@@ -479,10 +479,9 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
         final Field field = (Field)searchField;
         field.setFieldValue(this.lastValue);
       }
-      if (this.searchField instanceof RecordStoreQueryTextField) {
-        final RecordStoreQueryTextField recordStoreSearchTextField = (RecordStoreQueryTextField)this.searchField;
-        recordStoreSearchTextField.setPreferredSize(new Dimension(200, 22));
-        recordStoreSearchTextField.setBelow(true);
+      if (this.searchField instanceof AbstractRecordQueryField) {
+        final AbstractRecordQueryField recordQueryField = (AbstractRecordQueryField)this.searchField;
+        recordQueryField.setPreferredSize(new Dimension(200, 22));
       } else if (this.searchField instanceof JXSearchField) {
         final JXSearchField searchTextField = (JXSearchField)this.searchField;
         searchTextField.setPreferredSize(new Dimension(200, 22));

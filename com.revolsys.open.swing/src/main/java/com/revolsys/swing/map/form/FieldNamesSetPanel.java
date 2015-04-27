@@ -38,7 +38,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.transferhandler.ListReorderableTransferHandler;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.SearchField;
-import com.revolsys.swing.list.BaseListModel;
+import com.revolsys.swing.list.ArrayListModel;
 import com.revolsys.swing.list.filter.StringContainsRowFilter;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.toolbar.ToolBar;
@@ -53,7 +53,7 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
 
   private final JXList allFieldNames;
 
-  private final BaseListModel<String> allFieldNamesModel;
+  private final ArrayListModel<String> allFieldNamesModel;
 
   private final List<String> fieldNamesSetNames;
 
@@ -71,7 +71,7 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
 
   private final JXList selectedFieldNames;
 
-  private final BaseListModel<String> selectedFieldNamesModel;
+  private final ArrayListModel<String> selectedFieldNamesModel;
 
   private final JButton moveUpButton;
 
@@ -124,7 +124,7 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
     this.fieldsPanel = new JPanel(new HorizontalLayout(5));
     this.fieldsPanel.setOpaque(false);
 
-    this.allFieldNamesModel = new BaseListModel<>(layer.getFieldNames());
+    this.allFieldNamesModel = new ArrayListModel<>(layer.getFieldNames());
     this.allFieldNames = new JXList(this.allFieldNamesModel);
     this.allFieldNames.setAutoCreateRowSorter(true);
     this.allFieldNames.setSortable(true);
@@ -149,7 +149,7 @@ public class FieldNamesSetPanel extends ValueField implements ActionListener,
     this.moveDownButton = fieldsToolBar.addButtonTitleIcon("default", "Move Down", "arrow_down",
       this, "actionMoveSelectedDown");
 
-    this.selectedFieldNamesModel = new BaseListModel<String>();
+    this.selectedFieldNamesModel = new ArrayListModel<String>();
 
     this.selectedFieldNames = new JXList(this.selectedFieldNamesModel);
     this.selectedFieldNames.setAutoCreateRowSorter(false);

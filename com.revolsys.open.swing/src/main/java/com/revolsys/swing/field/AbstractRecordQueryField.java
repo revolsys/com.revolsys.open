@@ -17,8 +17,11 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -42,79 +45,80 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 import com.revolsys.awt.WebColors;
+import com.revolsys.beans.EventsEnabledState;
+import com.revolsys.beans.EventsEnabler;
 import com.revolsys.collection.map.LruMap;
-import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.data.query.BinaryCondition;
+import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Equal;
 import com.revolsys.data.query.Q;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.Value;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.layout.GroupLayoutUtil;
+import com.revolsys.swing.list.ArrayListModel;
+import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.list.RecordListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
-public class RecordStoreQueryTextField extends TextField implements DocumentListener, KeyListener,
-  MouseListener, FocusListener, ListDataListener, ItemSelectable, Field, ListSelectionListener,
-  HighlightPredicate {
+public abstract class AbstractRecordQueryField extends ValueField implements DocumentListener,
+  KeyListener, MouseListener, FocusListener, ListDataListener, ItemSelectable, Field,
+  ListSelectionListener, HighlightPredicate, EventsEnabler {
   private static final Icon ICON_DELETE = Icons.getIcon("delete");
 
   private static final long serialVersionUID = 1L;
 
-  private final RecordStore recordStore;
+  private final ThreadLocal<Boolean> eventsEnabled = new ThreadLocal<>();
 
   private final String displayFieldName;
 
-  private final String idFieldName;
-
   private final JXList list;
 
-  private final RecordStoreQueryListModel listModel;
+  private final ArrayListModel<Record> listModel = new ArrayListModel<>();
 
   private final JPopupMenu menu = new JPopupMenu();
 
-  private final RecordDefinition recordDefinition;
-
   private final JLabel oldValueItem;
 
-  public Record selectedItem;
+  private final TextField searchField = new TextField("search", 50);
 
-  private final Map<String, String> valueToDisplayMap = new LruMap<String, String>(100);
+  private Record selectedRecord;
 
-  private Object originalValue;
+  private final Map<Identifier, String> idToDisplayMap = new LruMap<>(100);
 
-  private boolean below = false;
+  private Identifier originalValue;
 
   private final List<Query> queries;
 
-  public RecordStoreQueryTextField(final RecordDefinition recordDefinition,
+  private final AtomicInteger searchIndex = new AtomicInteger();
+
+  private int maxResults = 100;
+
+  private final String typePath;
+
+  public AbstractRecordQueryField(final String fieldName, final String typePath,
     final String displayFieldName) {
-    this(recordDefinition, displayFieldName, new Query(recordDefinition, new Equal(
-      F.upper(displayFieldName), new Value(null))), new Query(recordDefinition, Q.iLike(
-      displayFieldName, "")));
-
-  }
-
-  public RecordStoreQueryTextField(final RecordDefinition recordDefinition,
-    final String displayFieldName, final List<Query> queries) {
-    super(displayFieldName);
-    this.recordDefinition = recordDefinition;
-    this.recordStore = recordDefinition.getRecordStore();
-    this.idFieldName = recordDefinition.getIdFieldName();
+    super(fieldName, null);
+    this.typePath = typePath;
     this.displayFieldName = displayFieldName;
-    this.queries = queries;
+    this.queries = Arrays.asList(new Query(typePath, new Equal(F.upper(displayFieldName),
+      new Value(null))), new Query(typePath, Q.iLike(displayFieldName, "")));
 
-    final Document document = getDocument();
+    final Document document = this.searchField.getDocument();
     document.addDocumentListener(this);
-    addFocusListener(new WeakFocusListener(this));
-    addKeyListener(this);
-    addMouseListener(this);
+    this.searchField.addFocusListener(new WeakFocusListener(this));
+    this.searchField.addKeyListener(this);
+    this.searchField.addMouseListener(this);
 
     this.menu.setLayout(new BorderLayout(2, 2));
     this.oldValueItem = new JLabel();
@@ -124,7 +128,6 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
     this.oldValueItem.setHorizontalAlignment(SwingConstants.LEFT);
     this.menu.add(this.oldValueItem, BorderLayout.NORTH);
 
-    this.listModel = new RecordStoreQueryListModel(this.recordStore, displayFieldName, queries);
     this.list = new JXList(this.listModel);
     this.list.setCellRenderer(new RecordListCellRenderer(displayFieldName));
     this.list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -140,22 +143,15 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
     this.menu.setBorder(BorderFactory.createCompoundBorder(
       BorderFactory.createLineBorder(Color.DARK_GRAY), BorderFactory.createEmptyBorder(1, 2, 1, 2)));
 
-    setEditable(true);
-    PopupMenu.getPopupMenuFactory(this);
-    setPreferredSize(new Dimension(100, 22));
+    this.searchField.setEditable(true);
+    PopupMenu.getPopupMenuFactory(this.searchField);
+    this.searchField.setPreferredSize(new Dimension(100, 22));
+    add(this.searchField);
+    GroupLayoutUtil.makeColumns(this, false);
   }
 
-  public RecordStoreQueryTextField(final RecordDefinition recordDefinition,
-    final String displayFieldName, final Query... queries) {
-    this(recordDefinition, displayFieldName, Arrays.asList(queries));
-
-  }
-
-  public RecordStoreQueryTextField(final RecordStore recordStore, final String typeName,
-    final String displayFieldName) {
-    this(recordStore.getRecordDefinition(typeName), displayFieldName, new Query(typeName,
-      new Equal(F.upper(displayFieldName), new Value(null))), new Query(typeName, Q.iLike(
-      displayFieldName, "")));
+  public void addActionListener(final InvokeMethodListener listener) {
+    this.searchField.addActionListener(listener);
   }
 
   @Override
@@ -169,14 +165,48 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
   }
 
   @Override
-  public Field clone() {
-    // TODO Auto-generated method stub
-    return new RecordStoreQueryTextField(this.recordDefinition, this.displayFieldName, this.queries);
-  }
-
-  @Override
   public void contentsChanged(final ListDataEvent e) {
     intervalAdded(e);
+  }
+
+  protected void doQuery(final int searchIndex, final String queryText) {
+    if (searchIndex == this.searchIndex.get()) {
+      if (Property.hasValue(queryText) && queryText.length() >= 2) {
+        Record selectedRecord = null;
+        final Map<String, Record> allRecords = new TreeMap<String, Record>();
+        for (Query query : this.queries) {
+          if (allRecords.size() < this.maxResults) {
+            query = query.clone();
+            query.addOrderBy(this.displayFieldName, true);
+            final Condition whereCondition = query.getWhereCondition();
+            if (whereCondition instanceof BinaryCondition) {
+              final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
+              if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
+                final String likeString = "%"
+                  + queryText.toUpperCase().replaceAll("[^A-Z0-9 ]", "%") + "%";
+                Q.setValue(0, binaryCondition, likeString);
+              } else {
+                Q.setValue(0, binaryCondition, queryText);
+              }
+            }
+            query.setLimit(this.maxResults);
+            final List<Record> records = getRecords(query);
+            for (final Record record : records) {
+              if (allRecords.size() < this.maxResults) {
+                final String key = record.getString(this.displayFieldName);
+                if (!allRecords.containsKey(key)) {
+                  if (queryText.equals(key)) {
+                    selectedRecord = record;
+                  }
+                  allRecords.put(key, record);
+                }
+              }
+            }
+          }
+        }
+        setSearchResults(searchIndex, allRecords.values(), selectedRecord);
+      }
+    }
   }
 
   protected void fireItemStateChanged(final ItemEvent e) {
@@ -207,33 +237,32 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
     }
   }
 
-  @Override
-  protected String getDisplayText(final Object value) {
-    final String stringValue = StringConverterRegistry.toString(value);
-    String displayText = this.valueToDisplayMap.get(stringValue);
-    if (!Property.hasValue(displayText) && Property.hasValue(stringValue)) {
-      try {
-        final Record record = this.recordStore.queryFirst(Query.equal(this.recordDefinition,
-          this.idFieldName, stringValue));
-        if (record == null) {
-          displayText = stringValue;
-        } else {
-          displayText = record.getString(this.displayFieldName);
+  protected String getDisplayText(final Identifier identifier) {
+    if (identifier == null || this.idToDisplayMap == null) {
+      return "";
+    } else {
+      String displayText = this.idToDisplayMap.get(identifier);
+      if (displayText == null) {
+        displayText = identifier.toString();
+        try {
+          final Record record = getRecord(identifier);
+          if (record != null) {
+            displayText = record.getString(this.displayFieldName);
+          }
+        } catch (final Exception e) {
         }
-      } catch (final Exception e) {
-        displayText = stringValue;
       }
+      return displayText;
     }
-    return displayText;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getFieldValue() {
-    if (this.selectedItem == null) {
+    if (this.selectedRecord == null) {
       return (T)super.getFieldValue();
     } else {
-      return (T)this.selectedItem.getIdentifier();
+      return (T)this.selectedRecord.getIdentifier();
     }
   }
 
@@ -241,13 +270,17 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
     return this.listenerList.getListeners(ItemListener.class);
   }
 
-  public Record getSelectedItem() {
-    return this.selectedItem;
+  protected abstract Record getRecord(final Identifier identifier);
+
+  protected abstract List<Record> getRecords(Query query);
+
+  public String getSearchText() {
+    return this.searchField.getText();
   }
 
   @Override
   public Object[] getSelectedObjects() {
-    final Record selectedItem = getSelectedItem();
+    final Record selectedItem = getSelectedRecord();
     if (selectedItem == null) {
       return null;
     } else {
@@ -255,6 +288,14 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
         selectedItem
       };
     }
+  }
+
+  public Record getSelectedRecord() {
+    return this.selectedRecord;
+  }
+
+  public String getTypePath() {
+    return this.typePath;
   }
 
   @Override
@@ -273,6 +314,11 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
   }
 
   @Override
+  public boolean isEventsEnabled() {
+    return this.eventsEnabled.get() != Boolean.FALSE;
+  }
+
+  @Override
   public boolean isFieldValid() {
     return true;
   }
@@ -280,26 +326,12 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
   @Override
   public boolean isHighlighted(final Component renderer, final ComponentAdapter adapter) {
     final Record object = this.listModel.getElementAt(adapter.row);
-    final String text = getText();
+    final String text = this.searchField.getText();
     final String value = object.getString(this.displayFieldName);
     if (EqualsRegistry.equal(text, value)) {
       return true;
     } else {
       return false;
-    }
-  }
-
-  public boolean isTextSameAsSelected() {
-    if (this.selectedItem == null) {
-      return false;
-    } else {
-      final String text = getText();
-      if (Property.hasValue(text)) {
-        final String value = this.selectedItem.getString(this.displayFieldName);
-        return text.equals(value);
-      } else {
-        return false;
-      }
     }
   }
 
@@ -323,17 +355,17 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
           selectedIndex = size - 1;
         }
         this.list.setSelectedIndex(selectedIndex);
-        this.selectedItem = this.listModel.getElementAt(selectedIndex);
+        this.selectedRecord = this.listModel.getElementAt(selectedIndex);
         e.consume();
       break;
       case KeyEvent.VK_ENTER:
         // if (size > 0) {
         // if (selectedIndex >= 0 && selectedIndex < size) {
-        // final Record selectedItem =
+        // final Record selectedRecord =
         // this.listModel.getElementAt(selectedIndex);
-        // final String text = selectedItem.getString(this.displayFieldName);
+        // final String text = selectedRecord.getString(this.displayFieldName);
         // if (!text.equals(this.getText())) {
-        // this.selectedItem = selectedItem;
+        // this.selectedItem = selectedRecord;
         // setText(text);
         // }
         // } else {
@@ -399,26 +431,24 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
   }
 
   protected void search() {
-    if (this.selectedItem != null) {
-      final Record oldValue = this.selectedItem;
-      this.selectedItem = null;
-      fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED, oldValue,
-        ItemEvent.DESELECTED));
-    }
-    final String text = getText();
-    this.listModel.setSearchText(text);
-    if (isShowing()) {
-      showMenu();
-      this.selectedItem = this.listModel.getSelectedItem();
-      if (this.selectedItem != null) {
-        fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED, this.selectedItem,
-          ItemEvent.SELECTED));
-      }
+    // TODO add a busy icon
+    if (isEventsEnabled()) {
+      final int searchIndex = this.searchIndex.incrementAndGet();
+      Invoke.background("search", () -> {
+        doQuery(searchIndex, this.searchField.getText());
+      });
     }
   }
 
-  public void setBelow(final boolean below) {
-    this.below = below;
+  @Override
+  public boolean setEventsEnabled(final boolean eventsEnabled) {
+    final boolean oldValue = this.eventsEnabled.get() != Boolean.FALSE;
+    if (eventsEnabled) {
+      this.eventsEnabled.set(null);
+    } else {
+      this.eventsEnabled.set(Boolean.FALSE);
+    }
+    return oldValue;
   }
 
   @Override
@@ -428,36 +458,54 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
 
   @Override
   public void setFieldValue(final Object value) {
-    super.setFieldValue(value);
-    this.originalValue = value;
-    Icon icon;
-    String originalText;
-    if (value == null) {
-      originalText = "-";
-      icon = null;
-    } else {
-      originalText = getDisplayText(value);
-      icon = ICON_DELETE;
+    final Identifier identifier = SingleIdentifier.create(value);
+    super.setFieldValue(identifier);
+    if (this.idToDisplayMap != null) {
+      this.originalValue = identifier;
+      Icon icon;
+      String originalText;
+      if (value == null) {
+        originalText = "-";
+        icon = null;
+      } else {
+        originalText = getDisplayText(identifier);
+        icon = ICON_DELETE;
+      }
+      this.oldValueItem.setIcon(icon);
+      this.oldValueItem.setText(originalText);
     }
-    this.oldValueItem.setIcon(icon);
-    this.oldValueItem.setText(originalText);
   }
 
   public void setMaxResults(final int maxResults) {
-    this.listModel.setMaxResults(maxResults);
+    this.maxResults = maxResults;
   }
 
-  @Override
-  public void setText(final String text) {
-    super.setText(text);
-    if (this.listModel != null) {
-      search();
-    }
+  protected void setSearchResults(final int searchIndex, final Collection<Record> records,
+    final Record selectedRecord) {
+    Invoke.later(() -> {
+      if (searchIndex == this.searchIndex.get()) {
+        if (this.selectedRecord != null) {
+          final Record oldValue = this.selectedRecord;
+          this.selectedRecord = null;
+          fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED, oldValue,
+            ItemEvent.DESELECTED));
+        }
+        this.listModel.setAll(records);
+        this.selectedRecord = selectedRecord;
+        if (isShowing()) {
+          showMenu();
+          if (this.selectedRecord != null) {
+            fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
+              this.selectedRecord, ItemEvent.SELECTED));
+          }
+        }
+      }
+    });
   }
 
   private void showMenu() {
-    final List<Record> objects = this.listModel.getObjects();
-    if (objects.isEmpty()) {
+    final List<Record> records = this.listModel;
+    if (records.isEmpty()) {
       this.menu.setVisible(false);
     } else {
       this.menu.setVisible(true);
@@ -489,22 +537,26 @@ public class RecordStoreQueryTextField extends TextField implements DocumentList
 
   @Override
   public void updateFieldValue() {
-    // setFieldValue(listModel.getSelectedItem());
   }
 
   @Override
   public void valueChanged(final ListSelectionEvent e) {
-    if (!e.getValueIsAdjusting()) {
-      final Record value = (Record)this.list.getSelectedValue();
-      if (value != null) {
-        final String label = value.getString(this.displayFieldName);
-        if (!EqualsRegistry.equal(label, getText())) {
-          setFieldValue(value.getIdentifier());
+    if (!e.getValueIsAdjusting() && isEventsEnabled()) {
+      try (
+        EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
+        final Record record = (Record)this.list.getSelectedValue();
+        if (record != null) {
+          final Identifier identifier = record.getIdentifier();
+          final String label = record.getString(this.displayFieldName);
+          this.idToDisplayMap.put(identifier, label);
+          if (!EqualsRegistry.equal(label, this.searchField.getText())) {
+            this.searchField.setFieldValue(label);
+          }
+          super.setFieldValue(identifier);
         }
+        this.menu.setVisible(false);
+        requestFocus();
       }
-      this.menu.setVisible(false);
-      requestFocus();
     }
-
   }
 }

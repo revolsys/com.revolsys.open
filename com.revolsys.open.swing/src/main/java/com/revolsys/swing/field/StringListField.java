@@ -22,7 +22,7 @@ import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.list.BaseListModel;
+import com.revolsys.swing.list.ArrayListModel;
 import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CollectionUtil;
@@ -35,7 +35,7 @@ public class StringListField extends ValueField {
 
   private final JTextField valueEntry = new JTextField();
 
-  private final BaseListModel<String> values = new BaseListModel<String>();
+  private final ArrayListModel<String> values = new ArrayListModel<String>();
 
   private final JButton addButton;
 

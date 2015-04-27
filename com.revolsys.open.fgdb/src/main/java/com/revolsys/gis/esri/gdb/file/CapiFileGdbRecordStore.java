@@ -28,6 +28,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
+import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.data.query.AbstractMultiCondition;
 import com.revolsys.data.query.BinaryCondition;
 import com.revolsys.data.query.CollectionValue;
@@ -349,7 +350,11 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
     }
   }
 
-  public void appendValue(final StringBuilder buffer, final Object value) {
+  public void appendValue(final StringBuilder buffer, Object value) {
+    if (value instanceof SingleIdentifier) {
+      final SingleIdentifier identifier = (SingleIdentifier)value;
+      value = identifier.getValue(0);
+    }
     if (value == null) {
       buffer.append("''");
     } else if (value instanceof Number) {
