@@ -152,7 +152,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
         }
         this.count++;
       }
-      if (this.limit > -1 && this.count >= this.offset + this.limit) {
+      if (this.count - this.offset >= this.limit) {
         throw new NoSuchElementException();
       }
       row = this.recordStore.nextRow(this.rows);

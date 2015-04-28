@@ -14,36 +14,16 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.revolsys.beans.InvokeMethodPropertyChangeListener;
 import com.revolsys.beans.NonWeakListener;
 import com.revolsys.swing.parallel.Invoke;
 
-public class InvokeMethodListener extends InvokeMethodPropertyChangeListener
-implements ActionListener, DocumentListener, ListSelectionListener,
-ItemListener, PropertyChangeListener, FocusListener, NonWeakListener {
+public class EventQueueRunnableListener implements ActionListener, DocumentListener,
+  ListSelectionListener, ItemListener, PropertyChangeListener, FocusListener, NonWeakListener {
 
-  private final boolean invokeLater;
+  private final Runnable runnable;
 
-  public InvokeMethodListener(final boolean invokeLater, final Class<?> clazz,
-    final String methodName, final Object... parameters) {
-    super(clazz, methodName, parameters);
-    this.invokeLater = invokeLater;
-  }
-
-  public InvokeMethodListener(final boolean invokeLater, final Object object,
-    final String methodName, final Object... parameters) {
-    super(object, methodName, parameters);
-    this.invokeLater = invokeLater;
-  }
-
-  public InvokeMethodListener(final Class<?> clazz, final String methodName,
-    final Object... parameters) {
-    this(true, clazz, methodName, parameters);
-  }
-
-  public InvokeMethodListener(final Object object, final String methodName,
-    final Object... parameters) {
-    this(true, object, methodName, parameters);
+  public EventQueueRunnableListener(final Runnable runnable) {
+    this.runnable = runnable;
   }
 
   @Override
@@ -72,11 +52,7 @@ ItemListener, PropertyChangeListener, FocusListener, NonWeakListener {
   }
 
   protected void invokeMethod() {
-    if (this.invokeLater) {
-      Invoke.later(this);
-    } else {
-      run();
-    }
+    Invoke.later(this.runnable);
   }
 
   @Override

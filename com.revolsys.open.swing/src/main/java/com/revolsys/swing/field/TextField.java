@@ -13,8 +13,8 @@ import org.jdesktop.swingx.JXTextField;
 import com.revolsys.awt.WebColors;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.listener.InvokeMethodActionListener;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.undo.UndoManager;
@@ -62,7 +62,7 @@ public class TextField extends JXTextField implements Field, FocusListener {
     setText(text);
     addFocusListener(new WeakFocusListener(this));
     PopupMenu.getPopupMenuFactory(this);
-    addActionListener(new InvokeMethodActionListener(this, "updateFieldValue"));
+    EventQueue.addAction(this, () -> updateFieldValue());
   }
 
   public TextField(final String fieldName, final Object fieldValue, final int columns) {

@@ -1,6 +1,7 @@
 package com.revolsys.swing.table.worker;
 
 import java.awt.BorderLayout;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 import java.util.List;
@@ -12,12 +13,14 @@ import javax.swing.SwingWorker;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 
-import com.revolsys.swing.listener.InvokeMethodListener;
+import com.revolsys.swing.listener.EventQueueRunnableListener;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 
 public class SwingWorkerTableModel extends AbstractTableModel {
+  private static final long serialVersionUID = 1L;
+
   public static JPanel createPanel() {
     final JPanel taskPanel = new JPanel(new BorderLayout());
     final BaseJTable table = SwingWorkerTableModel.createTable();
@@ -46,15 +49,12 @@ public class SwingWorkerTableModel extends AbstractTableModel {
     return table;
   }
 
-  private static final long serialVersionUID = 1L;
+  private final List<String> columnTitles = Arrays.asList("Description", "Status");
 
-  private final List<String> columnTitles = Arrays.asList("Description",
-      "Status");
-
-  private final InvokeMethodListener listener;
+  private final PropertyChangeListener listener = new EventQueueRunnableListener(
+    () -> fireTableDataChanged());
 
   public SwingWorkerTableModel() {
-    this.listener = new InvokeMethodListener(this, "fireTableDataChanged");
     final PropertyChangeSupport propertyChangeSupport = Invoke.getPropertyChangeSupport();
     propertyChangeSupport.addPropertyChangeListener(this.listener);
   }
@@ -103,7 +103,6 @@ public class SwingWorkerTableModel extends AbstractTableModel {
   }
 
   @Override
-  public void setValueAt(final Object value, final int rowIndex,
-    final int columnIndex) {
+  public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
   }
 }

@@ -178,7 +178,7 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
   private void addListeners(final JComponent component) {
     if (component instanceof AbstractRecordQueryField) {
       final AbstractRecordQueryField queryField = (AbstractRecordQueryField)component;
-      queryField.addItemListener(this);
+      queryField.addPropertyChangeListener("selectedRecord", this);
     } else if (component instanceof JXSearchField) {
       final JXSearchField searchTextField = (JXSearchField)component;
       searchTextField.addActionListener(this);
@@ -309,7 +309,7 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
   private void removeListeners(final JComponent component) {
     if (component instanceof AbstractRecordQueryField) {
       final AbstractRecordQueryField queryField = (AbstractRecordQueryField)component;
-      queryField.removeItemListener(this);
+      queryField.removePropertyChangeListener("selectedRecord", this);
     } else if (component instanceof JXSearchField) {
       final JXSearchField searchTextField = (JXSearchField)component;
       searchTextField.removeActionListener(this);

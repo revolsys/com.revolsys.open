@@ -8,8 +8,8 @@ import com.revolsys.jdbc.io.JdbcQueryIterator;
 
 public class OracleJdbcQueryIterator extends JdbcQueryIterator {
 
-  public OracleJdbcQueryIterator(final AbstractJdbcRecordStore recordStore,
-    final Query query, final Map<String, Object> properties) {
+  public OracleJdbcQueryIterator(final AbstractJdbcRecordStore recordStore, final Query query,
+    final Map<String, Object> properties) {
     super(recordStore, query, properties);
   }
 
@@ -19,11 +19,10 @@ public class OracleJdbcQueryIterator extends JdbcQueryIterator {
 
     final int offset = query.getOffset();
     final int limit = query.getLimit();
-    if (offset < 1 && limit < 0) {
+    if (offset < 1 && limit == Integer.MAX_VALUE) {
       return sql;
     }
-    sql = "SELECT * FROM (SELECT V.*,ROWNUM \"ROWN\" FROM (" + sql
-        + ") V ) WHERE ROWN ";
+    sql = "SELECT * FROM (SELECT V.*,ROWNUM \"ROWN\" FROM (" + sql + ") V ) WHERE ROWN ";
     final int startRowNum = offset + 1;
     final int endRowNum = offset + limit;
     if (offset > 0) {

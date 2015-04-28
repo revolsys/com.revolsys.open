@@ -8,8 +8,8 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 
 public class PostgreSQLJdbcQueryIterator extends JdbcQueryIterator {
 
-  public PostgreSQLJdbcQueryIterator(final JdbcRecordStore recordStore,
-    final Query query, final Map<String, Object> properties) {
+  public PostgreSQLJdbcQueryIterator(final JdbcRecordStore recordStore, final Query query,
+    final Map<String, Object> properties) {
     super(recordStore, query, properties);
   }
 
@@ -21,7 +21,7 @@ public class PostgreSQLJdbcQueryIterator extends JdbcQueryIterator {
     if (offset > 0) {
       sql += " OFFSET " + offset;
     }
-    if (limit > -1) {
+    if (limit != Integer.MAX_VALUE) {
       sql += " LIMIT " + limit;
     }
     return sql;

@@ -5,13 +5,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
-import java.awt.ItemSelectable;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -38,6 +36,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
 
+import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -64,7 +63,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.list.ArrayListModel;
-import com.revolsys.swing.listener.InvokeMethodListener;
+import com.revolsys.swing.listener.ActionListenable;
 import com.revolsys.swing.listener.WeakFocusListener;
 import com.revolsys.swing.map.list.RecordListCellRenderer;
 import com.revolsys.swing.menu.PopupMenu;
@@ -72,8 +71,8 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordQueryField extends ValueField implements DocumentListener,
-  KeyListener, MouseListener, FocusListener, ListDataListener, ItemSelectable, Field,
-  ListSelectionListener, HighlightPredicate, EventsEnabler {
+  KeyListener, MouseListener, FocusListener, ListDataListener, Field, ListSelectionListener,
+  HighlightPredicate, EventsEnabler, ActionListenable {
   private static final Icon ICON_DELETE = Icons.getIcon("delete");
 
   private static final long serialVersionUID = 1L;
@@ -92,6 +91,8 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
 
   private final TextField searchField = new TextField("search", 50);
 
+  private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(16, 16));
+
   private Record selectedRecord;
 
   private final Map<Identifier, String> idToDisplayMap = new LruMap<>(100);
@@ -102,9 +103,11 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
 
   private final AtomicInteger searchIndex = new AtomicInteger();
 
-  private int maxResults = 100;
+  private int maxResults = Integer.MAX_VALUE;
 
   private final String typePath;
+
+  private int minSearchCharacters = 2;
 
   public AbstractRecordQueryField(final String fieldName, final String typePath,
     final String displayFieldName) {
@@ -147,16 +150,14 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
     PopupMenu.getPopupMenuFactory(this.searchField);
     this.searchField.setPreferredSize(new Dimension(100, 22));
     add(this.searchField);
+    this.busyLabel.setVisible(false);
+    add(this.busyLabel);
     GroupLayoutUtil.makeColumns(this, false);
   }
 
-  public void addActionListener(final InvokeMethodListener listener) {
-    this.searchField.addActionListener(listener);
-  }
-
   @Override
-  public void addItemListener(final ItemListener l) {
-    this.listenerList.add(ItemListener.class, l);
+  public void addActionListener(final ActionListener listener) {
+    this.searchField.addActionListener(listener);
   }
 
   @Override
@@ -171,50 +172,39 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
 
   protected void doQuery(final int searchIndex, final String queryText) {
     if (searchIndex == this.searchIndex.get()) {
-      if (Property.hasValue(queryText) && queryText.length() >= 2) {
-        Record selectedRecord = null;
-        final Map<String, Record> allRecords = new TreeMap<String, Record>();
-        for (Query query : this.queries) {
-          if (allRecords.size() < this.maxResults) {
-            query = query.clone();
-            query.addOrderBy(this.displayFieldName, true);
-            final Condition whereCondition = query.getWhereCondition();
-            if (whereCondition instanceof BinaryCondition) {
-              final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
-              if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
-                final String likeString = "%"
-                  + queryText.toUpperCase().replaceAll("[^A-Z0-9 ]", "%") + "%";
-                Q.setValue(0, binaryCondition, likeString);
-              } else {
-                Q.setValue(0, binaryCondition, queryText);
-              }
+      Record selectedRecord = null;
+      final Map<String, Record> allRecords = new TreeMap<String, Record>();
+      for (Query query : this.queries) {
+        if (allRecords.size() < this.maxResults) {
+          query = query.clone();
+          query.addOrderBy(this.displayFieldName, true);
+          final Condition whereCondition = query.getWhereCondition();
+          if (whereCondition instanceof BinaryCondition) {
+            final BinaryCondition binaryCondition = (BinaryCondition)whereCondition;
+            if (binaryCondition.getOperator().equalsIgnoreCase("like")) {
+              final String likeString = "%" + queryText.toUpperCase().replaceAll("[^A-Z0-9 ]", "%")
+                + "%";
+              Q.setValue(0, binaryCondition, likeString);
+            } else {
+              Q.setValue(0, binaryCondition, queryText);
             }
-            query.setLimit(this.maxResults);
-            final List<Record> records = getRecords(query);
-            for (final Record record : records) {
-              if (allRecords.size() < this.maxResults) {
-                final String key = record.getString(this.displayFieldName);
-                if (!allRecords.containsKey(key)) {
-                  if (queryText.equals(key)) {
-                    selectedRecord = record;
-                  }
-                  allRecords.put(key, record);
+          }
+          query.setLimit(this.maxResults);
+          final List<Record> records = getRecords(query);
+          for (final Record record : records) {
+            if (allRecords.size() < this.maxResults) {
+              final String key = record.getString(this.displayFieldName);
+              if (!allRecords.containsKey(key)) {
+                if (queryText.equals(key)) {
+                  selectedRecord = record;
                 }
+                allRecords.put(key, record);
               }
             }
           }
         }
-        setSearchResults(searchIndex, allRecords.values(), selectedRecord);
       }
-    }
-  }
-
-  protected void fireItemStateChanged(final ItemEvent e) {
-    final Object[] listeners = this.listenerList.getListenerList();
-    for (int i = listeners.length - 2; i >= 0; i -= 2) {
-      if (listeners[i] == ItemListener.class) {
-        ((ItemListener)listeners[i + 1]).itemStateChanged(e);
-      }
+      setSearchResults(searchIndex, allRecords.values(), selectedRecord);
     }
   }
 
@@ -266,28 +256,12 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
     }
   }
 
-  public ItemListener[] getItemListeners() {
-    return this.listenerList.getListeners(ItemListener.class);
-  }
-
   protected abstract Record getRecord(final Identifier identifier);
 
   protected abstract List<Record> getRecords(Query query);
 
   public String getSearchText() {
     return this.searchField.getText();
-  }
-
-  @Override
-  public Object[] getSelectedObjects() {
-    final Record selectedItem = getSelectedRecord();
-    if (selectedItem == null) {
-      return null;
-    } else {
-      return new Object[] {
-        selectedItem
-      };
-    }
   }
 
   public Record getSelectedRecord() {
@@ -355,7 +329,7 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
           selectedIndex = size - 1;
         }
         this.list.setSelectedIndex(selectedIndex);
-        this.selectedRecord = this.listModel.getElementAt(selectedIndex);
+        setSelectedRecord(this.listModel.getElementAt(selectedIndex));
         e.consume();
       break;
       case KeyEvent.VK_ENTER:
@@ -421,8 +395,8 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
   }
 
   @Override
-  public void removeItemListener(final ItemListener l) {
-    this.listenerList.remove(ItemListener.class, l);
+  public void removeActionListener(final ActionListener listener) {
+    this.searchField.removeActionListener(listener);
   }
 
   @Override
@@ -431,12 +405,27 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
   }
 
   protected void search() {
-    // TODO add a busy icon
     if (isEventsEnabled()) {
-      final int searchIndex = this.searchIndex.incrementAndGet();
-      Invoke.background("search", () -> {
-        doQuery(searchIndex, this.searchField.getText());
-      });
+      final String queryText = this.searchField.getText();
+      if (Property.hasValue(queryText)) {
+        if (queryText.length() >= this.minSearchCharacters) {
+          this.searchField.setFieldValid();
+          this.busyLabel.setBusy(true);
+          this.busyLabel.setVisible(true);
+          final int searchIndex = this.searchIndex.incrementAndGet();
+          Invoke.background("search", () -> doQuery(searchIndex, queryText));
+        } else {
+          setSelectedRecord(null);
+          this.listModel.clear();
+          this.menu.setVisible(false);
+          this.searchField.setFieldInvalid("Minimum " + this.minSearchCharacters
+            + " characters required for search", WebColors.Red, WebColors.Pink);
+        }
+      } else {
+        this.listModel.clear();
+        this.menu.setVisible(false);
+        setSelectedRecord(null);
+      }
     }
   }
 
@@ -480,27 +469,31 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
     this.maxResults = maxResults;
   }
 
+  public void setMinSearchCharacters(final int minSearchCharacters) {
+    this.minSearchCharacters = minSearchCharacters;
+  }
+
   protected void setSearchResults(final int searchIndex, final Collection<Record> records,
     final Record selectedRecord) {
     Invoke.later(() -> {
       if (searchIndex == this.searchIndex.get()) {
-        if (this.selectedRecord != null) {
-          final Record oldValue = this.selectedRecord;
-          this.selectedRecord = null;
-          fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED, oldValue,
-            ItemEvent.DESELECTED));
-        }
+        this.busyLabel.setBusy(false);
+        this.busyLabel.setVisible(false);
         this.listModel.setAll(records);
-        this.selectedRecord = selectedRecord;
         if (isShowing()) {
           showMenu();
-          if (this.selectedRecord != null) {
-            fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED,
-              this.selectedRecord, ItemEvent.SELECTED));
-          }
+          setSelectedRecord(selectedRecord);
         }
       }
     });
+  }
+
+  private void setSelectedRecord(final Record selectedRecord) {
+    final Record oldSelectedRecord = this.selectedRecord;
+    if (!EqualsRegistry.equal(selectedRecord, oldSelectedRecord)) {
+      this.selectedRecord = selectedRecord;
+      firePropertyChange("selectedRecord", oldSelectedRecord, selectedRecord);
+    }
   }
 
   private void showMenu() {
@@ -546,6 +539,7 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
         EventsEnabledState eventsEnabled = EventsEnabledState.disabled(this)) {
         final Record record = (Record)this.list.getSelectedValue();
         if (record != null) {
+          setSelectedRecord(record);
           final Identifier identifier = record.getIdentifier();
           final String label = record.getString(this.displayFieldName);
           this.idToDisplayMap.put(identifier, label);
@@ -555,7 +549,7 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
           super.setFieldValue(identifier);
         }
         this.menu.setVisible(false);
-        requestFocus();
+        this.searchField.requestFocus();
       }
     }
   }

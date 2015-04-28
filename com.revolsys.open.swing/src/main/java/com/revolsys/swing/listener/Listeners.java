@@ -7,7 +7,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
 
-public class Listener {
+public class Listeners {
 
   public static void addKey(final Object object, final KeyListener listener) {
     if (object instanceof Component) {

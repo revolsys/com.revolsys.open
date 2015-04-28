@@ -19,9 +19,8 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jts.geom.BoundingBox;
 
 public class Query extends AbstractObjectWithProperties implements Cloneable {
-  private static void addFilter(final Query query,
-    final RecordDefinition recordDefinition, final Map<String, ?> filter,
-    final AbstractMultiCondition multipleCondition) {
+  private static void addFilter(final Query query, final RecordDefinition recordDefinition,
+    final Map<String, ?> filter, final AbstractMultiCondition multipleCondition) {
     if (filter != null && !filter.isEmpty()) {
       for (final Entry<String, ?> entry : filter.entrySet()) {
         final String name = entry.getKey();
@@ -52,8 +51,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     }
   }
 
-  public static Query and(final RecordDefinition recordDefinition,
-    final Map<String, ?> filter) {
+  public static Query and(final RecordDefinition recordDefinition, final Map<String, ?> filter) {
     final Query query = new Query(recordDefinition);
     final Condition[] conditions = {};
     final And and = new And(conditions);
@@ -61,8 +59,8 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     return query;
   }
 
-  public static Query equal(final RecordDefinition recordDefinition,
-    final String name, final Object value) {
+  public static Query equal(final RecordDefinition recordDefinition, final String name,
+    final Object value) {
     final FieldDefinition attribute = recordDefinition.getField(name);
     if (attribute == null) {
       return null;
@@ -81,16 +79,14 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     if (geometryField == null) {
       return null;
     } else {
-      final EnvelopeIntersects intersects = F.envelopeIntersects(geometryField,
-        boundingBox);
+      final EnvelopeIntersects intersects = F.envelopeIntersects(geometryField, boundingBox);
       final Query query = new Query(recordDefinition, intersects);
       return query;
     }
 
   }
 
-  public static Query or(final RecordDefinition recordDefinition,
-    final Map<String, ?> filter) {
+  public static Query or(final RecordDefinition recordDefinition, final Map<String, ?> filter) {
     final Query query = new Query(recordDefinition);
     final Condition[] conditions = {};
     final Or or = new Or(conditions);
@@ -102,7 +98,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
 
   private String fromClause;
 
-  private int limit = -1;
+  private int limit = Integer.MAX_VALUE;
 
   private boolean lockResults = false;
 
@@ -132,8 +128,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
     this.recordDefinition = recordDefinition;
   }
 
-  public Query(final RecordDefinition recordDefinition,
-    final Condition whereCondition) {
+  public Query(final RecordDefinition recordDefinition, final Condition whereCondition) {
     this(recordDefinition);
     setWhereCondition(whereCondition);
   }
@@ -270,7 +265,11 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   }
 
   public void setLimit(final int limit) {
-    this.limit = limit;
+    if (limit < 0) {
+      this.limit = Integer.MAX_VALUE;
+    } else {
+      this.limit = limit;
+    }
   }
 
   public void setLockResults(final boolean lockResults) {
@@ -325,8 +324,7 @@ public class Query extends AbstractObjectWithProperties implements Cloneable {
   }
 
   public void setWhere(final String where) {
-    final Condition whereCondition = QueryValue.parseWhere(
-      this.recordDefinition, where);
+    final Condition whereCondition = QueryValue.parseWhere(this.recordDefinition, where);
     setWhereCondition(whereCondition);
   }
 

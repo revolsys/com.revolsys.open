@@ -8,10 +8,9 @@ import javax.swing.JColorChooser;
 import org.jdesktop.swingx.JXColorSelectionButton;
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.component.ColorAlphaPanel;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.listener.InvokeMethodListener;
-import com.revolsys.util.Property;
 
 public class ColorChooserField extends ValueField {
   private static final long serialVersionUID = 1L;
@@ -20,8 +19,7 @@ public class ColorChooserField extends ValueField {
 
   public ColorChooserField(final String fieldName, final Color color) {
     super(fieldName, color);
-    Property.addListener(this.colorButton, "background",
-      new InvokeMethodListener(this, "updateFieldValue"));
+    EventQueue.addPropertyChange(this.colorButton, "background", () -> updateFieldValue());
     setLayout(new VerticalLayout());
     setBorder(BorderFactory.createEmptyBorder(0, 3, 3, 0));
     add(this.colorButton);

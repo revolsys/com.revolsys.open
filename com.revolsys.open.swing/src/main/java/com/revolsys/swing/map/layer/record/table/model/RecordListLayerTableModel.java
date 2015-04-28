@@ -9,25 +9,23 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.jts.geom.Geometry;
-import com.revolsys.swing.listener.InvokeMethodListener;
+import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.ListRecordLayer;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
-import com.revolsys.util.Property;
 
 public class RecordListLayerTableModel extends RecordLayerTableModel implements
   PropertyChangeListener {
+  private static final long serialVersionUID = 1L;
+
   public static RecordLayerTable createTable(final ListRecordLayer layer) {
     final RecordLayerTableModel model = new RecordListLayerTableModel(layer);
     final RecordLayerTable table = new RecordLayerTable(model);
 
-    Property.addListener(layer, "hasSelectedRecords", new InvokeMethodListener(
-      RecordLayerTableModel.class, "selectionChanged", table, model));
+    EventQueue.addPropertyChange(layer, "hasSelectedRecords", () -> selectionChanged(table, model));
 
     return table;
   }
-
-  private static final long serialVersionUID = 1L;
 
   private List<LayerRecord> records = Collections.emptyList();
 
