@@ -15,7 +15,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -83,7 +82,6 @@ import com.revolsys.data.query.Value;
 import com.revolsys.data.query.functions.Function;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.spring.SpelUtil;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -92,6 +90,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.component.AttributeTitleStringConveter;
+import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
@@ -103,39 +102,13 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
 
   private static final long serialVersionUID = 1L;
 
-  public static JComponent createSearchField(final FieldDefinition fieldDefinition,
-    final CodeTable codeTable) {
+  public static JComponent createSearchField(final AbstractRecordLayer layer,
+    final FieldDefinition fieldDefinition, final CodeTable codeTable) {
     if (fieldDefinition == null) {
       return new TextField(20);
     } else {
-      final String name = fieldDefinition.getName();
-      final Class<?> typeClass = fieldDefinition.getTypeClass();
-      final String searchFieldFactory = fieldDefinition.getProperty("searchFieldFactory");
-      final RecordDefinition recordDefinition = fieldDefinition.getRecordDefinition();
-      if (recordDefinition == null) {
-        return new TextField(20);
-      } else {
-        JComponent field;
-        if (fieldDefinition.equals(recordDefinition.getIdField())) {
-          field = new TextField(20);
-        } else if (Property.hasValue(searchFieldFactory)) {
-          final Map<String, Object> searchFieldFactoryParameters = fieldDefinition.getProperty("searchFieldFactoryParameters");
-          field = SpelUtil.getValue(searchFieldFactory, fieldDefinition,
-            searchFieldFactoryParameters);
-        } else {
-          if (codeTable == null) {
-            if (Number.class.isAssignableFrom(typeClass)
-              || String.class.isAssignableFrom(typeClass)) {
-              field = new TextField(20);
-            } else {
-              field = SwingUtil.createField(typeClass, name, null);
-            }
-          } else {
-            field = SwingUtil.createComboBox(codeTable, false, 30);
-          }
-        }
-        return field;
-      }
+      final String fieldName = fieldDefinition.getName();
+      return RecordLayerFields.createCompactField(layer, fieldName, true);
     }
   }
 
@@ -177,6 +150,8 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
 
   private final Condition originalFilter;
 
+  private final AbstractRecordLayer layer;
+
   public QueryWhereConditionField(final AbstractRecordLayer layer,
     final PropertyChangeListener listener, final Condition filter) {
     this(layer, listener, filter, null);
@@ -186,6 +161,7 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
     final PropertyChangeListener listener, final Condition filter, final String query) {
     super(new BorderLayout());
     setTitle("Advanced Search");
+    this.layer = layer;
     this.originalFilter = filter;
     this.listener = listener;
     this.recordDefinition = layer.getRecordDefinition();
@@ -537,11 +513,11 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
   public void itemStateChanged(final ItemEvent event) {
     if (event.getSource() == this.fieldNamesList) {
       if (event.getStateChange() == ItemEvent.SELECTED) {
-        final FieldDefinition attribute = (FieldDefinition)event.getItem();
-        final String name = attribute.getName();
-        this.codeTable = this.recordDefinition.getCodeTableByColumn(name);
-        final JComponent binaryConditionField = createSearchField(attribute, this.codeTable);
-        final JComponent inConditionField = createSearchField(attribute, this.codeTable);
+        final FieldDefinition field = (FieldDefinition)event.getItem();
+        final String fieldName = field.getName();
+        this.codeTable = this.recordDefinition.getCodeTableByFieldName(fieldName);
+        final JComponent binaryConditionField = createSearchField(this.layer, field, this.codeTable);
+        final JComponent inConditionField = createSearchField(this.layer, field, this.codeTable);
 
         if (this.codeTable == null) {
           if (binaryConditionField instanceof DateField) {
@@ -745,7 +721,7 @@ public class QueryWhereConditionField extends ValueField implements MouseListene
 
               final String name = column.getName();
               final FieldDefinition attribute = this.recordDefinition.getField(name);
-              final CodeTable codeTable = this.recordDefinition.getCodeTableByColumn(name);
+              final CodeTable codeTable = this.recordDefinition.getCodeTableByFieldName(name);
               if (codeTable == null || attribute == this.recordDefinition.getIdField()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {

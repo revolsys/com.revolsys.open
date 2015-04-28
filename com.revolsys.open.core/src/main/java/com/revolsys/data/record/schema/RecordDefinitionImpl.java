@@ -317,7 +317,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
   }
 
   @Override
-  public CodeTable getCodeTableByColumn(final String column) {
+  public CodeTable getCodeTableByFieldName(final String column) {
     final RecordStore recordStore = getRecordStore();
     if (recordStore == null) {
       return null;

@@ -14,14 +14,14 @@ import org.slf4j.LoggerFactory;
 
 import com.revolsys.swing.dnd.transferable.MapTransferable;
 import com.revolsys.swing.dnd.transferable.RecordTransferable;
-import com.revolsys.swing.map.form.LayerRecordForm;
+import com.revolsys.swing.map.form.RecordLayerForm;
 
 public class RecordLayerFormTransferHandler extends TransferHandler {
   private static final long serialVersionUID = 1L;
 
-  private final Reference<LayerRecordForm> form;
+  private final Reference<RecordLayerForm> form;
 
-  public RecordLayerFormTransferHandler(final LayerRecordForm form) {
+  public RecordLayerFormTransferHandler(final RecordLayerForm form) {
     this.form = new WeakReference<>(form);
   }
 
@@ -45,7 +45,7 @@ public class RecordLayerFormTransferHandler extends TransferHandler {
     return transferable;
   }
 
-  public LayerRecordForm getForm() {
+  public RecordLayerForm getForm() {
     return this.form.get();
   }
 

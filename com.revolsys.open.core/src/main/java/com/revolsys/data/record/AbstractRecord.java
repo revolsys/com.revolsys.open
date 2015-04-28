@@ -354,7 +354,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object> impleme
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
-            final CodeTable codeTable = this.getRecordDefinition().getCodeTableByColumn(
+            final CodeTable codeTable = this.getRecordDefinition().getCodeTableByFieldName(
               propertyName);
             if (codeTable != null) {
               propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
@@ -372,7 +372,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object> impleme
         if (propertyValue == null) {
           return null;
         } else if (i + 1 < propertyPath.length) {
-          final CodeTable codeTable = this.getRecordDefinition().getCodeTableByColumn(propertyName);
+          final CodeTable codeTable = this.getRecordDefinition().getCodeTableByFieldName(propertyName);
           if (codeTable != null) {
             propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
           }
@@ -570,7 +570,7 @@ public abstract class AbstractRecord extends AbstractMap<String, Object> impleme
       codeTableFieldName = name.substring(0, dotIndex);
       codeTableValueName = name.substring(dotIndex + 1);
     }
-    final CodeTable codeTable = this.getRecordDefinition().getCodeTableByColumn(codeTableFieldName);
+    final CodeTable codeTable = this.getRecordDefinition().getCodeTableByFieldName(codeTableFieldName);
     if (codeTable == null) {
       if (dotIndex != -1) {
         LoggerFactory.getLogger(getClass()).debug(

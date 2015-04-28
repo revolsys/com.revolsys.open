@@ -47,6 +47,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.beans.EventsEnabledState;
 import com.revolsys.beans.EventsEnabler;
 import com.revolsys.collection.map.LruMap;
+import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
@@ -58,6 +59,7 @@ import com.revolsys.data.query.Query;
 import com.revolsys.data.query.Value;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
@@ -227,22 +229,37 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
     }
   }
 
+  protected CodeTable getCodeTable() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final String fieldName = getFieldName();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getCodeTableByFieldName(fieldName);
+    }
+  }
+
   protected String getDisplayText(final Identifier identifier) {
     if (identifier == null || this.idToDisplayMap == null) {
       return "";
     } else {
-      String displayText = this.idToDisplayMap.get(identifier);
-      if (displayText == null) {
-        displayText = identifier.toString();
-        try {
-          final Record record = getRecord(identifier);
-          if (record != null) {
-            displayText = record.getString(this.displayFieldName);
+      final CodeTable codeTable = getCodeTable();
+      if (codeTable == null) {
+        String displayText = this.idToDisplayMap.get(identifier);
+        if (displayText == null) {
+          displayText = identifier.toString();
+          try {
+            final Record record = getRecord(identifier);
+            if (record != null) {
+              displayText = record.getString(this.displayFieldName);
+            }
+          } catch (final Exception e) {
           }
-        } catch (final Exception e) {
         }
+        return displayText;
+      } else {
+        return codeTable.getValue(identifier);
       }
-      return displayText;
     }
   }
 
@@ -257,6 +274,8 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
   }
 
   protected abstract Record getRecord(final Identifier identifier);
+
+  public abstract RecordDefinition getRecordDefinition();
 
   protected abstract List<Record> getRecords(Query query);
 
@@ -449,17 +468,21 @@ public abstract class AbstractRecordQueryField extends ValueField implements Doc
   public void setFieldValue(final Object value) {
     final Identifier identifier = SingleIdentifier.create(value);
     super.setFieldValue(identifier);
-    if (this.idToDisplayMap != null) {
-      this.originalValue = identifier;
-      Icon icon;
-      String originalText;
-      if (value == null) {
-        originalText = "-";
-        icon = null;
-      } else {
-        originalText = getDisplayText(identifier);
-        icon = ICON_DELETE;
-      }
+    final String displayText = getDisplayText(identifier);
+    if (this.searchField != null) {
+      this.searchField.setFieldValue(displayText);
+    }
+    this.originalValue = identifier;
+    Icon icon;
+    String originalText;
+    if (value == null) {
+      originalText = "-";
+      icon = null;
+    } else {
+      originalText = getDisplayText(this.originalValue);
+      icon = ICON_DELETE;
+    }
+    if (this.oldValueItem != null) {
       this.oldValueItem.setIcon(icon);
       this.oldValueItem.setText(originalText);
     }

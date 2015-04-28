@@ -10,7 +10,7 @@ import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class LayerFormRecordPropertyEnableCheck extends AbstractEnableCheck {
-  private final Reference<LayerRecordForm> form;
+  private final Reference<RecordLayerForm> form;
 
   private final String propertyName;
 
@@ -18,17 +18,17 @@ public class LayerFormRecordPropertyEnableCheck extends AbstractEnableCheck {
 
   private boolean inverse = false;
 
-  public LayerFormRecordPropertyEnableCheck(final LayerRecordForm form,
+  public LayerFormRecordPropertyEnableCheck(final RecordLayerForm form,
     final String propertyName) {
     this(form, propertyName, true);
   }
 
-  public LayerFormRecordPropertyEnableCheck(final LayerRecordForm form,
+  public LayerFormRecordPropertyEnableCheck(final RecordLayerForm form,
     final String propertyName, final Object value) {
     this(form, propertyName, value, false);
   }
 
-  public LayerFormRecordPropertyEnableCheck(final LayerRecordForm form,
+  public LayerFormRecordPropertyEnableCheck(final RecordLayerForm form,
     final String propertyName, final Object value, final boolean inverse) {
     this.form = new WeakReference<>(form);
     Property.addListener(form, propertyName, this);
@@ -38,7 +38,7 @@ public class LayerFormRecordPropertyEnableCheck extends AbstractEnableCheck {
   }
 
   protected LayerRecord getRecord() {
-    final LayerRecordForm form = this.form.get();
+    final RecordLayerForm form = this.form.get();
     if (form == null) {
       return null;
     } else {

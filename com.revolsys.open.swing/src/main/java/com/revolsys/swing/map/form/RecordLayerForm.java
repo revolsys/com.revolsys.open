@@ -89,6 +89,7 @@ import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.map.layer.record.table.model.LayerRecordTableModel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsErrorPredicate;
@@ -107,7 +108,7 @@ import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public class LayerRecordForm extends JPanel implements PropertyChangeListener, CellEditorListener,
+public class RecordLayerForm extends JPanel implements PropertyChangeListener, CellEditorListener,
   FocusListener, PropertyChangeSupportProxy, WindowListener {
 
   public static final String FLIP_FIELDS_ICON = "flip_fields";
@@ -182,7 +183,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   private LayerRecord addRecord;
 
-  public LayerRecordForm(final AbstractRecordLayer layer) {
+  public RecordLayerForm(final AbstractRecordLayer layer) {
     ProjectFrame.addSaveActions(this, layer.getProject());
     setLayout(new BorderLayout());
     setName(layer.getName());
@@ -211,7 +212,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     this.undoManager.addKeyMap(this);
   }
 
-  public LayerRecordForm(final AbstractRecordLayer layer, final LayerRecord object) {
+  public RecordLayerForm(final AbstractRecordLayer layer, final LayerRecord object) {
     this(layer);
     setRecord(object);
   }
@@ -730,7 +731,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   }
 
   public String getCodeValue(final String fieldName, final Object value) {
-    final CodeTable codeTable = this.recordDefinition.getCodeTableByColumn(fieldName);
+    final CodeTable codeTable = this.recordDefinition.getCodeTableByFieldName(fieldName);
     String string;
     if (value == null) {
       return "-";
@@ -761,7 +762,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
       if (field == null) {
         final boolean editable = !this.readOnlyFieldNames.contains(fieldName);
         try {
-          field = SwingUtil.createField(this.recordDefinition, fieldName, editable);
+          field = RecordLayerFields.createFormField(this.layer, fieldName, editable);
           addField(fieldName, field);
         } catch (final IllegalArgumentException e) {
         }
@@ -801,7 +802,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   @SuppressWarnings("unchecked")
   public <T> T getFieldValue(final String name) {
     final Object value = this.fieldValues.get(name);
-    final CodeTable codeTable = this.recordDefinition.getCodeTableByColumn(name);
+    final CodeTable codeTable = this.recordDefinition.getCodeTableByFieldName(name);
     if (codeTable == null) {
       if (value != null && name.endsWith("_IND")) {
         if ("Y".equals(value) || Boolean.TRUE.equals(value)) {

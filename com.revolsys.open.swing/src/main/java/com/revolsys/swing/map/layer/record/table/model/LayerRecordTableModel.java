@@ -10,7 +10,7 @@ import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.RecordState;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.swing.map.form.LayerRecordForm;
+import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
@@ -25,9 +25,9 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel implem
 
   private final AbstractRecordLayer layer;
 
-  private final Reference<LayerRecordForm> form;
+  private final Reference<RecordLayerForm> form;
 
-  public LayerRecordTableModel(final LayerRecordForm form) {
+  public LayerRecordTableModel(final RecordLayerForm form) {
     super(form.getRecordDefinition(), true);
     this.form = new WeakReference<>(form);
     this.layer = form.getLayer();

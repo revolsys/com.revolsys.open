@@ -163,7 +163,7 @@ public class Value extends QueryValue {
         final RecordDefinition recordDefinition = attribute.getRecordDefinition();
         if (recordDefinition != null) {
           final String fieldName = attribute.getName();
-          codeTable = recordDefinition.getCodeTableByColumn(fieldName);
+          codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
           if (codeTable instanceof CodeTableProperty) {
             final CodeTableProperty codeTableProperty = (CodeTableProperty)codeTable;
             if (codeTableProperty.getRecordDefinition() == recordDefinition) {

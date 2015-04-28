@@ -28,7 +28,7 @@ TableSortController<RecordLayerTableModel> {
     final RecordLayerTableModel model = getModel();
     final String fieldName = model.getFieldName(columnIndex);
     final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
-    final CodeTable codeTable = recordDefinition.getCodeTableByColumn(fieldName);
+    final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
     if (codeTable == null) {
       final Class<?> columnClass = model.getColumnClass(columnIndex);
       final Comparator<?> comparator = super.getComparator(columnIndex);

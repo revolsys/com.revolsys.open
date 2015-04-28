@@ -68,7 +68,7 @@ public class ModifiedAttributePredicate implements HighlightPredicate {
           if (highlighted) {
             final RecordDefinition recordDefinition = layerRecord.getRecordDefinition();
             final Object originalValue = layerRecord.getOriginalValue(fieldName);
-            final CodeTable codeTable = recordDefinition.getCodeTableByColumn(fieldName);
+            final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
             String text;
             if (originalValue == null) {
               text = "-";

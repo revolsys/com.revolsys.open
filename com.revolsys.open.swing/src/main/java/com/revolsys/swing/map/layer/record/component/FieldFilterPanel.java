@@ -111,7 +111,7 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
 
   private boolean settingFilter = false;
 
-  private FieldDefinition attribute;
+  private FieldDefinition field;
 
   public FieldFilterPanel(final TablePanel tablePanel, final RecordLayerTableModel tableModel) {
     this.tableModel = tableModel;
@@ -497,15 +497,15 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
       this.lastValue = null;
       this.previousSearchFieldName = searchFieldName;
       final RecordDefinition recordDefinition = this.tableModel.getRecordDefinition();
-      this.attribute = recordDefinition.getField(searchFieldName);
-      final Class<?> attributeClass = this.attribute.getTypeClass();
+      this.field = recordDefinition.getField(searchFieldName);
+      final Class<?> attributeClass = this.field.getTypeClass();
       if (!EqualsRegistry.equal(searchFieldName, this.nameField.getSelectedItem())) {
         this.nameField.setFieldValue(searchFieldName);
       }
       if (searchFieldName.equals(recordDefinition.getIdFieldName())) {
         this.codeTable = null;
       } else {
-        this.codeTable = this.recordDefinition.getCodeTableByColumn(searchFieldName);
+        this.codeTable = this.recordDefinition.getCodeTableByFieldName(searchFieldName);
       }
       ComboBox operatorField;
       if (this.codeTable != null) {
@@ -547,16 +547,17 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
           searchField = this.searchTextField;
         } else if ("IS NULL".equals(searchOperator)) {
           if (!this.settingFilter) {
-            setFilter(Q.isNull(this.attribute));
+            setFilter(Q.isNull(this.field));
           }
           this.codeTable = null;
         } else if ("IS NOT NULL".equals(searchOperator)) {
           if (!this.settingFilter) {
-            setFilter(Q.isNotNull(this.attribute));
+            setFilter(Q.isNotNull(this.field));
           }
           this.codeTable = null;
         } else {
-          searchField = QueryWhereConditionField.createSearchField(this.attribute, this.codeTable);
+          searchField = QueryWhereConditionField.createSearchField(this.layer, this.field,
+            this.codeTable);
         }
 
         setSearchField(searchField);
@@ -579,21 +580,21 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
       Condition condition = null;
       final String searchOperator = getSearchOperator();
       if ("IS NULL".equalsIgnoreCase(searchOperator)) {
-        condition = Q.isNull(this.attribute);
+        condition = Q.isNull(this.field);
       } else if ("IS NOT NULL".equalsIgnoreCase(searchOperator)) {
-        condition = Q.isNotNull(this.attribute);
-      } else if (this.attribute != null) {
+        condition = Q.isNotNull(this.field);
+      } else if (this.field != null) {
         if (Property.hasValue(StringConverterRegistry.toString(searchValue))) {
           if ("Like".equalsIgnoreCase(searchOperator)) {
             final String searchText = StringConverterRegistry.toString(searchValue);
             if (Property.hasValue(searchText)) {
-              condition = Q.iLike(this.attribute, "%" + searchText + "%");
+              condition = Q.iLike(this.field, "%" + searchText + "%");
             }
           } else {
             Object value = null;
             if (this.codeTable == null) {
               try {
-                final Class<?> attributeClass = this.attribute.getTypeClass();
+                final Class<?> attributeClass = this.field.getTypeClass();
                 value = StringConverterRegistry.toObject(attributeClass, searchValue);
               } catch (final Throwable t) {
                 return;
@@ -605,7 +606,7 @@ public class FieldFilterPanel extends JComponent implements ActionListener, Item
               }
             }
             if (value != null) {
-              condition = Q.binary(this.attribute, searchOperator, value);
+              condition = Q.binary(this.field, searchOperator, value);
             }
           }
         }

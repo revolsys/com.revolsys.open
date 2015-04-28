@@ -78,6 +78,11 @@ public class RecordTableCellEditor extends AbstractCellEditor implements TableCe
     }
   }
 
+  protected Field createField(final String fieldName) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return SwingUtil.createField(recordDefinition, fieldName, true);
+  }
+
   @Override
   public Object getCellEditorValue() {
     final Object value = SwingUtil.getValue(this.editorComponent);
@@ -100,6 +105,11 @@ public class RecordTableCellEditor extends AbstractCellEditor implements TableCe
     return this.oldValue;
   }
 
+  protected RecordDefinition getRecordDefinition() {
+    final AbstractRecordTableModel tableModel = getTableModel();
+    return tableModel.getRecordDefinition();
+  }
+
   public int getRowIndex() {
     return this.rowIndex;
   }
@@ -113,11 +123,12 @@ public class RecordTableCellEditor extends AbstractCellEditor implements TableCe
       columnIndex = jxTable.convertColumnIndexToModel(columnIndex);
     }
     this.oldValue = value;
-    final AbstractRecordTableModel model = (AbstractRecordTableModel)table.getModel();
+    final AbstractRecordTableModel model = getTableModel();
     this.fieldName = model.getFieldName(rowIndex, columnIndex);
     final RecordDefinition recordDefinition = model.getRecordDefinition();
     this.dataType = recordDefinition.getFieldType(this.fieldName);
-    this.editorComponent = (JComponent)SwingUtil.createField(recordDefinition, this.fieldName, true);
+    final Field field = createField(this.fieldName);
+    this.editorComponent = (JComponent)field;
     if (this.editorComponent instanceof JTextField) {
       final JTextField textField = (JTextField)this.editorComponent;
       textField.setBorder(BorderFactory.createCompoundBorder(
@@ -142,6 +153,10 @@ public class RecordTableCellEditor extends AbstractCellEditor implements TableCe
       this.popupMenu.addToComponent(this.editorComponent);
     }
     return this.editorComponent;
+  }
+
+  protected AbstractRecordTableModel getTableModel() {
+    return (AbstractRecordTableModel)this.table.getModel();
   }
 
   @Override

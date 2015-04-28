@@ -35,7 +35,7 @@ import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.InvokeMethodEnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
-import com.revolsys.swing.map.form.LayerRecordForm;
+import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.BatchUpdate;
@@ -140,13 +140,13 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
       if (geometryDataType == DataTypes.LINE_STRING
         || geometryDataType == DataTypes.MULTI_LINE_STRING) {
         if (DirectionalAttributes.getProperty(recordDefinition).hasDirectionalAttributes()) {
-          editMenu.addMenuItemTitleIcon("geometry", LayerRecordForm.FLIP_RECORD_NAME,
-            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, this, "flipRecordOrientation");
-          editMenu.addMenuItemTitleIcon("geometry", LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
-            LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck, this,
+          editMenu.addMenuItemTitleIcon("geometry", RecordLayerForm.FLIP_RECORD_NAME,
+            RecordLayerForm.FLIP_RECORD_ICON, editableEnableCheck, this, "flipRecordOrientation");
+          editMenu.addMenuItemTitleIcon("geometry", RecordLayerForm.FLIP_LINE_ORIENTATION_NAME,
+            RecordLayerForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck, this,
             "flipLineOrientation");
-          editMenu.addMenuItemTitleIcon("geometry", LayerRecordForm.FLIP_FIELDS_NAME,
-            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, this, "flipFields");
+          editMenu.addMenuItemTitleIcon("geometry", RecordLayerForm.FLIP_FIELDS_NAME,
+            RecordLayerForm.FLIP_FIELDS_ICON, editableEnableCheck, this, "flipFields");
         } else {
           editMenu.addMenuItemTitleIcon("geometry", "Flip Line Orientation", "flip_line",
             editableEnableCheck, this, "flipLineOrientation");

@@ -33,13 +33,13 @@ TableModelListener {
 
   private final TablePanel tablePanel;
 
-  private final Reference<LayerRecordForm> form;
+  private final Reference<RecordLayerForm> form;
 
   final TableCellRenderer cellRenderer = new BaseTableCellRenderer();
 
   final BaseTableCellEditor cellEditor;
 
-  public GeometryCoordinatesPanel(final LayerRecordForm form,
+  public GeometryCoordinatesPanel(final RecordLayerForm form,
     final String fieldName) {
     super(fieldName, null);
     setLayout(new BorderLayout());
@@ -57,7 +57,7 @@ TableModelListener {
     add(this.tablePanel, BorderLayout.WEST);
   }
 
-  public LayerRecordForm getForm() {
+  public RecordLayerForm getForm() {
     return this.form.get();
   }
 
