@@ -40,7 +40,7 @@ MapSerializer {
 
   void destroy();
 
-  CodeTable getCodeTableByColumn(String column);
+  CodeTable getCodeTableByFieldName(String fieldName);
 
   Object getDefaultValue(String fieldName);
 

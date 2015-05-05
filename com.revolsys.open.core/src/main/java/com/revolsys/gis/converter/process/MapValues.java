@@ -54,7 +54,7 @@ public class MapValues extends AbstractSourceToTargetProcess<Record, Record> {
       final Object targetValue = this.valueMap.get(sourceValue);
       if (targetValue != null) {
         final RecordDefinition targetRecordDefinition = target.getRecordDefinition();
-        final CodeTable codeTable = targetRecordDefinition.getCodeTableByColumn(this.targetFieldName);
+        final CodeTable codeTable = targetRecordDefinition.getCodeTableByFieldName(this.targetFieldName);
         if (codeTable == null) {
           target.setValue(this.targetFieldName, targetValue);
         } else {

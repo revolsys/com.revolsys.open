@@ -39,7 +39,8 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.BoundingBox;
-import com.revolsys.swing.listener.InvokeMethodListener;
+import com.revolsys.swing.EventQueue;
+import com.revolsys.swing.listener.EventQueueRunnableListener;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -61,6 +62,14 @@ import com.revolsys.util.Property;
 public class RecordLayerTableModel extends RecordRowTableModel implements SortableTableModel,
   PropertyChangeListener, PropertyChangeSupportProxy {
 
+  private static final long serialVersionUID = 1L;
+
+  public static final String MODE_ALL = "all";
+
+  public static final String MODE_SELECTED = "selected";
+
+  public static final String MODE_EDITS = "edits";
+
   public static RecordLayerTable createTable(final AbstractRecordLayer layer) {
     final RecordDefinition recordDefinition = layer.getRecordDefinition();
     if (recordDefinition == null) {
@@ -73,9 +82,8 @@ public class RecordLayerTableModel extends RecordRowTableModel implements Sortab
       NewPredicate.add(table);
       DeletedPredicate.add(table);
 
-      model.selectionChangedListener = new InvokeMethodListener(RecordLayerTableModel.class,
-        "selectionChanged", table, model);
-      Property.addListener(layer, "hasSelectedRecords", model.selectionChangedListener);
+      model.selectionChangedListener = EventQueue.addPropertyChange(layer, "hasSelectedRecords",
+        () -> selectionChanged(table, model));
       return table;
     }
   }
@@ -90,15 +98,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements Sortab
     }
   }
 
-  private InvokeMethodListener selectionChangedListener;
-
-  private static final long serialVersionUID = 1L;
-
-  public static final String MODE_ALL = "all";
-
-  public static final String MODE_SELECTED = "selected";
-
-  public static final String MODE_EDITS = "edits";
+  private EventQueueRunnableListener selectionChangedListener;
 
   private ListSelectionModel selectionModel = new RecordLayerListSelectionModel(this);
 

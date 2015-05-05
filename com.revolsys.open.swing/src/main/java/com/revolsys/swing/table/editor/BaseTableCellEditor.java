@@ -27,7 +27,7 @@ import com.revolsys.awt.WebColors;
 import com.revolsys.data.types.DataType;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
-import com.revolsys.swing.listener.Listener;
+import com.revolsys.swing.listener.Listeners;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.PopupMenu;
 import com.revolsys.swing.table.AbstractTableModel;
@@ -154,27 +154,27 @@ TableCellEditor, KeyListener, MouseListener, TableModelListener {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    Listener.mouseEvent(this.mouseListener, e);
+    Listeners.mouseEvent(this.mouseListener, e);
   }
 
   @Override
   public void mouseEntered(final MouseEvent e) {
-    Listener.mouseEvent(this.mouseListener, e);
+    Listeners.mouseEvent(this.mouseListener, e);
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    Listener.mouseEvent(this.mouseListener, e);
+    Listeners.mouseEvent(this.mouseListener, e);
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    Listener.mouseEvent(this.mouseListener, e);
+    Listeners.mouseEvent(this.mouseListener, e);
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    Listener.mouseEvent(this.mouseListener, e);
+    Listeners.mouseEvent(this.mouseListener, e);
   }
 
   public synchronized void removeMouseListener(final MouseListener l) {

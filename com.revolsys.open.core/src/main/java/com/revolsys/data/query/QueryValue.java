@@ -206,7 +206,7 @@ public abstract class QueryValue implements Cloneable {
               throw new IllegalArgumentException("Values can't be null for "
                   + operator + " use IS NULL or IS NOT NULL instead.");
             } else {
-              final CodeTable codeTable = recordDefinition.getCodeTableByColumn(name);
+              final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(name);
               if (codeTable == null
                   || attribute == recordDefinition.getIdField()) {
                 final Class<?> typeClass = attribute.getTypeClass();

@@ -128,7 +128,7 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
       }
       CodeTable codeTable = null;
       if (!name.equals(idFieldName)) {
-        codeTable = recordDefinition.getCodeTableByColumn(name);
+        codeTable = recordDefinition.getCodeTableByFieldName(name);
       }
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);
@@ -159,7 +159,7 @@ public abstract class AbstractRecordTableModel extends com.revolsys.swing.table.
       return null;
     }
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final CodeTable codeTable = recordDefinition.getCodeTableByColumn(fieldName);
+    final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
     if (codeTable == null) {
       final Class<?> fieldClass = recordDefinition.getFieldClass(fieldName);
       final Object objectValue = StringConverterRegistry.toObject(fieldClass, displayValue);

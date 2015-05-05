@@ -12,7 +12,6 @@ import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.io.StringPrinter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.MathUtil;
-import com.revolsys.util.Numbers;
 
 public final class JsonWriterUtil {
   public static void charSequence(final Writer out, final CharSequence string) throws IOException {
@@ -161,18 +160,17 @@ public final class JsonWriterUtil {
       } else {
         out.write("false");
       }
-    } else if (Numbers.isPrimitiveIntegral(value)) {
-      out.write(value.toString());
     } else if (value instanceof Number) {
       final Number number = (Number)value;
-      final double doubleValue = number.doubleValue();
-      if (Double.isInfinite(doubleValue)) {
-        out.write(MathUtil.toString(-Double.MAX_VALUE));
-      } else if (Double.isInfinite(doubleValue)) {
-        out.write("null");
-      } else {
-        out.write(MathUtil.toString(doubleValue));
+      String string = MathUtil.toString(number);
+      if ("NaN".equals(string)) {
+        string = "null";
+      } else if ("Infinity".equals(string)) {
+        string = MathUtil.MAX_DOUBLE_STRING;
+      } else if ("-Infinity".equals(string)) {
+        string = MathUtil.MIN_DOUBLE_STRING;
       }
+      out.write(string);
     } else if (value instanceof Collection) {
       final Collection<? extends Object> list = (Collection<? extends Object>)value;
       write(out, list, indent, writeNulls);

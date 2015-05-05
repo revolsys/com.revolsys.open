@@ -378,7 +378,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel imple
         }
         CodeTable codeTable = null;
         if (!name.equals(idFieldName)) {
-          codeTable = recordDefinition.getCodeTableByColumn(name);
+          codeTable = recordDefinition.getCodeTableByFieldName(name);
         }
         if (codeTable == null) {
           text = StringConverterRegistry.toString(objectValue);

@@ -92,7 +92,7 @@ import com.revolsys.swing.dnd.transferable.StringTransferable;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
-import com.revolsys.swing.map.form.LayerRecordForm;
+import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.form.SnapLayersPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
@@ -130,40 +130,6 @@ import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayer extends AbstractLayer implements RecordFactory,
   AddGeometryCompleteAction {
-
-  public static void addVisibleLayers(final List<AbstractRecordLayer> layers, final LayerGroup group) {
-    if (group.isExists() && group.isVisible()) {
-      for (final Layer layer : group) {
-        if (layer instanceof LayerGroup) {
-          final LayerGroup layerGroup = (LayerGroup)layer;
-          addVisibleLayers(layers, layerGroup);
-        } else if (layer instanceof AbstractRecordLayer) {
-          if (layer.isExists() && layer.isVisible()) {
-            final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
-            layers.add(recordLayer);
-          }
-        }
-      }
-    }
-  }
-
-  public static LayerRecord getAndRemoveSame(final Collection<? extends LayerRecord> records,
-    final LayerRecord record) {
-    for (final Iterator<? extends LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
-      final LayerRecord queryRecord = iterator.next();
-      if (queryRecord.isSame(record)) {
-        iterator.remove();
-        return queryRecord;
-      }
-    }
-    return null;
-  }
-
-  public static List<AbstractRecordLayer> getVisibleLayers(final LayerGroup group) {
-    final List<AbstractRecordLayer> layers = new ArrayList<AbstractRecordLayer>();
-    addVisibleLayers(layers, group);
-    return layers;
-  }
 
   public static final String ALL = "All";
 
@@ -227,6 +193,40 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     // menu.addMenuItem("edit", 0, MenuSourceRunnable.createAction(
     // "Export Records", "disk", new AndEnableCheck(exists, hasSelectedRecords),
     // "exportRecords"));
+  }
+
+  public static void addVisibleLayers(final List<AbstractRecordLayer> layers, final LayerGroup group) {
+    if (group.isExists() && group.isVisible()) {
+      for (final Layer layer : group) {
+        if (layer instanceof LayerGroup) {
+          final LayerGroup layerGroup = (LayerGroup)layer;
+          addVisibleLayers(layers, layerGroup);
+        } else if (layer instanceof AbstractRecordLayer) {
+          if (layer.isExists() && layer.isVisible()) {
+            final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
+            layers.add(recordLayer);
+          }
+        }
+      }
+    }
+  }
+
+  public static LayerRecord getAndRemoveSame(final Collection<? extends LayerRecord> records,
+    final LayerRecord record) {
+    for (final Iterator<? extends LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
+      final LayerRecord queryRecord = iterator.next();
+      if (queryRecord.isSame(record)) {
+        iterator.remove();
+        return queryRecord;
+      }
+    }
+    return null;
+  }
+
+  public static List<AbstractRecordLayer> getVisibleLayers(final LayerGroup group) {
+    final List<AbstractRecordLayer> layers = new ArrayList<AbstractRecordLayer>();
+    addVisibleLayers(layers, group);
+    return layers;
   }
 
   private BoundingBox boundingBox = new BoundingBoxDoubleGf();
@@ -601,11 +601,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     copyRecordsToClipboard(selectedRecords);
   }
 
-  protected LayerRecordForm createDefaultForm(final LayerRecord record) {
-    return new LayerRecordForm(this, record);
+  protected RecordLayerForm createDefaultForm(final LayerRecord record) {
+    return new RecordLayerForm(this, record);
   }
 
-  public LayerRecordForm createForm(final LayerRecord record) {
+  public RecordLayerForm createForm(final LayerRecord record) {
     final String formFactoryExpression = getProperty(FORM_FACTORY_EXPRESSION);
     if (Property.hasValue(formFactoryExpression)) {
       try {
@@ -613,7 +613,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
         final Expression expression = parser.parseExpression(formFactoryExpression);
         final EvaluationContext context = new StandardEvaluationContext(this);
         context.setVariable("object", record);
-        return expression.getValue(context, LayerRecordForm.class);
+        return expression.getValue(context, RecordLayerForm.class);
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Unable to create form for " + this, e);
         return null;
@@ -747,8 +747,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     }
     for (final Component form : this.formComponents) {
       if (form != null) {
-        if (form instanceof LayerRecordForm) {
-          final LayerRecordForm recordForm = (LayerRecordForm)form;
+        if (form instanceof RecordLayerForm) {
+          final RecordLayerForm recordForm = (RecordLayerForm)form;
           Invoke.later(recordForm, "destroy");
         }
       }
@@ -2006,8 +2006,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
           this.formRecords.remove(index);
           final Component form = this.formComponents.remove(index);
           if (form != null) {
-            if (form instanceof LayerRecordForm) {
-              final LayerRecordForm recordForm = (LayerRecordForm)form;
+            if (form instanceof RecordLayerForm) {
+              final RecordLayerForm recordForm = (RecordLayerForm)form;
               recordForm.destroy();
             }
           }
@@ -2515,7 +2515,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
   public LayerRecord showAddForm(final Map<String, Object> parameters) {
     if (isCanAddRecords()) {
       final LayerRecord newRecord = createRecord(parameters);
-      final LayerRecordForm form = createForm(newRecord);
+      final RecordLayerForm form = createForm(newRecord);
       if (form == null) {
         return null;
       } else {
@@ -2572,8 +2572,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
               if (id != null) {
                 title += " #" + id;
               }
-              if (form instanceof LayerRecordForm) {
-                final LayerRecordForm recordForm = (LayerRecordForm)form;
+              if (form instanceof RecordLayerForm) {
+                final RecordLayerForm recordForm = (RecordLayerForm)form;
                 recordForm.setEditable(false);
               }
             }
@@ -2581,8 +2581,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
             window = new BaseDialog(parent, title);
             window.add(form);
             window.pack();
-            if (form instanceof LayerRecordForm) {
-              final LayerRecordForm recordForm = (LayerRecordForm)form;
+            if (form instanceof RecordLayerForm) {
+              final RecordLayerForm recordForm = (RecordLayerForm)form;
               window.addWindowListener(recordForm);
             }
             SwingUtil.autoAdjustPosition(window);

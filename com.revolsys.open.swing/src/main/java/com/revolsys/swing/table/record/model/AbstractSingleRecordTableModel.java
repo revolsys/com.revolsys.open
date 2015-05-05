@@ -226,7 +226,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
       }
       CodeTable codeTable = null;
       if (!name.equals(idFieldName)) {
-        codeTable = recordDefinition.getCodeTableByColumn(name);
+        codeTable = recordDefinition.getCodeTableByFieldName(name);
       }
       if (codeTable == null) {
         text = StringConverterRegistry.toString(objectValue);

@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 
+import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.layout.SpringLayoutUtil;
-import com.revolsys.swing.listener.InvokeMethodActionListener;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.Property;
@@ -34,7 +34,7 @@ public class DirectoryNameField extends JPanel implements Field {
 
     add(this.directoryName);
     this.browseButton.setText("Browse...");
-    this.browseButton.addActionListener(new InvokeMethodActionListener(this, "browseClick"));
+    EventQueue.addAction(this.browseButton, () -> browseClick());
     add(this.browseButton);
     SpringLayoutUtil.makeCompactGrid(this, 1, 2, 5, 5, 5, 5);
   }

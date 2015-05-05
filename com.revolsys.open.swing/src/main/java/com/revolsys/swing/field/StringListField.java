@@ -21,9 +21,10 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.component.ValueField;
-import com.revolsys.swing.list.BaseListModel;
-import com.revolsys.swing.listener.InvokeMethodListener;
+import com.revolsys.swing.list.ArrayListModel;
+import com.revolsys.swing.listener.EventQueueRunnableListener;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
@@ -35,7 +36,7 @@ public class StringListField extends ValueField {
 
   private final JTextField valueEntry = new JTextField();
 
-  private final BaseListModel<String> values = new BaseListModel<String>();
+  private final ArrayListModel<String> values = new ArrayListModel<String>();
 
   private final JButton addButton;
 
@@ -45,8 +46,7 @@ public class StringListField extends ValueField {
 
   private final ToolBar toolBar = new ToolBar();
 
-  public StringListField(final Comparator<String> comparator,
-    final String fieldName) {
+  public StringListField(final Comparator<String> comparator, final String fieldName) {
     super(fieldName, "");
     setOpaque(false);
     this.comparator = comparator;
@@ -64,13 +64,12 @@ public class StringListField extends ValueField {
     this.valueEntry.setPreferredSize(new Dimension(600, 25));
     fieldPanel.add(this.valueEntry);
 
-    this.addButton = this.toolBar.addButtonTitleIcon("add", "Add", "add", this,
-        "addValue");
+    this.addButton = this.toolBar.addButtonTitleIcon("add", "Add", "add", this, "addValue");
 
     this.valueEntry.addActionListener(this.addButton.getAction());
 
-    this.toolBar.addButtonTitleIcon(SELECTED, "Remove Selected", "delete",
-      this, "removeSelectedValues");
+    this.toolBar.addButtonTitleIcon(SELECTED, "Remove Selected", "delete", this,
+      "removeSelectedValues");
 
     this.valuesField = new JXList(this.values);
     this.valuesField.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -81,11 +80,10 @@ public class StringListField extends ValueField {
     fieldPanel.add(namesPane);
     updateFields();
 
-    this.valueEntry.getDocument().addDocumentListener(
-      new InvokeMethodListener(this, "updateFields"));
+    final EventQueueRunnableListener updateFieldListener = EventQueue.addDocument(this.valueEntry,
+      () -> updateFields());
 
-    this.valuesField.addListSelectionListener(new InvokeMethodListener(this,
-        "updateFields"));
+    this.valuesField.addListSelectionListener(updateFieldListener);
 
   }
 

@@ -15,7 +15,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -83,7 +82,6 @@ import com.revolsys.data.query.Value;
 import com.revolsys.data.query.functions.Function;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.spring.SpelUtil;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
@@ -92,52 +90,27 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.component.AttributeTitleStringConveter;
+import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public class QueryWhereConditionField extends ValueField implements
-MouseListener, CaretListener, ItemListener {
-
-  public static JComponent createSearchField(final FieldDefinition attribute,
-    final CodeTable codeTable) {
-    if (attribute == null) {
-      return new TextField(20);
-    } else {
-      final String name = attribute.getName();
-      final Class<?> typeClass = attribute.getTypeClass();
-      final String searchFieldFactory = attribute.getProperty("searchFieldFactory");
-      final RecordDefinition recordDefinition = attribute.getRecordDefinition();
-      if (recordDefinition == null) {
-        return new TextField(20);
-      } else {
-        JComponent field;
-        if (attribute.equals(recordDefinition.getIdField())) {
-          field = new TextField(20);
-        } else if (Property.hasValue(searchFieldFactory)) {
-          final Map<String, Object> searchFieldFactoryParameters = attribute.getProperty("searchFieldFactoryParameters");
-          field = SpelUtil.getValue(searchFieldFactory, attribute,
-            searchFieldFactoryParameters);
-        } else {
-          if (codeTable == null) {
-            if (Number.class.isAssignableFrom(typeClass)
-                || String.class.isAssignableFrom(typeClass)) {
-              field = new TextField(20);
-            } else {
-              field = SwingUtil.createField(typeClass, name, null);
-            }
-          } else {
-            field = SwingUtil.createComboBox(codeTable, false, 30);
-          }
-        }
-        return field;
-      }
-    }
-  }
+public class QueryWhereConditionField extends ValueField implements MouseListener, CaretListener,
+  ItemListener {
 
   private static final ImageIcon ICON = Icons.getIcon("add");
 
   private static final long serialVersionUID = 1L;
+
+  public static JComponent createSearchField(final AbstractRecordLayer layer,
+    final FieldDefinition fieldDefinition, final CodeTable codeTable) {
+    if (fieldDefinition == null) {
+      return new TextField(20);
+    } else {
+      final String fieldName = fieldDefinition.getName();
+      return RecordLayerFields.createCompactField(layer, fieldName, true);
+    }
+  }
 
   private JComponent binaryConditionField;
 
@@ -177,23 +150,24 @@ MouseListener, CaretListener, ItemListener {
 
   private final Condition originalFilter;
 
+  private final AbstractRecordLayer layer;
+
   public QueryWhereConditionField(final AbstractRecordLayer layer,
     final PropertyChangeListener listener, final Condition filter) {
     this(layer, listener, filter, null);
   }
 
   public QueryWhereConditionField(final AbstractRecordLayer layer,
-    final PropertyChangeListener listener, final Condition filter,
-    final String query) {
+    final PropertyChangeListener listener, final Condition filter, final String query) {
     super(new BorderLayout());
     setTitle("Advanced Search");
+    this.layer = layer;
     this.originalFilter = filter;
     this.listener = listener;
     this.recordDefinition = layer.getRecordDefinition();
     final List<FieldDefinition> attributes = this.recordDefinition.getFields();
 
-    this.fieldNamesList = new ComboBox(new AttributeTitleStringConveter(layer),
-      false, attributes);
+    this.fieldNamesList = new ComboBox(new AttributeTitleStringConveter(layer), false, attributes);
     this.fieldNamesList.addItemListener(this);
     this.fieldNamesList.addMouseListener(this);
 
@@ -201,63 +175,52 @@ MouseListener, CaretListener, ItemListener {
     GroupLayoutUtil.makeColumns(fieldNamePanel, 1, false);
 
     this.binaryConditionOperator = new ComboBox("=", "<>", "<", "<=", ">", ">=");
-    final JButton binaryConditionAddButton = InvokeMethodAction.createButton(
-      "", "Add Binary Condition", ICON, this, "actionAddBinaryCondition");
+    final JButton binaryConditionAddButton = InvokeMethodAction.createButton("",
+      "Add Binary Condition", ICON, this, "actionAddBinaryCondition");
     this.binaryConditionPanel = new BasePanel(this.binaryConditionOperator,
       binaryConditionAddButton);
     setBinaryConditionField(null);
 
     this.rightUnaryConditionOperator = new ComboBox("IS NULL", "IS NOT NULL");
-    final JButton rightUnaryConditionAddButton = InvokeMethodAction.createButton(
-      "", "Add Unary Condition", ICON, this, "actionAddRightUnaryCondition");
-    final BasePanel rightUnaryConditionPanel = new BasePanel(
-      this.rightUnaryConditionOperator, rightUnaryConditionAddButton);
+    final JButton rightUnaryConditionAddButton = InvokeMethodAction.createButton("",
+      "Add Unary Condition", ICON, this, "actionAddRightUnaryCondition");
+    final BasePanel rightUnaryConditionPanel = new BasePanel(this.rightUnaryConditionOperator,
+      rightUnaryConditionAddButton);
     GroupLayoutUtil.makeColumns(rightUnaryConditionPanel, false);
 
     final JButton likeConditionAddButton = InvokeMethodAction.createButton("",
       "Add Unary Condition", ICON, this, "actionAddLikeCondition");
     this.likeConditionField = new TextField(20);
-    this.likePanel = new BasePanel(SwingUtil.createLabel("LIKE"), new JLabel(
-        " '%"), this.likeConditionField, new JLabel("%' "),
-        likeConditionAddButton);
+    this.likePanel = new BasePanel(SwingUtil.createLabel("LIKE"), new JLabel(" '%"),
+      this.likeConditionField, new JLabel("%' "), likeConditionAddButton);
     GroupLayoutUtil.makeColumns(this.likePanel, false);
 
-    final JButton inConditionAddButton = InvokeMethodAction.createButton("",
-      "Add Unary Condition", ICON, this, "actionAddInCondition");
+    final JButton inConditionAddButton = InvokeMethodAction.createButton("", "Add Unary Condition",
+      ICON, this, "actionAddInCondition");
     this.inConditionField = new TextField(20);
-    this.inConditionPanel = new BasePanel(SwingUtil.createLabel("IN"),
-      this.inConditionField, inConditionAddButton);
+    this.inConditionPanel = new BasePanel(SwingUtil.createLabel("IN"), this.inConditionField,
+      inConditionAddButton);
     setInConditionField(null);
 
-    final BasePanel operatorPanel = new BasePanel(new VerticalLayout(),
-      this.binaryConditionPanel, rightUnaryConditionPanel, this.likePanel,
-      this.inConditionPanel);
+    final BasePanel operatorPanel = new BasePanel(new VerticalLayout(), this.binaryConditionPanel,
+      rightUnaryConditionPanel, this.likePanel, this.inConditionPanel);
 
-    final BasePanel fieldConditions = new BasePanel(fieldNamePanel,
-      operatorPanel);
+    final BasePanel fieldConditions = new BasePanel(fieldNamePanel, operatorPanel);
     GroupLayoutUtil.makeColumns(fieldConditions, 2, false);
 
     final ToolBar buttonsPanel = new ToolBar();
     buttonsPanel.setBorderPainted(true);
-    buttonsPanel.addButton("relational", "AND", this, "insertText", "AND")
-    .setBorderPainted(true);
-    buttonsPanel.addButton("relational", "OR", this, "insertText", "OR")
-    .setBorderPainted(true);
-    buttonsPanel.addButton("relational", "NOT", this, "insertText", "NOT")
-    .setBorderPainted(true);
-    buttonsPanel.addButton("grouping", "( )", this, "insertText", "( )")
-    .setBorderPainted(true);
-    buttonsPanel.addButton("math", "+", this, "insertText", "+")
-    .setBorderPainted(true);
-    buttonsPanel.addButton("math", "-", this, "insertText", "-")
-    .setBorderPainted(true);
-    buttonsPanel.addButton("math", "*", this, "insertText", "*")
-    .setBorderPainted(true);
-    buttonsPanel.addButton("math", "/", this, "insertText", "/")
-    .setBorderPainted(true);
+    buttonsPanel.addButton("relational", "AND", this, "insertText", "AND").setBorderPainted(true);
+    buttonsPanel.addButton("relational", "OR", this, "insertText", "OR").setBorderPainted(true);
+    buttonsPanel.addButton("relational", "NOT", this, "insertText", "NOT").setBorderPainted(true);
+    buttonsPanel.addButton("grouping", "( )", this, "insertText", "( )").setBorderPainted(true);
+    buttonsPanel.addButton("math", "+", this, "insertText", "+").setBorderPainted(true);
+    buttonsPanel.addButton("math", "-", this, "insertText", "-").setBorderPainted(true);
+    buttonsPanel.addButton("math", "*", this, "insertText", "*").setBorderPainted(true);
+    buttonsPanel.addButton("math", "/", this, "insertText", "/").setBorderPainted(true);
 
-    final BasePanel widgetPanel = new BasePanel(new VerticalLayout(5),
-      fieldConditions, buttonsPanel);
+    final BasePanel widgetPanel = new BasePanel(new VerticalLayout(5), fieldConditions,
+      buttonsPanel);
 
     this.whereTextField = new TextPane(5, 20);
     this.whereTextField.setFont(new Font("Monospaced", Font.PLAIN, 11));
@@ -269,8 +232,7 @@ MouseListener, CaretListener, ItemListener {
     // pane
 
     this.sqlPrefix = "SELECT * FROM "
-        + this.recordDefinition.getPath().substring(1).replace('/', '.')
-        + " WHERE";
+      + this.recordDefinition.getPath().substring(1).replace('/', '.') + " WHERE";
 
     final JPanel filterTextPanel = new JPanel(new BorderLayout());
     filterTextPanel.setOpaque(false);
@@ -279,8 +241,8 @@ MouseListener, CaretListener, ItemListener {
 
     final ToolBar statusToolBar = new ToolBar();
     statusToolBar.setOpaque(false);
-    final JButton verifyButton = statusToolBar.addButton("default", "Verify",
-      this, "verifyCondition");
+    final JButton verifyButton = statusToolBar.addButton("default", "Verify", this,
+      "verifyCondition");
     verifyButton.setBorderPainted(true);
 
     final JPanel queryPanel = new JPanel(new BorderLayout());
@@ -301,8 +263,7 @@ MouseListener, CaretListener, ItemListener {
     statusPanel.setOpaque(false);
     statusPanel.add(statusPane, BorderLayout.CENTER);
 
-    final JSplitPane topBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-      queryPanel, statusPanel);
+    final JSplitPane topBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT, queryPanel, statusPanel);
     topBottom.setResizeWeight(0.7);
 
     add(topBottom, BorderLayout.CENTER);
@@ -341,11 +302,10 @@ MouseListener, CaretListener, ItemListener {
           Class<?> attributeClass = attribute.getTypeClass();
           if (this.codeTable == null) {
             try {
-              fieldValue = StringConverterRegistry.toObject(attributeClass,
-                fieldValue);
+              fieldValue = StringConverterRegistry.toObject(attributeClass, fieldValue);
             } catch (final Throwable e) {
               setInvalidMessage("'" + fieldValue + "' is not a valid "
-                  + attribute.getType().getValidationName());
+                + attribute.getType().getValidationName());
               return;
             }
           } else {
@@ -375,8 +335,7 @@ MouseListener, CaretListener, ItemListener {
             try {
               document.insertString(position, text.toString(), null);
             } catch (final BadLocationException e) {
-              LoggerFactory.getLogger(getClass()).error(
-                "Error inserting text: " + text, e);
+              LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
             }
           }
         }
@@ -394,11 +353,10 @@ MouseListener, CaretListener, ItemListener {
         if (fieldValue != null) {
           if (this.codeTable == null) {
             try {
-              fieldValue = StringConverterRegistry.toObject(attributeClass,
-                fieldValue);
+              fieldValue = StringConverterRegistry.toObject(attributeClass, fieldValue);
             } catch (final Throwable e) {
               setInvalidMessage("'" + fieldValue + "' is not a valid "
-                  + attribute.getType().getValidationName());
+                + attribute.getType().getValidationName());
               return;
             }
           } else {
@@ -429,8 +387,7 @@ MouseListener, CaretListener, ItemListener {
               }
               document.insertString(position, text.toString(), null);
             } catch (final BadLocationException e) {
-              LoggerFactory.getLogger(getClass()).error(
-                "Error inserting text: " + text, e);
+              LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
 
             }
           }
@@ -448,8 +405,7 @@ MouseListener, CaretListener, ItemListener {
           final int position = this.whereTextField.getCaretPosition();
           final Class<?> attributeClass = attribute.getTypeClass();
           if (fieldValue != null) {
-            final String valueString = StringConverterRegistry.toString(
-              attributeClass, fieldValue);
+            final String valueString = StringConverterRegistry.toString(attributeClass, fieldValue);
 
             final Document document = this.whereTextField.getDocument();
             final StringBuilder text = new StringBuilder();
@@ -463,8 +419,7 @@ MouseListener, CaretListener, ItemListener {
             try {
               document.insertString(position, text.toString(), null);
             } catch (final BadLocationException e) {
-              LoggerFactory.getLogger(getClass()).error(
-                "Error inserting text: " + text, e);
+              LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
             }
           }
         }
@@ -492,15 +447,13 @@ MouseListener, CaretListener, ItemListener {
         try {
           document.insertString(position, text.toString(), null);
         } catch (final BadLocationException e) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Error inserting text: " + text, e);
+          LoggerFactory.getLogger(getClass()).error("Error inserting text: " + text, e);
         }
       }
     }
   }
 
-  public void appendValue(final StringBuilder text, final Class<?> type,
-    final Object value) {
+  public void appendValue(final StringBuilder text, final Class<?> type, final Object value) {
     final String valueString = StringConverterRegistry.toString(type, value);
     if (Date.class.isAssignableFrom(type)) {
       text.append("{d '" + valueString + "'}");
@@ -537,16 +490,15 @@ MouseListener, CaretListener, ItemListener {
         previousText = "";
       }
       if (!Property.hasValue(previousText)
-          || !previousText.matches(".*"
-              + operator.replaceAll("\\(", "\\\\(")
-              .replaceAll("\\)", "\\\\)")
-              .replaceAll("\\*", "\\\\*")
-              .replaceAll("\\+", "\\\\+") + "\\s*$")) {
+        || !previousText.matches(".*"
+          + operator.replaceAll("\\(", "\\\\(")
+            .replaceAll("\\)", "\\\\)")
+            .replaceAll("\\*", "\\\\*")
+            .replaceAll("\\+", "\\\\+") + "\\s*$")) {
         final Document document = this.whereTextField.getDocument();
         try {
           if (Property.hasValue(previousText)
-              && !previousText.substring(previousText.length() - 1).matches(
-                  "\\s$")) {
+            && !previousText.substring(previousText.length() - 1).matches("\\s$")) {
             document.insertString(position++, " ", null);
           }
           document.insertString(position, operator + " ", null);
@@ -561,21 +513,11 @@ MouseListener, CaretListener, ItemListener {
   public void itemStateChanged(final ItemEvent event) {
     if (event.getSource() == this.fieldNamesList) {
       if (event.getStateChange() == ItemEvent.SELECTED) {
-        final FieldDefinition attribute = (FieldDefinition)event.getItem();
-        final String name = attribute.getName();
-        this.codeTable = this.recordDefinition.getCodeTableByColumn(name);
-        final JComponent binaryConditionField = createSearchField(attribute,
-          this.codeTable);
-        if (binaryConditionField instanceof RecordStoreQueryTextField) {
-          final RecordStoreQueryTextField queryField = (RecordStoreQueryTextField)binaryConditionField;
-          queryField.setBelow(true);
-        }
-        final JComponent inConditionField = createSearchField(attribute,
-          this.codeTable);
-        if (inConditionField instanceof RecordStoreQueryTextField) {
-          final RecordStoreQueryTextField queryField = (RecordStoreQueryTextField)inConditionField;
-          queryField.setBelow(true);
-        }
+        final FieldDefinition field = (FieldDefinition)event.getItem();
+        final String fieldName = field.getName();
+        this.codeTable = this.recordDefinition.getCodeTableByFieldName(fieldName);
+        final JComponent binaryConditionField = createSearchField(this.layer, field, this.codeTable);
+        final JComponent inConditionField = createSearchField(this.layer, field, this.codeTable);
 
         if (this.codeTable == null) {
           if (binaryConditionField instanceof DateField) {
@@ -606,12 +548,11 @@ MouseListener, CaretListener, ItemListener {
             previousText = "";
           }
           if (!Property.hasValue(previousText)
-              || !previousText.matches(".*\"?" + fieldName + "\"?\\s*$")) {
+            || !previousText.matches(".*\"?" + fieldName + "\"?\\s*$")) {
             final Document document = this.whereTextField.getDocument();
             try {
               if (Property.hasValue(previousText)
-                  && !previousText.substring(previousText.length() - 1).matches(
-                      "\\s$")) {
+                && !previousText.substring(previousText.length() - 1).matches("\\s$")) {
                 document.insertString(position++, " ", null);
               }
 
@@ -650,8 +591,8 @@ MouseListener, CaretListener, ItemListener {
   public void save() {
     super.save();
     final Condition condition = getFieldValue();
-    this.listener.propertyChange(new PropertyChangeEvent(this, "filter",
-      this.originalFilter, condition));
+    this.listener.propertyChange(new PropertyChangeEvent(this, "filter", this.originalFilter,
+      condition));
   }
 
   @Override
@@ -726,19 +667,16 @@ MouseListener, CaretListener, ItemListener {
       final ValueNode betweenExpressionStart = rightOperandList.get(0);
       final ValueNode betweenExpressionEnd = rightOperandList.get(1);
       if (!(leftValueNode instanceof ColumnReference)) {
-        setInvalidMessage("Between operator must use a column name not: "
-            + leftValueNode);
+        setInvalidMessage("Between operator must use a column name not: " + leftValueNode);
         return null;
       }
 
       if (!(betweenExpressionStart instanceof NumericConstantNode)) {
-        setInvalidMessage("Between min value must be a number not: "
-            + betweenExpressionStart);
+        setInvalidMessage("Between min value must be a number not: " + betweenExpressionStart);
         return null;
       }
       if (!(betweenExpressionEnd instanceof NumericConstantNode)) {
-        setInvalidMessage("Between max value must be a number not: "
-            + betweenExpressionEnd);
+        setInvalidMessage("Between max value must be a number not: " + betweenExpressionEnd);
         return null;
       }
       final Column column = toQueryValue(leftValueNode);
@@ -760,8 +698,7 @@ MouseListener, CaretListener, ItemListener {
       } else if ("OR".equals(operator)) {
         return (V)new Or(leftCondition, rightCondition);
       } else {
-        setInvalidMessage("Binary logical operator " + operator
-          + " not supported.");
+        setInvalidMessage("Binary logical operator " + operator + " not supported.");
         return null;
       }
     } else if (expression instanceof BinaryOperatorNode) {
@@ -784,24 +721,21 @@ MouseListener, CaretListener, ItemListener {
 
               final String name = column.getName();
               final FieldDefinition attribute = this.recordDefinition.getField(name);
-              final CodeTable codeTable = this.recordDefinition.getCodeTableByColumn(name);
-              if (codeTable == null
-                  || attribute == this.recordDefinition.getIdField()) {
+              final CodeTable codeTable = this.recordDefinition.getCodeTableByFieldName(name);
+              if (codeTable == null || attribute == this.recordDefinition.getIdField()) {
                 final Class<?> typeClass = attribute.getTypeClass();
                 try {
-                  final Object convertedValue = StringConverterRegistry.toObject(
-                    typeClass, value);
-                  if (convertedValue == null
-                      || !typeClass.isAssignableFrom(typeClass)) {
+                  final Object convertedValue = StringConverterRegistry.toObject(typeClass, value);
+                  if (convertedValue == null || !typeClass.isAssignableFrom(typeClass)) {
                     setInvalidMessage(name + "='" + value + "' is not a valid "
-                        + attribute.getType().getValidationName());
+                      + attribute.getType().getValidationName());
                     return null;
                   } else {
                     rightCondition = new Value(attribute, convertedValue);
                   }
                 } catch (final Throwable t) {
                   setInvalidMessage(name + "='" + value + "' is not a valid "
-                      + attribute.getType().getValidationName());
+                    + attribute.getType().getValidationName());
                 }
               } else {
                 Object id;
@@ -814,8 +748,7 @@ MouseListener, CaretListener, ItemListener {
                   id = codeTable.getId(value);
                 }
                 if (id == null) {
-                  setInvalidMessage(name + "='" + value
-                    + "' could not be found in the code table "
+                  setInvalidMessage(name + "='" + value + "' could not be found in the code table "
                     + codeTable.getName());
                 } else {
                   rightCondition = new Value(attribute, id);
@@ -825,12 +758,11 @@ MouseListener, CaretListener, ItemListener {
           }
         }
         if (expression instanceof BinaryArithmeticOperatorNode) {
-          final QueryValue arithmaticCondition = Q.arithmatic(leftCondition,
-            operator, rightCondition);
+          final QueryValue arithmaticCondition = Q.arithmatic(leftCondition, operator,
+            rightCondition);
           return (V)arithmaticCondition;
         } else {
-          final Condition binaryCondition = Q.binary(leftCondition, operator,
-            rightCondition);
+          final Condition binaryCondition = Q.binary(leftCondition, operator, rightCondition);
           return (V)binaryCondition;
         }
 
@@ -920,8 +852,7 @@ MouseListener, CaretListener, ItemListener {
     } else if (expression == null) {
       return null;
     } else {
-      setInvalidMessage("Unsupported expression" + expression.getClass() + " "
-          + expression);
+      setInvalidMessage("Unsupported expression" + expression.getClass() + " " + expression);
     }
     return null;
   }
@@ -955,8 +886,7 @@ MouseListener, CaretListener, ItemListener {
           setInvalidMessage(offset - this.sqlPrefix.length(),
             "Error parsing SQL: " + e.getMessage());
         } catch (final StandardException e) {
-          LoggerFactory.getLogger(getClass()).error(
-            "Error parsing SQL: " + whereClause, e);
+          LoggerFactory.getLogger(getClass()).error("Error parsing SQL: " + whereClause, e);
         }
       } else {
         this.statusLabel.setForeground(WebColors.DarkGreen);

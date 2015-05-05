@@ -76,6 +76,10 @@ public final class MathUtil {
 
   public static final double PI_TIMES_2 = 2.0 * Math.PI;
 
+  public static String MAX_DOUBLE_STRING = toString(Double.MAX_VALUE);
+
+  public static String MIN_DOUBLE_STRING = toString(-Double.MAX_VALUE);
+
   /**
    *
    * @param left The left operand.

@@ -48,7 +48,7 @@ public class ButtonsToolbarElement extends Element {
     if (Property.hasValue(uri)) {
       if (uri.startsWith("javascript:")) {
         out.startTag(HtmlUtil.BUTTON);
-        out.attribute(HtmlUtil.ATTR_CLASS, "btn btn-default");
+        out.attribute(HtmlUtil.ATTR_CLASS, "btn btn-default btn-sm");
         out.attribute(HtmlUtil.ATTR_ON_CLICK, uri.substring(11));
         out.text(menu.getTitle());
         out.endTag(HtmlUtil.BUTTON);
@@ -58,7 +58,7 @@ public class ButtonsToolbarElement extends Element {
         out.attribute(HtmlUtil.ATTR_TITLE, linkTitle);
         out.attribute(HtmlUtil.ATTR_ON_CLICK, onClick);
         out.attribute(HtmlUtil.ATTR_TARGET, menu.getTarget());
-        out.attribute(HtmlUtil.ATTR_CLASS, "btn btn-default");
+        out.attribute(HtmlUtil.ATTR_CLASS, "btn btn-default btn-sm");
         out.attribute(HtmlUtil.ATTR_ROLE, "button");
 
         out.text(linkTitle);

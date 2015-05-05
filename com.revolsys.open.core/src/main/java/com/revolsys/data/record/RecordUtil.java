@@ -211,7 +211,7 @@ public final class RecordUtil {
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
-            final CodeTable codeTable = recordDefinition.getCodeTableByColumn(propertyName);
+            final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(propertyName);
             if (codeTable != null) {
               propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
             }
@@ -228,7 +228,7 @@ public final class RecordUtil {
         if (propertyValue == null) {
           return null;
         } else if (i + 1 < propertyPath.length) {
-          final CodeTable codeTable = recordDefinition.getCodeTableByColumn(propertyName);
+          final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(propertyName);
           if (codeTable != null) {
             propertyValue = codeTable.getMap(SingleIdentifier.create(propertyValue));
           }

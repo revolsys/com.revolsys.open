@@ -40,7 +40,7 @@ AbstractSourceToTargetProcess<Record, Record> {
           codeTableValueName = codeTableFieldName.substring(dotIndex + 1);
           codeTableFieldName = codeTableFieldName.substring(0, dotIndex);
         }
-        final CodeTable targetCodeTable = targetRecordDefinition.getCodeTableByColumn(codeTableFieldName);
+        final CodeTable targetCodeTable = targetRecordDefinition.getCodeTableByFieldName(codeTableFieldName);
         if (targetCodeTable != null) {
           if (codeTableValueName == null) {
             sourceValue = targetCodeTable.getId(sourceValue);

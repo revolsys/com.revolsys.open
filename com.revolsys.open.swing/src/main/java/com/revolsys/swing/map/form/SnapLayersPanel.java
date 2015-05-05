@@ -30,7 +30,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.CheckBox;
 import com.revolsys.swing.field.SearchField;
 import com.revolsys.swing.layout.GroupLayoutUtil;
-import com.revolsys.swing.list.BaseListModel;
+import com.revolsys.swing.list.ArrayListModel;
 import com.revolsys.swing.list.filter.StringContainsRowFilter;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -49,9 +49,9 @@ ListSelectionListener {
 
   private final JXList layerPathsField;
 
-  private final BaseListModel<String> snapLayerPathsModel;
+  private final ArrayListModel<String> snapLayerPathsModel;
 
-  private final BaseListModel<String> layerPathsModel;
+  private final ArrayListModel<String> layerPathsModel;
 
   private final StringContainsRowFilter layerPathsTextFilter;
 
@@ -103,7 +103,7 @@ ListSelectionListener {
     final List<AbstractRecordLayer> recordLayers = layer.getProject()
         .getDescenants(AbstractRecordLayer.class);
 
-    this.layerPathsModel = new BaseListModel<String>();
+    this.layerPathsModel = new ArrayListModel<String>();
     for (final AbstractLayer recordLayer : recordLayers) {
       if (recordLayer.isHasGeometry()) {
         final String layerPath = recordLayer.getPath();
@@ -131,7 +131,7 @@ ListSelectionListener {
       "delete", this, "removeSelected");
 
     final Collection<String> snapLayerPaths = layer.getSnapLayerPaths();
-    this.snapLayerPathsModel = new BaseListModel<String>(snapLayerPaths);
+    this.snapLayerPathsModel = new ArrayListModel<String>(snapLayerPaths);
 
     this.snapLayerPathsField = new JXList(this.snapLayerPathsModel);
     this.snapLayerPathsField.setAutoCreateRowSorter(true);

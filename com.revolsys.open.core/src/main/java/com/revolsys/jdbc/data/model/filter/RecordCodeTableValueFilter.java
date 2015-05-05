@@ -52,7 +52,7 @@ public class RecordCodeTableValueFilter implements Filter<Record> {
       return true;
     } else {
       final RecordDefinition recordDefinition = object.getRecordDefinition();
-      final CodeTable codeTable = recordDefinition.getCodeTableByColumn(this.fieldName);
+      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(this.fieldName);
       if (codeTable != null) {
         final Object codeValue = codeTable.getValue(SingleIdentifier.create(propertyValue));
         if (this.values.contains(codeValue)) {

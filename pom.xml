@@ -47,14 +47,14 @@
 
   <modules>
     <module>com.revolsys.open.core</module>
-    <module>com.revolsys.open.web</module>
-    <module>com.revolsys.open.gis.oracle</module>
-    <module>com.revolsys.open.gis.postgresql</module>
-    <module>com.revolsys.open.gdal</module>
-    <module>com.revolsys.open.gis.esri.gdb.file</module>
     <module>com.revolsys.open.doclet</module>
-    <module>war-overlay</module>
+    <module>com.revolsys.open.fgdb</module>
+    <module>com.revolsys.open.gdal</module>
+    <module>com.revolsys.open.oracle</module>
+    <module>com.revolsys.open.postgresql</module>
     <module>com.revolsys.open.swing</module>
+    <module>com.revolsys.open.web</module>
+    <module>war-overlay</module>
   </modules>
 
   <build>

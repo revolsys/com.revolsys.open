@@ -17,11 +17,11 @@ import org.jdesktop.swingx.JXList;
 
 import com.revolsys.io.datastore.RecordStoreConnection;
 import com.revolsys.io.datastore.RecordStoreConnectionRegistry;
+import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.list.renderer.IconListCellRenderer;
-import com.revolsys.swing.listener.InvokeMethodListener;
 import com.revolsys.swing.map.border.FullSizeLayoutManager;
 
 public class RecordStoreConnectionDialog extends BaseDialog {
@@ -34,13 +34,11 @@ public class RecordStoreConnectionDialog extends BaseDialog {
 
   private final JLayeredPane panels;
 
-  public RecordStoreConnectionDialog(
-    final RecordStoreConnectionRegistry registry) {
+  public RecordStoreConnectionDialog(final RecordStoreConnectionRegistry registry) {
     this(registry, null);
   }
 
-  public RecordStoreConnectionDialog(
-    final RecordStoreConnectionRegistry registry,
+  public RecordStoreConnectionDialog(final RecordStoreConnectionRegistry registry,
     final RecordStoreConnection connection) {
     super(SwingUtil.getActiveWindow(), "Add Record Store Connection",
       ModalityType.APPLICATION_MODAL);
@@ -60,13 +58,11 @@ public class RecordStoreConnectionDialog extends BaseDialog {
     SwingUtil.setTitledBorder(oraclePanel, "Oracle");
     this.panels.add(oraclePanel, 0);
 
-    final AddRecordStoreConnectionPanel postgresPanel = new AddRecordStoreConnectionPanel(
-      registry);
+    final AddRecordStoreConnectionPanel postgresPanel = new AddRecordStoreConnectionPanel(registry);
     SwingUtil.setTitledBorder(postgresPanel, "PostgreSQL/PostGIS");
     this.panels.add(postgresPanel, new Integer(index++));
 
-    final AddRecordStoreConnectionPanel filePanel = new AddRecordStoreConnectionPanel(
-      registry);
+    final AddRecordStoreConnectionPanel filePanel = new AddRecordStoreConnectionPanel(registry);
     SwingUtil.setTitledBorder(filePanel, "File");
     this.panels.add(filePanel, new Integer(index++));
 
@@ -74,8 +70,7 @@ public class RecordStoreConnectionDialog extends BaseDialog {
       "Oracle", "PostgreSQL/PostGIS"
     });
     this.buttons.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    this.buttons.addListSelectionListener(new InvokeMethodListener(this,
-        "selectionChangeType"));
+    EventQueue.addListSelection(this.buttons, () -> selectionChangeType());
 
     final Map<Object, Icon> icons = new HashMap<>();
     icons.put("Oracle", Icons.getIcon("database"));

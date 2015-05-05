@@ -23,7 +23,7 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.swing.field.NumberTextField;
 import com.revolsys.swing.map.form.GeometryCoordinatesPanel;
-import com.revolsys.swing.map.form.LayerRecordForm;
+import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.TablePanel;
@@ -71,7 +71,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
 
   private int numIndexItems;
 
-  private Reference<LayerRecordForm> form;
+  private Reference<RecordLayerForm> form;
 
   private int vertexIndexColumn;
 
@@ -147,7 +147,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     }
   }
 
-  public LayerRecordForm getForm() {
+  public RecordLayerForm getForm() {
     return this.form.get();
   }
 
@@ -232,12 +232,12 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     return false;
   }
 
-  public void setForm(final LayerRecordForm form) {
-    this.form = new WeakReference<LayerRecordForm>(form);
+  public void setForm(final RecordLayerForm form) {
+    this.form = new WeakReference<RecordLayerForm>(form);
   }
 
   public void setGeometry(final Geometry geometry) {
-    final LayerRecordForm form = this.geometryCoordinatesPanel.getForm();
+    final RecordLayerForm form = this.geometryCoordinatesPanel.getForm();
     final LayerRecord record = form.getRecord();
     final Geometry oldGeometry = record.getGeometryValue();
 
