@@ -1,9 +1,7 @@
 JAVA_VERSION=1.8.0
+WIN_SDK=C:\Program Files (x86)\Windows Kits\8.1
 ESRI_FILE_GBD_HOME=C:\Apps\EsriFileGdb\1.4\winnt
 ESRI_FILE_GBD_INCLUDE=$(ESRI_FILE_GBD_HOME)\include
-TOOLS=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
-WIN_SDK=C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A
-WINLIBS=kernel32.lib advapi32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib
 
 !IFNDEF ARCH
 ARCH=x86
@@ -14,8 +12,7 @@ PLATFORM=IX86
 INCLUDE="-I$(VCINSTALLDIR)\include"
 JAVA_HOME=C:\Program Files (x86)\Java\jdk$(JAVA_VERSION)
 JAVA_INCLUDE="-I$(JAVA_HOME)\include" "-I$(JAVA_HOME)\include\win32"
-CFLAGS=/c /nologo /EHsc
-LDIR="/LIBPATH:$(VCINSTALLDIR)\lib" "/LIBPATH:$(WIN_SDK)\lib" "/LIBPATH:$(ESRI_FILE_GBD_HOME)\lib"
+LDIR="/LIBPATH:$(VCINSTALLDIR)\lib" "/LIBPATH:$(WIN_SDK)\Lib\winv6.3\um\x86" "/LIBPATH:$(ESRI_FILE_GBD_HOME)\lib"
 DLL_DIR=$(ESRI_FILE_GBD_HOME)\bin
 LINKFLAGS=/NODEFAULTLIB /NOLOGO /MACHINE:$(PLATFORM) -entry:_DllMainCRTStartup@12 /DLL
 !ENDIF
@@ -25,27 +22,17 @@ PLATFORM=X64
 INCLUDE="-I$(VCINSTALLDIR)\include"
 JAVA_HOME=C:\Program Files\Java\jdk$(JAVA_VERSION)
 JAVA_INCLUDE="-I$(JAVA_HOME)\include" "-I$(JAVA_HOME)\include\win32"
-CFLAGS=/c /nologo /EHsc /Fo64
-LDIR="/LIBPATH:$(VCINSTALLDIR)\lib\amd64" "/LIBPATH:$(WIN_SDK)\lib\x64" "/LIBPATH:$(ESRI_FILE_GBD_HOME)\lib64"
+LDIR="/LIBPATH:$(VCINSTALLDIR)\lib\amd64" "/LIBPATH:$(WIN_SDK)\Lib\winv6.3\um\x64" "/LIBPATH:$(ESRI_FILE_GBD_HOME)\lib64"
 DLL_DIR=$(ESRI_FILE_GBD_HOME)\bin64
 LINKFLAGS=/NODEFAULTLIB /NOLOGO /MACHINE:$(PLATFORM) -entry:_DllMainCRTStartup /DLL
 !ENDIF
 
-DEBUG=0
-
 # Linker options
 
-!IF "$(DEBUG)"== "1"
-CFLAGS=/D_DEBUG $(CFLAGS) /Od /Zi /MTd
-LINKFLAGS=$(LINKFLAGS) /DEBUG
-DLLIBC=msvcrtd.lib oldnames.lib libcpmtd.lib
-LIBS=$(DLLIBC) $(WINLIBS) FileGDBAPID.lib
-!ELSE
-CFLAGS=$(CFLAGS) /O2 /MT
+CFLAGS=/c /nologo /EHsc /O2 /MT
 LINKFLAGS=$(LINKFLAGS) /RELEASE
 DLLIBC=msvcrt.lib oldnames.lib libcpmt.lib
-LIBS=$(DLLIBC) $(WINLIBS) FileGDBAPI.lib
-!ENDIF
+LIBS=msvcrt.lib oldnames.lib libcpmt.lib kernel32.lib advapi32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib FileGDBAPI.lib
 
 SRC_FILE=src\main\cxx\EsriFileGdb_wrap.cxx
 TARGET_OBJ=target\o\EsriFileGdbJni.obj

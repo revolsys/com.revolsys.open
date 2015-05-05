@@ -16,13 +16,12 @@ public class EsriFileGdbJNI {
   static {
     if (OS.isUnix() || OS.isMac()) {
       ClasspathNativeLibraryUtil.loadLibrary("fgdbunixrtl");
+      ClasspathNativeLibraryUtil.loadLibrary("FileGDBAPI");
+      ClasspathNativeLibraryUtil.loadLibrary("EsriFileGdbJni");
     } else if (OS.isWindows()) {
+      ClasspathNativeLibraryUtil.loadLibrary("FileGDBAPI");
       ClasspathNativeLibraryUtil.loadLibrary("Esri.FILEGDBAPI");
-    }
-
-    ClasspathNativeLibraryUtil.loadLibrary("FileGDBAPI");
-    ClasspathNativeLibraryUtil.loadLibrary("EsriFileGdbJni");
-    if (OS.isWindows()) {
+      ClasspathNativeLibraryUtil.loadLibrary("EsriFileGdbJni");
       EsriFileGdb.setMaxOpenFiles(2048);
     }
   }
