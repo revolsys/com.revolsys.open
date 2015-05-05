@@ -131,40 +131,6 @@ import com.revolsys.util.Property;
 public abstract class AbstractRecordLayer extends AbstractLayer implements RecordFactory,
   AddGeometryCompleteAction {
 
-  public static void addVisibleLayers(final List<AbstractRecordLayer> layers, final LayerGroup group) {
-    if (group.isExists() && group.isVisible()) {
-      for (final Layer layer : group) {
-        if (layer instanceof LayerGroup) {
-          final LayerGroup layerGroup = (LayerGroup)layer;
-          addVisibleLayers(layers, layerGroup);
-        } else if (layer instanceof AbstractRecordLayer) {
-          if (layer.isExists() && layer.isVisible()) {
-            final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
-            layers.add(recordLayer);
-          }
-        }
-      }
-    }
-  }
-
-  public static LayerRecord getAndRemoveSame(final Collection<? extends LayerRecord> records,
-    final LayerRecord record) {
-    for (final Iterator<? extends LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
-      final LayerRecord queryRecord = iterator.next();
-      if (queryRecord.isSame(record)) {
-        iterator.remove();
-        return queryRecord;
-      }
-    }
-    return null;
-  }
-
-  public static List<AbstractRecordLayer> getVisibleLayers(final LayerGroup group) {
-    final List<AbstractRecordLayer> layers = new ArrayList<AbstractRecordLayer>();
-    addVisibleLayers(layers, group);
-    return layers;
-  }
-
   public static final String ALL = "All";
 
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
@@ -227,6 +193,40 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     // menu.addMenuItem("edit", 0, MenuSourceRunnable.createAction(
     // "Export Records", "disk", new AndEnableCheck(exists, hasSelectedRecords),
     // "exportRecords"));
+  }
+
+  public static void addVisibleLayers(final List<AbstractRecordLayer> layers, final LayerGroup group) {
+    if (group.isExists() && group.isVisible()) {
+      for (final Layer layer : group) {
+        if (layer instanceof LayerGroup) {
+          final LayerGroup layerGroup = (LayerGroup)layer;
+          addVisibleLayers(layers, layerGroup);
+        } else if (layer instanceof AbstractRecordLayer) {
+          if (layer.isExists() && layer.isVisible()) {
+            final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
+            layers.add(recordLayer);
+          }
+        }
+      }
+    }
+  }
+
+  public static LayerRecord getAndRemoveSame(final Collection<? extends LayerRecord> records,
+    final LayerRecord record) {
+    for (final Iterator<? extends LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
+      final LayerRecord queryRecord = iterator.next();
+      if (queryRecord.isSame(record)) {
+        iterator.remove();
+        return queryRecord;
+      }
+    }
+    return null;
+  }
+
+  public static List<AbstractRecordLayer> getVisibleLayers(final LayerGroup group) {
+    final List<AbstractRecordLayer> layers = new ArrayList<AbstractRecordLayer>();
+    addVisibleLayers(layers, group);
+    return layers;
   }
 
   private BoundingBox boundingBox = new BoundingBoxDoubleGf();

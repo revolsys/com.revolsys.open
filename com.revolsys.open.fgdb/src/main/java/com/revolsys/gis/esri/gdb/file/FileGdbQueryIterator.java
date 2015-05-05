@@ -168,9 +168,9 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
             this.statistics.add(record);
           }
           record.setState(RecordState.Initalizing);
-          for (final FieldDefinition attribute : this.recordDefinition.getFields()) {
-            final String name = attribute.getName();
-            final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
+          for (final FieldDefinition field : this.recordDefinition.getFields()) {
+            final String name = field.getName();
+            final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)field;
             final Object value;
             synchronized (this.recordStore) {
               value = esriAttribute.getValue(row);
