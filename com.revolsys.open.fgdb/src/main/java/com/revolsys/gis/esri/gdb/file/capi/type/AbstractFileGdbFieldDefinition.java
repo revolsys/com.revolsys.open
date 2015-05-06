@@ -33,8 +33,7 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
 
   public abstract Object getValue(Row row);
 
-  public Object setInsertValue(final Record object, final Row row,
-    final Object value) {
+  public Object setInsertValue(final Record object, final Row row, final Object value) {
     return setValue(object, row, value);
   }
 
@@ -45,8 +44,7 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
     this.recordStore = new WeakReference<CapiFileGdbRecordStore>(recordStore);
   }
 
-  public Object setUpdateValue(final Record object, final Row row,
-    final Object value) {
+  public Object setUpdateValue(final Record object, final Row row, final Object value) {
     return setValue(object, row, value);
   }
 

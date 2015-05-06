@@ -10,8 +10,7 @@ public class BinaryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   public BinaryFieldDefinition(final Field field) {
     super(field.getName(), DataTypes.BASE64_BINARY, field.getLength(),
-      BooleanStringConverter.getBoolean(field.getRequired())
-      || !field.isIsNullable());
+      BooleanStringConverter.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override
@@ -26,8 +25,7 @@ public class BinaryFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setValue(final Record object, final Row row,
-    final Object value) {
+  public Object setValue(final Record object, final Row row, final Object value) {
     return null;
   }
 

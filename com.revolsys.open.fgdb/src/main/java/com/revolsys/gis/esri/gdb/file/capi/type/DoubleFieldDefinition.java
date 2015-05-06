@@ -10,8 +10,7 @@ import com.revolsys.util.Property;
 
 public class DoubleFieldDefinition extends AbstractFileGdbFieldDefinition {
   public DoubleFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.DOUBLE,
-      BooleanStringConverter.getBoolean(field.getRequired())
+    super(field.getName(), DataTypes.DOUBLE, BooleanStringConverter.getBoolean(field.getRequired())
       || !field.isIsNullable());
   }
 
@@ -38,8 +37,7 @@ public class DoubleFieldDefinition extends AbstractFileGdbFieldDefinition {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
-        throw new IllegalArgumentException(name
-          + " is required and cannot be null");
+        throw new IllegalArgumentException(name + " is required and cannot be null");
       } else {
         getRecordStore().setNull(row, name);
       }
@@ -60,8 +58,7 @@ public class DoubleFieldDefinition extends AbstractFileGdbFieldDefinition {
         }
         return doubleValue;
       } else if (isRequired()) {
-        throw new IllegalArgumentException(name
-          + " is required and cannot be null");
+        throw new IllegalArgumentException(name + " is required and cannot be null");
       } else {
         getRecordStore().setNull(row, name);
         return null;

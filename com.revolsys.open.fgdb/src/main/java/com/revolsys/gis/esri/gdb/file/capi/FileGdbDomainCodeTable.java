@@ -17,9 +17,9 @@ import com.revolsys.format.esri.gdb.xml.model.Domain;
 import com.revolsys.gis.esri.gdb.file.CapiFileGdbRecordStore;
 
 public class FileGdbDomainCodeTable implements CodeTable {
-  private final CodedValueDomain domain;
-
   private static final Logger LOG = LoggerFactory.getLogger(FileGdbDomainCodeTable.class);
+
+  private final CodedValueDomain domain;
 
   private final String name;
 

@@ -16,6 +16,15 @@ import com.revolsys.io.FileUtil;
 
 public class FileGdbRecordStoreFactory implements RecordStoreFactory {
 
+  private static final Map<String, AtomicInteger> COUNTS = new HashMap<String, AtomicInteger>();
+
+  private static final Map<String, CapiFileGdbRecordStore> DATA_STORES = new HashMap<String, CapiFileGdbRecordStore>();
+
+  private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gdb");
+
+  private static final List<String> URL_PATTERNS = Arrays.asList("file:/(//)?.*.gdb/?",
+    "folderconnection:/(//)?.*.gdb/?");
+
   public static CapiFileGdbRecordStore create(File file) {
     if (file == null) {
       return null;
@@ -23,8 +32,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
       synchronized (COUNTS) {
         final String fileName = FileUtil.getCanonicalPath(file);
         file = new File(fileName);
-        final AtomicInteger count = Maps.get(COUNTS, fileName,
-          new AtomicInteger());
+        final AtomicInteger count = Maps.get(COUNTS, fileName, new AtomicInteger());
         count.incrementAndGet();
         CapiFileGdbRecordStore recordStore = DATA_STORES.get(fileName);
         if (recordStore == null || recordStore.isClosed()) {
@@ -43,8 +51,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     } else {
       synchronized (COUNTS) {
         fileName = FileUtil.getCanonicalPath(fileName);
-        final AtomicInteger countHolder = Maps.get(COUNTS, fileName,
-          new AtomicInteger());
+        final AtomicInteger countHolder = Maps.get(COUNTS, fileName, new AtomicInteger());
         final int count = countHolder.decrementAndGet();
         if (count <= 0) {
           COUNTS.remove(fileName);
@@ -63,20 +70,10 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     }
   }
 
-  private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gdb");
-
-  private static final List<String> URL_PATTERNS = Arrays.asList(
-    "file:/(//)?.*.gdb/?", "folderconnection:/(//)?.*.gdb/?");
-
-  private static final Map<String, AtomicInteger> COUNTS = new HashMap<String, AtomicInteger>();
-
-  private static final Map<String, CapiFileGdbRecordStore> DATA_STORES = new HashMap<String, CapiFileGdbRecordStore>();
-
   @Override
   public FileGdbRecordStore createRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
-    final Map<String, Object> properties = new LinkedHashMap<String, Object>(
-        connectionProperties);
+    final Map<String, Object> properties = new LinkedHashMap<String, Object>(connectionProperties);
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);
 

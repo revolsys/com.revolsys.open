@@ -481,9 +481,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
         final Geodatabase geodatabase = getGeodatabase();
         if (geodatabase != null) {
           try {
-            for (final Iterator<Entry<String, Table>> iterator = this.tablesToClose.entrySet()
-              .iterator(); iterator.hasNext();) {
-              final Entry<String, Table> entry = iterator.next();
+            for (Entry<String, Table> entry : this.tablesToClose.entrySet()) {
               final Table table = entry.getValue();
               try {
                 table.setLoadOnlyMode(false);

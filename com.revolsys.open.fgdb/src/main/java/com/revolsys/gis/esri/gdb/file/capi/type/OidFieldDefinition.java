@@ -9,8 +9,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 
 public class OidFieldDefinition extends AbstractFileGdbFieldDefinition {
   public OidFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.INT,
-      BooleanStringConverter.getBoolean(field.getRequired())
+    super(field.getName(), DataTypes.INT, BooleanStringConverter.getBoolean(field.getRequired())
       || !field.isIsNullable());
   }
 
@@ -42,14 +41,12 @@ public class OidFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setUpdateValue(final Record object, final Row row,
-    final Object value) {
+  public Object setUpdateValue(final Record object, final Row row, final Object value) {
     return value;
   }
 
   @Override
-  public Object setValue(final Record object, final Row row,
-    final Object value) {
+  public Object setValue(final Record object, final Row row, final Object value) {
     return null;
   }
 

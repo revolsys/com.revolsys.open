@@ -11,8 +11,7 @@ public class XmlFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   public XmlFieldDefinition(final Field field) {
     super(field.getName(), DataTypes.STRING, field.getLength(),
-      BooleanStringConverter.getBoolean(field.getRequired())
-      || !field.isIsNullable());
+      BooleanStringConverter.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override
@@ -29,13 +28,11 @@ public class XmlFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setValue(final Record object, final Row row,
-    final Object value) {
+  public Object setValue(final Record object, final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
-        throw new IllegalArgumentException(name
-          + " is required and cannot be null");
+        throw new IllegalArgumentException(name + " is required and cannot be null");
       } else {
         getRecordStore().setNull(row, name);
       }

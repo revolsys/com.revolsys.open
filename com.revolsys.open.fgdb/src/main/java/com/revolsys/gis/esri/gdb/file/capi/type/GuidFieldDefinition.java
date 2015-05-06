@@ -10,6 +10,8 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Guid;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 
 public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
+  private static final WeakHashMap<String, Guid> GUID_CACHE = new WeakHashMap<String, Guid>();
+
   public static void addGuid(final Guid guid) {
     synchronized (GUID_CACHE) {
       final String guidString = guid.toString();
@@ -31,16 +33,12 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
     }
   }
 
-  private static final WeakHashMap<String, Guid> GUID_CACHE = new WeakHashMap<String, Guid>();
-
   public GuidFieldDefinition(final Field field) {
-    this(field.getName(), field.getLength(),
-      BooleanStringConverter.getBoolean(field.getRequired())
+    this(field.getName(), field.getLength(), BooleanStringConverter.getBoolean(field.getRequired())
       || !field.isIsNullable());
   }
 
-  public GuidFieldDefinition(final String name, final int length,
-    final boolean required) {
+  public GuidFieldDefinition(final String name, final int length, final boolean required) {
     super(name, DataTypes.STRING, length, required);
   }
 
@@ -59,13 +57,11 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setValue(final Record object, final Row row,
-    final Object value) {
+  public Object setValue(final Record object, final Row row, final Object value) {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
-        throw new IllegalArgumentException(name
-          + " is required and cannot be null");
+        throw new IllegalArgumentException(name + " is required and cannot be null");
       } else {
         getRecordStore().setNull(row, name);
       }

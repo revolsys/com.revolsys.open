@@ -12,8 +12,7 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
   public StringFieldDefinition(final Field field) {
     super(field.getName(), DataTypes.STRING, field.getLength(),
-      BooleanStringConverter.getBoolean(field.getRequired())
-      || !field.isIsNullable());
+      BooleanStringConverter.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 
   @Override
@@ -34,8 +33,7 @@ public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
-        throw new IllegalArgumentException(name
-          + " is required and cannot be null");
+        throw new IllegalArgumentException(name + " is required and cannot be null");
       } else {
         getRecordStore().setNull(row, name);
       }
@@ -43,8 +41,7 @@ public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else {
       String string = value.toString();
       if (string.length() > getLength()) {
-        LoggerFactory.getLogger(getClass()).warn(
-          "Value is to long for: " + this + ":" + string);
+        LoggerFactory.getLogger(getClass()).warn("Value is to long for: " + this + ":" + string);
         string = string.substring(0, getLength());
       }
       synchronized (getRecordStore()) {

@@ -10,8 +10,8 @@ import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 
 public class GeometryField extends FgdbField {
-  public GeometryField(final String name, final DataType type,
-    final boolean required, final GeometryFactory geometryFactory) {
+  public GeometryField(final String name, final DataType type, final boolean required,
+    final GeometryFactory geometryFactory) {
     super(name, type, required);
     setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
   }

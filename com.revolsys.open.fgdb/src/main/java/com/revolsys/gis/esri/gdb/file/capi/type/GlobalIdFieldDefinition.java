@@ -9,13 +9,11 @@ import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 
 public class GlobalIdFieldDefinition extends AbstractFileGdbFieldDefinition {
   public GlobalIdFieldDefinition(final Field field) {
-    this(field.getName(), field.getLength(),
-      BooleanStringConverter.getBoolean(field.getRequired())
+    this(field.getName(), field.getLength(), BooleanStringConverter.getBoolean(field.getRequired())
       || !field.isIsNullable());
   }
 
-  public GlobalIdFieldDefinition(final String name, final int length,
-    final boolean required) {
+  public GlobalIdFieldDefinition(final String name, final int length, final boolean required) {
     super(name, DataTypes.STRING, length, required);
   }
 
@@ -38,8 +36,7 @@ public class GlobalIdFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public Object setValue(final Record object, final Row row,
-    final Object value) {
+  public Object setValue(final Record object, final Row row, final Object value) {
     return null;
   }
 

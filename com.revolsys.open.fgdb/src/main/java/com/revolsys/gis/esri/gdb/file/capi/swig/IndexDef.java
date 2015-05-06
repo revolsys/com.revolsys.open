@@ -9,66 +9,68 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class IndexDef {
-  private long swigCPtr;
+  protected static long getCPtr(final IndexDef obj) {
+    return obj == null ? 0 : obj.swigCPtr;
+  }
+
   protected boolean swigCMemOwn;
 
-  protected IndexDef(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
-  }
-
-  protected static long getCPtr(IndexDef obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
-
-  protected void finalize() {
-    delete();
-  }
-
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        EsriFileGdbJNI.delete_IndexDef(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
-  }
+  private long swigCPtr;
 
   public IndexDef() {
     this(EsriFileGdbJNI.new_IndexDef__SWIG_0(), true);
   }
 
-  public IndexDef(String name, String fields, boolean isUnique) {
-    this(EsriFileGdbJNI.new_IndexDef__SWIG_1(name, fields, isUnique), true);
+  protected IndexDef(final long cPtr, final boolean cMemoryOwn) {
+    this.swigCMemOwn = cMemoryOwn;
+    this.swigCPtr = cPtr;
   }
 
-  public IndexDef(String name, String fields) {
+  public IndexDef(final String name, final String fields) {
     this(EsriFileGdbJNI.new_IndexDef__SWIG_2(name, fields), true);
   }
 
-  public int SetName(String name) {
-    return EsriFileGdbJNI.IndexDef_SetName(swigCPtr, this, name);
+  public IndexDef(final String name, final String fields, final boolean isUnique) {
+    this(EsriFileGdbJNI.new_IndexDef__SWIG_1(name, fields, isUnique), true);
   }
 
-  public int SetFields(String fields) {
-    return EsriFileGdbJNI.IndexDef_SetFields(swigCPtr, this, fields);
+  public synchronized void delete() {
+    if (this.swigCPtr != 0) {
+      if (this.swigCMemOwn) {
+        this.swigCMemOwn = false;
+        EsriFileGdbJNI.delete_IndexDef(this.swigCPtr);
+      }
+      this.swigCPtr = 0;
+    }
   }
 
-  public int SetIsUnique(boolean isUnique) {
-    return EsriFileGdbJNI.IndexDef_SetIsUnique(swigCPtr, this, isUnique);
-  }
-
-  public boolean isUnique() {
-    return EsriFileGdbJNI.IndexDef_isUnique(swigCPtr, this);
-  }
-
-  public String getName() {
-    return EsriFileGdbJNI.IndexDef_getName(swigCPtr, this);
+  @Override
+  protected void finalize() {
+    delete();
   }
 
   public String getFields() {
-    return EsriFileGdbJNI.IndexDef_getFields(swigCPtr, this);
+    return EsriFileGdbJNI.IndexDef_getFields(this.swigCPtr, this);
+  }
+
+  public String getName() {
+    return EsriFileGdbJNI.IndexDef_getName(this.swigCPtr, this);
+  }
+
+  public boolean isUnique() {
+    return EsriFileGdbJNI.IndexDef_isUnique(this.swigCPtr, this);
+  }
+
+  public int SetFields(final String fields) {
+    return EsriFileGdbJNI.IndexDef_SetFields(this.swigCPtr, this, fields);
+  }
+
+  public int SetIsUnique(final boolean isUnique) {
+    return EsriFileGdbJNI.IndexDef_SetIsUnique(this.swigCPtr, this, isUnique);
+  }
+
+  public int SetName(final String name) {
+    return EsriFileGdbJNI.IndexDef_SetName(this.swigCPtr, this, name);
   }
 
 }

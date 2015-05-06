@@ -28,8 +28,8 @@ import com.revolsys.jts.test.geometry.TestUtil;
 
 public class FileGdbIoTest {
 
-  public static void doWriteReadTest(GeometryFactory geometryFactory,
-    final DataType dataType, Geometry geometry) {
+  public static void doWriteReadTest(GeometryFactory geometryFactory, final DataType dataType,
+    Geometry geometry) {
     if (geometry.isEmpty() || geometryFactory.getAxisCount() == 4) {
       return;
     }
@@ -39,7 +39,7 @@ public class FileGdbIoTest {
     geometry = geometry.convert(geometryFactory);
     final String geometryTypeString = dataType.toString();
     String name = "/tmp/revolsystest/io/gdb/" + geometryTypeString + "_"
-        + geometryFactory.getAxisCount();
+      + geometryFactory.getAxisCount();
     if (geometry instanceof GeometryCollection) {
       name += "_" + geometry.getGeometryCount();
     }
@@ -50,21 +50,20 @@ public class FileGdbIoTest {
     FileUtil.deleteDirectory(file);
     file.getParentFile().mkdirs();
     try (
-        final CapiFileGdbRecordStore recordStore = FileGdbRecordStoreFactory.create(file)) {
+      final CapiFileGdbRecordStore recordStore = FileGdbRecordStoreFactory.create(file)) {
       recordStore.setCreateMissingTables(true);
       recordStore.setCreateMissingRecordStore(true);
       recordStore.initialize();
 
       final String typePath = "/" + geometryTypeString;
-      final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-        typePath);
+      final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(typePath);
       recordDefinition.addField("ID", DataTypes.INT, true);
       recordDefinition.addField("NAME", DataTypes.STRING, 50, false);
       recordDefinition.addField("GEOMETRY", dataType, true);
       recordDefinition.setGeometryFactory(geometryFactory);
       recordStore.getRecordDefinition(recordDefinition);
       try (
-          Writer<Record> writer = recordStore.createWriter()) {
+        Writer<Record> writer = recordStore.createWriter()) {
         writer.setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
         writer.setProperty(IoConstants.GEOMETRY_TYPE, dataType);
 
@@ -74,7 +73,7 @@ public class FileGdbIoTest {
         writer.write(record);
       }
       try (
-          Reader<Record> reader = recordStore.query(typePath)) {
+        Reader<Record> reader = recordStore.query(typePath)) {
         final List<Record> objects = reader.read();
         Assert.assertEquals("Geometry Count", 1, objects.size());
         final Geometry actual = objects.get(0).getGeometryValue();
@@ -85,7 +84,7 @@ public class FileGdbIoTest {
           if (!actual.equals(axisCount, geometry)) {
             // Allow for conversion of multi part to single part
             if (geometry.getGeometryCount() != 1
-                || !actual.equals(axisCount, geometry.getGeometry(0))) {
+              || !actual.equals(axisCount, geometry.getGeometry(0))) {
               TestUtil.failNotEquals("Geometry Equal Exact", geometry, actual);
             }
           }
@@ -96,8 +95,7 @@ public class FileGdbIoTest {
 
   public static Test suite() {
     final TestSuite suite = new TestSuite("File GDB Geometry");
-    IoTestSuite.addGeometryTestSuites(suite, "File GDB", FileGdbIoTest.class,
-        "doWriteReadTest");
+    IoTestSuite.addGeometryTestSuites(suite, "File GDB", FileGdbIoTest.class, "doWriteReadTest");
     return suite;
   }
 

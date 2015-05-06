@@ -10,8 +10,7 @@ import com.revolsys.util.Property;
 
 public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
   public IntegerFieldDefinition(final Field field) {
-    super(field.getName(), DataTypes.INT,
-      BooleanStringConverter.getBoolean(field.getRequired())
+    super(field.getName(), DataTypes.INT, BooleanStringConverter.getBoolean(field.getRequired())
       || !field.isIsNullable());
   }
 
@@ -39,8 +38,7 @@ public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
     final String name = getName();
     if (value == null) {
       if (isRequired()) {
-        throw new IllegalArgumentException(name
-          + " is required and cannot be null");
+        throw new IllegalArgumentException(name + " is required and cannot be null");
       } else {
         getRecordStore().setNull(row, name);
       }
@@ -62,8 +60,7 @@ public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
         return intValue;
       } else {
         if (isRequired()) {
-          throw new IllegalArgumentException(name
-            + " is required and cannot be null");
+          throw new IllegalArgumentException(name + " is required and cannot be null");
         } else {
           getRecordStore().setNull(row, name);
           return null;

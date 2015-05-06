@@ -9,44 +9,31 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public enum ShapeType {
-  shapeNull(0),
-  shapePoint(1),
-  shapePointM(21),
-  shapePointZM(11),
-  shapePointZ(9),
-  shapeMultipoint(8),
-  shapeMultipointM(28),
-  shapeMultipointZM(18),
-  shapeMultipointZ(20),
-  shapePolyline(3),
-  shapePolylineM(23),
-  shapePolylineZM(13),
-  shapePolylineZ(10),
-  shapePolygon(5),
-  shapePolygonM(25),
-  shapePolygonZM(15),
-  shapePolygonZ(19),
-  shapeMultiPatchM(31),
-  shapeMultiPatch(32),
-  shapeGeneralPolyline(50),
-  shapeGeneralPolygon(51),
-  shapeGeneralPoint(52),
-  shapeGeneralMultipoint(53),
-  shapeGeneralMultiPatch(54);
+  shapeGeneralMultiPatch(54), shapeGeneralMultipoint(53), shapeGeneralPoint(52), shapeGeneralPolygon(
+  51), shapeGeneralPolyline(50), shapeMultiPatch(32), shapeMultiPatchM(31), shapeMultipoint(8), shapeMultipointM(
+      28), shapeMultipointZ(20), shapeMultipointZM(18), shapeNull(0), shapePoint(1), shapePointM(21), shapePointZ(9), shapePointZM(11), shapePolygon(5), shapePolygonM(25), shapePolygonZ(
+    19), shapePolygonZM(15), shapePolyline(3), shapePolylineM(23), shapePolylineZ(10), shapePolylineZM(
+    13);
 
-  public final int swigValue() {
-    return swigValue;
+  private static class SwigNext {
+    private static int next = 0;
   }
 
-  public static ShapeType swigToEnum(int swigValue) {
-    ShapeType[] swigValues = ShapeType.class.getEnumConstants();
-    if (swigValue < swigValues.length && swigValue >= 0 && swigValues[swigValue].swigValue == swigValue)
+  public static ShapeType swigToEnum(final int swigValue) {
+    final ShapeType[] swigValues = ShapeType.class.getEnumConstants();
+    if (swigValue < swigValues.length && swigValue >= 0
+      && swigValues[swigValue].swigValue == swigValue) {
       return swigValues[swigValue];
-    for (ShapeType swigEnum : swigValues)
-      if (swigEnum.swigValue == swigValue)
+    }
+    for (final ShapeType swigEnum : swigValues) {
+      if (swigEnum.swigValue == swigValue) {
         return swigEnum;
+      }
+    }
     throw new IllegalArgumentException("No enum " + ShapeType.class + " with value " + swigValue);
   }
+
+  private final int swigValue;
 
   @SuppressWarnings("unused")
   private ShapeType() {
@@ -54,21 +41,18 @@ public enum ShapeType {
   }
 
   @SuppressWarnings("unused")
-  private ShapeType(int swigValue) {
+  private ShapeType(final int swigValue) {
     this.swigValue = swigValue;
-    SwigNext.next = swigValue+1;
+    SwigNext.next = swigValue + 1;
   }
 
   @SuppressWarnings("unused")
-  private ShapeType(ShapeType swigEnum) {
+  private ShapeType(final ShapeType swigEnum) {
     this.swigValue = swigEnum.swigValue;
-    SwigNext.next = this.swigValue+1;
+    SwigNext.next = this.swigValue + 1;
   }
 
-  private final int swigValue;
-
-  private static class SwigNext {
-    private static int next = 0;
+  public final int swigValue() {
+    return this.swigValue;
   }
 }
-

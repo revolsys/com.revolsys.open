@@ -9,13 +9,11 @@ import com.revolsys.io.EndianInput;
 
 public class FgdbField extends FieldDefinition {
 
-  public FgdbField(final String name, final DataType type,
-    final boolean required) {
+  public FgdbField(final String name, final DataType type, final boolean required) {
     super(name, type, required);
   }
 
-  public FgdbField(final String name, final DataType type, final int length,
-    final boolean required) {
+  public FgdbField(final String name, final DataType type, final int length, final boolean required) {
     super(name, type, length, required);
   }
 
@@ -23,8 +21,7 @@ public class FgdbField extends FieldDefinition {
     throw new UnsupportedOperationException();
   }
 
-  public boolean setValue(final Record record, final EndianInput in)
-      throws IOException {
+  public boolean setValue(final Record record, final EndianInput in) throws IOException {
     final Object value = read(in);
     final String name = getName();
     record.setValue(name, value);

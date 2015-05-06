@@ -24,31 +24,31 @@ import com.revolsys.util.CollectionUtil;
 
 public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
-  private RecordFactory recordFactory;
+  private BoundingBox boundingBox;
 
-  private Table table;
+  private int count;
 
   private String fields;
 
-  private String sql;
+  private final int limit;
 
-  private BoundingBox boundingBox;
+  private final int offset;
 
   private RecordDefinition recordDefinition;
+
+  private RecordFactory recordFactory;
 
   private CapiFileGdbRecordStore recordStore;
 
   private EnumRows rows;
 
-  private final String typePath;
-
-  private final int offset;
-
-  private final int limit;
-
-  private int count;
+  private String sql;
 
   private Statistics statistics;
+
+  private Table table;
+
+  private final String typePath;
 
   FileGdbQueryIterator(final CapiFileGdbRecordStore recordStore, final String typePath) {
     this(recordStore, typePath, "*", "", null, 0, -1);
