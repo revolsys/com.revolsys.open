@@ -19,13 +19,13 @@ fgdbError checkResult(fgdbError error) {
   if (error) {
      std::wstring errorString;
      if (FileGDBAPI::ErrorInfo::GetErrorDescription(error, errorString) == S_FALSE) {
-     FileGDBAPI::ErrorInfo::ClearErrors();
          throw std::runtime_error("Unknown error");
      } else {
        std::stringstream out;
        out << wstring2string(errorString) << " (" << error << ")";
        std::string message = out.str();
-       FileGDBAPI::ErrorInfo::ClearErrors();
+       std::cout << message << std::endl;
+       std::cout.flush();
        throw std::runtime_error(message);
      }
   }
@@ -35,14 +35,14 @@ fgdbError checkResult(fgdbError error) {
 void handleException(JNIEnv *jenv, const std::exception e) {
   std::stringstream message;
   message << e.what() ;
-  jclass clazz = jenv->FindClass("java/lang/RuntimeException");
+  jclass clazz = jenv->FindClass("com/revolsys/gis/esri/gdb/file/FileGdbException");
   jenv->ThrowNew(clazz, message.str().c_str());
 }
   
 void handleException(JNIEnv *jenv, const std::runtime_error e) {
   std::stringstream message;
   message << e.what() ;
-  jclass clazz = jenv->FindClass("java/lang/RuntimeException");
+  jclass clazz = jenv->FindClass("com/revolsys/gis/esri/gdb/file/FileGdbException");
   jenv->ThrowNew(clazz, message.str().c_str());
 }
 
@@ -725,5 +725,3 @@ import com.revolsys.util.OS;
 %include "Util.h"
 
 %include "Raster.h"
-
-

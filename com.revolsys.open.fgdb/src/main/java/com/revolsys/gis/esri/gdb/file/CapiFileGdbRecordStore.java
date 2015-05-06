@@ -481,7 +481,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
         final Geodatabase geodatabase = getGeodatabase();
         if (geodatabase != null) {
           try {
-            for (Entry<String, Table> entry : this.tablesToClose.entrySet()) {
+            for (final Entry<String, Table> entry : this.tablesToClose.entrySet()) {
               final Table table = entry.getValue();
               try {
                 table.setLoadOnlyMode(false);
@@ -752,15 +752,13 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
             final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
             try {
               final Table table = geodatabase.createTable(tableDefinition, schemaCatalogPath);
-              try {
-                final RecordDefinitionImpl recordDefinition = getRecordDefinition(schemaPath,
-                  schemaCatalogPath, tableDefinition);
-                addRecordDefinition(recordDefinition);
-                schema.addElement(recordDefinition);
-                return recordDefinition;
-              } finally {
-                geodatabase.closeTable(table);
-              }
+              geodatabase.closeTable(table);
+              table.delete();
+              final RecordDefinitionImpl recordDefinition = getRecordDefinition(schemaPath,
+                schemaCatalogPath, tableDefinition);
+              addRecordDefinition(recordDefinition);
+              schema.addElement(recordDefinition);
+              return recordDefinition;
             } catch (final Throwable t) {
               throw new RuntimeException("Unable to create table " + deTable.getCatalogPath(), t);
             }
@@ -1146,9 +1144,10 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
     synchronized (this.apiSync) {
       final Table table = getTable(typePath);
       if (table != null) {
-        Maps.addCount(this.writeLockCountsByTypePath, typePath);
-        table.setWriteLock();
-        table.setLoadOnlyMode(true);
+        if (Maps.addCount(this.writeLockCountsByTypePath, typePath) == 1) {
+          table.setWriteLock();
+          table.setLoadOnlyMode(true);
+        }
       }
       return table;
     }
