@@ -109,24 +109,24 @@ public class FileGdbWriter extends AbstractRecordWriter {
       final Row row = this.recordStore.createRowObject(table);
       try {
         final List<Object> values = new ArrayList<Object>();
-        for (final FieldDefinition attribute : recordDefinition.getFields()) {
-          final String name = attribute.getName();
+        for (final FieldDefinition field : recordDefinition.getFields()) {
+          final String name = field.getName();
           try {
             final Object value = record.getValue(name);
-            final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
-            final Object esriValue = esriAttribute.setInsertValue(record, row, value);
+            final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+            final Object esriValue = esriField.setInsertValue(record, row, value);
             values.add(esriValue);
           } catch (final Throwable e) {
             throw new ObjectPropertyException(record, name, e);
           }
         }
         this.recordStore.insertRow(table, row);
-        for (final FieldDefinition attribute : recordDefinition.getFields()) {
-          final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
+        for (final FieldDefinition field : recordDefinition.getFields()) {
+          final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
           try {
-            esriAttribute.setPostInsertValue(record, row);
+            esriField.setPostInsertValue(record, row);
           } catch (final Throwable e) {
-            throw new ObjectPropertyException(record, attribute.getName(), e);
+            throw new ObjectPropertyException(record, field.getName(), e);
           }
         }
         record.setState(RecordState.Persisted);
@@ -171,12 +171,12 @@ public class FileGdbWriter extends AbstractRecordWriter {
             try {
               final List<Object> esriValues = new ArrayList<Object>();
               try {
-                for (final FieldDefinition attribute : recordDefinition.getFields()) {
-                  final String name = attribute.getName();
+                for (final FieldDefinition field : recordDefinition.getFields()) {
+                  final String name = field.getName();
                   try {
                     final Object value = record.getValue(name);
-                    final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)attribute;
-                    esriValues.add(esriAttribute.setUpdateValue(record, row, value));
+                    final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+                    esriValues.add(esriField.setUpdateValue(record, row, value));
                   } catch (final Throwable e) {
                     throw new ObjectPropertyException(record, name, e);
                   }
@@ -205,11 +205,11 @@ public class FileGdbWriter extends AbstractRecordWriter {
   }
 
   private void validateRequired(final Record record, final RecordDefinition recordDefinition) {
-    for (final FieldDefinition attribute : recordDefinition.getFields()) {
-      final String name = attribute.getName();
-      if (attribute.isRequired()) {
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      final String name = field.getName();
+      if (field.isRequired()) {
         final Object value = record.getValue(name);
-        if (value == null && !(attribute instanceof OidFieldDefinition)) {
+        if (value == null && !(field instanceof OidFieldDefinition)) {
           throw new ObjectPropertyException(record, name, "Value required");
         }
       }
