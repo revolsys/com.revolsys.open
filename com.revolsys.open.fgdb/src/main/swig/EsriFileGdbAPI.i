@@ -15,17 +15,18 @@ std::string wstring2string(std::wstring wstr) {
   return str;
 }
 
-  
 fgdbError checkResult(fgdbError error) {
   if (error) {
      std::wstring errorString;
      if (FileGDBAPI::ErrorInfo::GetErrorDescription(error, errorString) == S_FALSE) {
-       throw std::runtime_error("Unknown error");
+     FileGDBAPI::ErrorInfo::ClearErrors();
+         throw std::runtime_error("Unknown error");
      } else {
-       std::stringstream message;
-       message << error << "\t" << wstring2string(errorString);
+       std::stringstream out;
+       out << wstring2string(errorString) << " (" << error << ")";
+       std::string message = out.str();
        FileGDBAPI::ErrorInfo::ClearErrors();
-       throw std::runtime_error(message.str());
+       throw std::runtime_error(message);
      }
   }
   return error;

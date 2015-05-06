@@ -387,6 +387,11 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
     return this.codeTableColumNames;
   }
 
+  @Override
+  public RecordStoreConnected getConnected() {
+    return new RecordStoreConnected(this);
+  }
+
   protected Map<String, Object> getConnectionProperties() {
     return this.connectionProperties;
   }
@@ -623,6 +628,9 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
     }
   }
 
+  protected void obtainConnected() {
+  }
+
   @Override
   public ResultPager<Record> page(final Query query) {
     final Reader<Record> results = query(query);
@@ -698,6 +706,9 @@ public abstract class AbstractRecordStore extends AbstractObjectWithProperties i
   protected Map<String, ? extends RecordStoreSchemaElement> refreshSchemaElements(
     final RecordStoreSchema schema) {
     return Collections.emptyMap();
+  }
+
+  protected void releaseConnected() {
   }
 
   public void setCodeTableColumNames(final Map<String, List<String>> domainColumNames) {

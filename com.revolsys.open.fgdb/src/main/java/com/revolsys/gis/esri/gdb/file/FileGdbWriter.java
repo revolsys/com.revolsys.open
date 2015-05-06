@@ -7,8 +7,6 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.LoggerFactory;
-
 import com.revolsys.beans.ObjectException;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.data.record.Record;
@@ -36,9 +34,9 @@ public class FileGdbWriter extends AbstractRecordWriter {
   @PreDestroy
   public synchronized void close() {
     try {
-      if (this.recordStore != null) {
+      if (this.tables != null) {
         for (final String typePath : this.tables.keySet()) {
-          doCloseTable(typePath);
+          this.recordStore.releaseTableAndWriteLock(typePath);
         }
       }
     } finally {
@@ -47,12 +45,11 @@ public class FileGdbWriter extends AbstractRecordWriter {
     }
   }
 
-  public synchronized void closeTable(final String typePath) {
+  public void closeTable(final String typePath) {
     if (this.tables != null) {
       synchronized (this.tables) {
-        final Table table = this.tables.remove(typePath);
-        if (table != null) {
-          doCloseTable(typePath);
+        if (this.tables.remove(typePath) != null) {
+          this.recordStore.releaseTableAndWriteLock(typePath);
         }
       }
     }
@@ -62,14 +59,14 @@ public class FileGdbWriter extends AbstractRecordWriter {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final String typePath = recordDefinition.getPath();
     final Table table = getTable(typePath);
-    final EnumRows rows = this.recordStore.search(table, "OBJECTID",
+    final EnumRows rows = this.recordStore.search(typePath, table, "OBJECTID",
       "OBJECTID=" + record.getValue("OBJECTID"), false);
     if (rows != null) {
       try {
         final Row row = this.recordStore.nextRow(rows);
         if (row != null) {
           try {
-            this.recordStore.deletedRow(typePath, table, row);
+            this.recordStore.deleteRow(typePath, table, row);
             record.setState(RecordState.Deleted);
           } finally {
             this.recordStore.closeRow(row);
@@ -82,25 +79,22 @@ public class FileGdbWriter extends AbstractRecordWriter {
     }
   }
 
-  private void doCloseTable(final String typePath) {
-    try {
-      this.recordStore.freeWriteLock(typePath);
-      this.recordStore.closeTable(typePath);
-    } catch (final Throwable e) {
-      LoggerFactory.getLogger(FileGdbWriter.class).error("Unable to close table:" + typePath, e);
-    }
+  @Override
+  protected void finalize() throws Throwable {
+    close();
   }
 
   private Table getTable(final String typePath) {
-    Table table = this.tables.get(typePath);
-    if (table == null) {
-      table = this.recordStore.getTable(typePath);
-      if (table != null) {
-        this.tables.put(typePath, table);
-        this.recordStore.setWriteLock(typePath);
+    synchronized (this) {
+      Table table = this.tables.get(typePath);
+      if (table == null) {
+        table = this.recordStore.getTableWithWriteLock(typePath);
+        if (table != null) {
+          this.tables.put(typePath, table);
+        }
       }
+      return table;
     }
-    return table;
   }
 
   private void insert(final Record record) {
@@ -168,8 +162,8 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
       final String typePath = sourceRecordDefinition.getPath();
       final Table table = getTable(typePath);
-      final EnumRows rows = this.recordStore.search(table, "OBJECTID", "OBJECTID=" + objectId,
-        false);
+      final EnumRows rows = this.recordStore.search(typePath, table, "OBJECTID", "OBJECTID="
+        + objectId, false);
       if (rows != null) {
         try {
           final Row row = this.recordStore.nextRow(rows);

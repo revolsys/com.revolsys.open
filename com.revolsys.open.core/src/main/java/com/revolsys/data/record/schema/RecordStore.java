@@ -66,6 +66,8 @@ public interface RecordStore extends RecordDefinitionFactory, AutoCloseable {
 
   Map<String, CodeTable> getCodeTableByFieldNameMap();
 
+  RecordStoreConnected getConnected();
+
   GeometryFactory getGeometryFactory();
 
   String getLabel();

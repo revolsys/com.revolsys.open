@@ -92,8 +92,11 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
   protected void doClose() {
     if (this.recordStore != null) {
       try {
-        this.recordStore.closeEnumRows(this.rows);
-        this.recordStore.closeTable(this.typePath);
+        try {
+          this.recordStore.closeEnumRows(this.rows);
+        } finally {
+          this.recordStore.releaseTable(this.typePath);
+        }
       } catch (final Throwable e) {
         LoggerFactory.getLogger(getClass()).error("Error closing query: " + this.typePath);
       } finally {
@@ -116,7 +119,8 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
           if (this.sql.startsWith("SELECT")) {
             this.rows = this.recordStore.query(this.sql, true);
           } else {
-            this.rows = this.recordStore.search(this.table, this.fields, this.sql, true);
+            this.rows = this.recordStore.search(this.typePath, this.table, this.fields, this.sql,
+              true);
           }
         } else {
           BoundingBox boundingBox = this.boundingBox;
@@ -131,7 +135,8 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
           if ("1 = 1".equals(sql)) {
             sql = "";
           }
-          this.rows = this.recordStore.search(this.table, this.fields, sql, envelope, true);
+          this.rows = this.recordStore.search(this.typePath, this.table, this.fields, sql,
+            envelope, true);
         }
       }
     }
@@ -225,7 +230,6 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   @Override
   public String toString() {
-    return this.typePath.toString();
+    return this.typePath + " " + this.sql;
   }
-
 }
