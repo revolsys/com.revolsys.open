@@ -81,6 +81,18 @@ import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class ProjectFrame extends BaseFrame {
+  public static final String PROJECT_FRAME = "projectFrame";
+
+  public static final String SAVE_PROJECT_KEY = "Save Project";
+
+  public static final String SAVE_CHANGES_KEY = "Save Changes";
+
+  private static final long serialVersionUID = 1L;
+
+  static {
+    ResponseCache.setDefault(new FileResponseCache());
+  }
+
   public static void addSaveActions(final JComponent component, final Project project) {
     final InputMap inputMap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), SAVE_PROJECT_KEY);
@@ -111,18 +123,6 @@ public class ProjectFrame extends BaseFrame {
         return project.getProperty(PROJECT_FRAME);
       }
     }
-  }
-
-  public static final String PROJECT_FRAME = "projectFrame";
-
-  public static final String SAVE_PROJECT_KEY = "Save Project";
-
-  public static final String SAVE_CHANGES_KEY = "Save Changes";
-
-  private static final long serialVersionUID = 1L;
-
-  static {
-    ResponseCache.setDefault(new FileResponseCache());
   }
 
   private Project project;
@@ -579,6 +579,7 @@ public class ProjectFrame extends BaseFrame {
 
     this.leftRightSplit.setBorder(BorderFactory.createEmptyBorder());
     this.bottomTabs.setBorder(BorderFactory.createEmptyBorder());
+    this.bottomTabs.setPreferredSize(new Dimension(700, 200));
     final ContainerListener listener = new ContainerAdapter() {
       @Override
       public void componentRemoved(final ContainerEvent e) {

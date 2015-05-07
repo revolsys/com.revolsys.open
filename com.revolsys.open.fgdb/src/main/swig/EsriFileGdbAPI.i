@@ -22,6 +22,7 @@ fgdbError checkResult(fgdbError error) {
          throw std::runtime_error("Unknown error");
      } else {
        std::stringstream out;
+       out << wstring2string(errorString) << " (" << error << ")";
        std::string message = out.str();
        throw std::runtime_error(message);
      }
@@ -303,7 +304,7 @@ import com.revolsys.util.OS;
 %ignore FileGDBAPI::Table::GetDefaultSubtypeCode;
 %ignore FileGDBAPI::Table::CreateRowObject;
 %ignore FileGDBAPI::Table::GetIndexes;
-%ignore FileGDBAPI::Table::getFields();
+%ignore FileGDBAPI::Table::getFields;
 %ignore FileGDBAPI::Table::Search;
 %ignore FileGDBAPI::Table::Insert;
 %ignore FileGDBAPI::Table::Update;
@@ -381,7 +382,7 @@ import com.revolsys.util.OS;
     checkResult(self->FreeWriteLock());
   }
 
-  std::vector<FileGDBAPI::FieldDef> getFields() {
+  std::vector<FileGDBAPI::FieldDef> getFields {
     std::vector<FileGDBAPI::FieldDef> value;
     checkResult(self->GetFields(value));
     return value;
@@ -555,7 +556,7 @@ import com.revolsys.util.OS;
     checkResult(self->SetGeometry(shape));
   }
    
-  std::vector<FileGDBAPI::FieldDef> getFields() {
+  std::vector<FileGDBAPI::FieldDef> getFields {
     std::vector<FileGDBAPI::FieldDef> value;
     checkResult(self->GetFields(value));
     return value;
@@ -683,7 +684,7 @@ import com.revolsys.util.OS;
     checkResult(self->GetName(result));
     return result;
   }
-  std::wstring getFields() {
+  std::wstring getFields {
     std::wstring result;
     checkResult(self->GetFields(result));
     return result;
@@ -735,7 +736,7 @@ import com.revolsys.util.OS;
     }
   }
 
-  std::vector<FileGDBAPI::FieldDef> getFields() {
+  std::vector<FileGDBAPI::FieldDef> getFields {
     std::vector<FileGDBAPI::FieldDef> value;
     checkResult(self->GetFields(value));
     return value;
