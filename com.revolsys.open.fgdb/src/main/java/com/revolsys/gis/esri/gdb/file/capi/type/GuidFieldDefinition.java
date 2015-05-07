@@ -48,7 +48,7 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
     if (getRecordStore().isNull(row, name)) {
       return null;
     } else {
-      synchronized (getRecordStore()) {
+      synchronized (getSync()) {
         final Guid guid = row.getGuid(name);
         addGuid(guid);
         return guid.toString();
@@ -69,7 +69,7 @@ public class GuidFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else {
       final String guidString = value.toString();
       final Guid guid = getGuid(guidString);
-      synchronized (getRecordStore()) {
+      synchronized (getSync()) {
         row.setGuid(name, guid);
       }
       return guid;

@@ -21,7 +21,7 @@ public class XmlFieldDefinition extends AbstractFileGdbFieldDefinition {
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
-      synchronized (recordStore) {
+      synchronized (getSync()) {
         return row.getXML(name);
       }
     }
@@ -39,7 +39,7 @@ public class XmlFieldDefinition extends AbstractFileGdbFieldDefinition {
       return null;
     } else {
       final String string = value.toString();
-      synchronized (getRecordStore()) {
+      synchronized (getSync()) {
         row.setXML(name, string);
       }
       return string;

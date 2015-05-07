@@ -882,6 +882,10 @@ public class FileGdbRecordStoreImpl extends AbstractRecordStore implements FileG
     }
   }
 
+  public Object getApiSync() {
+    return this.apiSync;
+  }
+
   protected String getCatalogPath(final RecordStoreSchemaElement element) {
     final String path = element.getPath();
     return getCatalogPath(path);

@@ -38,7 +38,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
-      synchronized (recordStore) {
+      synchronized (getSync()) {
         long time;
         synchronized (LOCK) {
           time = row.getDate(name) * 1000;
@@ -87,7 +87,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
             return null;
           }
         }
-        synchronized (getRecordStore()) {
+        synchronized (getSync()) {
           final long time = date.getTime() / 1000;
           synchronized (LOCK) {
             row.setDate(name, time);

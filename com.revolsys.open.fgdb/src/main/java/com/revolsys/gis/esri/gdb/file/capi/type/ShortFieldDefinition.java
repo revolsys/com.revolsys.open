@@ -25,7 +25,7 @@ public class ShortFieldDefinition extends AbstractFileGdbFieldDefinition {
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
-      synchronized (recordStore) {
+      synchronized (getSync()) {
         return row.getShort(name);
       }
     }
@@ -44,14 +44,14 @@ public class ShortFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final short shortValue = number.shortValue();
-      synchronized (getRecordStore()) {
+      synchronized (getSync()) {
         row.setShort(name, shortValue);
       }
       return shortValue;
     } else {
       final String string = value.toString();
       final short shortValue = Short.parseShort(string);
-      synchronized (getRecordStore()) {
+      synchronized (getSync()) {
         row.setShort(name, shortValue);
       }
       return shortValue;

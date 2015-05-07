@@ -113,7 +113,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
       return null;
     } else {
       final byte[] buffer;
-      synchronized (recordStore) {
+      synchronized (getSync()) {
         buffer = row.getGeometry();
       }
       final ByteArrayInputStream byteIn = new ByteArrayInputStream(buffer);
@@ -173,7 +173,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
         SHP_UTIL.write(this.writeMethod, out, projectedGeometry);
       }
       final byte[] bytes = byteOut.toByteArray();
-      synchronized (getRecordStore()) {
+      synchronized (getSync()) {
         row.setGeometry(bytes);
       }
       return bytes;

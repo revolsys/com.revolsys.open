@@ -31,6 +31,10 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
     }
   }
 
+  public Object getSync() {
+    return getRecordStore().getApiSync();
+  }
+
   public abstract Object getValue(Row row);
 
   public Object setInsertValue(final Record record, final Row row, final Object value) {

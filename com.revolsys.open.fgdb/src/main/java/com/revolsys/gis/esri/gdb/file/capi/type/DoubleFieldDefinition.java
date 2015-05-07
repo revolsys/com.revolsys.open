@@ -26,7 +26,7 @@ public class DoubleFieldDefinition extends AbstractFileGdbFieldDefinition {
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
-      synchronized (recordStore) {
+      synchronized (getSync()) {
         return row.getDouble(name);
       }
     }
@@ -45,7 +45,7 @@ public class DoubleFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final double doubleValue = number.doubleValue();
-      synchronized (getRecordStore()) {
+      synchronized (getSync()) {
         row.setDouble(name, doubleValue);
       }
       return doubleValue;
@@ -53,7 +53,7 @@ public class DoubleFieldDefinition extends AbstractFileGdbFieldDefinition {
       final String string = value.toString();
       if (Property.hasValue(string)) {
         final double doubleValue = Double.parseDouble(string);
-        synchronized (getRecordStore()) {
+        synchronized (getSync()) {
           row.setDouble(name, doubleValue);
         }
         return doubleValue;

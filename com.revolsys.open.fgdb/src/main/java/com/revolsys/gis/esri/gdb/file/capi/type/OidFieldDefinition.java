@@ -25,7 +25,7 @@ public class OidFieldDefinition extends AbstractFileGdbFieldDefinition {
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
-      synchronized (recordStore) {
+      synchronized (getSync()) {
         return row.getOid();
       }
     }
@@ -33,7 +33,7 @@ public class OidFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   @Override
   public void setPostInsertValue(final Record record, final Row row) {
-    synchronized (getRecordStore()) {
+    synchronized (getSync()) {
       final int oid = row.getOid();
       final String name = getName();
       record.setValue(name, oid);

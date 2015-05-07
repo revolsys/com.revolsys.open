@@ -22,7 +22,7 @@ public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
-      synchronized (recordStore) {
+      synchronized (getSync()) {
         return row.getString(name);
       }
     }
@@ -44,7 +44,7 @@ public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
         LoggerFactory.getLogger(getClass()).warn("Value is to long for: " + this + ":" + string);
         string = string.substring(0, getLength());
       }
-      synchronized (getRecordStore()) {
+      synchronized (getSync()) {
         row.setString(name, string);
       }
       return string;

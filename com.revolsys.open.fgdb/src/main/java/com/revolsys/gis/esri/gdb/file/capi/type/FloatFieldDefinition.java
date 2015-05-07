@@ -25,7 +25,7 @@ public class FloatFieldDefinition extends AbstractFileGdbFieldDefinition {
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
-      synchronized (recordStore) {
+      synchronized (getSync()) {
         return row.getFloat(name);
       }
     }
@@ -44,14 +44,14 @@ public class FloatFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final float floatValue = number.floatValue();
-      synchronized (getRecordStore()) {
+      synchronized (getSync()) {
         row.setFloat(name, floatValue);
       }
       return floatValue;
     } else {
       final String string = value.toString();
       final float floatValue = Float.parseFloat(string);
-      synchronized (getRecordStore()) {
+      synchronized (getSync()) {
         row.setFloat(name, floatValue);
       }
       return floatValue;

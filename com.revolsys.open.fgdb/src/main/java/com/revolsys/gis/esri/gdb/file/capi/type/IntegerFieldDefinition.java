@@ -26,7 +26,7 @@ public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
-      synchronized (recordStore) {
+      synchronized (getSync()) {
         final Integer number = row.getInteger(name);
         return number;
       }
@@ -46,7 +46,7 @@ public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       final int intValue = number.intValue();
-      synchronized (getRecordStore()) {
+      synchronized (getSync()) {
         row.setInteger(name, intValue);
       }
       return intValue;
@@ -54,7 +54,7 @@ public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
       final String string = value.toString().trim();
       if (Property.hasValue(string)) {
         final int intValue = Integer.parseInt(string);
-        synchronized (getRecordStore()) {
+        synchronized (getSync()) {
           row.setInteger(name, intValue);
         }
         return intValue;
