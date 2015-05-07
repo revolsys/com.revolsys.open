@@ -88,6 +88,10 @@ import com.revolsys.util.Property;
  * @version 1.7
  */
 public class GeometryFactory implements Serializable, MapSerializer {
+  private static final long serialVersionUID = 4328651897279304108L;
+
+  private static IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
+
   public static void clear() {
     factoriesBySrid.clear();
   }
@@ -356,10 +360,6 @@ public class GeometryFactory implements Serializable, MapSerializer {
   public static GeometryFactory worldMercator() {
     return floating3(3857);
   }
-
-  private static final long serialVersionUID = 4328651897279304108L;
-
-  private static IntHashMap<IntHashMap<List<GeometryFactory>>> factoriesBySrid = new IntHashMap<>();
 
   private final CoordinateSystem coordinateSystem;
 
@@ -1003,11 +1003,6 @@ public class GeometryFactory implements Serializable, MapSerializer {
     return getScale(2);
   }
 
-  /**
-   * Gets the srid value defined for this factory.
-   *
-   * @return the factory srid value
-   */
   public int getSrid() {
     return this.srid;
   }

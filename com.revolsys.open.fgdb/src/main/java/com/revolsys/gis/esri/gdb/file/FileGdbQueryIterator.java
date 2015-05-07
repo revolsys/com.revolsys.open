@@ -175,10 +175,10 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
           record.setState(RecordState.Initalizing);
           for (final FieldDefinition field : this.recordDefinition.getFields()) {
             final String name = field.getName();
-            final AbstractFileGdbFieldDefinition esriAttribute = (AbstractFileGdbFieldDefinition)field;
+            final AbstractFileGdbFieldDefinition esriFieldDefinition = (AbstractFileGdbFieldDefinition)field;
             final Object value;
             synchronized (this.recordStore) {
-              value = esriAttribute.getValue(row);
+              value = esriFieldDefinition.getValue(row);
             }
             record.setValue(name, value);
           }
@@ -207,7 +207,6 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     final RecordDefinition recordDefinition = this.recordDefinition;
     if (recordDefinition != null) {
       this.boundingBox = boundingBox;
-
       if (boundingBox != null) {
         final FieldDefinition geometryField = recordDefinition.getGeometryField();
         if (geometryField != null) {
@@ -218,10 +217,6 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
         }
       }
     }
-  }
-
-  public void setSql(final String whereClause) {
-    this.sql = whereClause;
   }
 
   public void setStatistics(final Statistics statistics) {

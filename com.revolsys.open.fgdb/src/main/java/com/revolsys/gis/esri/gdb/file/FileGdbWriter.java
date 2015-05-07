@@ -56,25 +56,28 @@ public class FileGdbWriter extends AbstractRecordWriter {
   }
 
   private void delete(final Record record) {
-    final RecordDefinition recordDefinition = record.getRecordDefinition();
-    final String typePath = recordDefinition.getPath();
-    final Table table = getTable(typePath);
-    final EnumRows rows = this.recordStore.search(typePath, table, "OBJECTID",
-      "OBJECTID=" + record.getValue("OBJECTID"), false);
-    if (rows != null) {
-      try {
-        final Row row = this.recordStore.nextRow(rows);
-        if (row != null) {
-          try {
-            this.recordStore.deleteRow(typePath, table, row);
-            record.setState(RecordState.Deleted);
-          } finally {
-            this.recordStore.closeRow(row);
-            this.recordStore.addStatistic("Delete", record);
+    final Object objectId = record.getValue("OBJECTID");
+    if (objectId != null) {
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
+      final String typePath = recordDefinition.getPath();
+      final Table table = getTable(typePath);
+      final String whereClause = "OBJECTID=" + objectId;
+      final EnumRows rows = this.recordStore.search(typePath, table, "OBJECTID", whereClause, false);
+      if (rows != null) {
+        try {
+          final Row row = this.recordStore.nextRow(rows);
+          if (row != null) {
+            try {
+              this.recordStore.deleteRow(typePath, table, row);
+              record.setState(RecordState.Deleted);
+            } finally {
+              this.recordStore.closeRow(row);
+              this.recordStore.addStatistic("Delete", record);
+            }
           }
+        } finally {
+          this.recordStore.closeEnumRows(rows);
         }
-      } finally {
-        this.recordStore.closeEnumRows(rows);
       }
     }
   }
@@ -108,7 +111,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
     try {
       final Row row = this.recordStore.createRowObject(table);
       try {
-        final List<Object> values = new ArrayList<Object>();
+        final List<Object> values = new ArrayList<>();
         for (final FieldDefinition field : recordDefinition.getFields()) {
           final String name = field.getName();
           try {
@@ -143,7 +146,6 @@ public class FileGdbWriter extends AbstractRecordWriter {
     } catch (final Throwable e) {
       throw new ObjectException(record, e);
     }
-
   }
 
   public synchronized void openTable(final String typePath) {
@@ -162,21 +164,22 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
       final String typePath = sourceRecordDefinition.getPath();
       final Table table = getTable(typePath);
-      final EnumRows rows = this.recordStore.search(typePath, table, "OBJECTID", "OBJECTID="
-        + objectId, false);
+      final String whereClause = "OBJECTID=" + objectId;
+      final EnumRows rows = this.recordStore.search(typePath, table, "*", whereClause, true);
       if (rows != null) {
         try {
           final Row row = this.recordStore.nextRow(rows);
           if (row != null) {
             try {
-              final List<Object> esriValues = new ArrayList<Object>();
+              final List<Object> esriValues = new ArrayList<>();
               try {
                 for (final FieldDefinition field : recordDefinition.getFields()) {
                   final String name = field.getName();
                   try {
                     final Object value = record.getValue(name);
                     final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-                    esriValues.add(esriField.setUpdateValue(record, row, value));
+                    final Object esriValue = esriField.setUpdateValue(record, row, value);
+                    esriValues.add(esriValue);
                   } catch (final Throwable e) {
                     throw new ObjectPropertyException(record, name, e);
                   }
@@ -218,35 +221,27 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   @Override
   public synchronized void write(final Record record) {
-    try {
-      final RecordDefinition recordDefinition = record.getRecordDefinition();
-      final RecordStore recordStore = recordDefinition.getRecordStore();
-      if (recordStore == this.recordStore) {
-        switch (record.getState()) {
-          case New:
-            insert(record);
-          break;
-          case Modified:
-            update(record);
-          break;
-          case Persisted:
-          // No action required
-          break;
-          case Deleted:
-            delete(record);
-          break;
-          default:
-            throw new IllegalStateException("State not known");
-        }
-      } else {
-        insert(record);
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
+    final RecordStore recordStore = recordDefinition.getRecordStore();
+    if (recordStore == this.recordStore) {
+      switch (record.getState()) {
+        case New:
+          insert(record);
+        break;
+        case Modified:
+          update(record);
+        break;
+        case Persisted:
+        // No action required
+        break;
+        case Deleted:
+          delete(record);
+        break;
+        default:
+          throw new IllegalStateException("State not known");
       }
-    } catch (final RuntimeException e) {
-      throw e;
-    } catch (final Error e) {
-      throw e;
-    } catch (final Exception e) {
-      throw new RuntimeException("Unable to write", e);
+    } else {
+      insert(record);
     }
   }
 }

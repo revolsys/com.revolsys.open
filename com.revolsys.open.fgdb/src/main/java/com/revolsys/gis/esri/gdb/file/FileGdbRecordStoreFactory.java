@@ -25,13 +25,12 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
   private static final List<String> URL_PATTERNS = Arrays.asList("file:/(//)?.*.gdb/?",
     "folderconnection:/(//)?.*.gdb/?");
 
-  public static FileGdbRecordStoreImpl create(File file) {
+  public static FileGdbRecordStoreImpl create(final File file) {
     if (file == null) {
       return null;
     } else {
       synchronized (COUNTS) {
         final String fileName = FileUtil.getCanonicalPath(file);
-        file = new File(fileName);
         final AtomicInteger count = Maps.get(COUNTS, fileName, new AtomicInteger());
         count.incrementAndGet();
         FileGdbRecordStoreImpl recordStore = RECORD_STORES.get(fileName);

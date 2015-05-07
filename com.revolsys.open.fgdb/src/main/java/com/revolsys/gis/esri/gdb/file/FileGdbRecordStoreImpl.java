@@ -126,9 +126,9 @@ public class FileGdbRecordStoreImpl extends AbstractRecordStore implements FileG
   }
 
   private static void addFieldTypeAttributeConstructor(final FieldType fieldType,
-    final Class<? extends AbstractFileGdbFieldDefinition> attributeClass) {
+    final Class<? extends AbstractFileGdbFieldDefinition> fieldClass) {
     try {
-      final Constructor<? extends AbstractFileGdbFieldDefinition> constructor = attributeClass.getConstructor(Field.class);
+      final Constructor<? extends AbstractFileGdbFieldDefinition> constructor = fieldClass.getConstructor(Field.class);
       ESRI_FIELD_TYPE_ATTRIBUTE_MAP.put(fieldType, constructor);
     } catch (final SecurityException e) {
       LOG.error("No public constructor for ESRI type " + fieldType, e);
@@ -163,7 +163,7 @@ public class FileGdbRecordStoreImpl extends AbstractRecordStore implements FileG
 
   private String defaultSchemaPath = "/";
 
-  private Map<String, List<String>> domainColumNames = new HashMap<String, List<String>>();
+  private Map<String, List<String>> domainFieldNames = new HashMap<>();
 
   private final Set<EnumRows> enumRowsToClose = new HashSet<>();
 
@@ -175,7 +175,7 @@ public class FileGdbRecordStoreImpl extends AbstractRecordStore implements FileG
 
   private int geodatabaseReferenceCount;
 
-  private final Map<String, AtomicLong> idGenerators = new HashMap<String, AtomicLong>();
+  private final Map<String, AtomicLong> idGenerators = new HashMap<>();
 
   private boolean initialized;
 
@@ -512,7 +512,7 @@ public class FileGdbRecordStoreImpl extends AbstractRecordStore implements FileG
       if (geodatabase != null) {
         try {
           final String domainName = domain.getDomainName();
-          if (!this.domainColumNames.containsKey(domainName)) {
+          if (!this.domainFieldNames.containsKey(domainName)) {
             synchronized (API_SYNC) {
               final String domainDef = EsriGdbXmlSerializer.toString(domain);
               try {
@@ -913,8 +913,8 @@ public class FileGdbRecordStoreImpl extends AbstractRecordStore implements FileG
     return this.defaultSchemaPath;
   }
 
-  public Map<String, List<String>> getDomainColumNames() {
-    return this.domainColumNames;
+  public Map<String, List<String>> getDomainFieldNames() {
+    return this.domainFieldNames;
   }
 
   public String getFileName() {
@@ -1378,7 +1378,7 @@ public class FileGdbRecordStoreImpl extends AbstractRecordStore implements FileG
           final FileGdbDomainCodeTable codeTable = new FileGdbDomainCodeTable(this,
             codedValueDomain);
           super.addCodeTable(codeTable);
-          final List<String> columnNames = this.domainColumNames.get(domainName);
+          final List<String> columnNames = this.domainFieldNames.get(domainName);
           if (columnNames != null) {
             for (final String columnName : columnNames) {
               addCodeTable(columnName, codeTable);
@@ -1645,8 +1645,8 @@ public class FileGdbRecordStoreImpl extends AbstractRecordStore implements FileG
     }
   }
 
-  public void setDomainColumNames(final Map<String, List<String>> domainColumNames) {
-    this.domainColumNames = domainColumNames;
+  public void setDomainFieldNames(final Map<String, List<String>> domainColumNames) {
+    this.domainFieldNames = domainColumNames;
   }
 
   public void setFileName(final String fileName) {
