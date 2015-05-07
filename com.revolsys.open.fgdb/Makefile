@@ -9,8 +9,8 @@ else
   OS=linux
 endif
 
-ESRI_FILE_GBD_HOME=/opt/EsriFileGdb/1.4/macosx/x86_64
-ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb/1.4/macosx/x86_64/include
+ESRI_FILE_GBD_HOME=/opt/EsriFileGdb/1.4.0/macosx/x86_64
+ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb/1.4.0/macosx/x86_64/include
 
 all: clean swig libs
 	

@@ -14,7 +14,7 @@ import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.format.esri.gdb.xml.model.CodedValueDomain;
 import com.revolsys.format.esri.gdb.xml.model.Domain;
-import com.revolsys.gis.esri.gdb.file.CapiFileGdbRecordStore;
+import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreImpl;
 
 public class FileGdbDomainCodeTable implements CodeTable {
   private static final Logger LOG = LoggerFactory.getLogger(FileGdbDomainCodeTable.class);
@@ -23,11 +23,11 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   private final String name;
 
-  private final CapiFileGdbRecordStore recordStore;
+  private final FileGdbRecordStoreImpl recordStore;
 
   private JComponent swingEditor;
 
-  public FileGdbDomainCodeTable(final CapiFileGdbRecordStore recordStore,
+  public FileGdbDomainCodeTable(final FileGdbRecordStoreImpl recordStore,
     final CodedValueDomain domain) {
     this.recordStore = recordStore;
     this.domain = domain;

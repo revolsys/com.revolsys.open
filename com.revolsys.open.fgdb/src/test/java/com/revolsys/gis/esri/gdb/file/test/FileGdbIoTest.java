@@ -12,7 +12,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.gis.esri.gdb.file.CapiFileGdbRecordStore;
+import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreImpl;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
@@ -50,7 +50,7 @@ public class FileGdbIoTest {
     FileUtil.deleteDirectory(file);
     file.getParentFile().mkdirs();
     try (
-      final CapiFileGdbRecordStore recordStore = FileGdbRecordStoreFactory.create(file)) {
+      final FileGdbRecordStoreImpl recordStore = FileGdbRecordStoreFactory.create(file)) {
       recordStore.setCreateMissingTables(true);
       recordStore.setCreateMissingRecordStore(true);
       recordStore.initialize();

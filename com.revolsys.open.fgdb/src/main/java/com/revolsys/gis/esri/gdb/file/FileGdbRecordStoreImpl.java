@@ -99,12 +99,12 @@ import com.revolsys.util.ExceptionUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileGdbRecordStore {
-  private static final Object API_SYNC = new Object();
+public class FileGdbRecordStoreImpl extends AbstractRecordStore implements FileGdbRecordStore {
+  static final Object API_SYNC = new Object();
 
   private static final Map<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>> ESRI_FIELD_TYPE_ATTRIBUTE_MAP = new HashMap<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>>();
 
-  private static final Logger LOG = LoggerFactory.getLogger(CapiFileGdbRecordStore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileGdbRecordStoreImpl.class);
 
   private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
 
@@ -187,7 +187,7 @@ public class CapiFileGdbRecordStore extends AbstractRecordStore implements FileG
 
   private final Map<String, Integer> writeLockCountsByTypePath = new HashMap<>();
 
-  protected CapiFileGdbRecordStore(final File file) {
+  protected FileGdbRecordStoreImpl(final File file) {
     this.fileName = file.getAbsolutePath();
     setConnectionProperties(Collections.singletonMap("url", FileUtil.toUrl(file).toString()));
     this.catalogPathByPath.put("/", "\\");

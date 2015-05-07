@@ -225,17 +225,15 @@ std::string wstring2string(std::wstring wstr) {
   return str;
 }
 
-  
 fgdbError checkResult(fgdbError error) {
   if (error) {
      std::wstring errorString;
      if (FileGDBAPI::ErrorInfo::GetErrorDescription(error, errorString) == S_FALSE) {
-       throw std::runtime_error("Unknown error");
+         throw std::runtime_error("Unknown error");
      } else {
-       std::stringstream message;
-       message << error << "\t" << wstring2string(errorString);
-       FileGDBAPI::ErrorInfo::ClearErrors();
-       throw std::runtime_error(message.str());
+       std::stringstream out;
+       std::string message = out.str();
+       throw std::runtime_error(message);
      }
   }
   return error;
@@ -244,14 +242,14 @@ fgdbError checkResult(fgdbError error) {
 void handleException(JNIEnv *jenv, const std::exception e) {
   std::stringstream message;
   message << e.what() ;
-  jclass clazz = jenv->FindClass("java/lang/RuntimeException");
+  jclass clazz = jenv->FindClass("com/revolsys/gis/esri/gdb/file/FileGdbException");
   jenv->ThrowNew(clazz, message.str().c_str());
 }
   
 void handleException(JNIEnv *jenv, const std::runtime_error e) {
   std::stringstream message;
   message << e.what() ;
-  jclass clazz = jenv->FindClass("java/lang/RuntimeException");
+  jclass clazz = jenv->FindClass("com/revolsys/gis/esri/gdb/file/FileGdbException");
   jenv->ThrowNew(clazz, message.str().c_str());
 }
 
@@ -323,20 +321,6 @@ SWIGINTERN void std_vector_Sl_std_wstring_Sg__set(std::vector< std::wstring > *s
                 else
                     throw std::out_of_range("vector index out of range");
             }
-SWIGINTERN std::vector< FileGDBAPI::FieldDef >::const_reference std_vector_Sl_FileGDBAPI_FieldDef_Sg__get(std::vector< FileGDBAPI::FieldDef > *self,int i){
-                int size = int(self->size());
-                if (i>=0 && i<size)
-                    return (*self)[i];
-                else
-                    throw std::out_of_range("vector index out of range");
-            }
-SWIGINTERN void std_vector_Sl_FileGDBAPI_FieldDef_Sg__set(std::vector< FileGDBAPI::FieldDef > *self,int i,std::vector< FileGDBAPI::FieldDef >::value_type const &val){
-                int size = int(self->size());
-                if (i>=0 && i<size)
-                    (*self)[i] = val;
-                else
-                    throw std::out_of_range("vector index out of range");
-            }
 
 template<class T> class ArrayOut {
   public:
@@ -360,6 +344,20 @@ template<class T> class ArrayOut {
 
 
 
+  }
+  
+  std::vector<std::wstring> getErrors() {
+    std::vector<std::wstring> errors;
+    int errorCount;
+    fgdbError hr;
+    FileGDBAPI::ErrorInfo::GetErrorRecordCount(errorCount);
+    for (int i = 0; i < errorCount; i++) {
+      std::wstring errorText;
+      FileGDBAPI::ErrorInfo::GetErrorRecord(i, hr, errorText);
+      errors.push_back(errorText);
+    }
+    FileGDBAPI::ErrorInfo::ClearErrors();
+    return errors;
   }
   
   FileGDBAPI::Geodatabase* createGeodatabase(const std::wstring& path) {
@@ -511,11 +509,6 @@ SWIGINTERN void FileGDBAPI_Table_setWriteLock(FileGDBAPI::Table *self){
 SWIGINTERN void FileGDBAPI_Table_freeWriteLock(FileGDBAPI::Table *self){
     checkResult(self->FreeWriteLock());
   }
-SWIGINTERN std::vector< FileGDBAPI::FieldDef > FileGDBAPI_Table_getFields(FileGDBAPI::Table *self){
-    std::vector<FileGDBAPI::FieldDef> value;
-    checkResult(self->GetFields(value));
-    return value;
-  }
 SWIGINTERN bool FileGDBAPI_Row_isNull(FileGDBAPI::Row *self,std::wstring name){
     bool value;
     checkResult(self->IsNull(name,value));
@@ -630,11 +623,6 @@ SWIGINTERN void FileGDBAPI_Row_setGeometry(FileGDBAPI::Row *self,char *byteArray
     shape.inUseLength = length;
     checkResult(self->SetGeometry(shape));
   }
-SWIGINTERN std::vector< FileGDBAPI::FieldDef > FileGDBAPI_Row_getFields(FileGDBAPI::Row *self){
-    std::vector<FileGDBAPI::FieldDef> value;
-    checkResult(self->GetFields(value));
-    return value;
-  }
 SWIGINTERN FileGDBAPI::Row *FileGDBAPI_EnumRows_next(FileGDBAPI::EnumRows *self){
     FileGDBAPI::Row* value = new FileGDBAPI::Row();
     int hr = self->Next(*value);
@@ -644,76 +632,6 @@ SWIGINTERN FileGDBAPI::Row *FileGDBAPI_EnumRows_next(FileGDBAPI::EnumRows *self)
       delete value;
       return NULL;
     }
-  }
-SWIGINTERN std::vector< FileGDBAPI::FieldDef > FileGDBAPI_EnumRows_getFields(FileGDBAPI::EnumRows *self){
-    std::vector<FileGDBAPI::FieldDef> value;
-    checkResult(self->GetFields(value));
-    return value;
-  }
-SWIGINTERN std::wstring FileGDBAPI_FieldDef_getAlias(FileGDBAPI::FieldDef *self){
-    std::wstring value;
-    checkResult(self->GetAlias(value));
-    return value;
-  }
-SWIGINTERN std::wstring FileGDBAPI_FieldDef_getName(FileGDBAPI::FieldDef *self){
-    std::wstring value;
-    checkResult(self->GetName(value));
-    return value;
-  }
-SWIGINTERN bool FileGDBAPI_FieldDef_isNullable(FileGDBAPI::FieldDef *self){
-    bool result;
-    checkResult(self->GetIsNullable(result));
-    return result;
-  }
-SWIGINTERN int FileGDBAPI_FieldDef_getLength(FileGDBAPI::FieldDef *self){
-    int result;
-    checkResult(self->GetLength(result));
-    return result;
-  }
-SWIGINTERN FileGDBAPI::FieldType FileGDBAPI_FieldDef_getType(FileGDBAPI::FieldDef *self){
-    FileGDBAPI::FieldType result;
-    checkResult(self->GetType(result));
-    return result;
-  }
-SWIGINTERN bool FileGDBAPI_IndexDef_isUnique(FileGDBAPI::IndexDef *self){
-    bool result;
-    checkResult(self->GetIsUnique(result));
-    return result;
-  }
-SWIGINTERN std::wstring FileGDBAPI_IndexDef_getName(FileGDBAPI::IndexDef *self){
-    std::wstring result;
-    checkResult(self->GetName(result));
-    return result;
-  }
-SWIGINTERN std::wstring FileGDBAPI_IndexDef_getFields(FileGDBAPI::IndexDef *self){
-    std::wstring result;
-    checkResult(self->GetFields(result));
-    return result;
-  }
-SWIGINTERN int FileGDBAPI_FieldInfo_getFieldCount(FileGDBAPI::FieldInfo *self){
-    int count;
-    checkResult(self->GetFieldCount(count));
-    return count;
-  }
-SWIGINTERN std::wstring FileGDBAPI_FieldInfo_getFieldName(FileGDBAPI::FieldInfo *self,int i){
-    std::wstring name;
-    checkResult(self->GetFieldName(i, name));
-    return name;
-  }
-SWIGINTERN int FileGDBAPI_FieldInfo_getFieldLength(FileGDBAPI::FieldInfo *self,int i){
-    int length;
-    checkResult(self->GetFieldLength(i, length));
-    return length;
-  }
-SWIGINTERN bool FileGDBAPI_FieldInfo_isNullable(FileGDBAPI::FieldInfo *self,int i){
-    bool nullable;
-    checkResult(self->GetFieldIsNullable(i, nullable));
-    return nullable;
-  }
-SWIGINTERN FileGDBAPI::FieldType FileGDBAPI_FieldInfo_getFieldType(FileGDBAPI::FieldInfo *self,int i){
-    FileGDBAPI::FieldType type;
-    checkResult(self->GetFieldType(i, type));
-    return type;
   }
 SWIGINTERN std::wstring FileGDBAPI_Guid_toString(FileGDBAPI::Guid *self){
     std::wstring value;
@@ -1123,188 +1041,6 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
 }
 
 
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_new_1VectorOfFieldDef_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  std::vector< FileGDBAPI::FieldDef > *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  result = (std::vector< FileGDBAPI::FieldDef > *)new std::vector< FileGDBAPI::FieldDef >();
-  *(std::vector< FileGDBAPI::FieldDef > **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_new_1VectorOfFieldDef_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  jlong jresult = 0 ;
-  std::vector< FileGDBAPI::FieldDef >::size_type arg1 ;
-  std::vector< FileGDBAPI::FieldDef > *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = (std::vector< FileGDBAPI::FieldDef >::size_type)jarg1; 
-  result = (std::vector< FileGDBAPI::FieldDef > *)new std::vector< FileGDBAPI::FieldDef >(arg1);
-  *(std::vector< FileGDBAPI::FieldDef > **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_VectorOfFieldDef_1size(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  std::vector< FileGDBAPI::FieldDef > *arg1 = (std::vector< FileGDBAPI::FieldDef > *) 0 ;
-  std::vector< FileGDBAPI::FieldDef >::size_type result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(std::vector< FileGDBAPI::FieldDef > **)&jarg1; 
-  result = ((std::vector< FileGDBAPI::FieldDef > const *)arg1)->size();
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_VectorOfFieldDef_1capacity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  std::vector< FileGDBAPI::FieldDef > *arg1 = (std::vector< FileGDBAPI::FieldDef > *) 0 ;
-  std::vector< FileGDBAPI::FieldDef >::size_type result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(std::vector< FileGDBAPI::FieldDef > **)&jarg1; 
-  result = ((std::vector< FileGDBAPI::FieldDef > const *)arg1)->capacity();
-  jresult = (jlong)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_VectorOfFieldDef_1reserve(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2) {
-  std::vector< FileGDBAPI::FieldDef > *arg1 = (std::vector< FileGDBAPI::FieldDef > *) 0 ;
-  std::vector< FileGDBAPI::FieldDef >::size_type arg2 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(std::vector< FileGDBAPI::FieldDef > **)&jarg1; 
-  arg2 = (std::vector< FileGDBAPI::FieldDef >::size_type)jarg2; 
-  (arg1)->reserve(arg2);
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_VectorOfFieldDef_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  std::vector< FileGDBAPI::FieldDef > *arg1 = (std::vector< FileGDBAPI::FieldDef > *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(std::vector< FileGDBAPI::FieldDef > **)&jarg1; 
-  result = (bool)((std::vector< FileGDBAPI::FieldDef > const *)arg1)->empty();
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_VectorOfFieldDef_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  std::vector< FileGDBAPI::FieldDef > *arg1 = (std::vector< FileGDBAPI::FieldDef > *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(std::vector< FileGDBAPI::FieldDef > **)&jarg1; 
-  (arg1)->clear();
-}
-
-
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_VectorOfFieldDef_1add(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  std::vector< FileGDBAPI::FieldDef > *arg1 = (std::vector< FileGDBAPI::FieldDef > *) 0 ;
-  std::vector< FileGDBAPI::FieldDef >::value_type *arg2 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(std::vector< FileGDBAPI::FieldDef > **)&jarg1; 
-  arg2 = *(std::vector< FileGDBAPI::FieldDef >::value_type **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::vector< FileGDBAPI::FieldDef >::value_type const & reference is null");
-    return ;
-  } 
-  (arg1)->push_back((std::vector< FileGDBAPI::FieldDef >::value_type const &)*arg2);
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_VectorOfFieldDef_1get(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jlong jresult = 0 ;
-  std::vector< FileGDBAPI::FieldDef > *arg1 = (std::vector< FileGDBAPI::FieldDef > *) 0 ;
-  int arg2 ;
-  std::vector< FileGDBAPI::FieldDef >::value_type *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(std::vector< FileGDBAPI::FieldDef > **)&jarg1; 
-  arg2 = (int)jarg2; 
-  try {
-    result = (std::vector< FileGDBAPI::FieldDef >::value_type *) &std_vector_Sl_FileGDBAPI_FieldDef_Sg__get(arg1,arg2);
-  }
-  catch(std::out_of_range &_e) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
-    return 0;
-  }
-  
-  *(std::vector< FileGDBAPI::FieldDef >::value_type **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_VectorOfFieldDef_1set(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
-  std::vector< FileGDBAPI::FieldDef > *arg1 = (std::vector< FileGDBAPI::FieldDef > *) 0 ;
-  int arg2 ;
-  std::vector< FileGDBAPI::FieldDef >::value_type *arg3 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg3_;
-  arg1 = *(std::vector< FileGDBAPI::FieldDef > **)&jarg1; 
-  arg2 = (int)jarg2; 
-  arg3 = *(std::vector< FileGDBAPI::FieldDef >::value_type **)&jarg3;
-  if (!arg3) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::vector< FileGDBAPI::FieldDef >::value_type const & reference is null");
-    return ;
-  } 
-  try {
-    std_vector_Sl_FileGDBAPI_FieldDef_Sg__set(arg1,arg2,(FileGDBAPI::FieldDef const &)*arg3);
-  }
-  catch(std::out_of_range &_e) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
-    return ;
-  }
-  
-}
-
-
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_delete_1VectorOfFieldDef(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  std::vector< FileGDBAPI::FieldDef > *arg1 = (std::vector< FileGDBAPI::FieldDef > *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(std::vector< FileGDBAPI::FieldDef > **)&jarg1; 
-  {
-    try {
-      delete arg1;;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-}
-
-
 SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_setMaxOpenFiles(JNIEnv *jenv, jclass jcls, jint jarg1) {
   int arg1 ;
   
@@ -1320,6 +1056,26 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
       handleException(jenv, e);
     }
   }
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_getErrors(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  std::vector< std::wstring > result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    try {
+      result = getErrors();;
+    } catch (const std::runtime_error& e) {
+      handleException(jenv, e);
+    } catch (const std::exception& e) {
+      handleException(jenv, e);
+    }
+  }
+  *(std::vector< std::wstring > **)&jresult = new std::vector< std::wstring >((const std::vector< std::wstring > &)result); 
+  return jresult;
 }
 
 
@@ -2827,99 +2583,6 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Table_1GetFieldInformation(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jint jresult = 0 ;
-  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
-  FileGDBAPI::FieldInfo *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  arg2 = *(FileGDBAPI::FieldInfo **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileGDBAPI::FieldInfo & reference is null");
-    return 0;
-  } 
-  {
-    try {
-      result = (fgdbError)((FileGDBAPI::Table const *)arg1)->GetFieldInformation(*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Table_1AddField_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
-  std::string *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
-    return 0;
-  }
-  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
-  if (!arg2_pstr) return 0;
-  std::string arg2_str(arg2_pstr);
-  arg2 = &arg2_str;
-  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  {
-    try {
-      result = (fgdbError)(arg1)->AddField((std::string const &)*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Table_1AddField_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jint jresult = 0 ;
-  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
-  FileGDBAPI::FieldDef *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  arg2 = *(FileGDBAPI::FieldDef **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileGDBAPI::FieldDef const & reference is null");
-    return 0;
-  } 
-  {
-    try {
-      result = (fgdbError)(arg1)->AddField((FileGDBAPI::FieldDef const &)*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Table_1AlterField(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
   jint jresult = 0 ;
   FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
@@ -2983,69 +2646,6 @@ SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
   {
     try {
       result = (fgdbError)(arg1)->DeleteField((std::wstring const &)*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Table_1AddIndex_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
-  std::string *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null string");
-    return 0;
-  }
-  const char *arg2_pstr = (const char *)jenv->GetStringUTFChars(jarg2, 0); 
-  if (!arg2_pstr) return 0;
-  std::string arg2_str(arg2_pstr);
-  arg2 = &arg2_str;
-  jenv->ReleaseStringUTFChars(jarg2, arg2_pstr); 
-  {
-    try {
-      result = (fgdbError)(arg1)->AddIndex((std::string const &)*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Table_1AddIndex_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jint jresult = 0 ;
-  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
-  FileGDBAPI::IndexDef *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  arg2 = *(FileGDBAPI::IndexDef **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileGDBAPI::IndexDef const & reference is null");
-    return 0;
-  } 
-  {
-    try {
-      result = (fgdbError)(arg1)->AddIndex((FileGDBAPI::IndexDef const &)*arg2);;
     } catch (const std::runtime_error& e) {
       handleException(jenv, e);
     } catch (const std::exception& e) {
@@ -3798,59 +3398,6 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
       handleException(jenv, e);
     }
   }
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Table_1getFields(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  FileGDBAPI::Table *arg1 = (FileGDBAPI::Table *) 0 ;
-  std::vector< FileGDBAPI::FieldDef > result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::Table **)&jarg1; 
-  {
-    try {
-      result = FileGDBAPI_Table_getFields(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  *(std::vector< FileGDBAPI::FieldDef > **)&jresult = new std::vector< FileGDBAPI::FieldDef >((const std::vector< FileGDBAPI::FieldDef > &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Row_1GetFieldInformation(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jint jresult = 0 ;
-  FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
-  FileGDBAPI::FieldInfo *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(FileGDBAPI::Row **)&jarg1; 
-  arg2 = *(FileGDBAPI::FieldInfo **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileGDBAPI::FieldInfo & reference is null");
-    return 0;
-  } 
-  {
-    try {
-      result = (fgdbError)((FileGDBAPI::Row const *)arg1)->GetFieldInformation(*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
 }
 
 
@@ -4748,29 +4295,6 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
 }
 
 
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_Row_1getFields(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  FileGDBAPI::Row *arg1 = (FileGDBAPI::Row *) 0 ;
-  std::vector< FileGDBAPI::FieldDef > result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::Row **)&jarg1; 
-  {
-    try {
-      result = FileGDBAPI_Row_getFields(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  *(std::vector< FileGDBAPI::FieldDef > **)&jresult = new std::vector< FileGDBAPI::FieldDef >((const std::vector< FileGDBAPI::FieldDef > &)result); 
-  return jresult;
-}
-
-
 SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_EnumRows_1Close(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
   FileGDBAPI::EnumRows *arg1 = (FileGDBAPI::EnumRows *) 0 ;
   
@@ -4787,36 +4311,6 @@ SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGd
       handleException(jenv, e);
     }
   }
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_EnumRows_1GetFieldInformation(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
-  jint jresult = 0 ;
-  FileGDBAPI::EnumRows *arg1 = (FileGDBAPI::EnumRows *) 0 ;
-  FileGDBAPI::FieldInfo *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  (void)jarg2_;
-  arg1 = *(FileGDBAPI::EnumRows **)&jarg1; 
-  arg2 = *(FileGDBAPI::FieldInfo **)&jarg2;
-  if (!arg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "FileGDBAPI::FieldInfo & reference is null");
-    return 0;
-  } 
-  {
-    try {
-      result = (fgdbError)((FileGDBAPI::EnumRows const *)arg1)->GetFieldInformation(*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
 }
 
 
@@ -4877,858 +4371,6 @@ SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileG
     }
   }
   *(FileGDBAPI::Row **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_EnumRows_1getFields(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jlong jresult = 0 ;
-  FileGDBAPI::EnumRows *arg1 = (FileGDBAPI::EnumRows *) 0 ;
-  std::vector< FileGDBAPI::FieldDef > result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::EnumRows **)&jarg1; 
-  {
-    try {
-      result = FileGDBAPI_EnumRows_getFields(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  *(std::vector< FileGDBAPI::FieldDef > **)&jresult = new std::vector< FileGDBAPI::FieldDef >((const std::vector< FileGDBAPI::FieldDef > &)result); 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_new_1FieldDef(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  FileGDBAPI::FieldDef *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  {
-    try {
-      result = (FileGDBAPI::FieldDef *)new FileGDBAPI::FieldDef();;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  *(FileGDBAPI::FieldDef **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_delete_1FieldDef(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  FileGDBAPI::FieldDef *arg1 = (FileGDBAPI::FieldDef *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(FileGDBAPI::FieldDef **)&jarg1; 
-  {
-    try {
-      delete arg1;;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldDef_1SetName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::FieldDef *arg1 = (FileGDBAPI::FieldDef *) 0 ;
-  std::wstring *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldDef **)&jarg1; 
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
-    return 0;
-  }
-  const jchar *arg2_pstr = jenv->GetStringChars(jarg2, 0);
-  if (!arg2_pstr) return 0;
-  jsize arg2_len = jenv->GetStringLength(jarg2);
-  std::wstring arg2_str;
-  if (arg2_len) {
-    arg2_str.reserve(arg2_len);
-    for (jsize i = 0; i < arg2_len; ++i) {
-      arg2_str.push_back((wchar_t)arg2_pstr[i]);
-    }
-  }
-  arg2 = &arg2_str;
-  jenv->ReleaseStringChars(jarg2, arg2_pstr);
-  
-  {
-    try {
-      result = (fgdbError)(arg1)->SetName((std::wstring const &)*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldDef_1SetAlias(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::FieldDef *arg1 = (FileGDBAPI::FieldDef *) 0 ;
-  std::wstring *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldDef **)&jarg1; 
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
-    return 0;
-  }
-  const jchar *arg2_pstr = jenv->GetStringChars(jarg2, 0);
-  if (!arg2_pstr) return 0;
-  jsize arg2_len = jenv->GetStringLength(jarg2);
-  std::wstring arg2_str;
-  if (arg2_len) {
-    arg2_str.reserve(arg2_len);
-    for (jsize i = 0; i < arg2_len; ++i) {
-      arg2_str.push_back((wchar_t)arg2_pstr[i]);
-    }
-  }
-  arg2 = &arg2_str;
-  jenv->ReleaseStringChars(jarg2, arg2_pstr);
-  
-  {
-    try {
-      result = (fgdbError)(arg1)->SetAlias((std::wstring const &)*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldDef_1SetType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::FieldDef *arg1 = (FileGDBAPI::FieldDef *) 0 ;
-  FileGDBAPI::FieldType arg2 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldDef **)&jarg1; 
-  arg2 = (FileGDBAPI::FieldType)jarg2; 
-  {
-    try {
-      result = (fgdbError)(arg1)->SetType(arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldDef_1SetLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::FieldDef *arg1 = (FileGDBAPI::FieldDef *) 0 ;
-  int arg2 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldDef **)&jarg1; 
-  arg2 = (int)jarg2; 
-  {
-    try {
-      result = (fgdbError)(arg1)->SetLength(arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldDef_1SetIsNullable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::FieldDef *arg1 = (FileGDBAPI::FieldDef *) 0 ;
-  bool arg2 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldDef **)&jarg1; 
-  arg2 = jarg2 ? true : false; 
-  {
-    try {
-      result = (fgdbError)(arg1)->SetIsNullable(arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldDef_1getAlias(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  FileGDBAPI::FieldDef *arg1 = (FileGDBAPI::FieldDef *) 0 ;
-  std::wstring result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldDef **)&jarg1; 
-  {
-    try {
-      result = FileGDBAPI_FieldDef_getAlias(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jsize result_len = (&result)->length();
-  jchar *conv_buf = new jchar[result_len];
-  for (jsize i = 0; i < result_len; ++i) {
-    conv_buf[i] = (jchar)result[i];
-  }
-  jresult = jenv->NewString(conv_buf, result_len);
-  delete [] conv_buf; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldDef_1getName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  FileGDBAPI::FieldDef *arg1 = (FileGDBAPI::FieldDef *) 0 ;
-  std::wstring result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldDef **)&jarg1; 
-  {
-    try {
-      result = FileGDBAPI_FieldDef_getName(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jsize result_len = (&result)->length();
-  jchar *conv_buf = new jchar[result_len];
-  for (jsize i = 0; i < result_len; ++i) {
-    conv_buf[i] = (jchar)result[i];
-  }
-  jresult = jenv->NewString(conv_buf, result_len);
-  delete [] conv_buf; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldDef_1isNullable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  FileGDBAPI::FieldDef *arg1 = (FileGDBAPI::FieldDef *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldDef **)&jarg1; 
-  {
-    try {
-      result = (bool)FileGDBAPI_FieldDef_isNullable(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldDef_1getLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  FileGDBAPI::FieldDef *arg1 = (FileGDBAPI::FieldDef *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldDef **)&jarg1; 
-  {
-    try {
-      result = (int)FileGDBAPI_FieldDef_getLength(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldDef_1getType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  FileGDBAPI::FieldDef *arg1 = (FileGDBAPI::FieldDef *) 0 ;
-  FileGDBAPI::FieldType result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldDef **)&jarg1; 
-  {
-    try {
-      result = (FileGDBAPI::FieldType)FileGDBAPI_FieldDef_getType(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_new_1IndexDef_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  FileGDBAPI::IndexDef *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  {
-    try {
-      result = (FileGDBAPI::IndexDef *)new FileGDBAPI::IndexDef();;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  *(FileGDBAPI::IndexDef **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_new_1IndexDef_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jboolean jarg3) {
-  jlong jresult = 0 ;
-  std::wstring *arg1 = 0 ;
-  std::wstring *arg2 = 0 ;
-  bool arg3 ;
-  FileGDBAPI::IndexDef *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  if(!jarg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
-    return 0;
-  }
-  const jchar *arg1_pstr = jenv->GetStringChars(jarg1, 0);
-  if (!arg1_pstr) return 0;
-  jsize arg1_len = jenv->GetStringLength(jarg1);
-  std::wstring arg1_str;
-  if (arg1_len) {
-    arg1_str.reserve(arg1_len);
-    for (jsize i = 0; i < arg1_len; ++i) {
-      arg1_str.push_back((wchar_t)arg1_pstr[i]);
-    }
-  }
-  arg1 = &arg1_str;
-  jenv->ReleaseStringChars(jarg1, arg1_pstr);
-  
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
-    return 0;
-  }
-  const jchar *arg2_pstr = jenv->GetStringChars(jarg2, 0);
-  if (!arg2_pstr) return 0;
-  jsize arg2_len = jenv->GetStringLength(jarg2);
-  std::wstring arg2_str;
-  if (arg2_len) {
-    arg2_str.reserve(arg2_len);
-    for (jsize i = 0; i < arg2_len; ++i) {
-      arg2_str.push_back((wchar_t)arg2_pstr[i]);
-    }
-  }
-  arg2 = &arg2_str;
-  jenv->ReleaseStringChars(jarg2, arg2_pstr);
-  
-  arg3 = jarg3 ? true : false; 
-  {
-    try {
-      result = (FileGDBAPI::IndexDef *)new FileGDBAPI::IndexDef((std::wstring const &)*arg1,(std::wstring const &)*arg2,arg3);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  *(FileGDBAPI::IndexDef **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_new_1IndexDef_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
-  jlong jresult = 0 ;
-  std::wstring *arg1 = 0 ;
-  std::wstring *arg2 = 0 ;
-  FileGDBAPI::IndexDef *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  if(!jarg1) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
-    return 0;
-  }
-  const jchar *arg1_pstr = jenv->GetStringChars(jarg1, 0);
-  if (!arg1_pstr) return 0;
-  jsize arg1_len = jenv->GetStringLength(jarg1);
-  std::wstring arg1_str;
-  if (arg1_len) {
-    arg1_str.reserve(arg1_len);
-    for (jsize i = 0; i < arg1_len; ++i) {
-      arg1_str.push_back((wchar_t)arg1_pstr[i]);
-    }
-  }
-  arg1 = &arg1_str;
-  jenv->ReleaseStringChars(jarg1, arg1_pstr);
-  
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
-    return 0;
-  }
-  const jchar *arg2_pstr = jenv->GetStringChars(jarg2, 0);
-  if (!arg2_pstr) return 0;
-  jsize arg2_len = jenv->GetStringLength(jarg2);
-  std::wstring arg2_str;
-  if (arg2_len) {
-    arg2_str.reserve(arg2_len);
-    for (jsize i = 0; i < arg2_len; ++i) {
-      arg2_str.push_back((wchar_t)arg2_pstr[i]);
-    }
-  }
-  arg2 = &arg2_str;
-  jenv->ReleaseStringChars(jarg2, arg2_pstr);
-  
-  {
-    try {
-      result = (FileGDBAPI::IndexDef *)new FileGDBAPI::IndexDef((std::wstring const &)*arg1,(std::wstring const &)*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  *(FileGDBAPI::IndexDef **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_delete_1IndexDef(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  FileGDBAPI::IndexDef *arg1 = (FileGDBAPI::IndexDef *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(FileGDBAPI::IndexDef **)&jarg1; 
-  {
-    try {
-      delete arg1;;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_IndexDef_1SetName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::IndexDef *arg1 = (FileGDBAPI::IndexDef *) 0 ;
-  std::wstring *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::IndexDef **)&jarg1; 
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
-    return 0;
-  }
-  const jchar *arg2_pstr = jenv->GetStringChars(jarg2, 0);
-  if (!arg2_pstr) return 0;
-  jsize arg2_len = jenv->GetStringLength(jarg2);
-  std::wstring arg2_str;
-  if (arg2_len) {
-    arg2_str.reserve(arg2_len);
-    for (jsize i = 0; i < arg2_len; ++i) {
-      arg2_str.push_back((wchar_t)arg2_pstr[i]);
-    }
-  }
-  arg2 = &arg2_str;
-  jenv->ReleaseStringChars(jarg2, arg2_pstr);
-  
-  {
-    try {
-      result = (fgdbError)(arg1)->SetName((std::wstring const &)*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_IndexDef_1SetFields(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jstring jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::IndexDef *arg1 = (FileGDBAPI::IndexDef *) 0 ;
-  std::wstring *arg2 = 0 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::IndexDef **)&jarg1; 
-  if(!jarg2) {
-    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::wstring");
-    return 0;
-  }
-  const jchar *arg2_pstr = jenv->GetStringChars(jarg2, 0);
-  if (!arg2_pstr) return 0;
-  jsize arg2_len = jenv->GetStringLength(jarg2);
-  std::wstring arg2_str;
-  if (arg2_len) {
-    arg2_str.reserve(arg2_len);
-    for (jsize i = 0; i < arg2_len; ++i) {
-      arg2_str.push_back((wchar_t)arg2_pstr[i]);
-    }
-  }
-  arg2 = &arg2_str;
-  jenv->ReleaseStringChars(jarg2, arg2_pstr);
-  
-  {
-    try {
-      result = (fgdbError)(arg1)->SetFields((std::wstring const &)*arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_IndexDef_1SetIsUnique(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jboolean jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::IndexDef *arg1 = (FileGDBAPI::IndexDef *) 0 ;
-  bool arg2 ;
-  fgdbError result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::IndexDef **)&jarg1; 
-  arg2 = jarg2 ? true : false; 
-  {
-    try {
-      result = (fgdbError)(arg1)->SetIsUnique(arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_IndexDef_1isUnique(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  FileGDBAPI::IndexDef *arg1 = (FileGDBAPI::IndexDef *) 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::IndexDef **)&jarg1; 
-  {
-    try {
-      result = (bool)FileGDBAPI_IndexDef_isUnique(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_IndexDef_1getName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  FileGDBAPI::IndexDef *arg1 = (FileGDBAPI::IndexDef *) 0 ;
-  std::wstring result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::IndexDef **)&jarg1; 
-  {
-    try {
-      result = FileGDBAPI_IndexDef_getName(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jsize result_len = (&result)->length();
-  jchar *conv_buf = new jchar[result_len];
-  for (jsize i = 0; i < result_len; ++i) {
-    conv_buf[i] = (jchar)result[i];
-  }
-  jresult = jenv->NewString(conv_buf, result_len);
-  delete [] conv_buf; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_IndexDef_1getFields(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jstring jresult = 0 ;
-  FileGDBAPI::IndexDef *arg1 = (FileGDBAPI::IndexDef *) 0 ;
-  std::wstring result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::IndexDef **)&jarg1; 
-  {
-    try {
-      result = FileGDBAPI_IndexDef_getFields(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jsize result_len = (&result)->length();
-  jchar *conv_buf = new jchar[result_len];
-  for (jsize i = 0; i < result_len; ++i) {
-    conv_buf[i] = (jchar)result[i];
-  }
-  jresult = jenv->NewString(conv_buf, result_len);
-  delete [] conv_buf; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_new_1FieldInfo(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  FileGDBAPI::FieldInfo *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  {
-    try {
-      result = (FileGDBAPI::FieldInfo *)new FileGDBAPI::FieldInfo();;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  *(FileGDBAPI::FieldInfo **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_delete_1FieldInfo(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
-  {
-    try {
-      delete arg1;;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldInfo_1getFieldCount(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jint jresult = 0 ;
-  FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
-  {
-    try {
-      result = (int)FileGDBAPI_FieldInfo_getFieldCount(arg1);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldInfo_1getFieldName(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jstring jresult = 0 ;
-  FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
-  int arg2 ;
-  std::wstring result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
-  {
-    try {
-      result = FileGDBAPI_FieldInfo_getFieldName(arg1,arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jsize result_len = (&result)->length();
-  jchar *conv_buf = new jchar[result_len];
-  for (jsize i = 0; i < result_len; ++i) {
-    conv_buf[i] = (jchar)result[i];
-  }
-  jresult = jenv->NewString(conv_buf, result_len);
-  delete [] conv_buf; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldInfo_1getFieldLength(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
-  int arg2 ;
-  int result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
-  {
-    try {
-      result = (int)FileGDBAPI_FieldInfo_getFieldLength(arg1,arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldInfo_1isNullable(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jboolean jresult = 0 ;
-  FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
-  int arg2 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
-  {
-    try {
-      result = (bool)FileGDBAPI_FieldInfo_isNullable(arg1,arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_FieldInfo_1getFieldType(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
-  jint jresult = 0 ;
-  FileGDBAPI::FieldInfo *arg1 = (FileGDBAPI::FieldInfo *) 0 ;
-  int arg2 ;
-  FileGDBAPI::FieldType result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(FileGDBAPI::FieldInfo **)&jarg1; 
-  arg2 = (int)jarg2; 
-  {
-    try {
-      result = (FileGDBAPI::FieldType)FileGDBAPI_FieldInfo_getFieldType(arg1,arg2);;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  jresult = (jint)result; 
   return jresult;
 }
 
@@ -6212,44 +4854,6 @@ SWIGEXPORT jstring JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFil
   jresult = jenv->NewString(conv_buf, result_len);
   delete [] conv_buf; 
   return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_new_1Raster(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  FileGDBAPI::Raster *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  {
-    try {
-      result = (FileGDBAPI::Raster *)new FileGDBAPI::Raster();;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
-  *(FileGDBAPI::Raster **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_com_revolsys_gis_esri_gdb_file_capi_swig_EsriFileGdbJNI_delete_1Raster(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  FileGDBAPI::Raster *arg1 = (FileGDBAPI::Raster *) 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(FileGDBAPI::Raster **)&jarg1; 
-  {
-    try {
-      delete arg1;;
-    } catch (const std::runtime_error& e) {
-      handleException(jenv, e);
-    } catch (const std::exception& e) {
-      handleException(jenv, e);
-    }
-  }
 }
 
 

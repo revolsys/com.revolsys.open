@@ -2,8 +2,8 @@
 # /usr/lib/libfgdbunixrtl.so
 #/usr/lib/libFileGDBAPI.so
 
-ESRI_FILE_GBD_HOME=/opt/EsriFileGdb/1.4/${OS}/${ARCH}
-ESRI_FILE_GBD_INCLUDE=/opt/EsriFileGdb/1.4/${OS}/${ARCH}/include
+ESRI_FILE_GBD_HOME=/opt/EsriFileGdb/1.4.0/${OS}/${ARCH}
+ESRI_FILE_GBD_INCLUDE=$(ESRI_FILE_GBD_HOME)/include
 JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 CFG=Release
 CXX=clang++

@@ -22,10 +22,7 @@ fgdbError checkResult(fgdbError error) {
          throw std::runtime_error("Unknown error");
      } else {
        std::stringstream out;
-       out << wstring2string(errorString) << " (" << error << ")";
        std::string message = out.str();
-       std::cout << message << std::endl;
-       std::cout.flush();
        throw std::runtime_error(message);
      }
   }
@@ -109,7 +106,6 @@ import com.revolsys.util.OS;
 
 %template(VectorOfString) std::vector<std::string>;
 %template(VectorOfWString) std::vector<std::wstring>;
-%template(VectorOfFieldDef) std::vector<FileGDBAPI::FieldDef>;
 
 %include "Array.i"
 
@@ -142,6 +138,20 @@ import com.revolsys.util.OS;
 #endif
   }
   
+  std::vector<std::wstring> getErrors() {
+    std::vector<std::wstring> errors;
+    int errorCount;
+    fgdbError hr;
+    FileGDBAPI::ErrorInfo::GetErrorRecordCount(errorCount);
+    for (int i = 0; i < errorCount; i++) {
+      std::wstring errorText;
+      FileGDBAPI::ErrorInfo::GetErrorRecord(i, hr, errorText);
+      errors.push_back(errorText);
+    }
+    FileGDBAPI::ErrorInfo::ClearErrors();
+    return errors;
+  }
+  
   FileGDBAPI::Geodatabase* createGeodatabase(const std::wstring& path) {
     FileGDBAPI::Geodatabase* value = new FileGDBAPI::Geodatabase();
     checkResult(FileGDBAPI::CreateGeodatabase(path, *value));
@@ -160,8 +170,15 @@ import com.revolsys.util.OS;
   }
 }
 
-%ignore FileGDBAPI::ShapeModifiers;
 %ignore FileGDBAPI::CurveType;
+%ignore FileGDBAPI::FieldDef;
+%ignore FileGDBAPI::FieldInfo;
+%ignore FileGDBAPI::FieldType;
+%ignore FileGDBAPI::GeometryType;
+%ignore FileGDBAPI::IndexDef;
+%ignore FileGDBAPI::Raster;
+%ignore FileGDBAPI::ShapeModifiers;
+%ignore FileGDBAPI::ShapeType;
 
 %include "FileGDBCore.h"
 %include "GeodatabaseManagement.h"
@@ -275,7 +292,10 @@ import com.revolsys.util.OS;
 }
 %include "Geodatabase.h"
 
+%ignore FileGDBAPI::Table::AddField;
+%ignore FileGDBAPI::Table::AddIndex;
 %ignore FileGDBAPI::Table::GetFields;
+%ignore FileGDBAPI::Table::GetFieldInformation;
 %ignore FileGDBAPI::Table::IsEditable;
 %ignore FileGDBAPI::Table::GetDefinition;
 %ignore FileGDBAPI::Table::GetDocumentation;
@@ -283,6 +303,7 @@ import com.revolsys.util.OS;
 %ignore FileGDBAPI::Table::GetDefaultSubtypeCode;
 %ignore FileGDBAPI::Table::CreateRowObject;
 %ignore FileGDBAPI::Table::GetIndexes;
+%ignore FileGDBAPI::Table::getFields();
 %ignore FileGDBAPI::Table::Search;
 %ignore FileGDBAPI::Table::Insert;
 %ignore FileGDBAPI::Table::Update;
@@ -368,6 +389,7 @@ import com.revolsys.util.OS;
 }
 %include "Table.h"
 
+%ignore FileGDBAPI::Row::GetFieldInformation;
 %ignore FileGDBAPI::Row::IsNull;
 %ignore FileGDBAPI::Row::SetNull;
 %ignore FileGDBAPI::Row::GetDate;
@@ -397,6 +419,7 @@ import com.revolsys.util.OS;
 %ignore FileGDBAPI::Row::GetXML;
 %ignore FileGDBAPI::Row::SetXML;
 %ignore FileGDBAPI::Row::GetFields;
+%ignore FileGDBAPI::Row::getFields;
 %extend FileGDBAPI::Row {
   bool isNull(std::wstring name) {
     bool value;
@@ -690,6 +713,8 @@ import com.revolsys.util.OS;
 %ignore FileGDBAPI::MultiPartShapeBuffer;
 %ignore FileGDBAPI::MultiPatchShapeBuffer;
 
+%ignore FileGDBAPI::EnumRows::getFields;
+%ignore FileGDBAPI::EnumRows::GetFieldInformation;
 %ignore FileGDBAPI::EnumRows::Next;
 %ignore FileGDBAPI::EnumRows::GetFields;
 %newobject FileGDBAPI::EnumRows::next;
