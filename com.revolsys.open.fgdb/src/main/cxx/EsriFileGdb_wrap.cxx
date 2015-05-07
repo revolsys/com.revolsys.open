@@ -232,6 +232,7 @@ fgdbError checkResult(fgdbError error) {
          throw std::runtime_error("Unknown error");
      } else {
        std::stringstream out;
+       out << wstring2string(errorString) << " (" << error << ")";
        std::string message = out.str();
        throw std::runtime_error(message);
      }

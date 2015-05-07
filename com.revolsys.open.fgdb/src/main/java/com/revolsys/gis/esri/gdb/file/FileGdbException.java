@@ -3,9 +3,6 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.gis.esri.gdb.file.capi.swig.EsriFileGdb;
-import com.revolsys.gis.esri.gdb.file.capi.swig.VectorOfWString;
-
 public class FileGdbException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
@@ -34,28 +31,28 @@ public class FileGdbException extends RuntimeException {
   }
 
   private void initErrors() {
-    synchronized (FileGdbRecordStoreImpl.API_SYNC) {
-      final VectorOfWString errors = EsriFileGdb.getErrors();
-      final long errorCount = errors.size();
-      for (int i = 0; i < errorCount; i++) {
-        final String error = errors.get(i);
-        this.errors.add(error);
-      }
-    }
+    // synchronized (FileGdbRecordStoreImpl.API_SYNC) {
+    // final VectorOfWString errors = EsriFileGdb.getErrors();
+    // final long errorCount = errors.size();
+    // for (int i = 0; i < errorCount; i++) {
+    // final String error = errors.get(i);
+    // this.errors.add(error);
+    // }
+    // }
   }
 
-  @Override
-  public String toString() {
-    final String superString = super.toString();
-    if (this.errors.isEmpty()) {
-      return superString;
-    } else {
-      final StringBuilder string = new StringBuilder(superString);
-      for (final String error : this.errors) {
-        string.append("\n  ");
-        string.append(error);
-      }
-      return string.toString();
-    }
-  }
+  // @Override
+  // public String toString() {
+  // final String superString = super.toString();
+  // if (this.errors.isEmpty()) {
+  // return superString;
+  // } else {
+  // final StringBuilder string = new StringBuilder(superString);
+  // for (final String error : this.errors) {
+  // string.append("\n  ");
+  // string.append(error);
+  // }
+  // return string.toString();
+  // }
+  // }
 }

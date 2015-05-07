@@ -9,42 +9,44 @@
 package com.revolsys.gis.esri.gdb.file.capi.swig;
 
 public class EnumRows {
-  private long swigCPtr;
+  protected static long getCPtr(final EnumRows obj) {
+    return obj == null ? 0 : obj.swigCPtr;
+  }
+
   protected boolean swigCMemOwn;
 
-  protected EnumRows(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
-  }
-
-  protected static long getCPtr(EnumRows obj) {
-    return (obj == null) ? 0 : obj.swigCPtr;
-  }
-
-   protected void finalize() {
-   }
-
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        EsriFileGdbJNI.delete_EnumRows(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
-  }
-
-  public void Close() {
-    EsriFileGdbJNI.EnumRows_Close(swigCPtr, this);
-  }
+  private long swigCPtr;
 
   public EnumRows() {
     this(EsriFileGdbJNI.new_EnumRows(), true);
   }
 
+  protected EnumRows(final long cPtr, final boolean cMemoryOwn) {
+    this.swigCMemOwn = cMemoryOwn;
+    this.swigCPtr = cPtr;
+  }
+
+  public void Close() {
+    EsriFileGdbJNI.EnumRows_Close(this.swigCPtr, this);
+  }
+
+  public synchronized void delete() {
+    if (this.swigCPtr != 0) {
+      if (this.swigCMemOwn) {
+        this.swigCMemOwn = false;
+        EsriFileGdbJNI.delete_EnumRows(this.swigCPtr);
+      }
+      this.swigCPtr = 0;
+    }
+  }
+
+  @Override
+  protected void finalize() {
+  }
+
   public Row next() {
-    long cPtr = EsriFileGdbJNI.EnumRows_next(swigCPtr, this);
-    return (cPtr == 0) ? null : new Row(cPtr, true);
+    final long cPtr = EsriFileGdbJNI.EnumRows_next(this.swigCPtr, this);
+    return cPtr == 0 ? null : new Row(cPtr, true);
   }
 
 }
