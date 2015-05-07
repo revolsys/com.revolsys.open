@@ -26,17 +26,17 @@ public class GlobalIdFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
-  public void setPostInsertValue(final Record object, final Row row) {
+  public void setPostInsertValue(final Record record, final Row row) {
     synchronized (getRecordStore()) {
       final Guid guid = row.getGlobalId();
       final String name = getName();
       final String string = guid.toString();
-      object.setValue(name, string);
+      record.setValue(name, string);
     }
   }
 
   @Override
-  public Object setValue(final Record object, final Row row, final Object value) {
+  public Object setValue(final Record record, final Row row, final Object value) {
     return null;
   }
 

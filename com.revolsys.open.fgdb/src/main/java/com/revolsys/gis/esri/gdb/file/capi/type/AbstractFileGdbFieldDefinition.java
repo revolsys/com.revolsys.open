@@ -33,20 +33,20 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
 
   public abstract Object getValue(Row row);
 
-  public Object setInsertValue(final Record object, final Row row, final Object value) {
-    return setValue(object, row, value);
+  public Object setInsertValue(final Record record, final Row row, final Object value) {
+    return setValue(record, row, value);
   }
 
-  public void setPostInsertValue(final Record object, final Row row) {
+  public void setPostInsertValue(final Record record, final Row row) {
   }
 
   public void setRecordStore(final FileGdbRecordStoreImpl recordStore) {
     this.recordStore = new WeakReference<FileGdbRecordStoreImpl>(recordStore);
   }
 
-  public Object setUpdateValue(final Record object, final Row row, final Object value) {
-    return setValue(object, row, value);
+  public Object setUpdateValue(final Record record, final Row row, final Object value) {
+    return setValue(record, row, value);
   }
 
-  public abstract Object setValue(Record object, Row row, Object value);
+  public abstract Object setValue(Record record, Row row, Object value);
 }
