@@ -27,8 +27,7 @@ public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
       return null;
     } else {
       synchronized (getSync()) {
-        final Integer number = row.getInteger(name);
-        return number;
+        return row.getInteger(name);
       }
     }
   }

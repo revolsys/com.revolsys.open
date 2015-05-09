@@ -30,7 +30,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private String fields;
 
-  private final int limit;
+  private int limit = Integer.MAX_VALUE;
 
   private final int offset;
 
@@ -85,7 +85,9 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     setBoundingBox(boundingBox);
     this.recordFactory = recordStore.getRecordFactory();
     this.offset = offset;
-    this.limit = limit;
+    if (limit >= 0) {
+      this.limit = limit;
+    }
   }
 
   @Override
