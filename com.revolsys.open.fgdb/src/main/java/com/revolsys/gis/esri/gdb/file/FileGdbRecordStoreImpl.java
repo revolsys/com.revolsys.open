@@ -930,7 +930,6 @@ public class FileGdbRecordStoreImpl extends AbstractRecordStore implements FileG
       if (isExists()) {
         this.geodatabaseReferenceCount++;
         if (this.geodatabase == null) {
-          System.out.println("Get GDB\t" + this);
           this.geodatabase = openGeodatabase();
         }
         return this.geodatabase;
@@ -1529,7 +1528,6 @@ public class FileGdbRecordStoreImpl extends AbstractRecordStore implements FileG
         if (this.geodatabaseReferenceCount <= 0) {
           this.geodatabaseReferenceCount = 0;
           try {
-            System.out.println("Release " + this);
             closeGeodatabase(this.geodatabase);
           } finally {
             this.geodatabase = null;

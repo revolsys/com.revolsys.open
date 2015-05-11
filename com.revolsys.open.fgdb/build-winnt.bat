@@ -1,10 +1,11 @@
 @echo off
-set VCINSTALLDIR=E:\Apps\VisualC_2013
+set VSINSTALLDIR=C:\Program Files (x86)\Microsoft Visual Studio 11.0
 
-set PATH=%VCINSTALLDIR%\bin;%PATH%
-nmake ARCH=x86 /f Makefile.win.nmake
+set PATH=%VSINSTALLDIR%\Common7\IDE;%PATH%
+set PATH=%VSINSTALLDIR%\VC\bin;%PATH%
+nmake ARCH=x86 /f Makefile.nmake
 
-set PATH=%VCINSTALLDIR%\bin\amd64;%PATH%
-nmake ARCH=x86_64 /f Makefile.win.nmake
+set PATH=%VSINSTALLDIR%\VC\bin\x86_amd64;%PATH%
+nmake ARCH=x86_64 /f Makefile.nmake
 
 pause
