@@ -22,8 +22,7 @@ public class GdalImage extends AbstractGeoReferencedImage {
 
   private Dataset dataset;
 
-  public GdalImage(final GdalImageFactory readerSpi,
-    final Resource imageResource) {
+  public GdalImage(final GdalImageFactory readerSpi, final Resource imageResource) {
     setImageResource(imageResource);
     final Dataset dataset = getDataset();
     final Band band = dataset.GetRasterBand(1);
@@ -51,15 +50,13 @@ public class GdalImage extends AbstractGeoReferencedImage {
         }
       }
     }
-    setBoundingBox(geoTransform[0], geoTransform[3], geoTransform[1],
-      geoTransform[5]);
+    setBoundingBox(geoTransform[0], geoTransform[3], geoTransform[1], geoTransform[5]);
     postConstruct();
   }
 
   @Override
-  public void drawImage(final Graphics2D graphics,
-    final BoundingBox viewBoundingBox, final int viewWidth,
-    final int viewHeight, final boolean useTransform) {
+  public void drawImage(final Graphics2D graphics, final BoundingBox viewBoundingBox,
+    final int viewWidth, final int viewHeight, final boolean useTransform) {
     try {
       final Dataset dataset = getDataset();
 
@@ -76,8 +73,7 @@ public class GdalImage extends AbstractGeoReferencedImage {
       int bestOverviewIdx = -1;
 
       int srcWidth = getImageWidth();
-      final double clipResolution = Math.abs(clipBoundingBox.getHeight()
-        / targetHeight);
+      final double clipResolution = Math.abs(clipBoundingBox.getHeight() / targetHeight);
       final List<Dimension> overviewSizes = getOverviewSizes();
       for (int i = 0; i < overviewSizes.size(); i++) {
         final Dimension overviewSize = overviewSizes.get(i);
@@ -85,8 +81,7 @@ public class GdalImage extends AbstractGeoReferencedImage {
         final int height = overviewSize.height;
 
         if (0 != height && 0 != width) {
-          final double overviewResolution = Math.abs(imageBoundingBox.getHeight()
-            / height);
+          final double overviewResolution = Math.abs(imageBoundingBox.getHeight() / height);
           if (overviewResolution <= clipResolution) {
             bestOverviewIdx = i;
             srcWidth = width;
@@ -101,12 +96,11 @@ public class GdalImage extends AbstractGeoReferencedImage {
         * scale);
       final int clipWidth = (int)Math.ceil(clipModelWidth * scale);
       final int clipHeight = (int)Math.ceil(clipModelHeight * scale);
-      final BufferedImage bufferedImage = Gdal.getBufferedImage(dataset,
-        bestOverviewIdx, clipXoff, clipYoff, clipWidth, clipHeight,
-        targetWidth, targetHeight);
+      final BufferedImage bufferedImage = Gdal.getBufferedImage(dataset, bestOverviewIdx, clipXoff,
+        clipYoff, clipWidth, clipHeight, targetWidth, targetHeight);
 
-      super.drawRenderedImage(bufferedImage, clipBoundingBox, graphics,
-        viewBoundingBox, viewWidth, useTransform);
+      super.drawRenderedImage(bufferedImage, clipBoundingBox, graphics, viewBoundingBox, viewWidth,
+        useTransform);
 
     } catch (final Throwable e) {
       e.printStackTrace();

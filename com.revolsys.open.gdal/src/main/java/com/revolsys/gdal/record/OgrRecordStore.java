@@ -69,6 +69,8 @@ public class OgrRecordStore extends AbstractRecordStore {
 
   public static final String GEO_PAKCAGE = "GPKG";
 
+  private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
+
   private final File file;
 
   private DataSource dataSource;
@@ -78,8 +80,6 @@ public class OgrRecordStore extends AbstractRecordStore {
   private final Map<String, String> layerNameToPathMap = new HashMap<>();
 
   private final Map<String, String> pathToLayerNameMap = new HashMap<>();
-
-  private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\?");
 
   private final Set<Layer> layersToClose = new HashSet<>();
 
@@ -185,8 +185,7 @@ public class OgrRecordStore extends AbstractRecordStore {
       if (parameters.isEmpty()) {
         if (where.indexOf('?') > -1) {
           throw new IllegalArgumentException(
-            "No arguments specified for a where clause with placeholders: "
-                + where);
+            "No arguments specified for a where clause with placeholders: " + where);
         } else {
           sql.append(where);
         }
@@ -196,13 +195,11 @@ public class OgrRecordStore extends AbstractRecordStore {
         while (matcher.find()) {
           if (i >= parameters.size()) {
             throw new IllegalArgumentException(
-              "Not enough arguments for where clause with placeholders: "
-                  + where);
+              "Not enough arguments for where clause with placeholders: " + where);
           }
           final Object argument = parameters.get(i);
           final StringBuffer replacement = new StringBuffer();
-          matcher.appendReplacement(replacement,
-            StringConverterRegistry.toString(argument));
+          matcher.appendReplacement(replacement, StringConverterRegistry.toString(argument));
           sql.append(replacement);
           appendValue(sql, argument);
           i++;
@@ -229,8 +226,7 @@ public class OgrRecordStore extends AbstractRecordStore {
       final QueryValue geometry1Value = withinDistance.getGeometry1Value();
       final QueryValue geometry2Value = withinDistance.getGeometry2Value();
       final QueryValue distanceValue = withinDistance.getDistanceValue();
-      if (geometry1Value == null || geometry2Value == null
-          || distanceValue == null) {
+      if (geometry1Value == null || geometry2Value == null || distanceValue == null) {
         sql.append("1 = 0");
       } else {
         sql.append("Distance(");
@@ -252,12 +248,10 @@ public class OgrRecordStore extends AbstractRecordStore {
     } else if (value instanceof Number) {
       sql.append(value);
     } else if (value instanceof java.sql.Date) {
-      final String stringValue = DateUtil.format("yyyy-MM-dd",
-        (java.util.Date)value);
+      final String stringValue = DateUtil.format("yyyy-MM-dd", (java.util.Date)value);
       sql.append("CAST('" + stringValue + "' AS DATE)");
     } else if (value instanceof java.util.Date) {
-      final String stringValue = DateUtil.format("yyyy-MM-dd",
-        (java.util.Date)value);
+      final String stringValue = DateUtil.format("yyyy-MM-dd", (java.util.Date)value);
       sql.append("CAST('" + stringValue + "' AS TIMESTAMP)");
     } else if (value instanceof BoundingBox) {
       final BoundingBox boundingBox = (BoundingBox)value;
@@ -299,8 +293,7 @@ public class OgrRecordStore extends AbstractRecordStore {
       typePath = query.getTypeName();
       recordDefinition = getRecordDefinition(typePath);
       if (recordDefinition == null) {
-        throw new IllegalArgumentException("Type name does not exist "
-            + typePath);
+        throw new IllegalArgumentException("Type name does not exist " + typePath);
       } else {
         query.setRecordDefinition(recordDefinition);
       }
@@ -312,16 +305,15 @@ public class OgrRecordStore extends AbstractRecordStore {
     return iterator;
   }
 
-  protected RecordDefinitionImpl createRecordDefinition(
-    final RecordStoreSchema schema, final Layer layer) {
+  protected RecordDefinitionImpl createRecordDefinition(final RecordStoreSchema schema,
+    final Layer layer) {
     final String layerName = layer.GetName();
     final String typePath = Path.clean(layerName);
 
     /** This primes the layer so that the fidColumn is loaded correctly. */
     layer.GetNextFeature();
 
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-      schema, typePath);
+    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, typePath);
     String idFieldName = layer.GetFIDColumn();
     if (!Property.hasValue(idFieldName)) {
       idFieldName = "rowid";
@@ -342,31 +334,30 @@ public class OgrRecordStore extends AbstractRecordStore {
       switch (fieldType) {
         case 0:
           fieldDataType = DataTypes.INT;
-          break;
+        break;
         case 2:
           fieldDataType = DataTypes.DOUBLE;
-          break;
+        break;
         case 4:
         case 6:
           fieldDataType = DataTypes.STRING;
-          break;
+        break;
         case 9:
           fieldDataType = DataTypes.DATE;
-          break;
+        break;
         case 11:
           fieldDataType = DataTypes.DATE_TIME;
-          break;
+        break;
 
         default:
           fieldDataType = DataTypes.STRING;
           final String fieldTypeName = fieldDefinition.GetFieldTypeName(fieldType);
           LoggerFactory.getLogger(getClass()).error(
-            "Unsupported field type " + this.file + " " + fieldName + ": "
-                + fieldTypeName);
-          break;
+            "Unsupported field type " + this.file + " " + fieldName + ": " + fieldTypeName);
+        break;
       }
-      final FieldDefinition field = new FieldDefinition(fieldName,
-        fieldDataType, fieldWidth, fieldPrecision, false);
+      final FieldDefinition field = new FieldDefinition(fieldName, fieldDataType, fieldWidth,
+        fieldPrecision, false);
       recordDefinition.addField(field);
     }
     for (int fieldIndex = 0; fieldIndex < layerDefinition.GetGeomFieldCount(); fieldIndex++) {
@@ -378,67 +369,65 @@ public class OgrRecordStore extends AbstractRecordStore {
       switch (fieldType) {
         case 1:
           fieldDataType = DataTypes.POINT;
-          break;
+        break;
         case 2:
           fieldDataType = DataTypes.LINE_STRING;
-          break;
+        break;
         case 3:
           fieldDataType = DataTypes.POLYGON;
-          break;
+        break;
         case 4:
           fieldDataType = DataTypes.MULTI_POINT;
-          break;
+        break;
         case 5:
           fieldDataType = DataTypes.MULTI_LINE_STRING;
-          break;
+        break;
         case 6:
           fieldDataType = DataTypes.MULTI_POLYGON;
-          break;
+        break;
         case 7:
           fieldDataType = DataTypes.GEOMETRY_COLLECTION;
-          break;
+        break;
         case 101:
           fieldDataType = DataTypes.LINEAR_RING;
-          break;
+        break;
         case 0x80000000 + 1:
           fieldDataType = DataTypes.POINT;
-        axisCount = 3;
+          axisCount = 3;
         break;
         case 0x80000000 + 2:
           fieldDataType = DataTypes.LINE_STRING;
-        axisCount = 3;
+          axisCount = 3;
         break;
         case 0x80000000 + 3:
           fieldDataType = DataTypes.POLYGON;
-        axisCount = 3;
+          axisCount = 3;
         break;
         case 0x80000000 + 4:
           fieldDataType = DataTypes.MULTI_POINT;
-        axisCount = 3;
+          axisCount = 3;
         break;
         case 0x80000000 + 5:
           fieldDataType = DataTypes.MULTI_LINE_STRING;
-        axisCount = 3;
+          axisCount = 3;
         break;
         case 0x80000000 + 6:
           fieldDataType = DataTypes.MULTI_POLYGON;
-        axisCount = 3;
+          axisCount = 3;
         break;
         case 0x80000000 + 7:
           fieldDataType = DataTypes.GEOMETRY_COLLECTION;
-        axisCount = 3;
+          axisCount = 3;
         break;
 
         default:
           fieldDataType = DataTypes.GEOMETRY;
-          break;
+        break;
       }
       final SpatialReference spatialReference = fieldDefinition.GetSpatialRef();
       final CoordinateSystem coordinateSystem = Gdal.getCoordinateSystem(spatialReference);
-      final GeometryFactory geometryFactory = GeometryFactory.floating(
-        coordinateSystem, axisCount);
-      final FieldDefinition field = new FieldDefinition(fieldName,
-        fieldDataType, false);
+      final GeometryFactory geometryFactory = GeometryFactory.floating(coordinateSystem, axisCount);
+      final FieldDefinition field = new FieldDefinition(fieldName, fieldDataType, false);
       field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       recordDefinition.addField(field);
     }
@@ -606,7 +595,7 @@ public class OgrRecordStore extends AbstractRecordStore {
       sql.append(whereClause);
     }
     boolean first = true;
-    for (Entry<String, Boolean> entry : orderBy.entrySet()) {
+    for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
       final String column = entry.getKey();
       if (first) {
         sql.append(" ORDER BY ");
@@ -647,8 +636,7 @@ public class OgrRecordStore extends AbstractRecordStore {
           final Layer layer = dataSource.GetLayer(layerIndex);
           if (layer != null) {
             try {
-              final RecordDefinitionImpl recordDefinition = createRecordDefinition(
-                schema, layer);
+              final RecordDefinitionImpl recordDefinition = createRecordDefinition(schema, layer);
               final String typePath = recordDefinition.getPath().toUpperCase();
               final String layerName = layer.GetName();
               this.layerNameToPathMap.put(layerName.toUpperCase(), typePath);
@@ -671,8 +659,7 @@ public class OgrRecordStore extends AbstractRecordStore {
           this.dataSource.ReleaseResultSet(layer);
         }
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(getClass()).error(
-          "Cannot close Table " + layer.GetName(), e);
+        LoggerFactory.getLogger(getClass()).error("Cannot close Table " + layer.GetName(), e);
       } finally {
         this.layersToClose.remove(layer);
         layer.delete();

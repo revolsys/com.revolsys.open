@@ -37,11 +37,10 @@ public class OgrRecordWriter extends AbstractRecordWriter {
     this.dataSource = recordStore.createDataSource(true);
   }
 
-  private void addParts(final org.gdal.ogr.Geometry ogrGeometry,
-    final Geometry geometry, final int geometryType, final int axisCount) {
+  private void addParts(final org.gdal.ogr.Geometry ogrGeometry, final Geometry geometry,
+    final int geometryType, final int axisCount) {
     for (final Geometry part : geometry.geometries()) {
-      final org.gdal.ogr.Geometry ogrRing = toOgrGeometry(part, geometryType,
-        axisCount);
+      final org.gdal.ogr.Geometry ogrRing = toOgrGeometry(part, geometryType, axisCount);
       ogrGeometry.AddGeometry(ogrRing);
     }
   }
@@ -63,8 +62,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final Layer layer = getLayer(recordDefinition);
     final String driverName = this.recordStore.getDriverName();
-    if (OgrRecordStore.SQLITE.equals(driverName)
-        || OgrRecordStore.GEO_PAKCAGE.equals(driverName)) {
+    if (OgrRecordStore.SQLITE.equals(driverName) || OgrRecordStore.GEO_PAKCAGE.equals(driverName)) {
       final Integer fid = record.getInteger(OgrRecordStore.ROWID);
       if (fid != null) {
         layer.DeleteFeature(fid);
@@ -91,8 +89,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         if (attribute.isRequired()) {
           final Object value = record.getValue(name);
           if (value == null) {
-            throw new IllegalArgumentException("Atribute " + typePath + "."
-                + name + " is required");
+            throw new IllegalArgumentException("Atribute " + typePath + "." + name + " is required");
           }
         }
       }
@@ -107,9 +104,8 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         layer.CreateFeature(feature);
         final String driverName = this.recordStore.getDriverName();
         if (OgrRecordStore.SQLITE.equals(driverName)
-            || OgrRecordStore.GEO_PAKCAGE.equals(driverName)) {
-          record.setValue(OgrRecordStore.ROWID,
-            feature.GetFieldAsInteger(OgrRecordStore.ROWID));
+          || OgrRecordStore.GEO_PAKCAGE.equals(driverName)) {
+          record.setValue(OgrRecordStore.ROWID, feature.GetFieldAsInteger(OgrRecordStore.ROWID));
         }
         record.setState(RecordState.Persisted);
       } finally {
@@ -117,8 +113,8 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         this.recordStore.addStatistic("Insert", record);
       }
     } catch (final IllegalArgumentException e) {
-      throw new RuntimeException("Unable to insert row " + e.getMessage()
-        + "\n" + record.toString(), e);
+      throw new RuntimeException("Unable to insert row " + e.getMessage() + "\n"
+        + record.toString(), e);
     } catch (final RuntimeException e) {
       if (LoggerFactory.getLogger(OgrRecordWriter.class).isDebugEnabled()) {
         LoggerFactory.getLogger(OgrRecordWriter.class).debug(
@@ -130,8 +126,8 @@ public class OgrRecordWriter extends AbstractRecordWriter {
   }
 
   @SuppressWarnings("deprecation")
-  protected void setFieldValues(final FeatureDefn featureDefinition,
-    final Record record, final Feature feature) {
+  protected void setFieldValues(final FeatureDefn featureDefinition, final Record record,
+    final Feature feature) {
     final int fieldCount = featureDefinition.GetFieldCount();
     for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
       final FieldDefn fieldDefinition = featureDefinition.GetFieldDefn(fieldIndex);
@@ -141,42 +137,39 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         final int fieldType = fieldDefinition.GetFieldType();
         switch (fieldType) {
           case 0:
-            final Integer intValue = StringConverterRegistry.toObject(
-              Integer.class, value);
+            final Integer intValue = StringConverterRegistry.toObject(Integer.class, value);
             if (intValue != null) {
               feature.SetField(fieldIndex, intValue);
             }
-            break;
+          break;
           case 1:
-            // value = feature.GetFieldAsIntegerList(fieldIndex);
-            break;
+          // value = feature.GetFieldAsIntegerList(fieldIndex);
+          break;
           case 2:
-            final Double doubleValue = StringConverterRegistry.toObject(
-              Double.class, value);
+            final Double doubleValue = StringConverterRegistry.toObject(Double.class, value);
             if (doubleValue != null) {
               feature.SetField(fieldIndex, doubleValue);
             }
-            break;
+          break;
           case 3:
-            // value = feature.GetFieldAsDoubleList(fieldIndex);
-            break;
+          // value = feature.GetFieldAsDoubleList(fieldIndex);
+          break;
           case 4:
           case 6:
             final String string = StringConverterRegistry.toString(value);
             feature.SetField(fieldIndex, string);
-            break;
+          break;
           case 5:
           case 7:
-            // value = feature.GetFieldAsStringList(fieldIndex);
-            break;
+          // value = feature.GetFieldAsStringList(fieldIndex);
+          break;
           case 8:
-            // binary
-            break;
+          // binary
+          break;
           case 9:
           case 10:
           case 11:
-            final java.util.Date date = StringConverterRegistry.toObject(
-              Date.class, value);
+            final java.util.Date date = StringConverterRegistry.toObject(Date.class, value);
             final int year = 1900 + date.getYear();
             final int month = date.getMonth();
             final int day = date.getDay();
@@ -184,21 +177,20 @@ public class OgrRecordWriter extends AbstractRecordWriter {
             final int minutes = date.getMinutes();
             final int seconds = date.getSeconds();
             final int timezoneOffset = date.getTimezoneOffset();
-            feature.SetField(fieldIndex, year, month, day, hours, minutes,
-              seconds, timezoneOffset);
-            break;
+            feature.SetField(fieldIndex, year, month, day, hours, minutes, seconds, timezoneOffset);
+          break;
 
           default:
             final String string2 = StringConverterRegistry.toString(value);
             feature.SetField(fieldIndex, string2);
-            break;
+          break;
         }
       }
     }
   }
 
-  private void setGeometries(final FeatureDefn featureDefinition,
-    final Record record, final Feature feature) {
+  private void setGeometries(final FeatureDefn featureDefinition, final Record record,
+    final Feature feature) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final int geometryFieldCount = featureDefinition.GetGeomFieldCount();
     for (int fieldIndex = 0; fieldIndex < geometryFieldCount; fieldIndex++) {
@@ -211,17 +203,15 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         geometry = geometry.convert(geometryFactory);
         final int geometryType = fieldDefinition.GetFieldType();
         final int axisCount = geometryFactory.getAxisCount();
-        final org.gdal.ogr.Geometry ogrGeometry = toOgrGeometry(geometry,
-          geometryType, axisCount);
+        final org.gdal.ogr.Geometry ogrGeometry = toOgrGeometry(geometry, geometryType, axisCount);
         feature.SetGeomField(fieldIndex, ogrGeometry);
       }
     }
   }
 
-  protected org.gdal.ogr.Geometry toOgrGeometry(final Geometry geometry,
-    final int geometryType, final int axisCount) {
-    final org.gdal.ogr.Geometry ogrGeometry = new org.gdal.ogr.Geometry(
-      geometryType);
+  protected org.gdal.ogr.Geometry toOgrGeometry(final Geometry geometry, final int geometryType,
+    final int axisCount) {
+    final org.gdal.ogr.Geometry ogrGeometry = new org.gdal.ogr.Geometry(geometryType);
     if (!geometry.isEmpty()) {
       switch (geometryType) {
         case 1:
@@ -255,14 +245,13 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         case 3:
         case 0x80000000 + 3:
           for (final LinearRing ring : ((Polygon)geometry).rings()) {
-            final org.gdal.ogr.Geometry ogrRing = toOgrGeometry(ring, 101,
-              axisCount);
+            final org.gdal.ogr.Geometry ogrRing = toOgrGeometry(ring, 101, axisCount);
             ogrGeometry.AddGeometry(ogrRing);
           }
         break;
         case 4:
           addParts(ogrGeometry, geometry, 1, axisCount);
-          break;
+        break;
 
         case 0x80000000 + 4:
           addParts(ogrGeometry, geometry, 0x80000000 + 1, axisCount);
@@ -270,7 +259,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
 
         case 5:
           addParts(ogrGeometry, geometry, 2, axisCount);
-          break;
+        break;
 
         case 0x80000000 + 5:
           addParts(ogrGeometry, geometry, 0x80000000 + 2, axisCount);
@@ -278,7 +267,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
 
         case 6:
           addParts(ogrGeometry, geometry, 3, axisCount);
-          break;
+        break;
 
         case 0x80000000 + 6:
           addParts(ogrGeometry, geometry, 0x80000000 + 3, axisCount);
@@ -305,7 +294,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
               ogrGeometry.AddPoint(x, y, z);
             }
           }
-          break;
+        break;
         default:
           return null;
       }
@@ -321,8 +310,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final Layer layer = getLayer(recordDefinition);
     final String driverName = this.recordStore.getDriverName();
-    if (OgrRecordStore.SQLITE.equals(driverName)
-        || OgrRecordStore.GEO_PAKCAGE.equals(driverName)) {
+    if (OgrRecordStore.SQLITE.equals(driverName) || OgrRecordStore.GEO_PAKCAGE.equals(driverName)) {
       final Integer fid = record.getInteger(OgrRecordStore.ROWID);
       if (fid != null) {
         final Feature feature = layer.GetFeature(fid);
@@ -345,16 +333,16 @@ public class OgrRecordWriter extends AbstractRecordWriter {
         switch (record.getState()) {
           case New:
             insert(record);
-            break;
+          break;
           case Modified:
             update(record);
-            break;
+          break;
           case Persisted:
-            // No action required
-            break;
+          // No action required
+          break;
           case Deleted:
             delete(record);
-            break;
+          break;
           default:
             throw new IllegalStateException("State not known");
         }
