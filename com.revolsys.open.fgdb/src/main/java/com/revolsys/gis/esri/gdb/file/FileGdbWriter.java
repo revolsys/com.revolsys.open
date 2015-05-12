@@ -22,11 +22,11 @@ import com.revolsys.gis.esri.gdb.file.capi.type.OidFieldDefinition;
 import com.revolsys.io.AbstractRecordWriter;
 
 public class FileGdbWriter extends AbstractRecordWriter {
-  private FileGdbRecordStoreImpl recordStore;
+  private FileGdbRecordStore recordStore;
 
   private Map<String, Table> tables = new HashMap<>();
 
-  FileGdbWriter(final FileGdbRecordStoreImpl recordStore) {
+  FileGdbWriter(final FileGdbRecordStore recordStore) {
     this.recordStore = recordStore;
   }
 

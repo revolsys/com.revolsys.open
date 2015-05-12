@@ -20,12 +20,12 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
 
   private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gdb");
 
-  private static final Map<String, FileGdbRecordStoreImpl> RECORD_STORES = new HashMap<String, FileGdbRecordStoreImpl>();
+  private static final Map<String, FileGdbRecordStore> RECORD_STORES = new HashMap<String, FileGdbRecordStore>();
 
   private static final List<String> URL_PATTERNS = Arrays.asList("file:/(//)?.*.gdb/?",
     "folderconnection:/(//)?.*.gdb/?");
 
-  public static FileGdbRecordStoreImpl create(final File file) {
+  public static FileGdbRecordStore create(final File file) {
     if (file == null) {
       return null;
     } else {
@@ -33,9 +33,9 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
         final String fileName = FileUtil.getCanonicalPath(file);
         final AtomicInteger count = Maps.get(COUNTS, fileName, new AtomicInteger());
         count.incrementAndGet();
-        FileGdbRecordStoreImpl recordStore = RECORD_STORES.get(fileName);
+        FileGdbRecordStore recordStore = RECORD_STORES.get(fileName);
         if (recordStore == null || recordStore.isClosed()) {
-          recordStore = new FileGdbRecordStoreImpl(file);
+          recordStore = new FileGdbRecordStore(file);
           recordStore.setCreateMissingRecordStore(false);
           RECORD_STORES.put(fileName, recordStore);
         }
@@ -54,7 +54,7 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
         final int count = countHolder.decrementAndGet();
         if (count <= 0) {
           COUNTS.remove(fileName);
-          final FileGdbRecordStoreImpl recordStore = RECORD_STORES.remove(fileName);
+          final FileGdbRecordStore recordStore = RECORD_STORES.remove(fileName);
           if (recordStore == null) {
             return false;
           } else {

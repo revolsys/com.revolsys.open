@@ -4,7 +4,7 @@ import com.revolsys.converter.string.BooleanStringConverter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.format.esri.gdb.xml.model.Field;
-import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreImpl;
+import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.util.Property;
 
@@ -22,7 +22,7 @@ public class IntegerFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    final FileGdbRecordStoreImpl recordStore = getRecordStore();
+    final FileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {

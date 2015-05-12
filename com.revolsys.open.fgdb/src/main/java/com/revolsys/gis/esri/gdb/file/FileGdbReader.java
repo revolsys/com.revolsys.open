@@ -14,11 +14,11 @@ public class FileGdbReader extends AbstractMultipleIteratorReader<Record> {
 
   private int index = 0;
 
-  private final FileGdbRecordStoreImpl recordStore;
+  private final FileGdbRecordStore recordStore;
 
   private List<String> typePaths = new ArrayList<>();
 
-  public FileGdbReader(final FileGdbRecordStoreImpl recordStore) {
+  public FileGdbReader(final FileGdbRecordStore recordStore) {
     this.recordStore = recordStore;
   }
 

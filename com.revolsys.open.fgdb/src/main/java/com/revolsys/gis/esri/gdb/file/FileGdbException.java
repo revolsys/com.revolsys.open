@@ -31,7 +31,7 @@ public class FileGdbException extends RuntimeException {
   }
 
   private void initErrors() {
-    // synchronized (FileGdbRecordStoreImpl.API_SYNC) {
+    // synchronized (FileGdbRecordStore.API_SYNC) {
     // final VectorOfWString errors = EsriFileGdb.getErrors();
     // final long errorCount = errors.size();
     // for (int i = 0; i < errorCount; i++) {

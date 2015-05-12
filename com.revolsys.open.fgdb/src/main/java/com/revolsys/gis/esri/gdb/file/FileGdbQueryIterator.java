@@ -38,7 +38,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private RecordFactory recordFactory;
 
-  private FileGdbRecordStoreImpl recordStore;
+  private FileGdbRecordStore recordStore;
 
   private EnumRows rows;
 
@@ -50,16 +50,16 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
 
   private final String typePath;
 
-  FileGdbQueryIterator(final FileGdbRecordStoreImpl recordStore, final String typePath) {
+  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String typePath) {
     this(recordStore, typePath, "*", "", null, 0, -1);
   }
 
-  FileGdbQueryIterator(final FileGdbRecordStoreImpl recordStore, final String typePath,
+  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String typePath,
     final String whereClause) {
     this(recordStore, typePath, "*", whereClause, null, 0, -1);
   }
 
-  FileGdbQueryIterator(final FileGdbRecordStoreImpl recordStore, final String typePath,
+  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String typePath,
     final String whereClause, final BoundingBox boundingBox, final Query query, final int offset,
     final int limit) {
     this(recordStore, typePath, "*", whereClause, boundingBox, offset, limit);
@@ -69,7 +69,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> {
     }
   }
 
-  FileGdbQueryIterator(final FileGdbRecordStoreImpl recordStore, final String typePath,
+  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String typePath,
     final String fields, final String sql, final BoundingBox boundingBox, final int offset,
     final int limit) {
     this.recordStore = recordStore;

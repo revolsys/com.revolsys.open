@@ -18,7 +18,7 @@ import com.revolsys.format.esri.gdb.xml.model.SpatialReference;
 import com.revolsys.format.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.format.shp.ShapefileConstants;
 import com.revolsys.format.shp.ShapefileGeometryUtil;
-import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreImpl;
+import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.capi.swig.Row;
 import com.revolsys.gis.io.EndianInputStream;
 import com.revolsys.gis.io.EndianOutput;
@@ -108,7 +108,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
   @Override
   public Object getValue(final Row row) {
     final String name = getName();
-    final FileGdbRecordStoreImpl recordStore = getRecordStore();
+    final FileGdbRecordStore recordStore = getRecordStore();
     if (recordStore.isNull(row, name)) {
       return null;
     } else {
