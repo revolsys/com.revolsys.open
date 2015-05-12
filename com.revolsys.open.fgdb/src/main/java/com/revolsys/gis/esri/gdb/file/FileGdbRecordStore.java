@@ -155,7 +155,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   private final Map<String, String> catalogPathByPath = new HashMap<>();
 
-  private boolean closed;
+  private boolean closed = false;
 
   private boolean createMissingRecordStore = true;
 
@@ -178,8 +178,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   private final Map<String, AtomicLong> idGenerators = new HashMap<>();
 
   private boolean initialized;
-
-  private final Map<String, Integer> lockedTables = new HashMap<>();
 
   private final Map<String, Integer> tableReferenceCountsByTypePath = new HashMap<>();
 
@@ -1279,12 +1277,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return this.exists && !isClosed();
   }
 
-  public boolean isLoadOnly(final String typePath) {
-    synchronized (this.apiSync) {
-      return this.lockedTables.containsKey(typePath);
-    }
-  }
-
   public boolean isNull(final Row row, final String name) {
     synchronized (this.apiSync) {
       return row.isNull(name);
@@ -1325,17 +1317,17 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       while (index != -1) {
         final String parentPath = path.substring(0, index + 1);
         final int nextIndex = path.indexOf(index + 1, '\\');
-        String element;
+        String currentPath;
         if (nextIndex == -1) {
-          element = path.substring(index + 1);
+          currentPath = path;
         } else {
-          element = path.substring(index + 1, nextIndex);
+          currentPath = path.substring(0, nextIndex);
         }
         boolean found = false;
         final VectorOfWString children = geodatabase.getChildDatasets(parentPath, "Feature Dataset");
         for (int i = 0; i < children.size(); i++) {
           final String childPath = children.get(i);
-          if (childPath.equals(element)) {
+          if (childPath.equals(currentPath)) {
             found = true;
           }
         }
@@ -1654,17 +1646,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   public void setNull(final Row row, final String name) {
     synchronized (this.apiSync) {
       row.setNull(name);
-    }
-  }
-
-  protected void setWriteLock(final String typePath) {
-    synchronized (this.apiSync) {
-      final Table table = this.tablesToClose.get(typePath);
-      if (table != null) {
-        table.setLoadOnlyMode(true);
-        Maps.addCount(this.lockedTables, typePath);
-        table.setWriteLock();
-      }
     }
   }
 
