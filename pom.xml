@@ -104,8 +104,8 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9.1</version>
         <configuration>
-        <failOnError>false</failOnError>
-         <quiet>yes</quiet>
+          <failOnError>false</failOnError>
+          <quiet>yes</quiet>
         </configuration>
         <executions>
           <execution>
@@ -204,29 +204,29 @@
               <goal>aggregate-add-third-party</goal>
             </goals>
           </execution>
-        </executions> -->  
+        </executions> -->
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>3.4</version>
         <configuration>
-         <reportPlugins>
-           <plugin>
-             <groupId>org.apache.maven.plugins</groupId>
-             <artifactId>maven-project-info-reports-plugin</artifactId>
-             <version>2.4</version>
-             <configuration>
-               <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-               <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-             </configuration>
-           </plugin>
-           <plugin>
-             <groupId>org.apache.maven.plugins</groupId>
-             <artifactId>maven-javadoc-plugin</artifactId>
-             <version>2.9.1</version>
-           </plugin>
-         </reportPlugins>
+          <reportPlugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-project-info-reports-plugin</artifactId>
+              <version>2.4</version>
+              <configuration>
+                <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+              </configuration>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <version>2.9.1</version>
+            </plugin>
+          </reportPlugins>
         </configuration>
         <executions>
           <execution>
@@ -328,8 +328,8 @@
         </exclusions>
       </dependency>
       <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
         <version>3.1.0</version>
       </dependency>
       <dependency>
@@ -488,6 +488,11 @@
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
         <version>1.2.17</version>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.11</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

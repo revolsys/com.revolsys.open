@@ -58,13 +58,13 @@ import com.revolsys.transaction.Transaction;
 
 public abstract class AbstractJdbcRecordStore extends AbstractRecordStore implements
   JdbcRecordStore, RecordStoreExtension {
+  public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
+
   public static final AbstractIterator<Record> createJdbcIterator(
     final AbstractJdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     return new JdbcQueryIterator(recordStore, query, properties);
   }
-
-  public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
 
   private final Map<String, JdbcFieldAdder> attributeAdders = new HashMap<String, JdbcFieldAdder>();
 
@@ -690,7 +690,14 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore implem
           final String dbTableName = resultSet.getString("TABLE_NAME");
           if (!isExcluded(schemaName, dbTableName)) {
             final String privilege = resultSet.getString("PRIVILEGE");
-            Maps.addToList(tablePermissionsMap, dbTableName, privilege);
+            if ("ALL".equals(privilege)) {
+              Maps.addToList(tablePermissionsMap, dbTableName, "SELECT");
+              Maps.addToList(tablePermissionsMap, dbTableName, "INSERT");
+              Maps.addToList(tablePermissionsMap, dbTableName, "UPDATE");
+              Maps.addToList(tablePermissionsMap, dbTableName, "DELETE");
+            } else {
+              Maps.addToList(tablePermissionsMap, dbTableName, privilege);
+            }
 
             final String description = resultSet.getString("REMARKS");
             tableDescriptionMap.put(dbTableName, description);

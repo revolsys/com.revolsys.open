@@ -65,8 +65,8 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  *@version 1.7
  */
-public abstract class AbstractMultiPolygon extends AbstractGeometryCollection
-implements MultiPolygon {
+public abstract class AbstractMultiPolygon extends AbstractGeometryCollection implements
+  MultiPolygon {
 
   /**
    *
@@ -223,14 +223,12 @@ implements MultiPolygon {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V moveVertex(final Point newPoint,
-    final int... vertexId) {
+  public <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (vertexId.length == 3) {
       if (isEmpty()) {
-        throw new IllegalArgumentException(
-            "Cannot move vertex for empty MultiPolygon");
+        throw new IllegalArgumentException("Cannot move vertex for empty MultiPolygon");
       } else {
         final int partIndex = vertexId[0];
         final int ringIndex = vertexId[1];
@@ -240,21 +238,18 @@ implements MultiPolygon {
           final GeometryFactory geometryFactory = getGeometryFactory();
 
           final Polygon polygon = getPolygon(partIndex);
-          final Polygon newPolygon = polygon.moveVertex(newPoint, ringIndex,
-            vertexIndex);
+          final Polygon newPolygon = polygon.moveVertex(newPoint, ringIndex, vertexIndex);
           final List<Polygon> polygons = new ArrayList<>(getPolygons());
           polygons.set(partIndex, newPolygon);
           return (V)geometryFactory.multiPolygon(polygons);
         } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not "
-                + partIndex);
+          throw new IllegalArgumentException("Part index must be between 0 and " + partCount
+            + " not " + partIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for MultiPolygons must have length 3. "
-            + Arrays.toString(vertexId));
+      throw new IllegalArgumentException("Vertex id's for MultiPolygons must have length 3. "
+        + Arrays.toString(vertexId));
     }
   }
 
@@ -273,6 +268,11 @@ implements MultiPolygon {
       final MultiPolygon normalizedGeometry = geometryFactory.multiPolygon(geometries);
       return normalizedGeometry;
     }
+  }
+
+  @Override
+  public Iterable<Polygon> polygons() {
+    return getGeometries();
   }
 
   /**

@@ -62,17 +62,21 @@ public interface LineString extends Lineal {
   @Override
   LineString clone();
 
+  int copyCoordinates(int axisCount, double nanValue, double[] destCoordinates, int destOffset);
+
+  int copyCoordinatesReverse(int axisCount, double nanValue, double[] destCoordinates,
+    int destOffset);
+
   double distance(int index, Point point);
 
   boolean equals(int axisIndex, int vertexIndex, Point point);
 
   boolean equalsVertex(final int vertexIndex, final double... coordinates);
 
-  boolean equalsVertex(int axisCount, final int vertexIndex1,
-    final int vertexIndex2);
+  boolean equalsVertex(int axisCount, final int vertexIndex1, final int vertexIndex2);
 
-  boolean equalsVertex(int axisCount, final int vertexIndex,
-    final LineString line2, int vertexIndex2);
+  boolean equalsVertex(int axisCount, final int vertexIndex, final LineString line2,
+    int vertexIndex2);
 
   boolean equalsVertex(int axisCount, final int vertexIndex, final Point point);
 
@@ -81,6 +85,10 @@ public interface LineString extends Lineal {
   double getCoordinate(int vertexIndex, final int axisIndex);
 
   double[] getCoordinates();
+
+  double[] getCoordinates(int axisCount);
+
+  double[] getCoordinates(int axisCount, double nanValue);
 
   LineString getCoordinatesList();
 
@@ -155,7 +163,6 @@ public interface LineString extends Lineal {
 
   LineString subLine(final int vertexCount, final Point toPoint);
 
-  LineString subLine(final Point fromPoint, final int fromVertexIndex,
-    int vertexCount, final Point toPoint);
-
+  LineString subLine(final Point fromPoint, final int fromVertexIndex, int vertexCount,
+    final Point toPoint);
 }

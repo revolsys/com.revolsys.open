@@ -286,7 +286,10 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
   public GeometryFactory getGeometryFactory(final int oracleSrid, final int axisCount,
     final double... scales) {
-    final CoordinateSystem coordinateSystem = getCoordinateSystem(oracleSrid);
+    CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(oracleSrid);
+    if (coordinateSystem == null) {
+      coordinateSystem = getCoordinateSystem(oracleSrid);
+    }
     if (coordinateSystem == null) {
       return GeometryFactory.fixed(0, axisCount, scales);
     } else {
@@ -376,7 +379,9 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       setTablePermissionsSql("select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\" "
         + "from ALL_TAB_PRIVS_RECD P "
         + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
-        + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') ");
+        + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') "
+        + " union all "
+        + "select user \"SCHEMA_NAME\", t.table_name, 'ALL', comments from user_tables t join user_tab_comments c on (t.table_name = c.table_name) and c.table_type in ('TABLE', 'VIEW')");
 
       addRecordStoreExtension(new ArcSdeStGeometryRecordStoreExtension());
     }

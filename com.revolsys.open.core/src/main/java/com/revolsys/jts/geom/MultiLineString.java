@@ -49,6 +49,8 @@ public interface MultiLineString extends GeometryCollection, Lineal {
 
   public boolean isClosed();
 
+  Iterable<LineString> lineStrings();
+
   @Override
   public MultiLineString normalize();
 

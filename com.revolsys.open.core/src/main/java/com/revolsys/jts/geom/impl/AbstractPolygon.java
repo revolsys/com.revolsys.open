@@ -81,8 +81,8 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  *@version 1.7
  */
-public abstract class AbstractPolygon extends AbstractGeometry implements
-Polygon {
+public abstract class AbstractPolygon extends AbstractGeometry implements Polygon {
+  private static final long serialVersionUID = -3494792200821764533L;
 
   /**
    *  Returns the minimum coordinate, using the usual lexicographic comparison.
@@ -117,34 +117,29 @@ Polygon {
     final double[] coordinates = new double[vertexCount * axisCount];
     int newVertexIndex = 0;
     for (int vertexIndex = index; vertexIndex < vertexCount - 1; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount,
-        newVertexIndex++, points, vertexIndex);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
+        vertexIndex);
     }
     for (int vertexIndex = 0; vertexIndex < index; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount,
-        newVertexIndex++, points, vertexIndex);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
+        vertexIndex);
     }
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1,
-      points, index);
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1, points, index);
     final GeometryFactory geometryFactory = ring.getGeometryFactory();
     return geometryFactory.linearRing(axisCount, coordinates);
   }
-
-  private static final long serialVersionUID = -3494792200821764533L;
 
   public AbstractPolygon() {
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V appendVertex(final Point newPoint,
-    final int... geometryId) {
+  public <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (geometryId.length == 1) {
       if (isEmpty()) {
-        throw new IllegalArgumentException(
-            "Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = geometryId[0];
         final int ringCount = getRingCount();
@@ -157,15 +152,13 @@ Polygon {
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not "
-                + ringIndex);
+          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
+            + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException(
-        "Geometry id's for Polygons must have length 1. "
-            + Arrays.toString(geometryId));
+      throw new IllegalArgumentException("Geometry id's for Polygons must have length 1. "
+        + Arrays.toString(geometryId));
     }
   }
 
@@ -220,8 +213,7 @@ Polygon {
   public <V extends Geometry> V deleteVertex(final int... vertexId) {
     if (vertexId.length == 2) {
       if (isEmpty()) {
-        throw new IllegalArgumentException(
-            "Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -235,15 +227,13 @@ Polygon {
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not "
-                + ringIndex);
+          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
+            + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for Polygons must have length 2. "
-            + Arrays.toString(vertexId));
+      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
+        + Arrays.toString(vertexId));
     }
   }
 
@@ -377,8 +367,7 @@ Polygon {
   }
 
   @Override
-  public <V extends Geometry> List<V> getGeometryComponents(
-    final Class<V> geometryClass) {
+  public <V extends Geometry> List<V> getGeometryComponents(final Class<V> geometryClass) {
     final List<V> geometries = super.getGeometryComponents(geometryClass);
     for (final LinearRing ring : rings()) {
       if (ring != null) {
@@ -535,14 +524,12 @@ Polygon {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V insertVertex(final Point newPoint,
-    final int... vertexId) {
+  public <V extends Geometry> V insertVertex(final Point newPoint, final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (vertexId.length == 2) {
       if (isEmpty()) {
-        throw new IllegalArgumentException(
-            "Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -556,15 +543,13 @@ Polygon {
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not "
-                + ringIndex);
+          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
+            + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for Polygons must have length 2. "
-            + Arrays.toString(vertexId));
+      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
+        + Arrays.toString(vertexId));
     }
   }
 
@@ -656,14 +641,12 @@ Polygon {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V moveVertex(final Point newPoint,
-    final int... vertexId) {
+  public <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (vertexId.length == 2) {
       if (isEmpty()) {
-        throw new IllegalArgumentException(
-            "Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -677,15 +660,13 @@ Polygon {
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException(
-            "Ring index must be between 0 and " + ringCount + " not "
-                + ringIndex);
+          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
+            + " not " + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for Polygons must have length 2. "
-            + Arrays.toString(vertexId));
+      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
+        + Arrays.toString(vertexId));
     }
   }
 
@@ -724,6 +705,11 @@ Polygon {
   }
 
   @Override
+  public Iterable<Polygon> polygons() {
+    return Collections.singleton(this);
+  }
+
+  @Override
   @Deprecated
   public Polygon prepare() {
     return new PreparedPolygon(this);
@@ -754,24 +740,36 @@ Polygon {
     return new IteratorReader<>(iterator);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <G extends Geometry> G toClockwise() {
-    final List<Geometry> geometries = new ArrayList<>();
-    for (final LinearRing ring : rings()) {
-      geometries.add(ring.toClockwise());
+    final List<Geometry> rings = new ArrayList<>();
+    boolean exterior = true;
+    for (LinearRing ring : rings()) {
+      if (ring.isClockwise() != exterior) {
+        ring = ring.reverse();
+      }
+      exterior = false;
+      rings.add(ring);
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return (G)geometryFactory.polygon(geometries);
+    return (G)geometryFactory.polygon(rings);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <G extends Geometry> G toCounterClockwise() {
-    final List<Geometry> geometries = new ArrayList<>();
-    for (final LinearRing ring : rings()) {
-      geometries.add(ring.toCounterClockwise());
+    final List<Geometry> rings = new ArrayList<>();
+    boolean exterior = true;
+    for (LinearRing ring : rings()) {
+      if (ring.isClockwise() == exterior) {
+        ring = ring.reverse();
+      }
+      exterior = false;
+      rings.add(ring);
     }
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return (G)geometryFactory.polygon(geometries);
+    return (G)geometryFactory.polygon(rings);
   }
 
   @Override

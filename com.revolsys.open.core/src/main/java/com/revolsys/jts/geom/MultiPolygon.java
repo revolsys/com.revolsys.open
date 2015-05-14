@@ -54,6 +54,8 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   @Override
   MultiPolygon normalize();
 
+  Iterable<Polygon> polygons();
+
   /**
    * Creates a {@link MultiPolygon} with
    * every component reversed.

@@ -61,11 +61,16 @@ public class Assert {
    *@param  message                    a description of the assertion
    *@throws  AssertionError  if the two objects are not equal
    */
-  public static void equals(final Object expectedValue,
-    final Object actualValue, final String message) {
-    if (!actualValue.equals(expectedValue)) {
-      throw new AssertionError("Expected " + expectedValue
-        + " but encountered " + actualValue
+  public static void equals(final Object expectedValue, final Object actualValue,
+    final String message) {
+    final boolean equals = actualValue.equals(expectedValue);
+    equals(message, equals, expectedValue, actualValue);
+  }
+
+  public static void equals(final String message, final boolean equals, final Object expectedValue,
+    final Object actualValue) throws AssertionError {
+    if (!equals) {
+      throw new AssertionError("Expected " + expectedValue + " but encountered " + actualValue
         + (message != null ? ": " + message : ""));
     }
   }
@@ -116,7 +121,6 @@ public class Assert {
    *@throws  AssertionError  thrown always
    */
   public static void shouldNeverReachHere(final String message) {
-    throw new AssertionError("Should never reach here"
-        + (message != null ? ": " + message : ""));
+    throw new AssertionError("Should never reach here" + (message != null ? ": " + message : ""));
   }
 }
