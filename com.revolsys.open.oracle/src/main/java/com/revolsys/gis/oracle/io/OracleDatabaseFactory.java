@@ -2,6 +2,9 @@ package com.revolsys.gis.oracle.io;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.Reader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -11,8 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
-
-import oracle.net.jdbc.nl.NLParamParser;
 
 import org.slf4j.LoggerFactory;
 
@@ -38,36 +39,37 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
   private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
 
   public static List<String> getTnsConnectionNames() {
-    File tnsFile = new File(System.getProperty("oracle.net.tns_admin"),
-      "tnsnames.ora");
+    File tnsFile = new File(System.getProperty("oracle.net.tns_admin"), "tnsnames.ora");
     if (!tnsFile.exists()) {
       tnsFile = new File(System.getenv("TNS_ADMIN"), "tnsnames.ora");
       if (!tnsFile.exists()) {
-        tnsFile = new File(System.getenv("ORACLE_HOME") + "/network/admin",
-          "tnsnames.ora");
+        tnsFile = new File(System.getenv("ORACLE_HOME") + "/network/admin", "tnsnames.ora");
         if (!tnsFile.exists()) {
-          tnsFile = new File(System.getenv("ORACLE_HOME") + "/NETWORK/ADMIN",
-            "tnsnames.ora");
+          tnsFile = new File(System.getenv("ORACLE_HOME") + "/NETWORK/ADMIN", "tnsnames.ora");
 
         }
       }
     }
     if (tnsFile.exists()) {
       try {
-        FileReader reader = new FileReader(tnsFile);
-        final NLParamParser parser = new NLParamParser(reader);
-        return Arrays.asList(parser.getNLPAllNames());
+        final FileReader reader = new FileReader(tnsFile);
+        final Class<?> parserClass = Class.forName("oracle.net.jdbc.nl.NLParamParser");
+        final Constructor<?> constructor = parserClass.getConstructor(Reader.class);
+        final Object parser = constructor.newInstance(reader);
+        final Method method = parserClass.getMethod("getNLPAllNames");
+        final String[] names = (String[])method.invoke(parser);
+        return Arrays.asList(names);
+      } catch (final NoSuchMethodException e) {
+      } catch (final ClassNotFoundException e) {
       } catch (final Throwable e) {
-        LoggerFactory.getLogger(OracleDatabaseFactory.class).error(
-          "Error reading: " + tnsFile, e);
+        LoggerFactory.getLogger(OracleDatabaseFactory.class).error("Error reading: " + tnsFile, e);
       }
     }
     return Collections.emptyList();
   }
 
-  protected void addCacheProperty(final Map<String, Object> config,
-    final String key, final Properties cacheProperties,
-    final String propertyName, final Object defaultValue,
+  protected void addCacheProperty(final Map<String, Object> config, final String key,
+    final Properties cacheProperties, final String propertyName, final Object defaultValue,
     final DataType dataType) {
     Object value = config.remove(key);
     if (value == null) {
@@ -76,8 +78,7 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
     cacheProperties.put(propertyName, String.valueOf(defaultValue));
     if (value != null) {
       try {
-        final Object propertyValue = StringConverterRegistry.toObject(dataType,
-          value);
+        final Object propertyValue = StringConverterRegistry.toObject(dataType, value);
         final String stringValue = String.valueOf(propertyValue);
         cacheProperties.put(propertyName, stringValue);
       } catch (final Throwable e) {
@@ -97,8 +98,7 @@ public class OracleDatabaseFactory extends AbstractJdbcDatabaseFactory {
   }
 
   @Override
-  public JdbcRecordStore createRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
+  public JdbcRecordStore createRecordStore(final Map<String, ? extends Object> connectionProperties) {
     return new OracleRecordStore(this, connectionProperties);
   }
 

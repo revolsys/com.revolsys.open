@@ -22,6 +22,7 @@
       <groupId>com.oracle</groupId>
       <artifactId>ojdbc7</artifactId>
       <version>12.1.0.1</version>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
