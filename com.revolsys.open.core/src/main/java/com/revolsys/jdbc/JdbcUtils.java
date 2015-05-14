@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -740,5 +741,10 @@ public final class JdbcUtils {
     final int index) throws SQLException {
     final Array array = resultSet.getArray(index);
     return (BigDecimal[])array.getArray();
+  }
+
+  public static Struct struct(final Connection connection, final String type, final Object... args)
+    throws SQLException {
+    return connection.createStruct(type, args);
   }
 }

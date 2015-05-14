@@ -11,9 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import oracle.jdbc.OracleConnection;
-import oracle.spatial.geometry.JGeometry;
-
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.types.DataType;
@@ -40,6 +37,10 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
 
   private static final int[] LINESTRING_ELEM_INFO = new int[] {
     1, 2, 1
+  };
+
+  private static final int[] RECTANGLE_ELEM_INFO = new int[] {
+    1, 1003, 3
   };
 
   private final int axisCount;
@@ -144,11 +145,6 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       statement.setObject(parameterIndex, oracleValue);
     }
     return parameterIndex + 1;
-  }
-
-  private Struct struct(final Connection connection, final String type, final Object... args)
-    throws SQLException {
-    return connection.createStruct(type, args);
   }
 
   private LineString toLineString(final ResultSet resultSet, final int columnIndex,
@@ -319,14 +315,14 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   }
 
   private Struct toSdoGeometry(final Connection connection, final int geometryType,
-    final Struct pointStruct, final int[] elemInfo, final double[] coordinates) throws SQLException {
-    return struct(connection, MDSYS_SDO_GEOMETRY, geometryType, this.oracleSrid, pointStruct,
-      elemInfo, coordinates);
+    final Struct pointStruct, final int[] elemInfo, final double... coordinates)
+    throws SQLException {
+    return JdbcUtils.struct(connection, MDSYS_SDO_GEOMETRY, geometryType, this.oracleSrid,
+      pointStruct, elemInfo, coordinates);
   }
 
-  private Struct toSdoGeometry(Connection connection, final Object object, final int axisCount)
+  private Struct toSdoGeometry(final Connection connection, final Object object, final int axisCount)
     throws SQLException {
-    JGeometry jGeometry;
     if (object instanceof Geometry) {
       Geometry geometry = (Geometry)object;
       geometry = geometry.copy(this.geometryFactory);
@@ -348,8 +344,6 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       } else if (object instanceof MultiPolygon) {
         final MultiPolygon multiPolygon = (MultiPolygon)geometry;
         return toSdoMultiPolygon(connection, multiPolygon, axisCount);
-      } else {
-        throw new IllegalArgumentException("Unable to convert to SDO_GEOMETRY " + object.getClass());
       }
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;
@@ -358,20 +352,9 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       final double minY = boundingBox.getMinY();
       final double maxX = boundingBox.getMaxX();
       final double maxY = boundingBox.getMaxY();
-      final int srid = this.oracleSrid;
-      jGeometry = new JGeometry(minX, minY, maxX, maxY, srid);
-      try {
-        synchronized (JGeometry.class) {
-          connection = connection.unwrap(OracleConnection.class);
-          return JGeometry.storeJS(jGeometry, connection);
-        }
-      } catch (final SQLException e) {
-        throw new RuntimeException("Unable to convert Oracle JGeometry to STRUCT: "
-          + e.getMessage(), e);
-      }
-    } else {
-      throw new IllegalArgumentException("Unable to convert to SDO_GEOMETRY " + object.getClass());
+      return toSdoGeometry(connection, 3, null, RECTANGLE_ELEM_INFO, minX, minY, maxX, maxY);
     }
+    throw new IllegalArgumentException("Unable to convert to SDO_GEOMETRY " + object.getClass());
   }
 
   private Struct toSdoLineString(final Connection connection, final LineString line,
@@ -477,7 +460,7 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         z = null;
       }
     }
-    final Struct pointStruct = struct(connection, MDSYS_SDO_POINT_TYPE, x, y, z);
+    final Struct pointStruct = JdbcUtils.struct(connection, MDSYS_SDO_POINT_TYPE, x, y, z);
     return toSdoGeometry(connection, geometryType, pointStruct, null, null);
   }
 

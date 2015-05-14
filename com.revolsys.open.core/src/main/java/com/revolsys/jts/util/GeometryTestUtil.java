@@ -110,7 +110,6 @@ public class GeometryTestUtil {
       polygons[partIndex] = polygon(geometryFactory, axisCount, partIndex, ringCount);
     }
     final MultiPolygon multiPolygon = geometryFactory.multiPolygon(polygons);
-    System.out.println(multiPolygon);
     return multiPolygon;
   }
 
