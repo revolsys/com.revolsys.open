@@ -440,8 +440,8 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final int[] elemInfo = new int[ringCount * 3];
 
     int offset = 0;
+    int elemIndex = 0;
     for (final Polygon polygon : multiPolygon.polygons()) {
-      int elemIndex = 0;
       int i = 0;
       for (final LineString line : polygon.rings()) {
         elemInfo[elemIndex++] = offset + 1;

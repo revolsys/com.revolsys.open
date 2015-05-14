@@ -45,21 +45,29 @@ public class GeometryTestUtil {
   }
 
   public static LinearRing linearRing(final GeometryFactory geometryFactory, final int axisCount,
-    final int partIndex) {
+    final int partIndex, final int ringIndex) {
     final Point centre = getCentre(geometryFactory);
     final double[] coordinates = new double[axisCount * 5];
     int offset = 0;
-    final int baseIndex = partIndex * 2;
-    offset = setRingPoint(coordinates, offset, geometryFactory, axisCount, baseIndex, baseIndex,
-      centre);
-    offset = setRingPoint(coordinates, offset, geometryFactory, axisCount, baseIndex + 1,
-      baseIndex, centre);
-    offset = setRingPoint(coordinates, offset, geometryFactory, axisCount, baseIndex + 1,
-      baseIndex + 1, centre);
-    offset = setRingPoint(coordinates, offset, geometryFactory, axisCount, baseIndex,
-      baseIndex + 1, centre);
-    offset = setRingPoint(coordinates, offset, geometryFactory, axisCount, baseIndex, baseIndex,
-      centre);
+    int x1 = partIndex * 20;
+    int y1 = 0;
+    int x2;
+    int y2;
+    if (ringIndex == 0) {
+      x2 = x1 + 19;
+      y2 = y1 + 10;
+    } else {
+      x1 += ringIndex * 2;
+      x2 = x1 + 1;
+      y1 += 1;
+      y2 = y1 + 8;
+    }
+
+    offset = setRingPoint(coordinates, offset, geometryFactory, axisCount, x1, y1, centre);
+    offset = setRingPoint(coordinates, offset, geometryFactory, axisCount, x2, y1, centre);
+    offset = setRingPoint(coordinates, offset, geometryFactory, axisCount, x2, y2, centre);
+    offset = setRingPoint(coordinates, offset, geometryFactory, axisCount, x1, y2, centre);
+    offset = setRingPoint(coordinates, offset, geometryFactory, axisCount, x1, y1, centre);
     return geometryFactory.linearRing(axisCount, coordinates);
   }
 
@@ -81,7 +89,7 @@ public class GeometryTestUtil {
     final int axisCount, final int partCount) {
     final LineString[] lines = new LineString[partCount];
     for (int partIndex = 0; partIndex < partCount; partIndex++) {
-      lines[partIndex] = linearRing(geometryFactory, axisCount, partIndex);
+      lines[partIndex] = lineString(geometryFactory, axisCount, partIndex);
     }
     return geometryFactory.multiLineString(lines);
   }
@@ -101,7 +109,9 @@ public class GeometryTestUtil {
     for (int partIndex = 0; partIndex < partCount; partIndex++) {
       polygons[partIndex] = polygon(geometryFactory, axisCount, partIndex, ringCount);
     }
-    return geometryFactory.multiPolygon(polygons);
+    final MultiPolygon multiPolygon = geometryFactory.multiPolygon(polygons);
+    System.out.println(multiPolygon);
+    return multiPolygon;
   }
 
   public static Point point(final GeometryFactory geometryFactory, final int axisCount) {
@@ -125,7 +135,7 @@ public class GeometryTestUtil {
     final int partIndex, final int ringCount) {
     final LinearRing[] rings = new LinearRing[ringCount];
     for (int ringIndex = 0; ringIndex < ringCount; ringIndex++) {
-      rings[ringIndex] = linearRing(geometryFactory, axisCount, ringIndex);
+      rings[ringIndex] = linearRing(geometryFactory, axisCount, partIndex, ringIndex);
     }
     return geometryFactory.polygon(rings);
   }
