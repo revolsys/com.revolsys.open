@@ -194,6 +194,33 @@ public class Numbers {
     }
   }
 
+  public static double[] toDoubleArray(final Number[] numbers) {
+    final int length = numbers.length;
+    final double[] result = new double[length];
+    for (int i = 0; i < length; i++) {
+      final Number number = numbers[i];
+      result[i] = number.doubleValue();
+    }
+    return result;
+  }
+
+  public static double[] toDoubleArray(final Number[] numbers, int offset,
+    int length) {
+    if (length > 0) {
+      if (offset + length > numbers.length) {
+        length = numbers.length - offset;
+      }
+      final double[] result = new double[length];
+      for (int i = 0; i < length; i++) {
+        final Number number = numbers[offset++];
+        result[i] = number.doubleValue();
+      }
+      return result;
+    } else {
+      return new double[0];
+    }
+  }
+
   /**
    * Convert the value to a Long. If the value cannot be converted to a number
    * null is returned instead of an exception.

@@ -1,5 +1,7 @@
 package com.revolsys.jdbc;
 
+import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
@@ -732,5 +734,11 @@ public final class JdbcUtils {
 
   private JdbcUtils() {
 
+  }
+
+  public static BigDecimal[] getBigDecimalArray(final ResultSet resultSet,
+    final int index) throws SQLException {
+    final Array array = resultSet.getArray(index);
+    return (BigDecimal[])array.getArray();
   }
 }

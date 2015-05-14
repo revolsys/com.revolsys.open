@@ -9,8 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 
-import oracle.sql.CLOB;
-
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
@@ -42,8 +40,8 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-      if (value instanceof CLOB) {
-        final CLOB clob = (CLOB)value;
+      if (value instanceof Clob) {
+        final Clob clob = (Clob)value;
         statement.setClob(parameterIndex, clob);
       } else {
         Reader in;

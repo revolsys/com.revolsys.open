@@ -13,9 +13,8 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.PasswordUtil;
 
-public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory {
-
-  private boolean useCommonsDbcp = true;
+public abstract class AbstractJdbcDatabaseFactory implements
+  JdbcDatabaseFactory {
 
   @Override
   public void closeDataSource(final DataSource dataSource) {
@@ -56,11 +55,13 @@ public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory
       newConfig.remove("waitTimeout");
       dataSource.setMaxWaitMillis(maxWaitMillis);
 
-      final boolean validateConnection = Maps.getBool(config, "validateConnection", true);
+      final boolean validateConnection = Maps.getBool(config,
+        "validateConnection", true);
       newConfig.remove("validateConnection");
       // dataSource.setTestOnBorrow(validateConnection);
 
-      final int inactivityTimeout = Maps.getInteger(config, "inactivityTimeout", 60);
+      final int inactivityTimeout = Maps.getInteger(config,
+        "inactivityTimeout", 60);
       newConfig.remove("inactivityTimeout");
       dataSource.setMinEvictableIdleTimeMillis(inactivityTimeout * 1000);
       dataSource.setTimeBetweenEvictionRunsMillis(inactivityTimeout * 1000);
@@ -72,12 +73,14 @@ public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory
           JavaBeanUtil.setProperty(dataSource, name, value);
         } catch (final Throwable t) {
           LoggerFactory.getLogger(getClass()).debug(
-            "Unable to set data source property " + name + " = " + value + " for " + url, t);
+            "Unable to set data source property " + name + " = " + value
+              + " for " + url, t);
         }
       }
       return dataSource;
     } catch (final Throwable e) {
-      throw new IllegalArgumentException("Unable to create data source for " + config, e);
+      throw new IllegalArgumentException("Unable to create data source for "
+        + config, e);
     }
   }
 
@@ -86,12 +89,4 @@ public abstract class AbstractJdbcDatabaseFactory implements JdbcDatabaseFactory
   }
 
   public abstract String getDriverClassName();
-
-  public boolean isUseCommonsDbcp() {
-    return this.useCommonsDbcp;
-  }
-
-  public void setUseCommonsDbcp(final boolean useCommonsDbcp) {
-    this.useCommonsDbcp = useCommonsDbcp;
-  }
 }

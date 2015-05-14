@@ -9,8 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 
-import oracle.sql.BLOB;
-
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
@@ -42,8 +40,8 @@ public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-      if (value instanceof BLOB) {
-        final BLOB blob = (BLOB)value;
+      if (value instanceof Blob) {
+        final Blob blob = (Blob)value;
         statement.setBlob(parameterIndex, blob);
       } else {
         InputStream in;
