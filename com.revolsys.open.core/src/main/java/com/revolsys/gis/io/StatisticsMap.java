@@ -55,11 +55,6 @@ public class StatisticsMap {
     statistics.add(type, count);
   }
 
-  public synchronized void add(final String name, final Statistics statistics) {
-    this.statisticsMap.put(name, statistics);
-    statistics.connect();
-  }
-
   public void add(final String statisticName, final String name) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(name);
@@ -71,26 +66,41 @@ public class StatisticsMap {
     statistics.add(path, count);
   }
 
+  public void addAll(final StatisticsMap statisticsMap) {
+    synchronized (statisticsMap) {
+      for (final Entry<String, Statistics> entry : statisticsMap.statisticsMap.entrySet()) {
+        final String category = entry.getKey();
+        final Statistics statistics = entry.getValue();
+        addAll(category, statistics);
+      }
+    }
+  }
+
+  public void addAll(final String name, final Statistics statistics) {
+    final Statistics thisStatistics = getStatistics(name);
+    thisStatistics.addAll(statistics);
+  }
+
   public synchronized void addCountsText(final StringBuilder sb) {
-    for (final Statistics stats : this.statisticsMap.values()) {
+    for (final Statistics stats : statisticsMap.values()) {
       stats.addCountsText(sb);
     }
   }
 
   public void clear() {
-    this.statisticsMap.clear();
+    statisticsMap.clear();
   }
 
   @PostConstruct
   public synchronized void connect() {
-    this.providerCount++;
+    providerCount++;
   }
 
   @PreDestroy
   public synchronized void disconnect() {
-    this.providerCount--;
-    if (this.providerCount <= 0) {
-      for (final Statistics statistics : this.statisticsMap.values()) {
+    providerCount--;
+    if (providerCount <= 0) {
+      for (final Statistics statistics : statisticsMap.values()) {
         statistics.disconnect();
       }
     }
@@ -103,36 +113,35 @@ public class StatisticsMap {
   }
 
   public String getPrefix() {
-    return this.prefix;
+    return prefix;
   }
 
   public synchronized Statistics getStatistics(final String statisticName) {
     if (statisticName == null) {
       return null;
     } else {
-      final String name = CollectionUtil.toString(" ", this.prefix,
-        statisticName);
-      Statistics statistics = this.statisticsMap.get(name);
+      final String name = CollectionUtil.toString(" ", prefix, statisticName);
+      Statistics statistics = statisticsMap.get(name);
       if (statistics == null) {
         statistics = new Statistics(name);
-        statistics.setLogCounts(this.logCounts);
-        this.statisticsMap.put(name, statistics);
+        statistics.setLogCounts(logCounts);
+        statisticsMap.put(name, statistics);
       }
       return statistics;
     }
   }
 
   public synchronized Set<String> getStatisticsNames() {
-    return this.statisticsMap.keySet();
+    return statisticsMap.keySet();
   }
 
   public boolean isEmpty() {
-    return this.statisticsMap.isEmpty();
+    return statisticsMap.isEmpty();
   }
 
   public synchronized void setLogCounts(final boolean logCounts) {
     this.logCounts = logCounts;
-    for (final Statistics statistics : this.statisticsMap.values()) {
+    for (final Statistics statistics : statisticsMap.values()) {
       statistics.setLogCounts(logCounts);
     }
   }
@@ -147,22 +156,25 @@ public class StatisticsMap {
 
   public String toTsv(final String... fieldNames) {
     final StringWriter out = new StringWriter();
-    return toTsv(out, fieldNames);
+    toTsv(out, fieldNames);
+    return out.toString();
   }
 
-  public String toTsv(final Writer out, final String... fieldNames) {
+  public void toTsv(final Writer out, final String... fieldNames) {
     try (
-        TsvWriter tsv = new TsvWriter(out);) {
+      TsvWriter tsv = new TsvWriter(out);) {
       tsv.write(Arrays.asList(fieldNames));
-      for (final Entry<String, Statistics> entry : this.statisticsMap.entrySet()) {
+      long total = 0;
+      for (final Entry<String, Statistics> entry : statisticsMap.entrySet()) {
         final String category = entry.getKey();
         final Statistics statistics = entry.getValue();
         for (final String name : statistics.getNames()) {
           final long count = statistics.get(name);
+          total += count;
           tsv.write(category, name, count);
         }
       }
-      return out.toString();
+      tsv.write(null, "Total", total);
     }
   }
 }

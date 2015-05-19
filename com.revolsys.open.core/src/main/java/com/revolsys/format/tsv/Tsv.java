@@ -1,5 +1,6 @@
 package com.revolsys.format.tsv;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -14,9 +15,17 @@ import com.revolsys.io.MapWriter;
 import com.revolsys.io.MapWriterFactory;
 import com.revolsys.spring.SpringUtil;
 
-public class TsvMapIoFactory extends AbstractIoFactory implements
-MapWriterFactory {
-  public TsvMapIoFactory() {
+public class Tsv extends AbstractIoFactory implements MapWriterFactory {
+  public static TsvWriter plainWriter(final File file) {
+    if (file == null) {
+      throw new NullPointerException("File must not be null");
+    } else {
+      final Writer writer = FileUtil.createUtf8Writer(file);
+      return new TsvWriter(writer);
+    }
+  }
+
+  public Tsv() {
     super(TsvConstants.DESCRIPTION);
     addMediaTypeAndFileExtension(TsvConstants.MEDIA_TYPE,
       TsvConstants.FILE_EXTENSION);

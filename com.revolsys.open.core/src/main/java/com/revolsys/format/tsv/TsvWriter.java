@@ -1,6 +1,5 @@
 package com.revolsys.format.tsv;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -13,10 +12,6 @@ public class TsvWriter implements AutoCloseable {
   /** The writer */
   private final Writer out;
 
-  public TsvWriter(final File file) {
-    this(FileUtil.getWriter(file));
-  }
-
   public TsvWriter(final Writer out) {
     this.out = out;
   }
@@ -28,12 +23,12 @@ public class TsvWriter implements AutoCloseable {
    */
   @Override
   public void close() {
-    FileUtil.closeSilent(this.out);
+    FileUtil.closeSilent(out);
   }
 
   public void flush() {
     try {
-      this.out.flush();
+      out.flush();
     } catch (final IOException e) {
     }
   }
@@ -48,21 +43,21 @@ public class TsvWriter implements AutoCloseable {
         final Object value = values[i];
         if (value != null) {
           final String string = value.toString();
-          this.out.write('"');
+          out.write('"');
           for (int j = 0; j < string.length(); j++) {
             final char c = string.charAt(j);
             if (c == '"') {
-              this.out.write('"');
+              out.write('"');
             }
-            this.out.write(c);
+            out.write(c);
           }
-          this.out.write('"');
+          out.write('"');
         }
         if (i < values.length - 1) {
-          this.out.write('\t');
+          out.write('\t');
         }
       }
-      this.out.write('\n');
+      out.write('\n');
     } catch (final IOException e) {
       throw new WrappedException(e);
     }
