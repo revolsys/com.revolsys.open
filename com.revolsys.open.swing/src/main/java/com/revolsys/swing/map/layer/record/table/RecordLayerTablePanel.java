@@ -5,6 +5,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -68,11 +69,11 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
 
   private RecordLayerTableModel tableModel;
 
-  private final JToggleButton selectedButton;
-
   private final JButton fieldSetsButton;
 
   private FieldFilterPanel fieldFilterPanel;
+
+  private final Map<String, JToggleButton> fieldFilterButtonByMode = new HashMap<>();
 
   public RecordLayerTablePanel(final AbstractRecordLayer layer, final RecordLayerTable table) {
     super(table);
@@ -188,18 +189,15 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
 
     // Filter buttons
 
-    final JToggleButton clearFilter = toolBar.addToggleButtonTitleIcon(FILTER_ATTRIBUTE, -1,
-      "Show All Records", "table_filter", this.tableModel, "setFieldFilterMode",
-      RecordLayerTableModel.MODE_ALL);
+    final JToggleButton clearFilter = addFieldFilterToggleButton(toolBar, -1, "Show All Records",
+      "table_filter", RecordLayerTableModel.MODE_ALL, null);
     clearFilter.doClick();
 
-    toolBar.addToggleButton(FILTER_ATTRIBUTE, -1, "Show Only Changed Records",
-      "change_table_filter", editableEnableCheck, this.tableModel, "setFieldFilterMode",
-      RecordLayerTableModel.MODE_EDITS);
+    addFieldFilterToggleButton(toolBar, -1, "Show Only Changed Records", "change_table_filter",
+      RecordLayerTableModel.MODE_EDITS, editableEnableCheck);
 
-    this.selectedButton = toolBar.addToggleButton(FILTER_ATTRIBUTE, -1,
-      "Show Only Selected Records", "filter_selected", null, this.tableModel, "setFieldFilterMode",
-      RecordLayerTableModel.MODE_SELECTED);
+    addFieldFilterToggleButton(toolBar, -1, "Show Only Selected Records", "filter_selected",
+      RecordLayerTableModel.MODE_SELECTED, null);
 
     if (hasGeometry) {
       final JToggleButton showAllGeometries = toolBar.addToggleButtonTitleIcon(FILTER_GEOMETRY, -1,
@@ -232,6 +230,14 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
       menu.add(menuItem);
     }
     MenuFactory.showMenu(menu, this.fieldSetsButton, 10, 10);
+  }
+
+  protected JToggleButton addFieldFilterToggleButton(final ToolBar toolBar, final int index,
+    final String title, final String icon, final String mode, final EnableCheck enableCheck) {
+    final JToggleButton button = toolBar.addToggleButtonTitleIcon(FILTER_ATTRIBUTE, index, title,
+      icon, () -> setFieldFilterMode(mode));
+    this.fieldFilterButtonByMode.put(mode, button);
+    return button;
   }
 
   public boolean canPasteRecordGeometry() {
@@ -389,9 +395,13 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
   }
 
   public void setFieldFilterMode(final String mode) {
-    if (RecordLayerTableModel.MODE_SELECTED.equals(mode)) {
-      this.selectedButton.setSelected(true);
-      this.selectedButton.doClick();
+    final JToggleButton button = this.fieldFilterButtonByMode.get(mode);
+    if (button != null) {
+      if (!button.isSelected()) {
+        button.doClick();
+      }
+      this.tableModel.setFieldFilterMode(mode);
+      this.layer.setProperty("fieldFilterMode", mode);
     }
   }
 
@@ -410,7 +420,6 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
   @Override
   public Map<String, Object> toMap() {
     final Map<String, Object> map = new LinkedHashMap<>();
-    MapSerializerUtil.add(map, "fieldFilterMode", this.tableModel.getFieldFilterMode());
     final Condition condition = this.tableModel.getFilter();
     if (this.fieldFilterPanel != null) {
       MapSerializerUtil.add(map, "searchField", this.fieldFilterPanel.getSearchFieldName());

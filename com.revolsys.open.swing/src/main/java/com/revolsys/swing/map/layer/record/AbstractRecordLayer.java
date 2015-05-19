@@ -2620,19 +2620,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
   }
 
   public void showRecordsTable() {
-    showRecordsTable(RecordLayerTableModel.MODE_ALL);
+    showRecordsTable(null);
   }
 
-  public void showRecordsTable(String fieldFilterMode) {
-    if (SwingUtilities.isEventDispatchThread()) {
-      final RecordLayerTablePanel panel = showTableView();
-      panel.setFieldFilterMode(fieldFilterMode);
-    } else {
-      if (!Property.hasValue(fieldFilterMode)) {
-        fieldFilterMode = RecordLayerTableModel.MODE_ALL;
+  public void showRecordsTable(final String fieldFilterMode) {
+    Invoke.later(() -> {
+      String mode = fieldFilterMode;
+      if (!Property.hasValue(mode)) {
+        mode = Property.getString(this, "fieldFilterMode", RecordLayerTableModel.MODE_ALL);
       }
-      Invoke.later(this, "showRecordsTable", fieldFilterMode);
-    }
+      final RecordLayerTablePanel panel = showTableView();
+      panel.setFieldFilterMode(mode);
+    });
   }
 
   public List<LayerRecord> splitRecord(final LayerRecord record, final CloseLocation mouseLocation) {
