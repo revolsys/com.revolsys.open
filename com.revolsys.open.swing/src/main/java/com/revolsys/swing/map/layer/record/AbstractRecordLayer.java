@@ -329,6 +329,19 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
   }
 
   @Override
+  public void activatePanelComponent(final Component component, final Map<String, Object> config) {
+    if (component instanceof RecordLayerTablePanel) {
+      final RecordLayerTablePanel panel = (RecordLayerTablePanel)component;
+      final String fieldFilterMode = Maps.get(config, "fieldFilterMode",
+        RecordLayerTableModel.MODE_ALL);
+      panel.setFieldFilterMode(fieldFilterMode);
+      final String geometryFilterMode = Maps.get(config, "geometryFilterMode",
+        RecordLayerTableModel.MODE_ALL);
+      panel.setGeometryFilterMode(geometryFilterMode);
+    }
+  }
+
+  @Override
   public void addComplete(final AbstractOverlay overlay, final Geometry geometry) {
     if (geometry != null) {
       final RecordDefinition recordDefinition = getRecordDefinition();
@@ -723,18 +736,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
     }
   }
 
-  public RecordLayerTablePanel createTablePanel() {
+  public RecordLayerTablePanel createTablePanel(final Map<String, Object> config) {
     final RecordLayerTable table = RecordLayerTableModel.createTable(this);
     if (table == null) {
       return null;
     } else {
-      return new RecordLayerTablePanel(this, table);
+      return new RecordLayerTablePanel(this, table, config);
     }
   }
 
   @Override
-  protected Component createTableViewComponent() {
-    return createTablePanel();
+  protected Component createTableViewComponent(final Map<String, Object> config) {
+    return createTablePanel(config);
   }
 
   @Override
@@ -2625,12 +2638,19 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements Recor
 
   public void showRecordsTable(final String fieldFilterMode) {
     Invoke.later(() -> {
-      String mode = fieldFilterMode;
-      if (!Property.hasValue(mode)) {
-        mode = Property.getString(this, "fieldFilterMode", RecordLayerTableModel.MODE_ALL);
+      final Map<String, Object> config = new LinkedHashMap<>();
+      if (!Property.hasValue(fieldFilterMode)) {
+        final String mode = Property.getString(this, "fieldFilterMode",
+          RecordLayerTableModel.MODE_ALL);
+        config.put("fieldFilterMode", mode);
+      } else {
+        config.put("fieldFilterMode", fieldFilterMode);
       }
-      final RecordLayerTablePanel panel = showTableView();
-      panel.setFieldFilterMode(mode);
+      final String geometryFilterMode = Property.getString(this, "geometryFilterMode",
+        RecordLayerTableModel.MODE_ALL);
+      config.put("geometryFilterMode", geometryFilterMode);
+
+      showTableView(config);
     });
   }
 

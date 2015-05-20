@@ -46,10 +46,6 @@ import com.revolsys.util.Property;
 
 public class GeoReferencedImageLayer extends AbstractLayer {
 
-  public static GeoReferencedImageLayer create(final Map<String, Object> properties) {
-    return new GeoReferencedImageLayer(properties);
-  }
-
   static {
     final MenuFactory menu = MenuFactory.getMenu(GeoReferencedImageLayer.class);
     menu.addGroup(0, "table");
@@ -74,6 +70,10 @@ public class GeoReferencedImageLayer extends AbstractLayer {
       MenuSourceRunnable.createAction("Fit to Screen", "arrow_out", editable, "fitToViewport"));
 
     menu.deleteMenuItem("refresh", "Refresh");
+  }
+
+  public static GeoReferencedImageLayer create(final Map<String, Object> properties) {
+    return new GeoReferencedImageLayer(properties);
   }
 
   private GeoReferencedImage image;
@@ -126,7 +126,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   @Override
   public TabbedValuePanel createPropertiesPanel() {
     final TabbedValuePanel propertiesPanel = super.createPropertiesPanel();
-    final TiePointsPanel tiePointsPanel = createTableViewComponent();
+    final TiePointsPanel tiePointsPanel = createTableViewComponent(null);
     SwingUtil.setTitledBorder(tiePointsPanel, "Tie Points");
 
     propertiesPanel.addTab("Geo-Referencing", tiePointsPanel);
@@ -157,7 +157,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
   }
 
   @Override
-  protected TiePointsPanel createTableViewComponent() {
+  protected TiePointsPanel createTableViewComponent(final Map<String, Object> config) {
     return new TiePointsPanel(this);
   }
 
@@ -380,7 +380,7 @@ public class GeoReferencedImageLayer extends AbstractLayer {
 
   public void showTiePointsTable() {
     if (SwingUtilities.isEventDispatchThread()) {
-      showTableView();
+      showTableView(null);
     } else {
       Invoke.later(this, "showTiePointsTable");
     }

@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Icon;
 
@@ -139,5 +140,5 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties,
 
   void showRendererProperties(final LayerRenderer<?> renderer);
 
-  <C extends Component> C showTableView();
+  <C extends Component> C showTableView(Map<String, Object> config);
 }

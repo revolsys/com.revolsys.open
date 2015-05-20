@@ -145,6 +145,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
     setProperties(properties);
   }
 
+  @Override
+  public void activatePanelComponent(final Component component, final Map<String, Object> config) {
+
+  }
+
   protected void addParent(final List<Layer> path) {
     final LayerGroup parent = getLayerGroup();
     if (parent != null) {
@@ -215,8 +220,8 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
   }
 
   @Override
-  public Component createPanelComponent() {
-    return createTableViewComponent();
+  public Component createPanelComponent(final Map<String, Object> config) {
+    return createTableViewComponent(config);
   }
 
   @Override
@@ -340,7 +345,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
     return panel;
   }
 
-  protected Component createTableViewComponent() {
+  protected Component createTableViewComponent(final Map<String, Object> config) {
     return null;
   }
 
@@ -991,9 +996,10 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
     }
   }
 
-  public <C extends Component> C showTableView() {
+  @Override
+  public <C extends Component> C showTableView(final Map<String, Object> config) {
     final ProjectFrame projectFrame = ProjectFrame.get(this);
-    return projectFrame.addBottomTab(this);
+    return projectFrame.addBottomTab(this, config);
   }
 
   public void toggleEditable() {
