@@ -63,7 +63,7 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
 
   public static final String FILTER_GEOMETRY = "filter_geometry";
 
-  public static final String FILTER_ATTRIBUTE = "filter_attribute";
+  public static final String FILTER_FIELD = "filter_field";
 
   private AbstractRecordLayer layer;
 
@@ -73,14 +73,15 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
 
   private FieldFilterPanel fieldFilterPanel;
 
-  private final Map<String, JToggleButton> fieldFilterButtonByMode = new HashMap<>();
+  private final Map<String, JToggleButton> buttonByMode = new HashMap<>();
 
-  public RecordLayerTablePanel(final AbstractRecordLayer layer, final RecordLayerTable table) {
+  public RecordLayerTablePanel(final AbstractRecordLayer layer, final RecordLayerTable table,
+    final Map<String, Object> config) {
     super(table);
     this.layer = layer;
     this.tableModel = getTableModel();
-    final Map<String, Object> config = layer.getPluginConfig(PLUGIN_NAME);
-    setPluginConfig(config);
+    final Map<String, Object> pluginConfig = layer.getPluginConfig(PLUGIN_NAME);
+    setPluginConfig(pluginConfig);
     layer.setPluginConfig(PLUGIN_NAME, this);
 
     // Right click Menu
@@ -176,7 +177,7 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
     this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets", "fields_filter", this,
       "actionShowFieldSetsMenu");
 
-    this.fieldFilterPanel = new FieldFilterPanel(this, this.tableModel, config);
+    this.fieldFilterPanel = new FieldFilterPanel(this, this.tableModel, pluginConfig);
     toolBar.addComponent("search", this.fieldFilterPanel);
 
     toolBar.addButtonTitleIcon("search", "Advanced Search", "filter_edits", this.fieldFilterPanel,
@@ -200,12 +201,12 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
       RecordLayerTableModel.MODE_SELECTED, null);
 
     if (hasGeometry) {
-      final JToggleButton showAllGeometries = toolBar.addToggleButtonTitleIcon(FILTER_GEOMETRY, -1,
-        "Show All Records ", "world_filter", this.tableModel, "setFilterByBoundingBox", false);
+      final JToggleButton showAllGeometries = addGeometryFilterToggleButton(toolBar, -1,
+        "Show All Records ", "world_filter", "all", null);
       showAllGeometries.doClick();
 
-      toolBar.addToggleButtonTitleIcon(FILTER_GEOMETRY, -1, "Show Records on Map", "map_filter",
-        this.tableModel, "setFilterByBoundingBox", true);
+      addGeometryFilterToggleButton(toolBar, -1, "Show Records on Map", "map_filter",
+        "boundingBox", null);
     }
     Property.addListener(layer, this);
   }
@@ -234,9 +235,17 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
 
   protected JToggleButton addFieldFilterToggleButton(final ToolBar toolBar, final int index,
     final String title, final String icon, final String mode, final EnableCheck enableCheck) {
-    final JToggleButton button = toolBar.addToggleButtonTitleIcon(FILTER_ATTRIBUTE, index, title,
-      icon, () -> setFieldFilterMode(mode));
-    this.fieldFilterButtonByMode.put(mode, button);
+    final JToggleButton button = toolBar.addToggleButtonTitleIcon(FILTER_FIELD, index, title, icon,
+      () -> setFieldFilterMode(mode));
+    this.buttonByMode.put(FILTER_FIELD + "_" + mode, button);
+    return button;
+  }
+
+  protected JToggleButton addGeometryFilterToggleButton(final ToolBar toolBar, final int index,
+    final String title, final String icon, final String mode, final EnableCheck enableCheck) {
+    final JToggleButton button = toolBar.addToggleButtonTitleIcon(FILTER_GEOMETRY, index, title,
+      icon, () -> setGeometryFilterMode(mode));
+    this.buttonByMode.put(FILTER_GEOMETRY + "_" + mode, button);
     return button;
   }
 
@@ -395,13 +404,24 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
   }
 
   public void setFieldFilterMode(final String mode) {
-    final JToggleButton button = this.fieldFilterButtonByMode.get(mode);
+    final JToggleButton button = this.buttonByMode.get(FILTER_FIELD + "_" + mode);
     if (button != null) {
       if (!button.isSelected()) {
         button.doClick();
       }
       this.tableModel.setFieldFilterMode(mode);
       this.layer.setProperty("fieldFilterMode", mode);
+    }
+  }
+
+  public void setGeometryFilterMode(final String mode) {
+    final JToggleButton button = this.buttonByMode.get(FILTER_GEOMETRY + "_" + mode);
+    if (button != null) {
+      if (!button.isSelected()) {
+        button.doClick();
+      }
+      this.tableModel.setFilterByBoundingBox("boundingBox".equals(mode));
+      this.layer.setProperty("geometryFilterMode", mode);
     }
   }
 

@@ -42,11 +42,11 @@ public class ListRecordLayer extends AbstractRecordLayer {
     setEditable(true);
   }
 
-  public ListRecordLayer(final String name,
-    final GeometryFactory geometryFactory, final DataType geometryType) {
+  public ListRecordLayer(final String name, final GeometryFactory geometryFactory,
+    final DataType geometryType) {
     super(name);
-    final RecordDefinitionImpl recordDefinition = createRecordDefinition(name,
-      geometryFactory, geometryType);
+    final RecordDefinitionImpl recordDefinition = createRecordDefinition(name, geometryFactory,
+      geometryType);
     setRecordDefinition(recordDefinition);
   }
 
@@ -80,9 +80,9 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public RecordLayerTablePanel createTablePanel() {
+  public RecordLayerTablePanel createTablePanel(final Map<String, Object> config) {
     final RecordLayerTable table = RecordListLayerTableModel.createTable(this);
-    return new RecordLayerTablePanel(this, table);
+    return new RecordLayerTablePanel(this, table, config);
   }
 
   @Override

@@ -19,6 +19,7 @@ import java.io.File;
 import java.net.ResponseCache;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -225,7 +226,8 @@ public class ProjectFrame extends BaseFrame {
   }
 
   @SuppressWarnings("unchecked")
-  public <C extends Component> C addBottomTab(final ProjectFramePanel panel) {
+  public <C extends Component> C addBottomTab(final ProjectFramePanel panel,
+    final Map<String, Object> config) {
     final JTabbedPane tabs = getBottomTabs();
 
     final Object tableView = panel.getProperty("bottomTab");
@@ -237,9 +239,10 @@ public class ProjectFrame extends BaseFrame {
       }
     }
     if (component == null) {
-      component = panel.createPanelComponent();
+      component = panel.createPanelComponent(config);
 
       if (component != null) {
+        panel.activatePanelComponent(component, config);
         final int tabIndex = tabs.getTabCount();
         final String name = panel.getName();
         tabs.addTab(name, panel.getIcon(), component);
@@ -249,6 +252,7 @@ public class ProjectFrame extends BaseFrame {
         tabs.setSelectedIndex(tabIndex);
       }
     } else {
+      panel.activatePanelComponent(component, config);
       tabs.setSelectedComponent(component);
     }
     return (C)component;

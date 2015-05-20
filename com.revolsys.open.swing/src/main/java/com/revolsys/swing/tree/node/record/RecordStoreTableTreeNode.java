@@ -73,7 +73,7 @@ public class RecordStoreTableTreeNode extends BaseTreeNode {
     layerConfig.put("typePath", typePath);
     final AbstractLayer layer = RecordStoreLayer.create(layerConfig);
     Project.get().addLayer(layer);
-    layer.showTableView();
+    layer.showTableView(null);
     // TODO different layer groups?
   }
 
