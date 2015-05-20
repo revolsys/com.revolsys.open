@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.format.raster.RasterWriter;
-import com.revolsys.gis.util.Debug;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.raster.BufferedGeoReferencedImage;
@@ -35,7 +34,8 @@ public class UsgsDemGeoReferencedImage extends BufferedGeoReferencedImage {
     return getDouble(buffer, offset, 24);
   }
 
-  private static Double getDouble(final byte[] buffer, final int offset, final int length) {
+  private static Double getDouble(final byte[] buffer, final int offset,
+    final int length) {
     final String string = getString(buffer, offset, length);
     if (string.length() == 0) {
       return null;
@@ -57,7 +57,8 @@ public class UsgsDemGeoReferencedImage extends BufferedGeoReferencedImage {
     return getInteger(buffer, offset, 6);
   }
 
-  private static Integer getInteger(final byte[] buffer, final int offset, final int length) {
+  private static Integer getInteger(final byte[] buffer, final int offset,
+    final int length) {
     final String string = getString(buffer, offset, length);
     if (string.length() == 0) {
       return null;
@@ -66,7 +67,8 @@ public class UsgsDemGeoReferencedImage extends BufferedGeoReferencedImage {
     }
   }
 
-  private static Polygon getPolygon(final byte[] buffer, final GeometryFactory geometryFactory) {
+  private static Polygon getPolygon(final byte[] buffer,
+    final GeometryFactory geometryFactory) {
     final int polygonSides = getInteger(buffer, 541);
     final double[] bounds = new double[polygonSides * 2 + 2];
     int offset = 547;
@@ -77,7 +79,8 @@ public class UsgsDemGeoReferencedImage extends BufferedGeoReferencedImage {
     }
     bounds[i++] = bounds[0];
     bounds[i++] = bounds[1];
-    final Polygon polygon = geometryFactory.polygon(geometryFactory.linearRing(2, bounds));
+    final Polygon polygon = geometryFactory.polygon(geometryFactory.linearRing(
+      2, bounds));
     return polygon;
   }
 
@@ -90,11 +93,13 @@ public class UsgsDemGeoReferencedImage extends BufferedGeoReferencedImage {
     }
   }
 
-  private static String getString(final byte[] buffer, final int offset, final int length) {
+  private static String getString(final byte[] buffer, final int offset,
+    final int length) {
     return new String(buffer, offset - 1, length, StandardCharsets.US_ASCII).trim();
   }
 
-  public static void main(final String[] args) throws FileNotFoundException, IOException {
+  public static void main(final String[] args) throws FileNotFoundException,
+    IOException {
     final byte[] buffer = new byte[1024];
     try (
       InputStream in = new FileInputStream(new File("/apps/gba/data/dem/"
@@ -195,8 +200,6 @@ public class UsgsDemGeoReferencedImage extends BufferedGeoReferencedImage {
             out.values(min, 1, row);
           }
         }
-        Debug.noOp();
-
       }
     }
 
@@ -295,8 +298,8 @@ public class UsgsDemGeoReferencedImage extends BufferedGeoReferencedImage {
         }
         setImageWidth(rasterColCount);
         setImageHeight(rasterRowCount);
-        final BufferedImage image = new BufferedImage(rasterColCount, rasterRowCount,
-          BufferedImage.TYPE_USHORT_GRAY);
+        final BufferedImage image = new BufferedImage(rasterColCount,
+          rasterRowCount, BufferedImage.TYPE_USHORT_GRAY);
         final WritableRaster imageRaster = image.getRaster();
         final double[] pixel = {
           0, 0, 0, 255
@@ -305,14 +308,11 @@ public class UsgsDemGeoReferencedImage extends BufferedGeoReferencedImage {
           final double[] column = raster[columnIndex];
           for (int rowIndex = 0; rowIndex < raster.length; rowIndex++) {
             final double value = column[rowIndex];
-            Debug.noOp();
             // imageRaster.setPixel(x, y, dArray);
             // image.setRGB(columnIndex, rowIndex, value);
           }
         }
         setRenderedImage(image);
-        Debug.noOp();
-
       }
     } catch (final IOException e) {
       throw new WrappedException(e);

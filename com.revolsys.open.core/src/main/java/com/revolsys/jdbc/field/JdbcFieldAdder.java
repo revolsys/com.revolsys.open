@@ -1,4 +1,4 @@
-package com.revolsys.jdbc.attribute;
+package com.revolsys.jdbc.field;
 
 import java.sql.Types;
 import java.util.Collections;

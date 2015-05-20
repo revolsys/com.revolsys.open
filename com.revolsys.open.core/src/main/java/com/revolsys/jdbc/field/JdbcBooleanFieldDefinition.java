@@ -1,4 +1,4 @@
-package com.revolsys.jdbc.attribute;
+package com.revolsys.jdbc.field;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,26 +8,26 @@ import java.util.Map;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
 
-public class JdbcShortFieldDefinition extends JdbcFieldDefinition {
-  public JdbcShortFieldDefinition(final String dbName, final String name,
+public class JdbcBooleanFieldDefinition extends JdbcFieldDefinition {
+  public JdbcBooleanFieldDefinition(final String dbName, final String name,
     final int sqlType, final int length, final boolean required,
     final String description, final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.SHORT, sqlType, length, 0, required,
+    super(dbName, name, DataTypes.BOOLEAN, sqlType, length, 0, required,
       description, properties);
   }
 
   @Override
-  public JdbcShortFieldDefinition clone() {
-    return new JdbcShortFieldDefinition(getDbName(), getName(), getSqlType(),
+  public JdbcBooleanFieldDefinition clone() {
+    return new JdbcBooleanFieldDefinition(getDbName(), getName(), getSqlType(),
       getLength(), isRequired(), getDescription(), getProperties());
   }
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet,
     final int columnIndex, final Record object) throws SQLException {
-    final short value = resultSet.getShort(columnIndex);
+    final boolean booleanValue = resultSet.getBoolean(columnIndex);
     if (!resultSet.wasNull()) {
-      setValue(object, Short.valueOf(value));
+      setValue(object, booleanValue);
     }
     return columnIndex + 1;
   }
@@ -38,14 +38,21 @@ public class JdbcShortFieldDefinition extends JdbcFieldDefinition {
     if (value == null) {
       statement.setNull(parameterIndex, getSqlType());
     } else {
-      short numberValue;
-      if (value instanceof Number) {
+      boolean booleanValue;
+      if (value instanceof Boolean) {
+        booleanValue = (Boolean)value;
+      } else if (value instanceof Number) {
         final Number number = (Number)value;
-        numberValue = number.shortValue();
+        booleanValue = number.intValue() == 1;
       } else {
-        numberValue = Short.parseShort(value.toString());
+        final String stringValue = value.toString();
+        if (stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+          booleanValue = true;
+        } else {
+          booleanValue = false;
+        }
       }
-      statement.setShort(parameterIndex, numberValue);
+      statement.setBoolean(parameterIndex, booleanValue);
     }
     return parameterIndex + 1;
   }

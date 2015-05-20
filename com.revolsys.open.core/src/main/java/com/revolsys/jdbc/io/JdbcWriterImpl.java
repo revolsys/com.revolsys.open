@@ -26,7 +26,7 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.transaction.Transaction;
 
 public class JdbcWriterImpl extends AbstractRecordWriter implements JdbcWriter {

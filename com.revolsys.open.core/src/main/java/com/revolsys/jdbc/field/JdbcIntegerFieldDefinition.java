@@ -1,4 +1,4 @@
-package com.revolsys.jdbc.attribute;
+package com.revolsys.jdbc.field;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,26 +8,26 @@ import java.util.Map;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
 
-public class JdbcByteFieldDefinition extends JdbcFieldDefinition {
-  public JdbcByteFieldDefinition(final String dbName, final String name,
+public class JdbcIntegerFieldDefinition extends JdbcFieldDefinition {
+  public JdbcIntegerFieldDefinition(final String dbName, final String name,
     final int sqlType, final int length, final boolean required,
     final String description, final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.BYTE, sqlType, length, 0, required,
+    super(dbName, name, DataTypes.INT, sqlType, length, 0, required,
       description, properties);
   }
 
   @Override
-  public JdbcByteFieldDefinition clone() {
-    return new JdbcByteFieldDefinition(getDbName(), getName(), getSqlType(),
+  public JdbcIntegerFieldDefinition clone() {
+    return new JdbcIntegerFieldDefinition(getDbName(), getName(), getSqlType(),
       getLength(), isRequired(), getDescription(), getProperties());
   }
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet,
     final int columnIndex, final Record object) throws SQLException {
-    final byte byteValue = resultSet.getByte(columnIndex);
+    final int value = resultSet.getInt(columnIndex);
     if (!resultSet.wasNull()) {
-      setValue(object, Byte.valueOf(byteValue));
+      setValue(object, Integer.valueOf(value));
     }
     return columnIndex + 1;
   }
@@ -38,14 +38,14 @@ public class JdbcByteFieldDefinition extends JdbcFieldDefinition {
     if (value == null) {
       statement.setNull(parameterIndex, getSqlType());
     } else {
-      byte numberValue;
+      int numberValue;
       if (value instanceof Number) {
         final Number number = (Number)value;
-        numberValue = number.byteValue();
+        numberValue = number.intValue();
       } else {
-        numberValue = Byte.parseByte(value.toString());
+        numberValue = Integer.parseInt(value.toString());
       }
-      statement.setByte(parameterIndex, numberValue);
+      statement.setInt(parameterIndex, numberValue);
     }
     return parameterIndex + 1;
   }

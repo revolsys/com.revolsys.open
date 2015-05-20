@@ -13,7 +13,7 @@ import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.util.CollectionUtil;
 
 public class CollectionValue extends QueryValue {

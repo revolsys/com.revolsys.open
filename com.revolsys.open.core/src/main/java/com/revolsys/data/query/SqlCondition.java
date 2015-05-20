@@ -9,7 +9,7 @@ import java.util.List;
 import com.revolsys.data.equals.EqualsRegistry;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordStore;
-import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldDefinition;
 
 // TODO accept (how?)
 public class SqlCondition extends Condition {

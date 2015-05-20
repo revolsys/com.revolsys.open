@@ -17,7 +17,7 @@ import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;
-import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.DateUtil;
 import com.revolsys.util.Property;

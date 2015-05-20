@@ -46,10 +46,10 @@ public class ArrayRecord extends BaseRecord {
     final Map<String, ? extends Object> values) {
     super(recordDefinition);
     if (recordDefinition == null) {
-      this.attributes = new Object[0];
+      attributes = new Object[0];
     } else {
       final int attributeCount = recordDefinition.getFieldCount();
-      this.attributes = new Object[attributeCount];
+      attributes = new Object[attributeCount];
       final Map<String, Object> defaultValues = recordDefinition.getDefaultValues();
       setValuesByPath(defaultValues);
       setValues(values);
@@ -65,7 +65,7 @@ public class ArrayRecord extends BaseRecord {
   @Override
   public ArrayRecord clone() {
     final ArrayRecord clone = (ArrayRecord)super.clone();
-    clone.attributes = this.attributes.clone();
+    clone.attributes = attributes.clone();
     return clone;
   }
 
@@ -81,7 +81,7 @@ public class ArrayRecord extends BaseRecord {
     if (index < 0) {
       return null;
     } else {
-      return (T)this.attributes[index];
+      return (T)attributes[index];
     }
   }
 
@@ -92,12 +92,12 @@ public class ArrayRecord extends BaseRecord {
    */
   @Override
   public List<Object> getValues() {
-    return Arrays.asList(this.attributes);
+    return Arrays.asList(attributes);
   }
 
   @Override
   public int hashCode() {
-    return this.attributes.hashCode();
+    return attributes.hashCode();
   }
 
   /**
@@ -119,11 +119,11 @@ public class ArrayRecord extends BaseRecord {
         final SingleIdentifier identifier = (SingleIdentifier)value;
         value = identifier.getValue(0);
       }
-      final Object oldValue = this.attributes[index];
+      final Object oldValue = attributes[index];
       if (!EqualsInstance.INSTANCE.equals(oldValue, value)) {
         updateState();
       }
-      this.attributes[index] = value;
+      attributes[index] = value;
     }
   }
 }

@@ -1,4 +1,4 @@
-package com.revolsys.jdbc.attribute;
+package com.revolsys.jdbc.field;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,27 +8,25 @@ import java.util.Map;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataTypes;
 
-public class JdbcDoubleFieldDefinition extends JdbcFieldDefinition {
-  public JdbcDoubleFieldDefinition(final String dbName, final String name,
+public class JdbcStringFieldDefinition extends JdbcFieldDefinition {
+  public JdbcStringFieldDefinition(final String dbName, final String name,
     final int sqlType, final int length, final boolean required,
     final String description, final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.DOUBLE, sqlType, length, 0, required,
+    super(dbName, name, DataTypes.STRING, sqlType, length, 0, required,
       description, properties);
   }
 
   @Override
-  public JdbcDoubleFieldDefinition clone() {
-    return new JdbcDoubleFieldDefinition(getDbName(), getName(), getSqlType(),
+  public JdbcStringFieldDefinition clone() {
+    return new JdbcStringFieldDefinition(getDbName(), getName(), getSqlType(),
       getLength(), isRequired(), getDescription(), getProperties());
   }
 
   @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet,
     final int columnIndex, final Record object) throws SQLException {
-    final double longValue = resultSet.getDouble(columnIndex);
-    if (!resultSet.wasNull()) {
-      setValue(object, Double.valueOf(longValue));
-    }
+    final String value = resultSet.getString(columnIndex);
+    setValue(object, value);
     return columnIndex + 1;
   }
 
@@ -36,18 +34,12 @@ public class JdbcDoubleFieldDefinition extends JdbcFieldDefinition {
   public int setPreparedStatementValue(final PreparedStatement statement,
     final int parameterIndex, final Object value) throws SQLException {
     if (value == null) {
-      statement.setNull(parameterIndex, getSqlType());
+      final int sqlType = getSqlType();
+      statement.setNull(parameterIndex, sqlType);
     } else {
-      double numberValue;
-      if (value instanceof Number) {
-        final Number number = (Number)value;
-        numberValue = number.doubleValue();
-      } else {
-        numberValue = Double.parseDouble(value.toString());
-      }
-      statement.setDouble(parameterIndex, numberValue);
-
+      statement.setString(parameterIndex, value.toString());
     }
     return parameterIndex + 1;
   }
+
 }

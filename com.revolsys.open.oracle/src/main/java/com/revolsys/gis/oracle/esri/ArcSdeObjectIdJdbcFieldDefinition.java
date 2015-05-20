@@ -8,7 +8,7 @@ import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataTypes;
-import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldDefinition;
 
 public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
   public static void replaceAttribute(final String schemaName,

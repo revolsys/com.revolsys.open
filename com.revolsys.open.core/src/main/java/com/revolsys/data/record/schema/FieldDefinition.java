@@ -12,6 +12,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.codes.CodeTable;
+import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.query.Value;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.types.DataType;
@@ -32,8 +33,8 @@ import com.revolsys.util.Property;
  * @see Record
  * @see RecordDefinition
  */
-public class FieldDefinition extends AbstractObjectWithProperties implements Cloneable,
-  MapSerializer {
+public class FieldDefinition extends AbstractObjectWithProperties implements
+  Cloneable, MapSerializer {
 
   public static FieldDefinition create(final Map<String, Object> properties) {
     return new FieldDefinition(properties);
@@ -77,15 +78,15 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
   }
 
   public FieldDefinition(final FieldDefinition attribute) {
-    this.name = attribute.getName();
-    this.title = attribute.getTitle();
-    this.description = attribute.getDescription();
-    this.type = attribute.getType();
-    this.required = attribute.isRequired();
-    this.length = attribute.getLength();
-    this.scale = attribute.getScale();
-    this.minValue = attribute.getMinValue();
-    this.maxValue = attribute.getMaxValue();
+    name = attribute.getName();
+    title = attribute.getTitle();
+    description = attribute.getDescription();
+    type = attribute.getType();
+    required = attribute.isRequired();
+    length = attribute.getLength();
+    scale = attribute.getScale();
+    minValue = attribute.getMinValue();
+    maxValue = attribute.getMaxValue();
     final Map<String, Object> properties = attribute.getProperties();
     setProperties(properties);
   }
@@ -95,26 +96,26 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
   }
 
   public FieldDefinition(final Map<String, Object> properties) {
-    this.name = Maps.getString(properties, "name");
-    this.title = Maps.getString(properties, "title");
-    if (!Property.hasValue(this.title)) {
-      this.title = CaseConverter.toCapitalizedWords(this.name);
+    name = Maps.getString(properties, "name");
+    title = Maps.getString(properties, "title");
+    if (!Property.hasValue(title)) {
+      title = CaseConverter.toCapitalizedWords(name);
     }
-    this.description = Maps.getString(properties, "description");
-    this.type = DataTypes.getType(Maps.getString(properties, "dataType"));
-    this.required = Maps.getBool(properties, "required");
-    this.length = Maps.getInteger(properties, "length", 0);
-    this.scale = Maps.getInteger(properties, "scale", 0);
-    this.minValue = properties.get("minValue");
-    if (this.minValue == null) {
-      this.minValue = MathUtil.getMinValue(getTypeClass());
+    description = Maps.getString(properties, "description");
+    type = DataTypes.getType(Maps.getString(properties, "dataType"));
+    required = Maps.getBool(properties, "required");
+    length = Maps.getInteger(properties, "length", 0);
+    scale = Maps.getInteger(properties, "scale", 0);
+    minValue = properties.get("minValue");
+    if (minValue == null) {
+      minValue = MathUtil.getMinValue(getTypeClass());
     } else {
-      this.minValue = StringConverterRegistry.toString(this.type, this.minValue);
+      minValue = StringConverterRegistry.toString(type, minValue);
     }
-    if (this.maxValue == null) {
-      this.maxValue = MathUtil.getMaxValue(getTypeClass());
+    if (maxValue == null) {
+      maxValue = MathUtil.getMaxValue(getTypeClass());
     } else {
-      this.maxValue = StringConverterRegistry.toString(this.type, this.maxValue);
+      maxValue = StringConverterRegistry.toString(type, maxValue);
     }
   }
 
@@ -126,7 +127,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    * @param required The flag indicating if a value is required for the
    *          attribute.
    */
-  public FieldDefinition(final String name, final DataType type, final boolean required) {
+  public FieldDefinition(final String name, final DataType type,
+    final boolean required) {
     this(name, type, 0, 0, required, null, null);
   }
 
@@ -140,13 +142,13 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type, final boolean required,
-    final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type,
+    final boolean required, final Map<String, Object> properties) {
     this(name, type, 0, 0, required, properties);
   }
 
-  public FieldDefinition(final String name, final DataType dataType, final boolean required,
-    final String description) {
+  public FieldDefinition(final String name, final DataType dataType,
+    final boolean required, final String description) {
     this(name, dataType, 0, 0, required, description, null);
   }
 
@@ -159,8 +161,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    * @param required The flag indicating if a value is required for the
    *          attribute.
    */
-  public FieldDefinition(final String name, final DataType type, final int length,
-    final boolean required) {
+  public FieldDefinition(final String name, final DataType type,
+    final int length, final boolean required) {
     this(name, type, length, 0, required, null, null);
   }
 
@@ -175,13 +177,14 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type, final int length,
-    final boolean required, final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type,
+    final int length, final boolean required,
+    final Map<String, Object> properties) {
     this(name, type, length, 0, required, properties);
   }
 
-  public FieldDefinition(final String name, final DataType type, final int length,
-    final boolean required, final String description) {
+  public FieldDefinition(final String name, final DataType type,
+    final int length, final boolean required, final String description) {
     this(name, type, length, 0, required, description, null);
   }
 
@@ -194,8 +197,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type, final Integer length,
-    final Integer scale, final Boolean required) {
+  public FieldDefinition(final String name, final DataType type,
+    final Integer length, final Integer scale, final Boolean required) {
     this(name, type, length, scale, required, "");
   }
 
@@ -210,8 +213,9 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type, final Integer length,
-    final Integer scale, final Boolean required, final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type,
+    final Integer length, final Integer scale, final Boolean required,
+    final Map<String, Object> properties) {
     this(name, type, length, scale, required, null, properties);
 
   }
@@ -227,10 +231,11 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type, final Integer length,
-    final Integer scale, final Boolean required, final String description) {
+  public FieldDefinition(final String name, final DataType type,
+    final Integer length, final Integer scale, final Boolean required,
+    final String description) {
     this.name = name;
-    this.title = CaseConverter.toCapitalizedWords(name);
+    title = CaseConverter.toCapitalizedWords(name);
     this.description = description;
     this.type = type;
     if (required != null) {
@@ -243,8 +248,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
       this.scale = scale;
     }
     this.description = description;
-    this.minValue = MathUtil.getMinValue(getTypeClass());
-    this.maxValue = MathUtil.getMaxValue(getTypeClass());
+    minValue = MathUtil.getMinValue(getTypeClass());
+    maxValue = MathUtil.getMaxValue(getTypeClass());
   }
 
   /**
@@ -258,11 +263,11 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    *          attribute.
    * @param properties The meta data properties about the attribute.
    */
-  public FieldDefinition(final String name, final DataType type, final Integer length,
-    final Integer scale, final Boolean required, final String description,
-    final Map<String, Object> properties) {
+  public FieldDefinition(final String name, final DataType type,
+    final Integer length, final Integer scale, final Boolean required,
+    final String description, final Map<String, Object> properties) {
     this.name = name;
-    this.title = CaseConverter.toCapitalizedWords(name);
+    title = CaseConverter.toCapitalizedWords(name);
     this.type = type;
     if (required != null) {
       this.required = required;
@@ -275,23 +280,23 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
     }
     this.description = description;
     final Class<?> typeClass = getTypeClass();
-    this.minValue = MathUtil.getMinValue(typeClass);
-    this.maxValue = MathUtil.getMaxValue(typeClass);
+    minValue = MathUtil.getMinValue(typeClass);
+    maxValue = MathUtil.getMaxValue(typeClass);
     setProperties(properties);
   }
 
   public void addAllowedValue(final Object value, final Object text) {
-    this.allowedValues.put(value, text);
+    allowedValues.put(value, text);
   }
 
   public void appendType(final StringBuilder string) {
-    string.append(this.type);
-    if (this.length > 0) {
+    string.append(type);
+    if (length > 0) {
       string.append('(');
-      string.append(this.length);
-      if (this.scale > 0) {
+      string.append(length);
+      if (scale > 0) {
         string.append(',');
-        string.append(this.scale);
+        string.append(scale);
       }
       string.append(')');
     }
@@ -303,38 +308,38 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
   }
 
   public <V> V convert(final Object value) {
-    return StringConverterRegistry.toObject(this.type, value);
+    return StringConverterRegistry.toObject(type, value);
   }
 
   @Override
   public boolean equals(final Object object) {
     if (object instanceof FieldDefinition) {
       final FieldDefinition attribute = (FieldDefinition)object;
-      return this.name.equals(attribute.getName());
+      return name.equals(attribute.getName());
     } else {
       return false;
     }
   }
 
   public Map<Object, Object> getAllowedValues() {
-    return this.allowedValues;
+    return allowedValues;
   }
 
   public CodeTable getCodeTable() {
-    return this.codeTable;
+    return codeTable;
   }
 
   @SuppressWarnings("unchecked")
   public <T> T getDefaultValue() {
-    return (T)this.defaultValue;
+    return (T)defaultValue;
   }
 
   public String getDescription() {
-    return this.description;
+    return description;
   }
 
   public int getIndex() {
-    return this.index;
+    return index;
   }
 
   /**
@@ -344,18 +349,18 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    * @return The maximum length of an attribute value.
    */
   public int getLength() {
-    return this.length;
+    return length;
   }
 
   public int getMaxStringLength() {
     int length = this.length;
-    if (this.scale > 0) {
+    if (scale > 0) {
       length += 1;
-      length += this.scale;
+      length += scale;
     }
-    if (Number.class.isAssignableFrom(this.type.getJavaClass())) {
+    if (Number.class.isAssignableFrom(type.getJavaClass())) {
       length += 1;
-    } else if (DataTypes.DATE.equals(this.type)) {
+    } else if (DataTypes.DATE.equals(type)) {
       return 10;
     }
     return length;
@@ -363,12 +368,12 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
 
   @SuppressWarnings("unchecked")
   public <V> V getMaxValue() {
-    return (V)this.maxValue;
+    return (V)maxValue;
   }
 
   @SuppressWarnings("unchecked")
   public <V> V getMinValue() {
-    return (V)this.minValue;
+    return (V)minValue;
   }
 
   /**
@@ -377,14 +382,14 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    * @return The name of the attribute.
    */
   public String getName() {
-    return this.name;
+    return name;
   }
 
   public RecordDefinition getRecordDefinition() {
-    if (this.recordDefinition == null) {
+    if (recordDefinition == null) {
       return null;
     } else {
-      return this.recordDefinition.get();
+      return recordDefinition.get();
     }
   }
 
@@ -394,7 +399,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    * @return The maximum number of decimal places.
    */
   public int getScale() {
-    return this.scale;
+    return scale;
   }
 
   public String getSimpleType() {
@@ -405,15 +410,15 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
     } else if (CharSequence.class.isAssignableFrom(getTypeClass())) {
       typeName = "CHARACTER";
     } else {
-      typeName = this.type.getName().toUpperCase();
+      typeName = type.getName().toUpperCase();
     }
     string.append(typeName);
-    if (this.length > 0) {
+    if (length > 0) {
       string.append('(');
-      string.append(this.length);
-      if (this.scale > 0) {
+      string.append(length);
+      if (scale > 0) {
         string.append(',');
-        string.append(this.scale);
+        string.append(scale);
       }
       string.append(')');
     }
@@ -421,7 +426,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
   }
 
   public String getTitle() {
-    return this.title;
+    return title;
   }
 
   /**
@@ -430,7 +435,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    * @return The data type of the attribute value.
    */
   public DataType getType() {
-    return this.type;
+    return type;
   }
 
   /**
@@ -439,10 +444,10 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    * @return The data type of the attribute value.
    */
   public Class<?> getTypeClass() {
-    if (this.type == null) {
+    if (type == null) {
       return Object.class;
     } else {
-      return this.type.getJavaClass();
+      return type.getJavaClass();
     }
   }
 
@@ -464,7 +469,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    */
   @Override
   public int hashCode() {
-    return this.name.hashCode();
+    return name.hashCode();
   }
 
   /**
@@ -473,7 +478,7 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
    * @return True if a value is required, false otherwise.
    */
   public boolean isRequired() {
-    return this.required;
+    return required;
   }
 
   public void setAllowedValues(final Collection<?> allowedValues) {
@@ -515,7 +520,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
   }
 
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.recordDefinition = new WeakReference<RecordDefinition>(recordDefinition);
+    this.recordDefinition = new WeakReference<RecordDefinition>(
+      recordDefinition);
   }
 
   public void setRequired(final boolean required) {
@@ -540,7 +546,10 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
       if (value != null) {
         final CodeTable codeTable = getCodeTable();
         if (codeTable != null) {
-          value = Value.getValue(codeTable.getId(value));
+          final Identifier id = codeTable.getId(value);
+          if (id != null) {
+            value = Value.getValue(id);
+          }
         }
       }
       record.setValue(index, value);
@@ -562,13 +571,14 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
     MapSerializerUtil.add(map, "minValue", getMinValue(), null);
     MapSerializerUtil.add(map, "maxValue", getMaxValue(), null);
     MapSerializerUtil.add(map, "defaultValue", getDefaultValue(), null);
-    MapSerializerUtil.add(map, "allowedValues", getAllowedValues(), Collections.emptyMap());
+    MapSerializerUtil.add(map, "allowedValues", getAllowedValues(),
+      Collections.emptyMap());
     return map;
   }
 
   @Override
   public String toString() {
-    final StringBuilder string = new StringBuilder(this.name);
+    final StringBuilder string = new StringBuilder(name);
     string.append(':');
     appendType(string);
     return string.toString();
@@ -578,7 +588,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
     final String fieldName = getName();
 
     if (isRequired()) {
-      if (value == null || value instanceof String && !Property.hasValue((String)value)) {
+      if (value == null || value instanceof String
+        && !Property.hasValue((String)value)) {
         throw new IllegalArgumentException(fieldName + " is required");
       }
     }
@@ -590,12 +601,12 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
         try {
           value = StringConverterRegistry.toObject(fieldType, value);
         } catch (final Throwable t) {
-          throw new IllegalArgumentException(fieldName + "='" + value + "' is not a valid "
-            + fieldType.getValidationName());
+          throw new IllegalArgumentException(fieldName + "='" + value
+            + "' is not a valid " + fieldType.getValidationName());
         }
         if (value == null) {
-          throw new IllegalArgumentException(fieldName + "='" + value + "' is not a valid "
-            + fieldType.getValidationName());
+          throw new IllegalArgumentException(fieldName + "='" + value
+            + "' is not a valid " + fieldType.getValidationName());
         }
       }
       if (value != null) {
@@ -606,8 +617,8 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
           final int length = bigNumber.precision();
           if (maxLength > 0) {
             if (length > maxLength) {
-              throw new IllegalArgumentException(fieldName + "=" + value + " length " + length
-                + " > " + maxLength);
+              throw new IllegalArgumentException(fieldName + "=" + value
+                + " length " + length + " > " + maxLength);
             }
           }
 
@@ -615,20 +626,22 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
           final int maxScale = getScale();
           if (maxScale > 0) {
             if (scale > maxScale) {
-              throw new IllegalArgumentException(fieldName + "=" + value + " scale " + scale
-                + " > " + maxScale);
+              throw new IllegalArgumentException(fieldName + "=" + value
+                + " scale " + scale + " > " + maxScale);
             }
           }
           final Number minValue = getMinValue();
           if (minValue != null) {
             if (NumericComparator.numericCompare(number, minValue) < 0) {
-              throw new IllegalArgumentException(fieldName + "=" + value + " > " + minValue);
+              throw new IllegalArgumentException(fieldName + "=" + value
+                + " > " + minValue);
             }
           }
           final Number maxValue = getMaxValue();
           if (maxValue != null) {
             if (NumericComparator.numericCompare(number, maxValue) > 0) {
-              throw new IllegalArgumentException(fieldName + "=" + value + " < " + maxValue);
+              throw new IllegalArgumentException(fieldName + "=" + value
+                + " < " + maxValue);
             }
           }
         } else if (value instanceof String) {
@@ -636,15 +649,15 @@ public class FieldDefinition extends AbstractObjectWithProperties implements Clo
           final int length = string.length();
           if (maxLength > 0) {
             if (length > maxLength) {
-              throw new IllegalArgumentException(fieldName + "=" + value + " length " + length
-                + " > " + maxLength);
+              throw new IllegalArgumentException(fieldName + "=" + value
+                + " length " + length + " > " + maxLength);
             }
           }
         }
-        if (!this.allowedValues.isEmpty()) {
-          if (!this.allowedValues.containsKey(value)) {
-            throw new IllegalArgumentException(fieldName + "=" + value + " not in ("
-              + CollectionUtil.toString(",", this.allowedValues) + ")");
+        if (!allowedValues.isEmpty()) {
+          if (!allowedValues.containsKey(value)) {
+            throw new IllegalArgumentException(fieldName + "=" + value
+              + " not in (" + CollectionUtil.toString(",", allowedValues) + ")");
           }
         }
       }

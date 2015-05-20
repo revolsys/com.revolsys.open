@@ -15,7 +15,7 @@ import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.gis.oracle.io.OracleRecordStore;
 import com.revolsys.io.Path;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.attribute.JdbcFieldAdder;
+import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.util.Property;
 

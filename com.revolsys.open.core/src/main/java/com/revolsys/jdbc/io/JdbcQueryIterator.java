@@ -25,34 +25,33 @@ import com.revolsys.gis.io.Statistics;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.jdbc.attribute.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldDefinition;
 
 public class JdbcQueryIterator extends AbstractIterator<Record> implements
-RecordIterator {
+  RecordIterator {
 
-  public static Record getNextObject(final JdbcRecordStore recordStore,
+  public static Record getNextRecord(final JdbcRecordStore recordStore,
     final RecordDefinition recordDefinition,
-    final List<FieldDefinition> attributes, final RecordFactory recordFactory,
+    final List<FieldDefinition> fields, final RecordFactory recordFactory,
     final ResultSet resultSet) {
-    final Record object = recordFactory.createRecord(recordDefinition);
-    if (object != null) {
-      object.setState(RecordState.Initalizing);
+    final Record record = recordFactory.createRecord(recordDefinition);
+    if (record != null) {
+      record.setState(RecordState.Initalizing);
       int columnIndex = 1;
-
-      for (final FieldDefinition attribute : attributes) {
-        final JdbcFieldDefinition jdbcAttribute = (JdbcFieldDefinition)attribute;
+      for (final FieldDefinition field : fields) {
+        final JdbcFieldDefinition jdbcField = (JdbcFieldDefinition)field;
         try {
-          columnIndex = jdbcAttribute.setFieldValueFromResultSet(resultSet,
-            columnIndex, object);
+          columnIndex = jdbcField.setFieldValueFromResultSet(resultSet,
+            columnIndex, record);
         } catch (final SQLException e) {
           throw new RuntimeException("Unable to get value " + (columnIndex + 1)
             + " from result set", e);
         }
       }
-      object.setState(RecordState.Persisted);
-      recordStore.addStatistic("query", object);
+      record.setState(RecordState.Persisted);
+      recordStore.addStatistic("query", record);
     }
-    return object;
+    return record;
   }
 
   public static ResultSet getResultSet(final RecordDefinition recordDefinition,
@@ -80,7 +79,7 @@ RecordIterator {
 
   private PreparedStatement statement;
 
-  private List<FieldDefinition> attributes = new ArrayList<FieldDefinition>();
+  private List<FieldDefinition> fields = new ArrayList<FieldDefinition>();
 
   private Query query;
 
@@ -91,60 +90,59 @@ RecordIterator {
     super();
 
     final boolean autoCommit = BooleanStringConverter.getBoolean(properties.get("autoCommit"));
-    this.connection = recordStore.getJdbcConnection(autoCommit);
-    this.recordFactory = query.getProperty("recordFactory");
-    if (this.recordFactory == null) {
-      this.recordFactory = recordStore.getRecordFactory();
+    connection = recordStore.getJdbcConnection(autoCommit);
+    recordFactory = query.getProperty("recordFactory");
+    if (recordFactory == null) {
+      recordFactory = recordStore.getRecordFactory();
     }
     this.recordStore = recordStore;
     this.query = query;
-    this.statistics = query.getStatistics();
-    if (this.statistics == null) {
-      this.statistics = (Statistics)properties.get(Statistics.class.getName());
+    statistics = query.getStatistics();
+    if (statistics == null) {
+      statistics = (Statistics)properties.get(Statistics.class.getName());
     }
   }
 
   @Override
   @PreDestroy
   public void doClose() {
-    JdbcUtils.close(this.statement, this.resultSet);
-    FileUtil.closeSilent(this.connection);
-    this.attributes = null;
-    this.connection = null;
-    this.recordFactory = null;
-    this.recordStore = null;
-    this.recordDefinition = null;
-    this.queries = null;
-    this.query = null;
-    this.resultSet = null;
-    this.statement = null;
-    this.statistics = null;
+    JdbcUtils.close(statement, resultSet);
+    FileUtil.closeSilent(connection);
+    fields = null;
+    connection = null;
+    recordFactory = null;
+    recordStore = null;
+    recordDefinition = null;
+    queries = null;
+    query = null;
+    resultSet = null;
+    statement = null;
+    statistics = null;
   }
 
   @Override
   protected void doInit() {
-    this.resultSet = getResultSet();
+    resultSet = getResultSet();
   }
 
   protected String getErrorMessage() {
-    if (this.queries == null) {
+    if (queries == null) {
       return null;
     } else {
-      return this.queries.get(this.currentQueryIndex).getSql();
+      return queries.get(currentQueryIndex).getSql();
     }
   }
 
   @Override
   protected Record getNext() throws NoSuchElementException {
     try {
-      if (this.resultSet != null && this.resultSet.next()) {
-        final Record object = getNextObject(this.recordStore,
-          this.recordDefinition, this.attributes, this.recordFactory,
-          this.resultSet);
-        if (this.statistics != null) {
-          this.statistics.add(object);
+      if (resultSet != null && resultSet.next()) {
+        final Record record = getNextRecord(recordStore, recordDefinition,
+          fields, recordFactory, resultSet);
+        if (statistics != null) {
+          statistics.add(record);
         }
-        return object;
+        return record;
       } else {
         close();
         throw new NoSuchElementException();
@@ -163,65 +161,64 @@ RecordIterator {
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    if (this.recordDefinition == null) {
+    if (recordDefinition == null) {
       hasNext();
     }
-    return this.recordDefinition;
+    return recordDefinition;
   }
 
   public JdbcRecordStore getRecordStore() {
-    return this.recordStore;
+    return recordStore;
   }
 
   protected ResultSet getResultSet() {
-    final String tableName = this.query.getTypeName();
-    this.recordDefinition = this.query.getRecordDefinition();
-    if (this.recordDefinition == null) {
+    final String tableName = query.getTypeName();
+    recordDefinition = query.getRecordDefinition();
+    if (recordDefinition == null) {
       if (tableName != null) {
-        this.recordDefinition = this.recordStore.getRecordDefinition(tableName);
-        this.query.setRecordDefinition(this.recordDefinition);
+        recordDefinition = recordStore.getRecordDefinition(tableName);
+        query.setRecordDefinition(recordDefinition);
       }
     }
-    final String sql = getSql(this.query);
+    final String sql = getSql(query);
     try {
-      this.statement = this.connection.prepareStatement(sql);
-      this.statement.setFetchSize(this.fetchSize);
+      statement = connection.prepareStatement(sql);
+      statement.setFetchSize(fetchSize);
 
-      this.resultSet = getResultSet(this.recordDefinition, this.statement,
-        this.query);
-      final ResultSetMetaData resultSetMetaData = this.resultSet.getMetaData();
+      resultSet = getResultSet(recordDefinition, statement, query);
+      final ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
 
-      if (this.recordDefinition == null) {
-        this.recordDefinition = this.recordStore.getRecordDefinition(tableName,
+      if (recordDefinition == null) {
+        recordDefinition = recordStore.getRecordDefinition(tableName,
           resultSetMetaData);
       }
       final List<String> fieldNames = new ArrayList<String>(
-          this.query.getFieldNames());
+        query.getFieldNames());
       if (fieldNames.isEmpty()) {
-        this.attributes.addAll(this.recordDefinition.getFields());
+        fields.addAll(recordDefinition.getFields());
       } else {
         for (final String fieldName : fieldNames) {
           if (fieldName.equals("*")) {
-            this.attributes.addAll(this.recordDefinition.getFields());
+            fields.addAll(recordDefinition.getFields());
           } else {
-            final FieldDefinition attribute = this.recordDefinition.getField(fieldName);
-            if (attribute != null) {
-              this.attributes.add(attribute);
+            final FieldDefinition field = recordDefinition.getField(fieldName);
+            if (field != null) {
+              fields.add(field);
             }
           }
         }
       }
 
-      final String typePath = this.query.getTypeNameAlias();
+      final String typePath = query.getTypeNameAlias();
       if (typePath != null) {
-        final RecordDefinitionImpl newRecordDefinition = ((RecordDefinitionImpl)this.recordDefinition).rename(typePath);
-        this.recordDefinition = newRecordDefinition;
+        final RecordDefinitionImpl newRecordDefinition = ((RecordDefinitionImpl)recordDefinition).rename(typePath);
+        recordDefinition = newRecordDefinition;
       }
     } catch (final SQLException e) {
-      JdbcUtils.close(this.statement, this.resultSet);
-      throw this.connection.getException("Execute Query", sql, e);
+      JdbcUtils.close(statement, resultSet);
+      throw connection.getException("Execute Query", sql, e);
     }
-    return this.resultSet;
+    return resultSet;
   }
 
   protected String getSql(final Query query) {

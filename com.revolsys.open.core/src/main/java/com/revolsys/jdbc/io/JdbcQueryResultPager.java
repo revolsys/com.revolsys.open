@@ -338,7 +338,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
         if (this.resultSet.absolute(this.pageNumber * this.pageSize + 1)) {
           int i = 0;
           do {
-            final Record object = JdbcQueryIterator.getNextObject(
+            final Record object = JdbcQueryIterator.getNextRecord(
               this.recordStore, this.recordDefinition,
               this.recordDefinition.getFields(), this.recordFactory,
               this.resultSet);
