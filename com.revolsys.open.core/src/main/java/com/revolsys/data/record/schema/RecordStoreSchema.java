@@ -45,48 +45,63 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
   public RecordStoreSchema(final RecordStoreSchema schema, final String path) {
     super(schema, path);
-    this.recordStore = new EmptyReference<>();
+    recordStore = new EmptyReference<>();
   }
 
   public void addElement(final RecordStoreSchemaElement element) {
     refreshIfNeeded();
     final String upperPath = element.getPath().toUpperCase();
     if (Path.isParent(getPath(), upperPath)) {
-      this.elementsByPath.put(upperPath, element);
+      elementsByPath.put(upperPath, element);
       if (element instanceof RecordDefinition) {
         final RecordDefinition recordDefinition = (RecordDefinition)element;
-        this.recordDefinitionsByPath.put(upperPath, recordDefinition);
+        recordDefinitionsByPath.put(upperPath, recordDefinition);
         final AbstractRecordStore recordStore = getRecordStore();
         recordStore.addRecordDefinitionProperties((RecordDefinitionImpl)recordDefinition);
       }
       if (element instanceof RecordStoreSchema) {
         final RecordStoreSchema schema = (RecordStoreSchema)element;
-        this.schemasByPath.put(upperPath, schema);
+        schemasByPath.put(upperPath, schema);
       }
     } else {
       throw new IllegalArgumentException(getPath() + " is not a parent of "
-          + upperPath);
+        + upperPath);
     }
   }
 
   @Override
   @PreDestroy
   public synchronized void close() {
-    if (this.recordDefinitionsByPath != null) {
-      for (final RecordDefinition recordDefinition : this.recordDefinitionsByPath.values()) {
+    if (recordDefinitionsByPath != null) {
+      for (final RecordDefinition recordDefinition : recordDefinitionsByPath.values()) {
         recordDefinition.destroy();
       }
     }
-    this.recordStore = new WeakReference<AbstractRecordStore>(null);
-    this.recordDefinitionsByPath.clear();
-    this.elementsByPath.clear();
-    this.schemasByPath.clear();
+    recordStore = new WeakReference<AbstractRecordStore>(null);
+    recordDefinitionsByPath.clear();
+    elementsByPath.clear();
+    schemasByPath.clear();
     super.close();
+  }
+
+  public RecordStoreSchema createSchema(final String path) {
+    final RecordStoreSchemaElement element = getElement(path);
+    if (element == null) {
+      final RecordStoreSchema schema = new RecordStoreSchema(this, path);
+      addElement(schema);
+      return schema;
+    } else if (element instanceof RecordStoreSchema) {
+      final RecordStoreSchema schema = (RecordStoreSchema)element;
+      return schema;
+    } else {
+      throw new IllegalArgumentException("Non schema element with path " + path
+        + " already exists");
+    }
   }
 
   public synchronized RecordDefinition findRecordDefinition(final String path) {
     refreshIfNeeded();
-    final RecordDefinition recordDefinition = this.recordDefinitionsByPath.get(path);
+    final RecordDefinition recordDefinition = recordDefinitionsByPath.get(path);
     return recordDefinition;
   }
 
@@ -95,7 +110,8 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
     if (path == null) {
       return null;
     } else {
-      RecordStoreSchemaElement childElement = this.elementsByPath.get(path);
+      refreshIfNeeded();
+      RecordStoreSchemaElement childElement = elementsByPath.get(path);
       if (childElement == null) {
         path = Path.cleanUpper(path);
         if (equalPath(path)) {
@@ -107,7 +123,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
               refreshIfNeeded();
               final String childElementPath = Path.getChildPath(schemaPath,
                 path);
-              childElement = this.elementsByPath.get(childElementPath);
+              childElement = elementsByPath.get(childElementPath);
               if (childElement == null) {
                 return null;
               } else if (childElement.equalPath(path)) {
@@ -167,7 +183,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
   public List<RecordDefinition> getRecordDefinitions() {
     refreshIfNeeded();
-    return new ArrayList<>(this.recordDefinitionsByPath.values());
+    return new ArrayList<>(recordDefinitionsByPath.values());
   }
 
   @SuppressWarnings("unchecked")
@@ -175,7 +191,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
   public <V extends RecordStore> V getRecordStore() {
     final RecordStoreSchema schema = getSchema();
     if (schema == null) {
-      return (V)this.recordStore.get();
+      return (V)recordStore.get();
     } else {
       return schema.getRecordStore();
     }
@@ -192,17 +208,17 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
 
   public List<String> getSchemaPaths() {
     refreshIfNeeded();
-    return new ArrayList<>(this.schemasByPath.keySet());
+    return new ArrayList<>(schemasByPath.keySet());
   }
 
   public List<RecordStoreSchema> getSchemas() {
     refreshIfNeeded();
-    return new ArrayList<>(this.schemasByPath.values());
+    return new ArrayList<>(schemasByPath.values());
   }
 
   public List<String> getTypeNames() {
     refreshIfNeeded();
-    return new ArrayList<>(this.recordDefinitionsByPath.keySet());
+    return new ArrayList<>(recordDefinitionsByPath.keySet());
   }
 
   private boolean isEqual(final RecordStoreSchemaElement oldElement,
@@ -218,15 +234,15 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
       if (newElement instanceof RecordDefinition) {
         final RecordDefinition newRecordDefinition = (RecordDefinition)newElement;
         if (Property.equals(newRecordDefinition, oldRecordDefinition,
-            "idFieldNames")) {
+          "idFieldNames")) {
           if (Property.equals(newRecordDefinition, oldRecordDefinition,
-              "idFieldIndexes")) {
+            "idFieldIndexes")) {
             if (Property.equals(newRecordDefinition, oldRecordDefinition,
-                "geometryFieldNames")) {
+              "geometryFieldNames")) {
               if (Property.equals(newRecordDefinition, oldRecordDefinition,
-                  "geometryFieldIndexes")) {
+                "geometryFieldIndexes")) {
                 if (Property.equals(newRecordDefinition, oldRecordDefinition,
-                    "fields")) {
+                  "fields")) {
                   return true;
                 }
               }
@@ -239,11 +255,11 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
   }
 
   public boolean isInitialized() {
-    return this.recordDefinitionsByPath != null;
+    return initialized;
   }
 
   public synchronized void refresh() {
-    this.initialized = true;
+    initialized = true;
     final AbstractRecordStore recordStore = getRecordStore();
     if (recordStore != null) {
       final Collection<RecordStoreExtension> extensions = recordStore.getRecordStoreExtensions();
@@ -261,7 +277,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
       final Map<String, ? extends RecordStoreSchemaElement> elementsByPath = recordStore.refreshSchemaElements(this);
 
       final Set<String> removedPaths = new HashSet<>(
-          this.elementsByPath.keySet());
+        this.elementsByPath.keySet());
       for (final Entry<String, ? extends RecordStoreSchemaElement> entry : elementsByPath.entrySet()) {
         final String path = entry.getKey();
         final String upperPath = path.toUpperCase();
@@ -292,15 +308,15 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement {
   }
 
   protected void refreshIfNeeded() {
-    if (!this.initialized) {
+    if (!initialized) {
       refresh();
     }
   }
 
   private void removeElement(final String upperPath) {
-    this.elementsByPath.remove(upperPath);
-    this.recordDefinitionsByPath.remove(upperPath);
-    this.schemasByPath.remove(upperPath);
+    elementsByPath.remove(upperPath);
+    recordDefinitionsByPath.remove(upperPath);
+    schemasByPath.remove(upperPath);
   }
 
   private void replaceElement(final String upperPath,

@@ -119,14 +119,13 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     final RecordDefinition storeRecordDefinition = super.getRecordDefinition(recordDefinition);
     if (storeRecordDefinition == null && createMissingTables) {
       final String typePath = recordDefinition.getPath();
-      final String schemaName = Path.getPath(typePath);
-      RecordStoreSchema schema = getSchema(schemaName);
+      final String schemaPath = Path.getPath(typePath);
+      RecordStoreSchema schema = getSchema(schemaPath);
       if (schema == null && createMissingTables) {
         final RecordStoreSchema rootSchema = getRootSchema();
-        schema = new RecordStoreSchema(rootSchema, schemaName);
-        rootSchema.addElement(schema);
+        schema = rootSchema.createSchema(schemaPath);
       }
-      final File schemaDirectory = new File(directory, schemaName);
+      final File schemaDirectory = new File(directory, schemaPath);
       if (!schemaDirectory.exists()) {
         schemaDirectory.mkdirs();
       }
