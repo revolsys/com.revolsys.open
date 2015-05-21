@@ -32,7 +32,7 @@ public class FixedValueRecord extends BaseRecord {
   @Override
   @SuppressWarnings("unchecked")
   public <T> T getValue(final CharSequence name) {
-    return (T)this.value;
+    return (T)value;
   }
 
   @Override
@@ -41,28 +41,28 @@ public class FixedValueRecord extends BaseRecord {
     if (index < 0) {
       return null;
     } else {
-      return (T)this.value;
+      return (T)value;
     }
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <T> T getValueByPath(final CharSequence path) {
-    return (T)this.value;
+    return (T)value;
   }
 
   @Override
   public List<Object> getValues() {
-    return Arrays.asList(this.value);
+    return Arrays.asList(value);
   }
 
   @Override
   public int hashCode() {
-    return this.value.hashCode();
+    return value.hashCode();
   }
 
   @Override
-  public void setValue(final int index, final Object value) {
-
+  public boolean setValue(final int index, final Object value) {
+    return false;
   }
 }

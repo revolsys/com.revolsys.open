@@ -44,7 +44,7 @@ public class SingleRecordTableCellRenderer implements TableCellRenderer {
 
     JComponent component = null;
     final String name = model.getFieldName(rowIndex, columnIndex);
-    final boolean required = recordDefinition.isFieldDefinition(name);
+    final boolean required = recordDefinition.isFieldRequired(name);
     this.valueComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
     if (columnIndex == 0) {
       this.valueComponent.setText(String.valueOf(rowIndex + 1));

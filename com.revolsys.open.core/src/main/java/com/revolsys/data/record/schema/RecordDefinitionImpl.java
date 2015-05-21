@@ -584,7 +584,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
   }
 
   @Override
-  public boolean isFieldDefinition(final CharSequence name) {
+  public boolean isFieldRequired(final CharSequence name) {
     final FieldDefinition field = getField(name);
     if (field == null) {
       return false;
@@ -594,7 +594,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
   }
 
   @Override
-  public boolean isFieldDefinition(final int i) {
+  public boolean isFieldRequired(final int i) {
     final FieldDefinition field = getField(i);
     return field.isRequired();
   }

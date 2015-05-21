@@ -195,7 +195,7 @@ MapSerializer {
    */
   boolean hasField(CharSequence name);
 
-  boolean isFieldDefinition(CharSequence name);
+  boolean isFieldRequired(CharSequence name);
 
   /**
    * Return true if a value for the field is required.
@@ -203,7 +203,7 @@ MapSerializer {
    * @param index The field index.
    * @return True if the field is required, false otherwise.
    */
-  boolean isFieldDefinition(int index);
+  boolean isFieldRequired(int index);
 
   boolean isInstanceOf(RecordDefinition classDefinition);
 

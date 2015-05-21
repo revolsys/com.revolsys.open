@@ -9,7 +9,8 @@ import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.jts.geom.Geometry;
 
-public interface Record extends Map<String, Object>, Comparable<Record>, Identifiable {
+public interface Record extends Map<String, Object>, Comparable<Record>,
+  Identifiable {
   /**
    * Create a clone of the data object.
    *
@@ -82,7 +83,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
 
   <T> T getValueByPath(CharSequence attributePath);
 
-  Map<String, Object> getValueMap(final Collection<? extends CharSequence> fieldNames);
+  Map<String, Object> getValueMap(
+    final Collection<? extends CharSequence> fieldNames);
 
   /**
    * Get the values of all attributes.
@@ -139,7 +141,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
    * @param name The name of the attribute. param value The attribute value.
    * @param value The new value;
    */
-  void setValue(CharSequence name, Object value);
+  boolean setValue(CharSequence name, Object value);
 
   /**
    * Set the value of the attribute with the specified name.
@@ -147,11 +149,12 @@ public interface Record extends Map<String, Object>, Comparable<Record>, Identif
    * @param index The index of the attribute. param value The attribute value.
    * @param value The new value;
    */
-  void setValue(int index, Object value);
+  boolean setValue(int index, Object value);
 
-  void setValueByPath(CharSequence attributePath, Object value);
+  boolean setValueByPath(CharSequence attributePath, Object value);
 
-  <T> T setValueByPath(CharSequence attributePath, Record source, String sourceAttributePath);
+  <T> T setValueByPath(CharSequence attributePath, Record source,
+    String sourceAttributePath);
 
   void setValues(Map<String, ? extends Object> values);
 

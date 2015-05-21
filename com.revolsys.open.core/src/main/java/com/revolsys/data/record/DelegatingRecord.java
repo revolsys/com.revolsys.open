@@ -18,251 +18,254 @@ public class DelegatingRecord extends AbstractRecord {
 
   @Override
   public DelegatingRecord clone() {
-    return (DelegatingRecord)this.record.clone();
+    return (DelegatingRecord)record.clone();
   }
 
   @Override
   public int compareTo(final Record other) {
-    return this.record.compareTo(other);
+    return record.compareTo(other);
   }
 
   @Override
   public void delete() {
-    this.record.delete();
+    record.delete();
   }
 
   @Override
   public Set<Entry<String, Object>> entrySet() {
-    return this.record.entrySet();
+    return record.entrySet();
   }
 
   @Override
   public boolean equals(final Object o) {
-    return this.record.equals(o);
+    return record.equals(o);
   }
 
   @Override
   public Object get(final Object key) {
-    return this.record.get(key);
+    return record.get(key);
   }
 
   @Override
   public Byte getByte(final CharSequence name) {
-    return this.record.getByte(name);
+    return record.getByte(name);
   }
 
   @Override
   public Double getDouble(final CharSequence name) {
-    return this.record.getDouble(name);
+    return record.getDouble(name);
   }
 
   @Override
   public RecordFactory getFactory() {
-    return this.record.getFactory();
+    return record.getFactory();
   }
 
   @Override
   public String getFieldTitle(final String name) {
-    return this.record.getFieldTitle(name);
+    return record.getFieldTitle(name);
   }
 
   @Override
   public Float getFloat(final CharSequence name) {
-    return this.record.getFloat(name);
+    return record.getFloat(name);
   }
 
   @Override
   public <T extends Geometry> T getGeometryValue() {
-    return this.record.getGeometryValue();
+    return record.getGeometryValue();
   }
 
   @Override
   public Identifier getIdentifier() {
-    return this.record.getIdentifier();
+    return record.getIdentifier();
   }
 
   @Override
   public Identifier getIdentifier(final List<String> fieldNames) {
-    return this.record.getIdentifier(fieldNames);
+    return record.getIdentifier(fieldNames);
   }
 
   @Override
   public Identifier getIdentifier(final String... fieldNames) {
-    return this.record.getIdentifier(fieldNames);
+    return record.getIdentifier(fieldNames);
   }
 
   @Override
   public Integer getInteger(final CharSequence name) {
-    return this.record.getInteger(name);
+    return record.getInteger(name);
   }
 
   @Override
   public Long getLong(final CharSequence name) {
-    return this.record.getLong(name);
+    return record.getLong(name);
   }
 
   public Record getRecord() {
-    return this.record;
+    return record;
   }
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    return this.record.getRecordDefinition();
+    return record.getRecordDefinition();
   }
 
   @Override
   public Short getShort(final CharSequence name) {
-    return this.record.getShort(name);
+    return record.getShort(name);
   }
 
   @Override
   public RecordState getState() {
-    return this.record.getState();
+    return record.getState();
   }
 
   @Override
   public String getString(final CharSequence name) {
-    return this.record.getString(name);
+    return record.getString(name);
   }
 
   @Override
   public String getTypePath() {
-    return this.record.getTypePath();
+    return record.getTypePath();
   }
 
   @Override
   public <T> T getValue(final CharSequence name) {
-    return this.record.getValue(name);
+    return record.getValue(name);
   }
 
   @Override
   public <T extends Object> T getValue(final int index) {
-    return this.record.getValue(index);
+    return record.getValue(index);
   }
 
   @Override
   public <T> T getValueByPath(final CharSequence path) {
-    return this.record.getValueByPath(path);
+    return record.getValueByPath(path);
   }
 
   @Override
-  public Map<String, Object> getValueMap(final Collection<? extends CharSequence> fieldNames) {
-    return this.record.getValueMap(fieldNames);
+  public Map<String, Object> getValueMap(
+    final Collection<? extends CharSequence> fieldNames) {
+    return record.getValueMap(fieldNames);
   }
 
   @Override
   public List<Object> getValues() {
-    return this.record.getValues();
+    return record.getValues();
   }
 
   @Override
   public boolean hasField(final CharSequence name) {
-    return this.record.hasField(name);
+    return record.hasField(name);
   }
 
   @Override
   public int hashCode() {
-    return this.record.hashCode();
+    return record.hashCode();
   }
 
   @Override
   public boolean hasValue(final CharSequence name) {
-    return this.record.hasValue(name);
+    return record.hasValue(name);
   }
 
   @Override
   public boolean hasValuesAny(final String... fieldNames) {
-    return this.record.hasValuesAny(fieldNames);
+    return record.hasValuesAny(fieldNames);
   }
 
   @Override
   public boolean isModified() {
-    return this.record.isModified();
+    return record.isModified();
   }
 
   @Override
   public boolean isValid(final int index) {
-    return this.record.isValid(index);
+    return record.isValid(index);
   }
 
   @Override
   public boolean isValid(final String fieldName) {
-    return this.record.isValid(fieldName);
+    return record.isValid(fieldName);
   }
 
   @Override
   public Object put(final String key, final Object value) {
-    return this.record.put(key, value);
+    return record.put(key, value);
   }
 
   @Override
   public void setGeometryValue(final Geometry geometry) {
-    this.record.setGeometryValue(geometry);
+    record.setGeometryValue(geometry);
   }
 
   @Override
   public void setIdentifier(final Identifier identifier) {
-    this.record.setIdentifier(identifier);
+    record.setIdentifier(identifier);
   }
 
   @Override
   public void setIdValue(final Object id) {
-    this.record.setIdValue(id);
+    record.setIdValue(id);
   }
 
   @Override
   public void setState(final RecordState state) {
-    this.record.setState(state);
+    record.setState(state);
   }
 
   @Override
-  public void setValue(final CharSequence name, final Object value) {
-    this.record.setValue(name, value);
+  public boolean setValue(final CharSequence name, final Object value) {
+    return record.setValue(name, value);
   }
 
   @Override
-  public void setValue(final int index, final Object value) {
-    this.record.setValue(index, value);
+  public boolean setValue(final int index, final Object value) {
+    return record.setValue(index, value);
   }
 
   @Override
-  public void setValueByPath(final CharSequence path, final Object value) {
-    this.record.setValueByPath(path, value);
+  public boolean setValueByPath(final CharSequence path, final Object value) {
+    return record.setValueByPath(path, value);
   }
 
   @Override
-  public <T> T setValueByPath(final CharSequence attributePath, final Record source,
-    final String sourceAttributePath) {
-    return this.record.setValueByPath(attributePath, source, sourceAttributePath);
+  public <T> T setValueByPath(final CharSequence attributePath,
+    final Record source, final String sourceAttributePath) {
+    return record.setValueByPath(attributePath, source, sourceAttributePath);
   }
 
   @Override
   public void setValues(final Map<String, ? extends Object> values) {
-    this.record.setValues(values);
+    record.setValues(values);
   }
 
   @Override
-  public void setValues(final Map<String, Object> record, final Collection<String> attributesNames) {
+  public void setValues(final Map<String, Object> record,
+    final Collection<String> attributesNames) {
     this.record.setValues(record, attributesNames);
   }
 
   @Override
-  public void setValues(final Map<String, Object> record, final String... fieldNames) {
+  public void setValues(final Map<String, Object> record,
+    final String... fieldNames) {
     this.record.setValues(record, fieldNames);
   }
 
   @Override
   public void setValues(final Record object) {
-    this.record.setValues(object);
+    record.setValues(object);
   }
 
   @Override
   public void setValuesByPath(final Map<String, ? extends Object> values) {
-    this.record.setValuesByPath(values);
+    record.setValuesByPath(values);
   }
 
   @Override
   public String toString() {
-    return this.record.toString();
+    return record.toString();
   }
 }

@@ -35,7 +35,8 @@ public class LoadingRecord extends AbstractLayerRecord {
   }
 
   @Override
-  public void setValue(final int index, final Object value) {
+  public boolean setValue(final int index, final Object value) {
+    return false;
   }
 
 }
