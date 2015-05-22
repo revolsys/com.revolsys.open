@@ -31,8 +31,8 @@ import com.revolsys.util.Property;
 
 public final class RecordUtil {
 
-  public static int compareNullFirst(final Record record1, final Record record2,
-    final String fieldName) {
+  public static int compareNullFirst(final Record record1,
+    final Record record2, final String fieldName) {
     final Object value1 = getValue(record1, fieldName);
     final Object value2 = getValue(record2, fieldName);
     if (value1 == value2) {
@@ -48,8 +48,8 @@ public final class RecordUtil {
     }
   }
 
-  public static int compareNullFirst(final Record record1, final Record record2,
-    final String... fieldNames) {
+  public static int compareNullFirst(final Record record1,
+    final Record record2, final String... fieldNames) {
     for (final String fieldName : fieldNames) {
       final Object value1 = getValue(record1, fieldName);
       final Object value2 = getValue(record2, fieldName);
@@ -107,53 +107,56 @@ public final class RecordUtil {
     return 0;
   }
 
-  public static Record copy(final RecordDefinition recordDefinition, final Record object) {
+  public static Record copy(final RecordDefinition recordDefinition,
+    final Record record) {
     final Record copy = new ArrayRecord(recordDefinition);
-    copy.setValues(object);
+    copy.setValues(record);
     return copy;
   }
 
   /**
-   * Create a copy of the data object replacing the geometry with the new
-   * geometry. If the existing geometry on the object has user data it will be
+   * Create a copy of the data record replacing the geometry with the new
+   * geometry. If the existing geometry on the record has user data it will be
    * cloned to the new geometry.
    *
-   * @param object The object to copy.
+   * @param record The record to copy.
    * @param geometry The new geometry.
-   * @return The copied object.
+   * @return The copied record.
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Record> T copy(final T object, final Geometry geometry) {
-    final Geometry oldGeometry = object.getGeometryValue();
-    final T newObject = (T)object.clone();
+  public static <T extends Record> T copy(final T record,
+    final Geometry geometry) {
+    final Geometry oldGeometry = record.getGeometryValue();
+    final T newObject = (T)record.clone();
     newObject.setGeometryValue(geometry);
     GeometryProperties.copyUserData(oldGeometry, geometry);
     return newObject;
   }
 
   public static RecordDefinition createGeometryRecordDefinition() {
-    final FieldDefinition geometryField = new FieldDefinition("geometry", DataTypes.GEOMETRY, true);
+    final FieldDefinition geometryField = new FieldDefinition("geometry",
+      DataTypes.GEOMETRY, true);
     return new RecordDefinitionImpl("Feature", geometryField);
   }
 
-  public static <D extends Record> List<D> filter(final Collection<D> objects,
+  public static <D extends Record> List<D> filter(final Collection<D> records,
     final Geometry geometry, final double maxDistance) {
     final List<D> results = new ArrayList<D>();
-    for (final D object : objects) {
-      final Geometry objectGeometry = object.getGeometryValue();
-      final double distance = objectGeometry.distance(geometry);
+    for (final D record : records) {
+      final Geometry recordGeometry = record.getGeometryValue();
+      final double distance = recordGeometry.distance(geometry);
       if (distance < maxDistance) {
-        results.add(object);
+        results.add(record);
       }
     }
     return results;
   }
 
-  public static boolean getBoolean(final Record object, final String fieldName) {
-    if (object == null) {
+  public static boolean getBoolean(final Record record, final String fieldName) {
+    if (record == null) {
       return false;
     } else {
-      final Object value = getValue(object, fieldName);
+      final Object value = getValue(record, fieldName);
       if (value == null) {
         return false;
       } else if (value instanceof Boolean) {
@@ -164,7 +167,8 @@ public final class RecordUtil {
         return number.intValue() == 1;
       } else {
         final String stringValue = value.toString();
-        if (stringValue.equals("Y") || stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+        if (stringValue.equals("Y") || stringValue.equals("1")
+          || Boolean.parseBoolean(stringValue)) {
           return true;
         } else {
           return false;
@@ -173,8 +177,8 @@ public final class RecordUtil {
     }
   }
 
-  public static Double getDouble(final Record object, final int attributeIndex) {
-    final Number value = object.getValue(attributeIndex);
+  public static Double getDouble(final Record record, final int attributeIndex) {
+    final Number value = record.getValue(attributeIndex);
     if (value == null) {
       return null;
     } else if (value instanceof Double) {
@@ -184,8 +188,8 @@ public final class RecordUtil {
     }
   }
 
-  public static Double getDouble(final Record object, final String fieldName) {
-    final Number value = object.getValue(fieldName);
+  public static Double getDouble(final Record record, final String fieldName) {
+    final Number value = record.getValue(fieldName);
     if (value == null) {
       return null;
     } else if (value instanceof Double) {
@@ -196,18 +200,18 @@ public final class RecordUtil {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T getFieldByPath(final Record object, final String path) {
-    final RecordDefinition recordDefinition = object.getRecordDefinition();
+  public static <T> T getFieldByPath(final Record record, final String path) {
+    final RecordDefinition recordDefinition = record.getRecordDefinition();
 
     final String[] propertyPath = path.split("\\.");
-    Object propertyValue = object;
+    Object propertyValue = record;
     for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {
       final String propertyName = propertyPath[i];
       if (propertyValue instanceof Record) {
-        final Record record = (Record)propertyValue;
+        final Record recordValue = (Record)propertyValue;
 
-        if (record.hasField(propertyName)) {
-          propertyValue = getValue(record, propertyName);
+        if (recordValue.hasField(propertyName)) {
+          propertyValue = getValue(recordValue, propertyName);
           if (propertyValue == null) {
             return null;
           } else if (i + 1 < propertyPath.length) {
@@ -221,7 +225,8 @@ public final class RecordUtil {
         }
       } else if (propertyValue instanceof Geometry) {
         final Geometry geometry = (Geometry)propertyValue;
-        propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
+        propertyValue = GeometryProperties.getGeometryProperty(geometry,
+          propertyName);
       } else if (propertyValue instanceof Map) {
         final Map<String, Object> map = (Map<String, Object>)propertyValue;
         propertyValue = map.get(propertyName);
@@ -244,7 +249,8 @@ public final class RecordUtil {
     return (T)propertyValue;
   }
 
-  public static Set<Identifier> getIdentifiers(final Collection<? extends Record> records) {
+  public static Set<Identifier> getIdentifiers(
+    final Collection<? extends Record> records) {
     final Set<Identifier> identifiers = new TreeSet<>();
     for (final Record record : records) {
       final Identifier identifier = record.getIdentifier();
@@ -267,7 +273,8 @@ public final class RecordUtil {
     return identifiers;
   }
 
-  public static List<Identifier> getIdentifiers(final Record record, final String... fieldNames) {
+  public static List<Identifier> getIdentifiers(final Record record,
+    final String... fieldNames) {
     return getIdentifiers(record, Arrays.asList(fieldNames));
   }
 
@@ -286,12 +293,12 @@ public final class RecordUtil {
     }
   }
 
-  public static Integer getInteger(final Record object, final String fieldName,
+  public static Integer getInteger(final Record record, final String fieldName,
     final Integer defaultValue) {
-    if (object == null) {
+    if (record == null) {
       return null;
     } else {
-      final Number value = object.getValue(fieldName);
+      final Number value = record.getValue(fieldName);
       if (value == null) {
         return defaultValue;
       } else if (value instanceof Integer) {
@@ -302,8 +309,8 @@ public final class RecordUtil {
     }
   }
 
-  public static Long getLong(final Record object, final String fieldName) {
-    final Number value = object.getValue(fieldName);
+  public static Long getLong(final Record record, final String fieldName) {
+    final Number value = record.getValue(fieldName);
     if (value == null) {
       return null;
     } else if (value instanceof Long) {
@@ -315,7 +322,7 @@ public final class RecordUtil {
 
   public static Record getObject(final RecordDefinition recordDefinition,
     final Map<String, Object> values) {
-    final Record object = new ArrayRecord(recordDefinition);
+    final Record record = new ArrayRecord(recordDefinition);
     for (final Entry<String, Object> entry : values.entrySet()) {
       final String name = entry.getKey();
       final FieldDefinition attribute = recordDefinition.getField(name);
@@ -326,31 +333,32 @@ public final class RecordUtil {
           @SuppressWarnings("unchecked")
           final Class<Object> dataTypeClass = (Class<Object>)dataType.getJavaClass();
           if (dataTypeClass.isAssignableFrom(value.getClass())) {
-            object.setValue(name, value);
+            record.setValue(name, value);
           } else {
             final StringConverter<Object> converter = StringConverterRegistry.getInstance()
               .getConverter(dataTypeClass);
             if (converter == null) {
-              object.setValue(name, value);
+              record.setValue(name, value);
             } else {
               final Object convertedValue = converter.toObject(value);
-              object.setValue(name, convertedValue);
+              record.setValue(name, convertedValue);
             }
           }
         }
       }
     }
-    return object;
+    return record;
   }
 
-  public static List<Record> getObjects(final RecordDefinition recordDefinition,
+  public static List<Record> getObjects(
+    final RecordDefinition recordDefinition,
     final Collection<? extends Map<String, Object>> list) {
-    final List<Record> objects = new ArrayList<Record>();
+    final List<Record> records = new ArrayList<Record>();
     for (final Map<String, Object> map : list) {
-      final Record object = getObject(recordDefinition, map);
-      objects.add(object);
+      final Record record = getObject(recordDefinition, map);
+      records.add(record);
     }
-    return objects;
+    return records;
   }
 
   private static Object getValue(final Record record, final String fieldName) {
@@ -361,10 +369,11 @@ public final class RecordUtil {
     }
   }
 
-  public static void mergeStringListValue(final Map<String, Object> object, final Record object1,
-    final Record object2, final String fieldName, final String separator) {
-    final String value1 = object1.getString(fieldName);
-    final String value2 = object2.getString(fieldName);
+  public static void mergeStringListValue(final Map<String, Object> record,
+    final Record record1, final Record record2, final String fieldName,
+    final String separator) {
+    final String value1 = record1.getString(fieldName);
+    final String value2 = record2.getString(fieldName);
     Object value;
     if (!Property.hasValue(value1)) {
       value = value2;
@@ -378,13 +387,14 @@ public final class RecordUtil {
       values.addAll(CollectionUtil.split(value2, ","));
       value = CollectionUtil.toString(values);
     }
-    object.put(fieldName, value);
+    record.put(fieldName, value);
   }
 
-  public static void mergeValue(final Map<String, Object> object, final Record object1,
-    final Record object2, final String fieldName, final String separator) {
-    final String value1 = object1.getString(fieldName);
-    final String value2 = object2.getString(fieldName);
+  public static void mergeValue(final Map<String, Object> record,
+    final Record record1, final Record record2, final String fieldName,
+    final String separator) {
+    final String value1 = record1.getString(fieldName);
+    final String value2 = record2.getString(fieldName);
     Object value;
     if (!Property.hasValue(value1)) {
       value = value2;
@@ -395,11 +405,12 @@ public final class RecordUtil {
     } else {
       value = value1 + separator + value2;
     }
-    object.put(fieldName, value);
+    record.put(fieldName, value);
   }
 
   public static void setValues(final Record target, final Record source,
-    final Collection<String> fieldNames, final Collection<String> ignoreFieldNames) {
+    final Collection<String> fieldNames,
+    final Collection<String> ignoreFieldNames) {
     for (final String fieldName : fieldNames) {
       if (!ignoreFieldNames.contains(fieldName)) {
         final Object oldValue = getValue(target, fieldName);
@@ -412,10 +423,10 @@ public final class RecordUtil {
     }
   }
 
-  public static Geometry unionGeometry(final Collection<?> objects) {
+  public static Geometry unionGeometry(final Collection<?> records) {
     Geometry union = null;
-    for (final Object object : objects) {
-      final Geometry geometry = unionGeometry(object);
+    for (final Object record : records) {
+      final Geometry geometry = unionGeometry(record);
       if (geometry != null) {
         union = geometry.union(union);
       }

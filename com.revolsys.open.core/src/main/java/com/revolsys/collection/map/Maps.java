@@ -75,6 +75,16 @@ public class Maps {
     }
   }
 
+  public static <K1, V> boolean containsInCollection(
+    final Map<K1, ? extends Collection<V>> map, final K1 key, final V value) {
+    final Collection<V> collection = map.get(key);
+    if (collection == null) {
+      return false;
+    } else {
+      return collection.contains(value);
+    }
+  }
+
   public static <K1, K2, V> boolean containsKey(final Map<K1, Map<K2, V>> map,
     final K1 key1, final K2 key2) {
     final Map<K2, V> mapValue = getMap(map, key1);
