@@ -140,5 +140,7 @@ public interface Layer extends PropertyChangeSupportProxy, ObjectWithProperties,
 
   void showRendererProperties(final LayerRenderer<?> renderer);
 
+  void showTableView();
+
   <C extends Component> C showTableView(Map<String, Object> config);
 }

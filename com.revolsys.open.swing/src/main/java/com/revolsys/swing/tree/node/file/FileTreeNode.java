@@ -46,8 +46,48 @@ import com.revolsys.util.UrlUtil;
 
 public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
-  public static List<BaseTreeNode> getFileNodes(final BaseTreeNode parent,
-    final File file) {
+  public static final Icon ICON_FILE = Icons.getIcon("file");
+
+  public static final Icon ICON_FILE_DATABASE = Icons.getIcon("file_database");
+
+  public static final Icon ICON_FILE_IMAGE = Icons.getIcon("file_image");
+
+  public static final Icon ICON_FILE_TABLE = Icons.getIcon("file_table");
+
+  public static final Icon ICON_FILE_VECTOR = Icons.getIcon("file_table");
+
+  public static final Icon ICON_FOLDER = Icons.getIcon("folder");
+
+  public static final Icon ICON_FOLDER_OPEN = Icons.getIcon("folder_open");
+
+  public static final Icon ICON_DRIVE = Icons.getIcon("drive");
+
+  public static final Icon ICON_DRIVE_MISSING = Icons.getIcon("drive_error");
+
+  public static final ImageIcon ICON_FOLDER_LINK = Icons.getIcon("folder_link");
+
+  public static final ImageIcon ICON_FOLDER_LINK_OPEN = Icons.getIcon("folder_link_open");
+
+  public static final Icon ICON_FOLDER_MISSING = Icons.getIcon("folder_error");
+
+  private static final MenuFactory MENU = new MenuFactory("File");
+
+  static {
+    final EnableCheck isDirectory = new TreeNodePropertyEnableCheck("directory");
+    final EnableCheck isFileLayer = new TreeNodePropertyEnableCheck("fileLayer");
+
+    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh", "arrow_refresh",
+      NODE_EXISTS, "refresh");
+    MENU.addMenuItem("default", refresh);
+
+    MENU.addMenuItem("default",
+      TreeNodeRunnable.createAction("Add Layer", "map_add", isFileLayer, "addLayer"));
+
+    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Add Folder Connection", "link_add",
+      new AndEnableCheck(isDirectory, NODE_EXISTS), "addFolderConnection"));
+  }
+
+  public static List<BaseTreeNode> getFileNodes(final BaseTreeNode parent, final File file) {
     if (file.isDirectory()) {
       final File[] files = file.listFiles();
       return getFileNodes(parent, files);
@@ -56,15 +96,13 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     }
   }
 
-  public static List<BaseTreeNode> getFileNodes(final BaseTreeNode parent,
-    final File[] files) {
+  public static List<BaseTreeNode> getFileNodes(final BaseTreeNode parent, final File[] files) {
     final List<BaseTreeNode> children = new ArrayList<>();
     if (files != null) {
       for (final File childFile : files) {
         if (!childFile.isHidden()) {
           if (FileTreeNode.isRecordStore(childFile)) {
-            final FileRecordStoreTreeNode recordStoreNode = new FileRecordStoreTreeNode(
-              childFile);
+            final FileRecordStoreTreeNode recordStoreNode = new FileRecordStoreTreeNode(childFile);
             children.add(recordStoreNode);
           } else {
             final FileTreeNode child = new FileTreeNode(childFile);
@@ -131,56 +169,14 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
   public static boolean isImage(final File file) {
     final String fileNameExtension = FileUtil.getFileNameExtension(file);
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    return ioFactoryRegistry.isFileExtensionSupported(
-      GeoReferencedImageFactory.class, fileNameExtension);
+    return ioFactoryRegistry.isFileExtensionSupported(GeoReferencedImageFactory.class,
+      fileNameExtension);
   }
 
   public static boolean isRecordStore(final File file) {
     final Set<String> fileExtensions = RecordStoreFactoryRegistry.getFileExtensions();
     final String extension = FileUtil.getFileNameExtension(file).toLowerCase();
     return fileExtensions.contains(extension);
-  }
-
-  public static final Icon ICON_FILE = Icons.getIcon("file");
-
-  public static final Icon ICON_FILE_DATABASE = Icons.getIcon("file_database");
-
-  public static final Icon ICON_FILE_IMAGE = Icons.getIcon("file_image");
-
-  public static final Icon ICON_FILE_TABLE = Icons.getIcon("file_table");
-
-  public static final Icon ICON_FILE_VECTOR = Icons.getIcon("file_table");
-
-  public static final Icon ICON_FOLDER = Icons.getIcon("folder");
-
-  public static final Icon ICON_FOLDER_OPEN = Icons.getIcon("folder_open");
-
-  public static final Icon ICON_DRIVE = Icons.getIcon("drive");
-
-  public static final Icon ICON_DRIVE_MISSING = Icons.getIcon("drive_error");
-
-  public static final ImageIcon ICON_FOLDER_LINK = Icons.getIcon("folder_link");
-
-  public static final ImageIcon ICON_FOLDER_LINK_OPEN = Icons.getIcon("folder_link_open");
-
-  public static final Icon ICON_FOLDER_MISSING = Icons.getIcon("folder_error");
-
-  private static final MenuFactory MENU = new MenuFactory("File");
-
-  static {
-    final EnableCheck isDirectory = new TreeNodePropertyEnableCheck("directory");
-    final EnableCheck isFileLayer = new TreeNodePropertyEnableCheck("fileLayer");
-
-    final InvokeMethodAction refresh = TreeNodeRunnable.createAction("Refresh",
-      "arrow_refresh", NODE_EXISTS, "refresh");
-    MENU.addMenuItem("default", refresh);
-
-    MENU.addMenuItem("default", TreeNodeRunnable.createAction("Add Layer",
-      "map_add", isFileLayer, "addLayer"));
-
-    MENU.addMenuItem("default", TreeNodeRunnable.createAction(
-      "Add Folder Connection", "link_add", new AndEnableCheck(isDirectory,
-        NODE_EXISTS), "addFolderConnection"));
   }
 
   public FileTreeNode(final File file) {
@@ -210,7 +206,7 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
       SwingUtil.addLabel(panel, "Folder Connections");
       final List<FolderConnectionRegistry> registries = new ArrayList<>();
       for (final FolderConnectionRegistry registry : FolderConnectionManager.get()
-          .getVisibleConnectionRegistries()) {
+        .getVisibleConnectionRegistries()) {
         if (!registry.isReadOnly()) {
           registries.add(registry);
         }
@@ -241,7 +237,8 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   public void addLayer() {
     final URL url = getUrl();
-    Project.get().openFile(url);
+    final Project project = Project.get();
+    project.openFile(url);
   }
 
   @Override
@@ -297,8 +294,8 @@ public class FileTreeNode extends LazyLoadTreeNode implements UrlProxy {
     } else if (file.exists()) {
       final String extension = FileUtil.getFileNameExtension(file);
       if (Property.hasValue(extension)) {
-        final IoFactory factory = IoFactoryRegistry.getInstance()
-            .getFactoryByFileExtension(IoFactory.class, extension);
+        final IoFactory factory = IoFactoryRegistry.getInstance().getFactoryByFileExtension(
+          IoFactory.class, extension);
         if (factory != null) {
           return factory.getName();
         }

@@ -38,8 +38,15 @@ import com.revolsys.swing.tree.MenuSourceRunnable;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.Property;
 
-public class LayerGroup extends AbstractLayer implements Parent<Layer>,
-Iterable<Layer> {
+public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable<Layer> {
+
+  static {
+    final MenuFactory menu = MenuFactory.getMenu(LayerGroup.class);
+    menu.addGroup(0, "group");
+    menu.addMenuItem("group",
+      MenuSourceRunnable.createAction("Add Group", "folder_add", "addLayerGroup"));
+    menu.addMenuItem("group", new AddFileLayerAction());
+  }
 
   public static LayerGroup create(final Map<String, Object> properties) {
     final LayerGroup layerGroup = new LayerGroup();
@@ -65,8 +72,7 @@ Iterable<Layer> {
     return null;
   }
 
-  private static Layer getLayerByName(final LayerGroup group,
-    final String layerName) {
+  private static Layer getLayerByName(final LayerGroup group, final String layerName) {
     for (final Layer layer : group.getLayers()) {
       if (layer.getName().equals(layerName)) {
 
@@ -74,14 +80,6 @@ Iterable<Layer> {
       }
     }
     return null;
-  }
-
-  static {
-    final MenuFactory menu = MenuFactory.getMenu(LayerGroup.class);
-    menu.addGroup(0, "group");
-    menu.addMenuItem("group", MenuSourceRunnable.createAction("Add Group",
-      "folder_add", "addLayerGroup"));
-    menu.addMenuItem("group", new AddFileLayerAction());
   }
 
   private List<Layer> layers = new ArrayList<Layer>();
@@ -97,8 +95,7 @@ Iterable<Layer> {
     setInitialized(true);
   }
 
-  protected <V extends Layer> void addDescendants(final List<V> layers,
-    final Class<V> layerClass) {
+  protected <V extends Layer> void addDescendants(final List<V> layers, final Class<V> layerClass) {
     addLayers(layers, layerClass);
     for (final LayerGroup layerGroup : getLayerGroups()) {
       layerGroup.addDescendants(layers, layerClass);
@@ -137,9 +134,8 @@ Iterable<Layer> {
   }
 
   public LayerGroup addLayerGroup() {
-    final String name = JOptionPane.showInputDialog(
-      SwingUtil.getActiveWindow(), "Enter the name of the new Layer Group.",
-      "Add Layer Group", JOptionPane.PLAIN_MESSAGE);
+    final String name = JOptionPane.showInputDialog(SwingUtil.getActiveWindow(),
+      "Enter the name of the new Layer Group.", "Add Layer Group", JOptionPane.PLAIN_MESSAGE);
     if (Property.hasValue(name)) {
       final LayerGroup newGroup = new LayerGroup(name);
       addLayer(newGroup);
@@ -182,8 +178,7 @@ Iterable<Layer> {
   }
 
   @SuppressWarnings("unchecked")
-  protected <V extends Layer> void addLayers(final List<V> layers,
-    final Class<V> layerClass) {
+  protected <V extends Layer> void addLayers(final List<V> layers, final Class<V> layerClass) {
     for (final Layer layer : this.layers) {
       if (layerClass.isAssignableFrom(layer.getClass())) {
         layers.add((V)layer);
@@ -333,8 +328,7 @@ Iterable<Layer> {
   protected File getGroupSettingsDirectory(final File directory) {
     final String name = getName();
     final String groupDirectoryName = FileUtil.getSafeFileName(name);
-    final File groupDirectory = FileUtil.getDirectory(directory,
-      groupDirectoryName);
+    final File groupDirectory = FileUtil.getDirectory(directory, groupDirectoryName);
     return groupDirectory;
   }
 
@@ -376,8 +370,8 @@ Iterable<Layer> {
   }
 
   public Layer getLayerByPath(final String layerPath) {
-    final List<String> path = CollectionUtil.split(
-      layerPath.replaceAll("^\\s*/+\\s*", ""), "(\\s*/+\\s*)+");
+    final List<String> path = CollectionUtil.split(layerPath.replaceAll("^\\s*/+\\s*", ""),
+      "(\\s*/+\\s*)+");
     return getLayerByPath(path);
   }
 
@@ -438,8 +432,8 @@ Iterable<Layer> {
     return "rgLayerGroup.rgobject";
   }
 
-  public <V extends Layer> List<V> getVisibleDescendants(
-    final Class<V> layerClass, final double scale) {
+  public <V extends Layer> List<V> getVisibleDescendants(final Class<V> layerClass,
+    final double scale) {
     final List<V> layers = new ArrayList<V>();
     addVisibleDescendants(layers, layerClass, scale);
     return layers;
@@ -510,7 +504,7 @@ Iterable<Layer> {
     return getLayers().iterator();
   }
 
-  protected void loadLayer(final File file) {
+  protected Layer loadLayer(final File file) {
     final Resource oldResource = SpringUtil.setBaseResource(new FileSystemResource(
       file.getParentFile()));
 
@@ -520,9 +514,10 @@ Iterable<Layer> {
       if (layer != null) {
         addLayer(layer);
       }
+      return layer;
     } catch (final Throwable t) {
-      LoggerFactory.getLogger(getClass()).error(
-        "Cannot load layer from " + file, t);
+      LoggerFactory.getLogger(getClass()).error("Cannot load layer from " + file, t);
+      return null;
     } finally {
       SpringUtil.setBaseResource(oldResource);
     }
@@ -545,12 +540,10 @@ Iterable<Layer> {
             addLayer(layer);
           } else if (object != null) {
             LoggerFactory.getLogger(LayerGroup.class).error(
-              "Unexpected object type " + object.getClass() + " in "
-                  + childResource);
+              "Unexpected object type " + object.getClass() + " in " + childResource);
           }
         } else {
-          LoggerFactory.getLogger(LayerGroup.class).error(
-            "Cannot find " + childResource);
+          LoggerFactory.getLogger(LayerGroup.class).error("Cannot find " + childResource);
         }
       }
     }
@@ -585,7 +578,7 @@ Iterable<Layer> {
     String name = FileUtil.getFileName(urlString);
     name = FileUtil.fromSafeName(name);
     properties.put("name", name);
-    Layer layer = null;
+    Layer layer;
     if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(urlString)) {
       layer = new GeoReferencedImageLayer(properties);
     } else if (RecordIo.hasRecordReaderFactory(urlString)) {
@@ -593,8 +586,11 @@ Iterable<Layer> {
       final GeometryStyleRenderer renderer = recordLayer.getRenderer();
       renderer.setStyle(GeometryStyle.createStyle());
       layer = recordLayer;
+    } else {
+      layer = null;
     }
     if (layer != null) {
+      layer.setProperty("showTableView", true);
       if (index == -1) {
         addLayer(layer);
       } else {
@@ -605,22 +601,7 @@ Iterable<Layer> {
   }
 
   public void openFile(final URL url) {
-    final String urlString = url.toString();
-    final Map<String, Object> properties = new HashMap<String, Object>();
-    properties.put("url", urlString);
-    String name = FileUtil.getFileName(urlString);
-    name = FileUtil.fromSafeName(name);
-    properties.put("name", name);
-    if (AbstractGeoReferencedImageFactory.hasGeoReferencedImageFactory(urlString)) {
-      final GeoReferencedImageLayer layer = new GeoReferencedImageLayer(
-        properties);
-      addLayer(layer);
-    } else if (RecordIo.hasRecordReaderFactory(urlString)) {
-      final FileRecordLayer layer = new FileRecordLayer(properties);
-      final GeometryStyleRenderer renderer = layer.getRenderer();
-      renderer.setStyle(GeometryStyle.createStyle());
-      addLayer(layer);
-    }
+    openFile(-1, url);
   }
 
   public void openFiles(int index, final List<File> files) {
@@ -630,9 +611,7 @@ Iterable<Layer> {
   }
 
   public void openFiles(final List<File> files) {
-    for (final File file : files) {
-      openFile(file);
-    }
+    openFiles(-1, files);
   }
 
   public Layer removeLayer(final int index) {

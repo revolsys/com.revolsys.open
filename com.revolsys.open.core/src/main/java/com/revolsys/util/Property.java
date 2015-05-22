@@ -146,6 +146,30 @@ public final class Property {
     }
   }
 
+  public static boolean getBoolean(final ObjectWithProperties object, final String key) {
+    if (object == null) {
+      return false;
+    } else {
+      final Object value = object.getProperty(key);
+      if (value == null) {
+        return false;
+      } else if (value instanceof Boolean) {
+        final Boolean booleanValue = (Boolean)value;
+        return booleanValue;
+      } else if (value instanceof Number) {
+        final Number number = (Number)value;
+        return number.intValue() == 1;
+      } else {
+        final String stringValue = value.toString();
+        if (stringValue.equals("Y") || stringValue.equals("1") || Boolean.parseBoolean(stringValue)) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+  }
+
   public static Class<?> getClass(final Class<?> beanClass, final String name) {
     final PropertyDescriptor propertyDescriptor = descriptor(beanClass, name);
     if (propertyDescriptor == null) {

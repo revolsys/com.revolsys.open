@@ -25,8 +25,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.parallel.Invoke;
 
-public class FileDropTargetListener implements DropTargetListener,
-HierarchyListener {
+public class FileDropTargetListener implements DropTargetListener, HierarchyListener {
   private static final String ZERO_CHAR_STRING = String.valueOf((char)0);
 
   private static final Logger LOG = Logger.getLogger(FileDropTargetListener.class);
@@ -77,11 +76,11 @@ HierarchyListener {
   public void drop(final DropTargetDropEvent event) {
     try {
       final Transferable tr = event.getTransferable();
-      List<File> files = null;
+      final List<File> files = new ArrayList<File>();
       if (tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
         event.acceptDrop(DnDConstants.ACTION_COPY);
 
-        files = (List<File>)tr.getTransferData(DataFlavor.javaFileListFlavor);
+        files.addAll((List<File>)tr.getTransferData(DataFlavor.javaFileListFlavor));
       } else {
         final DataFlavor[] flavors = tr.getTransferDataFlavors();
         boolean handled = false;
@@ -89,10 +88,8 @@ HierarchyListener {
           if (flavor.isRepresentationClassReader()) {
             event.acceptDrop(DnDConstants.ACTION_COPY);
 
-            final BufferedReader reader = new BufferedReader(
-              flavor.getReaderForText(tr));
+            final BufferedReader reader = new BufferedReader(flavor.getReaderForText(tr));
             handled = true;
-            files = new ArrayList<File>();
             String fileName = null;
             while ((fileName = reader.readLine()) != null) {
               try {
@@ -115,9 +112,8 @@ HierarchyListener {
           return;
         }
       }
-      if (files != null && !files.isEmpty()) {
-        Invoke.background("Open Files", Project.get(), "openFiles", files);
-      }
+      final Project project = Project.get();
+      Invoke.background("Open Files", () -> project.openFiles(files));
       event.getDropTargetContext().dropComplete(true);
     } catch (final Throwable e) {
       LOG.error("Unable to drop", e);
@@ -147,8 +143,7 @@ HierarchyListener {
   private boolean isDragOk(final DropTargetDragEvent event) {
     final DataFlavor[] flavors = event.getCurrentDataFlavors();
     for (final DataFlavor flavor : flavors) {
-      if (flavor.equals(DataFlavor.javaFileListFlavor)
-          || flavor.isRepresentationClassReader()) {
+      if (flavor.equals(DataFlavor.javaFileListFlavor) || flavor.isRepresentationClassReader()) {
         return true;
       }
     }

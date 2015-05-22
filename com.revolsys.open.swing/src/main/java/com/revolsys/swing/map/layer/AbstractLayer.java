@@ -577,6 +577,9 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
       try {
         final boolean exists = doInitialize();
         setExists(exists);
+        if (Property.getBoolean(this, "showTableView")) {
+          Invoke.later(() -> showTableView());
+        }
       } catch (final Throwable e) {
         ExceptionUtil.log(getClass(), "Unable to initialize layer: " + getPath(), e);
         setExists(false);
@@ -997,6 +1000,11 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
   }
 
   @Override
+  public void showTableView() {
+    showTableView(Collections.emptyMap());
+  }
+
+  @Override
   public <C extends Component> C showTableView(final Map<String, Object> config) {
     final ProjectFrame projectFrame = ProjectFrame.get(this);
     return projectFrame.addBottomTab(this, config);
@@ -1043,6 +1051,7 @@ public abstract class AbstractLayer extends AbstractObjectWithProperties impleme
       }
     }
     map.remove("bottomTab");
+    map.remove("showTableView");
     return map;
   }
 
