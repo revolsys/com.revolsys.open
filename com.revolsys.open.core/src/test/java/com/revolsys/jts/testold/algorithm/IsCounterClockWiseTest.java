@@ -58,7 +58,7 @@ public class IsCounterClockWiseTest extends TestCase {
 
   private LineString getLineString(final String wkt) throws ParseException {
     final Polygon geom = (Polygon)this.reader.read(wkt);
-    return geom.getExteriorRing();
+    return geom.getShell();
   }
 
   public void testCounterClockWise() throws Exception {

@@ -59,7 +59,7 @@ public class SameStructureTester {
 
   private static boolean isSameStructurePolygon(final Polygon g1,
     final Polygon g2) {
-    if (g1.getNumInteriorRing() != g2.getNumInteriorRing()) {
+    if (g1.getHoleCount() != g2.getHoleCount()) {
       return false;
     }
     // could check for both empty or nonempty here

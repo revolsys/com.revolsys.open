@@ -79,9 +79,9 @@ public class EuclideanDistanceToPoint {
 
   public void computeDistance(final Polygon poly, final Point pt,
     final PointPairDistance ptDist) {
-    computeDistance(poly.getExteriorRing(), pt, ptDist);
-    for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      computeDistance(poly.getInteriorRing(i), pt, ptDist);
+    computeDistance(poly.getShell(), pt, ptDist);
+    for (int i = 0; i < poly.getHoleCount(); i++) {
+      computeDistance(poly.getHole(i), pt, ptDist);
     }
   }
 }

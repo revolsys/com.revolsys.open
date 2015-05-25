@@ -457,11 +457,11 @@ public class WKBWriter {
       throws IOException {
     writeByteOrder(os);
     writeGeometryType(WKBConstants.wkbPolygon, poly, os);
-    writeInt(poly.getNumInteriorRing() + 1, os);
-    writeCoordinateSequence(poly.getExteriorRing(), true,
+    writeInt(poly.getHoleCount() + 1, os);
+    writeCoordinateSequence(poly.getShell(), true,
       os);
-    for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      writeCoordinateSequence(poly.getInteriorRing(i),
+    for (int i = 0; i < poly.getHoleCount(); i++) {
+      writeCoordinateSequence(poly.getHole(i),
         true, os);
     }
   }

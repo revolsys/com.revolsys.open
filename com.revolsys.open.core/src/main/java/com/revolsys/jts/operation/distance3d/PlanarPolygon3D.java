@@ -161,7 +161,7 @@ public class PlanarPolygon3D {
    * @return the best-fit plane
    */
   private Plane3D findBestFitPlane(final Polygon poly) {
-    final LineString seq = poly.getExteriorRing();
+    final LineString seq = poly.getShell();
     final Point basePt = averagePoint(seq);
     final Vector3D normal = averageNormal(seq);
     return new Plane3D(normal, basePt);
@@ -176,12 +176,12 @@ public class PlanarPolygon3D {
   }
 
   public boolean intersects(final Point intPt) {
-    if (Location.EXTERIOR == locate(intPt, this.poly.getExteriorRing())) {
+    if (Location.EXTERIOR == locate(intPt, this.poly.getShell())) {
       return false;
     }
 
-    for (int i = 0; i < this.poly.getNumInteriorRing(); i++) {
-      if (Location.INTERIOR == locate(intPt, this.poly.getInteriorRing(i))) {
+    for (int i = 0; i < this.poly.getHoleCount(); i++) {
+      if (Location.INTERIOR == locate(intPt, this.poly.getHole(i))) {
         return false;
       }
     }

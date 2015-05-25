@@ -54,4 +54,6 @@ public interface MultiPoint extends GeometryCollection, Puntal {
 
   @Override
   MultiPoint normalize();
+
+  Iterable<Point> points();
 }

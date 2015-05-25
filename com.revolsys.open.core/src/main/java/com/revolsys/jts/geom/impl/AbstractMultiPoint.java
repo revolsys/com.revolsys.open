@@ -19,7 +19,7 @@ import com.revolsys.jts.geom.vertex.MultiPointVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
 
 public abstract class AbstractMultiPoint extends AbstractGeometryCollection
-implements MultiPoint {
+  implements MultiPoint {
 
   /**
    *
@@ -54,6 +54,22 @@ implements MultiPoint {
       newPoints.add(newPoint);
     }
     return (V)geometryFactory.multiPoint(newPoints);
+  }
+
+  @Override
+  protected double doDistance(final Geometry geometry,
+    final double terminateDistance) {
+    double minDistance = Double.MAX_VALUE;
+    for (final Point point : getPoints()) {
+      final double distance = geometry.distance(point, terminateDistance);
+      if (distance < minDistance) {
+        minDistance = distance;
+        if (distance <= terminateDistance) {
+          return distance;
+        }
+      }
+    }
+    return minDistance;
   }
 
   @Override
@@ -176,7 +192,7 @@ implements MultiPoint {
     } else if (vertexId.length <= 2) {
       if (isEmpty()) {
         throw new IllegalArgumentException(
-            "Cannot move vertex for empty MultiPoint");
+          "Cannot move vertex for empty MultiPoint");
       } else {
         final int partIndex = vertexId[0];
         final int partCount = getGeometryCount();
@@ -190,13 +206,13 @@ implements MultiPoint {
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not "
-                + partIndex);
+              + partIndex);
         }
       }
     } else {
       throw new IllegalArgumentException(
         "Vertex id's for MultiPoint must have length 1. "
-            + Arrays.toString(vertexId));
+          + Arrays.toString(vertexId));
     }
   }
 
@@ -215,6 +231,11 @@ implements MultiPoint {
       final MultiPoint normalizedGeometry = geometryFactory.multiPoint(geometries);
       return normalizedGeometry;
     }
+  }
+
+  @Override
+  public Iterable<Point> points() {
+    return getGeometries();
   }
 
   @Override

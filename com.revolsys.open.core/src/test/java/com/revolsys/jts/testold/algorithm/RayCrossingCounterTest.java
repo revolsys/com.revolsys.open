@@ -62,7 +62,7 @@ public class RayCrossingCounterTest extends AbstractPointInRingTest {
     final String wkt) throws Exception {
     final Polygon geom = (Polygon)this.reader.read(wkt);
     assertEquals(expectedLoc,
-      RayCrossingCounter.locatePointInRing(pt, geom.getExteriorRing()));
+      RayCrossingCounter.locatePointInRing(pt, geom.getShell()));
   }
 
 }

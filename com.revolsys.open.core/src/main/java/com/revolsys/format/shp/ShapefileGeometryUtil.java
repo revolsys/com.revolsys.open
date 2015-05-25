@@ -906,7 +906,7 @@ public final class ShapefileGeometryUtil {
       final Geometry part = geometry.getGeometry(i);
       if (part instanceof Polygon) {
         final Polygon polygon = (Polygon)part;
-        final LineString exterior = polygon.getExteriorRing();
+        final LineString exterior = polygon.getShell();
         LineString exteroirPoints = exterior;
         final boolean exteriorClockwise = !exterior.isCounterClockwise();
         if (exteriorClockwise != this.clockwise) {
@@ -914,9 +914,9 @@ public final class ShapefileGeometryUtil {
         }
         rings.add(exteroirPoints);
         vertexCount += exteroirPoints.getVertexCount();
-        final int numHoles = polygon.getNumInteriorRing();
+        final int numHoles = polygon.getHoleCount();
         for (int j = 0; j < numHoles; j++) {
-          final LineString interior = polygon.getInteriorRing(j);
+          final LineString interior = polygon.getHole(j);
           LineString interiorCoords = interior;
           final boolean interiorClockwise = !interior.isCounterClockwise();
           if (interiorClockwise == this.clockwise) {

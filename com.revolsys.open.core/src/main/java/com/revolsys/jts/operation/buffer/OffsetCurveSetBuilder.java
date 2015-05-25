@@ -165,7 +165,7 @@ public class OffsetCurveSetBuilder {
       offsetSide = Position.RIGHT;
     }
 
-    final LinearRing shell = p.getExteriorRing();
+    final LinearRing shell = p.getShell();
     final boolean shellClockwise = shell.isClockwise();
     final LineString shellCoord = CleanDuplicatePoints.clean((LineString)shell);
     // optimization - don't bother computing buffer
@@ -181,8 +181,8 @@ public class OffsetCurveSetBuilder {
     addPolygonRing(shellCoord, shellClockwise, offsetDistance, offsetSide,
       Location.EXTERIOR, Location.INTERIOR);
 
-    for (int i = 0; i < p.getNumInteriorRing(); i++) {
-      final LinearRing hole = p.getInteriorRing(i);
+    for (int i = 0; i < p.getHoleCount(); i++) {
+      final LinearRing hole = p.getHole(i);
       final boolean holeClockwise = hole.isClockwise();
       final LineString holeCoord = CleanDuplicatePoints.clean((LineString)hole);
 

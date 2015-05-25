@@ -304,7 +304,7 @@ public abstract class GeometryTransformer {
 
   protected Geometry transformPolygon(final Polygon geom, final Geometry parent) {
     boolean isAllValidLinearRings = true;
-    final Geometry shell = transformLinearRing(geom.getExteriorRing(), geom);
+    final Geometry shell = transformLinearRing(geom.getShell(), geom);
 
     if (shell == null || !(shell instanceof LinearRing) || shell.isEmpty()) {
       isAllValidLinearRings = false;
@@ -313,8 +313,8 @@ public abstract class GeometryTransformer {
 
     final List<LinearRing> rings = new ArrayList<>();
     rings.add((LinearRing)shell);
-    for (int i = 0; i < geom.getNumInteriorRing(); i++) {
-      final Geometry hole = transformLinearRing(geom.getInteriorRing(i), geom);
+    for (int i = 0; i < geom.getHoleCount(); i++) {
+      final Geometry hole = transformLinearRing(geom.getHole(i), geom);
       if (hole == null || hole.isEmpty()) {
         continue;
       }

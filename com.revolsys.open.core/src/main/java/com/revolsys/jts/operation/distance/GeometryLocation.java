@@ -90,7 +90,7 @@ public class GeometryLocation {
   /**
    * Returns the {@link Coordinates} of this location.
    */
-  public Point getCoordinate() {
+  public Point getPoint() {
     return this.pt;
   }
 

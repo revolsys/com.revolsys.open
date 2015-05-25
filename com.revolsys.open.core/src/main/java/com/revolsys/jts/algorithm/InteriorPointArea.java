@@ -104,9 +104,9 @@ public class InteriorPointArea {
 
     public double getBisectorY()
     {
-      process(this.poly.getExteriorRing());
-      for (int i = 0; i < this.poly.getNumInteriorRing(); i++) {
-        process(this.poly.getInteriorRing(i));
+      process(this.poly.getShell());
+      for (int i = 0; i < this.poly.getHoleCount(); i++) {
+        process(this.poly.getHole(i));
       }
       final double bisectY = avg(this.hiY, this.loY);
       return bisectY;

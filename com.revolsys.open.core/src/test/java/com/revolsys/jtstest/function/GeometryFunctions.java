@@ -78,7 +78,7 @@ public class GeometryFunctions {
 
   public static Geometry getPolygonHoleN(final Geometry g, final int i) {
     if (g instanceof Polygon) {
-      final LinearRing ring = ((Polygon)g).getInteriorRing(i);
+      final LinearRing ring = ((Polygon)g).getHole(i);
       return ring;
     }
     return null;
@@ -86,13 +86,13 @@ public class GeometryFunctions {
 
   public static Geometry getPolygonShell(final Geometry g) {
     if (g instanceof Polygon) {
-      final LinearRing shell = ((Polygon)g).getExteriorRing();
+      final LinearRing shell = ((Polygon)g).getShell();
       return g.getGeometryFactory().polygon(shell);
     }
     if (g instanceof MultiPolygon) {
       final Polygon[] poly = new Polygon[g.getGeometryCount()];
       for (int i = 0; i < g.getGeometryCount(); i++) {
-        final LinearRing shell = ((Polygon)g.getGeometry(i)).getExteriorRing();
+        final LinearRing shell = ((Polygon)g.getGeometry(i)).getShell();
         poly[i] = g.getGeometryFactory().polygon(shell);
       }
       return g.getGeometryFactory().multiPolygon(poly);
@@ -102,7 +102,7 @@ public class GeometryFunctions {
 
   public static boolean isCCW(final Geometry g) {
     if (g instanceof Polygon) {
-      return ((Polygon)g).getExteriorRing().isCounterClockwise();
+      return ((Polygon)g).getShell().isCounterClockwise();
     } else if (g instanceof LineString && ((LineString)g).isClosed()) {
       return ((LineString)g).isCounterClockwise();
     } else {

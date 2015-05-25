@@ -45,6 +45,7 @@ import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.prep.PreparedPoint;
 import com.revolsys.jts.geom.segment.Segment;
@@ -231,10 +232,18 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
   }
 
   @Override
-  public double distance(final Point point) {
-    final double x2 = point.getX();
-    final double y2 = point.getY();
-    return distance(x2, y2);
+  public double distance(Point point) {
+    if (point == null) {
+      throw new IllegalArgumentException("point must not be null");
+    } else if (isEmpty() || point.isEmpty()) {
+      return 0.0;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.convert(geometryFactory, 2);
+      final double x2 = point.getX();
+      final double y2 = point.getY();
+      return distance(x2, y2);
+    }
   }
 
   /**
@@ -249,6 +258,19 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
     final double dy = getY() - c.getY();
     final double dz = getZ() - c.getZ();
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  @Override
+  protected double doDistance(final Geometry geometry,
+    final double terminateDistance) {
+    if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      final double x = point.getX();
+      final double y = point.getY();
+      return distance(x, y);
+    } else {
+      return geometry.distance(this);
+    }
   }
 
   @Override
@@ -526,6 +548,15 @@ public abstract class AbstractPoint extends AbstractGeometry implements Point {
       }
     }
     return true;
+  }
+
+  @Override
+  public Location locate(final Point point) {
+    if (equals(2, point)) {
+      return Location.INTERIOR;
+    } else {
+      return Location.EXTERIOR;
+    }
   }
 
   @Override

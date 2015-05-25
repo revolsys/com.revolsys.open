@@ -42,11 +42,13 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.io.Reader;
+import com.revolsys.jts.algorithm.RayCrossingCounter;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.LineString;
 import com.revolsys.jts.geom.LinearRing;
+import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.prep.PreparedPolygon;
@@ -54,6 +56,7 @@ import com.revolsys.jts.geom.segment.PolygonSegment;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.PolygonVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.jts.operation.distance.DistanceOp;
 
 /**
  * Represents a polygon with linear edges, which may include holes.
@@ -81,7 +84,8 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *
  *@version 1.7
  */
-public abstract class AbstractPolygon extends AbstractGeometry implements Polygon {
+public abstract class AbstractPolygon extends AbstractGeometry implements
+  Polygon {
   private static final long serialVersionUID = -3494792200821764533L;
 
   /**
@@ -117,14 +121,15 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
     final double[] coordinates = new double[vertexCount * axisCount];
     int newVertexIndex = 0;
     for (int vertexIndex = index; vertexIndex < vertexCount - 1; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
-        vertexIndex);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount,
+        newVertexIndex++, points, vertexIndex);
     }
     for (int vertexIndex = 0; vertexIndex < index; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
-        vertexIndex);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount,
+        newVertexIndex++, points, vertexIndex);
     }
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1, points, index);
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1,
+      points, index);
     final GeometryFactory geometryFactory = ring.getGeometryFactory();
     return geometryFactory.linearRing(axisCount, coordinates);
   }
@@ -134,12 +139,14 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
+  public <V extends Geometry> V appendVertex(final Point newPoint,
+    final int... geometryId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (geometryId.length == 1) {
       if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException(
+          "Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = geometryId[0];
         final int ringCount = getRingCount();
@@ -152,13 +159,15 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
-            + " not " + ringIndex);
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not "
+              + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException("Geometry id's for Polygons must have length 1. "
-        + Arrays.toString(geometryId));
+      throw new IllegalArgumentException(
+        "Geometry id's for Polygons must have length 1. "
+          + Arrays.toString(geometryId));
     }
   }
 
@@ -176,9 +185,9 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
 
   @Override
   public int compareToSameClass(final Geometry geometry) {
-    final LinearRing thisShell = getExteriorRing();
+    final LinearRing thisShell = getShell();
     final Polygon ploygon2 = (Polygon)geometry;
-    final LinearRing otherShell = ploygon2.getExteriorRing();
+    final LinearRing otherShell = ploygon2.getShell();
     return thisShell.compareToSameClass(otherShell);
   }
 
@@ -194,7 +203,7 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
 
   @Override
   public Geometry convexHull() {
-    return getExteriorRing().convexHull();
+    return getShell().convexHull();
   }
 
   @SuppressWarnings("unchecked")
@@ -213,7 +222,8 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
   public <V extends Geometry> V deleteVertex(final int... vertexId) {
     if (vertexId.length == 2) {
       if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException(
+          "Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -227,14 +237,67 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
-            + " not " + ringIndex);
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not "
+              + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
-        + Arrays.toString(vertexId));
+      throw new IllegalArgumentException(
+        "Vertex id's for Polygons must have length 2. "
+          + Arrays.toString(vertexId));
     }
+  }
+
+  @Override
+  protected double doDistance(final Geometry geometry,
+    final double terminateDistance) {
+    if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return doDistance(point, terminateDistance);
+    } else if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+      return doDistance(line, terminateDistance);
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      return doDistance(polygon, terminateDistance);
+    } else {
+      return geometry.distance(this, terminateDistance);
+    }
+  }
+
+  protected double doDistance(final LineString line,
+    final double terminateDistance) {
+    // TODO Auto-generated method stub
+    final DistanceOp distOp = new DistanceOp(this, line, terminateDistance);
+    final double distance = distOp.distance();
+    return distance;
+  }
+
+  protected double doDistance(final Point point, final double terminateDistance) {
+    if (intersects(point)) {
+      return 0;
+    } else {
+      double minDistance = Double.MAX_VALUE;
+      for (final LinearRing ring : rings()) {
+        final double distance = ring.distance(point, terminateDistance);
+        if (distance < minDistance) {
+          minDistance = distance;
+          if (distance <= terminateDistance) {
+            return distance;
+          }
+        }
+      }
+      return minDistance;
+    }
+  }
+
+  protected double doDistance(final Polygon polygon,
+    final double terminateDistance) {
+    // TODO Auto-generated method stub
+    final DistanceOp distOp = new DistanceOp(this, polygon, terminateDistance);
+    final double distance = distOp.distance();
+    return distance;
   }
 
   @Override
@@ -335,7 +398,7 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
       return geometryFactory.multiLineString();
     } else {
       if (getRingCount() == 1) {
-        return geometryFactory.linearRing(getExteriorRing());
+        return geometryFactory.linearRing(getShell());
       } else {
         return geometryFactory.multiLineString(getRings());
       }
@@ -357,18 +420,14 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
     return 2;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public LinearRing getExteriorRing() {
-    if (isEmpty()) {
-      return null;
-    } else {
-      return getRing(0);
+  public <V extends Geometry> List<V> getGeometryComponents(
+    final Class<V> geometryClass) {
+    final List<V> geometries = new ArrayList<V>();
+    if (geometryClass.isAssignableFrom(getClass())) {
+      geometries.add((V)this);
     }
-  }
-
-  @Override
-  public <V extends Geometry> List<V> getGeometryComponents(final Class<V> geometryClass) {
-    final List<V> geometries = super.getGeometryComponents(geometryClass);
     for (final LinearRing ring : rings()) {
       if (ring != null) {
         final List<V> ringGeometries = ring.getGeometries(geometryClass);
@@ -384,8 +443,17 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
   }
 
   @Override
-  public LinearRing getInteriorRing(final int ringIndex) {
+  public LinearRing getHole(final int ringIndex) {
     return getRing(ringIndex + 1);
+  }
+
+  @Override
+  public int getHoleCount() {
+    if (isEmpty()) {
+      return 0;
+    } else {
+      return getRingCount() - 1;
+    }
   }
 
   /**
@@ -403,20 +471,11 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
   }
 
   @Override
-  public int getNumInteriorRing() {
-    if (isEmpty()) {
-      return 0;
-    } else {
-      return getRingCount() - 1;
-    }
-  }
-
-  @Override
   public Point getPoint() {
     if (isEmpty()) {
       return null;
     } else {
-      return getExteriorRing().getPoint();
+      return getShell().getPoint();
     }
   }
 
@@ -455,6 +514,15 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
         }
       }
       return null;
+    }
+  }
+
+  @Override
+  public LinearRing getShell() {
+    if (isEmpty()) {
+      return null;
+    } else {
+      return getRing(0);
     }
   }
 
@@ -510,12 +578,12 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
 
   @Override
   public Iterable<LinearRing> holes() {
-    if (getNumInteriorRing() == 0) {
+    if (getHoleCount() == 0) {
       return Collections.emptyList();
     } else {
       final List<LinearRing> holes = new ArrayList<>();
-      for (int i = 0; i < getNumInteriorRing(); i++) {
-        final LinearRing ring = getInteriorRing(i);
+      for (int i = 0; i < getHoleCount(); i++) {
+        final LinearRing ring = getHole(i);
         holes.add(ring);
       }
       return holes;
@@ -524,12 +592,14 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V insertVertex(final Point newPoint, final int... vertexId) {
+  public <V extends Geometry> V insertVertex(final Point newPoint,
+    final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (vertexId.length == 2) {
       if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException(
+          "Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -543,13 +613,15 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
-            + " not " + ringIndex);
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not "
+              + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
-        + Arrays.toString(vertexId));
+      throw new IllegalArgumentException(
+        "Vertex id's for Polygons must have length 2. "
+          + Arrays.toString(vertexId));
     }
   }
 
@@ -585,10 +657,10 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
   public boolean isRectangle() {
     if (isEmpty()) {
       return false;
-    } else if (getNumInteriorRing() != 0) {
+    } else if (getHoleCount() != 0) {
       return false;
     } else {
-      final LinearRing shell = getExteriorRing();
+      final LinearRing shell = getShell();
       if (shell.getVertexCount() != 5) {
         return false;
       } else {
@@ -625,6 +697,37 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
   }
 
   @Override
+  public Location locate(Point point) {
+    if (isEmpty() || point.isEmpty()) {
+      return Location.EXTERIOR;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.convert(geometryFactory);
+      final LinearRing shell = getShell();
+      final Point point1 = point;
+      final Location shellLocation = RayCrossingCounter.locatePointInRing(
+        point1, shell);
+      if (shellLocation == Location.EXTERIOR) {
+        return Location.EXTERIOR;
+      } else if (shellLocation == Location.BOUNDARY) {
+        return Location.BOUNDARY;
+      } else {
+        for (final LinearRing hole : holes()) {
+          final Point point2 = point;
+          final Location holeLocation = RayCrossingCounter.locatePointInRing(
+            point2, hole);
+          if (holeLocation == Location.INTERIOR) {
+            return Location.EXTERIOR;
+          } else if (holeLocation == Location.BOUNDARY) {
+            return Location.BOUNDARY;
+          }
+        }
+      }
+      return Location.INTERIOR;
+    }
+  }
+
+  @Override
   public Polygon move(final double... deltas) {
     if (deltas == null || isEmpty()) {
       return this;
@@ -641,12 +744,14 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
+  public <V extends Geometry> V moveVertex(final Point newPoint,
+    final int... vertexId) {
     if (newPoint == null || newPoint.isEmpty()) {
       return (V)this;
     } else if (vertexId.length == 2) {
       if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty Polygon");
+        throw new IllegalArgumentException(
+          "Cannot move vertex for empty Polygon");
       } else {
         final int ringIndex = vertexId[0];
         final int vertexIndex = vertexId[1];
@@ -660,13 +765,15 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
           rings.set(ringIndex, newRing);
           return (V)geometryFactory.polygon(rings);
         } else {
-          throw new IllegalArgumentException("Ring index must be between 0 and " + ringCount
-            + " not " + ringIndex);
+          throw new IllegalArgumentException(
+            "Ring index must be between 0 and " + ringCount + " not "
+              + ringIndex);
         }
       }
     } else {
-      throw new IllegalArgumentException("Vertex id's for Polygons must have length 2. "
-        + Arrays.toString(vertexId));
+      throw new IllegalArgumentException(
+        "Vertex id's for Polygons must have length 2. "
+          + Arrays.toString(vertexId));
     }
   }
 
@@ -675,7 +782,7 @@ public abstract class AbstractPolygon extends AbstractGeometry implements Polygo
     if (isEmpty()) {
       return this;
     } else {
-      final LinearRing exteriorRing = normalize(getExteriorRing(), true);
+      final LinearRing exteriorRing = normalize(getShell(), true);
       final List<LinearRing> rings = new ArrayList<>();
       for (final LinearRing hole : holes()) {
         final LinearRing normalizedHole = normalize(hole, false);

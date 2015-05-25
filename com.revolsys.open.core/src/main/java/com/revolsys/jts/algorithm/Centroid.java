@@ -144,9 +144,9 @@ public class Centroid {
   }
 
   private void add(final Polygon poly) {
-    addShell(poly.getExteriorRing());
-    for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      addHole(poly.getInteriorRing(i));
+    addShell(poly.getShell());
+    for (int i = 0; i < poly.getHoleCount(); i++) {
+      addHole(poly.getHole(i));
     }
   }
 

@@ -129,7 +129,7 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
   private boolean containsPoint = false;
 
   public GeometryContainsPointVisitor(final Polygon rectangle) {
-    this.rectSeq = rectangle.getExteriorRing();
+    this.rectSeq = rectangle.getShell();
     this.rectEnv = rectangle.getBoundingBox();
   }
 

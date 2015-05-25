@@ -79,13 +79,13 @@ public class SimplePointInAreaLocator implements PointOnGeometryLocator {
     if (poly.isEmpty()) {
       return false;
     }
-    final LinearRing shell = poly.getExteriorRing();
+    final LinearRing shell = poly.getShell();
     if (!isPointInRing(p, shell)) {
       return false;
     }
     // now test if the point lies in or on the holes
-    for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      final LinearRing hole = poly.getInteriorRing(i);
+    for (int i = 0; i < poly.getHoleCount(); i++) {
+      final LinearRing hole = poly.getHole(i);
       if (isPointInRing(p, hole)) {
         return false;
       }

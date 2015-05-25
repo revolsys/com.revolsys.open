@@ -175,7 +175,7 @@ public class TriangleTest extends TestCase {
   }
 
   public Triangle createTriangle(final Polygon g) {
-    final LineString line = g.getExteriorRing();
+    final LineString line = g.getShell();
     final Triangle t = createTriangle(line);
     return t;
   }

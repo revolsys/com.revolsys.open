@@ -492,7 +492,7 @@ public class MeasureOverlay extends AbstractOverlay {
           this.length = line.getLength();
         } else if (measureGeometry instanceof Polygon) {
           final Polygon polygon = (Polygon)measureGeometry;
-          final LinearRing ring = polygon.getExteriorRing();
+          final LinearRing ring = polygon.getShell();
           double length = 0;
           for (final Segment segment : ring.segments()) {
             if (!segment.isLineEnd()) {

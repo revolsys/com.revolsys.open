@@ -109,7 +109,7 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
 
   private void writePolygon(final XmlWriter out, final Polygon polygon) {
     final boolean hasZ;
-    final LineString exteriorRing = polygon.getExteriorRing();
+    final LineString exteriorRing = polygon.getShell();
     final LineString points = exteriorRing;
     hasZ = points.getAxisCount() > 2;
     out.element(HAS_ID, false);
@@ -121,8 +121,8 @@ public class XmlGeometryFieldType extends AbstractEsriGeodatabaseXmlFieldType {
 
     writeRing(out, exteriorRing, hasZ);
 
-    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final LineString interiorRing = polygon.getInteriorRing(i);
+    for (int i = 0; i < polygon.getHoleCount(); i++) {
+      final LineString interiorRing = polygon.getHole(i);
       writeRing(out, interiorRing, hasZ);
     }
 

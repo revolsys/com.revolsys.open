@@ -15,6 +15,7 @@ import com.revolsys.data.identifier.SingleIdentifier;
 import com.revolsys.format.esri.gdb.xml.model.CodedValueDomain;
 import com.revolsys.format.esri.gdb.xml.model.Domain;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
+import com.revolsys.util.CompareUtil;
 
 public class FileGdbDomainCodeTable implements CodeTable {
   private static final Logger LOG = LoggerFactory.getLogger(FileGdbDomainCodeTable.class);
@@ -27,10 +28,11 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   private JComponent swingEditor;
 
-  public FileGdbDomainCodeTable(final FileGdbRecordStore recordStore, final CodedValueDomain domain) {
+  public FileGdbDomainCodeTable(final FileGdbRecordStore recordStore,
+    final CodedValueDomain domain) {
     this.recordStore = recordStore;
     this.domain = domain;
-    this.name = domain.getDomainName();
+    name = domain.getDomainName();
   }
 
   @Override
@@ -42,41 +44,58 @@ public class FileGdbDomainCodeTable implements CodeTable {
     }
   }
 
+  @Override
+  public int compare(final Object value1, final Object value2) {
+    if (value1 == null) {
+      if (value2 == null) {
+        return 0;
+      } else {
+        return 1;
+      }
+    } else if (value2 == null) {
+      return -1;
+    } else {
+      final Object codeValue1 = getValue(SingleIdentifier.create(value1));
+      final Object codeValue2 = getValue(SingleIdentifier.create(value2));
+      return CompareUtil.compare(codeValue1, codeValue2);
+    }
+  }
+
   private Identifier createValue(final String name) {
-    synchronized (this.recordStore) {
-      final Identifier id = this.domain.addCodedValue(name);
-      this.recordStore.alterDomain(this.domain);
-      LOG.info(this.domain.getDomainName() + " created code " + id + "=" + name);
+    synchronized (recordStore) {
+      final Identifier id = domain.addCodedValue(name);
+      recordStore.alterDomain(domain);
+      LOG.info(domain.getDomainName() + " created code " + id + "=" + name);
       return id;
     }
   }
 
   @Override
   public Map<Identifier, List<Object>> getCodes() {
-    return this.domain.getCodes();
+    return domain.getCodes();
   }
 
   public Domain getDomain() {
-    return this.domain;
+    return domain;
   }
 
   @Override
   public List<String> getFieldAliases() {
-    return this.domain.getFieldAliases();
+    return domain.getFieldAliases();
   }
 
   @Override
   public Identifier getId(final Map<String, ? extends Object> values) {
-    final Identifier id = this.domain.getId(values);
+    final Identifier id = domain.getId(values);
     if (id == null) {
-      return createValue(this.domain.getName(values));
+      return createValue(domain.getName(values));
     }
     return id;
   }
 
   @Override
   public Identifier getId(final Object... values) {
-    final Identifier id = this.domain.getId(values);
+    final Identifier id = domain.getId(values);
     if (id == null) {
       return createValue((String)values[0]);
     }
@@ -95,28 +114,28 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public String getIdFieldName() {
-    return this.domain.getIdFieldName();
+    return domain.getIdFieldName();
   }
 
   @Override
   public Map<String, ? extends Object> getMap(final Identifier id) {
-    return this.domain.getMap(id);
+    return domain.getMap(id);
   }
 
   @Override
   public String getName() {
-    return this.name;
+    return name;
   }
 
   @Override
   public JComponent getSwingEditor() {
-    return this.swingEditor;
+    return swingEditor;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Identifier id) {
-    return (V)this.domain.getValue(id);
+    return (V)domain.getValue(id);
   }
 
   @Override
@@ -126,12 +145,12 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public List<String> getValueFieldNames() {
-    return this.domain.getValueFieldNames();
+    return domain.getValueFieldNames();
   }
 
   @Override
   public List<Object> getValues(final Identifier id) {
-    return this.domain.getValues(id);
+    return domain.getValues(id);
   }
 
   @Override
@@ -154,6 +173,6 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public String toString() {
-    return this.domain.toString();
+    return domain.toString();
   }
 }

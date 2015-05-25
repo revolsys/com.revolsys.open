@@ -166,7 +166,7 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *@version 1.7
  */
 public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
-DataTypeProxy {
+  DataTypeProxy {
   List<String> sortedGeometryTypes = Collections.unmodifiableList(Arrays.asList(
     "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
     "Polygon", "MultiPolygon", "GeometryCollection"));
@@ -552,6 +552,17 @@ DataTypeProxy {
    * @throws IllegalArgumentException if g is null
    */
   double distance(final Geometry geometry);
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another <code>Geometry</code>. Short circuits if the distance <= terminateDistance.
+   *
+   * @param  g the <code>Geometry</code> from which to compute the distance
+   * @return the distance between the geometries
+   * @return 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+  double distance(final Geometry geometry, double terminateDistance);
 
   boolean equal(final Point a, final Point b, final double tolerance);
 
@@ -999,6 +1010,8 @@ DataTypeProxy {
    */
   boolean intersects(final Geometry geometry);
 
+  boolean intersects(Point point);
+
   /**
    * Tests whether the set of points covered by this <code>Geometry</code> is
    * empty.
@@ -1055,6 +1068,8 @@ DataTypeProxy {
    * @return <code>true</code> if the geometries are less than <code>distance</code> apart.
    */
   boolean isWithinDistance(final Geometry geom, final double distance);
+
+  Location locate(Point point);
 
   Geometry move(final double... deltas);
 

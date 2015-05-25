@@ -33,6 +33,7 @@
 package com.revolsys.jts.operation.distance;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.jts.geom.Geometry;
@@ -53,18 +54,43 @@ public class ConnectedElementLocationFilter {
 
   /**
    * Returns a list containing a point from each Polygon, LineString, and Point
-   * found inside the specified geometry. Thus, if the specified geometry is
-   * not a GeometryCollection, an empty list will be returned. The elements of the list
+   * found inside the specified geometry. The elements of the list
    * are {@link com.revolsys.jts.operation.distance.GeometryLocation}s.
    */
   public static List<GeometryLocation> getLocations(final Geometry geometry) {
     final List<GeometryLocation> locations = new ArrayList<GeometryLocation>();
     for (final Geometry part : geometry.geometries()) {
       if (part instanceof Point || part instanceof LineString
-          || part instanceof Polygon) {
+        || part instanceof Polygon) {
         locations.add(new GeometryLocation(part, 0, part.getPoint()));
       }
     }
     return locations;
+  }
+
+  /**
+   * Returns a list containing a point from each Polygon, LineString, and Point
+   * found inside the specified geometry.
+   */
+  public static List<Point> getPoints(final Geometry geometry) {
+    if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return Collections.singletonList(point);
+    } else if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+      return Collections.singletonList(line.getPoint());
+    } else if (geometry instanceof Polygon) {
+      final Polygon polygon = (Polygon)geometry;
+      return Collections.singletonList(polygon.getPoint());
+    } else {
+      final List<Point> points = new ArrayList<>();
+      for (final Geometry part : geometry.geometries()) {
+        if (part instanceof Point || part instanceof LineString
+          || part instanceof Polygon) {
+          points.add(part.getPoint());
+        }
+      }
+      return points;
+    }
   }
 }

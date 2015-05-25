@@ -7,13 +7,12 @@ import org.jdesktop.swingx.sort.TableSortController;
 
 import com.revolsys.comparator.NumericComparator;
 import com.revolsys.data.codes.CodeTable;
-import com.revolsys.data.codes.CodeTableCoparator;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 
 public class RecordLayerTableRowSorter extends
-TableSortController<RecordLayerTableModel> {
+  TableSortController<RecordLayerTableModel> {
 
   private final AbstractRecordLayer layer;
 
@@ -27,7 +26,7 @@ TableSortController<RecordLayerTableModel> {
   public Comparator<?> getComparator(final int columnIndex) {
     final RecordLayerTableModel model = getModel();
     final String fieldName = model.getFieldName(columnIndex);
-    final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
+    final RecordDefinition recordDefinition = layer.getRecordDefinition();
     final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
     if (codeTable == null) {
       final Class<?> columnClass = model.getColumnClass(columnIndex);
@@ -45,7 +44,7 @@ TableSortController<RecordLayerTableModel> {
         return Collator.getInstance();
       }
     } else {
-      return new CodeTableCoparator(codeTable);
+      return codeTable;
     }
   }
 }

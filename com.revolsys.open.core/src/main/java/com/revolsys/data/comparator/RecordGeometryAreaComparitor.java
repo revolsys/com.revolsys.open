@@ -34,8 +34,8 @@ public class RecordGeometryAreaComparitor implements Comparator<Record> {
     if (compare == 0) {
       compare = geometry1.compareTo(geometry2);
       if (compare == 0) {
-        final boolean clockwise1 = geometry1.getExteriorRing().isClockwise();
-        final boolean clockwise2 = geometry2.getExteriorRing().isClockwise();
+        final boolean clockwise1 = geometry1.getShell().isClockwise();
+        final boolean clockwise2 = geometry2.getShell().isClockwise();
         if (clockwise1) {
           if (clockwise2) {
             return 0;

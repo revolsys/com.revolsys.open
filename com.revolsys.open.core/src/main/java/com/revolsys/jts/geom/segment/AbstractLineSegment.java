@@ -24,7 +24,9 @@ import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractLineSegment extends AbstractLineString implements
-LineSegment {
+  LineSegment {
+
+  private static final long serialVersionUID = 1L;
 
   private static int addEndPointIntersection(final double[] coordinates,
     final int intersectionCount, final int axisCount,
@@ -100,8 +102,6 @@ LineSegment {
     }
     return intersectionCount;
   }
-
-  private static final long serialVersionUID = 1L;
 
   public AbstractLineSegment() {
     super();
@@ -288,7 +288,7 @@ LineSegment {
    * @return the distance from this segment to the given point
    */
   @Override
-  public double distance(Point point) {
+  public double distance(Point point, final double terminateDistance) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     point = point.convert(geometryFactory, 2);
     final double x = point.getX();
@@ -395,7 +395,7 @@ LineSegment {
     final GeometryFactory geometryFactory = getGeometryFactory();
     Point intersection = null;
     final Polygon polygon = boundingBox.toPolygon(1);
-    final LineString ring = polygon.getExteriorRing();
+    final LineString ring = polygon.getShell();
     final LineString points = ring;
     for (int i = 0; i < 4; i++) {
       final Point ringC1 = points.getPoint(i);
@@ -891,7 +891,7 @@ LineSegment {
     if (offsetDistance != 0.0) {
       if (len <= 0.0) {
         throw new IllegalStateException(
-            "Cannot compute offset from zero-length line segment");
+          "Cannot compute offset from zero-length line segment");
       }
       double ux = 0.0;
       double uy = 0.0;

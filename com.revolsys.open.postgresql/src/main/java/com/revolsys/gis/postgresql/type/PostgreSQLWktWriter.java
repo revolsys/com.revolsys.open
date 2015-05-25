@@ -391,12 +391,12 @@ public class PostgreSQLWktWriter {
 
   private static void writePolygon(final PrintWriter out, final Polygon polygon, final int axisCount) {
     out.print('(');
-    final LineString shell = polygon.getExteriorRing();
+    final LineString shell = polygon.getShell();
     final LineString coordinates = shell;
     writeCoordinates(out, coordinates, axisCount);
-    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+    for (int i = 0; i < polygon.getHoleCount(); i++) {
       out.print(',');
-      final LineString hole = polygon.getInteriorRing(i);
+      final LineString hole = polygon.getHole(i);
       final LineString holeCoordinates = hole;
       writeCoordinates(out, holeCoordinates, axisCount);
     }

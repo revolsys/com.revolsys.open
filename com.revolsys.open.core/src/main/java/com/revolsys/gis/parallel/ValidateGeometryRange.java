@@ -89,11 +89,11 @@ BaseInOutProcess<Record, Record> {
       } else if (subGeometry instanceof Polygon) {
         final Polygon polygon = (Polygon)subGeometry;
 
-        if (!isValid(type, polygon.getExteriorRing())) {
+        if (!isValid(type, polygon.getShell())) {
           valid = false;
         }
-        for (int k = 0; k < polygon.getNumInteriorRing(); k++) {
-          final LineString ring = polygon.getInteriorRing(k);
+        for (int k = 0; k < polygon.getHoleCount(); k++) {
+          final LineString ring = polygon.getHole(k);
           if (!isValid(type, ring)) {
             valid = false;
           }

@@ -70,17 +70,17 @@ public interface Polygon extends Geometry, Polygonal {
   @Override
   Polygon clone();
 
-  LinearRing getExteriorRing();
+  LinearRing getHole(int ringIndex);
 
-  LinearRing getInteriorRing(int ringIndex);
-
-  int getNumInteriorRing();
+  int getHoleCount();
 
   LinearRing getRing(int ringIndex);
 
   int getRingCount();
 
   List<LinearRing> getRings();
+
+  LinearRing getShell();
 
   Iterable<LinearRing> holes();
 

@@ -114,10 +114,10 @@ GeoJsonConstants {
     this.out.startList(false);
     this.out.indent();
 
-    final LineString exteriorRing = polygon.getExteriorRing();
+    final LineString exteriorRing = polygon.getShell();
     coordinates(exteriorRing);
-    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final LineString interiorRing = polygon.getInteriorRing(i);
+    for (int i = 0; i < polygon.getHoleCount(); i++) {
+      final LineString interiorRing = polygon.getHole(i);
       this.out.endAttribute();
       this.out.indent();
       coordinates(interiorRing);

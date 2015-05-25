@@ -173,7 +173,7 @@ public class PreparedLineString extends AbstractLineString {
     final PointLocator locator = new PointLocator();
     final Geometry realGeometry = getLine();
     for (final Vertex vertex : geometry.vertices()) {
-      if (locator.intersects(vertex, realGeometry)) {
+      if (realGeometry.intersects(vertex)) {
         return true;
       }
     }

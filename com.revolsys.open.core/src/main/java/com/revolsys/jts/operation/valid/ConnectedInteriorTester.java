@@ -237,13 +237,13 @@ public class ConnectedInteriorTester {
   private void visitShellInteriors(final Geometry g, final PlanarGraph graph) {
     if (g instanceof Polygon) {
       final Polygon p = (Polygon)g;
-      visitInteriorRing(p.getExteriorRing(), graph);
+      visitInteriorRing(p.getShell(), graph);
     }
     if (g instanceof MultiPolygon) {
       final MultiPolygon mp = (MultiPolygon)g;
       for (int i = 0; i < mp.getGeometryCount(); i++) {
         final Polygon p = (Polygon)mp.getGeometry(i);
-        visitInteriorRing(p.getExteriorRing(), graph);
+        visitInteriorRing(p.getShell(), graph);
       }
     }
   }

@@ -158,7 +158,7 @@ public class Distance3DOp {
   private boolean isDone = false;
 
   /**
-   * Constructs a DistanceOp that computes the distance and nearest points
+   * Constructs a Distance3DOp that computes the distance and nearest points
    * between the two specified geometries.
    *
    * @param g0
@@ -171,7 +171,7 @@ public class Distance3DOp {
   }
 
   /**
-   * Constructs a DistanceOp that computes the distance and nearest points
+   * Constructs a Distance3DOp that computes the distance and nearest points
    * between the two specified geometries.
    *
    * @param g0
@@ -183,22 +183,22 @@ public class Distance3DOp {
    */
   public Distance3DOp(final Geometry g0, final Geometry g1,
     final double terminateDistance) {
-    this.geom = new Geometry[2];
-    this.geom[0] = g0;
-    this.geom[1] = g1;
+    geom = new Geometry[2];
+    geom[0] = g0;
+    geom[1] = g1;
     this.terminateDistance = terminateDistance;
   }
 
   private void computeMinDistance() {
     // only compute once
-    if (this.minDistanceLocation != null) {
+    if (minDistanceLocation != null) {
       return;
     }
-    this.minDistanceLocation = new GeometryLocation[2];
+    minDistanceLocation = new GeometryLocation[2];
 
     final int geomIndex = mostPolygonalIndex();
     final boolean flip = geomIndex == 0;
-    computeMinDistanceMultiMulti(this.geom[geomIndex], this.geom[1 - geomIndex], flip);
+    computeMinDistanceMultiMulti(geom[geomIndex], geom[1 - geomIndex], flip);
   }
 
   private void computeMinDistance(final Geometry g0, final Geometry g1,
@@ -260,16 +260,15 @@ public class Distance3DOp {
         final Point line2Point2 = segment2.getPoint(1);
         final double distance = CGAlgorithms3D.distanceSegmentSegment(
           line1point1, line1Point2, line2Point1, line2Point2);
-        if (distance < this.minDistance) {
-          this.minDistance = distance;
+        if (distance < minDistance) {
+          minDistance = distance;
           // TODO: compute closest pts in 3D
           final Point[] closestPt = segment1.closestPoints(segment2);
           updateDistance(distance,
             new GeometryLocation(line0, i, closestPt[0].clonePoint()),
-            new GeometryLocation(line1, j, closestPt[1].clonePoint()),
-            flip);
+            new GeometryLocation(line1, j, closestPt[1].clonePoint()), flip);
         }
-        if (this.isDone) {
+        if (isDone) {
           return;
         }
         j++;
@@ -286,13 +285,13 @@ public class Distance3DOp {
     for (final Segment segment : line.segments()) {
       final double dist = CGAlgorithms3D.distancePointSegment(coord,
         segment.getPoint(0), segment.getPoint(1));
-      if (dist < this.minDistance) {
+      if (dist < minDistance) {
         final Point segClosestPoint = segment.closestPoint(coord);
         updateDistance(dist,
           new GeometryLocation(line, i, segClosestPoint.clonePoint()),
           new GeometryLocation(point, 0, coord), flip);
       }
-      if (this.isDone) {
+      if (isDone) {
         return;
       }
       i++;
@@ -306,7 +305,7 @@ public class Distance3DOp {
       for (int i = 0; i < n; i++) {
         final Geometry g = g0.getGeometry(i);
         computeMinDistanceMultiMulti(g, g1, flip);
-        if (this.isDone) {
+        if (isDone) {
           return;
         }
       }
@@ -332,7 +331,7 @@ public class Distance3DOp {
       for (int i = 0; i < n; i++) {
         final Geometry g = g1.getGeometry(i);
         computeMinDistanceOneMulti(g0, g, flip);
-        if (this.isDone) {
+        if (isDone) {
           return;
         }
       }
@@ -348,7 +347,7 @@ public class Distance3DOp {
       for (int i = 0; i < n; i++) {
         final Geometry g = geom.getGeometry(i);
         computeMinDistanceOneMulti(poly, g, flip);
-        if (this.isDone) {
+        if (isDone) {
           return;
         }
       }
@@ -372,7 +371,7 @@ public class Distance3DOp {
     final Point point1, final boolean flip) {
     final double dist = CGAlgorithms3D.distance(point0.getPoint(),
       point1.getPoint());
-    if (dist < this.minDistance) {
+    if (dist < minDistance) {
       updateDistance(dist, new GeometryLocation(point0, 0, point0.getPoint()),
         new GeometryLocation(point1, 0, point1.getPoint()), flip);
     }
@@ -390,15 +389,14 @@ public class Distance3DOp {
     }
 
     // if no intersection, then compute line distance to polygon rings
-    computeMinDistanceLineLine(poly.getPolygon().getExteriorRing(), line, flip);
-    if (this.isDone) {
+    computeMinDistanceLineLine(poly.getPolygon().getShell(), line, flip);
+    if (isDone) {
       return;
     }
-    final int nHole = poly.getPolygon().getNumInteriorRing();
+    final int nHole = poly.getPolygon().getHoleCount();
     for (int i = 0; i < nHole; i++) {
-      computeMinDistanceLineLine(poly.getPolygon().getInteriorRing(i), line,
-        flip);
-      if (this.isDone) {
+      computeMinDistanceLineLine(poly.getPolygon().getHole(i), line, flip);
+      if (isDone) {
         return;
       }
     }
@@ -408,13 +406,13 @@ public class Distance3DOp {
     final Point point, final boolean flip) {
     final Point pt = point.getPoint();
 
-    final LineString shell = polyPlane.getPolygon().getExteriorRing();
+    final LineString shell = polyPlane.getPolygon().getShell();
     if (polyPlane.intersects(pt, shell)) {
       // point is either inside or in a hole
 
-      final int nHole = polyPlane.getPolygon().getNumInteriorRing();
+      final int nHole = polyPlane.getPolygon().getHoleCount();
       for (int i = 0; i < nHole; i++) {
-        final LineString hole = polyPlane.getPolygon().getInteriorRing(i);
+        final LineString hole = polyPlane.getPolygon().getHole(i);
         if (polyPlane.intersects(pt, hole)) {
           computeMinDistanceLinePoint(hole, point, flip);
           return;
@@ -452,7 +450,7 @@ public class Distance3DOp {
   private void computeMinDistancePolygonPolygon(final PlanarPolygon3D poly0,
     final Polygon poly1, final boolean flip) {
     computeMinDistancePolygonRings(poly0, poly1, flip);
-    if (this.isDone) {
+    if (isDone) {
       return;
     }
     final PlanarPolygon3D polyPlane1 = new PlanarPolygon3D(poly1);
@@ -469,15 +467,15 @@ public class Distance3DOp {
   private void computeMinDistancePolygonRings(final PlanarPolygon3D poly,
     final Polygon ringPoly, final boolean flip) {
     // compute shell ring
-    computeMinDistancePolygonLine(poly, ringPoly.getExteriorRing(), flip);
-    if (this.isDone) {
+    computeMinDistancePolygonLine(poly, ringPoly.getShell(), flip);
+    if (isDone) {
       return;
     }
     // compute hole rings
-    final int nHole = ringPoly.getNumInteriorRing();
+    final int nHole = ringPoly.getHoleCount();
     for (int i = 0; i < nHole; i++) {
-      computeMinDistancePolygonLine(poly, ringPoly.getInteriorRing(i), flip);
-      if (this.isDone) {
+      computeMinDistancePolygonLine(poly, ringPoly.getHole(i), flip);
+      if (isDone) {
         return;
       }
     }
@@ -491,15 +489,15 @@ public class Distance3DOp {
    *             if either input geometry is null
    */
   public double distance() {
-    if (this.geom[0] == null || this.geom[1] == null) {
+    if (geom[0] == null || geom[1] == null) {
       throw new IllegalArgumentException("null geometries are not supported");
     }
-    if (this.geom[0].isEmpty() || this.geom[1].isEmpty()) {
+    if (geom[0].isEmpty() || geom[1].isEmpty()) {
       return 0.0;
     }
 
     computeMinDistance();
-    return this.minDistance;
+    return minDistance;
   }
 
   private Point intersection(final PlanarPolygon3D poly, final LineString line) {
@@ -553,10 +551,10 @@ public class Distance3DOp {
    * @return the index of the most polygonal geometry
    */
   private int mostPolygonalIndex() {
-    final int dim0 = this.geom[0].getDimension();
-    final int dim1 = this.geom[1].getDimension();
+    final int dim0 = geom[0].getDimension();
+    final int dim1 = geom[1].getDimension();
     if (dim0 >= 2 && dim1 >= 2) {
-      if (this.geom[0].getVertexCount() > this.geom[1].getVertexCount()) {
+      if (geom[0].getVertexCount() > geom[1].getVertexCount()) {
         return 0;
       }
       return 1;
@@ -580,7 +578,7 @@ public class Distance3DOp {
    */
   public GeometryLocation[] nearestLocations() {
     computeMinDistance();
-    return this.minDistanceLocation;
+    return minDistanceLocation;
   }
 
   /**
@@ -592,20 +590,19 @@ public class Distance3DOp {
   public Point[] nearestPoints() {
     computeMinDistance();
     final Point[] nearestPts = new Point[] {
-      this.minDistanceLocation[0].getCoordinate(),
-      this.minDistanceLocation[1].getCoordinate()
+      minDistanceLocation[0].getPoint(), minDistanceLocation[1].getPoint()
     };
     return nearestPts;
   }
 
   private void updateDistance(final double dist, final GeometryLocation loc0,
     final GeometryLocation loc1, final boolean flip) {
-    this.minDistance = dist;
+    minDistance = dist;
     final int index = flip ? 1 : 0;
-    this.minDistanceLocation[index] = loc0;
-    this.minDistanceLocation[1 - index] = loc1;
-    if (this.minDistance < this.terminateDistance) {
-      this.isDone = true;
+    minDistanceLocation[index] = loc0;
+    minDistanceLocation[1 - index] = loc1;
+    if (minDistance <= terminateDistance) {
+      isDone = true;
     }
   }
 

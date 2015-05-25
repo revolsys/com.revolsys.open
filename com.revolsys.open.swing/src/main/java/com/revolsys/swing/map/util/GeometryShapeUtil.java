@@ -71,10 +71,10 @@ public final class GeometryShapeUtil {
 
   public static Shape toShape(final Viewport2D viewport, final Polygon polygon) {
     final GeneralPath path = new GeneralPath(PathIterator.WIND_EVEN_ODD);
-    final LineString exteriorRing = polygon.getExteriorRing();
+    final LineString exteriorRing = polygon.getShell();
     addLineString(viewport, path, exteriorRing);
-    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-      final LineString interiorRing = polygon.getInteriorRing(i);
+    for (int i = 0; i < polygon.getHoleCount(); i++) {
+      final LineString interiorRing = polygon.getHole(i);
       addLineString(viewport, path, interiorRing);
     }
     return path;

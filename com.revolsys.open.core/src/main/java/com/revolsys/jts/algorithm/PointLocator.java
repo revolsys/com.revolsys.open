@@ -55,8 +55,6 @@ import com.revolsys.jts.geom.Polygon;
  * @version 1.7
  */
 public class PointLocator {
-  private final BoundaryNodeRule boundaryRule = BoundaryNodeRule.OGC_SFS_BOUNDARY_RULE;
-
   private boolean isIn; // true if the point lies in or on any Geometry element
 
   public PointLocator() {
@@ -65,11 +63,15 @@ public class PointLocator {
   private int computeLocation(final Point point, final Geometry geometry) {
     int numBoundaries = 0;
     if (geometry instanceof Point) {
-      return updateLocationInfo(locate(point, (Point)geometry));
+      final Location location = point.locate((Point)geometry);
+      return updateLocationInfo(location);
     } else if (geometry instanceof LineString) {
-      return updateLocationInfo(locate(point, (LineString)geometry));
+      final Location location = ((LineString)geometry).locate(point);
+      return updateLocationInfo(location);
     } else if (geometry instanceof Polygon) {
-      return updateLocationInfo(locate(point, (Polygon)geometry));
+      final Polygon polygon = (Polygon)geometry;
+      final Location location = polygon.locate(point);
+      return updateLocationInfo(location);
     } else {
       for (final Geometry part : geometry.geometries()) {
         if (part != geometry) {
@@ -78,17 +80,6 @@ public class PointLocator {
       }
     }
     return numBoundaries;
-  }
-
-  /**
-   * Convenience method to test a point for intersection with
-   * a Geometry
-   * @param point the coordinate to test
-   * @param geometry the Geometry to test
-   * @return <code>true</code> if the point is in the interior or boundary of the Geometry
-   */
-  public boolean intersects(final Point point, final Geometry geometry) {
-    return locate(point, geometry) != Location.EXTERIOR;
   }
 
   /**
@@ -105,89 +96,25 @@ public class PointLocator {
     if (geometry.isEmpty()) {
       return Location.EXTERIOR;
     } else if (geometry instanceof LineString) {
-      return locate(point, (LineString)geometry);
+      return ((LineString)geometry).locate(point);
     } else if (geometry instanceof Polygon) {
-      return locate(point, (Polygon)geometry);
+      return ((Polygon)geometry).locate(point);
     }
 
-    this.isIn = false;
-    final int numBoundaries = computeLocation(point, geometry);
-    if (this.boundaryRule.isInBoundary(numBoundaries)) {
+    isIn = false;
+    final int boundaryCount = computeLocation(point, geometry);
+    if (boundaryCount % 2 == 1) {
       return Location.BOUNDARY;
-    }
-    if (numBoundaries > 0 || this.isIn) {
+    } else if (boundaryCount > 0 || isIn) {
       return Location.INTERIOR;
-    }
-
-    return Location.EXTERIOR;
-  }
-
-  private Location locate(final Point point, final LineString line) {
-    // bounding-box check
-    if (point.intersects(line.getBoundingBox())) {
-      if (!line.isClosed()) {
-        if (point.equals(line.getVertex(0)) || point.equals(line.getVertex(-1))) {
-          return Location.BOUNDARY;
-        }
-      }
-      if (CGAlgorithms.isOnLine(point, line)) {
-        return Location.INTERIOR;
-      }
-    }
-    return Location.EXTERIOR;
-  }
-
-  private Location locate(final Point p, final Point pt) {
-    // no point in doing envelope test, since equality test is just as fast
-
-    final Point ptCoord = pt.getPoint();
-    if (ptCoord.equals(2, p)) {
-      return Location.INTERIOR;
-    }
-    return Location.EXTERIOR;
-  }
-
-  private Location locate(final Point p, final Polygon poly) {
-    if (poly.isEmpty()) {
+    } else {
       return Location.EXTERIOR;
     }
-
-    final LinearRing shell = poly.getExteriorRing();
-
-    final Location shellLoc = locateInPolygonRing(p, shell);
-    if (shellLoc == Location.EXTERIOR) {
-      return Location.EXTERIOR;
-    }
-    if (shellLoc == Location.BOUNDARY) {
-      return Location.BOUNDARY;
-    }
-    // now test if the point lies in or on the holes
-    for (int i = 0; i < poly.getNumInteriorRing(); i++) {
-      final LinearRing hole = poly.getInteriorRing(i);
-      final Location holeLoc = locateInPolygonRing(p, hole);
-      if (holeLoc == Location.INTERIOR) {
-        return Location.EXTERIOR;
-      }
-      if (holeLoc == Location.BOUNDARY) {
-        return Location.BOUNDARY;
-      }
-    }
-    return Location.INTERIOR;
-  }
-
-  private Location locateInPolygonRing(final Point p, final LinearRing ring) {
-    // bounding-box check
-    if (!p.intersects(ring.getBoundingBox())) {
-      return Location.EXTERIOR;
-    }
-
-    return RayCrossingCounter.locatePointInRing(p, ring);
   }
 
   private int updateLocationInfo(final Location loc) {
-
     if (loc == Location.INTERIOR) {
-      this.isIn = true;
+      isIn = true;
     } else if (loc == Location.BOUNDARY) {
       return 1;
     }

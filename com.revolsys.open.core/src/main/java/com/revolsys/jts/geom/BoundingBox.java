@@ -62,6 +62,8 @@ public interface BoundingBox {
 
   double distance(Geometry point);
 
+  double distance(Point point);
+
   BoundingBox expand(double maxDistance);
 
   BoundingBox expand(final double deltaX, final double deltaY);

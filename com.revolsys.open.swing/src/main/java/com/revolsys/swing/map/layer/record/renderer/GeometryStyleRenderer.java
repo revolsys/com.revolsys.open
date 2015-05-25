@@ -120,9 +120,9 @@ public class GeometryStyleRenderer extends AbstractRecordLayerRenderer {
           renderLineString(viewport, graphics, lineString, style);
         } else if (part instanceof Polygon) {
           final Polygon polygon = (Polygon)part;
-          renderLineString(viewport, graphics, polygon.getExteriorRing(), style);
-          for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
-            final LineString ring = polygon.getInteriorRing(j);
+          renderLineString(viewport, graphics, polygon.getShell(), style);
+          for (int j = 0; j < polygon.getHoleCount(); j++) {
+            final LineString ring = polygon.getHole(j);
             renderLineString(viewport, graphics, ring, style);
           }
         }

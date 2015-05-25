@@ -72,7 +72,7 @@ public class MCPointInRingTest extends AbstractPointInRingTest {
       return;
     }
 
-    final LinearRing ring = ((Polygon)geom).getExteriorRing();
+    final LinearRing ring = ((Polygon)geom).getShell();
     final boolean expected = expectedLoc == Location.INTERIOR;
     final MCPointInRing pir = new MCPointInRing(ring);
     final boolean result = pir.isInside(pt);

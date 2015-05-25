@@ -164,7 +164,7 @@ public class PreparedMultiLineString extends AbstractMultiLineString {
      */
     final PointLocator locator = new PointLocator();
     for (final Vertex vertex : geometry.vertices()) {
-      if (locator.intersects(vertex, this.multiLine)) {
+      if (this.multiLine.intersects(vertex)) {
         return true;
       }
     }

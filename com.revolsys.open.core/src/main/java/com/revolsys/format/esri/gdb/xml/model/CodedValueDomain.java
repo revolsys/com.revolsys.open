@@ -12,6 +12,7 @@ import javax.swing.JComponent;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
+import com.revolsys.util.CompareUtil;
 
 public class CodedValueDomain extends Domain implements CodeTable {
   private List<CodedValue> codedValues = new ArrayList<CodedValue>();
@@ -29,15 +30,15 @@ public class CodedValueDomain extends Domain implements CodeTable {
   public synchronized void addCodedValue(final Object code, final String name) {
     final Identifier identifier = SingleIdentifier.create(code);
     final CodedValue value = new CodedValue(code, name);
-    this.codedValues.add(value);
+    codedValues.add(value);
     final List<Object> values = Collections.<Object> singletonList(name);
-    this.idValueMap.put(identifier, values);
-    this.stringIdMap.put(code.toString(), identifier);
-    this.valueIdMap.put(name.toLowerCase(), identifier);
+    idValueMap.put(identifier, values);
+    stringIdMap.put(code.toString(), identifier);
+    valueIdMap.put(name.toLowerCase(), identifier);
     if (code instanceof Number) {
       final int id = ((Number)code).intValue();
-      if (this.maxId < id) {
-        this.maxId = id;
+      if (maxId < id) {
+        maxId = id;
       }
     }
   }
@@ -46,14 +47,15 @@ public class CodedValueDomain extends Domain implements CodeTable {
     Object id;
     switch (getFieldType()) {
       case esriFieldTypeInteger:
-        id = (int)++this.maxId;
+        id = (int)++maxId;
       break;
       case esriFieldTypeSmallInteger:
-        id = (short)++this.maxId;
+        id = (short)++maxId;
       break;
 
       default:
-        throw new RuntimeException("Cannot generate code for field type " + getFieldType());
+        throw new RuntimeException("Cannot generate code for field type "
+          + getFieldType());
     }
     addCodedValue(id, name);
     return SingleIdentifier.create(id);
@@ -66,19 +68,36 @@ public class CodedValueDomain extends Domain implements CodeTable {
     clone.stringIdMap = new HashMap<>();
     clone.valueIdMap = new HashMap<>();
     clone.codedValues = new ArrayList<CodedValue>();
-    for (final CodedValue codedValue : this.codedValues) {
+    for (final CodedValue codedValue : codedValues) {
       clone.addCodedValue(codedValue.getCode(), codedValue.getName());
     }
     return clone;
   }
 
+  @Override
+  public int compare(final Object value1, final Object value2) {
+    if (value1 == null) {
+      if (value2 == null) {
+        return 0;
+      } else {
+        return 1;
+      }
+    } else if (value2 == null) {
+      return -1;
+    } else {
+      final Object codeValue1 = getValue(SingleIdentifier.create(value1));
+      final Object codeValue2 = getValue(SingleIdentifier.create(value2));
+      return CompareUtil.compare(codeValue1, codeValue2);
+    }
+  }
+
   public List<CodedValue> getCodedValues() {
-    return this.codedValues;
+    return codedValues;
   }
 
   @Override
   public Map<Identifier, List<Object>> getCodes() {
-    return Collections.unmodifiableMap(this.idValueMap);
+    return Collections.unmodifiableMap(idValueMap);
   }
 
   @Override
@@ -98,23 +117,24 @@ public class CodedValueDomain extends Domain implements CodeTable {
       final Object value = values[0];
       if (value == null) {
         return null;
-      } else if (this.idValueMap.containsKey(value)) {
+      } else if (idValueMap.containsKey(value)) {
         return SingleIdentifier.create(value);
-      } else if (this.stringIdMap.containsKey(value.toString())) {
-        return this.stringIdMap.get(value.toString());
+      } else if (stringIdMap.containsKey(value.toString())) {
+        return stringIdMap.get(value.toString());
       } else {
         final String lowerValue = ((String)value).toLowerCase();
-        final Identifier id = this.valueIdMap.get(lowerValue);
+        final Identifier id = valueIdMap.get(lowerValue);
         return id;
       }
     } else {
-      throw new IllegalArgumentException("Expecting only a single value " + values);
+      throw new IllegalArgumentException("Expecting only a single value "
+        + values);
     }
   }
 
   @Override
   public List<Identifier> getIdentifiers() {
-    return new ArrayList<>(this.idValueMap.keySet());
+    return new ArrayList<>(idValueMap.keySet());
   }
 
   @Override
@@ -144,7 +164,7 @@ public class CodedValueDomain extends Domain implements CodeTable {
 
   @Override
   public JComponent getSwingEditor() {
-    return this.swingEditor;
+    return swingEditor;
   }
 
   @Override
@@ -174,13 +194,13 @@ public class CodedValueDomain extends Domain implements CodeTable {
     if (id == null) {
       return null;
     } else {
-      List<Object> values = this.idValueMap.get(id);
+      List<Object> values = idValueMap.get(id);
       if (values == null) {
-        final Identifier objectId = this.stringIdMap.get(id.toString());
+        final Identifier objectId = stringIdMap.get(id.toString());
         if (objectId == null) {
           return null;
         } else {
-          values = this.idValueMap.get(objectId);
+          values = idValueMap.get(objectId);
         }
       }
       return Collections.unmodifiableList(values);

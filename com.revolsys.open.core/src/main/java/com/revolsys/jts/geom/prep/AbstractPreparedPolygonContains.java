@@ -370,7 +370,7 @@ abstract class AbstractPreparedPolygonContains {
     }
 
     final Polygon poly = (Polygon)geom.getGeometry(0);
-    final int numHoles = poly.getNumInteriorRing();
+    final int numHoles = poly.getHoleCount();
     if (numHoles == 0) {
       return true;
     }

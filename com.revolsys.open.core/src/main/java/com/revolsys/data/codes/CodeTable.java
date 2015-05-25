@@ -1,5 +1,6 @@
 package com.revolsys.data.codes;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -7,7 +8,7 @@ import javax.swing.JComponent;
 
 import com.revolsys.data.identifier.Identifier;
 
-public interface CodeTable extends Cloneable {
+public interface CodeTable extends Cloneable, Comparator<Object> {
   Map<Identifier, List<Object>> getCodes();
 
   List<String> getFieldAliases();

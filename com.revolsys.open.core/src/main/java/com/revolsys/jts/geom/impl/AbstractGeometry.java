@@ -35,6 +35,7 @@ package com.revolsys.jts.geom.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -55,6 +56,7 @@ import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.jts.geom.IntersectionMatrix;
 import com.revolsys.jts.geom.LineString;
+import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.Polygonal;
@@ -64,7 +66,6 @@ import com.revolsys.jts.geom.util.GeometryMapper;
 import com.revolsys.jts.geom.vertex.Vertex;
 import com.revolsys.jts.operation.IsSimpleOp;
 import com.revolsys.jts.operation.buffer.Buffer;
-import com.revolsys.jts.operation.distance.DistanceOp;
 import com.revolsys.jts.operation.linemerge.LineMerger;
 import com.revolsys.jts.operation.overlay.OverlayOp;
 import com.revolsys.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
@@ -191,6 +192,12 @@ import com.revolsys.jts.operation.valid.IsValidOp;
  *@version 1.7
  */
 public abstract class AbstractGeometry implements Geometry {
+  private static final long serialVersionUID = 8763622679187376702L;
+
+  private static final List<String> sortedGeometryTypes = Arrays.asList(
+    "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
+    "Polygon", "MultiPolygon", "GeometryCollection");
+
   public static int[] createVertexId(final int[] partId, final int vertexIndex) {
     final int[] vertexId = new int[partId.length + 1];
     System.arraycopy(partId, 0, vertexId, 0, partId.length);
@@ -245,12 +252,6 @@ public abstract class AbstractGeometry implements Geometry {
     newVertextId[lastIndex] = vertexIndex;
     return newVertextId;
   }
-
-  private static final long serialVersionUID = 8763622679187376702L;
-
-  private static final List<String> sortedGeometryTypes = Arrays.asList(
-    "Point", "MultiPoint", "LineString", "LinearRing", "MultiLineString",
-    "Polygon", "MultiPolygon", "GeometryCollection");
 
   /**
    * Computes a buffer area around this geometry having the given width. The
@@ -369,7 +370,7 @@ public abstract class AbstractGeometry implements Geometry {
     final DataType dataType = geometry.getDataType();
     if (dataType.equals(DataTypes.GEOMETRY_COLLECTION)) {
       throw new IllegalArgumentException(
-          "This method does not support GeometryCollection arguments");
+        "This method does not support GeometryCollection arguments");
     }
   }
 
@@ -809,16 +810,37 @@ public abstract class AbstractGeometry implements Geometry {
    *  and another <code>Geometry</code>.
    *
    * @param  geometry the <code>Geometry</code> from which to compute the distance
-   * @return the distance between the geometries
-   * @return 0 if either input geometry is empty
+   * @return the distance between the geometries or 0 if either input geometry is empty
    * @throws IllegalArgumentException if g is null
    */
   @Override
-  public double distance(Geometry geometry) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    geometry = geometry.convert(geometryFactory, 2);
-    return DistanceOp.distance(this, geometry);
+  public final double distance(final Geometry geometry) {
+    return distance(geometry, 0.0);
   }
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another <code>Geometry</code>.
+   *
+   * @param  geometry the <code>Geometry</code> from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+  @Override
+  public final double distance(Geometry geometry, final double terminateDistance) {
+    if (geometry == null) {
+      throw new IllegalArgumentException("Geometry must not be null");
+    } else if (isEmpty() || geometry.isEmpty()) {
+      return 0.0;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      geometry = geometry.convert(geometryFactory, 2);
+      return doDistance(geometry, terminateDistance);
+    }
+  }
+
+  protected abstract double doDistance(final Geometry geometry,
+    final double terminateDistance);
 
   protected abstract boolean doEquals(int axisCount, Geometry geometry);
 
@@ -1219,11 +1241,11 @@ public abstract class AbstractGeometry implements Geometry {
   @Override
   public <V extends Geometry> List<V> getGeometryComponents(
     final Class<V> geometryClass) {
-    final List<V> geometries = new ArrayList<V>();
     if (geometryClass.isAssignableFrom(getClass())) {
-      geometries.add((V)this);
+      return Collections.singletonList((V)this);
+    } else {
+      return Collections.emptyList();
     }
-    return geometries;
   }
 
   /**
@@ -1423,11 +1445,11 @@ public abstract class AbstractGeometry implements Geometry {
       final Geometry g2 = other;
       return GeometryCollectionMapper.map((GeometryCollection)this,
         new GeometryMapper.MapOp() {
-        @Override
-        public Geometry map(final Geometry g) {
-          return g.intersection(g2);
-        }
-      });
+          @Override
+          public Geometry map(final Geometry g) {
+            return g.intersection(g2);
+          }
+        });
     }
     // if (isGeometryCollection(other))
     // return other.intersection(this);
@@ -1495,6 +1517,11 @@ public abstract class AbstractGeometry implements Geometry {
     return relate(g).isIntersects();
   }
 
+  @Override
+  public boolean intersects(final Point point) {
+    return locate(point) != Location.EXTERIOR;
+  }
+
   /**
    * Tests whether any representative of the target geometry
    * intersects the test geometry.
@@ -1507,7 +1534,8 @@ public abstract class AbstractGeometry implements Geometry {
   protected boolean isAnyTargetComponentInTest(final Geometry testGeom) {
     final PointLocator locator = new PointLocator();
     for (final Vertex vertex : vertices()) {
-      if (locator.intersects(vertex, testGeom)) {
+      final boolean intersects = testGeom.intersects(vertex);
+      if (intersects) {
         return true;
       }
     }
@@ -1603,21 +1631,23 @@ public abstract class AbstractGeometry implements Geometry {
    * Tests whether the distance from this <code>Geometry</code>
    * to another is less than or equal to a specified value.
    *
-   * @param geom the Geometry to check the distance to
+   * @param geometry the Geometry to check the distance to
    * @param distance the distance value to compare
    * @return <code>true</code> if the geometries are less than <code>distance</code> apart.
    */
   @Override
-  public boolean isWithinDistance(final Geometry geom, final double distance) {
-    final double envDist = getBoundingBox().distance(geom.getBoundingBox());
-    if (envDist > distance) {
+  public boolean isWithinDistance(Geometry geometry, final double distance) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    geometry = geometry.convert(geometryFactory, 2);
+    final double bboxDistance = getBoundingBox().distance(
+      geometry.getBoundingBox());
+    if (bboxDistance > distance) {
       return false;
+    } else {
+      final double geometryDistance = this.distance(geometry);
+      return geometryDistance <= distance;
+
     }
-    return DistanceOp.isWithinDistance(this, geom, distance);
-    /*
-     * double geomDist = this.distance(geom); if (geomDist > distance) return
-     * false; return true;
-     */
   }
 
   /**

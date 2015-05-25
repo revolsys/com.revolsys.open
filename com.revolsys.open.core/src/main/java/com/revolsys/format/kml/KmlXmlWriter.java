@@ -324,7 +324,7 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     if (styleUrl != null) {
       element(STYLE_URL, styleUrl);
     }
-    final LineString exteriorRing = polygon.getExteriorRing();
+    final LineString exteriorRing = polygon.getShell();
     writeLineString(exteriorRing);
 
     endTag();
@@ -380,11 +380,11 @@ public class KmlXmlWriter extends XmlWriter implements Kml22Constants {
     startTag(Kml22Constants.POLYGON);
     if (!polygon.isEmpty()) {
       startTag(Kml22Constants.OUTER_BOUNDARY_IS);
-      writeLinearRing(polygon.getExteriorRing());
+      writeLinearRing(polygon.getShell());
       endTag();
-      for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+      for (int i = 0; i < polygon.getHoleCount(); i++) {
         startTag(Kml22Constants.INNER_BOUNDARY_IS);
-        final LineString ring = polygon.getInteriorRing(i);
+        final LineString ring = polygon.getHole(i);
         writeLinearRing(ring);
         endTag();
       }

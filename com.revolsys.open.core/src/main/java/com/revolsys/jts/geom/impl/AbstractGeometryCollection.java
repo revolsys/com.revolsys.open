@@ -42,16 +42,19 @@ import java.util.TreeSet;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
 import com.revolsys.io.Reader;
+import com.revolsys.jts.algorithm.PointLocator;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Dimension;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryCollection;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.jts.geom.Location;
 import com.revolsys.jts.geom.Point;
 import com.revolsys.jts.geom.segment.GeometryCollectionSegment;
 import com.revolsys.jts.geom.segment.Segment;
 import com.revolsys.jts.geom.vertex.GeometryCollectionVertex;
 import com.revolsys.jts.geom.vertex.Vertex;
+import com.revolsys.jts.operation.distance.DistanceOp;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -61,7 +64,7 @@ import com.revolsys.jts.geom.vertex.Vertex;
  *@version 1.7
  */
 public abstract class AbstractGeometryCollection extends AbstractGeometry
-implements GeometryCollection {
+  implements GeometryCollection {
   private static final long serialVersionUID = -8159852648192400768L;
 
   @SuppressWarnings("unchecked")
@@ -89,13 +92,13 @@ implements GeometryCollection {
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not "
-                + partIndex);
+              + partIndex);
         }
       }
     } else {
       throw new IllegalArgumentException(
         "Vertex id's for GeometryCollection must have length > 1. "
-            + Arrays.toString(geometryId));
+          + Arrays.toString(geometryId));
     }
   }
 
@@ -143,7 +146,7 @@ implements GeometryCollection {
     if (vertexId.length > 1) {
       if (isEmpty()) {
         throw new IllegalArgumentException(
-            "Cannot delete vertex for empty MultiPoint");
+          "Cannot delete vertex for empty MultiPoint");
       } else {
         final int partIndex = vertexId[0];
         final int partCount = getGeometryCount();
@@ -161,14 +164,22 @@ implements GeometryCollection {
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not "
-                + partIndex);
+              + partIndex);
         }
       }
     } else {
       throw new IllegalArgumentException(
         "Vertex id's for GeometryCollection must have length > 1. "
-            + Arrays.toString(vertexId));
+          + Arrays.toString(vertexId));
     }
+  }
+
+  @Override
+  protected double doDistance(final Geometry geometry,
+    final double terminateDistance) {
+    final DistanceOp distOp = new DistanceOp(this, geometry, terminateDistance);
+    final double distance = distOp.distance();
+    return distance;
   }
 
   @Override
@@ -229,7 +240,7 @@ implements GeometryCollection {
   @Override
   public Geometry getBoundary() {
     throw new IllegalArgumentException(
-        "This method does not support GeometryCollection arguments");
+      "This method does not support GeometryCollection arguments");
   }
 
   @Override
@@ -267,10 +278,14 @@ implements GeometryCollection {
     return geometries;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometryComponents(
     final Class<V> geometryClass) {
-    final List<V> geometries = super.getGeometryComponents(geometryClass);
+    final List<V> geometries = new ArrayList<V>();
+    if (geometryClass.isAssignableFrom(getClass())) {
+      geometries.add((V)this);
+    }
     for (final Geometry geometry : geometries()) {
       if (geometry != null) {
         final List<V> partGeometries = geometry.getGeometryComponents(geometryClass);
@@ -362,7 +377,7 @@ implements GeometryCollection {
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not "
-                + partIndex);
+              + partIndex);
         }
       }
     } else {
@@ -405,6 +420,11 @@ implements GeometryCollection {
   }
 
   @Override
+  public Location locate(final Point point) {
+    return new PointLocator().locate(point, this);
+  }
+
+  @Override
   public Geometry move(final double... deltas) {
     if (deltas == null || isEmpty()) {
       return this;
@@ -428,7 +448,7 @@ implements GeometryCollection {
     } else if (vertexId.length > 1) {
       if (isEmpty()) {
         throw new IllegalArgumentException("Cannot move vertex for empty "
-            + getGeometryType());
+          + getGeometryType());
       } else {
         final int partIndex = vertexId[0];
         final int partCount = getGeometryCount();
@@ -446,7 +466,7 @@ implements GeometryCollection {
         } else {
           throw new IllegalArgumentException(
             "Part index must be between 0 and " + partCount + " not "
-                + partIndex);
+              + partIndex);
         }
       }
     } else {

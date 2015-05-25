@@ -11,29 +11,18 @@ import com.revolsys.jts.geom.Polygon;
 import com.revolsys.jts.geom.impl.PointDouble;
 import com.revolsys.jts.io.WKTFileReader;
 import com.revolsys.jts.io.WKTReader;
-import com.revolsys.jts.operation.distance.DistanceOp;
 import com.revolsys.jts.operation.distance.IndexedFacetDistance;
 import com.revolsys.jts.testold.algorithm.InteriorPointTest;
 import com.revolsys.jts.util.Stopwatch;
 
 /**
  * Tests performance of {@link IndexedFacetDistance} versus standard
- * {@link DistanceOp}
  * using a grid of points to a target set of lines
  *
  * @author Martin Davis
  *
  */
 public class TestPerfDistanceLinesPoints {
-  public static void main(final String[] args) {
-    final TestPerfDistanceLinesPoints test = new TestPerfDistanceLinesPoints();
-    try {
-      test.test();
-    } catch (final Exception ex) {
-      ex.printStackTrace();
-    }
-  }
-
   static final boolean USE_INDEXED_DIST = true;
 
   static GeometryFactory geomFact = GeometryFactory.floating3();
@@ -45,6 +34,15 @@ public class TestPerfDistanceLinesPoints {
   static final double EXTENT = 1000;
 
   static final int NUM_PTS_SIDE = 100;
+
+  public static void main(final String[] args) {
+    final TestPerfDistanceLinesPoints test = new TestPerfDistanceLinesPoints();
+    try {
+      test.test();
+    } catch (final Exception ex) {
+      ex.printStackTrace();
+    }
+  }
 
   boolean verbose = true;
 
@@ -149,7 +147,7 @@ public class TestPerfDistanceLinesPoints {
   }
 
   public void test(final Geometry[] pts, final Geometry target) {
-    if (this.verbose) {
+    if (verbose) {
       // System.out.println("Query points = " + pts.length
       // + "     Target points = " + target.getVertexCount());
       // if (! verbose) System.out.print(num + ", ");
@@ -160,10 +158,10 @@ public class TestPerfDistanceLinesPoints {
     for (int i = 0; i < MAX_ITER; i++) {
       computeDistance(pts, target);
     }
-    if (!this.verbose) {
+    if (!verbose) {
       // System.out.println(sw.getTimeString());
     }
-    if (this.verbose) {
+    if (verbose) {
       final String name = USE_INDEXED_DIST ? "IndexedFacetDistance"
         : "Distance";
       // System.out.println(name + " - Run time: " + sw.getTimeString());

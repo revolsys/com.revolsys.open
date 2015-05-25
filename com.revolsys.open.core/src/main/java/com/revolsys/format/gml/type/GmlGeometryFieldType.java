@@ -166,13 +166,13 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.startTag(POLYGON);
     srsName(out, polygon, writeSrsName);
     if (!polygon.isEmpty()) {
-      final LineString exteriorRing = polygon.getExteriorRing();
+      final LineString exteriorRing = polygon.getShell();
       out.startTag(OUTER_BOUNDARY_IS);
       linearRing(out, exteriorRing, false);
       out.endTag(OUTER_BOUNDARY_IS);
 
-      for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-        final LineString interiorRing = polygon.getInteriorRing(i);
+      for (int i = 0; i < polygon.getHoleCount(); i++) {
+        final LineString interiorRing = polygon.getHole(i);
         out.startTag(INNER_BOUNDARY_IS);
         linearRing(out, interiorRing, false);
         out.endTag(INNER_BOUNDARY_IS);

@@ -208,10 +208,10 @@ public class GeometryGraph extends PlanarGraph {
   }
 
   private void addPolygon(final Polygon p) {
-    addPolygonRing(p.getExteriorRing(), Location.EXTERIOR, Location.INTERIOR);
+    addPolygonRing(p.getShell(), Location.EXTERIOR, Location.INTERIOR);
 
-    for (int i = 0; i < p.getNumInteriorRing(); i++) {
-      final LinearRing hole = p.getInteriorRing(i);
+    for (int i = 0; i < p.getHoleCount(); i++) {
+      final LinearRing hole = p.getHole(i);
 
       // Holes are topologically labelled opposite to the shell, since
       // the interior of the polygon lies on their opposite side
