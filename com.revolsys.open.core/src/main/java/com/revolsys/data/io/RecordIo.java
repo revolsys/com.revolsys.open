@@ -24,8 +24,7 @@ public class RecordIo {
 
   public static boolean canReadRecords(final String fileNameExtension) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    return ioFactoryRegistry.isFileExtensionSupported(
-      RecordReaderFactory.class, fileNameExtension);
+    return ioFactoryRegistry.isFileExtensionSupported(RecordReaderFactory.class, fileNameExtension);
   }
 
   public static boolean canWriteRecords(final File file) {
@@ -39,22 +38,20 @@ public class RecordIo {
 
   public static boolean canWriteRecords(final String fileNameExtension) {
     final IoFactoryRegistry ioFactoryRegistry = IoFactoryRegistry.getInstance();
-    return ioFactoryRegistry.isFileExtensionSupported(
-      RecordWriterFactory.class, fileNameExtension);
+    return ioFactoryRegistry.isFileExtensionSupported(RecordWriterFactory.class, fileNameExtension);
   }
 
-  public static void copy(final File sourceFile, final File targetFile) {
+  public static void copyRecords(final File sourceFile, final File targetFile) {
     try (
-        RecordReader reader = recordReader(sourceFile);) {
+      RecordReader reader = recordReader(sourceFile)) {
       if (reader == null) {
         throw new IllegalArgumentException("Unable to read " + sourceFile);
       } else {
+        final RecordDefinition recordDefinition = reader.getRecordDefinition();
         try (
-            Writer<Record> writer = recordWriter(reader.getRecordDefinition(),
-              targetFile)) {
+          Writer<Record> writer = recordWriter(recordDefinition, targetFile)) {
           if (writer == null) {
-            throw new IllegalArgumentException("Unable to create writer "
-                + targetFile);
+            throw new IllegalArgumentException("Unable to create writer " + targetFile);
           } else {
             for (final Record record : reader) {
               writer.write(record);
@@ -85,8 +82,7 @@ public class RecordIo {
     if (readerFactory == null) {
       return null;
     } else {
-      final RecordReader reader = readerFactory.createRecordReader(resource,
-        factory);
+      final RecordReader reader = readerFactory.createRecordReader(resource, factory);
       return reader;
     }
   }
@@ -101,14 +97,12 @@ public class RecordIo {
     }
   }
 
-  public static RecordReader recordReader(final Resource resource,
-    final RecordFactory factory) {
+  public static RecordReader recordReader(final Resource resource, final RecordFactory factory) {
     final RecordReaderFactory readerFactory = recordReaderFactory(resource);
     if (readerFactory == null) {
       return null;
     } else {
-      final RecordReader reader = readerFactory.createRecordReader(resource,
-        factory);
+      final RecordReader reader = readerFactory.createRecordReader(resource, factory);
       return reader;
     }
   }
@@ -132,19 +126,17 @@ public class RecordIo {
     return readerFactory;
   }
 
-  public static Writer<Record> recordWriter(
-    final RecordDefinition recordDefinition, final File file) {
+  public static Writer<Record> recordWriter(final RecordDefinition recordDefinition, final File file) {
     return recordWriter(recordDefinition, new FileSystemResource(file));
   }
 
-  public static Writer<Record> recordWriter(
-    final RecordDefinition recordDefinition, final Resource resource) {
+  public static Writer<Record> recordWriter(final RecordDefinition recordDefinition,
+    final Resource resource) {
     final RecordWriterFactory writerFactory = recordWriterFactory(resource);
     if (writerFactory == null) {
       return null;
     } else {
-      final Writer<Record> writer = writerFactory.createRecordWriter(
-        recordDefinition, resource);
+      final Writer<Record> writer = writerFactory.createRecordWriter(recordDefinition, resource);
       return writer;
     }
   }
