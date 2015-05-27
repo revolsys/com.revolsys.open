@@ -212,6 +212,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements Sortab
   }
 
   protected List<LayerRecord> getLayerRecords(final Query query) {
+    query.setOrderBy(this.orderBy);
     return this.layer.query(query);
   }
 
@@ -299,7 +300,6 @@ public class RecordLayerTableModel extends RecordRowTableModel implements Sortab
       records = layer.getChanges();
     } else {
       final Query query = getFilterQuery();
-      query.setOrderBy(this.orderBy);
       records = getLayerRecords(query);
     }
     return new ListRecordReader(recordDefinition, records);
@@ -434,7 +434,6 @@ public class RecordLayerTableModel extends RecordRowTableModel implements Sortab
 
   protected List<LayerRecord> loadPage(final int pageNumber) {
     final Query query = getFilterQuery();
-    query.setOrderBy(this.orderBy);
     query.setOffset(this.pageSize * pageNumber);
     query.setLimit(this.pageSize);
     final List<LayerRecord> records = getLayerRecords(query);
