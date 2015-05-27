@@ -435,6 +435,16 @@ public abstract class AbstractRecord extends AbstractMap<String, Object>
   }
 
   @Override
+  public boolean hasValuesAll(final String... fieldNames) {
+    for (final String fieldName : fieldNames) {
+      if (!hasValue(fieldName)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public boolean hasValuesAny(final String... fieldNames) {
     for (final String fieldName : fieldNames) {
       if (hasValue(fieldName)) {

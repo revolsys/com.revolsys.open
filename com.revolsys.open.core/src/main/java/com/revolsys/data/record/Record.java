@@ -104,6 +104,8 @@ public interface Record extends Map<String, Object>, Comparable<Record>,
 
   boolean hasValue(CharSequence name);
 
+  boolean hasValuesAll(String... fieldNames);
+
   /**
    * Check if any of the fields have a value.
    * @param fieldNames
