@@ -49,19 +49,19 @@ public class RecordQuadTree extends QuadTree<Record> {
     }
   }
 
-  public void insert(final Record object) {
-    if (object != null) {
-      final Geometry geometry = object.getGeometryValue();
+  public void insert(final Record record) {
+    if (record != null) {
+      final Geometry geometry = record.getGeometryValue();
       if (geometry != null && !geometry.isEmpty()) {
         final BoundingBox boundingBox = geometry.getBoundingBox();
-        insert(boundingBox, object);
+        insert(boundingBox, record);
       }
     }
   }
 
-  public void insertAll(final Collection<? extends Record> objects) {
-    for (final Record object : objects) {
-      insert(object);
+  public void insertAll(final Collection<? extends Record> records) {
+    for (final Record record : records) {
+      insert(record);
     }
   }
 
@@ -160,7 +160,7 @@ public class RecordQuadTree extends QuadTree<Record> {
   public List<Record> queryList(final BoundingBox boundingBox,
     final Filter<Record> filter, final Comparator<Record> comparator) {
     final CreateListVisitor<Record> listVisitor = new CreateListVisitor<Record>(
-        filter);
+      filter);
     visit(boundingBox, listVisitor);
     final List<Record> list = listVisitor.getList();
     if (comparator != null) {

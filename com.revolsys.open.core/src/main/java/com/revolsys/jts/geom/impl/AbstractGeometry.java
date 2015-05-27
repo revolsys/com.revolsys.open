@@ -1639,8 +1639,10 @@ public abstract class AbstractGeometry implements Geometry {
   public boolean isWithinDistance(Geometry geometry, final double distance) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     geometry = geometry.convert(geometryFactory, 2);
-    final double bboxDistance = getBoundingBox().distance(
-      geometry.getBoundingBox());
+    BoundingBox boundingBox = getBoundingBox();
+    BoundingBox boundingBox2 = geometry.getBoundingBox();
+    final double bboxDistance = boundingBox.distance(
+      boundingBox2);
     if (bboxDistance > distance) {
       return false;
     } else {

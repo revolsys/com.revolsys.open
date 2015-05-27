@@ -167,6 +167,16 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
     return new BoundingBoxDoubleGf();
   }
 
+  public static boolean isEmpty(final double minX, final double maxX) {
+    if (Double.isNaN(minX)) {
+      return true;
+    } else if (Double.isNaN(maxX)) {
+      return true;
+    } else {
+      return maxX < minX;
+    }
+  }
+
   private final double[] bounds;
 
   private GeometryFactory geometryFactory;
@@ -480,38 +490,52 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
    */
   @Override
   public double distance(BoundingBox boundingBox) {
-    boundingBox = boundingBox.convert(getGeometryFactory());
-    if (intersects(boundingBox)) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    boundingBox = boundingBox.convert(geometryFactory);
+    final double minX = getMinX();
+    final double minY = getMinY();
+    final double maxX = getMaxX();
+    final double maxY = getMaxY();
+
+    final double minX2 = boundingBox.getMinX();
+    final double minY2 = boundingBox.getMinY();
+    final double maxX2 = boundingBox.getMaxX();
+    final double maxY2 = boundingBox.getMaxY();
+
+    if (isEmpty(minX, maxX) || isEmpty(minX2, maxX2)) {
+      // Empty
+      return Double.MAX_VALUE;
+    } else if (!(minX2 > maxX || maxX2 < minX || minY2 > maxY || maxY2 < minY)) {
+      // Intersects
       return 0;
     } else {
-      final double minX = getMinX();
-      final double minY = getMinY();
-      final double maxX = getMaxX();
-      final double maxY = getMaxY();
-
-      double dx = 0.0;
-      if (maxX < boundingBox.getMinX()) {
-        dx = boundingBox.getMinX() - maxX;
-      } else if (minX > boundingBox.getMaxX()) {
-        dx = minX - boundingBox.getMaxX();
+      double dx;
+      if (maxX < minX2) {
+        dx = minX2 - maxX;
+      } else {
+        if (minX > maxX2) {
+          dx = minX - maxX2;
+        } else {
+          dx = 0;
+        }
       }
 
-      double dy = 0.0;
-      if (maxY < boundingBox.getMinY()) {
-        dy = boundingBox.getMinY() - maxY;
-      } else if (minY > boundingBox.getMaxY()) {
-        dy = minY - boundingBox.getMaxY();
+      double dy;
+      if (maxY < minY2) {
+        dy = minY2 - maxY;
+      } else if (minY > maxY2) {
+        dy = minY - maxY2;
+      } else {
+        dy = 0;
       }
 
-      // if either is zero, the envelopes overlap either vertically or
-      // horizontally
       if (dx == 0.0) {
         return dy;
-      }
-      if (dy == 0.0) {
+      } else if (dy == 0.0) {
         return dx;
+      } else {
+        return Math.sqrt(dx * dx + dy * dy);
       }
-      return Math.sqrt(dx * dx + dy * dy);
     }
   }
 
@@ -1139,9 +1163,11 @@ public class BoundingBoxDoubleGf implements Serializable, BoundingBox {
       final double maxX = getMaxX();
       final double maxY = getMaxY();
 
-      return !(convertedBoundingBox.getMinX() > maxX
-        || convertedBoundingBox.getMaxX() < minX
-        || convertedBoundingBox.getMinY() > maxY || convertedBoundingBox.getMaxY() < minY);
+      final double minX2 = convertedBoundingBox.getMinX();
+      final double minY2 = convertedBoundingBox.getMinY();
+      final double maxX2 = convertedBoundingBox.getMaxX();
+      final double maxY2 = convertedBoundingBox.getMaxY();
+      return !(minX2 > maxX || maxX2 < minX || minY2 > maxY || maxY2 < minY);
     }
   }
 

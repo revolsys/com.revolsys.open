@@ -1,6 +1,8 @@
 package com.revolsys.swing.tree.node.file;
 
-import java.io.File;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -34,8 +36,10 @@ public class FileSystemsTreeNode extends ListTreeNode {
 
   @Override
   protected List<BaseTreeNode> doLoadChildren() {
-    final File[] roots = File.listRoots();
-    return FileTreeNode.getFileNodes(this, roots);
+    final FileSystem fileSystem = FileSystems.getDefault();
+
+    final Iterable<Path> roots = fileSystem.getRootDirectories();
+    return FileTreeNode.getPathNodes(this, roots);
   }
 
   @Override

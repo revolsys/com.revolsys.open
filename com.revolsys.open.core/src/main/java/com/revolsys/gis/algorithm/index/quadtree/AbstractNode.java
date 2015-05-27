@@ -152,27 +152,28 @@ public abstract class AbstractNode<T> implements Serializable {
         maxX = centreX;
         minY = this.minY;
         maxY = centreY;
-        break;
+      break;
       case 1:
         minX = centreX;
         maxX = this.maxX;
         minY = this.minY;
         maxY = centreY;
-        break;
+      break;
       case 2:
         minX = this.minX;
         maxX = centreX;
         minY = centreY;
         maxY = this.maxY;
-        break;
+      break;
       case 3:
         minX = centreX;
         maxX = this.maxX;
         minY = centreY;
         maxY = this.maxY;
-        break;
+      break;
     }
-    final AbstractNode<T> node = createNode(this.level - 1, minX, minY, maxX, maxY);
+    final AbstractNode<T> node = createNode(this.level - 1, minX, minY, maxX,
+      maxY);
     return node;
   }
 
@@ -316,8 +317,8 @@ public abstract class AbstractNode<T> implements Serializable {
       final double maxY2 = bounds[3];
       AbstractNode<T> node = getNode(index);
       if (node == null
-          || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY,
-            minX2, minY2, maxX2, maxY2)) {
+        || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY,
+          minX2, minY2, maxX2, maxY2)) {
         final AbstractNode<T> largerNode = createExpanded(node, bounds);
         setNode(index, largerNode);
         node = largerNode;
@@ -353,8 +354,11 @@ public abstract class AbstractNode<T> implements Serializable {
     } else if (bounds == null) {
       return false;
     } else {
-      return BoundingBoxUtil.intersects(this.minX, this.minY, this.maxX,
-        this.maxY, bounds[0], bounds[1], bounds[2], bounds[3]);
+      final double minX2 = bounds[0];
+      final double minY2 = bounds[1];
+      final double maxX2 = bounds[2];
+      final double maxY2 = bounds[3];
+      return !(minX2 > maxX || maxX2 < minX || minY2 > maxY || maxY2 < minY);
     }
   }
 

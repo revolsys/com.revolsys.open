@@ -27,9 +27,9 @@ import com.revolsys.filter.Filter;
 import com.revolsys.jts.geom.Geometry;
 
 public class RecordGeometryDistanceFilter implements Filter<Record>,
-Comparator<Record> {
+  Comparator<Record> {
   /** The geometry to compare the data objects to to. */
-  private final Geometry geometry;
+  private Geometry geometry;
 
   /** The maximum maxDistance the object can be from the source geometry. */
   private final double maxDistance;
@@ -48,8 +48,9 @@ Comparator<Record> {
 
   @Override
   public boolean accept(final Record record) {
-    final double distance = getDistance(record);
-    if (distance <= this.maxDistance) {
+    final Geometry recordGeometry = record.getGeometryValue();
+    final double distance = recordGeometry.distance(geometry, maxDistance);
+    if (distance <= maxDistance) {
       return true;
     } else {
       return false;
@@ -58,14 +59,27 @@ Comparator<Record> {
 
   @Override
   public int compare(final Record record1, final Record record2) {
-    final double distance1 = getDistance(record1);
-    final double distance2 = getDistance(record2);
-    return Double.compare(distance1, distance2);
+    if (record1 == record2) {
+      return 0;
+    } else {
+      final double distance1 = getDistance(record1);
+      final double distance2 = getDistance(record2);
+      int compare = Double.compare(distance1, distance2);
+      if (compare == 0) {
+        compare = record1.compareTo(record2);
+      }
+      return compare;
+    }
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    geometry = null;
   }
 
   public double getDistance(final Record record) {
-    final Geometry matchGeometry = record.getGeometryValue();
-    final double distance = matchGeometry.distance(this.geometry);
+    final Geometry recordGeometry = record.getGeometryValue();
+    final double distance = recordGeometry.distance(geometry);
     return distance;
   }
 
@@ -75,7 +89,7 @@ Comparator<Record> {
    * @return The geometry to compare the data objects to to.
    */
   public Geometry getGeometry() {
-    return this.geometry;
+    return geometry;
   }
 
   /**
@@ -84,7 +98,7 @@ Comparator<Record> {
    * @return The maximum maxDistance the object can be from the source geometry.
    */
   public double getMaxDistance() {
-    return this.maxDistance;
+    return maxDistance;
   }
 
 }

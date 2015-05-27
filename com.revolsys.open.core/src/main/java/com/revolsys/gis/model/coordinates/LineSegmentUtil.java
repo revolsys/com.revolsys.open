@@ -79,7 +79,7 @@ public class LineSegmentUtil {
        */
 
       boolean noIntersection = false;
-      if (!BoundingBoxUtil.intersects(line1X1, line1Y1, line1X2, line1Y2,
+      if (!BoundingBoxUtil.intersectsMinMax(line1X1, line1Y1, line1X2, line1Y2,
         line2X1, line2Y1, line2X2, line2Y2)) {
         noIntersection = true;
       } else {

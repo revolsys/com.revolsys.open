@@ -93,7 +93,7 @@ public class BoundingBoxUtil {
   public static void expand(final double[] bounds, final int axisCount,
     final double... coordinates) {
     for (int axisIndex = 0; axisIndex < axisCount
-        && axisIndex < coordinates.length; axisIndex++) {
+      && axisIndex < coordinates.length; axisIndex++) {
       final double coordinate = coordinates[axisIndex];
       expand(bounds, axisCount, axisIndex, coordinate);
     }
@@ -234,40 +234,10 @@ public class BoundingBoxUtil {
   public static boolean intersects(final double p1X, final double p1Y,
     final double p2X, final double p2Y, final double qX, final double qY) {
     if (qX >= (p1X < p2X ? p1X : p2X) && qX <= (p1X > p2X ? p1X : p2X)
-        && qY >= (p1Y < p2Y ? p1Y : p2Y) && qY <= (p1Y > p2Y ? p1Y : p2Y)) {
+      && qY >= (p1Y < p2Y ? p1Y : p2Y) && qY <= (p1Y > p2Y ? p1Y : p2Y)) {
       return true;
     } else {
       return false;
-    }
-  }
-
-  public static boolean intersects(final double p1X, final double p1Y,
-    final double p2X, final double p2Y, final double q1X, final double q1Y,
-    final double q2X, final double q2Y) {
-    double minp = Math.min(p1X, p2X);
-    double maxq = Math.max(q1X, q2X);
-    if (minp > maxq) {
-      return false;
-    } else {
-      double minq = Math.min(q1X, q2X);
-      double maxp = Math.max(p1X, p2X);
-      if (maxp < minq) {
-        return false;
-      } else {
-        minp = Math.min(p1Y, p2Y);
-        maxq = Math.max(q1Y, q2Y);
-        if (minp > maxq) {
-          return false;
-        } else {
-          minq = Math.min(q1Y, q2Y);
-          maxp = Math.max(p1Y, p2Y);
-          if (maxp < minq) {
-            return false;
-          } else {
-            return true;
-          }
-        }
-      }
     }
   }
 
@@ -284,7 +254,8 @@ public class BoundingBoxUtil {
     final double minY2 = bounds2[1];
     final double maxX2 = bounds2[axisCount2];
     final double maxY2 = bounds2[axisCount2 + 1];
-    return intersects(minX1, minY1, maxX1, maxY1, minX2, minY2, maxX2, maxY2);
+
+    return !(minX2 > maxX1 || maxX2 < minX1 || minY2 > maxY1 || maxY2 < minY1);
   }
 
   /**
@@ -329,8 +300,38 @@ public class BoundingBoxUtil {
     final double line2y1 = line2Start.getY();
     final double line2x2 = line2End.getX();
     final double line2y2 = line2End.getY();
-    return intersects(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
-      line2x2, line2y2);
+    return intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1,
+      line2y1, line2x2, line2y2);
+  }
+
+  public static boolean intersectsMinMax(final double p1X, final double p1Y,
+    final double p2X, final double p2Y, final double q1X, final double q1Y,
+    final double q2X, final double q2Y) {
+    double minp = Math.min(p1X, p2X);
+    double maxq = Math.max(q1X, q2X);
+    if (minp > maxq) {
+      return false;
+    } else {
+      double minq = Math.min(q1X, q2X);
+      double maxp = Math.max(p1X, p2X);
+      if (maxp < minq) {
+        return false;
+      } else {
+        minp = Math.min(p1Y, p2Y);
+        maxq = Math.max(q1Y, q2Y);
+        if (minp > maxq) {
+          return false;
+        } else {
+          minq = Math.min(q1Y, q2Y);
+          maxp = Math.max(p1Y, p2Y);
+          if (maxp < minq) {
+            return false;
+          } else {
+            return true;
+          }
+        }
+      }
+    }
   }
 
   public static boolean isEmpty(final BoundingBox boundingBox) {
