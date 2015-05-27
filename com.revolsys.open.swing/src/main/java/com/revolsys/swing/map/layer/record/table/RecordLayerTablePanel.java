@@ -3,39 +3,52 @@ package com.revolsys.swing.map.layer.record.table;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellEditor;
 
 import com.revolsys.collection.map.Maps;
+import com.revolsys.data.io.RecordIo;
+import com.revolsys.data.io.RecordReader;
+import com.revolsys.data.io.RecordWriterFactory;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;
+import com.revolsys.io.FileUtil;
+import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.io.map.MapSerializerUtil;
 import com.revolsys.jts.geom.BoundingBox;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.jts.geom.GeometryFactory;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.AndEnableCheck;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.InvokeMethodEnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.action.enablecheck.OrEnableCheck;
+import com.revolsys.swing.map.action.AddFileLayerAction;
 import com.revolsys.swing.map.form.RecordLayerForm;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -46,6 +59,7 @@ import com.revolsys.swing.map.layer.record.component.FieldFilterPanel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.WrappedMenuFactory;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
@@ -53,6 +67,7 @@ import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.row.RecordRowPropertyEnableCheck;
 import com.revolsys.swing.table.record.row.RecordRowRunnable;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 
 public class RecordLayerTablePanel extends TablePanel implements PropertyChangeListener,
@@ -174,6 +189,56 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
 
     toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this, "refresh");
 
+    toolBar.addButtonTitleIcon(
+      "table",
+      "Export Records",
+      "table_save",
+      () -> {
+        final JFileChooser fileChooser = SwingUtil.createFileChooser("Export Records",
+          "com.revolsys.swing.map.table.export", "directory");
+        final String defaultFileExtension = PreferencesUtil.getUserString(
+          "com.revolsys.swing.map.table.export", "fileExtension", "tsv");
+
+        final List<FileNameExtensionFilter> recordFileFilters = new ArrayList<>();
+        for (final RecordWriterFactory factory : IoFactoryRegistry.getInstance().getFactories(
+          RecordWriterFactory.class)) {
+          if (recordDefinition.hasGeometryField() || factory.isCustomAttributionSupported()) {
+            recordFileFilters.add(AddFileLayerAction.createFilter(factory));
+          }
+        }
+        AddFileLayerAction.sortFilters(recordFileFilters);
+
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), layer.getName()));
+        for (final FileNameExtensionFilter fileFilter : recordFileFilters) {
+          fileChooser.addChoosableFileFilter(fileFilter);
+          if (Arrays.asList(fileFilter.getExtensions()).contains(defaultFileExtension)) {
+            fileChooser.setFileFilter(fileFilter);
+          }
+        }
+
+        fileChooser.setMultiSelectionEnabled(false);
+        final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+          final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser.getFileFilter();
+          File file = fileChooser.getSelectedFile();
+          final String fileExtension = FileUtil.getFileNameExtension(file);
+          final String expectedExtension = fileFilter.getExtensions()[0];
+          if (!fileExtension.equals(expectedExtension)) {
+            file = FileUtil.getFileWithExtension(file, expectedExtension);
+          }
+          final File targetFile = file;
+          PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "fileExtension",
+            expectedExtension);
+          PreferencesUtil.setUserString("com.revolsys.swing.map.table.export", "directory",
+            file.getParent());
+          Invoke.background("Export " + layer.getPath() + " to " + targetFile.getAbsolutePath(),
+            () -> {
+              final RecordReader reader = this.tableModel.getReader();
+              RecordIo.copyRecords(reader, targetFile);
+            });
+        }
+      });
     this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets", "fields_filter", this,
       "actionShowFieldSetsMenu");
 

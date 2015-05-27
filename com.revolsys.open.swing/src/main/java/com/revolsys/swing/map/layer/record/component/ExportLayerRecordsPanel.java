@@ -60,13 +60,11 @@ public class ExportLayerRecordsPanel extends BasePanel {
 
   private void addFileChooser(final JComponent component) {
 
-    final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(),
-        "currentDirectory");
+    final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(), "currentDirectory");
 
-    final List<FileFilter> recordFileFilters = new ArrayList<FileFilter>();
-    final Set<String> allRecordExtensions = new TreeSet<String>();
-    AddFileLayerAction.getFileFilters(recordFileFilters, allRecordExtensions,
-      RecordReaderFactory.class);
+    final Set<String> allRecordExtensions = new TreeSet<>();
+    final List<FileNameExtensionFilter> recordFileFilters = AddFileLayerAction.getFileFilters(
+      allRecordExtensions, RecordReaderFactory.class);
 
     final FileNameExtensionFilter allRecordFilter = AddFileLayerAction.createFileFilter(
       "All Vector/Data files", allRecordExtensions);
@@ -84,22 +82,19 @@ public class ExportLayerRecordsPanel extends BasePanel {
   private void createRecordsFilterPanel() {
     final List<Action> actions = new ArrayList<>();
 
-    actions.add(new I18nAction("allRecords", null, "All Records",
-      Icons.getIcon("table_filter")));
+    actions.add(new I18nAction("allRecords", null, "All Records", Icons.getIcon("table_filter")));
 
-    actions.add(new I18nAction("mapRecords", null, "Records on Map",
-      Icons.getIcon("map_filter")));
+    actions.add(new I18nAction("mapRecords", null, "Records on Map", Icons.getIcon("map_filter")));
 
     actions.add(new I18nAction("selectedRecords", null, "Selected Records",
       Icons.getIcon("filter_selected")));
 
-    this.recordsFilterType = new TogglePanel("recordsFilterType", "",
-      new Dimension(28, 28), actions);
+    this.recordsFilterType = new TogglePanel("recordsFilterType", "", new Dimension(28, 28),
+      actions);
   }
 
   public void doExport() {
-    this.exportResource = new FileSystemResource("/Users/paustin/Desktop/"
-        + getName() + ".gpx");
+    this.exportResource = new FileSystemResource("/Users/paustin/Desktop/" + getName() + ".gpx");
 
     final RecordDefinition recordDefinition = getRecordDefinition();
     final Query query = new Query(recordDefinition);
@@ -113,8 +108,7 @@ public class ExportLayerRecordsPanel extends BasePanel {
     } else if ("mapRecords".equals(filterType)) {
       final Project project = this.layer.getProject();
       final BoundingBox boundingBox = project.getViewBoundingBox();
-      final EnvelopeIntersects filter = F.envelopeIntersects(recordDefinition,
-        boundingBox);
+      final EnvelopeIntersects filter = F.envelopeIntersects(recordDefinition, boundingBox);
       query.setWhereCondition(filter);
       final List<LayerRecord> records = this.layer.query(query);
       writeRecords(records);
@@ -130,8 +124,8 @@ public class ExportLayerRecordsPanel extends BasePanel {
 
   private void writeRecords(final Iterable<LayerRecord> records) {
     try (
-        Writer<Record> writer = RecordIo.recordWriter(
-          this.layer.getRecordDefinition(), this.exportResource)) {
+      Writer<Record> writer = RecordIo.recordWriter(this.layer.getRecordDefinition(),
+        this.exportResource)) {
       for (final LayerRecord record : records) {
         writer.write(record);
       }

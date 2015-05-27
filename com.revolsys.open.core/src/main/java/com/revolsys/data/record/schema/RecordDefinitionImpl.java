@@ -584,6 +584,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
   }
 
   @Override
+  public boolean hasGeometryField() {
+    return this.geometryFieldDefinitionIndex != -1;
+  }
+
+  @Override
   public boolean isFieldRequired(final CharSequence name) {
     final FieldDefinition field = getField(name);
     if (field == null) {

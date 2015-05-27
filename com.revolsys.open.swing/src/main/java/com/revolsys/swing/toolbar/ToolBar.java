@@ -56,6 +56,17 @@ public class ToolBar extends JToolBar {
   }
 
   public JButton addButton(final String groupName, final int index, final String name,
+    final String title, final Icon icon, final EnableCheck enableCheck, final Runnable runnable) {
+    final RunnableAction action = new RunnableAction(name, title, icon, runnable);
+    action.setEnableCheck(enableCheck);
+
+    final JButton button = action.createButton();
+    button.setBorderPainted(false);
+    this.groups.addComponent(this, groupName, index, button);
+    return button;
+  }
+
+  public JButton addButton(final String groupName, final int index, final String name,
     final String title, final Icon icon, final Object object, final String methodName,
     final Object... parameters) {
     final InvokeMethodAction action = new InvokeMethodAction(name, title, icon, object, methodName,
@@ -106,6 +117,12 @@ public class ToolBar extends JToolBar {
     final String iconName, final Object object, final String methodName, final Object... parameters) {
     final ImageIcon icon = Icons.getIcon(iconName);
     return addButton(groupName, iconName, title, icon, object, methodName, parameters);
+  }
+
+  public JButton addButtonTitleIcon(final String groupName, final String title,
+    final String iconName, final Runnable runnable) {
+    final ImageIcon icon = Icons.getIcon(iconName);
+    return addButton(groupName, -1, iconName, title, icon, null, runnable);
   }
 
   public void addComponent(final Component component) {

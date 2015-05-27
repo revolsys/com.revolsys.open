@@ -26,6 +26,8 @@ import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.LruMap;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.equals.EqualsRegistry;
+import com.revolsys.data.io.ListRecordReader;
+import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.query.BinaryCondition;
 import com.revolsys.data.query.Cast;
 import com.revolsys.data.query.Column;
@@ -209,7 +211,7 @@ public class RecordLayerTableModel extends RecordRowTableModel implements Sortab
     return this.layer;
   }
 
-  protected List<LayerRecord> getLayerObjects(final Query query) {
+  protected List<LayerRecord> getLayerRecords(final Query query) {
     return this.layer.query(query);
   }
 
@@ -285,6 +287,22 @@ public class RecordLayerTableModel extends RecordRowTableModel implements Sortab
 
   public int getPageSize() {
     return this.pageSize;
+  }
+
+  public RecordReader getReader() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final List<LayerRecord> records;
+    if (this.fieldFilterMode.equals(MODE_SELECTED)) {
+      records = getSelectedRecords();
+    } else if (this.fieldFilterMode.equals(MODE_EDITS)) {
+      final AbstractRecordLayer layer = getLayer();
+      records = layer.getChanges();
+    } else {
+      final Query query = getFilterQuery();
+      query.setOrderBy(this.orderBy);
+      records = getLayerRecords(query);
+    }
+    return new ListRecordReader(recordDefinition, records);
   }
 
   @SuppressWarnings("unchecked")
@@ -419,8 +437,8 @@ public class RecordLayerTableModel extends RecordRowTableModel implements Sortab
     query.setOrderBy(this.orderBy);
     query.setOffset(this.pageSize * pageNumber);
     query.setLimit(this.pageSize);
-    final List<LayerRecord> objects = getLayerObjects(query);
-    return objects;
+    final List<LayerRecord> records = getLayerRecords(query);
+    return records;
   }
 
   public void loadPages(final int refreshIndex) {

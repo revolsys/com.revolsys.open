@@ -6,10 +6,10 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.swing.JFileChooser;
@@ -34,31 +34,46 @@ import com.revolsys.util.CollectionUtil;
 
 public class AddFileLayerAction extends AbstractAction {
 
-  public static FileNameExtensionFilter createFileFilter(
-    final String description, final Collection<String> fileExtensions) {
+  private static final long serialVersionUID = 1L;
+
+  public static FileNameExtensionFilter createFileFilter(final String description,
+    final Collection<String> fileExtensions) {
     final String[] array = fileExtensions.toArray(new String[0]);
     return new FileNameExtensionFilter(description, array);
   }
 
-  public static void getFileFilters(final List<FileFilter> fileFilters,
-    final Set<String> allExtensions,
-    final Class<? extends IoFactory> factoryClass) {
-    final Map<String, FileFilter> filtersByName = new TreeMap<>();
-    final Set<IoFactory> factories = IoFactoryRegistry.getInstance()
-        .getFactories(factoryClass);
-    for (final IoFactory factory : factories) {
-      final List<String> fileExtensions = factory.getFileExtensions();
-      String description = factory.getName();
-      description += " (" + CollectionUtil.toString(fileExtensions) + ")";
-      final FileNameExtensionFilter filter = createFileFilter(description,
-        fileExtensions);
-      filtersByName.put(description, filter);
-      allExtensions.addAll(fileExtensions);
-    }
-    fileFilters.addAll(filtersByName.values());
+  public static FileNameExtensionFilter createFilter(final IoFactory factory) {
+    final List<String> fileExtensions = factory.getFileExtensions();
+    String description = factory.getName();
+    description += " (" + CollectionUtil.toString(fileExtensions) + ")";
+    return createFileFilter(description, fileExtensions);
   }
 
-  private static final long serialVersionUID = 1L;
+  public static List<FileNameExtensionFilter> getFileFilters(final Set<String> allExtensions,
+    final Class<? extends IoFactory> factoryClass) {
+    final List<FileNameExtensionFilter> filters = new ArrayList<>();
+    final Set<IoFactory> factories = IoFactoryRegistry.getInstance().getFactories(factoryClass);
+    for (final IoFactory factory : factories) {
+      final List<String> fileExtensions = factory.getFileExtensions();
+      final FileNameExtensionFilter filter = createFilter(factory);
+      filters.add(filter);
+      if (allExtensions != null) {
+        allExtensions.addAll(fileExtensions);
+      }
+    }
+    sortFilters(filters);
+    return filters;
+  }
+
+  public static void sortFilters(final List<FileNameExtensionFilter> filters) {
+    Collections.sort(filters, new Comparator<FileNameExtensionFilter>() {
+      @Override
+      public int compare(final FileNameExtensionFilter filter1,
+        final FileNameExtensionFilter filter2) {
+        return filter1.getDescription().compareTo(filter2.getDescription());
+      }
+    });
+  }
 
   public AddFileLayerAction() {
     putValue(NAME, "Open File Layer");
@@ -76,32 +91,27 @@ public class AddFileLayerAction extends AbstractAction {
       window = null;
     }
 
-    final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(),
-        "currentDirectory");
+    final JFileChooser fileChooser = SwingUtil.createFileChooser(getClass(), "currentDirectory");
     fileChooser.setMultiSelectionEnabled(true);
 
-    final List<FileFilter> imageFileFilters = new ArrayList<FileFilter>();
     final Set<String> allImageExtensions = new TreeSet<String>();
-    getFileFilters(imageFileFilters, allImageExtensions,
+    final List<FileNameExtensionFilter> imageFileFilters = getFileFilters(allImageExtensions,
       GeoReferencedImageFactory.class);
 
-    final List<FileFilter> recordFileFilters = new ArrayList<FileFilter>();
     final Set<String> allRecordExtensions = new TreeSet<String>();
-    getFileFilters(recordFileFilters, allRecordExtensions,
+    final List<FileNameExtensionFilter> recordFileFilters = getFileFilters(allRecordExtensions,
       RecordReaderFactory.class);
 
     final Set<String> allExtensions = new TreeSet<String>();
     allExtensions.addAll(allRecordExtensions);
     allExtensions.addAll(allImageExtensions);
-    final FileNameExtensionFilter allFilter = createFileFilter(
-      "All Supported Files", allExtensions);
+    final FileNameExtensionFilter allFilter = createFileFilter("All Supported Files", allExtensions);
     fileChooser.addChoosableFileFilter(allFilter);
 
-    fileChooser.addChoosableFileFilter(createFileFilter(
-      "All Vector/Record Files", allRecordExtensions));
+    fileChooser.addChoosableFileFilter(createFileFilter("All Vector/Record Files",
+      allRecordExtensions));
 
-    fileChooser.addChoosableFileFilter(createFileFilter("All Image Files",
-      allImageExtensions));
+    fileChooser.addChoosableFileFilter(createFileFilter("All Image Files", allImageExtensions));
 
     for (final FileFilter fileFilter : recordFileFilters) {
       fileChooser.addChoosableFileFilter(fileFilter);
@@ -127,11 +137,10 @@ public class AddFileLayerAction extends AbstractAction {
         layerGroup = Project.get();
       }
       for (final File file : fileChooser.getSelectedFiles()) {
-        Invoke.background("Open file: " + FileUtil.getCanonicalPath(file),
-          layerGroup, "openFile", file);
+        Invoke.background("Open file: " + FileUtil.getCanonicalPath(file), layerGroup, "openFile",
+          file);
       }
     }
-    SwingUtil.saveFileChooserDirectory(getClass(), "currentDirectory",
-      fileChooser);
+    SwingUtil.saveFileChooserDirectory(getClass(), "currentDirectory", fileChooser);
   }
 }

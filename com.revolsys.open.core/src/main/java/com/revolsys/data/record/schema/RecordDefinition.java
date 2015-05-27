@@ -30,8 +30,7 @@ import com.revolsys.data.types.DataType;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.jts.geom.GeometryFactory;
 
-public interface RecordDefinition extends RecordStoreSchemaElement,
-MapSerializer {
+public interface RecordDefinition extends RecordStoreSchemaElement, MapSerializer {
   void addDefaultValue(String fieldName, Object defaultValue);
 
   Record createRecord();
@@ -194,6 +193,8 @@ MapSerializer {
    * @return True id the type has the field, false otherwise.
    */
   boolean hasField(CharSequence name);
+
+  boolean hasGeometryField();
 
   boolean isFieldRequired(CharSequence name);
 
