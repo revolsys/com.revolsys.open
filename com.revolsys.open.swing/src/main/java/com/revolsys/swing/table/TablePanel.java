@@ -23,7 +23,17 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
-public class TablePanel extends JPanel implements MouseListener {
+public class TablePanel extends JPanel implements MouseListener, AutoCloseable {
+  private static int eventColumn;
+
+  private static int eventRow;
+
+  private static Reference<JTable> eventTable = new WeakReference<JTable>(null);
+
+  private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(null);
+
+  private static final long serialVersionUID = 1L;
+
   public static int getEventColumn() {
     return eventColumn;
   }
@@ -61,16 +71,6 @@ public class TablePanel extends JPanel implements MouseListener {
     }
   }
 
-  private static int eventColumn;
-
-  private static int eventRow;
-
-  private static Reference<JTable> eventTable = new WeakReference<JTable>(null);
-
-  private static Reference<MouseEvent> popupMouseEvent = new WeakReference<MouseEvent>(null);
-
-  private static final long serialVersionUID = 1L;
-
   private JTable table;
 
   private ToolBar toolBar = new ToolBar();
@@ -101,6 +101,24 @@ public class TablePanel extends JPanel implements MouseListener {
 
     menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value", "paste_plain",
       new ObjectPropertyEnableCheck(this, "canPaste"), this, "pasteFieldValue");
+  }
+
+  @Override
+  public void close() {
+    if (this.scrollPane != null) {
+      remove(this.scrollPane);
+      this.scrollPane = null;
+    }
+    if (this.table != null) {
+      this.table.removeMouseListener(this);
+      final AbstractTableModel model = getTableModel();
+      model.dispose();
+    }
+    this.table = null;
+    if (this.toolBar != null) {
+      remove(this.toolBar);
+      this.toolBar = null;
+    }
   }
 
   private void copyCurrentCell() {
@@ -265,25 +283,6 @@ public class TablePanel extends JPanel implements MouseListener {
         tableModel.setValueAt(value, eventRow, eventColumn);
       }
     }
-  }
-
-  @Override
-  public void removeNotify() {
-    if (this.scrollPane != null) {
-      remove(this.scrollPane);
-      this.scrollPane = null;
-    }
-    if (this.table != null) {
-      this.table.removeMouseListener(this);
-      final AbstractTableModel model = getTableModel();
-      model.dispose();
-    }
-    this.table = null;
-    if (this.toolBar != null) {
-      remove(this.toolBar);
-      this.toolBar = null;
-    }
-    super.removeNotify();
   }
 
 }

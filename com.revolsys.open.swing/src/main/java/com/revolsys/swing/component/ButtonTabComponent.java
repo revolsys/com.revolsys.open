@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonModel;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,16 +24,12 @@ import javax.swing.plaf.basic.BasicButtonUI;
  * a JButton to close the tab it belongs to
  */
 public class ButtonTabComponent extends JPanel {
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
-
   private class TabButton extends JButton implements ActionListener {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
+
     private final JTabbedPane tabs;
 
     public TabButton(final JTabbedPane tabs) {
@@ -85,16 +82,32 @@ public class ButtonTabComponent extends JPanel {
     }
   }
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public ButtonTabComponent(final JTabbedPane tabs) {
     super(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
     setOpaque(false);
 
     // make JLabel read titles from JTabbedPane
     final JLabel label = new JLabel() {
+
       /**
        *
        */
       private static final long serialVersionUID = 1L;
+
+      @Override
+      public Icon getIcon() {
+        final int i = tabs.indexOfTabComponent(ButtonTabComponent.this);
+        if (i != -1) {
+          return tabs.getIconAt(i);
+        }
+        return null;
+      }
 
       @Override
       public String getText() {

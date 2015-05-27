@@ -254,6 +254,26 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
     return this.layer.canPasteRecordGeometry(record);
   }
 
+  @Override
+  public void close() {
+    final RecordLayerTable table = getTable();
+    if (table != null) {
+      final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
+      tableCellEditor.close();
+      table.dispose();
+    }
+    if (this.layer != null) {
+      Property.removeListener(this.layer, this);
+      this.layer.setPluginConfig(PLUGIN_NAME, toMap());
+    }
+    this.tableModel = null;
+    this.layer = null;
+    if (this.fieldFilterPanel != null) {
+      this.fieldFilterPanel.close();
+      this.fieldFilterPanel = null;
+    }
+  }
+
   public void copyRecord() {
     final LayerRecord record = getEventRowObject();
     this.layer.copyRecordsToClipboard(Collections.singletonList(record));
@@ -380,27 +400,6 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
 
   public void refresh() {
     this.tableModel.refresh();
-  }
-
-  @Override
-  public void removeNotify() {
-    final RecordLayerTable table = getTable();
-    if (table != null) {
-      final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
-      tableCellEditor.close();
-      table.dispose();
-    }
-    if (this.layer != null) {
-      Property.removeListener(this.layer, this);
-      this.layer.setPluginConfig(PLUGIN_NAME, toMap());
-    }
-    this.tableModel = null;
-    this.layer = null;
-    if (this.fieldFilterPanel != null) {
-      this.fieldFilterPanel.close();
-      this.fieldFilterPanel = null;
-    }
-    super.removeNotify();
   }
 
   public void setFieldFilterMode(final String mode) {

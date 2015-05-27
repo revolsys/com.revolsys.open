@@ -56,6 +56,7 @@ import com.revolsys.swing.action.InvokeMethodAction;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.component.ButtonTabComponent;
+import com.revolsys.swing.component.DnDTabbedPane;
 import com.revolsys.swing.listener.InvokeMethodPropertyChangeListener;
 import com.revolsys.swing.logging.Log4jTableModel;
 import com.revolsys.swing.map.layer.Layer;
@@ -130,7 +131,7 @@ public class ProjectFrame extends BaseFrame {
 
   private JTabbedPane leftTabs = new JTabbedPane();
 
-  private JTabbedPane bottomTabs = new JTabbedPane();
+  private DnDTabbedPane bottomTabs = new DnDTabbedPane();
 
   private MapPanel mapPanel;
 
