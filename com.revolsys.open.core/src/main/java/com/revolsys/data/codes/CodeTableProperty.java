@@ -25,14 +25,16 @@ import com.revolsys.io.Path;
 import com.revolsys.io.Reader;
 import com.revolsys.util.Property;
 
-public class CodeTableProperty extends AbstractCodeTable implements RecordDefinitionProperty {
+public class CodeTableProperty extends AbstractCodeTable implements
+  RecordDefinitionProperty {
 
   private static final ArrayList<String> DEFAULT_FIELD_NAMES = new ArrayList<String>(
     Arrays.asList("VALUE"));
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
 
-  public static final CodeTableProperty getProperty(final RecordDefinition recordDefinition) {
+  public static final CodeTableProperty getProperty(
+    final RecordDefinition recordDefinition) {
     final CodeTableProperty property = recordDefinition.getProperty(PROPERTY_NAME);
     return property;
   }
@@ -144,13 +146,9 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   @Override
   public Map<Identifier, List<Object>> getCodes() {
+    refreshIfNeeded();
     final Map<Identifier, List<Object>> codes = super.getCodes();
-    if (codes.isEmpty() && isLoadAll()) {
-      loadAll();
-      return super.getCodes();
-    } else {
-      return codes;
-    }
+    return codes;
   }
 
   public String getCreationTimestampFieldName() {
@@ -295,7 +293,8 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   }
 
   @Override
-  protected synchronized Identifier loadId(final List<Object> values, final boolean createId) {
+  protected synchronized Identifier loadId(final List<Object> values,
+    final boolean createId) {
     if (this.loadAll && !this.loadMissingCodes && !isEmpty()) {
       return null;
     }
@@ -323,7 +322,9 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       final Reader<Record> reader = this.recordStore.query(query);
       try {
         final List<Record> codes = reader.read();
-        this.recordStore.getStatistics().getStatistics("query").add(this.typePath, -codes.size());
+        this.recordStore.getStatistics()
+          .getStatistics("query")
+          .add(this.typePath, -codes.size());
         addValues(codes);
         id = getIdByValue(values);
         Property.firePropertyChange(this, "valuesChanged", false, true);
@@ -360,11 +361,18 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     }
   }
 
+  public void refreshIfNeeded() {
+    if (!isLoaded()) {
+      loadAll();
+    }
+  }
+
   public void setCreateMissingCodes(final boolean createMissingCodes) {
     this.createMissingCodes = createMissingCodes;
   }
 
-  public void setCreationTimestampFieldName(final String creationTimestampFieldName) {
+  public void setCreationTimestampFieldName(
+    final String creationTimestampFieldName) {
     this.creationTimestampFieldName = creationTimestampFieldName;
   }
 
@@ -384,7 +392,8 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     this.loadMissingCodes = loadMissingCodes;
   }
 
-  public void setModificationTimestampFieldName(final String modificationTimestampFieldName) {
+  public void setModificationTimestampFieldName(
+    final String modificationTimestampFieldName) {
     this.modificationTimestampFieldName = modificationTimestampFieldName;
   }
 

@@ -17,7 +17,7 @@ import com.revolsys.format.tsv.TsvWriter;
 import com.revolsys.util.CollectionUtil;
 
 public class StatisticsMap {
-  private final Map<String, Statistics> statisticsMap = new TreeMap<String, Statistics>();
+  private final Map<String, Statistics> statisticsMap = new TreeMap<>();
 
   private int providerCount = 0;
 
@@ -28,20 +28,26 @@ public class StatisticsMap {
   public StatisticsMap() {
   }
 
+  public StatisticsMap(final Map<String, Statistics> statisticsMap) {
+    if (statisticsMap != null) {
+      this.statisticsMap.putAll(statisticsMap);
+    }
+  }
+
   public StatisticsMap(final String prefix) {
     this.prefix = prefix;
   }
 
-  public void add(final String statisticName, final Record object) {
+  public void add(final String statisticName, final Record record) {
     final Statistics statistics = getStatistics(statisticName);
-    statistics.add(object);
+    statistics.add(record);
 
   }
 
-  public void add(final String statisticName, final Record object,
+  public void add(final String statisticName, final Record record,
     final long count) {
     final Statistics statistics = getStatistics(statisticName);
-    statistics.add(object, count);
+    statistics.add(record, count);
   }
 
   public void add(final String statisticName, final RecordDefinition type) {
@@ -82,25 +88,25 @@ public class StatisticsMap {
   }
 
   public synchronized void addCountsText(final StringBuilder sb) {
-    for (final Statistics stats : statisticsMap.values()) {
+    for (final Statistics stats : this.statisticsMap.values()) {
       stats.addCountsText(sb);
     }
   }
 
   public void clear() {
-    statisticsMap.clear();
+    this.statisticsMap.clear();
   }
 
   @PostConstruct
   public synchronized void connect() {
-    providerCount++;
+    this.providerCount++;
   }
 
   @PreDestroy
   public synchronized void disconnect() {
-    providerCount--;
-    if (providerCount <= 0) {
-      for (final Statistics statistics : statisticsMap.values()) {
+    this.providerCount--;
+    if (this.providerCount <= 0) {
+      for (final Statistics statistics : this.statisticsMap.values()) {
         statistics.disconnect();
       }
     }
@@ -113,35 +119,45 @@ public class StatisticsMap {
   }
 
   public String getPrefix() {
-    return prefix;
+    return this.prefix;
+  }
+
+  public long getStatistic(final String typeName, final String name) {
+    final Statistics statistics = getStatistics(typeName);
+    if (statistics == null) {
+      return 0;
+    } else {
+      return statistics.get(name);
+    }
   }
 
   public synchronized Statistics getStatistics(final String statisticName) {
     if (statisticName == null) {
       return null;
     } else {
-      final String name = CollectionUtil.toString(" ", prefix, statisticName);
-      Statistics statistics = statisticsMap.get(name);
+      final String name = CollectionUtil.toString(" ", this.prefix,
+        statisticName);
+      Statistics statistics = this.statisticsMap.get(name);
       if (statistics == null) {
         statistics = new Statistics(name);
-        statistics.setLogCounts(logCounts);
-        statisticsMap.put(name, statistics);
+        statistics.setLogCounts(this.logCounts);
+        this.statisticsMap.put(name, statistics);
       }
       return statistics;
     }
   }
 
   public synchronized Set<String> getStatisticsNames() {
-    return statisticsMap.keySet();
+    return this.statisticsMap.keySet();
   }
 
   public boolean isEmpty() {
-    return statisticsMap.isEmpty();
+    return this.statisticsMap.isEmpty();
   }
 
   public synchronized void setLogCounts(final boolean logCounts) {
     this.logCounts = logCounts;
-    for (final Statistics statistics : statisticsMap.values()) {
+    for (final Statistics statistics : this.statisticsMap.values()) {
       statistics.setLogCounts(logCounts);
     }
   }
@@ -165,7 +181,7 @@ public class StatisticsMap {
       TsvWriter tsv = new TsvWriter(out);) {
       tsv.write(Arrays.asList(fieldNames));
       long total = 0;
-      for (final Entry<String, Statistics> entry : statisticsMap.entrySet()) {
+      for (final Entry<String, Statistics> entry : this.statisticsMap.entrySet()) {
         final String category = entry.getKey();
         final Statistics statistics = entry.getValue();
         for (final String name : statistics.getNames()) {
