@@ -71,9 +71,16 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
 
   private final String name;
 
-  public OgrRecordStoreFactory(final String name, final List<String> fileNameExtensions) {
+  public OgrRecordStoreFactory(final String name, final String mediaType,
+    final List<String> fileNameExtensions) {
     this.name = name;
     this.fileNameExtensions = fileNameExtensions;
+
+    // final RecordStoreRecordAndGeometryWriterFactory writerFactory = new
+    // RecordStoreRecordAndGeometryWriterFactory(
+    // name, mediaType, true, true, fileNameExtensions);
+    // IoFactoryRegistry.getInstance().addFactory(writerFactory);
+
     for (final String extension : fileNameExtensions) {
       this.urlPatterns.add("file:/(//)?.*." + extension + "/?");
       this.urlPatterns.add("folderconnection:/(//)?.*." + extension + "/?");

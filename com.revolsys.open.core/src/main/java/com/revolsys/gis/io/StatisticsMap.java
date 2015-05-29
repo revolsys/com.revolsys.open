@@ -13,6 +13,7 @@ import javax.annotation.PreDestroy;
 
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.schema.RecordDefinition;
+import com.revolsys.format.tsv.Tsv;
 import com.revolsys.format.tsv.TsvWriter;
 import com.revolsys.util.CollectionUtil;
 
@@ -44,8 +45,7 @@ public class StatisticsMap {
 
   }
 
-  public void add(final String statisticName, final Record record,
-    final long count) {
+  public void add(final String statisticName, final Record record, final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(record, count);
   }
@@ -55,8 +55,7 @@ public class StatisticsMap {
     statistics.add(type);
   }
 
-  public void add(final String statisticName, final RecordDefinition type,
-    final long count) {
+  public void add(final String statisticName, final RecordDefinition type, final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(type, count);
   }
@@ -66,8 +65,7 @@ public class StatisticsMap {
     statistics.add(name);
   }
 
-  public void add(final String statisticName, final String path,
-    final long count) {
+  public void add(final String statisticName, final String path, final long count) {
     final Statistics statistics = getStatistics(statisticName);
     statistics.add(path, count);
   }
@@ -135,8 +133,7 @@ public class StatisticsMap {
     if (statisticName == null) {
       return null;
     } else {
-      final String name = CollectionUtil.toString(" ", this.prefix,
-        statisticName);
+      final String name = CollectionUtil.toString(" ", this.prefix, statisticName);
       Statistics statistics = this.statisticsMap.get(name);
       if (statistics == null) {
         statistics = new Statistics(name);
@@ -178,7 +175,7 @@ public class StatisticsMap {
 
   public void toTsv(final Writer out, final String... fieldNames) {
     try (
-      TsvWriter tsv = new TsvWriter(out);) {
+      TsvWriter tsv = Tsv.plainWriter(out)) {
       tsv.write(Arrays.asList(fieldNames));
       long total = 0;
       for (final Entry<String, Statistics> entry : this.statisticsMap.entrySet()) {

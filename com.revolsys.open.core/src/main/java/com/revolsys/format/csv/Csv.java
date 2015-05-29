@@ -61,6 +61,19 @@ public class Csv extends AbstractRecordAndGeometryIoFactory implements MapWriter
     return mapReader(reader);
   }
 
+  public static CsvWriter plainWriter(final File file) {
+    if (file == null) {
+      throw new NullPointerException("File must not be null");
+    } else {
+      final java.io.Writer writer = FileUtil.createUtf8Writer(file);
+      return plainWriter(writer);
+    }
+  }
+
+  public static CsvWriter plainWriter(final java.io.Writer writer) {
+    return new CsvWriter(writer);
+  }
+
   public Csv() {
     super(CsvConstants.DESCRIPTION, false, true);
     addMediaTypeAndFileExtension(CsvConstants.MEDIA_TYPE, CsvConstants.FILE_EXTENSION);

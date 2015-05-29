@@ -234,8 +234,10 @@ public class RecordLayerTablePanel extends TablePanel implements PropertyChangeL
             file.getParent());
           Invoke.background("Export " + layer.getPath() + " to " + targetFile.getAbsolutePath(),
             () -> {
-              final RecordReader reader = this.tableModel.getReader();
-              RecordIo.copyRecords(reader, targetFile);
+              try (
+                final RecordReader reader = this.tableModel.getReader()) {
+                RecordIo.copyRecords(reader, targetFile);
+              }
             });
         }
       });
