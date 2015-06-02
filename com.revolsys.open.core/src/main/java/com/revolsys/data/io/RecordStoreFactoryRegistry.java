@@ -146,15 +146,17 @@ public class RecordStoreFactoryRegistry {
   }
 
   public static RecordStoreFactory register(final RecordStoreFactory factory) {
-    final List<String> patterns = factory.getUrlPatterns();
-    for (final String regex : patterns) {
-      final Pattern pattern = Pattern.compile(regex);
-      recordStoreFactoryUrlPatterns.put(pattern, factory);
-    }
-    final List<String> factoryFileExtensions = factory.getRecordStoreFileExtensions();
-    if (!factoryFileExtensions.isEmpty()) {
-      fileExtensions.addAll(factoryFileExtensions);
-      fileRecordStoreFactories.add(factory);
+    if (factory != null && factory.isAvailable()) {
+      final List<String> patterns = factory.getUrlPatterns();
+      for (final String regex : patterns) {
+        final Pattern pattern = Pattern.compile(regex);
+        recordStoreFactoryUrlPatterns.put(pattern, factory);
+      }
+      final List<String> factoryFileExtensions = factory.getRecordStoreFileExtensions();
+      if (!factoryFileExtensions.isEmpty()) {
+        fileExtensions.addAll(factoryFileExtensions);
+        fileRecordStoreFactories.add(factory);
+      }
     }
     return factory;
   }

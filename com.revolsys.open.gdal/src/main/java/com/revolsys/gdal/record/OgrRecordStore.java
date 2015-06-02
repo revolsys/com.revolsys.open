@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import javax.annotation.PreDestroy;
 
 import org.gdal.ogr.DataSource;
+import org.gdal.ogr.Driver;
 import org.gdal.ogr.Feature;
 import org.gdal.ogr.FeatureDefn;
 import org.gdal.ogr.FieldDefn;
@@ -87,9 +88,11 @@ public class OgrRecordStore extends AbstractRecordStore {
 
   private final Map<String, String> idFieldNames = new HashMap<>();
 
-  protected OgrRecordStore(final File file) {
+  private boolean createMissingTables = true;
+
+  protected OgrRecordStore(final String driverName, final File file) {
+    this.driverName = driverName;
     this.file = file;
-    Gdal.init();
   }
 
   synchronized void addLayerToClose(final Layer layer) {
@@ -281,7 +284,15 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   protected DataSource createDataSource(final boolean update) {
-    return ogr.Open(FileUtil.getCanonicalPath(this.file), update);
+    final String path = FileUtil.getCanonicalPath(this.file);
+    DataSource dataSource;
+    if (this.file.exists()) {
+      dataSource = ogr.Open(path, update);
+    } else {
+      final Driver driver = ogr.GetDriverByName(this.driverName);
+      dataSource = driver.CreateDataSource(path);
+    }
+    return dataSource;
   }
 
   @Override
@@ -303,6 +314,28 @@ public class OgrRecordStore extends AbstractRecordStore {
 
     final OgrQueryIterator iterator = new OgrQueryIterator(this, query);
     return iterator;
+  }
+
+  private RecordDefinition createLayer(final DataSource dataSource,
+    final RecordDefinition sourceRecordDefinition) {
+    final String typePath = sourceRecordDefinition.getPath();
+    final String name = Path.getName(typePath);
+    final String parentPath = Path.getPath(typePath);
+    final RecordStoreSchema schema = getSchema(parentPath);
+    Layer layer;
+    if (sourceRecordDefinition.hasGeometryField()) {
+      final GeometryFactory geometryFactory = sourceRecordDefinition.getGeometryFactory();
+      final FieldDefinition geometryField = sourceRecordDefinition.getGeometryField();
+      final int geometryFieldType = getGeometryFieldType(geometryFactory, geometryField);
+      final SpatialReference spatialReference = Gdal.getSpatialReference(geometryFactory);
+      layer = dataSource.CreateLayer(typePath, spatialReference, geometryFieldType);
+    } else {
+      layer = dataSource.CreateLayer(name);
+    }
+    if (dataSource.TestCapability(ogr.ODsCCreateLayer) == false) {
+      System.err.println("CreateLayer not supported by driver.");
+    }
+    return createRecordDefinition(schema, layer);
   }
 
   protected RecordDefinitionImpl createRecordDefinition(final RecordStoreSchema schema,
@@ -363,71 +396,71 @@ public class OgrRecordStore extends AbstractRecordStore {
     for (int fieldIndex = 0; fieldIndex < layerDefinition.GetGeomFieldCount(); fieldIndex++) {
       final GeomFieldDefn fieldDefinition = layerDefinition.GetGeomFieldDefn(fieldIndex);
       final String fieldName = fieldDefinition.GetName();
-      final int fieldType = fieldDefinition.GetFieldType();
-      DataType fieldDataType;
+      final int geometryFieldType = fieldDefinition.GetFieldType();
+      DataType geometryFieldDataType;
       int axisCount = 2;
-      switch (fieldType) {
+      switch (geometryFieldType) {
         case 1:
-          fieldDataType = DataTypes.POINT;
+          geometryFieldDataType = DataTypes.POINT;
         break;
         case 2:
-          fieldDataType = DataTypes.LINE_STRING;
+          geometryFieldDataType = DataTypes.LINE_STRING;
         break;
         case 3:
-          fieldDataType = DataTypes.POLYGON;
+          geometryFieldDataType = DataTypes.POLYGON;
         break;
         case 4:
-          fieldDataType = DataTypes.MULTI_POINT;
+          geometryFieldDataType = DataTypes.MULTI_POINT;
         break;
         case 5:
-          fieldDataType = DataTypes.MULTI_LINE_STRING;
+          geometryFieldDataType = DataTypes.MULTI_LINE_STRING;
         break;
         case 6:
-          fieldDataType = DataTypes.MULTI_POLYGON;
+          geometryFieldDataType = DataTypes.MULTI_POLYGON;
         break;
         case 7:
-          fieldDataType = DataTypes.GEOMETRY_COLLECTION;
+          geometryFieldDataType = DataTypes.GEOMETRY_COLLECTION;
         break;
         case 101:
-          fieldDataType = DataTypes.LINEAR_RING;
+          geometryFieldDataType = DataTypes.LINEAR_RING;
         break;
         case 0x80000000 + 1:
-          fieldDataType = DataTypes.POINT;
+          geometryFieldDataType = DataTypes.POINT;
           axisCount = 3;
         break;
         case 0x80000000 + 2:
-          fieldDataType = DataTypes.LINE_STRING;
+          geometryFieldDataType = DataTypes.LINE_STRING;
           axisCount = 3;
         break;
         case 0x80000000 + 3:
-          fieldDataType = DataTypes.POLYGON;
+          geometryFieldDataType = DataTypes.POLYGON;
           axisCount = 3;
         break;
         case 0x80000000 + 4:
-          fieldDataType = DataTypes.MULTI_POINT;
+          geometryFieldDataType = DataTypes.MULTI_POINT;
           axisCount = 3;
         break;
         case 0x80000000 + 5:
-          fieldDataType = DataTypes.MULTI_LINE_STRING;
+          geometryFieldDataType = DataTypes.MULTI_LINE_STRING;
           axisCount = 3;
         break;
         case 0x80000000 + 6:
-          fieldDataType = DataTypes.MULTI_POLYGON;
+          geometryFieldDataType = DataTypes.MULTI_POLYGON;
           axisCount = 3;
         break;
         case 0x80000000 + 7:
-          fieldDataType = DataTypes.GEOMETRY_COLLECTION;
+          geometryFieldDataType = DataTypes.GEOMETRY_COLLECTION;
           axisCount = 3;
         break;
 
         default:
-          fieldDataType = DataTypes.GEOMETRY;
+          geometryFieldDataType = DataTypes.GEOMETRY;
         break;
       }
       final SpatialReference spatialReference = fieldDefinition.GetSpatialRef();
       final CoordinateSystem coordinateSystem = Gdal.getCoordinateSystem(spatialReference);
       final GeometryFactory geometryFactory = GeometryFactory.floating(coordinateSystem, axisCount);
-      final FieldDefinition field = new FieldDefinition(fieldName, fieldDataType, false);
+      final FieldDefinition field = new FieldDefinition(fieldName, geometryFieldDataType, false);
       field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       recordDefinition.addField(field);
     }
@@ -475,6 +508,37 @@ public class OgrRecordStore extends AbstractRecordStore {
     return this.driverName;
   }
 
+  private int getGeometryFieldType(final GeometryFactory geometryFactory,
+    final FieldDefinition field) {
+    int type;
+    final DataType dataType = field.getType();
+
+    if (DataTypes.POINT.equals(dataType)) {
+      type = 1;
+    } else if (DataTypes.LINE_STRING.equals(dataType)) {
+      type = 2;
+    } else if (DataTypes.POLYGON.equals(dataType)) {
+      type = 3;
+    } else if (DataTypes.MULTI_POINT.equals(dataType)) {
+      type = 4;
+    } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
+      type = 5;
+    } else if (DataTypes.MULTI_POINT.equals(dataType)) {
+      type = 6;
+    } else if (DataTypes.GEOMETRY_COLLECTION.equals(dataType)) {
+      type = 7;
+    } else if (DataTypes.LINEAR_RING.equals(dataType)) {
+      type = 101;
+    } else {
+      throw new IllegalArgumentException("Unsupported geometry type " + dataType + " for " + field);
+    }
+
+    if (geometryFactory.getAxisCount() > 2) {
+      type += 0x80000000;
+    }
+    return type;
+  }
+
   public String getIdFieldName(final RecordDefinition recordDefinition) {
     String path;
     if (recordDefinition == null) {
@@ -520,6 +584,21 @@ public class OgrRecordStore extends AbstractRecordStore {
       } else {
         return layerName;
       }
+    }
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition(final RecordDefinition sourceRecordDefinition) {
+    final DataSource dataSource = getDataSource();
+    synchronized (dataSource) {
+      if (getGeometryFactory() == null) {
+        setGeometryFactory(sourceRecordDefinition.getGeometryFactory());
+      }
+      RecordDefinition recordDefinition = super.getRecordDefinition(sourceRecordDefinition);
+      if (this.createMissingTables && recordDefinition == null) {
+        recordDefinition = createLayer(dataSource, sourceRecordDefinition);
+      }
+      return recordDefinition;
     }
   }
 
@@ -625,6 +704,10 @@ public class OgrRecordStore extends AbstractRecordStore {
     return this.closed;
   }
 
+  public boolean isCreateMissingTables() {
+    return this.createMissingTables;
+  }
+
   @Override
   protected synchronized Map<String, ? extends RecordStoreSchemaElement> refreshSchemaElements(
     final RecordStoreSchema schema) {
@@ -665,6 +748,10 @@ public class OgrRecordStore extends AbstractRecordStore {
         layer.delete();
       }
     }
+  }
+
+  public void setCreateMissingTables(final boolean createMissingTables) {
+    this.createMissingTables = createMissingTables;
   }
 
   @Override

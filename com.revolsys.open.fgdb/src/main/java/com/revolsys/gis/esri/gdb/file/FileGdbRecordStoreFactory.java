@@ -109,4 +109,9 @@ public class FileGdbRecordStoreFactory implements RecordStoreFactory {
     return URL_PATTERNS;
   }
 
+  @Override
+  public boolean isAvailable() {
+    return true;
+  }
+
 }

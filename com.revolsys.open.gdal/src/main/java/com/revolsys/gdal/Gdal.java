@@ -418,6 +418,20 @@ public class Gdal {
     }
   }
 
+  public static SpatialReference getSpatialReference(final GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      return null;
+    } else {
+      final int srid = geometryFactory.getSrid();
+      if (srid <= 0) {
+        final GeometryFactory coordinateSystem = geometryFactory;
+        return getSpatialReference(coordinateSystem);
+      } else {
+        return getSpatialReference(srid);
+      }
+    }
+  }
+
   public static SpatialReference getSpatialReference(final int srid) {
     final SpatialReference spatialReference = new SpatialReference("");
     spatialReference.ImportFromEPSG(srid);

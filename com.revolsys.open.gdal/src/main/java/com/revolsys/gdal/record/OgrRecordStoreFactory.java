@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.gdal.ogr.ogr;
+
 import com.revolsys.collection.map.Maps;
 import com.revolsys.data.io.RecordStoreFactory;
 import com.revolsys.data.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.record.schema.RecordStore;
+import com.revolsys.gdal.Gdal;
 import com.revolsys.io.FileUtil;
 
 public class OgrRecordStoreFactory implements RecordStoreFactory {
@@ -20,7 +23,7 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
 
   private static final Map<String, OgrRecordStore> DATA_STORES = new HashMap<>();
 
-  public static OgrRecordStore create(File file) {
+  private static OgrRecordStore create(final String driverName, File file) {
     if (file == null) {
       return null;
     } else {
@@ -31,7 +34,7 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
         count.incrementAndGet();
         OgrRecordStore recordStore = DATA_STORES.get(fileName);
         if (recordStore == null) {
-          recordStore = new OgrRecordStore(file);
+          recordStore = new OgrRecordStore(driverName, file);
           // recordStore.setCreateMissingRecordStore(false);
           DATA_STORES.put(fileName, recordStore);
         }
@@ -71,20 +74,31 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
 
   private final String name;
 
-  public OgrRecordStoreFactory(final String name, final String mediaType,
+  private boolean available;
+
+  private final String driverName;
+
+  public OgrRecordStoreFactory(final String name, final String driverName, final String mediaType,
     final List<String> fileNameExtensions) {
     this.name = name;
+    this.driverName = driverName;
     this.fileNameExtensions = fileNameExtensions;
+    if (Gdal.isAvailable()) {
+      this.available = ogr.GetDriverByName(driverName) != null;
+      if (this.available) {
+        // final RecordStoreRecordAndGeometryWriterFactory writerFactory = new
+        // RecordStoreRecordAndGeometryWriterFactory(
+        // name, mediaType, true, true, fileNameExtensions);
+        // IoFactoryRegistry.getInstance().addFactory(writerFactory);
 
-    // final RecordStoreRecordAndGeometryWriterFactory writerFactory = new
-    // RecordStoreRecordAndGeometryWriterFactory(
-    // name, mediaType, true, true, fileNameExtensions);
-    // IoFactoryRegistry.getInstance().addFactory(writerFactory);
+        for (final String extension : fileNameExtensions) {
+          this.urlPatterns.add("file:/(//)?.*." + extension + "/?");
+          this.urlPatterns.add("folderconnection:/(//)?.*." + extension + "/?");
 
-    for (final String extension : fileNameExtensions) {
-      this.urlPatterns.add("file:/(//)?.*." + extension + "/?");
-      this.urlPatterns.add("folderconnection:/(//)?.*." + extension + "/?");
-
+        }
+      }
+    } else {
+      this.available = false;
     }
   }
 
@@ -94,7 +108,7 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);
 
-    final OgrRecordStore recordStore = create(file);
+    final OgrRecordStore recordStore = create(this.driverName, file);
     RecordStoreFactoryRegistry.setConnectionProperties(recordStore, properties);
     return recordStore;
   }
@@ -118,5 +132,10 @@ public class OgrRecordStoreFactory implements RecordStoreFactory {
   @Override
   public List<String> getUrlPatterns() {
     return this.urlPatterns;
+  }
+
+  @Override
+  public boolean isAvailable() {
+    return this.available;
   }
 }

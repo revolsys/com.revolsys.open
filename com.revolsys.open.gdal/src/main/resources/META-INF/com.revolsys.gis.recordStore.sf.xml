@@ -16,13 +16,12 @@
     <constructor-arg>
       <bean class="com.revolsys.gdal.record.OgrRecordStoreFactory">
         <constructor-arg
-          index="0"
           value="SQLite/SpatiaLite" />
         <constructor-arg
-          index="1"
+          value="SQLite" />
+        <constructor-arg
           value="application/x-sqlite3" />
         <constructor-arg
-          index="2"
         >
           <list>
             <value>sqlite</value>
@@ -38,13 +37,12 @@
     <constructor-arg>
       <bean class="com.revolsys.gdal.record.OgrRecordStoreFactory">
         <constructor-arg
-          index="0"
           value="GeoPackage" />
         <constructor-arg
-          index="1"
+          value="GPKG" />
+        <constructor-arg
           value="application/x-gpkg" />
         <constructor-arg
-          index="2"
           name="fileNameExtensions"
         >
           <list>
