@@ -178,8 +178,8 @@ public class Maps {
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
-  public static <K, V> V get(final Map<K, ? extends Object> map, final K key,
-    final Factory<V> factory) {
+  public static <K, V> V get(final Factory<V> factory, final Map<K, ? extends Object> map,
+    final K key) {
     V value = (V)map.get(key);
     if (value == null) {
       value = factory.create();
@@ -397,7 +397,7 @@ public class Maps {
   public static <K1, K2, V> V getMap(final Map<K1, Map<K2, V>> map,
     final K1 key1, final K2 key2, final Factory<V> factory) {
     final Map<K2, V> values = getMap(map, key1);
-    return get(values, key2, factory);
+    return get(factory, values, key2);
   }
 
   public static <K, V> List<V> getNotNull(final Map<K, V> map,
