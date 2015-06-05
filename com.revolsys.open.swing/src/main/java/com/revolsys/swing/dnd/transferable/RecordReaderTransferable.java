@@ -8,8 +8,8 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.csv.CsvUtil;
 

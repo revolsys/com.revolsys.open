@@ -15,10 +15,10 @@ import java.util.NoSuchElementException;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.collection.AbstractIterator;
-import com.revolsys.data.io.RecordIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.io.RecordIterator;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;
 import com.revolsys.data.types.DataType;
 import com.revolsys.data.types.DataTypes;

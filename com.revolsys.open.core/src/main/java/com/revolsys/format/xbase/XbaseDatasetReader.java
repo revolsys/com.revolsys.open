@@ -23,7 +23,7 @@ package com.revolsys.format.xbase;
 import java.io.File;
 
 import com.revolsys.data.io.AbstractDirectoryReader;
-import com.revolsys.data.io.RecordDirectoryReader;
+import com.revolsys.data.record.io.RecordDirectoryReader;
 
 /**
  * <p>

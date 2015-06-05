@@ -7,9 +7,9 @@ import org.springframework.core.io.Resource;
 
 import com.revolsys.data.identifier.Identifier;
 import com.revolsys.data.identifier.SingleIdentifier;
-import com.revolsys.data.io.RecordIo;
-import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordIo;
+import com.revolsys.data.record.io.RecordReader;
 
 public class SimpleCodeTable extends AbstractCodeTable {
 

@@ -25,11 +25,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellEditor;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.data.io.RecordIo;
-import com.revolsys.data.io.RecordReader;
-import com.revolsys.data.io.RecordWriterFactory;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordIo;
+import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;

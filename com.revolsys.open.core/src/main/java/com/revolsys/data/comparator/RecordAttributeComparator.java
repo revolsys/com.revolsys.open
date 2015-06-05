@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
 import com.revolsys.util.CompareUtil;
 
 public class RecordAttributeComparator implements Comparator<Record> {
@@ -46,9 +46,9 @@ public class RecordAttributeComparator implements Comparator<Record> {
 
   public int compare(final Record object1, final Record object2,
     final String fieldName) {
-    final Comparable<Object> value1 = RecordUtil.getFieldByPath(object1,
+    final Comparable<Object> value1 = Records.getFieldByPath(object1,
       fieldName);
-    final Comparable<Object> value2 = RecordUtil.getFieldByPath(object2,
+    final Comparable<Object> value2 = Records.getFieldByPath(object2,
       fieldName);
     if (value1 == null) {
       if (value2 == null) {

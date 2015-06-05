@@ -6,11 +6,11 @@ import java.nio.charset.Charset;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractRecordIoFactory;
-import com.revolsys.data.io.RecordIteratorReader;
-import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.io.AbstractRecordIoFactory;
+import com.revolsys.data.record.io.RecordIteratorReader;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Writer;
 import com.revolsys.spring.OutputStreamResource;

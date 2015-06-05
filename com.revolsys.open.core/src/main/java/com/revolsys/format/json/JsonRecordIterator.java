@@ -6,12 +6,12 @@ import java.io.Reader;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.converter.string.StringConverter;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.ArrayRecord;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordIterator;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.types.DataType;

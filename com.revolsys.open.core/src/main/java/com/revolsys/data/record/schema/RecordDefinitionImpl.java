@@ -36,8 +36,8 @@ import com.revolsys.util.CaseConverter;
 import com.revolsys.util.CollectionUtil;
 import com.revolsys.util.JavaBeanUtil;
 
-public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement implements
-  RecordDefinition {
+public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
+  implements RecordDefinition {
   private static final AtomicInteger INSTANCE_IDS = new AtomicInteger(0);
 
   private static final Map<Integer, RecordDefinitionImpl> RECORD_DEFINITION_CACHE = new WeakCache<Integer, RecordDefinitionImpl>();
@@ -121,7 +121,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
   }
 
   public RecordDefinitionImpl(final RecordDefinition recordDefinition) {
-    this(recordDefinition.getPath(), recordDefinition.getProperties(), recordDefinition.getFields());
+    this(recordDefinition.getPath(), recordDefinition.getProperties(),
+      recordDefinition.getFields());
     setIdFieldIndex(recordDefinition.getIdFieldIndex());
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
@@ -144,8 +145,9 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
-  public RecordDefinitionImpl(final RecordStoreSchema schema, final String path,
-    final Map<String, Object> properties, final List<FieldDefinition> fields) {
+  public RecordDefinitionImpl(final RecordStoreSchema schema,
+    final String path, final Map<String, Object> properties,
+    final List<FieldDefinition> fields) {
     this(schema, path);
     for (final FieldDefinition field : fields) {
       addField(field.clone());
@@ -158,21 +160,23 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
-  public RecordDefinitionImpl(final String path, final FieldDefinition... fields) {
-    this(path, null, fields);
-  }
-
-  public RecordDefinitionImpl(final String path, final List<FieldDefinition> fields) {
-    this(path, null, fields);
-  }
-
-  public RecordDefinitionImpl(final String path, final Map<String, Object> properties,
+  public RecordDefinitionImpl(final String path,
     final FieldDefinition... fields) {
+    this(path, null, fields);
+  }
+
+  public RecordDefinitionImpl(final String path,
+    final List<FieldDefinition> fields) {
+    this(path, null, fields);
+  }
+
+  public RecordDefinitionImpl(final String path,
+    final Map<String, Object> properties, final FieldDefinition... fields) {
     this(path, properties, Arrays.asList(fields));
   }
 
-  public RecordDefinitionImpl(final String path, final Map<String, Object> properties,
-    final List<FieldDefinition> fields) {
+  public RecordDefinitionImpl(final String path,
+    final Map<String, Object> properties, final List<FieldDefinition> fields) {
     super(path);
     for (final FieldDefinition field : fields) {
       addField(field.clone());
@@ -229,27 +233,39 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     return addField(fieldName, type, false);
   }
 
-  public FieldDefinition addField(final String name, final DataType type, final boolean required) {
+  public FieldDefinition addField(final String name, final DataType type,
+    final boolean required) {
     final FieldDefinition field = new FieldDefinition(name, type, required);
     addField(field);
     return field;
   }
 
-  public FieldDefinition addField(final String name, final DataType type, final int length,
-    final boolean required) {
-    final FieldDefinition field = new FieldDefinition(name, type, length, required);
+  public FieldDefinition addField(final String name, final DataType type,
+    final int length, final boolean required) {
+    final FieldDefinition field = new FieldDefinition(name, type, length,
+      required);
     addField(field);
     return field;
   }
 
-  public FieldDefinition addField(final String name, final DataType type, final int length,
-    final int scale, final boolean required) {
-    final FieldDefinition field = new FieldDefinition(name, type, length, scale, required);
+  public FieldDefinition addField(final String fieldName, final DataType type,
+    final int length, final int scale) {
+    final FieldDefinition field = new FieldDefinition(fieldName, type, length,
+      scale, false);
     addField(field);
     return field;
   }
 
-  public void addRestriction(final String fieldPath, final Collection<Object> values) {
+  public FieldDefinition addField(final String name, final DataType type,
+    final int length, final int scale, final boolean required) {
+    final FieldDefinition field = new FieldDefinition(name, type, length,
+      scale, required);
+    addField(field);
+    return field;
+  }
+
+  public void addRestriction(final String fieldPath,
+    final Collection<Object> values) {
     this.restrictions.put(fieldPath, values);
   }
 
@@ -620,19 +636,22 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     return false;
   }
 
-  private void readObject(final ObjectInputStream ois) throws ClassNotFoundException, IOException {
+  private void readObject(final ObjectInputStream ois)
+    throws ClassNotFoundException, IOException {
     ois.defaultReadObject();
     RECORD_DEFINITION_CACHE.put(this.instanceId, this);
   }
 
   public RecordDefinitionImpl rename(final String path) {
-    final RecordDefinitionImpl clone = new RecordDefinitionImpl(path, getProperties(), this.fields);
+    final RecordDefinitionImpl clone = new RecordDefinitionImpl(path,
+      getProperties(), this.fields);
     clone.setIdFieldIndex(this.idFieldDefinitionIndex);
     clone.setProperties(getProperties());
     return clone;
   }
 
-  public void replaceField(final FieldDefinition field, final FieldDefinition newFieldDefinition) {
+  public void replaceField(final FieldDefinition field,
+    final FieldDefinition newFieldDefinition) {
     final String name = field.getName();
     final String lowerName = name.toLowerCase();
     final String newName = newFieldDefinition.getName();
@@ -646,7 +665,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
     }
   }
 
-  public void setCodeTableByColumnMap(final Map<String, CodeTable> codeTableByColumnMap) {
+  public void setCodeTableByColumnMap(
+    final Map<String, CodeTable> codeTableByColumnMap) {
     this.codeTableByColumnMap = codeTableByColumnMap;
   }
 
@@ -667,7 +687,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     final FieldDefinition geometryFieldDefinition = getGeometryField();
     if (geometryFieldDefinition != null) {
-      geometryFieldDefinition.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+      geometryFieldDefinition.setProperty(FieldProperties.GEOMETRY_FACTORY,
+        geometryFactory);
     }
   }
 
@@ -750,7 +771,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement imple
 
   }
 
-  public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
+  public void setRecordDefinitionFactory(
+    final RecordDefinitionFactory recordDefinitionFactory) {
     this.recordDefinitionFactory = recordDefinitionFactory;
   }
 

@@ -5,7 +5,7 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 
 class BPlusTreeLeafIterator<T> extends AbstractIterator<T> {
 

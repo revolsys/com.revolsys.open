@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
 import com.revolsys.data.record.schema.RecordDefinition;
 
 public class MapValues extends AbstractSourceToTargetProcess<Record, Record> {
@@ -48,7 +48,7 @@ public class MapValues extends AbstractSourceToTargetProcess<Record, Record> {
 
   @Override
   public void process(final Record source, final Record target) {
-    final Object sourceValue = RecordUtil.getFieldByPath(source,
+    final Object sourceValue = Records.getFieldByPath(source,
       this.sourceFieldName);
     if (sourceValue != null) {
       final Object targetValue = this.valueMap.get(sourceValue);

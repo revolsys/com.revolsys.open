@@ -2,7 +2,7 @@ package com.revolsys.jdbc.io;
 
 import java.sql.ResultSetMetaData;
 
-import com.revolsys.data.io.RecordStoreQueryReader;
+import com.revolsys.data.record.io.RecordStoreQueryReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gis.io.Statistics;

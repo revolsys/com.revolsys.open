@@ -7,10 +7,10 @@ import java.nio.charset.Charset;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractRecordAndGeometryIoFactory;
-import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.io.AbstractRecordAndGeometryIoFactory;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.zip.ZipRecordReader;
 import com.revolsys.io.FileUtil;

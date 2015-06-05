@@ -37,7 +37,7 @@ import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.support.GenericApplicationContext;
 
 import com.revolsys.beans.ResourceEditorRegistrar;
-import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.logging.log4j.ThreadLocalFileAppender;
 import com.revolsys.parallel.process.ProcessNetwork;
 import com.revolsys.util.JexlUtil;

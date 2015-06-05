@@ -5,15 +5,15 @@ import java.util.Collection;
 
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
 import com.revolsys.filter.Filter;
 
 public class AttributesEqualOrNullFilter implements Filter<Record> {
   public static boolean accept(final Record object1, final Record object2,
     final Collection<String> fieldNames) {
     for (final String fieldName : fieldNames) {
-      final Object value1 = RecordUtil.getFieldByPath(object1, fieldName);
-      final Object value2 = RecordUtil.getFieldByPath(object2, fieldName);
+      final Object value1 = Records.getFieldByPath(object1, fieldName);
+      final Object value2 = Records.getFieldByPath(object2, fieldName);
 
       if (value1 != null && value2 != null
           && !EqualsInstance.INSTANCE.equals(value1, value2)) {

@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.collection.FilterIterator;
+import com.revolsys.collection.iterator.FilterIterator;
 import com.revolsys.filter.Filter;
 
 public class FilterReader<T> extends AbstractReader<T> {

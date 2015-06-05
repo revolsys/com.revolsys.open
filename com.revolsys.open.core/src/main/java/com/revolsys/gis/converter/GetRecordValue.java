@@ -5,7 +5,7 @@ import java.util.Map;
 import org.springframework.core.convert.converter.Converter;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
 
 public class GetRecordValue implements Converter<Record, Object> {
   private String attributePath;
@@ -27,7 +27,7 @@ public class GetRecordValue implements Converter<Record, Object> {
 
   @Override
   public Object convert(final Record source) {
-    Object value = RecordUtil.getFieldByPath(source, this.attributePath);
+    Object value = Records.getFieldByPath(source, this.attributePath);
     if (!this.valueMap.isEmpty()) {
       if (this.valueMap.containsKey(value)) {
         value = this.valueMap.get(value);

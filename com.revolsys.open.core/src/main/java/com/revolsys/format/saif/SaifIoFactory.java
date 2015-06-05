@@ -2,9 +2,9 @@ package com.revolsys.format.saif;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractRecordAndGeometryReaderFactory;
-import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.io.AbstractRecordAndGeometryReaderFactory;
+import com.revolsys.data.record.io.RecordReader;
 
 public class SaifIoFactory extends AbstractRecordAndGeometryReaderFactory {
 

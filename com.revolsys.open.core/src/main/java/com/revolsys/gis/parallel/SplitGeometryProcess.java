@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
 import com.revolsys.gis.algorithm.index.LineSegmentIndex;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.jts.LineStringUtil;
@@ -32,7 +32,7 @@ BaseInOutProcess<Record, Record> {
 
   protected Record createSplitObject(final Record object,
     final LineString newLine) {
-    return RecordUtil.copy(object, newLine);
+    return Records.copy(object, newLine);
   }
 
   /**

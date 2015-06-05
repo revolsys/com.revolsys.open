@@ -12,8 +12,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.MapFactoryBean;
 import org.springframework.context.ApplicationContext;
 
-import com.revolsys.collection.ThreadSharedAttributes;
 import com.revolsys.collection.map.AttributeMap;
+import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.spring.TargetBeanFactoryBean;
 
 public class AttributesBeanConfigurer extends BeanConfigurrer {

@@ -19,9 +19,9 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.io.RecordIterator;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.xml.StaxUtils;
 import com.revolsys.gis.model.coordinates.list.CoordinatesListUtil;

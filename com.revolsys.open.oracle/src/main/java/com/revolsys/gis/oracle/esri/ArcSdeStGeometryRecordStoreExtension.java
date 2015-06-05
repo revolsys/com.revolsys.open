@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.data.io.RecordStoreExtension;
+import com.revolsys.data.record.io.RecordStoreExtension;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;

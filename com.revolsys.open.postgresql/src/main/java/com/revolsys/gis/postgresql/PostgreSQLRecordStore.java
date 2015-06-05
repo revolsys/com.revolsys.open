@@ -11,8 +11,8 @@ import javax.sql.DataSource;
 
 import org.postgresql.jdbc2.AbstractJdbc2Connection;
 
-import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.query.functions.EnvelopeIntersects;

@@ -3,7 +3,7 @@ package com.revolsys.parallel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.parallel.process.InvokeMethodRunnable;
 
 public class ExecutorServiceFactory {

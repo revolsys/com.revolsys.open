@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.ObjectWithProperties;
 

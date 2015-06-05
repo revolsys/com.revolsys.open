@@ -81,7 +81,7 @@ public interface Record extends Map<String, Object>, Comparable<Record>,
    */
   <T extends Object> T getValue(int index);
 
-  <T> T getValueByPath(CharSequence attributePath);
+  <T> T getValueByPath(CharSequence fieldPath);
 
   Map<String, Object> getValueMap(
     final Collection<? extends CharSequence> fieldNames);

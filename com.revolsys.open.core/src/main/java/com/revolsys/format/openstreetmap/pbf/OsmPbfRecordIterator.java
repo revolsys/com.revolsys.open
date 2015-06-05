@@ -16,10 +16,10 @@ import java.util.zip.Inflater;
 import org.springframework.core.io.Resource;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.LongHashMap;
-import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordIterator;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.openstreetmap.model.OsmConstants;
 import com.revolsys.format.openstreetmap.model.OsmElement;

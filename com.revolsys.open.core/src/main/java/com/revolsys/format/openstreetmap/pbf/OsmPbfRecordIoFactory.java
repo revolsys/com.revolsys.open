@@ -5,10 +5,10 @@ import java.util.Set;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractRecordAndGeometryReaderFactory;
-import com.revolsys.data.io.RecordIteratorReader;
-import com.revolsys.data.io.RecordReader;
 import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.io.AbstractRecordAndGeometryReaderFactory;
+import com.revolsys.data.record.io.RecordIteratorReader;
+import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.GeographicCoordinateSystem;
 import com.revolsys.gis.cs.epsg.EpsgCoordinateSystems;

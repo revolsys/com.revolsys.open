@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
 import com.revolsys.data.record.property.DirectionalAttributes;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.filter.Filter;
@@ -61,7 +61,7 @@ public class RecordGraph extends Graph<Record> {
     if (object == null) {
       return null;
     } else {
-      return RecordUtil.copy(object, line);
+      return Records.copy(object, line);
     }
   }
 

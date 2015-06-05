@@ -13,8 +13,8 @@ import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
-import com.revolsys.data.io.RecordStoreConnectionMapProxy;
-import com.revolsys.data.io.RecordStoreProxy;
+import com.revolsys.data.record.io.RecordStoreConnectionMapProxy;
+import com.revolsys.data.record.io.RecordStoreProxy;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.datastore.RecordStoreConnectionManager;

@@ -810,6 +810,8 @@ public interface Geometry extends Cloneable, Comparable<Object>, Serializable,
 
   <V extends Geometry> List<V> getGeometries(Class<V> geometryClass);
 
+  <V extends Geometry> V getGeometry(Class<? extends Geometry> geometryClass);
+
   /**
    * Returns an element {@link Geometry} from a {@link GeometryCollection}
    * (or <code>this</code>, if the geometry is not a collection).

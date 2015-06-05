@@ -7,9 +7,9 @@ import java.nio.charset.Charset;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.AbstractRecordAndGeometryWriterFactory;
 import com.revolsys.data.io.GeometryReader;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.AbstractRecordAndGeometryWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.FileUtil;

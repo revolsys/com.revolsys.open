@@ -4,7 +4,7 @@ import java.util.NoSuchElementException;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;

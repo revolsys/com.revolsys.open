@@ -20,7 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.data.io.RecordWriterFactory;
+import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.util.Property;
 
 public class IoFactoryRegistry {

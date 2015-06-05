@@ -24,7 +24,7 @@ import org.gdal.ogr.ogr;
 import org.gdal.osr.SpatialReference;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.converter.string.StringConverterRegistry;
 import com.revolsys.data.query.AbstractMultiCondition;
 import com.revolsys.data.query.BinaryCondition;

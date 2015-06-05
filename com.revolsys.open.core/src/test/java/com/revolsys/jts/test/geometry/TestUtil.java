@@ -4,8 +4,8 @@ import org.junit.Assert;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.RecordIo;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordIo;
 import com.revolsys.gis.cs.CoordinateSystem;
 import com.revolsys.gis.cs.ProjectedCoordinateSystem;
 import com.revolsys.io.Reader;

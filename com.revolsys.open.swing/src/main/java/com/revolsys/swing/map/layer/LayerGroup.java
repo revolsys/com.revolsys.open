@@ -17,7 +17,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.data.io.RecordIo;
+import com.revolsys.data.record.io.RecordIo;
 import com.revolsys.format.json.JsonMapIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.Path;

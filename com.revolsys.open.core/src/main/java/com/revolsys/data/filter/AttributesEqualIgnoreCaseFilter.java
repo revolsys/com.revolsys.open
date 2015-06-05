@@ -4,15 +4,15 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
 import com.revolsys.filter.Filter;
 
 public class AttributesEqualIgnoreCaseFilter implements Filter<Record> {
   public static boolean accept(final Record object1, final Record object2,
     final Collection<String> fieldNames) {
     for (final String fieldName : fieldNames) {
-      final String value1 = RecordUtil.getFieldByPath(object1, fieldName);
-      final String value2 = RecordUtil.getFieldByPath(object2, fieldName);
+      final String value1 = Records.getFieldByPath(object1, fieldName);
+      final String value2 = Records.getFieldByPath(object2, fieldName);
 
       if (value1 == null) {
         if (value2 != null) {

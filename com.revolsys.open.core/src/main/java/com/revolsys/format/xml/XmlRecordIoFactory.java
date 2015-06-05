@@ -4,8 +4,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
-import com.revolsys.data.io.AbstractRecordAndGeometryWriterFactory;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.AbstractRecordAndGeometryWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Writer;
 

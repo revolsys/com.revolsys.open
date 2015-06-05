@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
 import com.revolsys.filter.Filter;
 
 /**
@@ -72,7 +72,7 @@ public class AttributeValuesFilter implements Filter<Record> {
    */
   @Override
   public boolean accept(final Record object) {
-    final Object propertyValue = RecordUtil.getFieldByPath(object,
+    final Object propertyValue = Records.getFieldByPath(object,
       this.fieldName);
     if (propertyValue == null) {
       if (this.allowNulls) {

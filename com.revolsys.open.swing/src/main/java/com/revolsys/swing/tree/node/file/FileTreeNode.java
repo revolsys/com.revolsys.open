@@ -17,8 +17,8 @@ import javax.swing.JLabel;
 import javax.swing.filechooser.FileSystemView;
 
 import com.revolsys.data.equals.EqualsRegistry;
-import com.revolsys.data.io.RecordIo;
-import com.revolsys.data.io.RecordStoreFactoryRegistry;
+import com.revolsys.data.record.io.RecordIo;
+import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;

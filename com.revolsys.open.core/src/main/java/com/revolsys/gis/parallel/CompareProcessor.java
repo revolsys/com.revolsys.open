@@ -8,7 +8,7 @@ import java.util.Set;
 import com.revolsys.data.filter.RecordGeometryFilter;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordLog;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.filter.AndFilter;
 import com.revolsys.filter.Factory;
@@ -283,7 +283,7 @@ public class CompareProcessor extends AbstractMergeProcess {
           } else {
             for (int j = 0; j < nonMatchedLines.getGeometryCount(); j++) {
               final Geometry newGeometry = nonMatchedLines.getGeometry(j);
-              final Record newObject = RecordUtil.copy(sourceObject,
+              final Record newObject = Records.copy(sourceObject,
                 newGeometry);
               addSourceObject(newObject);
             }
@@ -295,7 +295,7 @@ public class CompareProcessor extends AbstractMergeProcess {
             i + 1, 0);
           for (int j = 0; j < otherNonMatched.getGeometryCount(); j++) {
             final Geometry newGeometry = otherNonMatched.getGeometry(j);
-            final Record newOtherObject = RecordUtil.copy(otherObject,
+            final Record newOtherObject = Records.copy(otherObject,
               newGeometry);
             addOtherObject(newOtherObject);
           }

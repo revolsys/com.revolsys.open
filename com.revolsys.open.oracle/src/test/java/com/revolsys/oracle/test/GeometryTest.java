@@ -6,8 +6,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.types.DataType;

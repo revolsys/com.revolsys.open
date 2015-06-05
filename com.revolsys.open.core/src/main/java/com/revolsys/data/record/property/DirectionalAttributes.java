@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.equals.RecordEquals;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.gis.graph.Edge;
 import com.revolsys.jts.geom.Geometry;
@@ -650,9 +650,9 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
     Record newObject;
     if (line1Longer) {
-      newObject = RecordUtil.copy(object1, newLine);
+      newObject = Records.copy(object1, newLine);
     } else {
-      newObject = RecordUtil.copy(object2, newLine);
+      newObject = Records.copy(object2, newLine);
     }
     setStartAttributes(startObject, newObject);
     setEndAttributes(endObject, newObject);
@@ -707,9 +707,9 @@ public class DirectionalAttributes extends AbstractRecordDefinitionProperty {
 
     Record newObject;
     if (line1Longer) {
-      newObject = RecordUtil.copy(object1, newLine);
+      newObject = Records.copy(object1, newLine);
     } else {
-      newObject = RecordUtil.copy(object2, newLine);
+      newObject = Records.copy(object2, newLine);
     }
     setStartAttributes(startObject, newObject);
     setEndAttributes(endObject, newObject);

@@ -11,13 +11,13 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
 
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.converter.string.BooleanStringConverter;
-import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
 import com.revolsys.data.record.RecordState;
+import com.revolsys.data.record.io.RecordIterator;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionImpl;

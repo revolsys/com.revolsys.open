@@ -16,12 +16,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.RecordIo;
-import com.revolsys.data.io.RecordReaderFactory;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.functions.EnvelopeIntersects;
 import com.revolsys.data.query.functions.F;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordIo;
+import com.revolsys.data.record.io.RecordReaderFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.Writer;
 import com.revolsys.jts.geom.BoundingBox;

@@ -8,7 +8,7 @@ import java.util.zip.ZipInputStream;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jts.geom.Geometry;
 import com.revolsys.spring.SpringUtil;

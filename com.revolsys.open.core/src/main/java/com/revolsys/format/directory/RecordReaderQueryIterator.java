@@ -3,11 +3,11 @@ package com.revolsys.format.directory;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.revolsys.collection.AbstractIterator;
-import com.revolsys.data.io.RecordReader;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.query.Condition;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordReader;
 
 public class RecordReaderQueryIterator extends AbstractIterator<Record> {
 

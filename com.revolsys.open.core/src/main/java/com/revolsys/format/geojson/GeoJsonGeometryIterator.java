@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.format.json.JsonParser;
 import com.revolsys.format.json.JsonParser.EventType;
 import com.revolsys.io.FileUtil;

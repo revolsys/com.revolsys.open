@@ -6,11 +6,11 @@ import java.util.NoSuchElementException;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.collection.AbstractIterator;
-import com.revolsys.data.io.RecordIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
+import com.revolsys.data.record.io.RecordIterator;
 import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -35,7 +35,7 @@ implements RecordIterator {
     this.factory = factory;
     this.in = new BufferedReader(
       FileUtil.createUtf8Reader(resource.getInputStream()));
-    this.recordDefinition = RecordUtil.createGeometryRecordDefinition();
+    this.recordDefinition = Records.createGeometryRecordDefinition();
   }
 
   @Override

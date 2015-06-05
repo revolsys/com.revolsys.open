@@ -10,7 +10,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.NamedLinkedHashMap;
 import com.revolsys.util.Property;
 

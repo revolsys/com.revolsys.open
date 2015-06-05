@@ -9,8 +9,8 @@ import javax.sql.DataSource;
 
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ResultPager;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.data.query.Column;
 import com.revolsys.data.query.Query;

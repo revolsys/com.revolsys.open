@@ -7,8 +7,8 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import com.revolsys.data.io.RecordStoreConnectionMapProxy;
-import com.revolsys.data.io.RecordStoreProxy;
+import com.revolsys.data.record.io.RecordStoreConnectionMapProxy;
+import com.revolsys.data.record.io.RecordStoreProxy;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.data.record.schema.RecordStoreSchema;
 import com.revolsys.io.Path;

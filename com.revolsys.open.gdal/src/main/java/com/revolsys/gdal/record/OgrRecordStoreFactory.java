@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.gdal.ogr.ogr;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.data.io.RecordStoreFactory;
-import com.revolsys.data.io.RecordStoreFactoryRegistry;
+import com.revolsys.data.record.io.RecordStoreFactory;
+import com.revolsys.data.record.io.RecordStoreFactoryRegistry;
 import com.revolsys.data.record.schema.RecordStore;
 import com.revolsys.gdal.Gdal;
 import com.revolsys.io.FileUtil;

@@ -8,8 +8,8 @@ import javax.annotation.PreDestroy;
 
 import org.springframework.core.io.FileSystemResource;
 
-import com.revolsys.data.io.RecordIo;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordIo;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.xbase.XbaseRecordWriter;
 import com.revolsys.gis.io.Statistics;

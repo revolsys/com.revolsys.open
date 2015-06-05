@@ -1,7 +1,6 @@
 package com.revolsys.gis.cs.esri;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -27,9 +26,42 @@ import com.revolsys.spring.NonExistingResource;
 import com.revolsys.spring.SpringUtil;
 
 public class EsriCoordinateSystems {
+  private static Map<CoordinateSystem, CoordinateSystem> coordinateSystems = new HashMap<CoordinateSystem, CoordinateSystem>();
+
+  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new HashMap<Integer, CoordinateSystem>();
+
+  private static Map<String, CoordinateSystem> coordinateSystemsByName = new HashMap<String, CoordinateSystem>();
+
+  static {
+    final List<GeographicCoordinateSystem> geographicCoordinateSystems = CoordinateSystemParser.getGeographicCoordinateSystems(
+      "ESRI",
+      EsriCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/esri/geographicCoordinateSystem.txt"));
+    for (final GeographicCoordinateSystem cs : geographicCoordinateSystems) {
+      final int id = getCrsId(cs);
+      coordinateSystemsById.put(id, cs);
+      coordinateSystemsByName.put(cs.getName(), cs);
+      coordinateSystems.put(cs, cs);
+    }
+    final List<ProjectedCoordinateSystem> projectedCoordinateSystems = CoordinateSystemParser.getProjectedCoordinateSystems(
+      coordinateSystemsById,
+      "ESRI",
+      EsriCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/esri/projectedCoordinateSystem.txt"));
+    for (final ProjectedCoordinateSystem cs : projectedCoordinateSystems) {
+      final int id = getCrsId(cs);
+      coordinateSystemsById.put(id, cs);
+      coordinateSystemsByName.put(cs.getName(), cs);
+      coordinateSystems.put(cs, cs);
+    }
+  }
+
+  public static void createPrjFile(final File file,
+    final GeometryFactory geometryFactory) {
+    final FileSystemResource resource = new FileSystemResource(file);
+    createPrjFile(resource, geometryFactory);
+  }
 
   public static void createPrjFile(final Resource resource,
-    final GeometryFactory geometryFactory) throws IOException {
+    final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
@@ -37,13 +69,17 @@ public class EsriCoordinateSystems {
         final Resource prjResource = SpringUtil.getResourceWithExtension(
           resource, "prj");
         if (!(prjResource instanceof NonExistingResource)) {
-          final OutputStream out = SpringUtil.getOutputStream(prjResource);
-          final PrintWriter writer = new PrintWriter(
-            FileUtil.createUtf8Writer(out));
-          final CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
-            "ESRI", String.valueOf(srid)));
-          EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
-          writer.close();
+          try (
+            final OutputStream out = SpringUtil.getOutputStream(prjResource);
+            final PrintWriter writer = new PrintWriter(
+              FileUtil.createUtf8Writer(out));) {
+            final CoordinateSystem esriCoordinateSystem = CoordinateSystems.getCoordinateSystem(new QName(
+              "ESRI", String.valueOf(srid)));
+            EsriCsWktWriter.write(writer, esriCoordinateSystem, -1);
+          } catch (final Throwable e) {
+            LoggerFactory.getLogger(EsriCoordinateSystems.class).error(
+              "Unable to create: " + resource, e);
+          }
         }
       }
     }
@@ -108,7 +144,7 @@ public class EsriCoordinateSystems {
    */
   public static GeometryFactory getGeometryFactory(final Resource resource) {
     final Resource projResource = SpringUtil.getResourceWithExtension(resource,
-        "prj");
+      "prj");
     if (projResource.exists()) {
       try {
         final CoordinateSystem coordinateSystem = getCoordinateSystem(projResource);
@@ -124,34 +160,6 @@ public class EsriCoordinateSystems {
       }
     }
     return null;
-  }
-
-  private static Map<CoordinateSystem, CoordinateSystem> coordinateSystems = new HashMap<CoordinateSystem, CoordinateSystem>();
-
-  private static Map<Integer, CoordinateSystem> coordinateSystemsById = new HashMap<Integer, CoordinateSystem>();
-
-  private static Map<String, CoordinateSystem> coordinateSystemsByName = new HashMap<String, CoordinateSystem>();
-
-  static {
-    final List<GeographicCoordinateSystem> geographicCoordinateSystems = CoordinateSystemParser.getGeographicCoordinateSystems(
-      "ESRI",
-      EsriCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/esri/geographicCoordinateSystem.txt"));
-    for (final GeographicCoordinateSystem cs : geographicCoordinateSystems) {
-      final int id = getCrsId(cs);
-      coordinateSystemsById.put(id, cs);
-      coordinateSystemsByName.put(cs.getName(), cs);
-      coordinateSystems.put(cs, cs);
-    }
-    final List<ProjectedCoordinateSystem> projectedCoordinateSystems = CoordinateSystemParser.getProjectedCoordinateSystems(
-      coordinateSystemsById,
-      "ESRI",
-      EsriCoordinateSystems.class.getResourceAsStream("/com/revolsys/gis/cs/esri/projectedCoordinateSystem.txt"));
-    for (final ProjectedCoordinateSystem cs : projectedCoordinateSystems) {
-      final int id = getCrsId(cs);
-      coordinateSystemsById.put(id, cs);
-      coordinateSystemsByName.put(cs.getName(), cs);
-      coordinateSystems.put(cs, cs);
-    }
   }
 
 }

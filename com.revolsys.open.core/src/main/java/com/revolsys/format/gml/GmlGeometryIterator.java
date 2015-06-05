@@ -11,7 +11,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.format.xml.StaxUtils;
 import com.revolsys.io.IoConstants;
 import com.revolsys.jts.geom.Geometry;

@@ -1224,6 +1224,14 @@ public abstract class AbstractGeometry implements Geometry {
     return geometries;
   }
 
+  @Override
+  public <V extends Geometry> V getGeometry(
+    final Class<? extends Geometry> geometryClass) {
+    final List<? extends Geometry> geometries = getGeometries(geometryClass);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.geometry(geometries);
+  }
+
   /**
    * Returns an element {@link Geometry} from a {@link GeometryCollection}
    * (or <code>this</code>, if the geometry is not a collection).
@@ -1639,10 +1647,9 @@ public abstract class AbstractGeometry implements Geometry {
   public boolean isWithinDistance(Geometry geometry, final double distance) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     geometry = geometry.convert(geometryFactory, 2);
-    BoundingBox boundingBox = getBoundingBox();
-    BoundingBox boundingBox2 = geometry.getBoundingBox();
-    final double bboxDistance = boundingBox.distance(
-      boundingBox2);
+    final BoundingBox boundingBox = getBoundingBox();
+    final BoundingBox boundingBox2 = geometry.getBoundingBox();
+    final double bboxDistance = boundingBox.distance(boundingBox2);
     if (bboxDistance > distance) {
       return false;
     } else {

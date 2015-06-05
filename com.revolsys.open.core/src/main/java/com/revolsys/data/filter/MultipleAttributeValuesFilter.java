@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 import com.revolsys.data.equals.EqualsInstance;
 import com.revolsys.data.record.Record;
-import com.revolsys.data.record.RecordUtil;
+import com.revolsys.data.record.Records;
 import com.revolsys.filter.Filter;
 
 /**
@@ -34,7 +34,7 @@ public class MultipleAttributeValuesFilter implements Filter<Record> {
     for (final Entry<String, ? extends Object> entry : this.values.entrySet()) {
       final String fieldName = entry.getKey();
       final Object value = entry.getValue();
-      final Object objectValue = RecordUtil.getFieldByPath(object, fieldName);
+      final Object objectValue = Records.getFieldByPath(object, fieldName);
       if (objectValue == null) {
         if (value != null) {
           if (!EqualsInstance.INSTANCE.equals(value, objectValue)) {

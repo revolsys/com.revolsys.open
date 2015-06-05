@@ -110,7 +110,8 @@ public class WktParser {
           return 3;
         }
       default:
-        throw new IllegalArgumentException("Expecting Z, M, ZM, (, or EMPTY not: " + text);
+        throw new IllegalArgumentException(
+          "Expecting Z, M, ZM, (, or EMPTY not: " + text);
     }
   }
 
@@ -118,8 +119,8 @@ public class WktParser {
     if (hasText(text, "EMPTY")) {
       skipWhitespace(text);
       if (text.length() > 0) {
-        throw new IllegalArgumentException("Unexpected text at the end of an empty geometry: "
-          + text);
+        throw new IllegalArgumentException(
+          "Unexpected text at the end of an empty geometry: " + text);
       }
       return true;
     } else {
@@ -143,7 +144,8 @@ public class WktParser {
           if (c == ')') {
             finished = true;
           } else {
-            throw new IllegalArgumentException("Expecting end of coordinates ')' not" + text);
+            throw new IllegalArgumentException(
+              "Expecting end of coordinates ')' not" + text);
           }
         } else if (c == ',' || c == ')') {
           if (axisNum < axisCount) {
@@ -157,8 +159,9 @@ public class WktParser {
             }
             axisNum = 0;
           } else {
-            throw new IllegalArgumentException("Too many coordinates, vertex must have "
-              + axisCount + " coordinates not " + (axisNum + 1));
+            throw new IllegalArgumentException(
+              "Too many coordinates, vertex must have " + axisCount
+                + " coordinates not " + (axisNum + 1));
           }
           if (c == ')') {
             finished = true;
@@ -172,8 +175,9 @@ public class WktParser {
             }
             axisNum++;
           } else {
-            throw new IllegalArgumentException("Too many coordinates, vertex must have "
-              + axisCount + " coordinates not " + (axisNum + 1));
+            throw new IllegalArgumentException(
+              "Too many coordinates, vertex must have " + axisCount
+                + " coordinates not " + (axisNum + 1));
 
           }
         }
@@ -181,7 +185,8 @@ public class WktParser {
       text.delete(0, 1);
       return new LineStringDouble(geometryFactoryAxisCount, coordinates);
     } else {
-      throw new IllegalArgumentException("Expecting start of coordinates '(' not: " + text);
+      throw new IllegalArgumentException(
+        "Expecting start of coordinates '(' not: " + text);
     }
   }
 
@@ -207,24 +212,34 @@ public class WktParser {
         hasText(text, ";");
       }
       if (hasText(text, "POINT")) {
-        geometry = parsePoint(geometryFactory, useAxisCountFromGeometryFactory, text);
+        geometry = parsePoint(geometryFactory, useAxisCountFromGeometryFactory,
+          text);
       } else if (hasText(text, "LINESTRING")) {
-        geometry = parseLineString(geometryFactory, useAxisCountFromGeometryFactory, text);
+        geometry = parseLineString(geometryFactory,
+          useAxisCountFromGeometryFactory, text);
       } else if (hasText(text, "POLYGON")) {
-        geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory, text);
+        geometry = parsePolygon(geometryFactory,
+          useAxisCountFromGeometryFactory, text);
       } else if (hasText(text, "MULTIPOINT")) {
-        geometry = parseMultiPoint(geometryFactory, useAxisCountFromGeometryFactory, text);
+        geometry = parseMultiPoint(geometryFactory,
+          useAxisCountFromGeometryFactory, text);
       } else if (hasText(text, "MULTILINESTRING")) {
-        geometry = parseMultiLineString(geometryFactory, useAxisCountFromGeometryFactory, text);
+        geometry = parseMultiLineString(geometryFactory,
+          useAxisCountFromGeometryFactory, text);
       } else if (hasText(text, "MULTIPOLYGON")) {
-        geometry = parseMultiPolygon(geometryFactory, useAxisCountFromGeometryFactory, text);
+        geometry = parseMultiPolygon(geometryFactory,
+          useAxisCountFromGeometryFactory, text);
+        // } else if (hasText(text, "GEOMETRYCOLLECTION")) {
+        // geometry = parseMultiPolygon(geometryFactory,
+        // useAxisCountFromGeometryFactory, text);
       } else {
         throw new IllegalArgumentException("Unknown geometry type " + text);
       }
       if (this.geometryFactory.getSrid() == 0) {
         final int srid = geometry.getSrid();
         if (useAxisCountFromGeometryFactory) {
-          geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+          geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY,
+            scaleZ);
           return (T)geometryFactory.geometry(geometry);
         } else {
           return (T)geometry;
@@ -247,13 +262,15 @@ public class WktParser {
         final int srid = geometryFactory.getSrid();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
-        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY,
+          scaleZ);
       }
     }
     if (isEmpty(text)) {
       return geometryFactory.lineString();
     } else {
-      final LineString points = parseCoordinates(geometryFactory, text, axisCount);
+      final LineString points = parseCoordinates(geometryFactory, text,
+        axisCount);
       if (points.getVertexCount() == 1) {
         return geometryFactory.point(points);
       } else {
@@ -270,7 +287,8 @@ public class WktParser {
         final int srid = geometryFactory.getSrid();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
-        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY,
+          scaleZ);
       }
     }
     final List<LineString> lines;
@@ -290,14 +308,16 @@ public class WktParser {
         final int srid = geometryFactory.getSrid();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
-        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY,
+          scaleZ);
       }
     }
 
     if (isEmpty(text)) {
       return geometryFactory.multiPoint();
     } else {
-      final List<LineString> pointsList = parseParts(geometryFactory, text, axisCount);
+      final List<LineString> pointsList = parseParts(geometryFactory, text,
+        axisCount);
       return geometryFactory.multiPoint(pointsList);
     }
   }
@@ -310,7 +330,8 @@ public class WktParser {
         final int srid = geometryFactory.getSrid();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
-        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY,
+          scaleZ);
       }
     }
 
@@ -331,7 +352,8 @@ public class WktParser {
       case '(':
         do {
           text.delete(0, 1);
-          final LineString coordinates = parseCoordinates(geometryFactory, text, axisCount);
+          final LineString coordinates = parseCoordinates(geometryFactory,
+            text, axisCount);
           parts.add(coordinates);
         } while (text.charAt(0) == ',');
         if (text.charAt(0) == ')') {
@@ -350,15 +372,17 @@ public class WktParser {
     return parts;
   }
 
-  private List<List<LineString>> parsePartsList(final GeometryFactory geometryFactory,
-    final StringBuilder text, final int axisCount) {
+  private List<List<LineString>> parsePartsList(
+    final GeometryFactory geometryFactory, final StringBuilder text,
+    final int axisCount) {
     final List<List<LineString>> partsList = new ArrayList<List<LineString>>();
     final char firstChar = text.charAt(0);
     switch (firstChar) {
       case '(':
         do {
           text.delete(0, 1);
-          final List<LineString> parts = parseParts(geometryFactory, text, axisCount);
+          final List<LineString> parts = parseParts(geometryFactory, text,
+            axisCount);
           partsList.add(parts);
         } while (text.charAt(0) == ',');
         if (text.charAt(0) == ')') {
@@ -385,13 +409,15 @@ public class WktParser {
         final int srid = geometryFactory.getSrid();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
-        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY,
+          scaleZ);
       }
     }
     if (isEmpty(text)) {
       return geometryFactory.point();
     } else {
-      final LineString points = parseCoordinates(geometryFactory, text, axisCount);
+      final LineString points = parseCoordinates(geometryFactory, text,
+        axisCount);
       if (points.getVertexCount() > 1) {
         throw new IllegalArgumentException("Points may only have 1 vertex");
       }
@@ -407,7 +433,8 @@ public class WktParser {
         final int srid = geometryFactory.getSrid();
         final double scaleXY = geometryFactory.getScaleXY();
         final double scaleZ = geometryFactory.getScaleZ();
-        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+        geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY,
+          scaleZ);
       }
     }
 

@@ -18,7 +18,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.logging.log4j.ThreadLocalAppenderRunnable;
 import com.revolsys.parallel.ThreadUtil;
 import com.revolsys.spring.TargetBeanFactoryBean;

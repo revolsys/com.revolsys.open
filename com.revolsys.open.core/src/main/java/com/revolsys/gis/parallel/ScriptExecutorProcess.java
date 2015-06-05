@@ -21,7 +21,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
-import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.data.record.Record;
 import com.revolsys.parallel.ThreadInterruptedException;
 import com.revolsys.parallel.ThreadUtil;

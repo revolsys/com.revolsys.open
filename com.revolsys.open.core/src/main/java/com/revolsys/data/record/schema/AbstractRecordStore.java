@@ -18,22 +18,22 @@ import javax.annotation.PreDestroy;
 
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.revolsys.collection.AbstractIterator;
 import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
-import com.revolsys.collection.ThreadSharedAttributes;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
+import com.revolsys.collection.map.ThreadSharedAttributes;
 import com.revolsys.data.codes.CodeTable;
 import com.revolsys.data.codes.CodeTableProperty;
 import com.revolsys.data.identifier.Identifier;
-import com.revolsys.data.io.RecordStoreExtension;
-import com.revolsys.data.io.RecordStoreQueryReader;
 import com.revolsys.data.query.Q;
 import com.revolsys.data.query.Query;
 import com.revolsys.data.query.QueryValue;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.io.RecordStoreExtension;
+import com.revolsys.data.record.io.RecordStoreQueryReader;
 import com.revolsys.data.record.property.RecordDefinitionProperty;
 import com.revolsys.gis.io.Statistics;
 import com.revolsys.gis.io.StatisticsMap;

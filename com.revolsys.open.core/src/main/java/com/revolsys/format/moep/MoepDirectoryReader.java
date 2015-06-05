@@ -7,9 +7,9 @@ import java.sql.Date;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.revolsys.data.io.RecordDirectoryReader;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordDirectoryReader;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.data.record.schema.RecordDefinitionFactory;
 import com.revolsys.io.FileUtil;

@@ -8,13 +8,13 @@ import java.util.NoSuchElementException;
 
 import org.springframework.core.io.Resource;
 
-import com.revolsys.collection.AbstractIterator;
+import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.converter.string.StringConverterRegistry;
-import com.revolsys.data.io.RecordIterator;
 import com.revolsys.data.record.ArrayRecordFactory;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.RecordFactory;
+import com.revolsys.data.record.io.RecordIterator;
 import com.revolsys.data.record.property.FieldProperties;
 import com.revolsys.data.record.schema.FieldDefinition;
 import com.revolsys.data.record.schema.RecordDefinition;
@@ -93,24 +93,36 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
         if (name.equalsIgnoreCase(this.geometryColumnName)) {
           type = this.geometryType;
           isGeometryAttribute = true;
+        } else if ("GEOMETRY".equalsIgnoreCase(name)) {
+          type = DataTypes.GEOMETRY;
+          isGeometryAttribute = true;
+        } else if ("GEOMETRYCOLLECTION".equalsIgnoreCase(name)
+          || "GEOMETRY_COLLECTION".equalsIgnoreCase(name)) {
+          type = DataTypes.GEOMETRY_COLLECTION;
+          isGeometryAttribute = true;
         } else if ("POINT".equalsIgnoreCase(name)) {
           type = DataTypes.POINT;
           isGeometryAttribute = true;
-        } else if ("MULTIPOINT".equalsIgnoreCase(name)) {
+        } else if ("MULTI_POINT".equalsIgnoreCase(name)
+          || "MULTIPOINT".equalsIgnoreCase(name)) {
           type = DataTypes.MULTI_POINT;
           isGeometryAttribute = true;
-        } else if ("LINESTRING".equalsIgnoreCase(name)
+        } else if ("LINE_STRING".equalsIgnoreCase(name)
+          || "LINESTRING".equalsIgnoreCase(name)
           || "LINE".equalsIgnoreCase(name)) {
           type = DataTypes.LINE_STRING;
           isGeometryAttribute = true;
-        } else if ("MULTILINESTRING".equalsIgnoreCase(name)
-          || "MULTILINE".equalsIgnoreCase(name)) {
+        } else if ("MULTI_LINESTRING".equalsIgnoreCase(name)
+          || "MULTILINESTRING".equalsIgnoreCase(name)
+          || "MULTILINE".equalsIgnoreCase(name)
+          || "MULTI_LINE".equalsIgnoreCase(name)) {
           type = DataTypes.MULTI_LINE_STRING;
           isGeometryAttribute = true;
         } else if ("POLYGON".equalsIgnoreCase(name)) {
           type = DataTypes.POLYGON;
           isGeometryAttribute = true;
-        } else if ("MULTIPOLYGON".equalsIgnoreCase(name)) {
+        } else if ("MULTI_POLYGON".equalsIgnoreCase(name)
+          || "MULTIPOLYGON".equalsIgnoreCase(name)) {
           type = DataTypes.MULTI_POLYGON;
           isGeometryAttribute = true;
         }
