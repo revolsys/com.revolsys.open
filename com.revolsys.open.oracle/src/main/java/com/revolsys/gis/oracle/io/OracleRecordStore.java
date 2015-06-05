@@ -371,12 +371,14 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
       final OracleClobFieldAdder clobAdder = new OracleClobFieldAdder();
       addFieldAdder("CLOB", clobAdder);
+
       setPrimaryKeySql("SELECT distinct cols.table_name, cols.column_name FROM all_constraints cons, all_cons_columns cols WHERE cons.constraint_type = 'P' AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner AND cons.owner =?");
+      setPrimaryKeyTableCondition(" AND cols.table_name = ?");
 
       setSchemaPermissionsSql("select distinct p.owner \"SCHEMA_NAME\" "
         + "from ALL_TAB_PRIVS_RECD P "
         + "where p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') union all select USER \"SCHEMA_NAME\" from DUAL");
-      setTablePermissionsSql("select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\" "
+      setSchemaTablePermissionsSql("select distinct p.owner \"SCHEMA_NAME\", p.table_name, p.privilege, comments \"REMARKS\" "
         + "from ALL_TAB_PRIVS_RECD P "
         + "join all_tab_comments C on (p.owner = c.owner and p.table_name = c.table_name) "
         + "where p.owner = ? and c.table_type in ('TABLE', 'VIEW') and p.privilege in ('SELECT', 'INSERT', 'UPDATE', 'DELETE') "
