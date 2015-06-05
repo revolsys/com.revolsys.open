@@ -11,11 +11,11 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import com.revolsys.data.io.ListRecordReader;
-import com.revolsys.data.io.RecordReader;
-import com.revolsys.data.io.RecordReaderFactory;
-import com.revolsys.data.io.RecordWriterFactory;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.ListRecordReader;
+import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordReaderFactory;
+import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactoryRegistry;
@@ -23,15 +23,13 @@ import com.revolsys.jts.geom.GeometryFactory;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
-public class RecordHttpMessageConverter extends
-AbstractHttpMessageConverter<Record> {
+public class RecordHttpMessageConverter extends AbstractHttpMessageConverter<Record> {
 
   private final RecordReaderHttpMessageConverter readerConverter = new RecordReaderHttpMessageConverter();
 
   public RecordHttpMessageConverter() {
-    super(Record.class, IoFactoryRegistry.getInstance().getMediaTypes(
-      RecordReaderFactory.class), IoFactoryRegistry.getInstance()
-      .getMediaTypes(RecordWriterFactory.class));
+    super(Record.class, IoFactoryRegistry.getInstance().getMediaTypes(RecordReaderFactory.class),
+      IoFactoryRegistry.getInstance().getMediaTypes(RecordWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -43,11 +41,9 @@ AbstractHttpMessageConverter<Record> {
   }
 
   @Override
-  public Record read(final Class<? extends Record> clazz,
-    final HttpInputMessage inputMessage) throws IOException,
-    HttpMessageNotReadableException {
-    final RecordReader reader = this.readerConverter.read(RecordReader.class,
-      inputMessage);
+  public Record read(final Class<? extends Record> clazz, final HttpInputMessage inputMessage)
+    throws IOException, HttpMessageNotReadableException {
+    final RecordReader reader = this.readerConverter.read(RecordReader.class, inputMessage);
     try {
       for (final Record record : reader) {
         return record;
@@ -68,16 +64,14 @@ AbstractHttpMessageConverter<Record> {
 
   @Override
   public void write(final Record record, final MediaType mediaType,
-    final HttpOutputMessage outputMessage) throws IOException,
-    HttpMessageNotWritableException {
+    final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {
       if (record != null) {
         final RecordDefinition recordDefinition = record.getRecordDefinition();
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        requestAttributes.setAttribute(IoConstants.SINGLE_OBJECT_PROPERTY,
-          true, RequestAttributes.SCOPE_REQUEST);
-        final ListRecordReader reader = new ListRecordReader(recordDefinition,
-          record);
+        requestAttributes.setAttribute(IoConstants.SINGLE_OBJECT_PROPERTY, true,
+          RequestAttributes.SCOPE_REQUEST);
+        final ListRecordReader reader = new ListRecordReader(recordDefinition, record);
         this.readerConverter.write(reader, mediaType, outputMessage);
       }
     }

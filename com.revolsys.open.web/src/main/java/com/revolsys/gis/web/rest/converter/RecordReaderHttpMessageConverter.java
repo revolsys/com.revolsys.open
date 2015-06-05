@@ -21,10 +21,10 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.revolsys.data.io.RecordReader;
-import com.revolsys.data.io.RecordReaderFactory;
-import com.revolsys.data.io.RecordWriterFactory;
 import com.revolsys.data.record.Record;
+import com.revolsys.data.record.io.RecordReader;
+import com.revolsys.data.record.io.RecordReaderFactory;
+import com.revolsys.data.record.io.RecordWriterFactory;
 import com.revolsys.data.record.schema.RecordDefinition;
 import com.revolsys.format.kml.Kml22Constants;
 import com.revolsys.io.IoConstants;
@@ -37,14 +37,11 @@ import com.revolsys.spring.InputStreamResource;
 import com.revolsys.ui.web.rest.converter.AbstractHttpMessageConverter;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 
-public class RecordReaderHttpMessageConverter extends
-AbstractHttpMessageConverter<RecordReader> {
+public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConverter<RecordReader> {
 
-  private List<String> requestAttributeNames = Arrays.asList(
-    IoConstants.SINGLE_OBJECT_PROPERTY, Kml22Constants.STYLE_URL_PROPERTY,
-    Kml22Constants.LOOK_AT_POINT_PROPERTY,
-    Kml22Constants.LOOK_AT_RANGE_PROPERTY,
-    Kml22Constants.LOOK_AT_MIN_RANGE_PROPERTY,
+  private List<String> requestAttributeNames = Arrays.asList(IoConstants.SINGLE_OBJECT_PROPERTY,
+    Kml22Constants.STYLE_URL_PROPERTY, Kml22Constants.LOOK_AT_POINT_PROPERTY,
+    Kml22Constants.LOOK_AT_RANGE_PROPERTY, Kml22Constants.LOOK_AT_MIN_RANGE_PROPERTY,
     Kml22Constants.LOOK_AT_MAX_RANGE_PROPERTY, IoConstants.JSONP_PROPERTY,
     IoConstants.TITLE_PROPERTY, IoConstants.DESCRIPTION_PROPERTY);
 
@@ -54,8 +51,8 @@ AbstractHttpMessageConverter<RecordReader> {
 
   public RecordReaderHttpMessageConverter() {
     super(RecordReader.class, IoFactoryRegistry.getInstance().getMediaTypes(
-      RecordReaderFactory.class), IoFactoryRegistry.getInstance()
-      .getMediaTypes(RecordWriterFactory.class));
+      RecordReaderFactory.class), IoFactoryRegistry.getInstance().getMediaTypes(
+      RecordWriterFactory.class));
   }
 
   public GeometryFactory getGeometryFactory() {
@@ -68,8 +65,7 @@ AbstractHttpMessageConverter<RecordReader> {
 
   @Override
   public RecordReader read(final Class<? extends RecordReader> clazz,
-    final HttpInputMessage inputMessage) throws IOException,
-    HttpMessageNotReadableException {
+    final HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
     try {
       final HttpHeaders headers = inputMessage.getHeaders();
       final MediaType mediaType = headers.getContentType();
@@ -78,13 +74,11 @@ AbstractHttpMessageConverter<RecordReader> {
         charset = StandardCharsets.UTF_8;
       }
       final InputStream body = inputMessage.getBody();
-      final String mediaTypeString = mediaType.getType() + "/"
-          + mediaType.getSubtype();
+      final String mediaTypeString = mediaType.getType() + "/" + mediaType.getSubtype();
       final RecordReaderFactory readerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
         RecordReaderFactory.class, mediaTypeString);
       if (readerFactory == null) {
-        throw new HttpMessageNotReadableException("Cannot read data in format"
-            + mediaType);
+        throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
         final Reader<Record> reader = readerFactory.createRecordReader(new InputStreamResource(
           "recordInput", body));
@@ -113,8 +107,7 @@ AbstractHttpMessageConverter<RecordReader> {
 
   @Override
   public void write(final RecordReader reader, final MediaType mediaType,
-    final HttpOutputMessage outputMessage) throws IOException,
-    HttpMessageNotWritableException {
+    final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
     if (!HttpServletUtils.getResponse().isCommitted()) {
       MediaType actualMediaType;
       if (mediaType == null) {
@@ -123,37 +116,34 @@ AbstractHttpMessageConverter<RecordReader> {
         actualMediaType = mediaType;
       }
       if (actualMediaType != null) {
-        final Charset charset = HttpServletUtils.setContentTypeWithCharset(
-          outputMessage, actualMediaType);
+        final Charset charset = HttpServletUtils.setContentTypeWithCharset(outputMessage,
+          actualMediaType);
         final String mediaTypeString = actualMediaType.getType() + "/"
-            + actualMediaType.getSubtype();
+          + actualMediaType.getSubtype();
         final RecordWriterFactory writerFactory = this.ioFactoryRegistry.getFactoryByMediaType(
           RecordWriterFactory.class, mediaTypeString);
         if (writerFactory == null) {
-          throw new IllegalArgumentException("Media type " + actualMediaType
-            + " not supported");
+          throw new IllegalArgumentException("Media type " + actualMediaType + " not supported");
         } else {
           final RecordDefinition recordDefinition = reader.getRecordDefinition();
           final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-          String baseName = (String)requestAttributes.getAttribute(
-            "contentDispositionFileName", RequestAttributes.SCOPE_REQUEST);
+          String baseName = (String)requestAttributes.getAttribute("contentDispositionFileName",
+            RequestAttributes.SCOPE_REQUEST);
           if (baseName == null) {
             baseName = HttpServletUtils.getRequestBaseFileName();
           }
-          String contentDisposition = (String)requestAttributes.getAttribute(
-            "contentDisposition", RequestAttributes.SCOPE_REQUEST);
+          String contentDisposition = (String)requestAttributes.getAttribute("contentDisposition",
+            RequestAttributes.SCOPE_REQUEST);
           if (contentDisposition == null) {
             contentDisposition = "attachment";
           }
-          final String fileName = baseName + "."
-              + writerFactory.getFileExtension(mediaTypeString);
+          final String fileName = baseName + "." + writerFactory.getFileExtension(mediaTypeString);
           final HttpHeaders headers = outputMessage.getHeaders();
-          headers.set("Content-Disposition", contentDisposition + "; filename="
-              + fileName);
+          headers.set("Content-Disposition", contentDisposition + "; filename=" + fileName);
 
           final OutputStream body = outputMessage.getBody();
-          final Writer<Record> writer = writerFactory.createRecordWriter(
-            baseName, recordDefinition, body, charset);
+          final Writer<Record> writer = writerFactory.createRecordWriter(baseName,
+            recordDefinition, body, charset);
           if (Boolean.FALSE.equals(requestAttributes.getAttribute("wrapHtml",
             RequestAttributes.SCOPE_REQUEST))) {
             writer.setProperty(IoConstants.WRAP_PROPERTY, false);
@@ -170,7 +160,7 @@ AbstractHttpMessageConverter<RecordReader> {
             final Object value = requestAttributes.getAttribute(attributeName,
               RequestAttributes.SCOPE_REQUEST);
             if (value != null && attributeName.startsWith("java:")
-                || this.requestAttributeNames.contains(attributeName)) {
+              || this.requestAttributeNames.contains(attributeName)) {
               writer.setProperty(attributeName, value);
             }
           }
