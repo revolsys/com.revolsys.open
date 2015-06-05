@@ -11,7 +11,7 @@ import java.util.Collection;
 import com.revolsys.data.record.Record;
 import com.revolsys.data.record.io.RecordReader;
 import com.revolsys.data.record.schema.RecordDefinition;
-import com.revolsys.format.csv.CsvUtil;
+import com.revolsys.format.csv.Csv;
 
 public class RecordReaderTransferable implements Transferable {
 
@@ -41,11 +41,11 @@ public class RecordReaderTransferable implements Transferable {
       final RecordDefinition recordDefinition = this.reader.getRecordDefinition();
       if (recordDefinition != null) {
         final Collection<String> fieldNames = recordDefinition.getFieldNames();
-        CsvUtil.writeColumns(out, fieldNames, '\t', '\n');
+        Csv.writeColumns(out, fieldNames, '\t', '\n');
         for (final Record object : this.reader) {
           if (object != null) {
             final Collection<Object> values = object.values();
-            CsvUtil.writeColumns(out, values, '\t', '\n');
+            Csv.writeColumns(out, values, '\t', '\n');
           }
         }
       }

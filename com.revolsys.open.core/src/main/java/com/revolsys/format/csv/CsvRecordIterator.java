@@ -84,60 +84,60 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
       this.pointXFieldName = null;
       this.pointYFieldName = null;
     }
-    final List<FieldDefinition> attributes = new ArrayList<>();
+    final List<FieldDefinition> fields = new ArrayList<>();
     FieldDefinition geometryField = null;
-    for (final String name : fieldNames) {
+    for (final String fieldName : fieldNames) {
       DataType type = DataTypes.STRING;
-      boolean isGeometryAttribute = false;
-      if (name != null) {
-        if (name.equalsIgnoreCase(this.geometryColumnName)) {
+      boolean isGeometryField = false;
+      if (fieldName != null) {
+        if (fieldName.equalsIgnoreCase(this.geometryColumnName)) {
           type = this.geometryType;
-          isGeometryAttribute = true;
-        } else if ("GEOMETRY".equalsIgnoreCase(name)) {
+          isGeometryField = true;
+        } else if ("GEOMETRY".equalsIgnoreCase(fieldName)) {
           type = DataTypes.GEOMETRY;
-          isGeometryAttribute = true;
-        } else if ("GEOMETRYCOLLECTION".equalsIgnoreCase(name)
-          || "GEOMETRY_COLLECTION".equalsIgnoreCase(name)) {
+          isGeometryField = true;
+        } else if ("GEOMETRYCOLLECTION".equalsIgnoreCase(fieldName)
+          || "GEOMETRY_COLLECTION".equalsIgnoreCase(fieldName)) {
           type = DataTypes.GEOMETRY_COLLECTION;
-          isGeometryAttribute = true;
-        } else if ("POINT".equalsIgnoreCase(name)) {
+          isGeometryField = true;
+        } else if ("POINT".equalsIgnoreCase(fieldName)) {
           type = DataTypes.POINT;
-          isGeometryAttribute = true;
-        } else if ("MULTI_POINT".equalsIgnoreCase(name)
-          || "MULTIPOINT".equalsIgnoreCase(name)) {
+          isGeometryField = true;
+        } else if ("MULTI_POINT".equalsIgnoreCase(fieldName)
+          || "MULTIPOINT".equalsIgnoreCase(fieldName)) {
           type = DataTypes.MULTI_POINT;
-          isGeometryAttribute = true;
-        } else if ("LINE_STRING".equalsIgnoreCase(name)
-          || "LINESTRING".equalsIgnoreCase(name)
-          || "LINE".equalsIgnoreCase(name)) {
+          isGeometryField = true;
+        } else if ("LINE_STRING".equalsIgnoreCase(fieldName)
+          || "LINESTRING".equalsIgnoreCase(fieldName)
+          || "LINE".equalsIgnoreCase(fieldName)) {
           type = DataTypes.LINE_STRING;
-          isGeometryAttribute = true;
-        } else if ("MULTI_LINESTRING".equalsIgnoreCase(name)
-          || "MULTILINESTRING".equalsIgnoreCase(name)
-          || "MULTILINE".equalsIgnoreCase(name)
-          || "MULTI_LINE".equalsIgnoreCase(name)) {
+          isGeometryField = true;
+        } else if ("MULTI_LINESTRING".equalsIgnoreCase(fieldName)
+          || "MULTILINESTRING".equalsIgnoreCase(fieldName)
+          || "MULTILINE".equalsIgnoreCase(fieldName)
+          || "MULTI_LINE".equalsIgnoreCase(fieldName)) {
           type = DataTypes.MULTI_LINE_STRING;
-          isGeometryAttribute = true;
-        } else if ("POLYGON".equalsIgnoreCase(name)) {
+          isGeometryField = true;
+        } else if ("POLYGON".equalsIgnoreCase(fieldName)) {
           type = DataTypes.POLYGON;
-          isGeometryAttribute = true;
-        } else if ("MULTI_POLYGON".equalsIgnoreCase(name)
-          || "MULTIPOLYGON".equalsIgnoreCase(name)) {
+          isGeometryField = true;
+        } else if ("MULTI_POLYGON".equalsIgnoreCase(fieldName)
+          || "MULTIPOLYGON".equalsIgnoreCase(fieldName)) {
           type = DataTypes.MULTI_POLYGON;
-          isGeometryAttribute = true;
+          isGeometryField = true;
         }
       }
-      final FieldDefinition attribute = new FieldDefinition(name, type, false);
-      if (isGeometryAttribute) {
-        geometryField = attribute;
+      final FieldDefinition field = new FieldDefinition(fieldName, type, false);
+      if (isGeometryField) {
+        geometryField = field;
       }
-      attributes.add(attribute);
+      fields.add(field);
     }
     if (this.hasPointFields) {
       if (geometryField == null) {
         geometryField = new FieldDefinition(this.geometryColumnName,
           this.geometryType, true);
-        attributes.add(geometryField);
+        fields.add(geometryField);
       }
     }
     if (geometryField != null) {
@@ -157,7 +157,7 @@ public class CsvRecordIterator extends AbstractIterator<Record> implements
       }
     }
     this.recordDefinition = new RecordDefinitionImpl(schema, typePath,
-      getProperties(), attributes);
+      getProperties(), fields);
   }
 
   /**

@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import com.revolsys.data.record.Record;
-import com.revolsys.format.csv.CsvUtil;
+import com.revolsys.format.csv.Csv;
 
 public class RecordTransferable implements Transferable {
 
@@ -38,9 +38,9 @@ public class RecordTransferable implements Transferable {
       final StringWriter out = new StringWriter();
       final Collection<String> fieldNames = this.object.getRecordDefinition()
           .getFieldNames();
-      CsvUtil.writeColumns(out, fieldNames, '\t', '\n');
+      Csv.writeColumns(out, fieldNames, '\t', '\n');
       final Collection<Object> values = this.object.values();
-      CsvUtil.writeColumns(out, values, '\t', '\n');
+      Csv.writeColumns(out, values, '\t', '\n');
       final String text = out.toString();
       return text;
     } else {
